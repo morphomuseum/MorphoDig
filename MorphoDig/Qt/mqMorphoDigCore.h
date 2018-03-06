@@ -104,6 +104,8 @@ class  mqMorphoDigCore : public QObject
 public:
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
+	void GetDisplayToWorld(double x, double y, double z, double worldPt[4]);
+	void GetWorldToDisplay(double x, double y, double z, double displayPt[3]);
 
 	void UnselectAll(int Count);
 	void SelectAll(int Count);

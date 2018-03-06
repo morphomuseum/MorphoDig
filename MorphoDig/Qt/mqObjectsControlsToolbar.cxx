@@ -207,42 +207,7 @@ ren->GetDisplayPoint(displayPt);
 */
 
 
-void mqObjectsControlsToolbar::GetWorldToDisplay(double x,	double y,	double z,	double displayPt[3])
-{
-	mqMorphoDigCore::instance()->getRenderer()->SetWorldPoint(x, y, z, 1.0);
-	mqMorphoDigCore::instance()->getRenderer()->WorldToDisplay();
-	mqMorphoDigCore::instance()->getRenderer()->GetDisplayPoint(displayPt);
-}
 
-void mqObjectsControlsToolbar::GetDisplayToWorld(double x, double y, double z, double worldPt[4])
-{
-	
-	mqMorphoDigCore::instance()->getRenderer()->SetDisplayPoint(x, y, z);
-	mqMorphoDigCore::instance()->getRenderer()->DisplayToWorld();
-	mqMorphoDigCore::instance()->getRenderer()->GetWorldPoint(worldPt);
-  if (worldPt[3])
-  {
-    worldPt[0] /= worldPt[3];
-    worldPt[1] /= worldPt[3];
-    worldPt[2] /= worldPt[3];
-    worldPt[3] = 1.0;
-}
-	
-	
-
-	/*double coordinates[3];
-	coordinates[0] =x;
-	coordinates[1] =y;
-	coordinates[2] = 0;
-
-	mqMorphoDigCore::instance()->getRenderer()->SetDisplayPoint(coordinates);
-	mqMorphoDigCore::instance()->getRenderer()->DisplayToView();
-	mqMorphoDigCore::instance()->getRenderer()->GetViewPoint(coordinates);
-	mqMorphoDigCore::instance()->getRenderer()->ViewToWorld();
-	
-	mqMorphoDigCore::instance()->getRenderer()->GetWorldPoint(worldpt);
-	*/
-}
 void mqObjectsControlsToolbar::PanActors(int axis, int value)
 {
 	
@@ -269,9 +234,9 @@ void mqObjectsControlsToolbar::PanActors(int axis, int value)
 		
 		//cout << "try  DTW2" << endl;
 		int move = 10;
-		this->GetWorldToDisplay(pan_center[0], pan_center[1], pan_center[2], dPanCenter);
-		this->GetDisplayToWorld(dPanCenter[0], dPanCenter[1], dPanCenter[2], origin);
-		this->GetDisplayToWorld(dPanCenter[0], dPanCenter[1]+30, dPanCenter[2], away); //example : 10px away from origin!
+		mqMorphoDigCore::instance()->GetWorldToDisplay(pan_center[0], pan_center[1], pan_center[2], dPanCenter);
+		mqMorphoDigCore::instance()->GetDisplayToWorld(dPanCenter[0], dPanCenter[1], dPanCenter[2], origin);
+		mqMorphoDigCore::instance()->GetDisplayToWorld(dPanCenter[0], dPanCenter[1]+30, dPanCenter[2], away); //example : 10px away from origin!
 		
 		// origin[2] -away[2] will give the amplitude of the movement. Now, let us compute the direction!
 		double ampli = value*(origin[2] - away[2]) / 12;
