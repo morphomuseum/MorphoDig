@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mqScalarsControlsToolbar</class>
+ <widget class="QToolBar" name="mqScalarsControlsToolbar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>159</width>
+    <height>34</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Main Controls</string>
+  </property>
+  <property name="orientation">
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <action name="actionScalarVisibility">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/scalars.png</normaloff>
+     <normalon>:/Icons/scalars.png</normalon>:/Icons/scalars.png</iconset>
+   </property>
+   <property name="text">
+    <string>Scalar visibility on/off</string>
+   </property>
+   <property name="toolTip">
+    <string>Display scalars on/off toggle button</string>
+   </property>
+  </action>
+  <action name="actionColorScaleEdit">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/color_scale_edit.png</normaloff>
+     <normalon>:/Icons/color_scale_edit.png</normalon>:/Icons/color_scale_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit color_scale</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit color sale</string>
+   </property>
+  </action>
+  <action name="actionTagEdit">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/tag_edit.png</normaloff>
+     <normalon>:/Icons/tag_edit.png</normalon>:/Icons/tag_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit tags</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit tags</string>
+   </property>
+  </action>
+  <addaction name="actionScalarVisibility"/>
+  <addaction name="actionColorScaleEdit"/>
+  <addaction name="actionTagEdit"/>
+ </widget>
+ <resources>
+  <include location="../Icons/icons.qrc"/>
+  <include location="../Icons/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

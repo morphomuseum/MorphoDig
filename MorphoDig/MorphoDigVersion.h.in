@@ -1,0 +1,2 @@
+// MorphoDig Version
+#define MORPHODIG_VERSION "@MORPHODIG_VERSION@"

@@ -1,0 +1,69 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/Logos">
+<file>Logo_software.png</file>
+  </qresource>
+  <qresource prefix="/Icons">
+  <!-- Application Icon. -->
+ <file>MorphoDig.ico</file>
+    <!-- Typical file operations. -->
+    <file>fileopen.png</file>
+    <file>filesave.png</file>
+ 
+    <file>delete.png</file>
+    <file>delete2.png</file>
+    <!-- Help -->
+    <file>backface_off.png</file>
+    <file>backface_on.png</file>
+    <file>clipping_plane_off.png</file>
+    <file>clipping_plane_on.png</file>
+    <file>scalars.png</file>
+    <file>tag_edit.png</file>
+    <file>color_scale_edit.png</file>
+    <file>help.png</file>
+    <file>name.png</file>
+    <file>actor_edit.png</file>
+   <file>light_above.png</file>
+   <file>light_back.png</file>
+   <file>light_below.png</file>
+   <file>light_left.png</file>
+   <file>light_right.png</file>
+   <file>light_front.png</file>
+    <!-- Typical camera operations. -->
+    <file>camera_above.png</file>
+    <file>camera_back.png</file>
+    <file>camera_below.png</file>
+    <file>camera_front.png</file>
+    <file>camera_left.png</file>
+    <file>camera_right.png</file>
+	<!-- Grid and orientation helper. -->
+  <file>grid.png</file>
+  <file>orientation_helper.png</file>
+ <file>move.png</file>
+ <file>move_cam.png</file>
+ <file>move_cam2.png</file>
+ <file>camera_ortho.png</file>
+ <file>camera_persp.png</file>
+ <file>renderer_anaglyph.png</file>
+ <file>undo.png</file>
+ <file>redo.png</file>
+<!-- landmarks related stuff. -->
+<file>Lmk_edit.png</file>
+<file>Lmk_xyz.png</file>
+<file>Flag02.png</file>
+ <file>landmarks2.png</file>
+ <file>landmarks4.png</file>
+ <file>landmarks5.png</file>
+ <file>landmarks6.png</file>
+ <file>landmarks7.png</file>
+ <file>landmarks8.png</file>
+ <file>landmarks9.png</file>
+ <file>Flag01.png</file>
+ <file>s_right.png</file>
+ <file>s_left.png</file>
+
+
+
+
+  </qresource>
+</RCC>

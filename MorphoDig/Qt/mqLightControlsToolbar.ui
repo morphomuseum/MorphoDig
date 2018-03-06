@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mqLightControlsToolbar</class>
+ <widget class="QToolBar" name="mqLightControlsToolbar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>478</width>
+    <height>34</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Light controls</string>
+  </property>
+  <property name="orientation">
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <action name="actionFrontLight">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/light_front.png</normaloff>
+     <normalon>:/Icons/light_front.png</normalon>:/Icons/light_front.png</iconset>
+   </property>
+   <property name="text">
+    <string>Light: front</string>
+   </property>
+   <property name="toolTip">
+    <string>Lightning: from front side</string>
+   </property>
+  </action>
+  <action name="actionLeftLight">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/light_left.png</normaloff>
+     <normalon>:/Icons/light_left.png</normalon>:/Icons/light_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Light: left</string>
+   </property>
+   <property name="toolTip">
+    <string>Lightning: from left side</string>
+   </property>
+  </action>
+  <action name="actionRightLight">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/light_right.png</normaloff>
+     <normalon>:/Icons/light_right.png</normalon>:/Icons/light_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Light: right</string>
+   </property>
+   <property name="toolTip">
+    <string>Lightning: from right side</string>
+   </property>
+  </action>
+  <action name="actionAboveLight">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/light_above.png</normaloff>
+     <normalon>:/Icons/light_above.png</normalon>:/Icons/light_above.png</iconset>
+   </property>
+   <property name="text">
+    <string>Light: above</string>
+   </property>
+   <property name="toolTip">
+    <string>Lignthing: from above</string>
+   </property>
+  </action>
+  <action name="actionBelowLight">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/light_below.png</normaloff>
+     <normalon>:/Icons/light_below.png</normalon>:/Icons/light_below.png</iconset>
+   </property>
+   <property name="text">
+    <string>Light: from below</string>
+   </property>
+   <property name="toolTip">
+    <string>Lightning: from below</string>
+   </property>
+  </action>
+  <action name="actionBackLight">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/light_back.png</normaloff>
+     <normalon>:/Icons/light_back.png</normalon>:/Icons/light_back.png</iconset>
+   </property>
+   <property name="text">
+    <string>Light: back</string>
+   </property>
+   <property name="toolTip">
+    <string>Lightning: from back side</string>
+   </property>
+  </action>
+  <addaction name="actionFrontLight"/>
+  <addaction name="actionBackLight"/>
+  <addaction name="actionRightLight"/>
+  <addaction name="actionLeftLight"/>
+  <addaction name="actionAboveLight"/>
+  <addaction name="actionBelowLight"/>
+ </widget>
+ <resources>
+  <include location="../Icons/icons.qrc"/>
+  <include location="../Icons/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

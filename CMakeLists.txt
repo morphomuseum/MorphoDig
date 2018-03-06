@@ -1,0 +1,39 @@
+project(MorphoDig)
+
+cmake_minimum_required(VERSION 2.8)
+
+add_subdirectory(MorphoDig)
+
+
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+include(InstallRequiredSystemLibraries)
+install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+        DESTINATION programs
+        COMPONENT applications)
+
+
+set(CPACK_PACKAGE_NAME "MorphoDig")
+set(CPACK_PACKAGE_VENDOR "Renaud Lebrun")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MorphoDig Installation")
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "beta")
+set(CPACK_PACKAGE_VERSION_PATCH "5")
+set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "MorphoDig")
+
+set(CPACK_COMPONENTS_ALL applications)
+
+set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "applications (MorphoDig)")
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+
+set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\MorphoDig.bmp")
+set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/MorphoDig.ico")
+set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/MorphoDig.ico")
+
+set(CPACK_NSIS_MENU_LINKS "programs\\MorphoDig" "MorphoDig")
+
+
+
+
+include(CPack)

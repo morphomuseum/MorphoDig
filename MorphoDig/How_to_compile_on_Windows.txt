@@ -1,0 +1,27 @@
+On windows: 
+Install NSIS
+Install CMAKE
+
+Install Visual Studio 2015
+Install QT (http://qt.io )
+qt-unified-windows-x86-2.0.3-1-online => just select Qt 5.8
+
+Add to environmentvariables QTDIR D:\Qt\5.8\msvc2015_64
+Append environment PATH : D:\Qt\5.8\msvc2015_64\bin
+Append PATH D:\VTK8.1.0bin\bin\Release (needed to access the .dll!)
+Append PATH D:\VTK8.1.0bin (needed for CMAKE to find which version of VTK is present on the computer)
+Append PATH D:\Qt\5.8\msvc2015_64\bin 
+
+Load CMAKE after Path has been modified
+VTK : Build backend : OpenGL2 + Glew!
+VTK_QT_VERSION : 5
+VTK_Group_Qt : v
+vtlGuiSupportQt: v
+Module_vtkGUISupportQtOpenGL : v
+
+http://www.vtk.org/Wiki/VTK/Tutorials/QtSetup
+
+Sometimes, link compilation errors arise 
+=> in VC, sometimes (probably when there are path issues) you have to modify the project: link editor, change the name of all VTK libraries 
+
+When distributing the .exe file, add a  directory named "platforms"+ qwindows.dll inside.

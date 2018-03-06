@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mqMainControlsToolbar</class>
+ <widget class="QToolBar" name="mqMainControlsToolbar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>618</width>
+    <height>34</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Main Controls</string>
+  </property>
+  <property name="orientation">
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <action name="actionOpenData">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/fileopen.png</normaloff>:/Icons/fileopen.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open...</string>
+   </property>
+   <property name="statusTip">
+    <string>Open</string>
+   </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSaveData">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/filesave.png</normaloff>:/Icons/filesave.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save project...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save project...</string>
+   </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/undo.png</normaloff>:/Icons/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/redo.png</normaloff>:/Icons/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Redo</string>
+   </property>
+  </action>
+  <action name="actionCameraFront">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/camera_front.png</normaloff>
+     <normalon>:/Icons/camera_front.png</normalon>:/Icons/camera_front.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera: front</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Camera: view objects from front side</string>
+   </property>
+  </action>
+  <action name="actionCameraLeft">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/camera_left.png</normaloff>
+     <normalon>:/Icons/camera_left.png</normalon>:/Icons/camera_left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera: left</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Camera: view objects from left side</string>
+   </property>
+  </action>
+  <action name="actionCameraRight">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/camera_right.png</normaloff>
+     <normalon>:/Icons/camera_right.png</normalon>:/Icons/camera_right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera: right</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Camera: view objects from right side</string>
+   </property>
+  </action>
+  <action name="actionCameraAbove">
+   <property name="icon">
+    <iconset>
+     <normaloff>Icons/camera_above.png</normaloff>
+     <normalon>:/Icons/camera_above.png</normalon>Icons/camera_above.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera: above</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Camera: view objects from above</string>
+   </property>
+  </action>
+  <action name="actionCameraBelow">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/camera_below.png</normaloff>
+     <normalon>:/Icons/camera_below.png</normalon>:/Icons/camera_below.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera: below</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Camera: underneath view</string>
+   </property>
+  </action>
+  <action name="actionCameraBack">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/camera_back.png</normaloff>
+     <normalon>:/Icons/camera_back.png</normalon>:/Icons/camera_back.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera: back</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Camera: view objects from back side</string>
+   </property>
+  </action>
+  <action name="actionGridToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/grid.png</normaloff>
+     <normalon>:/Icons/grid.png</normalon>:/Icons/grid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Grid: show/hide</string>
+   </property>
+   <property name="toolTip">
+    <string>Grid : show or hide</string>
+   </property>
+  </action>
+  <action name="actionOrientationHelperToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/orientation_helper.png</normaloff>
+     <normalon>:/Icons/orientation_helper.png</normalon>:/Icons/orientation_helper.png</iconset>
+   </property>
+   <property name="text">
+    <string>Orientation helper: show/hide</string>
+   </property>
+   <property name="toolTip">
+    <string>Orientation helper : show or hide</string>
+   </property>
+  </action>
+  <action name="actionCameraCentreOfMassToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/move_cam.png</normaloff>
+     <normalon>:/Icons/move_cam2.png</normalon>:/Icons/move_cam.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera mode: toggle</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle camera : centered at (x,y,z) = (0,0,0) / or at the centre of mass of all opened objects</string>
+   </property>
+  </action>
+  <action name="actionCameraOrthoPerspectiveToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/camera_ortho.png</normaloff>
+     <normalon>:/Icons/camera_persp.png</normalon>:/Icons/camera_ortho.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera projection mode: toggle</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle camera : orthonormal or perspective projection</string>
+   </property>
+  </action>
+  <action name="actionRendererAnaglyphToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/renderer_anaglyph.png</normaloff>
+     <normalon>:/Icons/renderer_anaglyph.png</normalon>:/Icons/renderer_anaglyph.png</iconset>
+   </property>
+   <property name="text">
+    <string>Anaglyph : toggle</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle renderer : normal or anaglyph (red-blue)</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeNormal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks9.png</normaloff>
+     <normalon>:/Icons/landmarks9.png</normalon>:/Icons/landmarks9.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set &quot;normal&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Normal landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeTarget">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks6.png</normaloff>
+     <normalon>:/Icons/landmarks6.png</normalon>:/Icons/landmarks6.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set &quot;target&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Target landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeNode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks7.png</normaloff>
+     <normalon>:/Icons/landmarks7.png</normalon>:/Icons/landmarks7.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set curve &quot;node&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Curve Node landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeHandle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks5.png</normaloff>
+     <normalon>:/Icons/landmarks5.png</normalon>:/Icons/landmarks5.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set curve &quot;handle&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Curve Handle landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeFlag">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Flag01.png</normaloff>
+     <normalon>:/Icons/Flag01.png</normalon>:/Icons/Flag01.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set Flag</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Flag landmark</string>
+   </property>
+  </action>
+  <action name="actionMoveAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/move.png</normaloff>
+     <normalon>:/Icons/move.png</normalon>:/Icons/move.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move all objects</string>
+   </property>
+   <property name="toolTip">
+    <string>Allow to select (right click) and subsequently move all objects (CTRL + mouse move)</string>
+   </property>
+  </action>
+  <action name="actionMoveOnlyLandmarks">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks2.png</normaloff>
+     <normalon>:/Icons/landmarks2.png</normalon>:/Icons/landmarks2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move only landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Allow to select (right click) and subsequently move only landmarks (CTRL + mouse move)</string>
+   </property>
+  </action>
+  <action name="actionEditLandmarks">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lmk_edit.png</normaloff>
+     <normalon>:/Icons/Lmk_edit.png</normalon>:/Icons/Lmk_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit first selected landmarks coordinates</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit first selected landmarks coordinates</string>
+   </property>
+  </action>
+  <action name="actionCreateLandmark">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lmk_xyz.png</normaloff>
+     <normalon>:/Icons/Lmk_xyz.png</normalon>:/Icons/Lmk_xyz.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create landmark at X,Y,Z</string>
+   </property>
+   <property name="toolTip">
+    <string>Create landmark at X,Y,Z</string>
+   </property>
+  </action>
+  <action name="actionEditFlags">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Flag02.png</normaloff>
+     <normalon>:/Icons/Flag02.png</normalon>:/Icons/Flag02.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit first selected flag label length and color</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit first selected flag label length and color</string>
+   </property>
+  </action>
+  <action name="actionEditActors">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/actor_edit.png</normaloff>
+     <normalon>:/Icons/actor_edit.png</normalon>:/Icons/actor_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit first selected surface object</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit first selected object name, color and matrix</string>
+   </property>
+  </action>
+  <addaction name="actionOpenData"/>
+  <addaction name="actionSaveData"/>
+  <addaction name="separator"/>
+  <addaction name="actionUndo"/>
+  <addaction name="actionRedo"/>
+  <addaction name="separator"/>
+  <addaction name="actionMoveAll"/>
+  <addaction name="actionMoveOnlyLandmarks"/>
+  <addaction name="separator"/>
+  <addaction name="separator"/>
+  <addaction name="actionGridToggle"/>
+  <addaction name="actionOrientationHelperToggle"/>
+  <addaction name="actionRendererAnaglyphToggle"/>
+  <addaction name="separator"/>
+  <addaction name="actionLandmarksModeNormal"/>
+  <addaction name="actionLandmarksModeTarget"/>
+  <addaction name="actionLandmarksModeNode"/>
+  <addaction name="actionLandmarksModeHandle"/>
+  <addaction name="actionLandmarksModeFlag"/>
+  <addaction name="separator"/>
+  <addaction name="actionCreateLandmark"/>
+  <addaction name="separator"/>
+  <addaction name="actionEditActors"/>
+  <addaction name="actionEditLandmarks"/>
+  <addaction name="actionEditFlags"/>
+ </widget>
+ <resources>
+  <include location="../Icons/icons.qrc"/>
+  <include location="../Icons/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>
