@@ -31,7 +31,7 @@ set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\MorphoDig.bmp")
 set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/MorphoDig.ico")
 set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/MorphoDig.ico")
 
-set(CPACK_NSIS_MENU_LINKS "programs\\MorphoDig" "MorphoDig")
+set(CPACK_NSIS_MENU_LINKS "bin\\MorphoDig" "MorphoDig")
 
 
 
