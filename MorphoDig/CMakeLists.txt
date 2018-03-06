@@ -136,7 +136,7 @@ endif()
 
 install(TARGETS MorphoDig	
         RUNTIME
-        DESTINATION programs
+        DESTINATION bin
         COMPONENT applications)
 #set (QT5_BINARIES "C:/Qt/5.8/msvc2015_64/bin") 
 
@@ -144,7 +144,7 @@ file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Core.dll" qtcore)
 file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Widgets.dll" qtwidgets)
 file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5GUI.dll" qtgui)
 file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/platforms/qwindows.dll" qtwindows)
-
+file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/imageformats/qico.dll" qtico)
 
 install(
 	FILES
@@ -204,10 +204,17 @@ install(
 		"${qtwidgets}"
 		"${qtgui}"
 	                
-        DESTINATION programs
+        DESTINATION bin
         COMPONENT applications)
 install(
 	FILES
 		"${qtwindows}"                
-        DESTINATION programs/platforms
+        DESTINATION bin/platforms
+        COMPONENT applications)
+
+
+install(
+	FILES
+		"${qtico}"                
+        DESTINATION bin/imageformats
         COMPONENT applications)
