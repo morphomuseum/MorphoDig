@@ -315,8 +315,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->Renderer->AddViewProp(cornerAnnotation);
 	this->Renderer->AddActor(this->GridActor);
 	this->Renderer->TwoSidedLightingOff();
-		
-
+	connect(this, SIGNAL(zoomChanged()), this, SLOT(slotEditGridInfos()));
+	connect(this, SIGNAL(projectionModeChanged()), this, SLOT(slotEditGridInfos()));
 }
 
 mqMorphoDigCore::~mqMorphoDigCore()
@@ -7045,8 +7045,9 @@ void mqMorphoDigCore::AdjustCameraAndGrid()
 	this->getRenderer()->ResetCameraClippingRange();
 	this->ActivateClippingPlane();
 	//this->ui->qvtkWidget->update();
+	mqMorphoDigCore::instance()->signal_zoomChanged();
 	this->Render();
-
+	
 
 
 }
@@ -7254,31 +7255,25 @@ void mqMorphoDigCore::SetGridInfos()
 	//myAnnotation = myBeginning + this->Getmui_SizeUnit();
 	//QString follows("\nGrid: 1 square=");
 	QString follows("Grid: 1 square=");
+	QString onehundredpx("");
 	double pan_center[3] = { 0,0,0 };
-	this->GetCenterOfMassOfSelectedActors(pan_center);
-	double dPanCenter[3] = { 0,0,0 };
-	double origin[4] = { 0, 0, 1,1 };
-	double away[4] = { 0, 0, 2,1 };
+	if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
+	{
+		
+		double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+		QString hundredpx = QString::number(HundredPxSU, 'f', 2);
+		onehundredpx = ", 100px=" + hundredpx + this->Getmui_SizeUnit();
+		
+	}
+	
+	
 	QString valueAsString = QString::number(this->Getmui_GridSpacing());
 	
-	//100 px in mm (not yet ready)
 	
-	//this->GetWorldToDisplay(pan_center[0], pan_center[1], pan_center[2], dPanCenter);
-	//this->GetDisplayToWorld(dPanCenter[0], dPanCenter[1], dPanCenter[2], origin);
-	//this->GetDisplayToWorld(dPanCenter[0], dPanCenter[1] + 100, dPanCenter[2], away);
-	//double p1[3] = { away[0], away[1], away[2] };
-	//double p2[3] = { origin[0], origin[1], origin[2] };
-
-	//double dist = sqrt(vtkMath::Distance2BetweenPoints(p1, p2));
-	//cout << "away:" << away[0] << "," << away[1] << ","<<away[2] << endl;
-	//cout << "origin:" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
-	//QString hundredpx = QString::number(dist,'f',2);
-
-
 	//myAnnotation = myAnnotation + follows;
 	myAnnotation = follows + valueAsString;
 	//myAnnotation = myAnnotation + this->Getmui_SizeUnit() + ", 100px="+hundredpx+ this->Getmui_SizeUnit();
-	myAnnotation = myAnnotation + this->Getmui_SizeUnit();
+	myAnnotation = myAnnotation + this->Getmui_SizeUnit()+ onehundredpx;
 	cornerAnnotation->SetText(vtkCornerAnnotation::LowerRight, myAnnotation.toStdString().c_str());
 	//QString myTest("Loulou fait du ski\nEt voila\nToutou");
 	if (this->Getmui_ShowGrid() == 1)
@@ -7319,7 +7314,7 @@ void mqMorphoDigCore::SetGridInfos()
 
 	}
 	this->Render();*/
-
+	//this->Render();
 }
 
 void mqMorphoDigCore::SetOrientationHelperVisibility()
@@ -8674,6 +8669,17 @@ void mqMorphoDigCore::signal_existingScalarsChanged()
 	emit this->existingScalarsChanged();
 }
 
+void mqMorphoDigCore::signal_projectionModeChanged()
+{
+	cout << "Emit projection Mode Changed" << endl;
+	emit this->projectionModeChanged();
+}
+void mqMorphoDigCore::signal_zoomChanged()
+{
+	cout << "Emit projection Mode Changed" << endl;
+	emit this->zoomChanged();
+}
+
 void mqMorphoDigCore::signal_actorSelectionChanged()
 {
 	cout << "Emit actor Selection changed" << endl;
@@ -8851,7 +8857,11 @@ void mqMorphoDigCore::SetSelectedActorsTransparency(int trans) {
 		this->Render();
 	}
 }
+void mqMorphoDigCore::slotEditGridInfos()
+{
+	this->SetGridInfos();
 
+}
 void mqMorphoDigCore::slotLandmarkMoveUp()
 {
 

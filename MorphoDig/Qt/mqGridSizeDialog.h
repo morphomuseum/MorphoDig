@@ -32,12 +32,12 @@ public:
   void Refresh();
   ~mqGridSizeDialog();
   void editGridSize();
-  
+  void adjustParallelScale();
   public slots:
   
-  
-  
-  virtual void sloteditGridSize();
+  virtual void slotEditHundredPxSu();
+  virtual void slotRefresh();
+  virtual void slotEditGridSize();
   virtual void slotReinitialize();
   
 

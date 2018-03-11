@@ -195,7 +195,8 @@ void mqCameraReaction::CameraOrthoPerspectiveToggle() {
 
 	}
 
+	mqMorphoDigCore::instance()->signal_projectionModeChanged(); 
 	mqMorphoDigCore::instance()->ResetCameraOrthoPerspective();
-
+	
 }
 

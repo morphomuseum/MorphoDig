@@ -367,6 +367,8 @@ public:
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
+  void signal_projectionModeChanged();
+  void signal_zoomChanged();
   void signal_existingScalarsChanged();
   void signal_activeScalarChanged();
   double GetScalarRangeMin();
@@ -382,6 +384,8 @@ public:
   void ComputeSelectedNamesLists();
 signals:
 
+  void projectionModeChanged();
+  void zoomChanged();
   void lmSelectionChanged();
   void actorSelectionChanged();
   void existingScalarsChanged();
@@ -531,6 +535,7 @@ public slots:
 	virtual void slotDarkgreen();
 	virtual void slotOrange();
 	virtual void slotBrown();
+	virtual void slotEditGridInfos();
 
 private:
 	static mqMorphoDigCore* Instance;

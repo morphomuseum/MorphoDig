@@ -63,7 +63,7 @@ mqGridSizeDialog::mqGridSizeDialog(QWidget* Parent)
 	this->Ui->gridspacing->setMaximum(DBL_MAX);
 	this->Ui->gridspacing->setSingleStep(1);
 	this->Ui->gridspacing->setValue(GridSpacing);
-
+	this->Ui->hundredpxsu->setDisabled(true);
 	QString myUnit = mqMorphoDigCore::instance()->Getmui_SizeUnit();
 
 	//double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
@@ -86,8 +86,12 @@ mqGridSizeDialog::mqGridSizeDialog(QWidget* Parent)
   
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditGridSize()));
 	 connect(this->Ui->reinit, SIGNAL(clicked()), this, SLOT(slotReinitialize()));
-	 
+	 connect(this->Ui->hundredpxsu, SIGNAL(valueChanged(double)), this, SLOT(slotEditHundredPxSu()));
+	 connect(mqMorphoDigCore::instance(), SIGNAL(zoomChanged()), this, SLOT(slotRefresh()));
+	 connect(mqMorphoDigCore::instance(), SIGNAL(projectionModeChanged()), this, SLOT(slotRefresh()));
 
+	 //connect(mqMorphoDigCore::instance(), SIGNAL(actorSelectionChanged()), this, SLOT(slotRefreshDialog()));
+	
 }
 
 
@@ -100,6 +104,30 @@ mqGridSizeDialog::~mqGridSizeDialog()
  //depending on what is 
 	
   delete this->Ui;
+}
+void mqGridSizeDialog::adjustParallelScale()
+{
+	
+	if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
+	{
+		double currentScale = mqMorphoDigCore::instance()->getCamera()->GetParallelScale();
+		double currentHundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+		double newHundredPxSu = this->Ui->hundredpxsu->value();
+		if (currentHundredPxSU>0 && newHundredPxSu>0)
+		{
+			double newScale = currentScale*newHundredPxSu / currentHundredPxSU;
+			mqMorphoDigCore::instance()->getCamera()->SetParallelScale(newScale);
+			// now change camera position
+			mqMorphoDigCore::instance()->DollyCameraForPerspectiveMode();
+			//change grid infos
+			mqMorphoDigCore::instance()->SetGridInfos();
+			mqMorphoDigCore::instance()->Render();
+		}
+		
+		
+		
+	}
+
 }
 void mqGridSizeDialog::editGridSize()
 {
@@ -114,26 +142,46 @@ void mqGridSizeDialog::editGridSize()
 	else if (this->Ui->cm->isChecked()) { mqMorphoDigCore::instance()->Setmui_SizeUnit(cm); }
 	else if (this->Ui->nm->isChecked()) { mqMorphoDigCore::instance()->Setmui_SizeUnit(nm); }
 	mqMorphoDigCore::instance()->Setmui_GridSpacing(this->Ui->gridspacing->value());
+	this->adjustParallelScale();
+	
 	mqMorphoDigCore::instance()->SetGridInfos();
 }
 
 
 
 
+void mqGridSizeDialog::slotEditHundredPxSu()
+{
 
+	this->adjustParallelScale();
+}
 
-
-void mqGridSizeDialog::sloteditGridSize()
+void mqGridSizeDialog::slotRefresh()
+{
+	this->Refresh();
+}
+void mqGridSizeDialog::slotEditGridSize()
 {
 	this->editGridSize();
 }
 void mqGridSizeDialog::Refresh()
 {
-	double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
-	this->Ui->hundredpxsu->setMinimum(0.00000001);
-	this->Ui->hundredpxsu->setMaximum(DBL_MAX);
-	this->Ui->hundredpxsu->setSingleStep(1);
-	this->Ui->hundredpxsu->setValue(HundredPxSU);
+	if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
+	{
+		if (this->Ui->hundredpxsu->isEnabled()==false)
+		{
+			this->Ui->hundredpxsu->setDisabled(false);
+		}
+		double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+		this->Ui->hundredpxsu->setValue(HundredPxSU);
+	}
+	else
+	{
+		if (this->Ui->hundredpxsu->isEnabled())
+		{
+			this->Ui->hundredpxsu->setDisabled(true);
+		}
+	}
 }
 void mqGridSizeDialog::slotReinitialize()
 {

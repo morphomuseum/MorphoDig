@@ -243,7 +243,9 @@ void mqCameraControlsToolbar::slotZoom()
 		mqMorphoDigCore::instance()->getCamera()->Zoom(0.9);
 		
 	}
+	mqMorphoDigCore::instance()->signal_zoomChanged();
 	mqMorphoDigCore::instance()->Render();
+	
 }
 void mqCameraControlsToolbar::slotCp(int val)
 {

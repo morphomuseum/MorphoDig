@@ -814,7 +814,10 @@ void vtkMDInteractorStyle::Dolly(double factor)
 		this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
 	}
 
+	mqMorphoDigCore::instance()->signal_zoomChanged();
 	this->Interactor->Render();
+
+
 }
 void vtkMDInteractorStyle::RubberStart()
 {
