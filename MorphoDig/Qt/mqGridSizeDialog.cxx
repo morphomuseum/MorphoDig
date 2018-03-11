@@ -65,6 +65,12 @@ mqGridSizeDialog::mqGridSizeDialog(QWidget* Parent)
 	this->Ui->gridspacing->setValue(GridSpacing);
 
 	QString myUnit = mqMorphoDigCore::instance()->Getmui_SizeUnit();
+
+	//double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+	this->Ui->hundredpxsu->setMinimum(0.00000001);
+	this->Ui->hundredpxsu->setMaximum(DBL_MAX);
+	this->Ui->hundredpxsu->setSingleStep(1);
+	this->Ui->hundredpxsu->setValue(100);
 	QString mm("mm");
 	QString cm("cm");
 	QString m("m");
@@ -80,6 +86,8 @@ mqGridSizeDialog::mqGridSizeDialog(QWidget* Parent)
   
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditGridSize()));
 	 connect(this->Ui->reinit, SIGNAL(clicked()), this, SLOT(slotReinitialize()));
+	 
+
 }
 
 
@@ -119,6 +127,14 @@ void mqGridSizeDialog::sloteditGridSize()
 {
 	this->editGridSize();
 }
+void mqGridSizeDialog::Refresh()
+{
+	double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+	this->Ui->hundredpxsu->setMinimum(0.00000001);
+	this->Ui->hundredpxsu->setMaximum(DBL_MAX);
+	this->Ui->hundredpxsu->setSingleStep(1);
+	this->Ui->hundredpxsu->setValue(HundredPxSU);
+}
 void mqGridSizeDialog::slotReinitialize()
 {
 	double GridSpacing = mqMorphoDigCore::instance()->Getmui_DefaultGridSpacing();
@@ -136,6 +152,7 @@ void mqGridSizeDialog::slotReinitialize()
 	if (QString::compare(myUnit, um, Qt::CaseInsensitive) == 0) { this->Ui->um->setChecked(true); }
 	if (QString::compare(myUnit, nm, Qt::CaseInsensitive) == 0) { this->Ui->nm->setChecked(true); }
 	if (QString::compare(myUnit, m, Qt::CaseInsensitive) == 0) { this->Ui->m->setChecked(true); }
+	
 
 }
 

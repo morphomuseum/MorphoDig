@@ -25,6 +25,6 @@ mqGridSizeDialogReaction::mqGridSizeDialogReaction(QAction* parentObject)
 void mqGridSizeDialogReaction::showGridSizeDialog(mqGridSizeDialog *GridSize_dialog)
 {
 	
-  
+	GridSize_dialog->Refresh();
   GridSize_dialog->show();
 }

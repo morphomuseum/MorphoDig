@@ -7227,6 +7227,26 @@ void mqMorphoDigCore::SetGridVisibility()
 	this->Render();
 }
 
+double mqMorphoDigCore::GetHundredPxSU()
+{
+	//100 px in mm 
+	double pan_center[3] = { 0,0,0 };
+	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
+	{
+		this->GetCenterOfMassOfSelectedActors(pan_center);
+	}
+	double dPanCenter[3] = { 0,0,0 };
+	double origin[4] = { 0, 0, 1,1 };
+	double away[4] = { 0, 0, 2,1 };
+	this->GetWorldToDisplay(pan_center[0], pan_center[1], pan_center[2], dPanCenter);
+	this->GetDisplayToWorld(dPanCenter[0], dPanCenter[1], dPanCenter[2], origin);
+	this->GetDisplayToWorld(dPanCenter[0], dPanCenter[1] + 100, dPanCenter[2], away);
+	double p1[3] = { away[0], away[1], away[2] };
+	double p2[3] = { origin[0], origin[1], origin[2] };
+
+	double dist = sqrt(vtkMath::Distance2BetweenPoints(p1, p2));
+	return dist;
+}
 void mqMorphoDigCore::SetGridInfos()
 {
 	QString myAnnotation;

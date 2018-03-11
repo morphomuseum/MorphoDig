@@ -29,7 +29,7 @@ class  mqGridSizeDialog : public QDialog
 
 public:
   mqGridSizeDialog(QWidget* Parent);
-  
+  void Refresh();
   ~mqGridSizeDialog();
   void editGridSize();
   
