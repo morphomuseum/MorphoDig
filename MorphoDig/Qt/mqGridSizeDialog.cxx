@@ -13,7 +13,7 @@
 #include "mqUndoStack.h"
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
-
+#include <vtkRenderer.h>
 // we actually do not need glew...
 //#include <GL/glew.h>
 #include <QApplication>
@@ -119,6 +119,7 @@ void mqGridSizeDialog::adjustParallelScale()
 			mqMorphoDigCore::instance()->getCamera()->SetParallelScale(newScale);
 			// now change camera position
 			mqMorphoDigCore::instance()->DollyCameraForPerspectiveMode();
+			mqMorphoDigCore::instance()->getRenderer()->ResetCameraClippingRange();
 			//change grid infos
 			mqMorphoDigCore::instance()->SetGridInfos();
 			mqMorphoDigCore::instance()->Render();

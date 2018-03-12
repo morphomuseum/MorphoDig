@@ -4334,17 +4334,21 @@ void mqMorphoDigCore::addMirrorXZ()
 				vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 				Mat->DeepCopy (myActor->GetMatrix());
 
-				double n1, n2, n3, n4;
-				n1 = -1 * MatOrig->GetElement(3, 1);
+				double n1, n2, n3, n4, n5;
+				n1 = -1 * MatOrig->GetElement(1, 3);
 				n2 = -1 * MatOrig->GetElement(0, 1);
 				n3 = -1 * MatOrig->GetElement(1, 0);
-				n4 = -1 * MatOrig->GetElement(2, 1);
+				n4 = -1 * MatOrig->GetElement(1, 2);
+				n5 = -1 * MatOrig->GetElement(2, 1);
+			
 
-				Mat->SetElement(3, 1, n1);
+
+
+				Mat->SetElement(1, 3, n1);
 				Mat->SetElement(0, 1, n2);
 				Mat->SetElement(1, 0, n3);
-				Mat->SetElement(2, 1, n4);
-
+				Mat->SetElement(1, 2, n4);
+				Mat->SetElement(2, 1, n5);
 				
 
 				vtkTransform *newTransform = vtkTransform::New();
