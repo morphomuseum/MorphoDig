@@ -17,6 +17,7 @@
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
 #include "vtkMDActorCollection.h"
+#include <QVTKOpenGLWidget.h>
 //#include "vtkUndoStack.h"
 //#include "vtkUndoSet.h"
 //#include "vtkUndoElement.h"
@@ -80,6 +81,11 @@
 #include <vtkConeSource.h>
 #include <vtkBoxWidget.h>
 #include <vtkCommand.h>
+
+#include <QMdiArea>
+#include <QDockWidget>
+//#include <QLabel>
+#include <QTreeView>
 
 //-----------------------------------------------------------------------------
 //MorphoDig* MorphoDig::Instance = 0;
@@ -275,10 +281,61 @@ void RubberBandSelect(vtkObject* caller,
 
 // Constructor
 MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {  
-setupUi(this); 
+
+	setupUi(this); 
 //MorphoDig::MorphoDig(){
+	/*
+	auto subWindowWidget = new QMainWindow;
+    mdi->addSubWindow(subWindowWidget);
+
+    auto dock1 = new QDockWidget("Dock1");
+    dock1->setWidget(new QLabel("Label1"));
+    dock1->setAllowedAreas(Qt::AllDockWidgetAreas);
+    subWindowWidget->setCentralWidget(dock1);
+
+    auto dock2 = new QDockWidget("Dock2");
+    dock2->setWidget(new QLabel("Label2"));
+    dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
+    subWindowWidget->addDockWidget(Qt::BottomDockWidgetArea, dock2);
+
+	
+	*/
+	//auto subWindowWidget = new QMainWindow(this->TabProject);
+	
+	
+	//this
 	
 
+
+
+
+	auto subWindowWidget = new QMainWindow();
+	this->mdiArea->addSubWindow(subWindowWidget);
+	/*auto dock1 = new QDockWidget("3D viewer");
+	dock1->setWidget(qvtkWidget2);
+	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);
+	subWindowWidget->setCentralWidget(dock1);
+	*/
+	this->qvtkWidget2 = new QVTKOpenGLWidget();
+	qvtkWidget2->setObjectName(QStringLiteral("qvtkWidget"));
+	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	sizePolicy.setHorizontalStretch(1);
+	sizePolicy.setVerticalStretch(1);
+	sizePolicy.setHeightForWidth(qvtkWidget2->sizePolicy().hasHeightForWidth());
+	qvtkWidget2->setSizePolicy(sizePolicy);
+	qvtkWidget2->setMinimumSize(QSize(300, 300));
+
+		
+	subWindowWidget->setCentralWidget(qvtkWidget2);
+
+
+	//subWindowWidget->Maximise
+	subWindowWidget->showMaximized();
+	auto mytree = new QTreeView(this->TabProject);
+	auto dock2 = new QDockWidget("Actors");
+	dock2->setWidget(mytree);
+	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
+	subWindowWidget->addDockWidget(Qt::RightDockWidgetArea, dock2);
 
 	cout << "Try to set render window" << endl;
   auto window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
@@ -450,7 +507,7 @@ setupUi(this);
 	// Place the table view in the designer form
 	//this->ui->tableFrame->layout()->addWidget(this->TableView->GetWidget());
 	
-	this->qvtkWidget->SetRenderWindow(window);
+	this->qvtkWidget2->SetRenderWindow(window);
 
 	//this->MorphoDigCore->SetRenderWindow(this->ui->qvtkWidget->GetRenderWindow());
 	this->MorphoDigCore->SetRenderWindow(window);
@@ -575,8 +632,8 @@ setupUi(this);
 	 this->AreaPicker->AddObserver(vtkCommand::EndPickEvent, pickCallback);
 	
  style->SetCurrentRenderer(this->MorphoDigCore->getRenderer());
-  this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
-  this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+  this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
+  this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   
   window->GetInteractor()->SetPicker(this->AreaPicker);
   window->GetInteractor()->SetInteractorStyle(style);
@@ -603,7 +660,7 @@ setupUi(this);
   this->MorphoDigCore->SetGridInfos();
   this->MorphoDigCore->InitializeOrientationHelper(); // creates orientation helper...
   this->MorphoDigCore->SetOrientationHelperVisibility();
-  this->qvtkWidget->SetRenderWindow(window);
+  this->qvtkWidget2->SetRenderWindow(window);
   
   //EXAMPLE vtkBoxWidget
 
