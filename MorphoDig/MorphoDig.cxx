@@ -300,7 +300,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
 	
 	*/
-	//auto subWindowWidget = new QMainWindow(this->TabProject);
+	auto subWindowWidget = new QMainWindow(this->TabProject);
 	
 	
 	//this
@@ -309,7 +309,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
 
 
-	auto subWindowWidget = new QMainWindow();
+	//auto subWindowWidget = new QMainWindow();
+	
 	this->mdiArea->addSubWindow(subWindowWidget);
 	/*auto dock1 = new QDockWidget("3D viewer");
 	dock1->setWidget(qvtkWidget2);
@@ -336,6 +337,11 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	dock2->setWidget(mytree);
 	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
 	subWindowWidget->addDockWidget(Qt::RightDockWidgetArea, dock2);
+	subWindowWidget->setWindowModality(Qt::WindowModal);
+	/*Qt::WindowFlags flags = windowFlags();
+	Qt::WindowFlags closeFlag = Qt::WindowCloseButtonHint;
+	flags = flags & (~closeFlag);
+	subWindowWidget->setWindowFlags(flags);*/
 
 	cout << "Try to set render window" << endl;
   auto window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
