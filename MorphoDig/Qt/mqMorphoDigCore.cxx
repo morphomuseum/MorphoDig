@@ -6805,7 +6805,13 @@ void mqMorphoDigCore::SetMainWindow(QMainWindow *_mainWindow)
 QMainWindow* mqMorphoDigCore::GetMainWindow() {
 	return this->MainWindow	;
 }
-
+void mqMorphoDigCore::SetProjectWindow(QMainWindow *_projectWindow)
+{
+	this->ProjectWindow = _projectWindow;
+}
+QMainWindow* mqMorphoDigCore::GetProjectWindow() {
+	return this->ProjectWindow;
+}
 //Called to repplace camera and grid positions when switching from "orange grid mode" to "blue grid mode"
 //= when camera focalpoint and grid center are changed between 0,0,0 and COM of all opened meshes.
 void mqMorphoDigCore::ReplaceCameraAndGrid()
@@ -8669,24 +8675,24 @@ void mqMorphoDigCore::setUndoStack(mqUndoStack* stack)
 
 void mqMorphoDigCore::signal_existingScalarsChanged()
 {
-	cout << "Emit existing scalars changed" << endl;
+	//cout << "Emit existing scalars changed" << endl;
 	emit this->existingScalarsChanged();
 }
 
 void mqMorphoDigCore::signal_projectionModeChanged()
 {
-	cout << "Emit projection Mode Changed" << endl;
+	//cout << "Emit projection Mode Changed" << endl;
 	emit this->projectionModeChanged();
 }
 void mqMorphoDigCore::signal_zoomChanged()
 {
-	cout << "Emit projection Mode Changed" << endl;
+	//cout << "Emit projection Mode Changed" << endl;
 	emit this->zoomChanged();
 }
 
 void mqMorphoDigCore::signal_actorSelectionChanged()
 {
-	cout << "Emit actor Selection changed" << endl;
+	//cout << "Emit actor Selection changed" << endl;
 	emit this->actorSelectionChanged();
 }
 void mqMorphoDigCore::signal_lmSelectionChanged()

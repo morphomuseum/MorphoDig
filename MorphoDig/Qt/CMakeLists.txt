@@ -1,4 +1,8 @@
 set (Qt_SRCS
+mqViewMenuManager.h
+mqViewMenuManager.cxx
+  mqActorTreePanel.cxx
+  mqActorTreePanel.h
   mqAboutDialog.cxx
   mqAboutDialog.h
   mqAboutDialogReaction.cxx
@@ -211,6 +215,7 @@ mqDensifyDialog.ui
 mqFillHolesDialog.ui
 mqTPSDialog.ui
 mqDecomposeDialog.ui
+mqActorTreePanel.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

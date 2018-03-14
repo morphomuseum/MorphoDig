@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Light controls</string>
+   <string>Actor controls</string>
   </property>
   <property name="orientation">
    <enum>Qt::Vertical</enum>

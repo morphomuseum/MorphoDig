@@ -283,7 +283,9 @@ public:
 	void UpdateLandmarkSettings();
 	void UpdateLandmarkSettings(vtkLMActor *myActor);
 	void SetMainWindow(QMainWindow *_mainWindow);
+	void SetProjectWindow(QMainWindow *_projectWindow);
 	QMainWindow* GetMainWindow();
+	QMainWindow* GetProjectWindow();
 	void LandmarksMoveUp();
 	void ChangeClippingPlane();
 	int Getmui_ClippinPlane();
@@ -431,6 +433,7 @@ protected:
 	vtkSmartPointer<vtkLMActor> LMActor;
 	vtkSmartPointer<vtkLMActor> LMActor2;
 	QMainWindow* MainWindow;
+	QMainWindow* ProjectWindow;
 	//vtkUndoStack* UndoStack;
 	mqUndoStack* UndoStack;
 	//vtkSmartPointer<vtkUndoStack> UndoStack;

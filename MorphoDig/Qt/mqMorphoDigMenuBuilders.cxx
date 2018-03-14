@@ -18,6 +18,7 @@
 #include "mqCameraControlsToolbar.h"
 #include "mqMainControlsToolbar.h"
 #include "mqLightControlsToolbar.h"
+#include "mqActorTreePanel.h"
 #include "mqObjectsControlsToolbar.h"
 #include "mqScalarsControlsToolbar.h"
 #include "mqDesktopServicesReaction.h"
@@ -40,6 +41,7 @@
 #include "mqTPSDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
 #include "mqSetName.h"
+#include "mqViewMenuManager.h"
 
 //#include "ui_mqEditMenuBuilder.h" // no .ui Edit menu file yet
 //#include "ui_mqFileMenuBuilder.h" // no .ui File menu yet
@@ -58,6 +60,18 @@
 #include <QMainWindow>
 #include <QMenu>
 
+void mqMorphoDigMenuBuilders::buildViewMenu(QMenu& menu, QMainWindow& window, QMainWindow& projectwindow)
+{
+/*	QString objectName = menu.objectName();
+	std::cout << "Menu object name" << objectName.toStdString() << std::endl;
+	m_p_Act_Button1 = new QAction("Super Button 1", this);
+	m_p_Act_Button1->setCheckable(true);
+	m_p_Act_Button1->setChecked(true);
+	connect(m_p_Act_Button1, SIGNAL(triggered()), this, SLOT(slot_SomethingChecked()));*/
+	
+	new mqViewMenuManager(&window, &menu, &projectwindow);
+
+}
 //-----------------------------------------------------------------------------
 //void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu, QMainWindow* mainWindow = 0)
 void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
@@ -280,13 +294,69 @@ void mqMorphoDigMenuBuilders::buildHelpMenu(QMenu& menu)
   new mqAboutDialogReaction(menu.addAction("About...") << mqSetName("actionAbout"));
 }
 
+void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
+{
+	
+
+	//auto dock3 = new QDockWidget(&projectWindow);
+	auto dock3 = new QDockWidget("Actors", &projectWindow);
+	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock3);
+	auto window = new QMainWindow(0);
+	/*QToolBar* cameraToolBar = new mqCameraControlsToolbar(window)
+		<< mqSetName("CameraControlsToolbar");*/
+	dock3->setAllowedAreas(Qt::AllDockWidgetAreas);
+	//cameraToolBar->layout()->setSpacing(0);
+	QWidget* actor_panel = new mqActorTreePanel(window);
+
+	//window->addToolBar(cameraToolBar);
+	window->setCentralWidget(actor_panel);
+
+	dock3->setWidget(window);
+	
+
+	//QWidget* actor_panel = new mqActorTreePanel(window);
+
+	/*auto mytree = new QTreeView(this->tabWidget);
+	auto dock2 = new QDockWidget("Actors");
+	dock2->setWidget(mytree);
+	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
+	projectWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);
+	projectWindow->setWindowModality(Qt::WindowModal);*/
+
+	//mainWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);
+	
+
+	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
+		<< mqSetName("LightControlsToolbar");
+	lightToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);
+
+	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
+		<< mqSetName("ObjectsControlsToolbar");
+	ObjectsToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);
+
+	QToolBar* scalarsToolBar = new mqScalarsControlsToolbar(&projectWindow)
+		<< mqSetName("ScalarsControlsToolbar");
+	scalarsToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::BottomToolBarArea, scalarsToolBar);
+
+	QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow)
+		<< mqSetName("CameraControlsToolbar");
+	cameraToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);
+
+}
+
 //-----------------------------------------------------------------------------
 void mqMorphoDigMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 {
+
 	QToolBar* mainToolBar = new mqMainControlsToolbar(&mainWindow)
 		<< mqSetName("MainControlsToolbar");
 	mainToolBar->layout()->setSpacing(0);
 	mainWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
+	/*
 
 	QToolBar* lightToolBar = new mqLightControlsToolbar(&mainWindow)
 		<< mqSetName("LightControlsToolbar");
@@ -307,6 +377,6 @@ void mqMorphoDigMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 		<< mqSetName("CameraControlsToolbar");
 	cameraToolBar->layout()->setSpacing(0);
 	mainWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);
-
+	*/
 }
 

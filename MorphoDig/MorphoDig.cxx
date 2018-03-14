@@ -284,38 +284,29 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
 	setupUi(this); 
 //MorphoDig::MorphoDig(){
-	/*
-	auto subWindowWidget = new QMainWindow;
-    mdi->addSubWindow(subWindowWidget);
-
-    auto dock1 = new QDockWidget("Dock1");
-    dock1->setWidget(new QLabel("Label1"));
-    dock1->setAllowedAreas(Qt::AllDockWidgetAreas);
-    subWindowWidget->setCentralWidget(dock1);
-
-    auto dock2 = new QDockWidget("Dock2");
-    dock2->setWidget(new QLabel("Label2"));
-    dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
-    subWindowWidget->addDockWidget(Qt::BottomDockWidgetArea, dock2);
+	
 
 	
-	*/
-	auto subWindowWidget = new QMainWindow(this->TabProject);
+	auto projectWindow = new QMainWindow(this->tabWidget);
 	
 	
 	//this
+	QWidget *projectTab = new QWidget();
+	QHBoxLayout *projectLayout = new QHBoxLayout;
+	projectLayout->addWidget(projectWindow);
+
+	projectTab->setLayout(projectLayout);
+	this->tabWidget->addTab(projectTab, "Project");
+
+
+
+	//auto projectWindow = new QMainWindow();
 	
-
-
-
-
-	//auto subWindowWidget = new QMainWindow();
-	
-	this->mdiArea->addSubWindow(subWindowWidget);
+	//this->mdiArea->addSubWindow(projectWindow);
 	/*auto dock1 = new QDockWidget("3D viewer");
 	dock1->setWidget(qvtkWidget2);
 	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);
-	subWindowWidget->setCentralWidget(dock1);
+	projectWindow->setCentralWidget(dock1);
 	*/
 	this->qvtkWidget2 = new QVTKOpenGLWidget();
 	qvtkWidget2->setObjectName(QStringLiteral("qvtkWidget"));
@@ -327,21 +318,23 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	qvtkWidget2->setMinimumSize(QSize(300, 300));
 
 		
-	subWindowWidget->setCentralWidget(qvtkWidget2);
+	projectWindow->setCentralWidget(qvtkWidget2);
 
 
-	//subWindowWidget->Maximise
-	subWindowWidget->showMaximized();
-	auto mytree = new QTreeView(this->TabProject);
+	//projectWindow->Maximise
+	projectWindow->showMaximized();
+	//auto mytree = new QTreeView(this->TabProject);
+	/*auto mytree = new QTreeView(this->tabWidget);
 	auto dock2 = new QDockWidget("Actors");
 	dock2->setWidget(mytree);
 	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
-	subWindowWidget->addDockWidget(Qt::RightDockWidgetArea, dock2);
-	subWindowWidget->setWindowModality(Qt::WindowModal);
+	projectWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);*/
+
+	projectWindow->setWindowModality(Qt::WindowModal);
 	/*Qt::WindowFlags flags = windowFlags();
 	Qt::WindowFlags closeFlag = Qt::WindowCloseButtonHint;
 	flags = flags & (~closeFlag);
-	subWindowWidget->setWindowFlags(flags);*/
+	projectWindow->setWindowFlags(flags);*/
 
 	cout << "Try to set render window" << endl;
   auto window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
@@ -351,6 +344,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
 	vtkObject::GlobalWarningDisplayOff();
 	this->MorphoDigCore =  new mqMorphoDigCore();
+	MorphoDigCore->SetProjectWindow(projectWindow);
 	window->AddRenderer(this->MorphoDigCore->getRenderer());
 	//vtkUndoStack* undoStack = vtkUndoStack::New();
 
@@ -598,8 +592,9 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	mqMorphoDigMenuBuilders::buildLandmarksMenu(*this->menuLandmarks);
 	mqMorphoDigMenuBuilders::buildHelpMenu(*this->menuHelp);
 	mqMorphoDigMenuBuilders::buildToolbars(*this);
-
-	
+	mqMorphoDigMenuBuilders::buildProjectDocks(*projectWindow);
+	cout << "About to build view Menu!" << endl;
+	mqMorphoDigMenuBuilders::buildViewMenu(*this->menuView, *this, *projectWindow);
 
 
 	double myorigin[3];
