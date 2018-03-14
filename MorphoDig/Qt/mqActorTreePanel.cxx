@@ -22,16 +22,16 @@ void mqActorTreePanel::constructor()
   this->ui = new Ui_mqActorTreePanel;
   this->ui->setupUi(this);
  
-  //connect(this->ui->actionFrontLight, SIGNAL(triggered()), this, SLOT(slotFrontLight()));
+  connect(mqMorphoDigCore::instance(), SIGNAL(actorsMightHaveChanged()), this, SLOT(slotRefresh()));
   
  
   
 }
 
 
-void mqActorTreePanel::slotSomething()
+void mqActorTreePanel::slotRefresh()
 {
-	
+	cout << "Refresh actor panel!!!" << endl;
 	//mqMorphoDigCore::instance()->Render();	
 	
 }

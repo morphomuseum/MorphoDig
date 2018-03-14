@@ -2075,6 +2075,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			actor->SetSelected(1);
 			actor->SetName(newname);
 			this->getActorCollection()->AddItem(actor);
+			emit this->actorsMightHaveChanged(); 
 			this->Initmui_ExistingScalars();
 			std::string action = "Load mesh file";
 			int mCount = BEGIN_UNDO_SET(action);
@@ -4208,6 +4209,7 @@ void mqMorphoDigCore::addConvexHull()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Convex Hull added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -4389,6 +4391,7 @@ void mqMorphoDigCore::addMirrorXZ()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Mirror object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -4735,6 +4738,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "TPS object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -4894,6 +4898,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Hole filled object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5048,6 +5053,7 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Densified object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5229,6 +5235,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Decimated object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5390,6 +5397,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Smoothed object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5631,6 +5639,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Largest region object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5784,6 +5793,7 @@ void mqMorphoDigCore::addKeepLargest()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Largest region object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5818,6 +5828,7 @@ void mqMorphoDigCore::DeleteSelectedActors()
 	this->NodeLandmarkCollection->DeleteSelectedActors();
 	this->HandleLandmarkCollection->DeleteSelectedActors();
 	this->FlagLandmarkCollection->DeleteSelectedActors();
+	emit this->actorsMightHaveChanged();
 	
 }
 void mqMorphoDigCore::addInvert()
@@ -5950,6 +5961,7 @@ void mqMorphoDigCore::addInvert()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Inverted object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -6634,6 +6646,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		
 		
 		this->NormalLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NormalLandmarkCollection->SetChanged(1);
 		std::string action = "Create Normal landmark";
@@ -6646,6 +6659,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	{
 
 		this->TargetLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->TargetLandmarkCollection->SetChanged(1);
 		std::string action = "Create Target landmark";
@@ -6657,6 +6671,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	else if (lmk_type == NODE_LMK)
 	{
 		this->NodeLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NodeLandmarkCollection->SetChanged(1);
 		std::string action = "Create Curve Node";
@@ -6668,6 +6683,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	else if (lmk_type == HANDLE_LMK)
 	{
 		this->HandleLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->HandleLandmarkCollection->ReorderLandmarks();
 		this->HandleLandmarkCollection->SetChanged(1);
 		std::string action = "Create Curve Handle";
@@ -6677,7 +6693,8 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	}
 	else if (lmk_type == FLAG_LMK)
 	{
-		this->FlagLandmarkCollection->AddItem(myLM);		
+		this->FlagLandmarkCollection->AddItem(myLM);	
+		emit this->actorsMightHaveChanged();
 		this->FlagLandmarkCollection->SetChanged(1);
 		std::string action = "Create Flag Landmark";
 		int mCount = BEGIN_UNDO_SET(action);
@@ -8434,6 +8451,7 @@ void mqMorphoDigCore::Undo()
 	//this->ActorCollection->Undo(MySet);
 	//cout << "Root Undo!" << endl;
 	this->UndoStack->undo(); // removes the next undo set.. 
+	emit this->actorsMightHaveChanged();
 
 }
 void mqMorphoDigCore::Undo(int Count)
@@ -8513,6 +8531,7 @@ void mqMorphoDigCore::Redo()
 {
 	//cout << "Root Redo!" << endl;
 	this->UndoStack->redo(); // removes the next undo set.. 
+	emit this->actorsMightHaveChanged();
 }
 
 void mqMorphoDigCore::Redo(int Count)

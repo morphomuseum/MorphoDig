@@ -373,6 +373,7 @@ public:
   void signal_zoomChanged();
   void signal_existingScalarsChanged();
   void signal_activeScalarChanged();
+  //void signal_ActorsMightHaveChanged();
   double GetScalarRangeMin();
   void UpddateLookupTablesRanges(double min, double max);
 	double GetScalarRangeMax();
@@ -392,7 +393,7 @@ signals:
   void actorSelectionChanged();
   void existingScalarsChanged();
   void activeScalarChanged();
-
+  void actorsMightHaveChanged();
 
 protected:
 	

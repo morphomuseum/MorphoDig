@@ -31,7 +31,7 @@ public:
   
 
   public slots :
- virtual void slotSomething();
+ virtual void slotRefresh();
   
   
 private:
