@@ -626,10 +626,11 @@ void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
 		{
 			double curr = pts[4 * j];
 			cout << "x" << j << "=" << curr << endl;
-			//if (curr < old_min) { old_min = curr; }
+			if (curr < old_min) { old_min = curr; }
 			if (curr > old_max) { old_max = curr; }
 
 		}
+		cout << "old max:" << old_max << ", old min:" << old_min << endl;
 		if (old_max > old_min)
 		{
 			double old_range = old_max - old_min;
@@ -639,7 +640,7 @@ void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
 			for (int k = 0; k < numnodes; k++)
 			{
 				pts[4 * k] = pts[4 * k] * mult + c;
-				//cout << "nx" << k << "=" << pts[4 * k] << endl;
+				cout << "nx" << k << "=" << pts[4 * k] << endl;
 			}
 			CM->FillFromDataPointer(numnodes, pts);
 
