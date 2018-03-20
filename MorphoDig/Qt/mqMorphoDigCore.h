@@ -333,6 +333,7 @@ public:
   void addDecimate(int quadric, double factor);
   void addInvert();// create an inverted surface for each selected surface
   void addKeepLargest();// create for each selected surface an object which keeps only the largest "independent" region of the corresponding object.
+  void scalarsCameraDistance(); //compute camera distance for each selected scalar.
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
@@ -526,6 +527,7 @@ public slots:
 	virtual void slotMirror();
 	virtual void slotInvert();
 	virtual void slotKeepLargest();
+	virtual void slotScalarsCameraDistance();
 	virtual void  slotGrey();
 	virtual void slotYellow();
 	virtual void slotRed();

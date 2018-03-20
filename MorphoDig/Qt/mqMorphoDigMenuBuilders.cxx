@@ -191,6 +191,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *ConvexHULL = submenuStructureModification->addAction("Create convex hull for each selected surface");
 
 	QMenu* submenuRenderingModification = menu.addMenu("Rendering modification");
+	
+
 	new mqEditAlphaDialogReaction(submenuRenderingModification->addAction("Change transparency") << mqSetName("actionEditAlpha"));
 
 	QMenu* submenuChangeObjectColor = submenuRenderingModification->addMenu("Change object color");
@@ -210,6 +212,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Orange = submenuChangeObjectColor->addAction("Orange");
 	QAction *Brown = submenuChangeObjectColor->addAction("Brown");
 	
+	
+
 	QAction::connect(KeepLargest, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotKeepLargest()));
 	QAction::connect(Invert, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotInvert()));
 	QAction::connect(Mirror, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirror()));
@@ -230,7 +234,12 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(Orange, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotOrange()));
 	QAction::connect(Brown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotBrown()));
 	
-	
+	QMenu* submenuScalarModification = menu.addMenu("Scalar computation");
+	//new mqThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickness"));
+	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
+	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance from camera");
+	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
+
 }
 void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 {
@@ -299,31 +308,21 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	
 
 	//auto dock3 = new QDockWidget(&projectWindow);
-	auto dock3 = new QDockWidget("Actors", &projectWindow);
-	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock3);
-	auto window = new QMainWindow(0);
-	/*QToolBar* cameraToolBar = new mqCameraControlsToolbar(window)
-		<< mqSetName("CameraControlsToolbar");*/
-	dock3->setAllowedAreas(Qt::AllDockWidgetAreas);
-	//cameraToolBar->layout()->setSpacing(0);
-	QWidget* actor_panel = new mqActorTreePanel(window);
-
-	//window->addToolBar(cameraToolBar);
-	window->setCentralWidget(actor_panel);
-
-	dock3->setWidget(window);
 	
+	
+	//@@ ADD BACK ACTOR TREEE
+	
+	/*
+	auto dock3 = new QDockWidget("Actors", &projectWindow);
+	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock3);	
+	auto window = new QMainWindow(0);	
+	dock3->setAllowedAreas(Qt::AllDockWidgetAreas);	
+	QWidget* actor_panel = new mqActorTreePanel(window);	
+	window->setCentralWidget(actor_panel);
+	dock3->setWidget(window);*/
+	//@@
 
-	//QWidget* actor_panel = new mqActorTreePanel(window);
-
-	/*auto mytree = new QTreeView(this->tabWidget);
-	auto dock2 = new QDockWidget("Actors");
-	dock2->setWidget(mytree);
-	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
-	projectWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);
-	projectWindow->setWindowModality(Qt::WindowModal);*/
-
-	//mainWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);
+	
 	
 
 	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)

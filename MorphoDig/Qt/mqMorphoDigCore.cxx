@@ -346,10 +346,9 @@ void mqMorphoDigCore::ActivateClippingPlane()
 		
 		this->getRenderer()->GetActiveCamera()->GetPosition(cameracentre);
 		this->getRenderer()->GetActiveCamera()->GetFocalPoint(camerafocalpoint);
-		double dist = sqrt((cameracentre[0] - camerafocalpoint[0])*(cameracentre[0] - camerafocalpoint[0])
-		+ (cameracentre[1] - camerafocalpoint[1])*(cameracentre[1] - camerafocalpoint[1])
-			+ (cameracentre[2] - camerafocalpoint[2])*(cameracentre[2] - camerafocalpoint[2])
-		);
+	
+
+		double dist = sqrt(vtkMath::Distance2BetweenPoints(cameracentre, camerafocalpoint));
 		this->getRenderer()->GetActiveCamera()->GetClippingRange(cr);
 
 		this->getRenderer()->GetActiveCamera()->SetClippingRange(dist, cr[1]);
@@ -3681,8 +3680,8 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 							intvv2[1] = (1 - t)*(1 - t)*(1 - t)*nn1[1] + 3 * (1 - t)*(1 - t)*t*hh1[1] + 3 * (1 - t)*t*t*hh2[1] + t*t*t*nn2[1];
 							intvv2[2] = (1 - t)*(1 - t)*(1 - t)*nn1[2] + 3 * (1 - t)*(1 - t)*t*hh1[2] + 3 * (1 - t)*t*t*hh2[2] + t*t*t*nn2[2];
 
-							double len = sqrt((intvv[0] - intvv2[0])*(intvv[0] - intvv2[0]) + (intvv[1] - intvv2[1])*(intvv[1] - intvv2[1]) + (intvv[2] - intvv2[2])*(intvv[2] - intvv2[2]));
-
+							
+							double len = sqrt(vtkMath::Distance2BetweenPoints(intvv, intvv2));
 							// cout << "connect:" << ls[0] << "," << ls[1] << endl;
 							current_length += len;
 							//glVertex3d(intvv2[0], intvv2[1], intvv2[2]);
@@ -5669,6 +5668,96 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 }
+void mqMorphoDigCore::scalarsCameraDistance()
+{
+		
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Largest region of next actor:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+
+				double numvert = mymapper->GetInput()->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);
+
+				newScalars->SetNumberOfTuples(numvert);
+
+			
+
+				
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+				double ve_init_pos[3];;
+				double ve_final_pos[3];
+				double distance_from_camera;
+				vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+				distance_from_camera = 3;
+				double campos[3];
+				this->getCamera()->GetPosition(campos);
+
+				for (vtkIdType i = 0; i < numvert; i++)	// for each vertex of this
+
+				{									
+						mPD->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+											
+						distance_from_camera = sqrt(vtkMath::Distance2BetweenPoints(campos, ve_final_pos));
+				
+					newScalars->InsertTuple1(i, distance_from_camera);
+
+
+				}
+				newScalars->SetName("Depth");
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray("Depth");
+				mPD->GetPointData()->AddArray(newScalars);
+				mPD->GetPointData()->SetActiveScalars("Depth");
+				//g_active_scalar = 0;
+				// 0 => depth
+				// 1 =>	"Maximum_Curvature"
+				// 2 => "Minimum_Curvature"
+				// 3 => "Gauss_Curvature"
+				// 4 => "Mean_Curvature"
+
+				modified = 1;
+
+			}
+			
+		}
+	}
+	if (modified == 1)
+	{
+		
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars updated " << endl;
+		this->Initmui_ExistingScalars();
+		
+		
+		this->Render();
+	}
+
+
+
+}
 void mqMorphoDigCore::addKeepLargest()
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -7112,7 +7201,8 @@ void mqMorphoDigCore::ResetCameraOrthoPerspective()
 	//cout << "Camera Position:" << campos[0] <<","<<campos[1]<<","<<campos[2]<< endl;
 	this->getCamera()->GetFocalPoint(foc);
 	//cout << "Camera Position:" << foc[0] << "," << foc[1] << "," << foc[2] << endl;
-	dist = sqrt(pow((campos[0] - foc[0]), 2) + pow((campos[1] - foc[1]), 2) + pow((campos[2] - foc[2]), 2));
+	
+	dist = sqrt(vtkMath::Distance2BetweenPoints(campos, foc));
 	//cout << "Distance between camera and focal point:" << dist << endl;
 
 	//cout << "Camera viewing angle:" << this->MorphoDigCore->getCamera()->GetViewAngle() << endl;
@@ -7136,7 +7226,7 @@ void mqMorphoDigCore::DollyCameraForParallelScale()
 	this->getCamera()->GetPosition(campos);
 	this->getCamera()->GetFocalPoint(foc);
 	double dist = sqrt(vtkMath::Distance2BetweenPoints(campos, foc));
-	//double dist = sqrt(pow((campos[0] - foc[0]), 2) + pow((campos[1] - foc[1]), 2) + pow((campos[2] - foc[2]), 2));
+	
 	double multfactor = 1 / tan(this->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
 
 	double newparallelscale = dist / multfactor;
@@ -8912,6 +9002,11 @@ void mqMorphoDigCore::slotMirror() { this->addMirrorXZ(); }
 void mqMorphoDigCore::slotInvert() { 
 		this->addInvert(); 
 
+}
+
+void mqMorphoDigCore::slotScalarsCameraDistance()
+{
+	this->scalarsCameraDistance();
 }
 
 void mqMorphoDigCore::slotKeepLargest() {
