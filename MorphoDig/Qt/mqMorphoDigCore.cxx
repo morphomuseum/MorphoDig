@@ -11,6 +11,7 @@
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
+#include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
 #include <vtkMaskFields.h>
 #include <vtkActor.h>
@@ -5749,15 +5750,291 @@ void mqMorphoDigCore::scalarsCameraDistance()
 		
 		//cout << "camera and grid adjusted" << endl;
 		cout << "scalars updated " << endl;
+
 		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender("Depth", VTK_DOUBLE, 1);
 		
 		
+	}
+
+
+
+}
+
+vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
+	double sc, vtkIdType id, int tool_mode)
+{
+	vtkSmartPointer<vtkIdList> connectedVertices =
+		vtkSmartPointer<vtkIdList>::New();
+	connectedVertices->InsertNextId(id);
+	vtkSmartPointer<vtkIdList> cellIdList =
+		vtkSmartPointer<vtkIdList>::New();
+	mesh->GetPointCells(id, cellIdList);
+
+	for (vtkIdType i = 0; i < cellIdList->GetNumberOfIds(); i++)
+	{
+		vtkSmartPointer<vtkIdList> pointIdList =
+			vtkSmartPointer<vtkIdList>::New();
+		mesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
+
+		vtkIdType newid;
+
+		if (pointIdList->GetId(0) != id)
+		{
+			newid = pointIdList->GetId(0);
+		}
+		else
+		{
+			newid = pointIdList->GetId(1);
+
+		}
+		if (tool_mode == -1) //  no tool (-1) 
+		{
+			connectedVertices->InsertNextId(newid);
+		}
+
+		/*else if (tool_mode == 2 || (tool_mode == 1 && g_magic_wand_extension == 180) || (tool_mode == 0)) // flood bucket or magic wand with maximal extension or pencil
+		{
+			// get tag value of current id
+			vtkFloatArray *currentTags;
+			currentTags = (vtkFloatArray*)this->GetPointData()->GetScalars("Tags");
+			if (currentTags == NULL)
+			{
+				connectedVertices->InsertNextId(newid);
+			}
+			else
+			{
+				double currentTag = currentTags->GetTuple(newid)[0];
+				//std::cout<<"Current tag ="<<currentTag<<std::endl;
+				//std::cout<<"sc ="<<sc<<std::endl;
+
+				if (currentTag == sc || g_magic_wand_over == 1 || currentTag == 0.0) // Tag 0 is special! Overriden...
+				{
+					connectedVertices->InsertNextId(newid);
+				}
+			}
+		}
+		else // magic wand : consider both current tag value and normal angle limit extension
+		{
+
+			vtkFloatArray *currentTags;
+			currentTags = (vtkFloatArray*)this->GetPointData()->GetScalars("Tags");
+			int oktag = 0;
+			if (g_magic_wand_over == 1)
+			{
+				oktag = 1;
+			}
+			if (currentTags == NULL)
+			{
+				oktag = 1;
+			}
+			else
+			{
+				double currentTag = currentTags->GetTuple(newid)[0];
+				if (currentTag == sc || currentTag == 0.0) // Tag 0 is special! Overriden...
+				{
+					oktag = 1;
+				}
+			}
+			if (oktag == 1)
+			{
+				// now check normal
+				double *vn2;
+				float vvn1[3];
+				float vvn[3];
+
+
+				vtkFloatArray* norms = vtkFloatArray::SafeDownCast
+				(this->GetPointData()->GetNormals());
+				if (norms != NULL)
+				{
+					vn2 = norms->GetTuple(newid);
+					vvn1[0] = (float)vn2[0];
+					vvn1[1] = (float)vn2[1];
+					vvn1[2] = (float)vn2[2];
+					glMatrix wc_mat;
+					glMatrix screen_mat;
+					glPushMatrix();
+					glLoadIdentity();
+					glMultMatrixf((GLfloat*) this->Mat2);
+					glTranslated(
+						this->mean[0],
+						this->mean[1],
+						this->mean[2]
+					);
+					glMultMatrixf((GLfloat *)this->Mat1);
+					glTranslated(
+						-this->mean[0],
+						-this->mean[1],
+						-this->mean[2]
+					);
+					this->get_world_coordinates_matrix(wc_mat);
+					this->get_screen_projection_matrix(screen_mat);
+					glPopMatrix();
+
+					ApplyRotation(vvn1, vvn, wc_mat);	//rotation of the normals..
+
+
+					double curr_cos = vn[0] * (double)vvn[0] + vn[1] * (double)vvn[1] + vn[2] * (double)vvn[2];
+					if (curr_cos>g_magic_wand_extension_min_cos)
+					{
+						connectedVertices->InsertNextId(newid);
+					}
+
+				}
+				else
+				{
+					std::cout << "Norm NULL..." << std::endl;
+				}
+
+			}
+		}*/
+
+	}
+	return connectedVertices;
+}
+
+void mqMorphoDigCore::scalarsGaussianBlur()
+{
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Largest region of next actor:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+				vtkDoubleArray *currentScalars;
+				currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
+
+
+				double numvert = mymapper->GetInput()->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);
+				newScalars->SetNumberOfTuples(numvert);
+
+
+				if (currentScalars != NULL)
+				{
+					std::string scname = mPD->GetPointData()->GetScalars()->GetName();
+					std::string sTags("Tags");
+					std::size_t found = scname.find(sTags);
+
+					if (found == std::string::npos)
+					{
+						vtkSmartPointer<vtkExtractEdges> extractEdges =
+							vtkSmartPointer<vtkExtractEdges>::New();
+						extractEdges->SetInputData((vtkPolyData*)mPD);
+						extractEdges->Update();
+
+						vtkSmartPointer<vtkPolyData> mesh = extractEdges->GetOutput();
+
+						vtkSmartPointer<vtkFloatArray> newScalars =
+							vtkSmartPointer<vtkFloatArray>::New();
+
+						newScalars->SetNumberOfComponents(1);
+						newScalars->SetNumberOfTuples(numvert);
+
+						vtkIdType ve;
+
+
+						double vn[3];
+						vn[0] = 0;
+						vn[1] = 0;
+						vn[2] = 1;
+						double picked_value = 0;
+						for (ve = 0; ve<numvert; ve++)
+						{
+							// get all vertices connected to this point (neighbouring vertices).
+							//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+							vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+							connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1); //	int tool_mode=-1; //no pencil! no magic wand!
+
+							vtkSmartPointer<vtkIdTypeArray> ids =
+								vtkSmartPointer<vtkIdTypeArray>::New();
+							ids->SetNumberOfComponents(1);
+							//if (ve<10){std::cout << "Connected vertices: ";}
+							for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
+							{
+								//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+								ids->InsertNextValue(connectedVertices->GetId(j));
+							}
+							float newscalar = 0;
+							int n_vertices = connectedVertices->GetNumberOfIds();
+
+							newscalar = 0;
+
+							//on ajoute une fois la valeur actuelle.
+
+							// get all scalars 				
+							//if (ve<10){std::cout<<std::endl;}
+
+							for (vtkIdType j = 0; j<ids->GetNumberOfTuples(); j++)
+							{	// for all neighbouring vertices							
+								vtkIdType at = ids->GetTuple(j)[0];
+								//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
+								double curr_scalar = (double)(currentScalars->GetTuple(at))[0];
+								//std::cout<<curr_scalar<<std::endl;
+								newscalar += curr_scalar;
+
+							}
+							if (n_vertices>0)
+							{
+								newscalar /= n_vertices;
+							}
+
+							// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
+							newScalars->InsertTuple1(ve, newscalar);
+
+
+						}
+						//std::cout<<"New Scalar computation done "<<std::endl;
+						std::string sc_name = this->Getmui_ActiveScalars()->Name.toStdString();
+						newScalars->SetName(sc_name.c_str());
+						mPD->GetPointData()->RemoveArray(sc_name.c_str());
+						//std::cout<<"Add array "<<std::endl;
+						mPD->GetPointData()->AddArray(newScalars);
+						//std::cout<<"Set Active scalar"<<std::endl;
+						mPD->GetPointData()->SetActiveScalars(sc_name.c_str());
+					}// not scalar "Tags
+					else
+					{
+						std::cout << "Cannot smooth Tags" << std::endl;
+					}
+				}//scalars not null
+
+
+				modified = 1;
+
+			}
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars updated " << endl;		
 		this->Render();
 	}
 
 
 
 }
+
 void mqMorphoDigCore::addKeepLargest()
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -8178,6 +8455,8 @@ void mqMorphoDigCore::Setmui_ActiveScalars(QString Scalar, int dataType, int num
 }
 
 
+
+
 int mqMorphoDigCore::Getmui_DefaultAnaglyph() { return this->mui_DefaultAnaglyph; }
 int mqMorphoDigCore::Getmui_Anaglyph() { return this->mui_Anaglyph; }
 void mqMorphoDigCore::Setmui_Anaglyph(int anaglyph)
@@ -9007,6 +9286,11 @@ void mqMorphoDigCore::slotInvert() {
 void mqMorphoDigCore::slotScalarsCameraDistance()
 {
 	this->scalarsCameraDistance();
+}
+
+void mqMorphoDigCore::slotScalarsGaussianBlur()
+{
+	this->scalarsGaussianBlur();
 }
 
 void mqMorphoDigCore::slotKeepLargest() {
