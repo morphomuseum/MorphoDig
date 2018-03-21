@@ -173,6 +173,10 @@ QReleaseSliderValue.h
   mqDecomposeDialog.h
   mqDecomposeDialogReaction.cxx
   mqDecomposeDialogReaction.h
+mqScalarsThicknessDialog.h
+mqScalarsThicknessDialog.cxx
+mqScalarsThicknessDialogReaction.h
+mqScalarsThicknessDialogReaction.cxx
 )
 
 set (Qt_MOC_HDRS
@@ -216,6 +220,7 @@ mqFillHolesDialog.ui
 mqTPSDialog.ui
 mqDecomposeDialog.ui
 mqActorTreePanel.ui
+mqScalarsThicknessDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

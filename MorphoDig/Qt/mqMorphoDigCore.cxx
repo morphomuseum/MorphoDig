@@ -11,6 +11,7 @@
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
+#include <vtkKdTreePointLocator.h>
 #include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
 #include <vtkMaskFields.h>
@@ -5681,6 +5682,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
+			myActor->SetSelected(0);
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 			{
@@ -5893,7 +5895,171 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer
 	}
 	return connectedVertices;
 }
+void mqMorphoDigCore::scalarsThickness(double max_thickness)
+{
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Largest region of next actor:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			myActor->SetSelected(0);
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
 
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+					vtkSmartPointer<vtkKdTreePointLocator>::New();
+				kDTree->SetDataSet(mPD);
+				kDTree->BuildLocator();
+
+				
+
+
+				double numvert = mymapper->GetInput()->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);								
+				vtkIdType ve;
+				double pt[3] = { 0,0,1 };
+				double pt2[3] = { 0,0,1 };
+				double projected_pt2[3] = { 0,0,1 };
+				double *ptn;
+				double *ptn2;
+				double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
+				double cur_cos = 1.0; // compare ve1's normal and ve2's normal
+				double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
+				double AB[3];
+				double AC[3];
+				double ABnorm[3];
+
+				double picked_value = 0;
+				double tmp_dist = 0;
+				auto norms = vtkDoubleArray::SafeDownCast(mPD->GetPointData()->GetNormals());
+				//cout << "Safe point downcast done ! " << endl;
+				if (norms)
+				{
+					for (ve = 0; ve < numvert; ve++)
+					{
+						mPD->GetPoint(ve, pt);
+						ptn= norms->GetTuple3(ve);
+						// get all neighbouring vertices within a max_thickness/2 radius
+						//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+						vtkSmartPointer<vtkIdList> neighbours = vtkSmartPointer<vtkIdList>::New();
+						double Radius = 1.1*max_thickness / 2;
+						kDTree->FindPointsWithinRadius(Radius, pt, neighbours);
+						vtkSmartPointer<vtkIdTypeArray> ids =
+							vtkSmartPointer<vtkIdTypeArray>::New();
+						ids->SetNumberOfComponents(1);
+						//if (ve<10){std::cout << "Connected vertices: ";}
+						double newscalar = 0;
+						for (vtkIdType j = 0; j < neighbours->GetNumberOfIds(); j++)
+						{
+							
+							//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+							vtkIdType connectedVertex = neighbours->GetId(j);
+							if (ve != connectedVertex)
+							{
+								mPD->GetPoint(connectedVertex, pt2);
+								AB[0] = pt2[0] - pt[0];
+								AB[1] = pt2[1] - pt[1];
+								AB[2] = pt2[2] - pt[2];
+								double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+								ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
+								if (curr_dist>0)
+								{
+									ABnorm[0] = AB[0] / curr_dist;
+									ABnorm[1] = AB[1] / curr_dist;
+									ABnorm[2] = AB[2] / curr_dist;
+								}
+								if (curr_dist <max_thickness)
+								{
+									// calculate projected point along the normal of point 1 
+									// towards point 2
+									// seach if vv1n et vv2n sont suffisamment dans la bonne direction.
+									cur_cos = ptn[0] * ptn2[0] + ptn[1] * ptn2[1] + ptn[2] * ptn2[2];
+									cur_cos2 = ABnorm[0] * ptn[0] + ABnorm[1] * ptn[1] + ABnorm[2] * ptn[2];
+									if (cur_cos> min_cos && cur_cos2>min_cos)
+									{
+										// we have a candidate!
+										// compute projected point 2 along vvn1 !
+										projected_pt2[0] = pt[0] + ptn[0] * AB[0];
+										projected_pt2[1] = pt[1] + ptn[1] * AB[1];
+										projected_pt2[2] = pt[2] + ptn[2] * AB[2];
+										AC[0] = projected_pt2[0] - pt[0];
+										AC[1] = projected_pt2[1] - pt[1];
+										AC[2] = projected_pt2[2] - pt[2];
+										//tmp_dist = (float)sqrt(AC[0]*AC[0]+AC[1]*AC[1]+AC[2]*AC[2]);
+										// well I am not sure I want this distance!!!
+										tmp_dist = curr_dist;
+
+									}
+									else
+									{
+										tmp_dist = thickness_max_distance;
+									}
+								}
+								else
+								{
+									tmp_dist = thickness_max_distance;
+								}
+								if (tmp_dist< min_dist) { min_dist = tmp_dist; }
+
+							}
+
+						}
+
+						// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
+						newScalars->InsertTuple1(ve, newscalar);
+
+
+					}
+					//std::cout<<"New Scalar computation done "<<std::endl;
+
+					newScalars->SetName("Thickness");
+					// test if exists...
+					//
+					int exists = 0;
+
+					// remove this scalar
+					//this->GetPointData()->SetScalars(newScalars);
+					mPD->GetPointData()->RemoveArray("Thickness");
+					mPD->GetPointData()->AddArray(newScalars);
+					mPD->GetPointData()->SetActiveScalars("Thickness");
+					//g_active_scalar = 0;
+					// 0 => depth
+					// 1 =>	"Maximum_Curvature"
+					// 2 => "Minimum_Curvature"
+					// 3 => "Gauss_Curvature"
+					// 4 => "Mean_Curvature"
+
+					modified = 1;
+				}
+
+			}
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "thickness scalars computed " << endl;
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender("Thickness", VTK_DOUBLE, 1);
+		
+	}
+}
 void mqMorphoDigCore::scalarsGaussianBlur()
 {
 
@@ -5906,6 +6072,7 @@ void mqMorphoDigCore::scalarsGaussianBlur()
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
+			myActor->SetSelected(0);
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 			{

@@ -40,6 +40,8 @@
 #include "mqFillHolesDialogReaction.h"
 #include "mqTPSDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
+#include "mqScalarsThicknessDialogReaction.h"
+
 #include "mqSetName.h"
 #include "mqViewMenuManager.h"
 
@@ -239,8 +241,11 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
 	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance from camera");
 	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
+	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
+
 	QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
+
 }
 void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 {
