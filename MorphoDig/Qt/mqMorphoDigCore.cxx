@@ -5958,6 +5958,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 					kDTree->BuildLocator();
 					for (ve = 0; ve < numvert; ve++)
 					{
+						min_dist = max_thickness;
 						progress.setValue(ve);
 						if (progress.wasCanceled())
 							break;
@@ -5982,6 +5983,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 							if (ve != connectedVertex)
 							{
 								mPD->GetPoint(connectedVertex, pt2);
+								ptn2 = norms->GetTuple3(connectedVertex);
 								AB[0] = pt2[0] - pt[0];
 								AB[1] = pt2[1] - pt[1];
 								AB[2] = pt2[2] - pt[2];
