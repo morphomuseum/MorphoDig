@@ -5678,7 +5678,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Largest region of next actor:" << i << endl;
+		cout << "Camera distance" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -5686,7 +5686,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 			{
-
+				
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
@@ -5902,7 +5902,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Largest region of next actor:" << i << endl;
+		cout << "Scalar thickness:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -5914,13 +5914,9 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
 				mPD = mymapper->GetInput();
 
-				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
-					vtkSmartPointer<vtkKdTreePointLocator>::New();
-				kDTree->SetDataSet(mPD);
-				kDTree->BuildLocator();
-
 				
 
+				
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
@@ -5944,19 +5940,34 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 				double ABnorm[3];
 
 				double picked_value = 0;
+				double min_dist = max_thickness;
 				double tmp_dist = 0;
-				auto norms = vtkDoubleArray::SafeDownCast(mPD->GetPointData()->GetNormals());
+				auto norms = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetNormals());
+				
+				cout << "Have tried to get norms" << endl;
 				//cout << "Safe point downcast done ! " << endl;
 				if (norms)
 				{
+					cout << "We have found some norms" << endl;
+
+					QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
+					progress.setWindowModality(Qt::WindowModal);
+					vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+						vtkSmartPointer<vtkKdTreePointLocator>::New();
+					kDTree->SetDataSet(mPD);
+					kDTree->BuildLocator();
 					for (ve = 0; ve < numvert; ve++)
 					{
+						progress.setValue(ve);
+						if (progress.wasCanceled())
+							break;
+
 						mPD->GetPoint(ve, pt);
 						ptn= norms->GetTuple3(ve);
 						// get all neighbouring vertices within a max_thickness/2 radius
 						//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
 						vtkSmartPointer<vtkIdList> neighbours = vtkSmartPointer<vtkIdList>::New();
-						double Radius = 1.1*max_thickness / 2;
+						double Radius = 1.1*max_thickness;
 						kDTree->FindPointsWithinRadius(Radius, pt, neighbours);
 						vtkSmartPointer<vtkIdTypeArray> ids =
 							vtkSmartPointer<vtkIdTypeArray>::New();
@@ -6006,12 +6017,12 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 									}
 									else
 									{
-										tmp_dist = thickness_max_distance;
+										tmp_dist = max_thickness;
 									}
 								}
 								else
 								{
-									tmp_dist = thickness_max_distance;
+									tmp_dist = max_thickness;
 								}
 								if (tmp_dist< min_dist) { min_dist = tmp_dist; }
 
@@ -6020,7 +6031,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 						}
 
 						// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
-						newScalars->InsertTuple1(ve, newscalar);
+						newScalars->InsertTuple1(ve, min_dist);
 
 
 					}
@@ -6045,6 +6056,12 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 
 					modified = 1;
 				}
+				else
+				{
+					cout << "found no norms!" << endl;
+
+				}
+
 
 			}
 
