@@ -3979,6 +3979,8 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 							vtkSmartPointer<vtkQuadricDecimation> decimate =
 								vtkSmartPointer<vtkQuadricDecimation>::New();
 
+						
+							
 							vtkSmartPointer<vtkDelaunay3D> delaunay3D =
 								vtkSmartPointer<vtkDelaunay3D>::New();
 							decimate->SetInputData(mapper->GetInput());
@@ -5163,7 +5165,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 				{
 					ObjNormals->SetInputData(decimate2->GetOutput());
 				}
-				ObjNormals->ComputePointNormalsOff();
+				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				//ObjNormals->AutoOrientNormalsOff();
 				ObjNormals->ConsistencyOff();
@@ -5460,6 +5462,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 				cfilter->Update();
 				int regions = cfilter->GetNumberOfExtractedRegions();
 				QProgressDialog progress("Surface decomposition into non connex subregions.", "Abort decomposition", 0, regions);
+				progress.setCancelButton(0);
 				progress.setWindowModality(Qt::WindowModal);
 				std::cout << "\nVtkConnectivity number of regions:" << regions << std::endl;
 				vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
@@ -5764,7 +5767,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 }
 
 vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
-	double sc, vtkIdType id, int tool_mode)
+	double sc, vtkIdType id, int tool_mode, int compute_avg_norm)
 {
 	vtkSmartPointer<vtkIdList> connectedVertices =
 		vtkSmartPointer<vtkIdList>::New();
@@ -5893,9 +5896,48 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer
 		}*/
 
 	}
+	// now I compute a mean vn.
+	if (compute_avg_norm)
+	{
+		auto norms = vtkFloatArray::SafeDownCast(mesh->GetPointData()->GetNormals());
+
+		//cout << "Have tried to get norms" << endl;
+		//cout << "Safe point downcast done ! " << endl;
+		if (norms)
+		{
+			//if (ve<10){std::cout << "Connected vertices: ";}		
+			double *norm = norms->GetTuple3(id);
+			double newn[3];
+			newn[0] = norm [0];
+			newn[1] = norm[1];
+			newn[2] = norm[2];
+			int n_vertices = connectedVertices->GetNumberOfIds();
+
+
+			for (vtkIdType j = 0; j < n_vertices; j++)
+			{	// for all neighbouring vertices							
+				norm = norms->GetTuple3(connectedVertices->GetId(j));
+				newn[0] += norm[0];
+				newn[1] += norm[1];
+				newn[2] += norm[2];
+												
+
+			}
+			
+			/*newnx /= (n_vertices+1);
+			newny /= (n_vertices + 1);
+			newnz /= (n_vertices + 1);*/
+			vtkMath::Normalize(newn);
+			
+			vn[0] = newn[0];
+			vn[1] = newn[1];
+			vn[2] = newn[2];
+		}
+	}
+
 	return connectedVertices;
 }
-void mqMorphoDigCore::scalarsThickness(double max_thickness)
+void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg)
 {
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -5930,7 +5972,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 				double pt[3] = { 0,0,1 };
 				double pt2[3] = { 0,0,1 };
 				double projected_pt2[3] = { 0,0,1 };
-				double *ptn;
+				double ptn[3];
 				double *ptn2;
 				double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
 				double cur_cos = 1.0; // compare ve1's normal and ve2's normal
@@ -5944,11 +5986,11 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 				double tmp_dist = 0;
 				auto norms = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetNormals());
 				
-				cout << "Have tried to get norms" << endl;
+			//	cout << "Have tried to get norms" << endl;
 				//cout << "Safe point downcast done ! " << endl;
 				if (norms)
 				{
-					cout << "We have found some norms" << endl;
+				//	cout << "We have found some norms" << endl;
 
 					QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
 					progress.setWindowModality(Qt::WindowModal);
@@ -5960,21 +6002,68 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 					{
 						min_dist = max_thickness;
 						progress.setValue(ve);
-						if (progress.wasCanceled())
-							break;
+						/*if (progress.wasCanceled())
+							break;*/
 
 						mPD->GetPoint(ve, pt);
-						ptn= norms->GetTuple3(ve);
-						// get all neighbouring vertices within a max_thickness/2 radius
+						double *mptn= norms->GetTuple3(ve);
+						ptn[0] = mptn[0];
+						ptn[1] = mptn[1];
+						ptn[2] = mptn[2];
+						if (ve < 10)
+						{
+							//cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+						}
+						vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+						//ptn will be the average norm of all connected vertices.
+						if (smooth_normales)
+						{
+							connectedVertices = GetConnectedVertices(mPD, ptn, picked_value, ve, -1, 1); //	int tool_mode=-1; //no pencil! no magic wand!
+						}
+						else
+						{
+							if (ve < 10)
+							{
+								//cout << "no ptn avg!" << endl;
+							}
+							
+
+						}
+						if (ve < 10)
+						{
+							//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+						}
+							
+						ptn[0] = -ptn[0];
+						ptn[1] = -ptn[1];
+						ptn[2] = -ptn[2];
+																										 // here we will look at the neighbour vertices of pt to compute an average ptn (otherwise this filter is extremely sensitive with non planar/rough surfaces with changing normals)
+						
+
+
+						// get all neighbouring vertices within a max_thickness radius
 						//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
 						vtkSmartPointer<vtkIdList> neighbours = vtkSmartPointer<vtkIdList>::New();
 						double Radius = 1.1*max_thickness;
 						kDTree->FindPointsWithinRadius(Radius, pt, neighbours);
-						vtkSmartPointer<vtkIdTypeArray> ids =
-							vtkSmartPointer<vtkIdTypeArray>::New();
-						ids->SetNumberOfComponents(1);
+						
+
+
+
 						//if (ve<10){std::cout << "Connected vertices: ";}
 						double newscalar = 0;
+						/*if (ve < 10)
+						{
+							cout << "found" << neighbours->GetNumberOfIds() << " neighbours" << endl;
+						}*/
+
+						std::vector<double> thicknesses;
+						int cpt = 0;
+							
+						
+
+						
+
 						for (vtkIdType j = 0; j < neighbours->GetNumberOfIds(); j++)
 						{
 							
@@ -5982,7 +6071,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 							vtkIdType connectedVertex = neighbours->GetId(j);
 							if (ve != connectedVertex)
 							{
-								mPD->GetPoint(connectedVertex, pt2);
+								mPD->GetPoint(connectedVertex, pt2);								
 								ptn2 = norms->GetTuple3(connectedVertex);
 								AB[0] = pt2[0] - pt[0];
 								AB[1] = pt2[1] - pt[1];
@@ -6015,6 +6104,8 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 										//tmp_dist = (float)sqrt(AC[0]*AC[0]+AC[1]*AC[1]+AC[2]*AC[2]);
 										// well I am not sure I want this distance!!!
 										tmp_dist = curr_dist;
+										thicknesses.push_back(tmp_dist);
+										cpt++;
 
 									}
 									else
@@ -6032,8 +6123,34 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness)
 
 						}
 
-						// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
-						newScalars->InsertTuple1(ve, min_dist);
+						// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+						if (avg <= 1 ||cpt==0)
+						{
+							
+							newScalars->InsertTuple1(ve, min_dist);
+						}
+						else
+						{
+							/*if (ve < 10)
+							{
+								cout << "try to sort thicknesses"  << endl;
+							}*/
+							std::sort(thicknesses.begin(), thicknesses.end());
+							double thick_avg = 0;
+							double mavg = avg;// in some cases there are less thickness candidates thant avg => the avg thickness will be done using less than "avg" nr of candidates.
+							if (cpt < avg) { mavg = cpt; }
+							for (int i = 0; i < mavg; i++)
+							{
+								thick_avg += thicknesses.at(i);
+							}
+							thick_avg /= mavg;
+							newScalars->InsertTuple1(ve, thick_avg);
+							if (ve < 10)
+							{
+								//cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << endl;
+							}
+
+						}
 
 
 					}
@@ -6147,7 +6264,7 @@ void mqMorphoDigCore::scalarsGaussianBlur()
 							// get all vertices connected to this point (neighbouring vertices).
 							//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
 							vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
-							connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1); //	int tool_mode=-1; //no pencil! no magic wand!
+							connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
 
 							vtkSmartPointer<vtkIdTypeArray> ids =
 								vtkSmartPointer<vtkIdTypeArray>::New();

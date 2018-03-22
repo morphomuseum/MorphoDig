@@ -61,7 +61,13 @@ mqScalarsThicknessDialog::mqScalarsThicknessDialog(QWidget* Parent)
 	this->Ui->thickness->setSingleStep(1);
 	this->Ui->thickness->setValue(2);
 
-
+	this->Ui->smoothNormales->setChecked(true);
+	
+	this->Ui->avg->setMinimum(1);
+	this->Ui->avg->setValue(5);
+	this->Ui->avg->setMaximum(1000);
+	this->Ui->avg->setSingleStep(1);
+	
   
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditThickness()));
 
@@ -86,7 +92,7 @@ void mqScalarsThicknessDialog::editThickness()
 	{
 		std::string action = "Update thickness";
 		
-		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value());// to update thickness
+		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value());// to update thickness
 		
 	}
 }

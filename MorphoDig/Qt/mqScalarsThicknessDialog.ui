@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>135</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,7 +432,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>100</y>
+     <y>160</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -456,7 +456,7 @@
      <x>10</x>
      <y>10</y>
      <width>411</width>
-     <height>71</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -468,7 +468,7 @@
       <x>40</x>
       <y>30</y>
       <width>201</width>
-      <height>31</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -483,6 +483,58 @@
       <width>62</width>
       <height>22</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="smoothNormales">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>90</y>
+      <width>331</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Use neighbour vertices to &quot;smooth&quot; search direction</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>60</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thickness = avg of &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="avg">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>60</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>60</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;closest vertices found&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
