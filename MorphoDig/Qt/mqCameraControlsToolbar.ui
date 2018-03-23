@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>35</width>
-    <height>319</height>
+    <height>253</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,38 +16,6 @@
   <property name="orientation">
    <enum>Qt::Vertical</enum>
   </property>
-  <action name="actionClippingPlaneOnOff">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../Icons/icons.qrc">
-     <normaloff>:/Icons/clipping_plane_off.png</normaloff>
-     <normalon>:/Icons/clipping_plane_on.png</normalon>:/Icons/clipping_plane_off.png</iconset>
-   </property>
-   <property name="text">
-    <string>Scalar visibility on/off</string>
-   </property>
-   <property name="toolTip">
-    <string>Clipping plane On/Off toggle</string>
-   </property>
-  </action>
-  <action name="actionBackfaceCullingOnOff">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../Icons/icons.qrc">
-     <normaloff>:/Icons/backface_on.png</normaloff>
-     <normalon>:/Icons/backface_off.png</normalon>:/Icons/backface_on.png</iconset>
-   </property>
-   <property name="text">
-    <string>Backface visibility on/off</string>
-   </property>
-   <property name="toolTip">
-    <string>Backface culling On/Off toggle</string>
-   </property>
-  </action>
   <action name="actionCameraFront">
    <property name="icon">
     <iconset resource="../Icons/icons.qrc">
@@ -167,9 +135,6 @@
   <addaction name="actionCameraLeft"/>
   <addaction name="actionCameraAbove"/>
   <addaction name="actionCameraBelow"/>
-  <addaction name="separator"/>
-  <addaction name="actionClippingPlaneOnOff"/>
-  <addaction name="actionBackfaceCullingOnOff"/>
  </widget>
  <resources>
   <include location="../Icons/icons.qrc"/>

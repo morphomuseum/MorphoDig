@@ -8012,7 +8012,7 @@ void mqMorphoDigCore::SetGridInfos()
 
 	}
 	this->Render();*/
-	//this->Render();
+	this->Render();
 }
 
 void mqMorphoDigCore::SetOrientationHelperVisibility()

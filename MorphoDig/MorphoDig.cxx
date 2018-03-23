@@ -309,6 +309,9 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	projectWindow->setCentralWidget(dock1);
 	*/
 	this->qvtkWidget2 = new QVTKOpenGLWidget();
+
+
+
 	qvtkWidget2->setObjectName(QStringLiteral("qvtkWidget"));
 	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	sizePolicy.setHorizontalStretch(1);
@@ -319,6 +322,12 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
 		
 	projectWindow->setCentralWidget(qvtkWidget2);
+
+	/*QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_add.png");
+	QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+		
+	
+	qvtkWidget2->setCursor(projectCursor);*/
 
 
 	//projectWindow->Maximise
@@ -633,9 +642,10 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	 this->AreaPicker->AddObserver(vtkCommand::EndPickEvent, pickCallback);
 	
  style->SetCurrentRenderer(this->MorphoDigCore->getRenderer());
-  this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
-  this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+  //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
+  //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   
+ //same thing !!!!
   window->GetInteractor()->SetPicker(this->AreaPicker);
   window->GetInteractor()->SetInteractorStyle(style);
 

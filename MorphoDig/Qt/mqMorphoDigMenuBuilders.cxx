@@ -17,6 +17,8 @@
 #include "mqMorphoDigMenuBuilders.h"
 #include "mqCameraControlsToolbar.h"
 #include "mqMainControlsToolbar.h"
+#include "mqInteractionControlsToolbar.h"
+#include "mqDisplayControlsToolbar.h"
 #include "mqLightControlsToolbar.h"
 #include "mqActorTreePanel.h"
 #include "mqObjectsControlsToolbar.h"
@@ -329,7 +331,15 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	//@@
 
 	
+	QToolBar*displayToolBar = new mqDisplayControlsToolbar(&projectWindow)
+		<< mqSetName("DisplayControlsToolbar");
+	displayToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::TopToolBarArea, displayToolBar);
 	
+	QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow)
+		<< mqSetName("InteractionControlsToolbar");
+	interactionToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::TopToolBarArea, interactionToolBar);
 
 	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
 		<< mqSetName("LightControlsToolbar");

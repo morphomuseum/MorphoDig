@@ -1,5 +1,8 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
+ <qresource prefix="/Cursors">
+ <file>Lasso_add.png</file>
+  </qresource>
   <qresource prefix="/Logos">
 <file>Logo_software.png</file>
   </qresource>
@@ -7,6 +10,7 @@
   <!-- Application Icon. -->
  <file>MorphoDig.ico</file>
     <!-- Typical file operations. -->
+   <file>Lasso_sub.png</file>
     <file>fileopen.png</file>
     <file>filesave.png</file>
  

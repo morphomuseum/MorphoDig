@@ -29,44 +29,74 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "mqMainControlsToolbar.h"
-#include "ui_mqMainControlsToolbar.h"
+#include "mqDisplayControlsToolbar.h"
+#include "ui_mqDisplayControlsToolbar.h"
 
 // For later!
-#include "mqSaveNTWDialogReaction.h"
-#include "mqUndoRedoReaction.h"
 
 #include "mqMorphoDigCore.h"
-#include "mqOpenDataReaction.h"
 
-
-
+#include "mqDisplayReaction.h"
+#include <vtkRenderer.h>
 #include <QToolButton>
 
 
 //-----------------------------------------------------------------------------
-void mqMainControlsToolbar::constructor()
+void mqDisplayControlsToolbar::constructor()
 {
- // Ui::mqMainControlsToolbar ui;
+ // Ui::mqDisplayControlsToolbar ui;
  // ui.setupUi(this);
-  this->ui = new Ui_mqMainControlsToolbar;
+  this->ui = new Ui_mqDisplayControlsToolbar;
   this->ui->setupUi(this);
-  new mqSaveNTWDialogReaction(this->ui->actionSaveData);
-  new mqOpenDataReaction(this->ui->actionOpenData, 0);//0= open data (generic)
- 
+  
   //new mqSaveDataReaction(this->ui->actionSaveData);
  
-  new mqUndoRedoReaction(this->ui->actionUndo, true);
-  new mqUndoRedoReaction(this->ui->actionRedo, false);
 
   
 
+  if (mqMorphoDigCore::instance()->Getmui_Anaglyph() == 1)
+  {
+
+	  this->ui->actionRendererAnaglyphToggle->setChecked(true);
+  }
+
+  if (mqMorphoDigCore::instance()->Getmui_ShowGrid() == 1)
+  {
+
+	  this->ui->actionGridToggle->setChecked(true);
+  }
+  if (mqMorphoDigCore::instance()->Getmui_ShowOrientationHelper() == 1)
+  {
+
+	  this->ui->actionOrientationHelperToggle->setChecked(true);
+  }
+
+
+
+  new mqDisplayReaction(this->ui->actionGridToggle, 0); //0 = display Grid Toggle
+  new mqDisplayReaction(this->ui->actionOrientationHelperToggle, 1); //1 = display Orientation Helper Toggle
+  new mqDisplayReaction(this->ui->actionRendererAnaglyphToggle, 2); //2 = display Anaglyph mode Toggle
+
+  connect(this->ui->actionBackfaceCullingOnOff, SIGNAL(triggered()), this, SLOT(slotBackfaceCullingOnOff()));
+  connect(this->ui->actionClippingPlaneOnOff, SIGNAL(triggered()), this, SLOT(slotClippingPlaneOnOff()));
 
   
   
 }
 
+void mqDisplayControlsToolbar::slotClippingPlaneOnOff()
+{
+	mqMorphoDigCore::instance()->getRenderer()->ResetCameraClippingRange();
+	mqMorphoDigCore::instance()->ChangeClippingPlane();
+	mqMorphoDigCore::instance()->Render();
+	//mqMorphoDigCore::instance()->Render();
+}
 
+void mqDisplayControlsToolbar::slotBackfaceCullingOnOff()
+{
 
-
+	mqMorphoDigCore::instance()->ChangeBackfaceCulling();
+	mqMorphoDigCore::instance()->Render();
+	//mqMorphoDigCore::instance()->Render();
+}
 

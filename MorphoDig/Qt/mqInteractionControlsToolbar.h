@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    Copied from Paraview pqMainControlsToolbar.cxx
+   Module:    Copied from Paraview pqMainControlsToolbar.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,50 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "mqMainControlsToolbar.h"
-#include "ui_mqMainControlsToolbar.h"
-
-// For later!
-#include "mqSaveNTWDialogReaction.h"
-#include "mqUndoRedoReaction.h"
-
-#include "mqMorphoDigCore.h"
-#include "mqOpenDataReaction.h"
+#ifndef mqInteractionControlsToolbar_h
+#define mqInteractionControlsToolbar_h
 
 
+#include <QToolBar>
+class Ui_mqInteractionControlsToolbar;
 
-#include <QToolButton>
-
-
-//-----------------------------------------------------------------------------
-void mqMainControlsToolbar::constructor()
+/**
+* mqInteractionControlsToolbar is the toolbar with actions (and reactions) for the
+* "Interaction Controls" toolbar in MophoDig. 
+* Simply instantiate this and put it in your application UI file or
+* QMainWindow to use it.
+*/
+class  mqInteractionControlsToolbar : public QToolBar
 {
- // Ui::mqMainControlsToolbar ui;
- // ui.setupUi(this);
-  this->ui = new Ui_mqMainControlsToolbar;
-  this->ui->setupUi(this);
-  new mqSaveNTWDialogReaction(this->ui->actionSaveData);
-  new mqOpenDataReaction(this->ui->actionOpenData, 0);//0= open data (generic)
- 
-  //new mqSaveDataReaction(this->ui->actionSaveData);
- 
-  new mqUndoRedoReaction(this->ui->actionUndo, true);
-  new mqUndoRedoReaction(this->ui->actionRedo, false);
+  Q_OBJECT
+  typedef QToolBar Superclass;
 
+public:
+  mqInteractionControlsToolbar(const QString& title, QWidget* parentObject = 0)
+    : Superclass(title, parentObject)
+  {
+    this->constructor();
+  }
+  mqInteractionControlsToolbar(QWidget* parentObject = 0)
+    : Superclass(parentObject)
+  {
+    this->constructor();
+  }
   
 
-
+  public slots :
+  virtual void slotLandmarkNormalMode();
+  virtual void slotLandmarkTargetMode();
+  virtual void slotLandmarkNodeMode();
+  virtual void slotLandmarkHandleMode();
+  virtual void slotFlagMode();
+  virtual void slotMoveAll();
+  virtual void slotMoveOnlyLandmarks();
+private:
+	Q_DISABLE_COPY(mqInteractionControlsToolbar)
   
-  
-}
+  Ui_mqInteractionControlsToolbar *ui;
+  void constructor();
+};
 
-
-
-
-
+#endif

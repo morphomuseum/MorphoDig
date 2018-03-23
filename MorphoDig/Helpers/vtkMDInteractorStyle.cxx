@@ -48,6 +48,16 @@
 vtkStandardNewMacro(vtkMDInteractorStyle);
 
 
+#define MOVECAM_CURSOR 0
+#define MOVEOBJ_CURSOR 1
+#define LMK_CURSOR 2
+#define SELECT_CURSOR 3
+#define LASSO_CURSOR 4
+#define PENCIL_CURSOR 5
+#define MAGICWAND_CURSOR 6
+#define PAINTBUCKET_CURSOR 7
+
+
 #define NORMAL_LMK 0
 #define TARGET_LMK 1
 #define NODE_LMK 2
