@@ -16,6 +16,7 @@
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
+#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
 #include <QVTKOpenGLWidget.h>
 //#include "vtkUndoStack.h"
@@ -620,6 +621,10 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	
 	 vtkSmartPointer<vtkMDInteractorStyle> style =
     vtkSmartPointer<vtkMDInteractorStyle>::New();
+
+	 vtkSmartPointer<vtkMDInteractorStyle> lassostyle =
+		 vtkSmartPointer<vtkMDInteractorStyle>::New();
+
 	 style->SetActorCollection(this->MorphoDigCore->getActorCollection());
 	 style->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
 	 style->SetTargetLandmarkCollection(this->MorphoDigCore->getTargetLandmarkCollection());

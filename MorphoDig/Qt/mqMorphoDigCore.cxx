@@ -4062,6 +4062,12 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 	return 1;
 }
 
+void mqMorphoDigCore::startLassoCut()
+{
+ //1 change interaction mode
+
+// 2 start lasso cut (and not lasso tag)
+}
 void mqMorphoDigCore::addConvexHull()
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -9579,6 +9585,7 @@ void mqMorphoDigCore::slotLandmarkMoveDown()
 	this->LandmarksMoveDown();
 }
 
+void mqMorphoDigCore::slotLasso() { this->startLassoCut(); }
 void mqMorphoDigCore::slotConvexHULL() { this->addConvexHull(); }
 void mqMorphoDigCore::slotMirror() { this->addMirrorXZ(); }
 void mqMorphoDigCore::slotInvert() { 

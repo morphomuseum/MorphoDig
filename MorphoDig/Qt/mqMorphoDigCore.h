@@ -340,6 +340,7 @@ public:
   void scalarsGaussianBlur(); //compute gaussian blur of current scalars
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
+  void startLassoCut();//change interaction style
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
   void Redo(); // calls the undoStack Redo function
   void Undo(); // callse the undoStack Undo function
@@ -528,6 +529,7 @@ public slots:
 	virtual void slotLandmarkMoveDown();
 	virtual void slotUpdateAllSelectedFlagsColors();
 	virtual void slotConvexHULL();
+	virtual void slotLasso();
 	virtual void slotMirror();
 	virtual void slotInvert();
 	virtual void slotKeepLargest();
