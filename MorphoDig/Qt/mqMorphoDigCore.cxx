@@ -100,6 +100,9 @@ mqMorphoDigCore::mqMorphoDigCore()
 {
 
 	mqMorphoDigCore::Instance = this;
+	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
+	this->LassoStyle = vtkSmartPointer<vtkMDLassoInteractorStyle>::New();
+	
 	this->ScalarRangeMin = 0;
 	this->ScalarRangeMax = 1;
 	this->mui_ClippingPlane = 0; // no x=0 clipping plane by default
@@ -336,6 +339,15 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	{
 		mqMorphoDigCore::Instance = 0;
 	}
+}
+
+void mqMorphoDigCore::SetInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
+{
+	this->Style = mStyle;
+}
+void mqMorphoDigCore::SetLassoInteractorStyle(vtkSmartPointer<vtkMDLassoInteractorStyle> mLassoStyle)
+{
+	this->LassoStyle = mLassoStyle;
 }
 void mqMorphoDigCore::ActivateClippingPlane()
 {

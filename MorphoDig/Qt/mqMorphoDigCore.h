@@ -19,6 +19,8 @@
 #include "vtkMDActorCollection.h"
 #include "vtkBezierCurveSource.h"
 #include "vtkLMActorCollection.h"
+#include "vtkMDInteractorStyle.h"
+#include "vtkMDLassoInteractorStyle.h"
 #include "vtkGridActor.h"
 #include "vtkLMActor.h"
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
@@ -389,6 +391,8 @@ public:
   vtkSmartPointer<vtkLookupTable> GetTagLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
+  void SetInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
+  void SetLassoInteractorStyle(vtkSmartPointer<vtkMDLassoInteractorStyle> mLassoStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
 signals:
@@ -400,7 +404,7 @@ signals:
   void existingScalarsChanged();
   void activeScalarChanged();
   void actorsMightHaveChanged();
-
+  
 protected:
 	
 	~mqMorphoDigCore();
@@ -408,6 +412,8 @@ protected:
 	vtkSmartPointer<vtkLookupTable> TagLut;
 	int TagTableSize;
 
+	vtkSmartPointer<vtkMDInteractorStyle> Style;
+	vtkSmartPointer<vtkMDLassoInteractorStyle> LassoStyle;
 	vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRedLut;

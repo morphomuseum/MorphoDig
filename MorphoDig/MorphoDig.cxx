@@ -622,8 +622,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	 vtkSmartPointer<vtkMDInteractorStyle> style =
     vtkSmartPointer<vtkMDInteractorStyle>::New();
 
-	 vtkSmartPointer<vtkMDInteractorStyle> lassostyle =
-		 vtkSmartPointer<vtkMDInteractorStyle>::New();
+	 vtkSmartPointer<vtkMDLassoInteractorStyle> lassostyle =
+		 vtkSmartPointer<vtkMDLassoInteractorStyle>::New();
 
 	 style->SetActorCollection(this->MorphoDigCore->getActorCollection());
 	 style->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
@@ -631,6 +631,14 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	 style->SetNodeLandmarkCollection(this->MorphoDigCore->getNodeLandmarkCollection());
 	 style->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
 	 style->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());
+
+	 lassostyle->SetActorCollection(this->MorphoDigCore->getActorCollection());
+	 lassostyle->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
+	 lassostyle->SetTargetLandmarkCollection(this->MorphoDigCore->getTargetLandmarkCollection());
+	 lassostyle->SetNodeLandmarkCollection(this->MorphoDigCore->getNodeLandmarkCollection());
+	 lassostyle->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
+	 lassostyle->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());
+
 	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
 	//vtkSmartPointer<vtkInteractorStyleTrackballActor> style =
 	//	vtkSmartPointer<vtkInteractorStyleTrackballActor>::New();
@@ -655,6 +663,9 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   window->GetInteractor()->SetPicker(this->AreaPicker);
   window->GetInteractor()->SetInteractorStyle(style);
 
+  // mqMorphoDigCore should be aware of the 2 coexisting interactor styles (so that we can switch between them
+  mqMorphoDigCore::instance()->SetInteractorStyle(style);
+  mqMorphoDigCore::instance()->SetLassoInteractorStyle(lassostyle);
 
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetHandles(mqMorphoDigCore::instance()->getHandleLandmarkCollection());
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetNodes(mqMorphoDigCore::instance()->getNodeLandmarkCollection());
