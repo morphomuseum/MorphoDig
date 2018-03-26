@@ -118,9 +118,9 @@ public:
 	int Getmui_DefaultScalarVisibility();
 	int Getmui_ScalarVisibility();
 
-	void Setmui_MoveAll(int moveall);
-	int Getmui_MoveAll();
-	int Getmui_DefaultMoveAll();
+	void Setmui_MoveMode(int movemode);
+	int Getmui_MoveMode();
+	int Getmui_DefaultMoveMode();
 
 	void Setmui_ShowGrid(int showgrid);
 	int Getmui_ShowGrid();
@@ -452,7 +452,7 @@ protected:
 	ExistingColorMaps *mui_ExistingColorMaps;
 
 	QString mui_LastUsedDir;
-	int mui_MoveAll;
+	int mui_MoveMode;
 	int mui_ShowGrid;
 	double mui_GridSpacing;
 	QString mui_SizeUnit;
@@ -485,7 +485,7 @@ protected:
 	QString mui_DefaultZ2Label;
 
 	int mui_DefaultShowGrid;
-	int mui_DefaultMoveAll;
+	int mui_DefaultMoveMode;
 	int mui_DefaultAnaglyph;
 	int mui_DefaultShowOrientationHelper;
 	int mui_DefaultCameraCentreOfMassAtOrigin;

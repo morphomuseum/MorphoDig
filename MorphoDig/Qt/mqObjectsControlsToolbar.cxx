@@ -72,10 +72,7 @@ void mqObjectsControlsToolbar::constructor()
  // ui.setupUi(this);
   this->ui = new Ui_mqObjectsControlsToolbar;
   
-  new mqEditLMKDialogReaction(this->ui->actionEditLandmarks);
-  new mqCreateLMKDialogReaction(this->ui->actionCreateLandmark);
-  new mqEditFLGDialogReaction(this->ui->actionEditFlags);
-  new mqEditACTORDialogReaction(this->ui->actionEditActors);
+  
   this->oldrotval = 0;
   this->oldtrval = 0;
   this->ui->setupUi(this);
@@ -194,6 +191,11 @@ void mqObjectsControlsToolbar::constructor()
   connect(zTr, SIGNAL(sliderPressed()), this, SLOT(slotZtrPressed()));
   connect(yTr, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
   connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));
+  
+  new mqEditLMKDialogReaction(this->ui->actionEditLandmarks);
+  new mqCreateLMKDialogReaction(this->ui->actionCreateLandmark);
+  new mqEditFLGDialogReaction(this->ui->actionEditFlags);
+  new mqEditACTORDialogReaction(this->ui->actionEditActors);
  
 }
 

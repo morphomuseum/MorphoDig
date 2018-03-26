@@ -54,14 +54,19 @@ void mqInteractionControlsToolbar::constructor()
  
   
 
-  if (mqMorphoDigCore::instance()->Getmui_MoveAll() == 1)
+  if (mqMorphoDigCore::instance()->Getmui_MoveMode() == 1)
   {
 
-	  this->ui->actionMoveAll->setChecked(true);
+	  this->ui->actionMoveCamera->setChecked(true);
+  }
+  else  if (mqMorphoDigCore::instance()->Getmui_MoveMode() == 0)
+  {
+	  this->ui->actionMoveOnlyLandmarks->setChecked(true);
   }
   else
   {
-	  this->ui->actionMoveOnlyLandmarks->setChecked(true);
+	  this->ui->actionMoveObjects->setChecked(true);
+
   }
 
 
@@ -77,7 +82,8 @@ void mqInteractionControlsToolbar::constructor()
   connect(this->ui->actionLandmarksModeHandle, SIGNAL(triggered()), this, SLOT(slotLandmarkHandleMode()));
   connect(this->ui->actionLandmarksModeNode, SIGNAL(triggered()), this, SLOT(slotLandmarkNodeMode()));
   connect(this->ui->actionLandmarksModeFlag, SIGNAL(triggered()), this, SLOT(slotFlagMode()));
-  connect(this->ui->actionMoveAll, SIGNAL(triggered()), this, SLOT(slotMoveAll()));
+  connect(this->ui->actionMoveCamera, SIGNAL(triggered()), this, SLOT(slotMoveCamera()));
+  connect(this->ui->actionMoveObjects, SIGNAL(triggered()), this, SLOT(slotMoveObjects()));
   connect(this->ui->actionMoveOnlyLandmarks, SIGNAL(triggered()), this, SLOT(slotMoveOnlyLandmarks()));
   
   
@@ -86,14 +92,25 @@ void mqInteractionControlsToolbar::constructor()
 
 
 
-void mqInteractionControlsToolbar::slotMoveAll()
+void mqInteractionControlsToolbar::slotMoveCamera()
 {
 	
-		this->ui->actionMoveAll->setChecked(true);
+		this->ui->actionMoveCamera->setChecked(true);
 		this->ui->actionMoveOnlyLandmarks->setChecked(false);
-
+		this->ui->actionMoveObjects->setChecked(false);
 	
-	mqMorphoDigCore::instance()->Setmui_MoveAll(1);
+	mqMorphoDigCore::instance()->Setmui_MoveMode(1);
+
+}
+
+void mqInteractionControlsToolbar::slotMoveObjects()
+{
+
+	this->ui->actionMoveObjects->setChecked(true);
+	this->ui->actionMoveOnlyLandmarks->setChecked(false);
+	this->ui->actionMoveCamera->setChecked(false);
+
+	mqMorphoDigCore::instance()->Setmui_MoveMode(2);
 
 }
 
@@ -101,13 +118,13 @@ void mqInteractionControlsToolbar::slotMoveOnlyLandmarks()
 {
 	
 
-		this->ui->actionMoveAll->setChecked(false);
+		this->ui->actionMoveCamera->setChecked(false);
 		this->ui->actionMoveOnlyLandmarks->setChecked(true);
-
+		this->ui->actionMoveObjects->setChecked(false);
 
 	
 
-	mqMorphoDigCore::instance()->Setmui_MoveAll(0);
+	mqMorphoDigCore::instance()->Setmui_MoveMode(0);
 	mqMorphoDigCore::instance()->Render();
 
 }

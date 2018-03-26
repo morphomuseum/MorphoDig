@@ -218,7 +218,8 @@ void RubberBandSelect(vtkObject* caller,
 			
 		}
 
-		if (mqMorphoDigCore::instance()->Getmui_MoveAll() == 1)
+		//if not "only select landmarks".
+		if (mqMorphoDigCore::instance()->Getmui_MoveMode() != 0)
 		{
 			std::string str2("vtkMDActor");
 			if (str2.compare(myprop3D->GetClassName()) == 0)
@@ -370,8 +371,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->MorphoDigCore->Setmui_LastUsedDir(settings.value("LastUsedDir", QDir::currentPath()).toString());
 	settings.endGroup();
 	settings.beginGroup("interaction_mode");
-	this->MorphoDigCore->Setmui_MoveAll(settings.value("MoveAll",
-		this->MorphoDigCore->Getmui_DefaultMoveAll()
+	this->MorphoDigCore->Setmui_MoveMode(settings.value("MoveMode",
+		this->MorphoDigCore->Getmui_DefaultMoveMode()
 	).toInt());
 	settings.endGroup();
 
@@ -800,7 +801,7 @@ void MorphoDig::saveSettings()
 	settings.setValue("LastUsedDir", this->MorphoDigCore->Getmui_LastUsedDir());
 	settings.endGroup();
 	settings.beginGroup("interaction_mode");
-	settings.setValue("MoveAll", this->MorphoDigCore->Getmui_MoveAll());
+	settings.setValue("MoveMode", this->MorphoDigCore->Getmui_MoveMode());
 	settings.endGroup();
 	settings.beginGroup("display_options");
 	settings.setValue("ShowGrid", this->MorphoDigCore->Getmui_ShowGrid());

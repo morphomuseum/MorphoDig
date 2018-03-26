@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>230</width>
+    <width>268</width>
     <height>34</height>
    </rect>
   </property>
@@ -96,7 +96,7 @@
     <string>Set Flag landmark</string>
    </property>
   </action>
-  <action name="actionMoveAll">
+  <action name="actionMoveCamera">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -106,10 +106,10 @@
      <normalon>:/Icons/move.png</normalon>:/Icons/move.png</iconset>
    </property>
    <property name="text">
-    <string>Move all objects</string>
+    <string>Move camera </string>
    </property>
    <property name="toolTip">
-    <string>Allow to select (right click) and subsequently move all objects (CTRL + mouse move)</string>
+    <string>Move camera (drag left click). Allows to select (drag right click) and subsequently move all objects (CTRL + drag left click)</string>
    </property>
   </action>
   <action name="actionMoveOnlyLandmarks">
@@ -128,7 +128,24 @@
     <string>Allow to select (right click) and subsequently move only landmarks (CTRL + mouse move)</string>
    </property>
   </action>
-  <addaction name="actionMoveAll"/>
+  <action name="actionMoveObjects">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/move_mode2.png</normaloff>
+     <normalon>:/Icons/move_mode2.png</normalon>:/Icons/move_mode2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move all objects</string>
+   </property>
+   <property name="toolTip">
+    <string>Move selected objects (drag left click). Allows to select (drag right click). Camera can also be moved  (CTRL + drag left click).</string>
+   </property>
+  </action>
+  <addaction name="actionMoveCamera"/>
+  <addaction name="actionMoveObjects"/>
   <addaction name="actionMoveOnlyLandmarks"/>
   <addaction name="separator"/>
   <addaction name="actionLandmarksModeNormal"/>

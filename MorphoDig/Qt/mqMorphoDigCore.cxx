@@ -146,7 +146,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_GridSpacing = this->mui_DefaultGridSpacing = 10;
 	this->mui_SizeUnit = this->mui_DefaultSizeUnit = "mm";
 
-	this->mui_MoveAll = this->mui_DefaultMoveAll = 1;
+	this->mui_MoveMode = this->mui_DefaultMoveMode = 1;
 	this->mui_FlagColor[0] = this->mui_DefaultFlagColor[0] = 0;
 	this->mui_FlagColor[1] = this->mui_DefaultFlagColor[1] = 0.7;
 	this->mui_FlagColor[2] = this->mui_DefaultFlagColor[2] = 0.7;
@@ -8338,11 +8338,11 @@ void mqMorphoDigCore::Setmui_SizeUnit(QString unit) { this->mui_SizeUnit = unit;
 QString mqMorphoDigCore::Getmui_SizeUnit() { return this->mui_SizeUnit; }
 QString mqMorphoDigCore::Getmui_DefaultSizeUnit() { return this->mui_DefaultSizeUnit; }
 
-void mqMorphoDigCore::Setmui_MoveAll(int moveall) { this->mui_MoveAll= moveall;
-if (moveall == 0) { this->UnselectAll(-1);  }
+void mqMorphoDigCore::Setmui_MoveMode(int movemode) { this->mui_MoveMode= movemode;
+if (movemode == 0) { this->UnselectAll(-1);  }
 }
-int mqMorphoDigCore::Getmui_MoveAll() { return this->mui_MoveAll; }
-int mqMorphoDigCore::Getmui_DefaultMoveAll() { return this->mui_DefaultMoveAll; };
+int mqMorphoDigCore::Getmui_MoveMode() { return this->mui_MoveMode; }
+int mqMorphoDigCore::Getmui_DefaultMoveMode() { return this->mui_DefaultMoveMode; };
 
 void mqMorphoDigCore::Setmui_ScalarVisibility(int scalarvisibility)
 {

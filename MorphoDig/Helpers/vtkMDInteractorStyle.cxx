@@ -57,6 +57,14 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define MAGICWAND_CURSOR 6
 #define PAINTBUCKET_CURSOR 7
 
+#define CAM 0
+#define OBJ 1
+
+#define MOVELMK_MODE 0
+#define MOVECAM_MODE 1
+#define MOVEOBJ_MODE 2
+
+
 
 #define NORMAL_LMK 0
 #define TARGET_LMK 1
@@ -71,7 +79,7 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define LBUTTON_UP 1
 
 #define VTKISMT_ORIENT 0
-#define VTKISMT_SELECT 1
+#define VTKISMD_SELECT 1
 #define CTRL_RELEASED 0
 #define CTRL_PRESSED 1
 #define ALT_PRESSED 4
@@ -87,8 +95,9 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 {
 	this->CurrentMode = VTKISMT_ORIENT;
 	this->Alt = ALT_RELEASED;
-
+	//this->MoveMode = MOVECAM_MODE;
 	this->L = L_RELEASED;
+	this->MoveWhat = CAM;
 	this->Ctrl = CTRL_RELEASED;
 	this->LM_Button = LBUTTON_UP;
 	this->StartPosition[0] = this->StartPosition[1] = 0;
@@ -247,7 +256,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::StartSelect()
 {
-	this->CurrentMode = VTKISMT_SELECT;
+	this->CurrentMode = VTKISMD_SELECT;
 
 }
 //--------------------------------------------------------------------------
@@ -767,7 +776,7 @@ void vtkMDInteractorStyle::OnChar()
 		//r toggles the rubber band selection mode for mouse button 1
 		if (this->CurrentMode == VTKISMT_ORIENT)
 		{
-			this->CurrentMode = VTKISMT_SELECT;
+			this->CurrentMode = VTKISMD_SELECT;
 		}
 		else
 		{
@@ -859,171 +868,215 @@ void vtkMDInteractorStyle::RubberStart()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnRightButtonDown()
 {
-	
+	//Special case: move landmark
+	if (this->L == L_PRESSED)
+	{
+		//int* clickPos = this->GetInteractor()->GetEventPosition();
+		int x = this->Interactor->GetEventPosition()[0];
+		int y = this->Interactor->GetEventPosition()[1];
+		//std::cout << "Clicked at "
+		//	<< x << " " << y << std::endl;
+		if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+		if (this->CurrentRenderer != NULL)
+		{
+			//std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+			// Pick from this location.
+			/* vtkSmartPointer<vtkPropPicker>  picker =
+			vtkSmartPointer<vtkPropPicker>::New();*/
+
+			vtkSmartPointer<vtkCellPicker> picker =
+				vtkSmartPointer<vtkCellPicker>::New();
+
+			picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+			double* pos = picker->GetPickPosition();
+			//std::cout << "Pick position (world coordinates) is: "
+			//	<< pos[0] << " " << pos[1]
+			//	<< " " << pos[2] << std::endl;
+			double* norm = picker->GetPickNormal();
+			//std::cout << "Pick normal : "
+			//	<< norm[0] << " " << norm[1]
+			//	<< " " << norm[2] << std::endl;
+
+			//std::cout << "Picked actor: " << picker->GetActor() << std::endl;
+			if (picker->GetActor() == NULL) {
+				cout << "Picked Null actor" << endl;
+			}
+			else
+			{
+				mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
+
+				mqMorphoDigCore::instance()->Render();
+			}
+
+		}
+		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+
+
+	}
+	else
+	{
+
+		this->ResetMoveWhat();
+		//Right drag:
+		// CAM mode: draw rubber band
+		// OBJ mode: draw rubber band if alt is not pressed
+		// OBJ mode : if alt is pressed, spin rotate actors 
+		if (this->MoveWhat == CAM || this->Alt != ALT_PRESSED)
+		
+		{
+			
+
+				this->CurrentMode = VTKISMD_SELECT;
+				this->RubberStart();
+			
+		}
+		else // spin
+		{
+			this->ActorsPositionsSaved = 0;//allow to save position
+			int x = this->Interactor->GetEventPosition()[0];
+			int y = this->Interactor->GetEventPosition()[1];
+
+			this->FindPokedRenderer(x, y);
+			if (this->CurrentRenderer == NULL)
+			{
+				return;
+			}
+
+			this->GrabFocus(this->EventCallbackCommand);
+			this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
+			this->StartSpin();
+		}
+
+	}
+}
+void vtkMDInteractorStyle::ResetMoveWhat()
+{
+	int movemode = mqMorphoDigCore::instance()->Getmui_MoveMode();
 	if (this->Ctrl != CTRL_PRESSED)
 	{
-		if (this->L == L_PRESSED)
+		if (movemode != MOVEOBJ_MODE)
 		{
-				//int* clickPos = this->GetInteractor()->GetEventPosition();
-				int x = this->Interactor->GetEventPosition()[0];
-				int y = this->Interactor->GetEventPosition()[1];
-				//std::cout << "Clicked at "
-				//	<< x << " " << y << std::endl;
-				if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
-				if (this->CurrentRenderer != NULL)
-				{
-					//std::cout << "Current renderer:" << this->CurrentRenderer << endl;
-					// Pick from this location.
-					/* vtkSmartPointer<vtkPropPicker>  picker =
-					vtkSmartPointer<vtkPropPicker>::New();*/
-
-					vtkSmartPointer<vtkCellPicker> picker =
-						vtkSmartPointer<vtkCellPicker>::New();
-
-					picker->Pick(x, y, 0, this->CurrentRenderer);
-
-
-
-					double* pos = picker->GetPickPosition();
-					//std::cout << "Pick position (world coordinates) is: "
-					//	<< pos[0] << " " << pos[1]
-					//	<< " " << pos[2] << std::endl;
-					double* norm = picker->GetPickNormal();
-					//std::cout << "Pick normal : "
-					//	<< norm[0] << " " << norm[1]
-					//	<< " " << norm[2] << std::endl;
-
-					//std::cout << "Picked actor: " << picker->GetActor() << std::endl;
-					if (picker->GetActor() == NULL) { 
-						cout << "Picked Null actor" << endl; 
-					}
-					else
-					{
-						mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
-
-						mqMorphoDigCore::instance()->Render();
-					}
-
-				}
-				//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-
-
-			}
+			this->MoveWhat = CAM;
+		}
 		else
 		{
-
-			this->CurrentMode = VTKISMT_SELECT;
-			this->RubberStart();
+			this->MoveWhat = OBJ;
 		}
 	}
 	else
 	{
-		this->ActorsPositionsSaved = 0;//allow to save position
-		int x = this->Interactor->GetEventPosition()[0];
-		int y = this->Interactor->GetEventPosition()[1];
-
-		this->FindPokedRenderer(x, y);
-		if (this->CurrentRenderer == NULL)
+		if (movemode != MOVEOBJ_MODE)
 		{
-			return;
+			this->MoveWhat = OBJ;
+		}
+		else
+		{
+			this->MoveWhat = CAM;
 		}
 
-		this->GrabFocus(this->EventCallbackCommand);
-		this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
-		this->StartSpin();
 	}
-
-	
 }
 void vtkMDInteractorStyle::OnLeftButtonDown()
 {
 	//cout << "Left button down!" << endl;
 	this->LM_Button = LBUTTON_DOWN;
-  if (this->CurrentMode != VTKISMT_SELECT)
+	
+  if (this->CurrentMode != VTKISMD_SELECT)
   {
     //if not in rubber band mode, let the parent class handle it
 	  //this->Interactor->GetControlKey()
-	  if (this->Ctrl != CTRL_PRESSED)
+
+	  //special case : landmark setting!
+	  if (this->L == L_PRESSED && this->Ctrl != CTRL_PRESSED)
 	  {
-		  if (this->L==L_PRESSED)
-		  { 
-		  
-			  //int* clickPos = this->GetInteractor()->GetEventPosition();
-			  int x = this->Interactor->GetEventPosition()[0];
-			  int y = this->Interactor->GetEventPosition()[1];
-			 // std::cout << "Clicked at "
-			//	  << x << " " << y   << std::endl;
-			  if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
-			  if (this->CurrentRenderer != NULL)
+
+		  //int* clickPos = this->GetInteractor()->GetEventPosition();
+		  int x = this->Interactor->GetEventPosition()[0];
+		  int y = this->Interactor->GetEventPosition()[1];
+		  // std::cout << "Clicked at "
+		  //	  << x << " " << y   << std::endl;
+		  if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+		  if (this->CurrentRenderer != NULL)
+		  {
+			  //	  std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+			  // Pick from this location.
+			  /* vtkSmartPointer<vtkPropPicker>  picker =
+			  vtkSmartPointer<vtkPropPicker>::New();*/
+
+			  vtkSmartPointer<vtkCellPicker> picker =
+				  vtkSmartPointer<vtkCellPicker>::New();
+
+			  picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+			  double* pos = picker->GetPickPosition();
+			  //  std::cout << "Pick position (world coordinates) is: "
+			  //	  << pos[0] << " " << pos[1]
+			  //	  << " " << pos[2] << std::endl;
+			  double* norm = picker->GetPickNormal();
+			  //  std::cout << "Pick normal : "
+			  //	  << norm[0] << " " << norm[1]
+			  //	  << " " << norm[2] << std::endl;
+
+			  //  std::cout << "Picked actor: " << picker->GetActor() << std::endl;
+			  if (picker->GetActor() == NULL) { cout << "Picked Null actor" << endl; }
+			  else
 			  {
-			//	  std::cout << "Current renderer:" << this->CurrentRenderer << endl;
-				  // Pick from this location.
-				 /* vtkSmartPointer<vtkPropPicker>  picker =
-					  vtkSmartPointer<vtkPropPicker>::New();*/
-				
-				  vtkSmartPointer<vtkCellPicker> picker =
-					  vtkSmartPointer<vtkCellPicker>::New();
+				  mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
 
-				  picker->Pick(x, y, 0, this->CurrentRenderer);
-
-
-				 
-				  double* pos = picker->GetPickPosition();
-				//  std::cout << "Pick position (world coordinates) is: "
-				//	  << pos[0] << " " << pos[1]
-				//	  << " " << pos[2] << std::endl;
-				  double* norm = picker->GetPickNormal();
-				//  std::cout << "Pick normal : "
-				//	  << norm[0] << " " << norm[1]
-				//	  << " " << norm[2] << std::endl;
-
-				//  std::cout << "Picked actor: " << picker->GetActor() << std::endl;
-				  if (picker->GetActor() == NULL) { cout << "Picked Null actor" << endl; }
-				  else
-				  {
-					  mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
-
-					  mqMorphoDigCore::instance()->Render();
-				  }
-
+				  mqMorphoDigCore::instance()->Render();
 			  }
-			  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-			
+
+		  }
+		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+
+
+	  }//left button down, no landmark 
+	  else
+	  { // left mouse pressed, no 
+		  this->ResetMoveWhat();
 		  
-		  }		  
-		  else
+
+		  if (this->MoveWhat==CAM)
 		  {
 			  if (this->Alt == ALT_PRESSED)
 			  {
 				  this->StartSpin();
 			  }
-			  this->Superclass::OnLeftButtonDown();		
-			
-		  }
-	  }
-	  else
-	  {
-		  this->ActorsPositionsSaved = 0;//allow to save position
-		  int x = this->Interactor->GetEventPosition()[0];
-		  int y = this->Interactor->GetEventPosition()[1];
+			  this->Superclass::OnLeftButtonDown();
 
-		  this->FindPokedRenderer(x, y);
-		  //this->FindPickedActor(x, y);
-		  if (this->CurrentRenderer == NULL )
+
+		  }
+		  else
 		  {
-			  return;
+			  this->ActorsPositionsSaved = 0;//allow to save position
+			  int x = this->Interactor->GetEventPosition()[0];
+			  int y = this->Interactor->GetEventPosition()[1];
+
+			  this->FindPokedRenderer(x, y);
+			  //this->FindPickedActor(x, y);
+			  if (this->CurrentRenderer == NULL)
+			  {
+				  return;
+			  }
+
+			  this->GrabFocus(this->EventCallbackCommand);
+
+			  //cout << "Start Rotate CTRL" << endl;
+			  this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
+			  this->StartRotate();
+
+
 		  }
-
-		  this->GrabFocus(this->EventCallbackCommand);
-		 
-		  //cout << "Start Rotate CTRL" << endl;
-		  this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
-		  this->StartRotate();
-		 
-
+		  
 	  }
-    return;
+	  return;
   }
+  //REALLY??? 
   this->RubberStart();
 
   
@@ -1215,9 +1268,11 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnMouseMove()
 {
-  if (this->CurrentMode != VTKISMT_SELECT )
+  if (this->CurrentMode != VTKISMD_SELECT )
   {
-	  if (this->Ctrl != CTRL_PRESSED)
+	 // this->ResetMoveWhat();
+	  //if (this->Ctrl != CTRL_PRESSED)
+	  if (this->MoveWhat == CAM)
 	  {
 		  //let the parent class handle it
 		  this->Superclass::OnMouseMove();
@@ -1227,7 +1282,7 @@ void vtkMDInteractorStyle::OnMouseMove()
 			  mqMorphoDigCore::instance()->ActivateClippingPlane();
 		  }
 	  }
-	  else
+	  else // MoveWhat = objects
 	  {
 		 
 		  //copied from Trackball Actor
@@ -1314,10 +1369,13 @@ this->Moving = 0;
 
 void vtkMDInteractorStyle::OnRightButtonUp()
 {	
-	if (this->CurrentMode != VTKISMT_SELECT)
+	if (this->CurrentMode != VTKISMD_SELECT)
 	{
 		
-		if (this->Ctrl != CTRL_PRESSED)
+		//this->ResetMoveWhat();
+
+		//if (this->Ctrl != CTRL_PRESSED)
+		if (this->MoveWhat == CAM)
 		{
 			//if not in rubber band mode,  let the parent class handle it
 			this->Superclass::OnRightButtonUp();
@@ -1357,10 +1415,14 @@ void vtkMDInteractorStyle::OnRightButtonUp()
 void vtkMDInteractorStyle::OnLeftButtonUp()
 {
 	this->LM_Button = LBUTTON_UP;
-  if (this->CurrentMode != VTKISMT_SELECT)
+  if (this->CurrentMode != VTKISMD_SELECT)
   {
-	  if (this->Ctrl != CTRL_PRESSED)
-	  {
+	 // this->ResetMoveWhat();
+
+	  //if (this->Ctrl != CTRL_PRESSED)
+	  if (this->MoveWhat == CAM)
+	  {	  
+	  
 		  //if not in rubber band mode,  let the parent class handle it
 		  this->Superclass::OnLeftButtonUp();
 	  }
@@ -1395,8 +1457,12 @@ void vtkMDInteractorStyle::OnLeftButtonUp()
 
 void vtkMDInteractorStyle::OnMiddleButtonDown()
 {
-	if (this->Ctrl != CTRL_PRESSED)
+	this->ResetMoveWhat();
+
+	//if (this->Ctrl != CTRL_PRESSED)
+	if (this->MoveWhat == CAM)
 	{
+		
 		//if not in rubber band mode,  let the parent class handle it
 		this->Superclass::OnMiddleButtonDown();
 	}
@@ -1426,11 +1492,14 @@ void vtkMDInteractorStyle::OnMiddleButtonDown()
 //----------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnMiddleButtonUp()
 {
-	if (this->CurrentMode != VTKISMT_SELECT)
+	if (this->CurrentMode != VTKISMD_SELECT)
 	{
+		//this->ResetMoveWhat();
 
-		if (this->Ctrl != CTRL_PRESSED)
+		//if (this->Ctrl != CTRL_PRESSED)
+		if (this->MoveWhat == CAM)
 		{
+
 			//if not in rubber band mode,  let the parent class handle it
 			this->Superclass::OnMiddleButtonUp();
 		}
