@@ -391,8 +391,9 @@ public:
   vtkSmartPointer<vtkLookupTable> GetTagLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
-  void SetInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
+  void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void SetLassoInteractorStyle(vtkSmartPointer<vtkMDLassoInteractorStyle> mLassoStyle);
+  //void SetCurrentInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
 signals:

@@ -664,7 +664,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   window->GetInteractor()->SetInteractorStyle(style);
 
   // mqMorphoDigCore should be aware of the 2 coexisting interactor styles (so that we can switch between them
-  mqMorphoDigCore::instance()->SetInteractorStyle(style);
+  mqMorphoDigCore::instance()->SetNormalInteractorStyle(style);
   mqMorphoDigCore::instance()->SetLassoInteractorStyle(lassostyle);
 
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetHandles(mqMorphoDigCore::instance()->getHandleLandmarkCollection());

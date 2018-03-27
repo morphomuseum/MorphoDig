@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLMActor.h"
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
+//#include <vtkRenderWindowInteractor.h>
 #include <vtkProp3D.h>
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>

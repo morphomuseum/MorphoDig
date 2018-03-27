@@ -11,6 +11,7 @@
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
+#include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
@@ -341,7 +342,7 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	}
 }
 
-void mqMorphoDigCore::SetInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
+void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
 {
 	this->Style = mStyle;
 }
@@ -4077,7 +4078,8 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 void mqMorphoDigCore::startLassoCut()
 {
  //1 change interaction mode
-
+	cout << "Set Lasso style as current interaction style!" << endl;
+	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->LassoStyle);
 // 2 start lasso cut (and not lasso tag)
 }
 void mqMorphoDigCore::addConvexHull()

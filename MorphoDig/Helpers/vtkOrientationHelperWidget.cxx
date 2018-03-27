@@ -14,19 +14,19 @@
 =========================================================================*/
 #include "vtkOrientationHelperWidget.h"
 
-#include "vtkActor2D.h"
-#include "vtkCallbackCommand.h"
-#include "vtkCamera.h"
-#include "vtkCoordinate.h"
-#include "vtkObjectFactory.h"
-#include "vtkPoints.h"
-#include "vtkPolyData.h"
-#include "vtkPolyDataMapper2D.h"
-#include "vtkProperty2D.h"
-#include "vtkProp.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
+#include <vtkActor2D.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
+#include <vtkCoordinate.h>
+#include <vtkObjectFactory.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkProperty2D.h>
+#include <vtkProp.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 
 vtkStandardNewMacro(vtkOrientationHelperWidget);
 
