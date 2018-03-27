@@ -20,6 +20,7 @@
 #include "vtkBezierCurveSource.h"
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
+#include <vtkInteractorStyleDrawPolygon.h>
 #include "vtkMDLassoInteractorStyle.h"
 #include "vtkGridActor.h"
 #include "vtkLMActor.h"
@@ -98,6 +99,212 @@ public:
 
 // 
 class mqUndoStack;
+
+typedef struct {
+public:
+	double x, y, z;
+} POLYGON_VERTEX;
+class POLYGON_LIST
+{
+public:
+	
+	std::vector<vtkVector2i> point_list;
+	int point_number;
+	int state; //state 0 = not finished or not valid; state 1 =closed and valide
+
+
+	POLYGON_LIST()
+	{
+		this->point_list.clear();
+		this->point_number = 0;
+		this->state = 0;
+
+
+	}
+	int POLYGON_POINT_INSIDE(POLYGON_VERTEX P)
+	{
+		int    cn = 0;    // the crossing number counter
+
+						  // loop through all edges of the polygon
+		for (int i = 0; i<this->point_list.size() - 1; i++) {    // edge from V[i] to V[i+1]
+			const vtkVector2i &V1 = point_list[i];
+			const vtkVector2i &V2 = point_list[i+1];
+			if (((V1[1] <= P.y) && (V2[1] > P.y))    // an upward crossing
+				|| ((V1[1] > P.y) && (V2[1] <= P.y))) { // a downward crossing
+																				// compute the actual edge-ray intersect x-coordinate
+				double vt = (double)(P.y - V1[1]) / (V2[1] - V1[1]);
+				if (P.x < V1[0] + vt * (V2[0] -V1[0])) // P.x < intersect
+					++cn;   // a valid crossing of y=P.y right of P.x
+			}
+		}
+		//last edge
+		const vtkVector2i &F = point_list[0]; //first point
+		const vtkVector2i &L = point_list[point_number - 1];//last point
+
+		if (((F[1] <= P.y) && (L[1] > P.y))    // an upward crossing
+			|| ((F[1] > P.y) && (L[1] <= P.y))) { // a downward crossing
+																					   // compute the actual edge-ray intersect x-coordinate
+			double vt = (double)(P.y - F[1]) / (L[1] - F[1]);
+			if (P.x < F[0] + vt * (L[0] - F[0])) // P.x < intersect
+				++cn;   // a valid crossing of y=P.y right of P.x
+		}
+		return (cn & 1);    // 0 if even (out), and 1 if odd (in)
+
+	}
+	void SetPointList(std::vector<vtkVector2i> points)
+	{
+		this->point_list = points;
+		this->point_number = (int)points.size();
+		this->state =0;
+		this->state = this->Polygon_valid();
+	}
+	
+	void Polygon_init()
+	{
+		
+		this->point_number = 0;
+		this->state = 0;
+
+
+	}
+	int Poly_cross(double x1, double y1, double x2, double y2, double u1, double u2, double v1, double v2)
+	{
+
+		double b1;
+		double b2;
+		double xi, yi;
+		double a1, a2;
+		if ((x2 - x1 == 0) || (u2 - u1 == 0))
+		{
+			return 0;
+		}// Cases were one edge is vertical are avoided...(A and B exceptions)
+
+		b1 = (y2 - y1) / (x2 - x1); //(A) 
+		b2 = (v2 - v1) / (u2 - u1); // (B) 
+
+		if (b2 - b1 == 0)
+		{
+			return 0;
+		}// Cases were two edges are parallel are avoided. (C exception)
+
+		a1 = y1 - b1*x1;
+		a2 = v1 - b2*u1;
+		xi = -(a1 - a2) / (b1 - b2); //(C) 
+		yi = a1 + b1*xi;
+		if (
+			((x1 - xi)*(xi - x2) >= 0)
+			&& ((u1 - xi)*(xi - u2) >= 0)
+			&& ((y1 - yi)*(yi - y2) >= 0)
+			&& ((v1 - yi)*(yi - v2) >= 0)
+			)
+		{
+			return 1;
+		}
+		else { return 0; }
+
+
+	}
+	int Polygon_valid()						// Allocate Memory For Each Object
+	{
+		int x1, x2, y1, y2, u1, u2, v1, v2;
+		// And Defines points
+
+		int valid = 1;
+
+		if (this->point_number < 3)
+		{
+			return 0;
+		}
+		else
+		{//return 1;
+			if (this->point_number == 3)
+			{
+				const vtkVector2i &A = point_list[0];
+				const vtkVector2i &B = point_list[1];
+				const vtkVector2i &C = point_list[2];
+				
+				x1 = (int)A[0];
+				x2 = (int)B[0];
+				y1 = (int)A[1];
+				y2 = (int)B[1];
+				u1 = (int)B[0];
+				u2 = (int)C[0];
+				v1 = (int)B[1];
+				v2 = (int)C[1];
+				if (Poly_cross((double)x1, (double)y1, (double)x2, (double)y2, (double)u1, (double)u2, (double)v1, (double)v2))
+				{
+					valid = 0;
+				}
+				//test if paralleles
+			}
+			else
+			{
+				int i;
+				for (i = 0; i < point_number - 1; i++)
+				{
+					const vtkVector2i &V1 = point_list[i];
+					const vtkVector2i &V2 = point_list[i + 1];
+					x1 = (int)V1[0];
+					x2 = (int)V2[0];
+					y1 = (int)V1[1];
+					y2 = (int)V2[1];
+					for (int j = i + 2; j < point_number - 1; j++)
+					{
+						const vtkVector2i &U1 = point_list[j];
+						const vtkVector2i &U2 = point_list[j + 1];
+						//fprintf(stderr, "Segment %d - %d\n", i + 1, j + 1);
+						u1 = (int)U1[0];
+						u2 = (int)U2[0];
+						v1 = (int)U1[1];
+						v2 = (int)U2[1];
+
+
+						if (Poly_cross((double)x1, (double)y1, (double)x2, (double)y2, (double)u1, (double)u2, (double)v1, (double)v2))
+						{
+							cout << "Segment " << j + 1 << "-" << j + 2 << ": U1[0]" << U1[0] << ", U1[1]" << U1[1] << ", U2[0]" << U2[0] << "U2[1]" << U1[1] << endl;
+							cout << "Vs Segment " << i + 1 << "-" << i + 2 << ": V1[0]" << V1[0] << ", V1[1]" << V1[1] << ", V2[0]" << V2[0] << "V2[1]" << V1[1] << endl;
+
+							valid = 0;
+						}
+					}
+				
+			}
+			//Last edge
+			const vtkVector2i &F = point_list[0]; //first point
+			const vtkVector2i &L = point_list[point_number - 1];//last point
+			x1 = (int)L[0];
+			x2 = (int)F[0];
+			y1 = (int)L[1];
+			y2 = (int)F[1];
+		
+			for (i = 1; i<point_number - 2; i++)
+			{
+				const vtkVector2i &V1 = point_list[i];
+				const vtkVector2i &V2 = point_list[i + 1];
+
+
+					u1 = (int)V1[0];
+					u2 = (int)V2[0];
+					v1 = (int)V1[1];
+					v2 = (int)V2[1];
+					//fprintf(stderr, "Segment %d - %d\n", point_number, i + 1);
+					
+					if (Poly_cross((double)x1, (double)y1, (double)x2, (double)y2, (double)u1, (double)u2, (double)v1, (double)v2))
+					{
+						cout << "Last " << point_number << "-" << 1 << ": F[0]" << F[0] << ", F[1]" << F[1] << ", L[0]" << L[0] << "L[1]" << L[1] << endl;
+						cout << "Vs Segment" << i + 1 << "-" << i + 2 << ": V1[0]" << V1[0] << ", V1[1]" << V1[1] << ", V2[0]" << V2[0] << "V2[1]" << V1[1] << endl;
+
+						valid = 0;
+					}
+				}
+
+			}
+		}
+		return valid;
+	}		
+
+};
+
 
 class  mqMorphoDigCore : public QObject
 {
@@ -342,7 +549,9 @@ public:
   void scalarsGaussianBlur(); //compute gaussian blur of current scalars
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
-  void startLassoCut();//change interaction style
+  void lassoCutSelectedActors(int keep_inside);
+  void startLasso(int lasso_mode);//change interaction style
+  void stopLasso();//change interaction style back to normal
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
   void Redo(); // calls the undoStack Redo function
   void Undo(); // callse the undoStack Undo function
@@ -392,7 +601,7 @@ public:
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
   void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
-  void SetLassoInteractorStyle(vtkSmartPointer<vtkMDLassoInteractorStyle> mLassoStyle);
+  void SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyleDrawPolygon> mLassoStyle);
   //void SetCurrentInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
@@ -414,7 +623,7 @@ protected:
 	int TagTableSize;
 
 	vtkSmartPointer<vtkMDInteractorStyle> Style;
-	vtkSmartPointer<vtkMDLassoInteractorStyle> LassoStyle;
+	vtkSmartPointer<vtkInteractorStyleDrawPolygon> LassoStyle;
 	vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRedLut;
@@ -536,7 +745,11 @@ public slots:
 	virtual void slotLandmarkMoveDown();
 	virtual void slotUpdateAllSelectedFlagsColors();
 	virtual void slotConvexHULL();
-	virtual void slotLasso();
+	
+	virtual void slotLassoCutKeepInside();
+	virtual void slotLassoCutKeepOutside();
+	virtual void slotLassoTagInside();
+	virtual void slotLassoTagOutside();
 	virtual void slotMirror();
 	virtual void slotInvert();
 	virtual void slotKeepLargest();
@@ -560,7 +773,7 @@ public slots:
 private:
 	static mqMorphoDigCore* Instance;
 
-	
+	int currentLassoMode;
 	int selected_file_exists(std::string path, std::string ext, std::string postfix);
 	int context_file_exists(std::string path, std::string ext, std::string postfix);
 

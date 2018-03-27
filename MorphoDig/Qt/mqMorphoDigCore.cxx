@@ -102,8 +102,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 	mqMorphoDigCore::Instance = this;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
-	this->LassoStyle = vtkSmartPointer<vtkMDLassoInteractorStyle>::New();
-	
+	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
+	this->currentLassoMode = 0; // 
 	this->ScalarRangeMin = 0;
 	this->ScalarRangeMax = 1;
 	this->mui_ClippingPlane = 0; // no x=0 clipping plane by default
@@ -346,7 +346,7 @@ void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorSt
 {
 	this->Style = mStyle;
 }
-void mqMorphoDigCore::SetLassoInteractorStyle(vtkSmartPointer<vtkMDLassoInteractorStyle> mLassoStyle)
+void mqMorphoDigCore::SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyleDrawPolygon> mLassoStyle)
 {
 	this->LassoStyle = mLassoStyle;
 }
@@ -4075,13 +4075,261 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 	return 1;
 }
 
-void mqMorphoDigCore::startLassoCut()
+void mqMorphoDigCore::startLasso(int lasso_mode)
 {
- //1 change interaction mode
-	cout << "Set Lasso style as current interaction style!" << endl;
+	// lasso_mode 0: = lasso cut (for selected surfaces), and we will only keep the outside of the selection
+	//lasso_mode 1: = lasso cut (for selected surfaces), and we will only keep the inside of the selection
+	//lasso_mode 2: = lasso tag and we will only tag the outside of the selection
+	//lasso_mode 3: = lasso tag and we will only tag the inside of the selection
+	
+	//cout << "Set Lasso style as current interaction style!" << endl;
+	//1 change interaction mode
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->LassoStyle);
-// 2 start lasso cut (and not lasso tag)
+	this->currentLassoMode = lasso_mode;
+// 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
 }
+void mqMorphoDigCore::stopLasso()
+{
+	//bacl to normal selection mode
+	if (this->currentLassoMode == 0|| this->currentLassoMode == 1)// lasso cut
+	{
+		int keep_inside = this->currentLassoMode;
+		this->lassoCutSelectedActors(keep_inside);
+	}
+	
+	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
+
+}
+
+void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
+{
+	POLYGON_LIST poly;
+	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
+	cout << "Poly valide: " << poly.state << endl;
+	if (poly.state == 1)// only for valid lasso selections!
+	{
+
+
+		vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		int modified = 0;
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				myActor->SetSelected(0);
+
+
+				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+				{
+					vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+				
+					vtkSmartPointer<vtkIntArray> newCuts =
+						vtkSmartPointer<vtkIntArray>::New();
+
+					newCuts->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					newCuts->SetNumberOfTuples(myPD->GetNumberOfPoints());
+					
+					double ve_init_pos[3];;
+					double ve_final_pos[3];
+					double ve_proj_screen[3];
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+					POLYGON_VERTEX proj_screen;
+					int proj_is_inside;
+					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						myPD->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
+						if (i < 10)
+						{
+							cout << "ve_proj_screen "<<i<<"=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+						}
+						proj_screen.x = ve_proj_screen[0];
+						proj_screen.y = ve_proj_screen[1];
+						proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+						if (i < 10)
+						{
+						}
+						
+						if (keep_inside == 0)
+						{
+							if (proj_is_inside == 0) { proj_is_inside = 1; }
+							else
+							{
+								proj_is_inside = 0;
+							}
+						}
+						if ((ve_proj_screen[2] > -1.0) && ve_proj_screen[2] < 1.0 && (proj_is_inside == 1))
+						{
+							newCuts->InsertTuple1(i, 1);
+						}
+
+					}
+					newCuts->SetName("Cuts");
+					myPD->GetPointData()->AddArray(newCuts);
+					myPD->GetPointData()->SetActiveScalars("Cuts");
+					
+					vtkSmartPointer<vtkThreshold> selector =
+						vtkSmartPointer<vtkThreshold>::New();
+					vtkSmartPointer<vtkMaskFields> scalarsOff =
+						vtkSmartPointer<vtkMaskFields>::New();
+					vtkSmartPointer<vtkGeometryFilter> geometry =
+						vtkSmartPointer<vtkGeometryFilter>::New();
+					selector->SetInputData((vtkPolyData*)myPD);
+					selector->SetInputArrayToProcess(0, 0, 0,
+						vtkDataObject::FIELD_ASSOCIATION_CELLS,
+						vtkDataSetAttributes::SCALARS);
+					selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
+					selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
+					selector->ThresholdBetween(0.9, 1.1);
+					selector->Update();
+					std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
+					std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
+
+					scalarsOff->SetInputData(selector->GetOutput());
+					scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->Update();
+					geometry->SetInputData(scalarsOff->GetOutput());
+					geometry->Update();
+
+
+					
+					vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+
+
+					MyObj = geometry->GetOutput();
+					std::cout << "\nLasso new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
+					std::cout << "\nLasso  new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
+
+					if (MyObj->GetNumberOfPoints() > 10)
+					{
+						VTK_CREATE(vtkMDActor, newactor);
+						if (this->mui_BackfaceCulling == 0)
+						{
+							newactor->GetProperty()->BackfaceCullingOff();
+						}
+						else
+						{
+							newactor->GetProperty()->BackfaceCullingOn();
+						}
+
+
+						//VTK_CREATE(vtkDataSetMapper, newmapper);
+						VTK_CREATE(vtkPolyDataMapper, newmapper);
+						//VTK_CREATE(vtkSmartPointer<vtkDataSetMapper>
+						//newmapper->ImmediateModeRenderingOn();
+						newmapper->SetColorModeToDefault();
+
+						if (
+							(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+							&& this->mui_ActiveScalars->NumComp == 1
+							)
+						{
+							newmapper->SetScalarRange(0, this->TagTableSize - 1);
+							newmapper->SetLookupTable(this->GetTagLut());
+						}
+						else
+						{
+							newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+						}
+
+
+						newmapper->ScalarVisibilityOn();
+						
+						cout << "cut object" << MyObj->GetNumberOfPoints() << endl;
+						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+						newmapper->SetInputData(MyObj);
+
+						//VTK_CREATE(vtkActor, actor);
+
+						int num = 2;
+
+						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+						vtkTransform *newTransform = vtkTransform::New();
+						newTransform->PostMultiply();
+
+						newTransform->SetMatrix(Mat);
+						newactor->SetPosition(newTransform->GetPosition());
+						newactor->SetScale(newTransform->GetScale());
+						newactor->SetOrientation(newTransform->GetOrientation());
+						newTransform->Delete();
+
+
+						double color[4] = { 0.5, 0.5, 0.5, 1 };
+						myActor->GetmColor(color);
+						double trans = 20;
+						if (trans >= 0 && trans <= 100)
+						{
+							color[3] = (double)((double)trans / 100);
+
+
+						}
+
+						newactor->SetmColor(color);
+
+						newactor->SetMapper(newmapper);
+						newactor->SetSelected(0);
+
+
+						newactor->SetName("LC" + myActor->GetName());
+						cout << "try to add new actor=" << endl;
+						newcoll->AddTmpItem(newactor);
+						modified = 1;
+					}
+
+
+					
+
+
+				}
+			}
+		}
+		if (modified == 1)
+		{
+			newcoll->InitTraversal();
+			vtkIdType num = newcoll->GetNumberOfItems();
+			for (vtkIdType i = 0; i < num; i++)
+			{
+				cout << "try to get next actor from newcoll:" << i << endl;
+				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+
+
+				this->getActorCollection()->AddItem(myActor);
+				emit this->actorsMightHaveChanged();
+				std::string action = "Convex Hull added: " + myActor->GetName();
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+
+			}
+			//cout << "camera and grid adjusted" << endl;
+			cout << "new actor(s) added" << endl;
+			this->Initmui_ExistingScalars();
+
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			this->Render();
+		}
+
+	}
+}
+
 void mqMorphoDigCore::addConvexHull()
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -9599,7 +9847,11 @@ void mqMorphoDigCore::slotLandmarkMoveDown()
 	this->LandmarksMoveDown();
 }
 
-void mqMorphoDigCore::slotLasso() { this->startLassoCut(); }
+void mqMorphoDigCore::slotLassoCutKeepInside() { this->startLasso(1); }
+void mqMorphoDigCore::slotLassoCutKeepOutside() { this->startLasso(0); }
+void mqMorphoDigCore::slotLassoTagInside() { this->startLasso(3); }
+void mqMorphoDigCore::slotLassoTagOutside() { this->startLasso(2); }
+
 void mqMorphoDigCore::slotConvexHULL() { this->addConvexHull(); }
 void mqMorphoDigCore::slotMirror() { this->addMirrorXZ(); }
 void mqMorphoDigCore::slotInvert() { 

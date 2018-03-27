@@ -27,6 +27,7 @@
 #include <sstream>
 #include <iostream>
 
+#include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkPoints.h>
 #include <vtkCylinderSource.h> 
@@ -135,6 +136,15 @@ public:
 	}
 };
 
+void lassoselect(vtkObject* caller,
+	long unsigned int vtkNotUsed(eventId),
+	void* vtkNotUsed(clientData),
+	void* vtkNotUsed(callData))
+{
+	cout << "Lasso selection changed!" << endl;
+	mqMorphoDigCore::instance()->stopLasso();
+
+}
 
 //Select meshes, landmarks and tags ... first try!
 void RubberBandSelect(vtkObject* caller,
@@ -622,8 +632,11 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	 vtkSmartPointer<vtkMDInteractorStyle> style =
     vtkSmartPointer<vtkMDInteractorStyle>::New();
 
-	 vtkSmartPointer<vtkMDLassoInteractorStyle> lassostyle =
-		 vtkSmartPointer<vtkMDLassoInteractorStyle>::New();
+	 /*vtkSmartPointer<vtkMDLassoInteractorStyle> lassostyle =
+		 vtkSmartPointer<vtkMDLassoInteractorStyle>::New();*/
+
+	 vtkSmartPointer<vtkInteractorStyleDrawPolygon> lassostyle =
+		 vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
 
 	 style->SetActorCollection(this->MorphoDigCore->getActorCollection());
 	 style->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
@@ -632,18 +645,24 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	 style->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
 	 style->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());
 
-	 lassostyle->SetActorCollection(this->MorphoDigCore->getActorCollection());
+	/* lassostyle->SetActorCollection(this->MorphoDigCore->getActorCollection());
 	 lassostyle->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
 	 lassostyle->SetTargetLandmarkCollection(this->MorphoDigCore->getTargetLandmarkCollection());
 	 lassostyle->SetNodeLandmarkCollection(this->MorphoDigCore->getNodeLandmarkCollection());
 	 lassostyle->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
-	 lassostyle->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());
+	 lassostyle->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());*/
 
 	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
 	//vtkSmartPointer<vtkInteractorStyleTrackballActor> style =
 	//	vtkSmartPointer<vtkInteractorStyleTrackballActor>::New();
 	//vtkSmartPointer<vtkInteractorStyleSwitch> style =
 	//	vtkSmartPointer<vtkInteractorStyleSwitch>::New();
+
+	 vtkSmartPointer<vtkCallbackCommand> lassoselectionCallback =
+		 vtkSmartPointer<vtkCallbackCommand>::New();
+	 lassoselectionCallback->SetCallback(lassoselect);
+	 lassostyle->AddObserver(vtkCommand::SelectionChangedEvent, lassoselectionCallback);
+
 	 vtkSmartPointer<vtkCallbackCommand> pickCallback =
 		 vtkSmartPointer<vtkCallbackCommand>::New();
 

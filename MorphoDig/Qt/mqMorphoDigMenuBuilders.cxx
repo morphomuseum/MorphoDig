@@ -193,7 +193,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Invert = submenuStructureModification->addAction("Invert each selected surface");
 	QAction *Mirror = submenuStructureModification->addAction("Mirror each selected surface along Y plane");
 	QAction *ConvexHULL = submenuStructureModification->addAction("Create convex hull for each selected surface");
-	QAction *Lasso = submenuStructureModification->addAction("Lasso cut");
+	QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
+	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");
 	QMenu* submenuRenderingModification = menu.addMenu("Rendering modification");
 	
 
@@ -222,7 +223,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(Invert, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotInvert()));
 	QAction::connect(Mirror, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirror()));
 	QAction::connect(ConvexHULL, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotConvexHULL()));
-	QAction::connect(Lasso, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLasso()));
+	QAction::connect(Lasso, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
+	QAction::connect(Lasso2, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
 	
 	QAction::connect(Grey, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotGrey()));
 	QAction::connect(Yellow, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotYellow()));
