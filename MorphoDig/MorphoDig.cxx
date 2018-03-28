@@ -335,11 +335,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 		
 	projectWindow->setCentralWidget(qvtkWidget2);
 
-	/*QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_add.png");
-	QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
-		
 	
-	qvtkWidget2->setCursor(projectCursor);*/
 
 
 	//projectWindow->Maximise
@@ -365,8 +361,11 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
 	vtkObject::GlobalWarningDisplayOff();
 	this->MorphoDigCore =  new mqMorphoDigCore();
+	this->MorphoDigCore->setQVTKWidget(this->qvtkWidget2);
 	MorphoDigCore->SetProjectWindow(projectWindow);
 	window->AddRenderer(this->MorphoDigCore->getRenderer());
+
+	this->MorphoDigCore->setCurrentCursor(0);
 	//vtkUndoStack* undoStack = vtkUndoStack::New();
 
 	//@@@

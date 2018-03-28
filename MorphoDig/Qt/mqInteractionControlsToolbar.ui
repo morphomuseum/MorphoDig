@@ -102,8 +102,8 @@
    </property>
    <property name="icon">
     <iconset resource="../Icons/icons.qrc">
-     <normaloff>:/Icons/move.png</normaloff>
-     <normalon>:/Icons/move.png</normalon>:/Icons/move.png</iconset>
+     <normaloff>:/Icons/move3.png</normaloff>
+     <normalon>:/Icons/move3.png</normalon>:/Icons/move3.png</iconset>
    </property>
    <property name="text">
     <string>Move camera </string>

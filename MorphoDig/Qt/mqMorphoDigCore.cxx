@@ -101,6 +101,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 {
 
 	mqMorphoDigCore::Instance = this;
+	this->qvtkWidget = NULL;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
 	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
 	this->currentLassoMode = 0; // 
@@ -342,6 +343,13 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	}
 }
 
+
+void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget) 
+{
+	this->qvtkWidget = mqvtkWidget;
+}
+
+QVTKOpenGLWidget* mqMorphoDigCore::getQVTKWidget() { return this->qvtkWidget; }
 void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
 {
 	this->Style = mStyle;
@@ -4086,10 +4094,21 @@ void mqMorphoDigCore::startLasso(int lasso_mode)
 	//1 change interaction mode
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->LassoStyle);
 	this->currentLassoMode = lasso_mode;
+	if (lasso_mode == 0) { this->setCurrentCursor(3); }
+	if (lasso_mode == 1) { this->setCurrentCursor(2); }
 // 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
 }
 void mqMorphoDigCore::stopLasso()
 {
+	if (this->Getmui_MoveMode()==0 || this->Getmui_MoveMode() == 1)
+	{
+		this->setCurrentCursor(0);
+	}
+	else
+	{
+		this->setCurrentCursor(1);
+	}
+	
 	//bacl to normal selection mode
 	if (this->currentLassoMode == 0|| this->currentLassoMode == 1)// lasso cut
 	{
@@ -4100,7 +4119,123 @@ void mqMorphoDigCore::stopLasso()
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
 
 }
+void mqMorphoDigCore::setCurrentCursor(int cursor)
 
+{
+//0 = hande cursor (move3.png)
+//1 = move pointer (move_mode2.png)
+//2 = lasso cut keep inside
+//3 = lasso cut keep outside
+//4 = select mode
+//5 = pencil
+//6 = paint bucket
+//7 = set landmark
+	if (this->getQVTKWidget() != NULL)
+	{
+		if (cursor == 0)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 1)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/move_mode2.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 2)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_keepinside.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 3)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_keepoutside.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 4)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/select_mode2.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 5)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/pencil.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 6)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/Flood_fill.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 7)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/magic_wand.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+
+		}
+	}
+
+}
+//changes mouse cursor
 void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 {
 	POLYGON_LIST poly;
@@ -4120,7 +4255,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
-				myActor->SetSelected(0);
+				//myActor->SetSelected(0); we don't unselect after a cut
 
 
 				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
@@ -4204,6 +4339,8 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 
 
 					MyObj = geometry->GetOutput();
+					myPD->GetPointData()->RemoveArray("Cuts");
+
 					std::cout << "\nLasso new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
 					std::cout << "\nLasso  new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
 
@@ -4263,13 +4400,13 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 
 						double color[4] = { 0.5, 0.5, 0.5, 1 };
 						myActor->GetmColor(color);
-						double trans = 20;
+						/*double trans = 100* color[3];
 						if (trans >= 0 && trans <= 100)
 						{
 							color[3] = (double)((double)trans / 100);
 
 
-						}
+						}*/
 
 						newactor->SetmColor(color);
 

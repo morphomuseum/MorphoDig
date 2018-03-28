@@ -192,6 +192,9 @@ void mqObjectsControlsToolbar::constructor()
   connect(yTr, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
   connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));
   
+  connect(this->ui->actionLassoCutKeepInside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
+  connect(this->ui->actionLassoCutKeepOutside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
+
   new mqEditLMKDialogReaction(this->ui->actionEditLandmarks);
   new mqCreateLMKDialogReaction(this->ui->actionCreateLandmark);
   new mqEditFLGDialogReaction(this->ui->actionEditFlags);

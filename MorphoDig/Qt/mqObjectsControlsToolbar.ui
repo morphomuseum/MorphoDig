@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>35</width>
-    <height>170</height>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,6 +81,32 @@
     <string>Edit first selected object name, color and matrix</string>
    </property>
   </action>
+  <action name="actionLassoCutKeepInside">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lasso_keepinside.png</normaloff>
+     <normalon>:/Icons/Lasso_keepinside.png</normalon>:/Icons/Lasso_keepinside.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lasso cut: keep inside selected area</string>
+   </property>
+   <property name="toolTip">
+    <string>Lasso cut : keep inside selected area</string>
+   </property>
+  </action>
+  <action name="actionLassoCutKeepOutside">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lasso_keepoutside.png</normaloff>
+     <normalon>:/Icons/Lasso_keepoutside.png</normalon>:/Icons/Lasso_keepoutside.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lasso cut: keep outside selected area</string>
+   </property>
+   <property name="toolTip">
+    <string>Lasso cut : keep outside selected area</string>
+   </property>
+  </action>
   <addaction name="actionDelete"/>
   <addaction name="separator"/>
   <addaction name="actionCreateLandmark"/>
@@ -88,6 +114,9 @@
   <addaction name="actionEditActors"/>
   <addaction name="actionEditLandmarks"/>
   <addaction name="actionEditFlags"/>
+  <addaction name="separator"/>
+  <addaction name="actionLassoCutKeepInside"/>
+  <addaction name="actionLassoCutKeepOutside"/>
  </widget>
  <resources>
   <include location="../Icons/icons.qrc"/>

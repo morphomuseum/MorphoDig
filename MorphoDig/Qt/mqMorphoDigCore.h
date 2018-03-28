@@ -27,6 +27,7 @@
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
 //#include "vtkUndoStackInternal.h"
 
+#include <QVTKOpenGLWidget.h>
 #include <vtkScalarBarActor.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkSmartPointer.h>    
@@ -551,6 +552,7 @@ public:
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
   void startLasso(int lasso_mode);//change interaction style
+  void setCurrentCursor(int cursor); //changes mouse cursor
   void stopLasso();//change interaction style back to normal
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
   void Redo(); // calls the undoStack Redo function
@@ -598,6 +600,9 @@ public:
 	double GetSuggestedScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
+  void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
+  
+  QVTKOpenGLWidget* getQVTKWidget();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
   void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
@@ -772,7 +777,7 @@ public slots:
 
 private:
 	static mqMorphoDigCore* Instance;
-
+	QVTKOpenGLWidget *qvtkWidget;
 	int currentLassoMode;
 	int selected_file_exists(std::string path, std::string ext, std::string postfix);
 	int context_file_exists(std::string path, std::string ext, std::string postfix);

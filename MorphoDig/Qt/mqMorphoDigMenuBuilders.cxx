@@ -333,6 +333,12 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	//@@
 
 	
+	QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
+		<< mqSetName("MainControlsToolbar");
+	mainToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
+	cout << "end create main tool bar" << endl;
+
 	//cout << "create interaction tool bar" << endl;
 	QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow)
 		<< mqSetName("InteractionControlsToolbar");
@@ -350,7 +356,7 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
 		<< mqSetName("LightControlsToolbar");
 	lightToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::TopToolBarArea, lightToolBar);
+	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);
 	//cout << "create objects tool bar" << endl;
 
 	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
@@ -374,12 +380,12 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 //-----------------------------------------------------------------------------
 void mqMorphoDigMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 {
-	cout << "create main tool bar" << endl;
+	/*cout << "create main tool bar" << endl;
 	QToolBar* mainToolBar = new mqMainControlsToolbar(&mainWindow)
 		<< mqSetName("MainControlsToolbar");
 	mainToolBar->layout()->setSpacing(0);
 	mainWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
-	cout << "end create main tool bar" << endl;
+	cout << "end create main tool bar" << endl;*/
 
 
 	/*

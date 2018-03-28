@@ -100,6 +100,7 @@ void mqInteractionControlsToolbar::slotMoveCamera()
 		this->ui->actionMoveObjects->setChecked(false);
 	
 	mqMorphoDigCore::instance()->Setmui_MoveMode(1);
+	mqMorphoDigCore::instance()->setCurrentCursor(0);
 
 }
 
@@ -111,6 +112,7 @@ void mqInteractionControlsToolbar::slotMoveObjects()
 	this->ui->actionMoveCamera->setChecked(false);
 
 	mqMorphoDigCore::instance()->Setmui_MoveMode(2);
+	mqMorphoDigCore::instance()->setCurrentCursor(1);
 
 }
 
@@ -121,7 +123,7 @@ void mqInteractionControlsToolbar::slotMoveOnlyLandmarks()
 		this->ui->actionMoveCamera->setChecked(false);
 		this->ui->actionMoveOnlyLandmarks->setChecked(true);
 		this->ui->actionMoveObjects->setChecked(false);
-
+		mqMorphoDigCore::instance()->setCurrentCursor(0);
 	
 
 	mqMorphoDigCore::instance()->Setmui_MoveMode(0);
