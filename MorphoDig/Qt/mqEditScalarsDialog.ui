@@ -475,37 +475,37 @@
      <string>suggested min:</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushInitScalar">
+   <widget class="QPushButton" name="pushRemoveScalarAll">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>60</y>
-      <width>75</width>
+      <x>20</x>
+      <y>50</y>
+      <width>141</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Init Scalar</string>
+     <string>Remove Scalar (all objects)</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushRemoveScalar">
+   <widget class="QPushButton" name="pushRemoveScalarSelected">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>60</y>
-      <width>81</width>
+      <x>190</x>
+      <y>50</y>
+      <width>171</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Remove scalar</string>
+     <string>Remove scalar (selectedl objects)</string>
     </property>
    </widget>
    <widget class="QComboBox" name="comboActiveScalar">
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>34</y>
+      <y>20</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -515,7 +515,7 @@
     <property name="geometry">
      <rect>
       <x>22</x>
-      <y>38</y>
+      <y>20</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -528,7 +528,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>90</y>
+      <y>110</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -538,7 +538,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>90</y>
+      <y>110</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -652,19 +652,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="cbBelowMin">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>140</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Show below min</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
@@ -702,19 +689,6 @@
     </property>
     <property name="text">
      <string>max: </string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="cbAboeMax">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>170</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>show above max: </string>
     </property>
    </widget>
    <widget class="QDoubleSlider" name="sliderMin">

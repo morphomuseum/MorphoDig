@@ -735,7 +735,7 @@ void mqMorphoDigCore::InitLuts()
 	opacityRfunction->AddPoint(0.2, 0.6);
 	opacityRfunction->AddPoint(0.8, 0.8);
 	opacityRfunction->AddPoint(1, 1);
-
+	opacityRfunction->AddPoint(1.0001, 0);
 	this->ScalarRainbowLut->SetScalarOpacityFunction(opacityRfunction);
 	this->ScalarRainbowLut->EnableOpacityMappingOn();
 	this->ScalarRainbowLut->Build();
