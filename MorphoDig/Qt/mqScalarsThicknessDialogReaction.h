@@ -26,17 +26,21 @@ public:
   /**
   * Shows the FLG dialog for the application.
   */
-  static void showScalarsThicknessDialog(mqScalarsThicknessDialog *FLG_dialog);
+  //static void showScalarsThicknessDialog(mqScalarsThicknessDialog *FLG_dialog);
+  static void showScalarsThicknessDialog();
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { mqScalarsThicknessDialogReaction::showScalarsThicknessDialog(this->Thickness_dialog); }
+	virtual void onTriggered() { mqScalarsThicknessDialogReaction::showScalarsThicknessDialog(); }
+  
+	//For an non modal dialog
+	//virtual void onTriggered() { mqScalarsThicknessDialogReaction::showScalarsThicknessDialog(this->Thickness_dialog); }
 
 private:
 	Q_DISABLE_COPY(mqScalarsThicknessDialogReaction)
-		mqScalarsThicknessDialog *Thickness_dialog;
+		//mqScalarsThicknessDialog *Thickness_dialog;
 };
 
 #endif

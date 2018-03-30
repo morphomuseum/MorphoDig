@@ -6358,8 +6358,13 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer
 
 	return connectedVertices;
 }
-void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg)
+void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName)
 {
+	std::string mScalarName = "Thickness";
+	if (scalarName.length() >0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
 	int modified = 0;
@@ -6413,16 +6418,18 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 				{
 				//	cout << "We have found some norms" << endl;
 
-					QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
-					progress.setWindowModality(Qt::WindowModal);
+					//QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
+					//progress.setWindowModality(Qt::WindowModal);
 					vtkSmartPointer<vtkKdTreePointLocator> kDTree =
 						vtkSmartPointer<vtkKdTreePointLocator>::New();
 					kDTree->SetDataSet(mPD);
 					kDTree->BuildLocator();
+					
 					for (ve = 0; ve < numvert; ve++)
 					{
 						min_dist = max_thickness;
-						progress.setValue(ve);
+						emit thicknessProgression((int)(100 * ve / numvert));
+						//progress.setValue(ve);
 						/*if (progress.wasCanceled())
 							break;*/
 
@@ -6576,17 +6583,17 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 
 					}
 					//std::cout<<"New Scalar computation done "<<std::endl;
-
-					newScalars->SetName("Thickness");
+					
+					newScalars->SetName(mScalarName.c_str());
 					// test if exists...
 					//
 					int exists = 0;
 
 					// remove this scalar
 					//this->GetPointData()->SetScalars(newScalars);
-					mPD->GetPointData()->RemoveArray("Thickness");
+					mPD->GetPointData()->RemoveArray(mScalarName.c_str());
 					mPD->GetPointData()->AddArray(newScalars);
-					mPD->GetPointData()->SetActiveScalars("Thickness");
+					mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
 					//g_active_scalar = 0;
 					// 0 => depth
 					// 1 =>	"Maximum_Curvature"
@@ -6613,7 +6620,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 		//cout << "camera and grid adjusted" << endl;
 		cout << "thickness scalars computed " << endl;
 		this->Initmui_ExistingScalars();
-		this->Setmui_ActiveScalarsAndRender("Thickness", VTK_DOUBLE, 1);
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 		
 	}
 }

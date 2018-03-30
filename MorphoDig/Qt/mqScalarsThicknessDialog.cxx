@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QRadioButton>
 #include <QFileDialog>
+#include <QProgressBar>
 #include <QCheckBox>
 #include <QHeaderView>
 
@@ -60,7 +61,7 @@ mqScalarsThicknessDialog::mqScalarsThicknessDialog(QWidget* Parent)
 	this->Ui->thickness->setMaximum(DBL_MAX);
 	this->Ui->thickness->setSingleStep(1);
 	this->Ui->thickness->setValue(2);
-
+	this->Ui->progressBar->setVisible(false);
 	this->Ui->smoothNormales->setChecked(true);
 	
 	this->Ui->avg->setMinimum(1);
@@ -69,8 +70,10 @@ mqScalarsThicknessDialog::mqScalarsThicknessDialog(QWidget* Parent)
 	this->Ui->avg->setSingleStep(1);
 	
   
-	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditThickness()));
-
+	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditThickness()));
+	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditThickness()));
+	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
+	 connect(mqMorphoDigCore::instance(), SIGNAL(thicknessProgression(int)), this, SLOT(slotProgressBar(int)));
 }
 
 
@@ -86,26 +89,38 @@ mqScalarsThicknessDialog::~mqScalarsThicknessDialog()
 }
 void mqScalarsThicknessDialog::editThickness()
 {
-	cout << "Edit alpha" << endl;
+	cout << "Edit thickness" << endl;
+	this->Ui->cancel->setDisabled(true);
 	
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
 	{
 		std::string action = "Update thickness";
 		
-		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value());// to update thickness
+		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text());// to update thickness
 		
 	}
+
+}
+
+void mqScalarsThicknessDialog::slotProgressBar(int val)
+{
+	this->Ui->progressBar->setValue(val);
 }
 
 
-
-
-
+void mqScalarsThicknessDialog::slotClose()
+{
+	
+	this->close();
+}
 
 
 void mqScalarsThicknessDialog::sloteditThickness()
 {
+	//cout << "Set visible true!!!" << endl;
+	this->Ui->progressBar->setVisible(true);
 	this->editThickness();
+	this->close();
 }
 
 
