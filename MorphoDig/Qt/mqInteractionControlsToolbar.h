@@ -69,6 +69,7 @@ public:
   virtual void slotMoveCamera();
   virtual void slotMoveObjects();
   virtual void slotMoveOnlyLandmarks();
+  virtual void slotMoveModeChanged();
 private:
 	Q_DISABLE_COPY(mqInteractionControlsToolbar)
   

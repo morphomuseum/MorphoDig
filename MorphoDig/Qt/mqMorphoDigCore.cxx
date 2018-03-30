@@ -4098,6 +4098,22 @@ void mqMorphoDigCore::startLasso(int lasso_mode)
 	if (lasso_mode == 1) { this->setCurrentCursor(2); }
 // 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
 }
+void mqMorphoDigCore::SwitchMoveMode()
+{
+	if (this->Getmui_MoveMode() == 0 || this->Getmui_MoveMode() == 1) //0 lmk movemode //1 camera //2 move objects
+	{
+		this->Setmui_MoveMode(2); // switch to move objects
+		this->setCurrentCursor(1); //appropriate cursor
+
+	}
+	
+	else
+	{
+		this->Setmui_MoveMode(1);// swtich to camera mve mode
+		this->setCurrentCursor(0);//appropriate cursor
+	}
+	emit this->modeModeChanged();
+}
 void mqMorphoDigCore::stopLasso()
 {
 	if (this->Getmui_MoveMode()==0 || this->Getmui_MoveMode() == 1)

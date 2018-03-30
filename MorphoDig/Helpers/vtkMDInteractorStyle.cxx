@@ -268,6 +268,10 @@ void vtkMDInteractorStyle::StartSelect()
 	
 	// Output the key that was pressed
 	//cout << key << endl;
+	if (key.compare("Escape") == 0)
+	{
+		mqMorphoDigCore::instance()->SwitchMoveMode();
+	}
 	if (key.compare("Alt_L")==0)
 	{
 		this->Alt = ALT_PRESSED;

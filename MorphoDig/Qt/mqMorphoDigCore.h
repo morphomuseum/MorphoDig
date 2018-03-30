@@ -331,7 +331,7 @@ public:
 	void Setmui_MoveMode(int movemode);
 	int Getmui_MoveMode();
 	int Getmui_DefaultMoveMode();
-
+	void SwitchMoveMode();
 	void Setmui_ShowGrid(int showgrid);
 	int Getmui_ShowGrid();
 	int Getmui_DefaultShowGrid();
@@ -586,6 +586,7 @@ public:
   void CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type = -1);
   void UpdateFirstSelectedLandmark(double coord[3], double ori[3]);
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
+  
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
   void signal_projectionModeChanged();
@@ -619,7 +620,7 @@ signals:
   void existingScalarsChanged();
   void activeScalarChanged();
   void actorsMightHaveChanged();
-  
+  void modeModeChanged();
 protected:
 	
 	~mqMorphoDigCore();

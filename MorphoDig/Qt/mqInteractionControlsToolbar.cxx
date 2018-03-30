@@ -85,12 +85,31 @@ void mqInteractionControlsToolbar::constructor()
   connect(this->ui->actionMoveCamera, SIGNAL(triggered()), this, SLOT(slotMoveCamera()));
   connect(this->ui->actionMoveObjects, SIGNAL(triggered()), this, SLOT(slotMoveObjects()));
   connect(this->ui->actionMoveOnlyLandmarks, SIGNAL(triggered()), this, SLOT(slotMoveOnlyLandmarks()));
-  
+  connect(mqMorphoDigCore::instance(), SIGNAL(modeModeChanged()), this, SLOT(slotMoveModeChanged()));
   
 }
 
 
 
+void mqInteractionControlsToolbar::slotMoveModeChanged()
+{
+	// move mode was changed externally (ex: "Escape" pressed)
+	if (mqMorphoDigCore::instance()->Getmui_MoveMode() == 0 || mqMorphoDigCore::instance()->Getmui_MoveMode() == 1) //0 lmk movemode //1 camera //2 move objects
+	{
+
+		this->ui->actionMoveCamera->setChecked(true);
+		this->ui->actionMoveOnlyLandmarks->setChecked(false);
+		this->ui->actionMoveObjects->setChecked(false);
+
+	}
+
+	else
+	{
+		this->ui->actionMoveObjects->setChecked(true);
+		this->ui->actionMoveOnlyLandmarks->setChecked(false);
+		this->ui->actionMoveCamera->setChecked(false);
+	}
+}
 
 void mqInteractionControlsToolbar::slotMoveCamera()
 {
