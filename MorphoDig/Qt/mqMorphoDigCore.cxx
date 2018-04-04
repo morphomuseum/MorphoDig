@@ -120,7 +120,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	cout << "try to create mui_ActiveScalars" << endl;
 	this->mui_ActiveScalars = new ActiveScalars;
 	this->mui_ExistingScalars = new ExistingScalars;
-
+	this->mui_ScalarsOfSelectedObjects = new ExistingScalars;
 	this->ScalarBarActor = vtkSmartPointer<vtkScalarBarActor>::New();
 	this->ScalarBarActor->SetOrientationToHorizontal();
 	this->ScalarBarActor->SetHeight(0.1);
@@ -331,6 +331,8 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	//this->ActorCollection->Delete();
 	this->mui_ExistingScalars->Stack.clear();
 	delete this->mui_ExistingScalars;
+	this->mui_ScalarsOfSelectedObjects->Stack.clear();
+	delete this->mui_ScalarsOfSelectedObjects;
 	delete this->mui_ActiveScalars;
 
 	this->mui_ExistingColorMaps->Stack.clear();
@@ -730,7 +732,7 @@ void mqMorphoDigCore::InitLuts()
 	this->ScalarRainbowLut->AddRGBPoint(0.8, 1.0, 1.0, 0.0); //# yellow
 	this->ScalarRainbowLut->AddRGBPoint(1.0, 1.0, 0.0, 0.0); //# red
 	vtkSmartPointer<vtkPiecewiseFunction> opacityRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
-
+	
 	opacityRfunction->AddPoint(0, 0.3);
 	opacityRfunction->AddPoint(0.2, 0.6);
 	opacityRfunction->AddPoint(0.8, 0.8);
@@ -3252,8 +3254,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 					int File_type = 1; //: vtk-vtp
 
 					if (save_surfaces_as_ply == 1) { File_type = 2; }//2 = PLY
-	
-					this->SaveSurfaceFile(QString(_mesh_fullpath.c_str()),0 , apply_position_to_surfaces, File_type, 0, myActor);
+					std::vector<std::string> mscalarsToBeRemoved; // no scalar to be removed here for the moment...
+					this->SaveSurfaceFile(QString(_mesh_fullpath.c_str()),0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, 0, myActor);
 				}
 
 				
@@ -7251,13 +7253,16 @@ to achieve desired the correct rendering. Do not understand why yet.
 	}
 }
 */
-int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, int save_norms, vtkMDActor *myActor)
+int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int save_norms, vtkMDActor *myActor)
 {
 	// Write_Type 0 : Binary LE or "Default Binary"
 	// Write_Type 1 : Binary BE 
 	// Write_Type 2 : ASCII
 	
-
+	
+	// if length = 1 and contains "all" or length = 0 => save all scalars.
+	// else : remove the selected scalars
+	
 	// Position_mode 0 : orignal position
 	// Position_mode 1 : moved position
 
@@ -8900,12 +8905,12 @@ ExistingScalars * mqMorphoDigCore::Getmui_ExistingScalars()
 	return this->mui_ExistingScalars;
 }
 
-ExistingScalars * mqMorphoDigCore::GetScalarsofSelectedObjects()
+ExistingScalars * mqMorphoDigCore::Getmui_ScalarsOfSelectedObjects()
 {
-	return this->mui_ExistingScalars;
-	/*	// browse through all actors and check for existing scalar
+	
+		// browse through all actors and check for existing scalar
 	// add
-	cout << "Init mui existing scalars" << endl;
+	cout << "Init mui scalars of selected objects" << endl;
 	QStringList existing;
 	this->ActorCollection->InitTraversal();
 	this->mui_ExistingScalars->Stack.clear();
@@ -8914,55 +8919,57 @@ ExistingScalars * mqMorphoDigCore::GetScalarsofSelectedObjects()
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
-		
-		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+		if(myActor->GetSelected()==1)
 		{
-			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
-			int nbarrays = myPD->GetPointData()->GetNumberOfArrays();
-			for (int i = 0; i < nbarrays; i++)
+			vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		
+			if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 			{
-				//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << endl;
-				int num_comp = myPD->GetPointData()->GetArray(i)->GetNumberOfComponents();
-				//cout << "Array" << i << " has "<<myPD->GetPointData()->GetArray(i)->GetNumberOfComponents()<< " components"<<endl;
-				//std::cout << VTK_UNSIGNED_CHAR << " unsigned char" << std::endl;
-				//std::cout << VTK_UNSIGNED_INT << " unsigned int" << std::endl;
-				//std::cout << VTK_FLOAT << " float" << std::endl;
-				//std::cout << VTK_DOUBLE << " double" << std::endl;
-				int dataType = myPD->GetPointData()->GetArray(i)->GetDataType();
-				
+				vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+				int nbarrays = myPD->GetPointData()->GetNumberOfArrays();
+				for (int i = 0; i < nbarrays; i++)
+				{
+					//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << endl;
+					int num_comp = myPD->GetPointData()->GetArray(i)->GetNumberOfComponents();
+					//cout << "Array" << i << " has "<<myPD->GetPointData()->GetArray(i)->GetNumberOfComponents()<< " components"<<endl;
+					//std::cout << VTK_UNSIGNED_CHAR << " unsigned char" << std::endl;
+					//std::cout << VTK_UNSIGNED_INT << " unsigned int" << std::endl;
+					//std::cout << VTK_FLOAT << " float" << std::endl;
+					//std::cout << VTK_DOUBLE << " double" << std::endl;
+					int dataType = myPD->GetPointData()->GetArray(i)->GetDataType();
 
-				if (dataType == VTK_UNSIGNED_CHAR && (num_comp == 3 || num_comp == 4))
-				{
-					// ok to add RGB like scalars
-					QString RGBlike = QString(myPD->GetPointData()->GetArrayName(i));
-					this->Addmui_ExistingScalars(RGBlike, dataType, num_comp);
+
+					if (dataType == VTK_UNSIGNED_CHAR && (num_comp == 3 || num_comp == 4))
+					{
+						// ok to add RGB like scalars
+						QString RGBlike = QString(myPD->GetPointData()->GetArrayName(i));
+						this->Addmui_ExistingScalars(RGBlike, dataType, num_comp, 1);
+					}
+					if ((dataType == VTK_UNSIGNED_INT || dataType == VTK_INT) && (num_comp == 1))
+					{
+						// ok to add TAG like scalars
+						QString Taglike = QString(myPD->GetPointData()->GetArrayName(i));
+						this->Addmui_ExistingScalars(Taglike, dataType, num_comp, 1);
+					}
+					if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 1))
+					{
+						// ok to add conventional scalars (like curvature, thickness, height etc... )
+						QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
+						this->Addmui_ExistingScalars(ConvScalar, dataType, num_comp, 1);
+					}
+
 				}
-				if ((dataType == VTK_UNSIGNED_INT || dataType == VTK_INT)  && (num_comp == 1))
-				{
-					// ok to add TAG like scalars
-					QString Taglike = QString(myPD->GetPointData()->GetArrayName(i));
-					this->Addmui_ExistingScalars(Taglike, dataType, num_comp);
-				}
-				if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 1))
-				{
-					// ok to add conventional scalars (like curvature, thickness, height etc... )
-					QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
-					this->Addmui_ExistingScalars(ConvScalar, dataType, num_comp);
-				}
-				
+
 			}
-			
-
-}
+		}
 
 
 	}
 	int exists = 0;
 
 
-	*/
-
+	
+	return this->mui_ScalarsOfSelectedObjects;
 
 }
 
@@ -8972,8 +8979,9 @@ ExistingColorMaps * mqMorphoDigCore::Getmui_ExistingColorMaps()
 
 }
 
-void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int numComp)
+void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int only_selected)
 {
+	// if only_selected == 1 : populate the list of scalars of selected actors
 	int exists = 0;
 	QString none = QString("none");
 	/*if (this->mui_ExistingScalars.size() == 1 && this->mui_ExistingScalars.at(0) == none)
@@ -8987,9 +8995,19 @@ void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int n
 	{*/
 		
 		//check first if Scalar already exists!
-		for (int i = 0; i < this->mui_ExistingScalars->Stack.size(); i++)
+	ExistingScalars * myCurrentScalarList;
+	if (only_selected==0)
+	{
+		myCurrentScalarList = this->mui_ExistingScalars;
+	}
+	else
+	{
+		myCurrentScalarList = this->mui_ScalarsOfSelectedObjects;
+	}
+
+		for (int i = 0; i < myCurrentScalarList->Stack.size(); i++)
 		{
-			QString myScalar = this->mui_ExistingScalars->Stack.at(i).Name;
+			QString myScalar = myCurrentScalarList->Stack.at(i).Name;
 			if (myScalar == Scalar)
 			{
 				exists = 1;
@@ -8999,7 +9017,7 @@ void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int n
 		}
 		if (exists == 0)
 		{
-			this->mui_ExistingScalars->Stack.push_back(ExistingScalars::Element(Scalar, dataType, numComp));
+			myCurrentScalarList->Stack.push_back(ExistingScalars::Element(Scalar, dataType, numComp));
 			
 		}
 	/*}*/

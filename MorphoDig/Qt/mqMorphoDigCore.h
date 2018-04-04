@@ -398,7 +398,7 @@ public:
 	
 	int SaveShapeMeasures(QString fileName, int mode);
 	
-	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, int save_norms = 0, vtkMDActor *myActor = NULL);
+	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
 	void DeleteSelectedActors();
@@ -464,9 +464,10 @@ public:
 	void Setmui_BackGroundColor(double bg1, double bg2, double bg3);
 	void Setmui_BackGroundColor(double background[3]);
 
-	ExistingScalars *GetScalarsofSelectedObjects();
+	ExistingScalars *Getmui_ScalarsOfSelectedObjects();
 	ExistingScalars* Getmui_ExistingScalars();
-	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp);
+	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int only_selected =0);
+	
 	void Initmui_ExistingScalars();
 	void Setmui_ActiveScalars(QString Scalar, int dataType, int numComp);
 
@@ -672,6 +673,7 @@ protected:
 	//QString mui_ActiveScalars;
 	ActiveScalars *mui_ActiveScalars;
 	ExistingScalars *mui_ExistingScalars;
+	ExistingScalars *mui_ScalarsOfSelectedObjects;
 
 	ActiveColorMap *mui_ActiveColorMap;
 	ExistingColorMaps *mui_ExistingColorMaps;

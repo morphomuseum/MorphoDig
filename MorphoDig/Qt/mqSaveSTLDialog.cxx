@@ -86,10 +86,10 @@ void mqSaveSTLDialog::slotSaveSTLFile()
 	if (this->Ui->PositionModified->isChecked()) { position_mode = 1; }
 	else if (this->Ui->PositionOriginal->isChecked()) { position_mode = 0; }
 	
-
+	std::vector<std::string> mscalarsToBeRemoved;
 	
 
-	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, save_norms);
+	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved,save_norms);
 
 }
 

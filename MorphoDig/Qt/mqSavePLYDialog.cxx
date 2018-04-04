@@ -90,8 +90,8 @@ void mqSavePLYDialog::slotSavePlyFile()
 
 	if (this->Ui->SaveNormalsOn->isChecked()) { save_norms = 1; }
 	else if (this->Ui->SaveNormalsOff->isChecked()) { save_norms = 0; }
-
-	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, save_norms);
+	std::vector<std::string> mscalarsToBeRemoved;
+	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved, save_norms);
 
 }
 

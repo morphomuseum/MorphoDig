@@ -57,12 +57,15 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  this->Ui->Binary->setChecked(true);
  this->Ui->PositionOriginal->setChecked(true);
  this->Ui->scalarList->clear();
- ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+ ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfSelectedObjects();
  for (int i = 0; i < MyList->Stack.size(); i++)
  {
 	 if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
 	 {
-		 this->Ui->scalarList->addItem(MyList->Stack.at(i).Name);
+		 QListWidgetItem* item = new QListWidgetItem(MyList->Stack.at(i).Name, this->Ui->scalarList);
+		 item->setFlags(item->flags() | Qt::ItemIsUserCheckable); // set checkable flag
+		 item->setCheckState(Qt::Checked);
+		// this->Ui->scalarList->addItem(MyList->Stack.at(i).Name);
 	 }
 
  }
@@ -114,9 +117,17 @@ void mqSaveVTKDialog::slotSaveVTKFile()
 	if (this->Ui->PositionModified->isChecked()) { position_mode = 1; }
 	else if (this->Ui->PositionOriginal->isChecked()) { position_mode = 0; }
 	
-
-
-	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, save_norms);
+	//now retrieve all checked scalars
+	std::vector<std::string> mscalarsToBeRemoved;
+	for (int i = 0; i < this->Ui->scalarList->count(); i++)
+	{
+		if (this->Ui->scalarList->item(i)->checkState() == Qt::Unchecked)
+		{
+			mscalarsToBeRemoved.push_back(this->Ui->scalarList->item(i)->text().toStdString());
+		}
+	}
+	// RGB and Tags ? Not handled yet... 
+	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved, save_norms);
 
 }
 
