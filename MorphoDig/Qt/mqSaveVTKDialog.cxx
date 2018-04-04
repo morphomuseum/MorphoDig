@@ -18,6 +18,7 @@
 #include <QRadioButton>
 #include <QCheckBox>
 #include <QHeaderView>
+#include <QListWidget>
 
 
 #include <sstream>
@@ -55,7 +56,34 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  
  this->Ui->Binary->setChecked(true);
  this->Ui->PositionOriginal->setChecked(true);
+ this->Ui->scalarList->clear();
+ ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+ for (int i = 0; i < MyList->Stack.size(); i++)
+ {
+	 if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+	 {
+		 this->Ui->scalarList->addItem(MyList->Stack.at(i).Name);
+	 }
+
+ }
+ /*
  
+ this->Ui->comboActiveScalar->clear();
+	ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+	for (int i = 0; i < MyList->Stack.size(); i++)
+	{
+		if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+		{
+			this->Ui->comboActiveScalar->addItem(MyList->Stack.at(i).Name);
+		}
+
+	}
+ */
+ //QListWidget *scalarList = 
+ /*
+     QListWidgetItem* item = new QListWidgetItem("item", listWidget);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable); // set checkable flag
+    item->setCheckState(Qt::Unchecked); // AND initialize check state*/
   // Should connect...
   
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveVTKFile()));

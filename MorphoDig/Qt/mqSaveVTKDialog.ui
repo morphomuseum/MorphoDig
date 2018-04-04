@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>284</width>
-    <height>300</height>
+    <height>486</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,7 +432,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>260</y>
+     <y>440</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -456,7 +456,7 @@
      <x>20</x>
      <y>20</y>
      <width>251</width>
-     <height>221</height>
+     <height>371</height>
     </rect>
    </property>
    <property name="palette">
@@ -955,7 +955,44 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="VTKScalars">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>230</y>
+      <width>221</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Scalars to be saved:</string>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget_9">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>181</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout1_5"/>
+    </widget>
+    <widget class="QListWidget" name="scalarList">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>30</y>
+       <width>161</width>
+       <height>71</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
   </widget>
+  <zorder>layoutWidget</zorder>
+  <zorder>SaveVTKBox</zorder>
+  <zorder>buttonBox</zorder>
  </widget>
  <resources/>
  <connections>

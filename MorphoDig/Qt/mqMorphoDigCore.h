@@ -464,7 +464,7 @@ public:
 	void Setmui_BackGroundColor(double bg1, double bg2, double bg3);
 	void Setmui_BackGroundColor(double background[3]);
 
-
+	ExistingScalars *GetScalarsofSelectedObjects();
 	ExistingScalars* Getmui_ExistingScalars();
 	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp);
 	void Initmui_ExistingScalars();
