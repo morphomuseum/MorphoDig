@@ -735,7 +735,7 @@ void mqMorphoDigCore::InitLuts()
 	opacityRfunction->AddPoint(0.2, 0.6);
 	opacityRfunction->AddPoint(0.8, 0.8);
 	opacityRfunction->AddPoint(1, 1);
-	opacityRfunction->AddPoint(1.0001, 0);
+	//opacityRfunction->AddPoint(1.0001, 0);
 	this->ScalarRainbowLut->SetScalarOpacityFunction(opacityRfunction);
 	this->ScalarRainbowLut->EnableOpacityMappingOn();
 	this->ScalarRainbowLut->Build();
@@ -6357,6 +6357,54 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer
 	}
 
 	return connectedVertices;
+}
+void mqMorphoDigCore::RemoveScalar(QString scalarName, int onlySelectedObjects)
+{
+	std::string mScalarName = "RGB";
+	if (scalarName.length() >0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
+	else
+	{
+		return;
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1 || onlySelectedObjects==0)
+		{
+			myActor->SetSelected(0);
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+					mPD = mymapper->GetInput();
+					mPD->GetPointData()->RemoveArray(mScalarName.c_str());									
+					modified = 1;
+			}
+				
+
+
+		}
+
+		
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars modified " << endl;
+		this->Initmui_ExistingScalars();		
+
+	}
+
+
 }
 void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName)
 {

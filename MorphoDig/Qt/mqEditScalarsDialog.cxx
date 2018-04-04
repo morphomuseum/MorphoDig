@@ -69,6 +69,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->comboActiveScalar, SIGNAL(activated(int)), this, SLOT(slotActiveScalarChanged(int)));
 	connect(this->Ui->comboColorMap, SIGNAL(activated(int)), this, SLOT(slotActiveColorMapChanged(int)));
 	
+	
 	this->Ui->currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->suggestedMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -111,6 +112,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 
 	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
+	connect(this->Ui->pushRemoveScalar, SIGNAL(pressed()), this, SLOT(slotRemoveScalar()));
 	
 
 	this->RefreshSliders();
@@ -367,7 +369,13 @@ void mqEditScalarsDialog::RefreshComboColorMaps()
 	}
 }
 
-
+void mqEditScalarsDialog::slotRemoveScalar()
+{
+	mqMorphoDigCore::instance()->RemoveScalar(this->Ui->comboActiveScalar->currentText(), this->Ui->selectedObjects->isChecked());
+	this->UpdateUI();
+	
+	
+}
 void mqEditScalarsDialog::slotAcceptSuggestedMax()
 {
 	if (this->Ui->suggestedMax->value() > this->Ui->currentMin->value())
