@@ -772,6 +772,7 @@ void vtkMDInteractorStyle::StartSelect()
 	  {
 		  this->Alt = ALT_RELEASED;
 	  }
+
 	  if (key.compare("l") == 0)
 	  {
 		  this->L = L_RELEASED;
@@ -946,13 +947,19 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 		
 		{
 			
-
+			if (this->Alt == ALT_PRESSED)
+			{
+				this->StartSpin();
+				this->Superclass::OnRightButtonDown();
+			}
+			else
+			{
 				this->CurrentMode = VTKISMD_SELECT;
-				
+
 				this->RubberStart();
-			
+			}
 		}
-		else // spin
+		else // spin actors
 		{
 			this->ActorsPositionsSaved = 0;//allow to save position
 			int x = this->Interactor->GetEventPosition()[0];
@@ -1096,7 +1103,15 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 			  //cout << "Start Rotate CTRL" << endl;
 			  this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
-			  this->StartRotate();
+			  if (this->Alt == ALT_PRESSED)
+			  {
+				  this->StartSpin();
+			  }
+			  else
+			  {
+				  this->StartRotate();
+			  }
+			  
 
 
 		  }
@@ -1408,6 +1423,8 @@ void vtkMDInteractorStyle::OnRightButtonUp()
 		if (this->MoveWhat == CAM)
 		{
 			//if not in rubber band mode,  let the parent class handle it
+			
+			
 			this->Superclass::OnRightButtonUp();
 		}
 		else
@@ -1440,6 +1457,7 @@ void vtkMDInteractorStyle::OnRightButtonUp()
 	}
 	this->RubberStop();	
 	this->CurrentMode = VTKISMT_ORIENT;
+	this->Alt = ALT_RELEASED;
 }
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnLeftButtonUp()
@@ -1482,6 +1500,7 @@ void vtkMDInteractorStyle::OnLeftButtonUp()
     return;
   }
   this->RubberStop();
+  this->Alt = ALT_RELEASED;
 
 }
 
