@@ -3255,7 +3255,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 					if (save_surfaces_as_ply == 1) { File_type = 2; }//2 = PLY
 					std::vector<std::string> mscalarsToBeRemoved; // no scalar to be removed here for the moment...
-					this->SaveSurfaceFile(QString(_mesh_fullpath.c_str()),0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, 0, myActor);
+					int RGBopt = 0; //now: keep current RGB color
+					this->SaveSurfaceFile(QString(_mesh_fullpath.c_str()),0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, RGBopt, 0, myActor);
 				}
 
 				
@@ -4983,7 +4984,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+				
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -5016,7 +5017,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 				cout << "TPS basis=" << r<< endl;
 			
-				///@@@ TPS
+				/// TPS
 				vtkSmartPointer<vtkThinPlateSplineTransform> tps =
 				vtkSmartPointer<vtkThinPlateSplineTransform>::New();
 
@@ -5211,7 +5212,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+				
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -5369,7 +5370,7 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+				
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -5524,7 +5525,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+			
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -5710,8 +5711,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
-
+			
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
 				{
@@ -6837,8 +6837,7 @@ void mqMorphoDigCore::addKeepLargest()
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
-
+			
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
 				{
@@ -7000,8 +6999,7 @@ void mqMorphoDigCore::addInvert()
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
-
+		
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
 				{
@@ -7253,23 +7251,23 @@ to achieve desired the correct rendering. Do not understand why yet.
 	}
 }
 */
-int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int save_norms, vtkMDActor *myActor)
+int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt, int save_norms, vtkMDActor *myActor)
 {
 	// Write_Type 0 : Binary LE or "Default Binary"
 	// Write_Type 1 : Binary BE 
 	// Write_Type 2 : ASCII
-	
-	
+
+
 	// if length = 1 and contains "all" or length = 0 => save all scalars.
 	// else : remove the selected scalars
-	
+
 	// Position_mode 0 : orignal position
 	// Position_mode 1 : moved position
 
 	// File_type 0 : stl
 	// File_type 1 : vtk-vtp
 	// File_type 2 : ply
-	
+
 	// If myActor is NULL : => what will be saved is an aggregation of all selected surface objects.
 	// If myActor is not NULL: => what will be saved is the underlying surface object.
 
@@ -7287,7 +7285,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
 	int Ok = 1;
 
-	
+
 	if (myActor == NULL)
 	{
 		//cout << "myActor is null" << endl;
@@ -7367,7 +7365,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			}
 
 		}
-		
+
 	}
 
 	Ok = 1;
@@ -7377,6 +7375,159 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		mergedObjects->GetOutput()->GetPointData()->SetNormals(NULL);
 		mergedObjects->GetOutput()->GetCellData()->SetNormals(NULL);
 	}
+	if (scalarsToBeRemoved.size() > 0)
+	{
+		for (int i = 0; i < scalarsToBeRemoved.size(); i++)
+		{
+			cout << "Removed scalar:" << scalarsToBeRemoved.at(i) << endl;
+				mergedObjects->GetOutput()->GetPointData()->RemoveArray(scalarsToBeRemoved.at(i).c_str());
+		}
+	}
+
+	// "RGB"
+	if (RGBopt == 0)
+	{
+		// then do nothing, as we will keep RGB scalars (if those exist), and if they don't we do not care
+	}
+	else if (RGBopt ==1)
+	{ 
+		//remove RGB scalars if they exist
+		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
+	}
+	else if (RGBopt == 2)
+	{
+		vtkSmartPointer<vtkUnsignedCharArray> newcolors =
+			vtkSmartPointer<vtkUnsignedCharArray>::New();
+		newcolors->SetNumberOfComponents(4);
+		newcolors->SetNumberOfTuples(mergedObjects->GetOutput()->GetNumberOfPoints());
+		
+		vtkIdType iRGB = 0;
+		int nr, ng, nb, na;
+		this->ActorCollection->InitTraversal();
+		QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+		QString none = QString("none");
+		QString RGB = QString("RGB");
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor2->GetSelected() == 1)
+			{
+				// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
+				int RGB_fromglobal = 1;
+				if (mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str())!=NULL)
+				{
+					RGB_fromglobal = 0;
+				}
+				
+
+
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
+				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+				{
+
+					// on cherche la scalar active pour ce maillage
+					vtkSmartPointer<vtkPolyData> toSave = mapper->GetInput();
+					for (vtkIdType j = 0; j < toSave->GetNumberOfPoints(); j++)
+					{
+						//if (RGB_fromglobal == 1)
+						//{
+							nr = (unsigned char)(255 * myActor2->GetmColor()[0]);
+							ng = (unsigned char)(255 * myActor2->GetmColor()[1]);
+							nb = (unsigned char)(255 * myActor2->GetmColor()[2]); 
+							na = (unsigned char)255;
+						
+						//}
+
+
+
+						newcolors->InsertTuple4(iRGB, nr, ng, nb, na);
+						iRGB++;
+
+					}
+				}
+
+			}
+
+		}
+		newcolors->SetName("RGB");
+		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
+		mergedObjects->GetOutput()->GetPointData()->AddArray(newcolors);
+
+		// And YES...  NR NG NB should be a 0.. 255 value !!!! For the moment, color[] is a 0.0 ... 1.0 range
+		//std::cout<<"currentScalars null "<<std::endl;
+		
+		
+
+		//create a new RGB scalar!
+		/*
+		From MeshTools 1.3
+		//std::cout<<"Update RGB of "<<this->name<<std::endl;
+		vtkSmartPointer<vtkUnsignedCharArray> newcolors =
+		vtkSmartPointer<vtkUnsignedCharArray>::New();
+		newcolors->SetNumberOfComponents(4);
+		newcolors->SetNumberOfTuples(this->GetNumberOfPoints());
+		vtkFloatArray *currentScalars;
+		currentScalars =(vtkFloatArray*)this->GetPointData()->GetScalars();  // couleur des courbure
+		GLfloat cv[4];
+		// now we create and populate RGB and Tags
+		//std::cout<<"g_scalar_display_mode= "<<g_scalar_display_mode<<std::endl;
+		//std::cout<<"g_tag_display_mode= "<<g_tag_display_mode<<std::endl;
+		if (currentScalars!=NULL && (g_scalar_display_mode ==1 || g_tag_display_mode ==1))
+		{
+		//	std::cout<<"currentScalars not null "<<std::endl;
+		}
+		else
+		{
+		//	std::cout<<"currentScalars null "<<std::endl;
+		}
+		for (int i=0;i<this->GetNumberOfPoints();i++)	// for each vertex
+		{
+		//@@@@@
+		int nr,ng,nb,na;
+
+		//Colour scale!
+		if (currentScalars!=NULL && (g_scalar_display_mode ==1 || g_tag_display_mode ==1))
+		{
+		//std::cout<<"currentScalars not null "<<std::endl;
+		double cur_t = currentScalars->GetTuple(i)[0];
+
+		ConvertScalarToColor((float)cur_t, cv, 1);
+		nr= (unsigned char)(mround(255*cv[0]));
+		ng= (unsigned char)(mround(255*cv[1]));
+		nb= (unsigned char)(mround(255*cv[2]));
+		na= (unsigned char)(mround(255*cv[3]));
+
+
+		}
+		else
+		{
+		// And YES...  NR NG NB should be a 0.. 255 value !!!! For the moment, color[] is a 0.0 ... 1.0 range
+		//std::cout<<"currentScalars null "<<std::endl;
+		nr= (unsigned char)(mround(255*this->color[0]));
+		ng= (unsigned char)(mround(255*this->color[1]));
+		nb= (unsigned char)(mround(255*this->color[2]));
+		na= (unsigned char)(mround(255*this->blend));
+
+		}
+		if (i<500)
+		{
+		//std::cout<<"nr="<<nr<<", ng="<<ng<<", nb="<<nb<<std::endl;
+		}
+		////newcolors->InsertTuple3(i, (unsigned char)mround(255*cv[0]),(unsigned char)mround(255*cv[1]),(unsigned char)mround(255*cv[2]));
+		//newcolors->InsertTuple3(i, 0,0,255);
+		if(i<10)
+		{
+		//std::cout<<"nr="<<nr<<", ng="<<ng<<", nb="<<nb<<", na="<<na<<std::endl;
+		}
+		newcolors->InsertTuple4(i, nr,ng,nb,na);
+		newcolors->InsertTuple4(i, nr,ng,nb,na);
+		}
+		newcolors->SetName("RGB");
+
+		*/
+	}
+
+
 	if (file_type == 0)
 	{
 		vtkSmartPointer<vtkSTLWriter> Writer =
@@ -7466,7 +7617,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		vtkUnsignedCharArray* test = (vtkUnsignedCharArray*)MyMergedObject->GetPointData()->GetScalars("RGB");
 		if (test != NULL)
 		{
-			// std::cout<<"Colors found!"<<std::endl;
+			// for the moment: useless piece of code... 
+			 std::cout<<"Save Surface file: colors found inside merged object!"<<std::endl;
 
 			vtkSmartPointer<vtkUnsignedCharArray> colors =
 				vtkSmartPointer<vtkUnsignedCharArray>::New();
@@ -7492,7 +7644,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			colorsRGB->SetName("Colors");
 			MyMergedObject->GetPointData()->AddArray(colorsRGB);
 			//colors->SetName("Colors");	  
-			//std::cout << "Colors num of tuples :" << colors->GetNumberOfTuples() << std::endl;
+			std::cout << "Colors num of tuples :" << colors->GetNumberOfTuples() << std::endl;
 			for (int i = 0; i<10; i++)
 			{
 				//std::cout<<"RGB stuff i:"<<colors->GetTuple(i)[0]<<","<<colors->GetTuple(i)[1]<<","<<colors->GetTuple(i)[2]<<std::endl;
@@ -7500,6 +7652,15 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			}
 			Writer->SetArrayName("Colors");
 		}
+		else
+		{
+
+			cout << "Save surface file: No 4 colors found inside merged object" << endl;
+
+		}
+
+
+	
 
 
 		std::size_t found = fileName.toStdString().find(PLYext);

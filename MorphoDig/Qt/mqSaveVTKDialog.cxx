@@ -127,7 +127,11 @@ void mqSaveVTKDialog::slotSaveVTKFile()
 		}
 	}
 	// RGB and Tags ? Not handled yet... 
-	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved, save_norms);
+	int RGBopt = 0;
+	if (this->Ui->RGBkeep->isChecked()) { RGBopt = 0; }
+	if (this->Ui->RGBremove->isChecked()) { RGBopt = 1; }
+	if (this->Ui->RGBreplace->isChecked()) { RGBopt = 2; }
+	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved,RGBopt, save_norms);
 
 }
 

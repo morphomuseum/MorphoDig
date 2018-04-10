@@ -88,8 +88,8 @@ void mqSaveSTLDialog::slotSaveSTLFile()
 	
 	std::vector<std::string> mscalarsToBeRemoved;
 	
-
-	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved,save_norms);
+	int RGBopt = 0;
+	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved,RGBopt, save_norms);
 
 }
 
