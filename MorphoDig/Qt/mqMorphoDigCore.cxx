@@ -7412,31 +7412,107 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor2->GetSelected() == 1)
 			{
-				// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
-				int RGB_fromglobal = 1;
-				if (mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str())!=NULL)
-				{
-					RGB_fromglobal = 0;
-				}
+				
 				
 
 
 				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
 				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 				{
+					// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
+					int RGB_fromglobal = 1;
+					// if current active scalar is not the "none" one, and if the actor as current active scalar.
+					//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+					if (ActiveScalar != none && 	mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+					{
+						RGB_fromglobal = 0;
+					}
 
+					//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
+					//colors->SetNumberOfComponents(4);
+					//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars("RGB");
+					//vtkFloatArray *currentFScalars = (vtkFloatArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mapper->GetInput()->GetPointData()->GetScalars("RGB");
+					vtkFloatArray *currentFScalars = (vtkFloatArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					
+
+						
+
+						
+					
 					// on cherche la scalar active pour ce maillage
 					vtkSmartPointer<vtkPolyData> toSave = mapper->GetInput();
 					for (vtkIdType j = 0; j < toSave->GetNumberOfPoints(); j++)
 					{
-						//if (RGB_fromglobal == 1)
-						//{
-							nr = (unsigned char)(255 * myActor2->GetmColor()[0]);
-							ng = (unsigned char)(255 * myActor2->GetmColor()[1]);
-							nb = (unsigned char)(255 * myActor2->GetmColor()[2]); 
-							na = (unsigned char)255;
+						//Fill nr ng nb with at least something... 
+						nr = (unsigned char)(255 * myActor2->GetmColor()[0]);
+						ng = (unsigned char)(255 * myActor2->GetmColor()[1]);
+						nb = (unsigned char)(255 * myActor2->GetmColor()[2]);
+						na = (unsigned char)(255 * myActor2->GetmColor()[3]);
+
+						//1st case  : the current actor has not the currently active scalar.
+						if (RGB_fromglobal == 1)
+						{
+							//do nothing here as nr ng nb na have already been correctly instantiated just above
 						
-						//}
+						}
+						else
+						{
+							// 2 cases : 
+							//      A: active scalar = RGB => so we retake RGB... as we have started to do so earlier!
+							if (ActiveScalar == RGB)
+							{
+								if (colors != NULL)
+								{
+									nr = (unsigned char)(colors->GetTuple(j)[0]);
+									ng = (unsigned char)( colors->GetTuple(j)[1]);
+									nb = (unsigned char)(colors->GetTuple(j)[2]);
+									na = (unsigned char)(colors->GetTuple(j)[3]);
+								}
+								// else we keep global RGB as instantiated above.
+								
+							}
+							else
+							{
+								//      B: active scalar = 1 scalar or tag => we translate scalar or tag as RGB
+								if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+									this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+									)
+									&& this->Getmui_ActiveScalars()->NumComp == 1)
+								{
+
+									double cscalar = 0;
+									if (currentFScalars!=NULL)
+									{
+										cscalar = (double)currentFScalars->GetTuple(j)[0];
+									}
+									if (currentDScalars != NULL)
+									{
+										cscalar = currentDScalars->GetTuple(j)[0];
+									}
+									// retrieve scalar value
+									
+									double cRGB[3];
+									double cOpac=1;
+									mapper->GetLookupTable()->GetColor(cscalar, cRGB);
+									nr = (unsigned char)(255 * cRGB[0]);
+									ng = (unsigned char)(255 * cRGB[1]);
+									nb = (unsigned char)(255 * cRGB[2]);
+									na= (unsigned char)(255 * mapper->GetLookupTable()->GetOpacity(cscalar));
+									
+									// translate it as RGB
+
+
+								}
+								// else we keep global RGB as instantiated above.
+								
+							}
+							
+							
+
+						}
 
 
 
