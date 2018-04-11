@@ -463,10 +463,12 @@ public:
 	void Getmui_DefaultBackGroundColor(double bg[3]);
 	void Setmui_BackGroundColor(double bg1, double bg2, double bg3);
 	void Setmui_BackGroundColor(double background[3]);
-
-	ExistingScalars *Getmui_ScalarsOfSelectedObjects();
+	void EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString oldScalarName, QString newScalarName);
+	void DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName);
+	ExistingScalars *Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDActor> actor);
+	ExistingScalars *Getmui_ScalarsOfSelectedObjects(int onlyfirst=0);
 	ExistingScalars* Getmui_ExistingScalars();
-	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int only_selected =0);
+	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int toglobalList =1);
 	
 	void Initmui_ExistingScalars();
 	void Setmui_ActiveScalars(QString Scalar, int dataType, int numComp);
@@ -673,7 +675,7 @@ protected:
 	//QString mui_ActiveScalars;
 	ActiveScalars *mui_ActiveScalars;
 	ExistingScalars *mui_ExistingScalars;
-	ExistingScalars *mui_ScalarsOfSelectedObjects;
+	ExistingScalars *mui_ScalarsList; //can be of a given actor, or of selected objects
 
 	ActiveColorMap *mui_ActiveColorMap;
 	ExistingColorMaps *mui_ExistingColorMaps;

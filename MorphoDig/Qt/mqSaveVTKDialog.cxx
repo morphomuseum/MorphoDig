@@ -57,7 +57,7 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  this->Ui->Binary->setChecked(true);
  this->Ui->PositionOriginal->setChecked(true);
  this->Ui->scalarList->clear();
- ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfSelectedObjects();
+ ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfSelectedObjects(0);
  for (int i = 0; i < MyList->Stack.size(); i++)
  {
 	 if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
@@ -65,7 +65,7 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
 		 QListWidgetItem* item = new QListWidgetItem(MyList->Stack.at(i).Name, this->Ui->scalarList);
 		 item->setFlags(item->flags() | Qt::ItemIsUserCheckable); // set checkable flag
 		 item->setCheckState(Qt::Checked);
-		// this->Ui->scalarList->addItem(MyList->Stack.at(i).Name);
+		
 	 }
 
  }
