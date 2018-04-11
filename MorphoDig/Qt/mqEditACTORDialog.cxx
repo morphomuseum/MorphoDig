@@ -561,12 +561,15 @@ void mqEditACTORDialog::slotEditScalar()
 void mqEditACTORDialog::slotDeleteScalar()
 {
 	int row = this->Ui->scalarList->currentIndex().row();
-	cout << "try to delete scalar " << row << ":" << this->Ui->scalarList->item(row)->text().toStdString() << endl;
-	mqMorphoDigCore::instance()->DeleteScalar(this->ACTOR, this->Ui->scalarList->item(row)->text());
-	cout << "Try to update UI" << endl;
-	this->UpdateUI();
-	cout << "Try to update UI ok" << endl;
-	
+	cout << "try to delete scalar " << row << ":";
+	cout<< this->Ui->scalarList->item(row)->text().toStdString() << endl;
+	if (this->ACTOR != NULL)
+	{
+		mqMorphoDigCore::instance()->DeleteScalar(this->ACTOR, this->Ui->scalarList->item(row)->text());
+		cout << "Try to update UI" << endl;
+		this->UpdateUI();
+		cout << "Try to update UI ok" << endl;
+	}
 
 }
 void mqEditACTORDialog::slotapplyMatrixToAllSelectedActors()
