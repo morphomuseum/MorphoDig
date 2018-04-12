@@ -540,31 +540,36 @@ void mqEditACTORDialog::GetPrecedingActor()
 void mqEditACTORDialog::slotEditScalar()
 {
 	int row = this->Ui->scalarList->currentIndex().row();
-	QString oldScalarName = this->Ui->scalarList->item(row)->text();
-	cout << "try to edit scalar" <<  endl;
-	cout << "try to edit scalar " << row << ":"<< this->Ui->scalarList->item(row)->text().toStdString()<< endl;
-	QInputDialog *renameDialog = new QInputDialog();
-	bool dialogResult;
-	QString newScalarName = renameDialog->getText(0, "Rename Label", "New name:", QLineEdit::Normal,
-		this->Ui->scalarList->item(row)->text(), &dialogResult);
-	if (dialogResult)
+	if (this->ACTOR != NULL && row >= 0)
 	{
-		cout << "new name given:" << newScalarName.toStdString() << endl;
-		mqMorphoDigCore::instance()->EditScalarName(this->ACTOR, oldScalarName, newScalarName);
-		this->UpdateUI();
-	}
-	else
-	{
-		cout << "cancel "  << endl;
+		QString oldScalarName = this->Ui->scalarList->item(row)->text();
+		cout << "try to edit scalar" << endl;
+		cout << "try to edit scalar " << row << ":" << this->Ui->scalarList->item(row)->text().toStdString() << endl;
+		QInputDialog *renameDialog = new QInputDialog();
+		bool dialogResult;
+		QString newScalarName = renameDialog->getText(0, "Rename Label", "New name:", QLineEdit::Normal,
+			this->Ui->scalarList->item(row)->text(), &dialogResult);
+		if (dialogResult)
+		{
+			cout << "new name given:" << newScalarName.toStdString() << endl;
+			mqMorphoDigCore::instance()->EditScalarName(this->ACTOR, oldScalarName, newScalarName);
+			this->UpdateUI();
+		}
+		else
+		{
+			cout << "cancel " << endl;
+		}
 	}
 }
 void mqEditACTORDialog::slotDeleteScalar()
 {
 	int row = this->Ui->scalarList->currentIndex().row();
 	cout << "try to delete scalar " << row << ":";
-	cout<< this->Ui->scalarList->item(row)->text().toStdString() << endl;
-	if (this->ACTOR != NULL)
+
+	
+	if (this->ACTOR != NULL && row>=0)
 	{
+		cout << this->Ui->scalarList->item(row)->text().toStdString() << endl;
 		mqMorphoDigCore::instance()->DeleteScalar(this->ACTOR, this->Ui->scalarList->item(row)->text());
 		cout << "Try to update UI" << endl;
 		this->UpdateUI();
