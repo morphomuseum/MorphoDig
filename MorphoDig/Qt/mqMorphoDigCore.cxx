@@ -6102,12 +6102,15 @@ void mqMorphoDigCore::scalarsCameraDistance()
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
 	int modified = 0;
+	std::string action = "Compute depth scalar";
+	int Count = BEGIN_UNDO_SET(action);
 	for (vtkIdType i = 0; i < num; i++)
 	{
 		cout << "Camera distance" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
+			myActor->SaveState(Count, QString("Depth"));
 			myActor->SetSelected(0);
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
@@ -6184,6 +6187,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 		
 		
 	}
+	END_UNDO_SET();
 
 
 
