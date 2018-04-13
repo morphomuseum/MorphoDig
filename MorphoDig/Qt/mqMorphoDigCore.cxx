@@ -858,20 +858,20 @@ void mqMorphoDigCore::ComputeSelectedNamesLists()
 	
 }
 
-int mqMorphoDigCore::context_file_exists(std::string path, std::string ext, std::string postfix)
+int mqMorphoDigCore::context_file_exists(QString path, QString ext, QString postfix)
 {
 	// used by the save NTW function : 
 	//looks whether a non-mesh related file = context file (.ori, .flg, .tag, .ver, .cur, .stv) constructed with only a postfix + extension (project name) already exists 
-	std::string filename;
+	QString filename;
 	int exists = 0;
 
-	filename = path.c_str();
+	filename = path;
 	if (postfix.length()>0)
 	{
-		filename.append(postfix.c_str());
+		filename = filename + postfix;
 	}
-	filename.append(ext.c_str());
-	ifstream file(filename.c_str());
+	filename += ext;
+	ifstream file(filename.toLocal8Bit());
 	if (file)
 	{
 		file.close();
@@ -880,22 +880,22 @@ int mqMorphoDigCore::context_file_exists(std::string path, std::string ext, std:
 	return exists;
 }
 
-int mqMorphoDigCore::selected_file_exists(std::string path, std::string ext, std::string postfix)
+int mqMorphoDigCore::selected_file_exists(QString path, QString ext, QString postfix)
 {
 	// used by the save NTW function : 
 	//looks whether mesh related files (vtk, vtp, stl, ply, pos) constructed with a prefix (object name) and a postfix (project name) already exist 
-	std::string filename;
+	QString filename;
 	int exists = 0;
 	for (int i = 0; i<g_distinct_selected_names.size(); i++)
 	{
-		filename = path.c_str();
+		filename = path;
 		filename.append(g_distinct_selected_names.at(i).c_str());
 		if (postfix.length()>0)
 		{
-			filename.append(postfix.c_str());
+			filename += postfix;
 		}
-		filename.append(ext.c_str());
-		ifstream file(filename.c_str());
+		filename += ext;;
+		ifstream file(filename.toLocal8Bit());
 		if (file)
 		{
 			file.close();
@@ -1202,16 +1202,16 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 	//Open a landmark file!
 
 
-	size_t  length;
+	int  length;
 
 
-	length = fileName.toStdString().length();
+	length = fileName.length();
 
 	int done = 0;
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1220,7 +1220,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
 			file_exists = 0;
 		}
 
@@ -1247,7 +1247,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 			{
 
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1317,10 +1317,10 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 	//Open a position file!
 
 	int i, j, l;
-	size_t  length;
+	int  length;
 
 
-	length = fileName.toStdString().length();
+	length = fileName.length();
 
 	union {
 		float f;
@@ -1333,7 +1333,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1342,7 +1342,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
 			file_exists = 0;
 		}
 
@@ -1382,7 +1382,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 			if (type == 1)
 			{
 				FILE	*filein;									// Filename To Open
-				filein = fopen(fileName.toStdString().c_str(), "rb");
+				filein = fopen(fileName.toLocal8Bit(), "rb");
 				for (i = 0; i<4; i++)
 					for (j = 0; j<4; j++)
 					{
@@ -1410,7 +1410,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 			}
 			else
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1465,10 +1465,10 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 	//Open a position file!
 
 	int i, j, l;
-	size_t  length;
+	int  length;
 
 
-	length = fileName.toStdString().length();
+	length = fileName.length();
 
 	union {
 		float f;
@@ -1481,7 +1481,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1532,7 +1532,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 				FILE	*filein;									// Filename To Open
 
 
-				filein = fopen(fileName.toStdString().c_str(), "rb");
+				filein = fopen(fileName.toLocal8Bit(), "rb");
 				for (i = 0; i<4; i++)
 					for (j = 0; j<4; j++)
 					{
@@ -1559,7 +1559,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 			}
 			else
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1648,7 +1648,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1657,7 +1657,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
 			file_exists = 0;
 		}
 
@@ -1672,7 +1672,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 			if (found != std::string::npos || found2 != std::string::npos)
 			{
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1730,7 +1730,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1777,7 +1777,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 			}
 			else
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1893,7 +1893,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			vtkSmartPointer<vtkSTLReader> reader =
 				vtkSmartPointer<vtkSTLReader>::New();
 
-			reader->SetFileName(fileName.toStdString().c_str());
+			reader->SetFileName(fileName.toLocal8Bit());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -1903,7 +1903,9 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 
 			vtkSmartPointer<vtkPolyDataReader> reader =
 				vtkSmartPointer<vtkPolyDataReader>::New();
-			reader->SetFileName(fileName.toStdString().c_str());
+			reader->SetFileName(fileName.toLocal8Bit());
+			cout << "inside open mesh:"<<fileName.toStdString().c_str() << endl;
+			//reader->SetFileName(fileName.toUtf8());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -1912,7 +1914,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 
 			vtkSmartPointer<vtkPLYReader> reader =
 				vtkSmartPointer<vtkPLYReader>::New();
-			reader->SetFileName(fileName.toStdString().c_str());
+			reader->SetFileName(fileName.toLocal8Bit());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -2284,7 +2286,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 
 	/*	if (fileName.isEmpty()) return;
 
-	//if (img.loadImage(fileName.toStdString().c_str()))
+	//if (img.loadImage(fileName.toLocal8Bit()))
 
 	fileName = QFileDialog::getOpenFileName(this,
 	tr("Open File"), "/home/jana", tr("Surface Files (*.vtk *.stl *.ply)"));
@@ -2337,6 +2339,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 		if (inputFile.open(QIODevice::ReadOnly))
 		{
 			QTextStream in(&inputFile);
+			in.setCodec("UTF-8");
 			while (!in.atEnd())
 			{
 				QString line = in.readLine();
@@ -2610,7 +2613,7 @@ void mqMorphoDigCore::OpenORI(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -2646,7 +2649,7 @@ void mqMorphoDigCore::OpenORI(QString fileName)
 			if (type == 1)
 			{
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -2704,7 +2707,7 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -2739,7 +2742,7 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 			if (type == 1)
 			{
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -2795,7 +2798,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -2826,7 +2829,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 
 			if (type == 1)
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 				if (inputFile.open(QIODevice::ReadOnly))
@@ -2988,31 +2991,34 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 	QFileInfo fileInfo(fileName);
 	QString onlyfilename(fileInfo.fileName());
-
-
-
+	QString onlypath = fileName.left(fileName.length() - onlyfilename.length());
+	QString projectname = onlyfilename.left(onlyfilename.lastIndexOf("."));
+	cout << "QString onlyfilename: " << onlyfilename.toStdString() << endl;;
+	cout << "QString onlypath: " << onlypath.toStdString() << endl;;
+	cout << "QString projectname: " << projectname.toStdString() << endl;;
 	QFile file(fileName);
 	QTextStream stream(&file);
+	//stream.setCodec("UTF-8");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		std::string only_filename = onlyfilename.toStdString();
-		std::string project_name = only_filename.c_str();
-		size_t nPos = project_name.find_last_of(".");
-		if (nPos > 0 && nPos <= project_name.length())
-		{
-			project_name = project_name.substr(0, nPos);
-		}
-		std::string path = fileName.toStdString().substr(0, (fileName.toStdString().length() - only_filename.length()));
-		std::string posExt = ".pos";
+		//std::string only_filename = onlyfilename.toStdString();
+		//std::string project_name = only_filename.c_str();
+		//size_t nPos = project_name.find_last_of(".");
+		//if (nPos > 0 && nPos <= project_name.length())
+		//{
+		//	project_name = project_name.substr(0, nPos);
+		//}
+		//std::string path = fileName.toStdString().substr(0, (fileName.toStdString().length() - only_filename.length()));
+		QString posExt = ".pos";
 		//std::string vtpExt = ".vtp";
-		std::string vtkExt = ".vtk";
-		std::string plyExt = ".ply";
-		std::string tagExt = ".tag";
-		std::string oriExt = ".ori";
-		std::string flgExt = ".flg";
-		std::string verExt = ".ver";
-		std::string stvExt = ".stv";
-		std::string curExt = ".cur";
+		QString vtkExt = ".vtk";
+		QString plyExt = ".ply";
+		QString tagExt = ".tag";
+		QString oriExt = ".ori";
+		QString flgExt = ".flg";
+		QString verExt = ".ver";
+		QString stvExt = ".stv";
+		QString curExt = ".cur";
 		int overwrite_pos = 1;
 		int overwrite_mesh = 1;
 		int overwrite_ori = 1;
@@ -3023,37 +3029,37 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		int overwrite_stv = 1;
 
 		this->ComputeSelectedNamesLists();
-		std::string postfix = "_";
-		postfix.append(project_name.c_str());
-		std::string no_postfix = "";
+		QString postfix = "_";
+		postfix.append(projectname.toStdString().c_str());
+		QString no_postfix = "";
 		int pos_exists = 0;
 		int pos_special = 0;
-		if (g_distinct_selected_names.size() == 1 && project_name.compare(g_distinct_selected_names.at(0)) == 0)
+		if (g_distinct_selected_names.size() == 1 && projectname.toStdString().compare(g_distinct_selected_names.at(0)) == 0)
 		{
 			pos_special = 1;
-			pos_exists = this->selected_file_exists(path, posExt, no_postfix);
+			pos_exists = this->selected_file_exists(onlypath, posExt, no_postfix);
 		}
 		else
 		{
-			pos_exists = this->selected_file_exists(path, posExt, postfix);
+			pos_exists = this->selected_file_exists(onlypath, posExt, postfix);
 		}
 			
 
 		int mesh_exists = 0;
 		if (save_surfaces_as_ply == 0)
 		{
-			mesh_exists = this->selected_file_exists(path, vtkExt, no_postfix);
+			mesh_exists = this->selected_file_exists(onlypath, vtkExt, no_postfix);
 		}
 		else
 		{
-			mesh_exists = this->selected_file_exists(path, plyExt, no_postfix);
+			mesh_exists = this->selected_file_exists(onlypath, plyExt, no_postfix);
 		}
 
 		if (save_ori == 1)
 		{
-			std::string _ori_fullpath;
-			std::string _ori_file;
-			int ori_exists = this->context_file_exists(path, oriExt, project_name);
+			QString _ori_fullpath;
+			QString _ori_file;
+			int ori_exists = this->context_file_exists(onlypath, oriExt, projectname);
 			if (ori_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3066,19 +3072,21 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			}
 			
 
-			_ori_file = project_name.c_str();
+			/*_ori_file = projectname.toStdString().c_str();
 			_ori_file.append(".ori");
-			_ori_fullpath = path.c_str();
-			_ori_fullpath.append(_ori_file.c_str());
+			_ori_fullpath = onlypath.toStdString.c_str();
+			_ori_fullpath.append(_ori_file.c_str());*/
+			_ori_file = projectname + oriExt;
+			_ori_fullpath = onlypath + _ori_file;
 			int write = 1;
-			QString qori(_ori_fullpath.c_str());
+			//QString qori(_ori_fullpath.c_str());
 			
 			if (overwrite_ori == 1)
 			{
 				//write or overwrite ORI file without further question (0)
-				this->SaveORI(qori);
+				this->SaveORI(_ori_fullpath);
 			}
-			stream << _ori_file.c_str() << endl;
+			stream << _ori_file.toStdString().c_str() << endl;
 
 		}
 		if (mesh_exists == 1)
@@ -3106,9 +3114,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 		if (save_tag == 1)
 		{
-			std::string _tag_fullpath;
-			std::string _tag_file;
-			int tag_exists = this->context_file_exists(path, tagExt, project_name);
+			QString _tag_fullpath;
+			QString _tag_file;
+			int tag_exists = this->context_file_exists(onlypath, tagExt, projectname);
 			if (tag_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3120,10 +3128,10 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				
 			}
 
-			_tag_file = project_name.c_str();
+			_tag_file = projectname;
 			_tag_file.append(".tag");
-			_tag_fullpath = path.c_str();
-			_tag_fullpath.append(_tag_file.c_str());
+			_tag_fullpath = onlypath;
+			_tag_fullpath += _tag_file;
 			int write = 1;
 			
 			if (overwrite_tag == 1)
@@ -3132,7 +3140,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				//@@ TODO!
 				//this->SaveTAG(_tag_fullpath);
 			}
-			stream << _tag_file.c_str() << endl;
+			stream << _tag_file.toLocal8Bit() << endl;
 			
 
 		}
@@ -3141,9 +3149,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		vtkIdType selectedflags = this->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
 		if (selectedflags>0)
 		{
-			std::string _flg_fullpath;
-			std::string _flg_file;
-			int flg_exists = this->context_file_exists(path, flgExt, project_name);
+			QString _flg_fullpath;
+			QString _flg_file;
+			int flg_exists = this->context_file_exists(onlypath, flgExt, projectname);
 			if (flg_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3155,18 +3163,18 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				
 			}
 
-			_flg_file = project_name.c_str();
+			_flg_file = projectname;
 			_flg_file.append(".flg");
-			_flg_fullpath = path.c_str();
-			_flg_fullpath.append(_flg_file.c_str());
+			_flg_fullpath = onlypath;
+			_flg_fullpath+=_flg_file;
 			if (overwrite_flg == 1)			
 			{
 				//cout << "Try to save FLG file" << endl;
 				//write or overwrite FLG file without further question (0)
-				QString qflg(_flg_fullpath.c_str());
-				this->SaveFlagFile(qflg, 1);
+				//QString qflg(_flg_fullpath.c_str());
+				this->SaveFlagFile(_flg_fullpath, 1);
 			}
-			stream << _flg_file.c_str() << endl;
+			stream << _flg_file.toStdString().c_str() << endl;
 
 		}
 
@@ -3176,9 +3184,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		int nselhan = this->HandleLandmarkCollection->GetNumberOfSelectedActors();
 		if (nselnor > 0 || nseltar > 0|| nselnod > 0|| nselhan > 0)
 		{
-			std::string _stv_fullpath;
-			std::string _stv_file;
-			int stv_exists = this->context_file_exists(path, stvExt, project_name);
+			QString _stv_fullpath;
+			QString _stv_file;
+			int stv_exists = this->context_file_exists(onlypath, stvExt, projectname);
 			if (stv_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3190,18 +3198,17 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				
 			}
 
-			_stv_file = project_name.c_str();
+			_stv_file = projectname;
 			_stv_file.append(".stv");
-			_stv_fullpath = path.c_str();
-			_stv_fullpath.append(_stv_file.c_str());
+			_stv_fullpath = onlypath+_stv_file;
 			int write = 1;
 			if (overwrite_stv == 1)
 			{
 				//write or overwrite stv file without further question (0)
-				QString qstv(_stv_fullpath.c_str());
-				this->SaveSTVFile(qstv,1);
+				//QString qstv(_stv_fullpath.c_str());
+				this->SaveSTVFile(_stv_fullpath,1);
 			}
-			stream << _stv_file.c_str() << endl;
+			stream << _stv_file.toStdString().c_str() << endl;
 			
 		}
 
@@ -3211,12 +3218,12 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
-				std::string _mesh_fullpath;
-				std::string _pos_fullpath;
-				std::string _mesh_file;
-				std::string _pos_file;												
-				_mesh_file = myActor->GetName();
-				_pos_file = myActor->GetName();
+				QString _mesh_fullpath;
+				QString _pos_fullpath;
+				QString _mesh_file;
+				QString _pos_file;
+				_mesh_file.append(myActor->GetName().c_str());
+				_pos_file.append(myActor->GetName().c_str());
 				if (save_surfaces_as_ply == 0)
 				{
 					_mesh_file.append(".vtk");
@@ -3227,21 +3234,21 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				}
 				if (pos_special==0)
 				{
-					_pos_file.append(postfix.c_str());
+					_pos_file+=postfix;
 				}
 				_pos_file.append(".pos");
 
-				_mesh_fullpath = path.c_str();
-					_mesh_fullpath.append(_mesh_file.c_str());
+				_mesh_fullpath = onlypath;
+				_mesh_fullpath+=_mesh_file;
 
-				_pos_fullpath = path.c_str();
-				_pos_fullpath.append(_pos_file.c_str());
+				_pos_fullpath = onlypath;
+				_pos_fullpath+=_pos_file;
 
 				int write = 1;
 				if (overwrite_mesh == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_mesh_fullpath.c_str());
+					ifstream file2(_mesh_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -3256,7 +3263,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 					if (save_surfaces_as_ply == 1) { File_type = 2; }//2 = PLY
 					std::vector<std::string> mscalarsToBeRemoved; // no scalar to be removed here for the moment...
 					int RGBopt = 0; //now: keep current RGB color
-					this->SaveSurfaceFile(QString(_mesh_fullpath.c_str()),0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, RGBopt, 0, myActor);
+					this->SaveSurfaceFile(_mesh_fullpath ,0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, RGBopt, 0, myActor);
 				}
 
 				
@@ -3265,7 +3272,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_pos == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_pos_fullpath.c_str());
+					ifstream file2(_pos_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -3278,18 +3285,19 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 					if (apply_position_to_surfaces == 0)
 					{
 						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
-						this->SavePOS(Mat, QString(_pos_fullpath.c_str()));
+						this->SavePOS(Mat, _pos_fullpath);
 					}
 					else
 					{
 						vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 						Mat->Identity();
-						this->SavePOS(Mat, QString(_pos_fullpath.c_str()));
+						this->SavePOS(Mat,_pos_fullpath);
 
 					}
 				}
-				stream << _mesh_file.c_str() << endl;
-				stream << _pos_file.c_str() << endl;
+
+				stream << _mesh_file.toStdString().c_str() << endl;
+				stream << _pos_file.toStdString().c_str() << endl;
 				
 				double colors[4];
 				myActor->GetmColor(colors);
@@ -7652,7 +7660,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 		}
 		
-			Writer->SetFileName(fileName.toStdString().c_str());
+			Writer->SetFileName(fileName.toLocal8Bit());
 			Writer->SetInputData(mergedObjects->GetOutput());
 			//  stlWrite->Update();
 			Writer->Write();
@@ -7680,8 +7688,15 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		{
 			fileName.append(".vtk");
 		}
+		//cout << "fileName utf8" << fileName.toUtf8().toStdString() << endl;
+		//cout << "fileName local 8bits" << fileName.toLocal8Bit().toStdString() << endl;
+		//cout << "fileName local 8bits raw" << fileName.toLocal8Bit().toStdString << endl;
+		//fileName = QString::fromUtf8(fileName.toLocal8Bit());
+		//fileName = QString::fromLocal8Bit(fileName.toLocal8Bit());
 		
-		Writer->SetFileName(fileName.toStdString().c_str());
+	//	cout << "fileName raw toSTD" << fileName.toStdString()<< endl;
+		
+			Writer->SetFileName(fileName.toLocal8Bit());
 		Writer->SetInputData(mergedObjects->GetOutput());
 		//  stlWrite->Update();
 		Writer->Write();
@@ -7769,10 +7784,10 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		{
 			fileName.append(".ply");
 		}
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		
 		
-			Writer->SetFileName(fileName.toStdString().c_str());
+			Writer->SetFileName(fileName.toLocal8Bit());
 			//
 			Writer->SetInputData(MyMergedObject);
 			//Writer->SetInputData((vtkPolyData*)My_Obj);	

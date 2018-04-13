@@ -786,8 +786,8 @@ private:
 	static mqMorphoDigCore* Instance;
 	QVTKOpenGLWidget *qvtkWidget;
 	int currentLassoMode;
-	int selected_file_exists(std::string path, std::string ext, std::string postfix);
-	int context_file_exists(std::string path, std::string ext, std::string postfix);
+	int selected_file_exists(QString path, QString ext, QString postfix);
+	int context_file_exists(QString path, QString ext, QString postfix);
 
 };
 
