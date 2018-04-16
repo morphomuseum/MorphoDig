@@ -6440,6 +6440,372 @@ void mqMorphoDigCore::DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString Sc
 
 	
 }
+void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor)
+{
+	if (impactedActor != NULL && observedActor != NULL)
+	{
+		std::string mScalarName = "Thickness";
+		if (scalarName.length() > 0)
+		{
+			mScalarName = scalarName.toStdString();
+		}
+
+		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
+		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
+		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
+		{
+
+			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPD = myImpactedMapper->GetInput();
+
+			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPD = myObservedMapper->GetInput();
+
+
+
+
+			double numvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
+
+
+			vtkSmartPointer<vtkDoubleArray> newScalars =
+				vtkSmartPointer<vtkDoubleArray>::New();
+
+			newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+			newScalars->SetNumberOfTuples(numvert);
+			vtkIdType ve;
+
+			double ve_obs_init_pos[3];;			
+			double ve_obs_final_pos[3];;
+			double ven_obs_init_pos[3];;
+			
+			double ve_imp_init_pos[3];;
+			double ven_imp_init_pos[3];;
+
+
+			vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
+			vtkSmartPointer<vtkMatrix4x4> obsMat = observedActor->GetMatrix();
+
+			/*vtkSmartPointer<vtkPolyData> toSave = vtkSmartPointer<vtkPolyData>::New();
+			toSave->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
+			double ve_init_pos[3];;
+			double ve_final_pos[3];
+			vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+
+
+			for (vtkIdType i = 0; i < toSave->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				toSave->GetPoint(i, ve_init_pos);
+				mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+
+				toSave->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+			}*/
+
+			double pt[3] = { 0,0,1 };
+			double pt2[3] = { 0,0,1 };
+			double projected_pt2[3] = { 0,0,1 };
+			double ptn[3];
+			double *ptn2;
+			double ptn2obs[3];
+			double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
+			double cur_cos = 1.0; // compare ve1's normal and ve2's normal
+			double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
+			double AB[3];
+			double AC[3];
+			double ABnorm[3];
+
+			double picked_value = 0;
+			double min_dist = max_thickness;
+			double tmp_dist = 0;
+			auto impactedNorms = vtkFloatArray::SafeDownCast(mImpactedPD->GetPointData()->GetNormals());
+			auto observedNorms = vtkFloatArray::SafeDownCast(mObservedPD->GetPointData()->GetNormals());
+
+			//	cout << "Have tried to get norms" << endl;
+			//cout << "Safe point downcast done ! " << endl;
+			if (impactedNorms && observedNorms)
+			{
+				//	cout << "We have found some norms" << endl;
+
+				//QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
+				//progress.setWindowModality(Qt::WindowModal);
+				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+					vtkSmartPointer<vtkKdTreePointLocator>::New();
+				
+				vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
+				observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
+				
+
+				for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
+					// for every triangle 
+					observedMoved->GetPoint(i, ve_obs_init_pos);
+					mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
+
+					observedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_obs_final_pos);
+				}
+
+
+				kDTree->SetDataSet(observedMoved);
+				
+				kDTree->BuildLocator();
+
+				for (ve = 0; ve < numvert; ve++)
+				{
+					min_dist = max_thickness;
+					emit thicknessProgression((int)(100 * ve / numvert));
+					//progress.setValue(ve);
+					/*if (progress.wasCanceled())
+					break;*/
+
+					mImpactedPD->GetPoint(ve, ve_imp_init_pos);
+					mqMorphoDigCore::TransformPoint(impMat, ve_imp_init_pos, pt);
+					double *mImpactedptn = impactedNorms->GetTuple3(ve);
+					ven_imp_init_pos[0] = mImpactedptn[0];
+					ven_imp_init_pos[1] = mImpactedptn[1];
+					ven_imp_init_pos[2] = mImpactedptn[2];
+					mqMorphoDigCore::RotateNorm(impMat, ven_imp_init_pos, ptn);
+					/*ptn[0] = mImpactedptn[0];
+					ptn[1] = mImpactedptn[1];
+					ptn[2] = mImpactedptn[2];*/
+
+					if (ve < 10)
+					{
+						//cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+					}
+					vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+					//ptn will be the average norm of all connected vertices.
+					if (smooth_normales)
+					{
+						connectedVertices = GetConnectedVertices(mImpactedPD, ptn, picked_value, ve, -1, 1); //	int tool_mode=-1; //no pencil! no magic wand!
+					}
+					else
+					{
+						if (ve < 10)
+						{
+							//cout << "no ptn avg!" << endl;
+						}
+
+
+					}
+					if (ve < 10)
+					{
+						//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+					}
+
+						////self thickness : look for norms in other directions!
+						ptn[0] = -ptn[0];
+						ptn[1] = -ptn[1];
+						ptn[2] = -ptn[2];
+					
+					// here we will look at the neighbour vertices of pt to compute an average ptn (otherwise this filter is extremely sensitive with non planar/rough surfaces with changing normals)
+
+
+
+					// get all neighbouring vertices within a max_thickness radius
+					//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+					double Radius = 1.1*max_thickness;
+					kDTree->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+
+
+
+
+					//if (ve<10){std::cout << "Connected vertices: ";}
+					double newscalar = 0;
+					/*if (ve < 10)
+					{
+					cout << "found" << neighbours->GetNumberOfIds() << " neighbours" << endl;
+					}*/
+
+					std::vector<double> thicknesses;
+					int cpt = 0;
+
+
+
+
+
+					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+					{
+
+						//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+						vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+						if (ve != observedConnectedVertex || impactedActor != observedActor)// to cases: 1) self observation= we don't want to compare 1 vertex with itself; 2) comparison, then impacted and observed lists do not have links
+						{
+							observedMoved->GetPoint(observedConnectedVertex, pt2);
+							ptn2 = observedNorms->GetTuple3(observedConnectedVertex);
+
+							ven_obs_init_pos[0] = ptn2[0]; 
+							ven_obs_init_pos[1] = ptn2[1];
+							ven_obs_init_pos[2] = ptn2[2];
+							mqMorphoDigCore::RotateNorm(obsMat, ven_obs_init_pos, ptn2obs);
+							// do not forget to rotate observed norms!
+							/*ptn2obs[0] = ptn2[0];
+							ptn2obs[1] = ptn2[1];
+							ptn2obs[2] = ptn2[2];*/
+
+							if (observedActor != impactedActor)
+							{
+								ptn2obs[0] = -ptn2obs[0];
+								ptn2obs[1] = -ptn2obs[1];
+								ptn2obs[2] = -ptn2obs[2];
+
+							}
+							AB[0] = pt2[0] - pt[0];
+							AB[1] = pt2[1] - pt[1];
+							AB[2] = pt2[2] - pt[2];
+							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+							ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
+							if (curr_dist > 0)
+							{
+								ABnorm[0] = AB[0] / curr_dist;
+								ABnorm[1] = AB[1] / curr_dist;
+								ABnorm[2] = AB[2] / curr_dist;
+							}
+							if (curr_dist < max_thickness)
+							{
+								// calculate projected point along the normal of point 1 
+								// towards point 2
+								// seach if vv1n et vv2n sont suffisamment dans la bonne direction.
+								cur_cos = ptn[0] * ptn2obs[0] + ptn[1] * ptn2obs[1] + ptn[2] * ptn2obs[2];
+								cur_cos2 = ABnorm[0] * ptn[0] + ABnorm[1] * ptn[1] + ABnorm[2] * ptn[2];
+								if (cur_cos > min_cos && cur_cos2 > min_cos )																	
+								{
+									// we have a candidate!
+									// compute projected point 2 along vvn1 !
+
+								
+										
+									projected_pt2[0] = pt[0] + ptn[0] * AB[0];
+									projected_pt2[1] = pt[1] + ptn[1] * AB[1];
+									projected_pt2[2] = pt[2] + ptn[2] * AB[2];
+									AC[0] = projected_pt2[0] - pt[0];
+									AC[1] = projected_pt2[1] - pt[1];
+									AC[2] = projected_pt2[2] - pt[2];
+									//tmp_dist = (float)sqrt(AC[0]*AC[0]+AC[1]*AC[1]+AC[2]*AC[2]);
+									// well I am not sure I want this distance!!!
+									tmp_dist = curr_dist;
+									thicknesses.push_back(tmp_dist);
+									cpt++;
+
+								}
+								else
+								{
+									tmp_dist = max_thickness;
+								}
+							}
+							else
+							{
+								tmp_dist = max_thickness;
+							}
+							if (tmp_dist < min_dist) { min_dist = tmp_dist; }
+
+						}
+
+					}
+
+					// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+					if (avg <= 1 || cpt == 0 )
+					{
+
+						newScalars->InsertTuple1(ve, min_dist);
+					}
+					else
+					{
+						/*if (ve < 10)
+						{
+						cout << "try to sort thicknesses"  << endl;
+						}*/
+						std::sort(thicknesses.begin(), thicknesses.end());
+						double thick_avg = 0;
+						double mavg = avg;// in some cases there are less thickness candidates thant avg => the avg thickness will be done using less than "avg" nr of candidates.
+						if (cpt < avg) { mavg = cpt; }
+						for (int i = 0; i < mavg; i++)
+						{
+							thick_avg += thicknesses.at(i);
+						}
+						thick_avg /= mavg;
+						newScalars->InsertTuple1(ve, thick_avg);
+						if (ve < 10)
+						{
+							//cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << endl;
+						}
+
+					}
+
+
+				}
+				//std::cout<<"New Scalar computation done "<<std::endl;
+
+				newScalars->SetName(mScalarName.c_str());
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mImpactedPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mImpactedPD->GetPointData()->AddArray(newScalars);
+				mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+				//g_active_scalar = 0;
+				// 0 => depth
+				// 1 =>	"Maximum_Curvature"
+				// 2 => "Minimum_Curvature"
+				// 3 => "Gauss_Curvature"
+				// 4 => "Mean_Curvature"
+
+				//modified = 1;
+			}
+			else
+			{
+				cout << "found no norms!" << endl;
+
+			}
+
+
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "thickness scalars between computed " << endl;
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+
+	}
+	
+
+		
+	
+}
+
+std::vector<std::string> mqMorphoDigCore::getActorNames()
+{
+	std::vector<std::string> myList;
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Scalar thickness:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		myList.push_back(myActor->GetName());
+	}
+	return myList;
+}
+
+vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
+{
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Scalar thickness:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetName().compare(actorName.toStdString())==0)
+		{
+			return myActor;
+		}
+	}
+
+
+	return NULL;
+}
 void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName)
 {
 	std::string mScalarName = "Thickness";
@@ -6447,6 +6813,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 	{
 		mScalarName = scalarName.toStdString();
 	}
+	
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
 	int modified = 0;
@@ -6457,242 +6824,9 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 		if (myActor->GetSelected() == 1)
 		{
 			myActor->SetSelected(0);
-			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
-			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
-			{
-
-				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
-				mPD = mymapper->GetInput();
-
-				
-
-				
-
-				double numvert = mymapper->GetInput()->GetNumberOfPoints();
-
-
-				vtkSmartPointer<vtkDoubleArray> newScalars =
-					vtkSmartPointer<vtkDoubleArray>::New();
-
-				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-				newScalars->SetNumberOfTuples(numvert);								
-				vtkIdType ve;
-				double pt[3] = { 0,0,1 };
-				double pt2[3] = { 0,0,1 };
-				double projected_pt2[3] = { 0,0,1 };
-				double ptn[3];
-				double *ptn2;
-				double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
-				double cur_cos = 1.0; // compare ve1's normal and ve2's normal
-				double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
-				double AB[3];
-				double AC[3];
-				double ABnorm[3];
-
-				double picked_value = 0;
-				double min_dist = max_thickness;
-				double tmp_dist = 0;
-				auto norms = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetNormals());
-				
-			//	cout << "Have tried to get norms" << endl;
-				//cout << "Safe point downcast done ! " << endl;
-				if (norms)
-				{
-				//	cout << "We have found some norms" << endl;
-
-					//QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
-					//progress.setWindowModality(Qt::WindowModal);
-					vtkSmartPointer<vtkKdTreePointLocator> kDTree =
-						vtkSmartPointer<vtkKdTreePointLocator>::New();
-					kDTree->SetDataSet(mPD);
-					kDTree->BuildLocator();
-					
-					for (ve = 0; ve < numvert; ve++)
-					{
-						min_dist = max_thickness;
-						emit thicknessProgression((int)(100 * ve / numvert));
-						//progress.setValue(ve);
-						/*if (progress.wasCanceled())
-							break;*/
-
-						mPD->GetPoint(ve, pt);
-						double *mptn= norms->GetTuple3(ve);
-						ptn[0] = mptn[0];
-						ptn[1] = mptn[1];
-						ptn[2] = mptn[2];
-						if (ve < 10)
-						{
-							//cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
-						}
-						vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
-						//ptn will be the average norm of all connected vertices.
-						if (smooth_normales)
-						{
-							connectedVertices = GetConnectedVertices(mPD, ptn, picked_value, ve, -1, 1); //	int tool_mode=-1; //no pencil! no magic wand!
-						}
-						else
-						{
-							if (ve < 10)
-							{
-								//cout << "no ptn avg!" << endl;
-							}
-							
-
-						}
-						if (ve < 10)
-						{
-							//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
-						}
-							
-						ptn[0] = -ptn[0];
-						ptn[1] = -ptn[1];
-						ptn[2] = -ptn[2];
-																										 // here we will look at the neighbour vertices of pt to compute an average ptn (otherwise this filter is extremely sensitive with non planar/rough surfaces with changing normals)
-						
-
-
-						// get all neighbouring vertices within a max_thickness radius
-						//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
-						vtkSmartPointer<vtkIdList> neighbours = vtkSmartPointer<vtkIdList>::New();
-						double Radius = 1.1*max_thickness;
-						kDTree->FindPointsWithinRadius(Radius, pt, neighbours);
-						
-
-
-
-						//if (ve<10){std::cout << "Connected vertices: ";}
-						double newscalar = 0;
-						/*if (ve < 10)
-						{
-							cout << "found" << neighbours->GetNumberOfIds() << " neighbours" << endl;
-						}*/
-
-						std::vector<double> thicknesses;
-						int cpt = 0;
-							
-						
-
-						
-
-						for (vtkIdType j = 0; j < neighbours->GetNumberOfIds(); j++)
-						{
-							
-							//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
-							vtkIdType connectedVertex = neighbours->GetId(j);
-							if (ve != connectedVertex)
-							{
-								mPD->GetPoint(connectedVertex, pt2);								
-								ptn2 = norms->GetTuple3(connectedVertex);
-								AB[0] = pt2[0] - pt[0];
-								AB[1] = pt2[1] - pt[1];
-								AB[2] = pt2[2] - pt[2];
-								double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
-								ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
-								if (curr_dist>0)
-								{
-									ABnorm[0] = AB[0] / curr_dist;
-									ABnorm[1] = AB[1] / curr_dist;
-									ABnorm[2] = AB[2] / curr_dist;
-								}
-								if (curr_dist <max_thickness)
-								{
-									// calculate projected point along the normal of point 1 
-									// towards point 2
-									// seach if vv1n et vv2n sont suffisamment dans la bonne direction.
-									cur_cos = ptn[0] * ptn2[0] + ptn[1] * ptn2[1] + ptn[2] * ptn2[2];
-									cur_cos2 = ABnorm[0] * ptn[0] + ABnorm[1] * ptn[1] + ABnorm[2] * ptn[2];
-									if (cur_cos> min_cos && cur_cos2>min_cos)
-									{
-										// we have a candidate!
-										// compute projected point 2 along vvn1 !
-										projected_pt2[0] = pt[0] + ptn[0] * AB[0];
-										projected_pt2[1] = pt[1] + ptn[1] * AB[1];
-										projected_pt2[2] = pt[2] + ptn[2] * AB[2];
-										AC[0] = projected_pt2[0] - pt[0];
-										AC[1] = projected_pt2[1] - pt[1];
-										AC[2] = projected_pt2[2] - pt[2];
-										//tmp_dist = (float)sqrt(AC[0]*AC[0]+AC[1]*AC[1]+AC[2]*AC[2]);
-										// well I am not sure I want this distance!!!
-										tmp_dist = curr_dist;
-										thicknesses.push_back(tmp_dist);
-										cpt++;
-
-									}
-									else
-									{
-										tmp_dist = max_thickness;
-									}
-								}
-								else
-								{
-									tmp_dist = max_thickness;
-								}
-								if (tmp_dist< min_dist) { min_dist = tmp_dist; }
-
-							}
-
-						}
-
-						// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
-						if (avg <= 1 ||cpt==0)
-						{
-							
-							newScalars->InsertTuple1(ve, min_dist);
-						}
-						else
-						{
-							/*if (ve < 10)
-							{
-								cout << "try to sort thicknesses"  << endl;
-							}*/
-							std::sort(thicknesses.begin(), thicknesses.end());
-							double thick_avg = 0;
-							double mavg = avg;// in some cases there are less thickness candidates thant avg => the avg thickness will be done using less than "avg" nr of candidates.
-							if (cpt < avg) { mavg = cpt; }
-							for (int i = 0; i < mavg; i++)
-							{
-								thick_avg += thicknesses.at(i);
-							}
-							thick_avg /= mavg;
-							newScalars->InsertTuple1(ve, thick_avg);
-							if (ve < 10)
-							{
-								//cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << endl;
-							}
-
-						}
-
-
-					}
-					//std::cout<<"New Scalar computation done "<<std::endl;
-					
-					newScalars->SetName(mScalarName.c_str());
-					// test if exists...
-					//
-					int exists = 0;
-
-					// remove this scalar
-					//this->GetPointData()->SetScalars(newScalars);
-					mPD->GetPointData()->RemoveArray(mScalarName.c_str());
-					mPD->GetPointData()->AddArray(newScalars);
-					mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
-					//g_active_scalar = 0;
-					// 0 => depth
-					// 1 =>	"Maximum_Curvature"
-					// 2 => "Minimum_Curvature"
-					// 3 => "Gauss_Curvature"
-					// 4 => "Mean_Curvature"
-
-					modified = 1;
-				}
-				else
-				{
-					cout << "found no norms!" << endl;
-
-				}
-
-
-			}
+			// here we can call : 
+			this->scalarsThicknessBetween( max_thickness,  smooth_normales,  avg,  scalarName,  myActor, myActor);
+			modified = 1;
 
 		}
 	}
@@ -10362,6 +10496,35 @@ void mqMorphoDigCore::TransformPoint(vtkMatrix4x4* matrix, double pointin[3], do
 	pointout[2] = pointNew[2];
 }
 
+void mqMorphoDigCore::RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]) {
+	double nInit[4]; double nTrans[4] = { 0, 0, 0, 0 };
+	double ori[4]; double oriT[4] = { 0, 0, 0, 0 };
+	double step1[3];
+	double step2[3];
+
+	nInit[0] = normin[0];
+	nInit[1] = normin[1];
+	nInit[2] = normin[2];
+	nInit[3] = 1;
+
+	matrix->MultiplyPoint(nInit, nTrans);
+	step1[0] = nTrans[0];
+	step1[1] = nTrans[1];
+	step1[2] = nTrans[2];
+
+	
+	ori[3] = 1;
+	matrix->MultiplyPoint(ori, oriT);
+	step2[0] = oriT[0];
+	step2[1] = oriT[1];
+	step2[2] = oriT[2];
+
+
+	normout[0] = step1[0] - step2[0];
+	normout[1] = step1[1] - step2[1];
+	normout[2] = step1[2] - step2[2];
+
+}
 void mqMorphoDigCore::SetSelectedActorsColor(int r, int g, int b) 
 {
 	int num_selected = this->ActorCollection->GetNumberOfSelectedActors();

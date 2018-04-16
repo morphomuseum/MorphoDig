@@ -550,6 +550,10 @@ public:
   vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
   void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName);
+  void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor);
+  vtkMDActor * getFirstActorFromName(QString actorName);
+  std::vector<std::string> getActorNames();
+  
   void scalarsCameraDistance(); //compute camera distance for each selected scalar.
   void scalarsGaussianBlur(); //compute gaussian blur of current scalars
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
@@ -590,6 +594,7 @@ public:
   void CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type = -1);
   void UpdateFirstSelectedLandmark(double coord[3], double ori[3]);
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
+  static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);
   
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();

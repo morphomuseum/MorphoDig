@@ -41,7 +41,7 @@ mqViewMenuManager.cxx
   mqEditAllFLGColorDialogReaction.cxx
   mqEditAllFLGColorDialog.h
   mqEditAllFLGColorDialog.cxx
-mqEditAllFLGLengthDialogReaction.h
+  mqEditAllFLGLengthDialogReaction.h
   mqEditAllFLGLengthDialogReaction.cxx
   mqEditAllFLGLengthDialog.h
   mqEditAllFLGLengthDialog.cxx
@@ -181,6 +181,11 @@ mqScalarsThicknessDialog.h
 mqScalarsThicknessDialog.cxx
 mqScalarsThicknessDialogReaction.h
 mqScalarsThicknessDialogReaction.cxx
+mqScalarsThicknessBetweenDialog.h
+mqScalarsThicknessBetweenDialog.cxx
+mqScalarsThicknessBetweenDialogReaction.h
+mqScalarsThicknessBetweenDialogReaction.cxx
+
 )
 
 set (Qt_MOC_HDRS
@@ -227,6 +232,7 @@ mqTPSDialog.ui
 mqDecomposeDialog.ui
 mqActorTreePanel.ui
 mqScalarsThicknessDialog.ui
+mqScalarsThicknessBetweenDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

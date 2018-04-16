@@ -43,6 +43,7 @@
 #include "mqTPSDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
 #include "mqScalarsThicknessDialogReaction.h"
+#include "mqScalarsThicknessBetweenDialogReaction.h"
 
 #include "mqSetName.h"
 #include "mqViewMenuManager.h"
@@ -245,7 +246,12 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
 	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance from camera");
 	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
+
+	QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
+	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
+
 	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
+	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness between two objects") << mqSetName("actionThickessBetween"));
 
 	QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
