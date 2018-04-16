@@ -10497,6 +10497,10 @@ void mqMorphoDigCore::TransformPoint(vtkMatrix4x4* matrix, double pointin[3], do
 }
 
 void mqMorphoDigCore::RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]) {
+	/*result[0] = input[0]*mat[0][0] + input[1]*mat[1][0] + input[2]*mat[2][0];	
+	result[1] = input[0]*mat[0][1] + input[1]*mat[1][1] + input[2]*mat[2][1];	
+	result[2] = input[0]*mat[0][2] + input[1]*mat[1][2] + input[2]*mat[2][2];	*/
+	
 	double nInit[4]; double nTrans[4] = { 0, 0, 0, 0 };
 	double ori[4]; double oriT[4] = { 0, 0, 0, 0 };
 	double step1[3];
