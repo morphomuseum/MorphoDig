@@ -20,6 +20,10 @@ Module:    vtkMDActor.cxx
 #include <vtkTransform.h>
 #include <vtkPolyData.h>
 #include <vtkDoubleArray.h>
+#include <vtkUnsignedIntArray.h>
+#include <vtkFloatArray.h>
+#include <vtkIntArray.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkPlane.h>
 #include <QString>
 vtkStandardNewMacro(vtkMDActor);
@@ -32,7 +36,7 @@ vtkMDActor::vtkMDActor()
 	vtkSmartPointer<vtkProperty> backFaces =
 		vtkSmartPointer<vtkProperty>::New();
 	//backFaces->SetDiffuseColor(.8, .8, .8);
-	backFaces->SetColor(.8, .8, .8);
+	backFaces->SetColor(.7, .7, .7);
 	backFaces->SetOpacity(0.5);
 
 	this->SetBackfaceProperty(backFaces);
@@ -282,8 +286,44 @@ void vtkMDActor::PopUndoStack()
 		{
 			cout << "Here something wrong! deep copy array " << this->UndoRedo->UndoStack.back().arrayName.toStdString() << endl;
 			
-			savedArray= vtkSmartPointer<vtkDoubleArray>::New();
-			savedArray->DeepCopy(toSaveArray);
+			int dataType = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->UndoStack.back().arrayName.toStdString().c_str())->GetDataType();
+
+			if (dataType == VTK_UNSIGNED_CHAR) {
+				savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+			}
+			else if (dataType == VTK_UNSIGNED_INT) {
+				savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
+			}
+			else if (dataType == VTK_INT) {
+				savedArray = vtkSmartPointer<vtkIntArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//cout << "Array" << i << " contains INTs" << endl; 
+			}
+			else if (dataType == VTK_FLOAT) {
+				savedArray = vtkSmartPointer<vtkFloatArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+
+				//cout << "Array" << i << " contains FLOATs" << endl; 
+			}
+			else if (dataType == VTK_DOUBLE) {
+				savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+			}
+			else
+			{
+				//savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				//savedArray->DeepCopy(toSaveArray);
+			}
+
+			
+
+			/*savedArray= vtkSmartPointer<vtkDoubleArray>::New();
+			savedArray->DeepCopy(toSaveArray);*/
 		}
 		
 		toRestoreArray = this->UndoRedo->UndoStack.back().sauvArray;
@@ -293,7 +333,9 @@ void vtkMDActor::PopUndoStack()
 		{
 			cout << "try to restore array found in undo stack" << endl;
 			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
+			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
 		}
+		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
 		
 		
 		
@@ -377,8 +419,9 @@ void vtkMDActor::PopRedoStack()
 		{
 			cout << "POPREDO: try to restor array found in redo stack"  << endl;
 			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
+			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
 		}
-
+		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
 
 	}
 
