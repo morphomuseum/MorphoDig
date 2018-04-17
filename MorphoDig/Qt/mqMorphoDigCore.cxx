@@ -6561,7 +6561,8 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					ven_imp_init_pos[0] = mImpactedptn[0];
 					ven_imp_init_pos[1] = mImpactedptn[1];
 					ven_imp_init_pos[2] = mImpactedptn[2];
-					mqMorphoDigCore::RotateNorm(impMat, ven_imp_init_pos, ptn);
+					
+					
 					/*ptn[0] = mImpactedptn[0];
 					ptn[1] = mImpactedptn[1];
 					ptn[2] = mImpactedptn[2];*/
@@ -6585,6 +6586,13 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 
 					}
+					mqMorphoDigCore::RotateNorm(impMat, ven_imp_init_pos, ptn);
+					if (ve < 10) {
+						cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << endl;
+						cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << endl;
+
+					}
+
 					if (ve < 10)
 					{
 						//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
@@ -6636,6 +6644,13 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 							ven_obs_init_pos[1] = ptn2[1];
 							ven_obs_init_pos[2] = ptn2[2];
 							mqMorphoDigCore::RotateNorm(obsMat, ven_obs_init_pos, ptn2obs);
+							if (ve<10 && j < 3) {
+								cout << "j=" << j << endl;
+								cout << "ven_obs_init_pos=" << ven_obs_init_pos[0] << "|" << ven_obs_init_pos[1] << "|" << ven_obs_init_pos[2] << "|" << endl;
+								cout << "ptn2obs=" << ptn2obs[0] << "|" << ptn2obs[1] << "|" << ptn2obs[2] << "|" << endl;
+
+							}
+
 							// do not forget to rotate observed norms!
 							/*ptn2obs[0] = ptn2[0];
 							ptn2obs[1] = ptn2[1];
@@ -6666,6 +6681,12 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 								// seach if vv1n et vv2n sont suffisamment dans la bonne direction.
 								cur_cos = ptn[0] * ptn2obs[0] + ptn[1] * ptn2obs[1] + ptn[2] * ptn2obs[2];
 								cur_cos2 = ABnorm[0] * ptn[0] + ABnorm[1] * ptn[1] + ABnorm[2] * ptn[2];
+
+								if (ve < 10 && j < 3) {
+									cout << "cur_cos=" << cur_cos << endl;
+									cout << "cur_cos2=" << cur_cos2 << endl;
+								}
+
 								if (cur_cos > min_cos && cur_cos2 > min_cos )																	
 								{
 									// we have a candidate!
@@ -10501,32 +10522,12 @@ void mqMorphoDigCore::RotateNorm(vtkMatrix4x4* matrix, double normin[3], double 
 	result[1] = input[0]*mat[0][1] + input[1]*mat[1][1] + input[2]*mat[2][1];	
 	result[2] = input[0]*mat[0][2] + input[1]*mat[1][2] + input[2]*mat[2][2];	*/
 	
-	double nInit[4]; double nTrans[4] = { 0, 0, 0, 0 };
-	double ori[4]; double oriT[4] = { 0, 0, 0, 0 };
-	double step1[3];
-	double step2[3];
-
-	nInit[0] = normin[0];
-	nInit[1] = normin[1];
-	nInit[2] = normin[2];
-	nInit[3] = 1;
-
-	matrix->MultiplyPoint(nInit, nTrans);
-	step1[0] = nTrans[0];
-	step1[1] = nTrans[1];
-	step1[2] = nTrans[2];
-
-	
-	ori[3] = 1;
-	matrix->MultiplyPoint(ori, oriT);
-	step2[0] = oriT[0];
-	step2[1] = oriT[1];
-	step2[2] = oriT[2];
-
-
-	normout[0] = step1[0] - step2[0];
-	normout[1] = step1[1] - step2[1];
-	normout[2] = step1[2] - step2[2];
+	normout[0] = normin[0] * matrix->GetElement(0, 0) + normin[1] * matrix->GetElement(0, 1) + normin[2] * matrix->GetElement(0, 2);
+	normout[1] = normin[0] * matrix->GetElement(1, 0) + normin[1] * matrix->GetElement(1, 1) + normin[2] * matrix->GetElement(1, 2);
+	normout[2] = normin[0] * matrix->GetElement(2, 0) + normin[1] * matrix->GetElement(2, 1) + normin[2] * matrix->GetElement(2, 2);
+	/*normout[0] = normin[0] * matrix->GetElement(0, 0) + normin[1] * matrix->GetElement(1, 0) + normin[2] * matrix->GetElement(2, 0);
+	normout[1] = normin[0] * matrix->GetElement(0, 1) + normin[1] * matrix->GetElement(1, 1) + normin[2] * matrix->GetElement(2, 1);
+	normout[2] = normin[0] * matrix->GetElement(0, 2) + normin[1] * matrix->GetElement(1, 2) + normin[2] * matrix->GetElement(2, 2);*/
 
 }
 void mqMorphoDigCore::SetSelectedActorsColor(int r, int g, int b) 
