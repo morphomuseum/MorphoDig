@@ -139,7 +139,7 @@ void mqScalarsThicknessBetweenDialog::editThickness()
 		if (this->observedActor != NULL && this->impactedActor != NULL)
 		{
 		//	cout << "Call mphodigcore between function" << endl;
-			mqMorphoDigCore::instance()->scalarsThicknessBetween(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->impactedActor, this->observedActor);// to update thickness
+			mqMorphoDigCore::instance()->scalarsThicknessBetween(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->impactedActor, this->observedActor, this->Ui->angularLimit->value(), this->Ui->invertObservedNormales->isChecked());// to update thickness
 		}
 		
 	}

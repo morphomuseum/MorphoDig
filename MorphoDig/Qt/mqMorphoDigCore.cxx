@@ -6440,7 +6440,7 @@ void mqMorphoDigCore::DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString Sc
 
 	
 }
-void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor)
+void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
 {
 	if (impactedActor != NULL && observedActor != NULL)
 	{
@@ -6507,6 +6507,9 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 			double *ptn2;
 			double ptn2obs[3];
 			double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
+			if (angularLimit > 0 && angularLimit <= 180);
+			min_cos = cos(angularLimit*vtkMath::Pi() / 180);
+			cout << "min_cos=" << min_cos << endl;
 			double cur_cos = 1.0; // compare ve1's normal and ve2's normal
 			double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
 			double AB[3];
@@ -6588,8 +6591,8 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					}
 					mqMorphoDigCore::RotateNorm(impMat, ven_imp_init_pos, ptn);
 					if (ve < 10) {
-						cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << endl;
-						cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << endl;
+					//	cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << endl;
+					//	cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << endl;
 
 					}
 
@@ -6645,9 +6648,9 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 							ven_obs_init_pos[2] = ptn2[2];
 							mqMorphoDigCore::RotateNorm(obsMat, ven_obs_init_pos, ptn2obs);
 							if (ve<10 && j < 3) {
-								cout << "j=" << j << endl;
-								cout << "ven_obs_init_pos=" << ven_obs_init_pos[0] << "|" << ven_obs_init_pos[1] << "|" << ven_obs_init_pos[2] << "|" << endl;
-								cout << "ptn2obs=" << ptn2obs[0] << "|" << ptn2obs[1] << "|" << ptn2obs[2] << "|" << endl;
+							//	cout << "j=" << j << endl;
+							//	cout << "ven_obs_init_pos=" << ven_obs_init_pos[0] << "|" << ven_obs_init_pos[1] << "|" << ven_obs_init_pos[2] << "|" << endl;
+							//	cout << "ptn2obs=" << ptn2obs[0] << "|" << ptn2obs[1] << "|" << ptn2obs[2] << "|" << endl;
 
 							}
 
@@ -6656,7 +6659,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 							ptn2obs[1] = ptn2[1];
 							ptn2obs[2] = ptn2[2];*/
 
-							if (observedActor != impactedActor)
+							if (observedActor != impactedActor && invertObservedNormales==1)
 							{
 								ptn2obs[0] = -ptn2obs[0];
 								ptn2obs[1] = -ptn2obs[1];
@@ -6683,8 +6686,8 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 								cur_cos2 = ABnorm[0] * ptn[0] + ABnorm[1] * ptn[1] + ABnorm[2] * ptn[2];
 
 								if (ve < 10 && j < 3) {
-									cout << "cur_cos=" << cur_cos << endl;
-									cout << "cur_cos2=" << cur_cos2 << endl;
+								//	cout << "cur_cos=" << cur_cos << endl;
+								//	cout << "cur_cos2=" << cur_cos2 << endl;
 								}
 
 								if (cur_cos > min_cos && cur_cos2 > min_cos )																	
@@ -6827,7 +6830,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 
 	return NULL;
 }
-void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName)
+void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit )
 {
 	std::string mScalarName = "Thickness";
 	if (scalarName.length() >0)
@@ -6846,7 +6849,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 		{
 			myActor->SetSelected(0);
 			// here we can call : 
-			this->scalarsThicknessBetween( max_thickness,  smooth_normales,  avg,  scalarName,  myActor, myActor);
+			this->scalarsThicknessBetween( max_thickness,  smooth_normales,  avg,  scalarName,  myActor, myActor, angularLimit);
 			modified = 1;
 
 		}

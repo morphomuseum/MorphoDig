@@ -460,7 +460,7 @@
      <x>10</x>
      <y>10</y>
      <width>411</width>
-     <height>201</height>
+     <height>221</height>
     </rect>
    </property>
    <property name="title">
@@ -476,7 +476,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximal thickness (size unit)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximal thickness (size unit):&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="thickness">
@@ -493,7 +493,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>90</y>
+      <y>130</y>
       <width>331</width>
       <height>17</height>
      </rect>
@@ -506,7 +506,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>60</y>
+      <y>100</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -519,7 +519,7 @@
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>60</y>
+      <y>100</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -532,7 +532,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>60</y>
+      <y>100</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -545,7 +545,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>130</y>
+      <y>160</y>
       <width>113</width>
       <height>20</height>
      </rect>
@@ -558,7 +558,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>130</y>
+      <y>160</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -567,12 +567,41 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scalar name:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
+   <widget class="QDoubleSpinBox" name="angularLimit">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>60</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>70.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>60</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search angular limit (degrees):&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QProgressBar" name="progressBar">
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>180</y>
+     <y>200</y>
      <width>321</width>
      <height>23</height>
     </rect>

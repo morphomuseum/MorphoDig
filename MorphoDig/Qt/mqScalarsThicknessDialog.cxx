@@ -96,7 +96,7 @@ void mqScalarsThicknessDialog::editThickness()
 	{
 		std::string action = "Update thickness";
 		
-		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text());// to update thickness
+		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->Ui->angularLimit->value());// to update thickness
 		
 	}
 
