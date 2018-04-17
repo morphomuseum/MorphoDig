@@ -70,6 +70,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QInputDialog>
 #include <QProgressDialog>
 
 #include "mqUndoStack.h"
@@ -6104,6 +6105,205 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 }
+
+void mqMorphoDigCore::scalarsRGB(QString newRGB)
+{
+	std::string mScalarName = "RGB";
+	if (newRGB.length() > 0)
+	{
+		mScalarName = newRGB.toStdString();
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	std::string action = "Compute RGB scalar";
+	int Count = BEGIN_UNDO_SET(action);
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "RGB distance" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+
+			myActor->SetSelected(0);
+			myActor->SaveState(Count, QString(mScalarName.c_str()));
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				double numvert =mPD->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkUnsignedCharArray> newcolors =
+					vtkSmartPointer<vtkUnsignedCharArray>::New();
+				newcolors->SetNumberOfComponents(4);
+				newcolors->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
+
+				vtkIdType iRGB = 0;
+				int nr, ng, nb, na;
+				this->ActorCollection->InitTraversal();
+				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+				QString none = QString("none");
+				QString RGB = QString("RGB");
+				
+				// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
+				int RGB_fromglobal = 1;
+				// if current active scalar is not the "none" one, and if the actor as current active scalar.
+				//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+				if (ActiveScalar != none && 	mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+				{
+					RGB_fromglobal = 0;
+				}
+
+				//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
+				//colors->SetNumberOfComponents(4);
+				//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars("RGB");
+				//vtkFloatArray *currentFScalars = (vtkFloatArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				vtkFloatArray *currentFScalars = (vtkFloatArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+
+
+
+
+
+
+					// on cherche la scalar active pour ce maillage
+					
+					for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+					{
+						//Fill nr ng nb with at least something... 
+						nr = (unsigned char)(255 * myActor->GetmColor()[0]);
+						ng = (unsigned char)(255 * myActor->GetmColor()[1]);
+						nb = (unsigned char)(255 * myActor->GetmColor()[2]);
+						na = (unsigned char)(255 * myActor->GetmColor()[3]);
+
+						//1st case  : the current actor has not the currently active scalar.
+						if (RGB_fromglobal == 1)
+						{
+							//do nothing here as nr ng nb na have already been correctly instantiated just above
+
+						}
+						else
+						{
+							// 2 cases : 
+							//      A: active scalar = RGB => so we retake RGB... as we have started to do so earlier!
+							if(this->mui_ActiveScalars->DataType == VTK_UNSIGNED_CHAR
+								&&  this->mui_ActiveScalars->NumComp >= 3)
+							{
+								if (colors != NULL)
+								{
+									nr = (unsigned char)(colors->GetTuple(j)[0]);
+									ng = (unsigned char)(colors->GetTuple(j)[1]);
+									nb = (unsigned char)(colors->GetTuple(j)[2]);
+									if (this->mui_ActiveScalars->NumComp == 4)
+									{
+										na = (unsigned char)(colors->GetTuple(j)[3]);
+									}
+									else
+									{
+										na = 1;
+									}
+								}
+								// else we keep global RGB as instantiated above.
+
+							}
+							else
+							{
+								//      B: active scalar = 1 scalar or tag => we translate scalar or tag as RGB
+								if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+									this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+									)
+									&& this->Getmui_ActiveScalars()->NumComp == 1)
+								{
+
+									double cscalar = 0;
+									if (currentFScalars != NULL)
+									{
+										cscalar = (double)currentFScalars->GetTuple(j)[0];
+									}
+									if (currentDScalars != NULL)
+									{
+										cscalar = currentDScalars->GetTuple(j)[0];
+									}
+									// retrieve scalar value
+
+									double cRGB[3];
+									double cOpac = 1;
+									mymapper->GetLookupTable()->GetColor(cscalar, cRGB);
+									nr = (unsigned char)(255 * cRGB[0]);
+									ng = (unsigned char)(255 * cRGB[1]);
+									nb = (unsigned char)(255 * cRGB[2]);
+									na = (unsigned char)(255 * mymapper->GetLookupTable()->GetOpacity(cscalar));
+
+									// translate it as RGB
+
+
+								}
+								// else we keep global RGB as instantiated above.
+
+							}
+
+
+
+						}
+
+
+
+						newcolors->InsertTuple4(iRGB, nr, ng, nb, na);
+						iRGB++;
+
+				}
+					
+
+				
+				
+
+
+				newcolors->SetName(mScalarName.c_str());
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mPD->GetPointData()->AddArray(newcolors);
+				mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+				//g_active_scalar = 0;
+				// 0 => depth
+				// 1 =>	"Maximum_Curvature"
+				// 2 => "Minimum_Curvature"
+				// 3 => "Gauss_Curvature"
+				// 4 => "Mean_Curvature"
+
+				modified = 1;
+
+			}
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "RGB scalars created" << endl;
+
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_UNSIGNED_CHAR, 4);
+
+
+	}
+	END_UNDO_SET();
+
+
+}
+
 void mqMorphoDigCore::scalarsCameraDistance()
 {
 		
@@ -6118,8 +6318,9 @@ void mqMorphoDigCore::scalarsCameraDistance()
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
-			myActor->SaveState(Count, QString("Depth"));
+			
 			myActor->SetSelected(0);
+			myActor->SaveState(Count, QString("Depth"));
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 			{
@@ -6444,12 +6645,16 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 {
 	if (impactedActor != NULL && observedActor != NULL)
 	{
+		std::string action = "Compute thickness for ";
+		action.append(impactedActor->GetName().c_str());
+		int Count = BEGIN_UNDO_SET(action);
+
 		std::string mScalarName = "Thickness";
 		if (scalarName.length() > 0)
 		{
 			mScalarName = scalarName.toStdString();
 		}
-
+		impactedActor->SaveState(Count, QString(mScalarName.c_str()));
 		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
 		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
 		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
@@ -6507,8 +6712,10 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 			double *ptn2;
 			double ptn2obs[3];
 			double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
-			if (angularLimit > 0 && angularLimit <= 180);
-			min_cos = cos(angularLimit*vtkMath::Pi() / 180);
+			if (angularLimit > 0 && angularLimit <= 180)
+			{
+				min_cos = cos(angularLimit*vtkMath::Pi() / 180);
+			}
 			cout << "min_cos=" << min_cos << endl;
 			double cur_cos = 1.0; // compare ve1's normal and ve2's normal
 			double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
@@ -6790,7 +6997,9 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 		this->Initmui_ExistingScalars();
 		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 
-	}
+	
+		END_UNDO_SET();
+}
 	
 
 		
@@ -9370,6 +9579,7 @@ ExistingScalars * mqMorphoDigCore::Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDAc
 			if (dataType == VTK_UNSIGNED_CHAR && (num_comp == 3 || num_comp == 4))
 			{
 				// ok to add RGB like scalars
+				cout << "Found RGB like" << endl;
 				QString RGBlike = QString(myPD->GetPointData()->GetArrayName(i));
 				this->Addmui_ExistingScalars(RGBlike, dataType, num_comp, 0);
 			}
@@ -9615,7 +9825,7 @@ void mqMorphoDigCore::Initmui_ExistingScalars()
 	}
 
 	// if RGB exists, and this->mui_ActiveScalars ==none, set active scalar to RGB
-	QString RGB = QString("RGB");
+	/*QString RGB = QString("RGB");
 	for (int i = 0; i < this->mui_ExistingScalars->Stack.size(); i++)
 	{
 		QString myScalar = this->mui_ExistingScalars->Stack.at(i).Name;
@@ -9626,7 +9836,7 @@ void mqMorphoDigCore::Initmui_ExistingScalars()
 
 		}
 
-	}
+	}*/
 	
 	// last case : no RGB and none is not set as the active scalar before.
 	if (exists == 0)
@@ -10653,6 +10863,28 @@ void mqMorphoDigCore::slotMirror() { this->addMirrorXZ(); }
 void mqMorphoDigCore::slotInvert() { 
 		this->addInvert(); 
 
+}
+
+
+void mqMorphoDigCore::slotScalarsRGB()
+{
+	QString RGB = QString("RGB");
+	QInputDialog *newRGBName= new QInputDialog();
+	bool dialogResult;
+	QString newRGB = newRGBName->getText(0, "RGB array name", "name:", QLineEdit::Normal,
+		RGB, &dialogResult);
+	if (dialogResult)
+	{
+		cout << "RGB chosen name:" << newRGB.toStdString() << endl;
+		mqMorphoDigCore::instance()->scalarsRGB(newRGB);		
+	}
+	else
+	{
+		cout << "cancel " << endl;
+	}
+
+
+	
 }
 
 void mqMorphoDigCore::slotScalarsCameraDistance()
