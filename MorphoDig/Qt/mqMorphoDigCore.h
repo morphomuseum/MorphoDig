@@ -19,11 +19,15 @@
 #include "vtkMDActorCollection.h"
 #include "vtkBezierCurveSource.h"
 #include "vtkLMActorCollection.h"
+#include "vtkMDInteractorStyle.h"
+#include <vtkInteractorStyleDrawPolygon.h>
+#include "vtkMDLassoInteractorStyle.h"
 #include "vtkGridActor.h"
 #include "vtkLMActor.h"
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
 //#include "vtkUndoStackInternal.h"
 
+#include <QVTKOpenGLWidget.h>
 #include <vtkScalarBarActor.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkSmartPointer.h>    
@@ -97,6 +101,212 @@ public:
 // 
 class mqUndoStack;
 
+typedef struct {
+public:
+	double x, y, z;
+} POLYGON_VERTEX;
+class POLYGON_LIST
+{
+public:
+	
+	std::vector<vtkVector2i> point_list;
+	int point_number;
+	int state; //state 0 = not finished or not valid; state 1 =closed and valide
+
+
+	POLYGON_LIST()
+	{
+		this->point_list.clear();
+		this->point_number = 0;
+		this->state = 0;
+
+
+	}
+	int POLYGON_POINT_INSIDE(POLYGON_VERTEX P)
+	{
+		int    cn = 0;    // the crossing number counter
+
+						  // loop through all edges of the polygon
+		for (int i = 0; i<this->point_list.size() - 1; i++) {    // edge from V[i] to V[i+1]
+			const vtkVector2i &V1 = point_list[i];
+			const vtkVector2i &V2 = point_list[i+1];
+			if (((V1[1] <= P.y) && (V2[1] > P.y))    // an upward crossing
+				|| ((V1[1] > P.y) && (V2[1] <= P.y))) { // a downward crossing
+																				// compute the actual edge-ray intersect x-coordinate
+				double vt = (double)(P.y - V1[1]) / (V2[1] - V1[1]);
+				if (P.x < V1[0] + vt * (V2[0] -V1[0])) // P.x < intersect
+					++cn;   // a valid crossing of y=P.y right of P.x
+			}
+		}
+		//last edge
+		const vtkVector2i &F = point_list[0]; //first point
+		const vtkVector2i &L = point_list[point_number - 1];//last point
+
+		if (((F[1] <= P.y) && (L[1] > P.y))    // an upward crossing
+			|| ((F[1] > P.y) && (L[1] <= P.y))) { // a downward crossing
+																					   // compute the actual edge-ray intersect x-coordinate
+			double vt = (double)(P.y - F[1]) / (L[1] - F[1]);
+			if (P.x < F[0] + vt * (L[0] - F[0])) // P.x < intersect
+				++cn;   // a valid crossing of y=P.y right of P.x
+		}
+		return (cn & 1);    // 0 if even (out), and 1 if odd (in)
+
+	}
+	void SetPointList(std::vector<vtkVector2i> points)
+	{
+		this->point_list = points;
+		this->point_number = (int)points.size();
+		this->state =0;
+		this->state = this->Polygon_valid();
+	}
+	
+	void Polygon_init()
+	{
+		
+		this->point_number = 0;
+		this->state = 0;
+
+
+	}
+	int Poly_cross(double x1, double y1, double x2, double y2, double u1, double u2, double v1, double v2)
+	{
+
+		double b1;
+		double b2;
+		double xi, yi;
+		double a1, a2;
+		if ((x2 - x1 == 0) || (u2 - u1 == 0))
+		{
+			return 0;
+		}// Cases were one edge is vertical are avoided...(A and B exceptions)
+
+		b1 = (y2 - y1) / (x2 - x1); //(A) 
+		b2 = (v2 - v1) / (u2 - u1); // (B) 
+
+		if (b2 - b1 == 0)
+		{
+			return 0;
+		}// Cases were two edges are parallel are avoided. (C exception)
+
+		a1 = y1 - b1*x1;
+		a2 = v1 - b2*u1;
+		xi = -(a1 - a2) / (b1 - b2); //(C) 
+		yi = a1 + b1*xi;
+		if (
+			((x1 - xi)*(xi - x2) >= 0)
+			&& ((u1 - xi)*(xi - u2) >= 0)
+			&& ((y1 - yi)*(yi - y2) >= 0)
+			&& ((v1 - yi)*(yi - v2) >= 0)
+			)
+		{
+			return 1;
+		}
+		else { return 0; }
+
+
+	}
+	int Polygon_valid()						// Allocate Memory For Each Object
+	{
+		int x1, x2, y1, y2, u1, u2, v1, v2;
+		// And Defines points
+
+		int valid = 1;
+
+		if (this->point_number < 3)
+		{
+			return 0;
+		}
+		else
+		{//return 1;
+			if (this->point_number == 3)
+			{
+				const vtkVector2i &A = point_list[0];
+				const vtkVector2i &B = point_list[1];
+				const vtkVector2i &C = point_list[2];
+				
+				x1 = (int)A[0];
+				x2 = (int)B[0];
+				y1 = (int)A[1];
+				y2 = (int)B[1];
+				u1 = (int)B[0];
+				u2 = (int)C[0];
+				v1 = (int)B[1];
+				v2 = (int)C[1];
+				if (Poly_cross((double)x1, (double)y1, (double)x2, (double)y2, (double)u1, (double)u2, (double)v1, (double)v2))
+				{
+					valid = 0;
+				}
+				//test if paralleles
+			}
+			else
+			{
+				int i;
+				for (i = 0; i < point_number - 1; i++)
+				{
+					const vtkVector2i &V1 = point_list[i];
+					const vtkVector2i &V2 = point_list[i + 1];
+					x1 = (int)V1[0];
+					x2 = (int)V2[0];
+					y1 = (int)V1[1];
+					y2 = (int)V2[1];
+					for (int j = i + 2; j < point_number - 1; j++)
+					{
+						const vtkVector2i &U1 = point_list[j];
+						const vtkVector2i &U2 = point_list[j + 1];
+						//fprintf(stderr, "Segment %d - %d\n", i + 1, j + 1);
+						u1 = (int)U1[0];
+						u2 = (int)U2[0];
+						v1 = (int)U1[1];
+						v2 = (int)U2[1];
+
+
+						if (Poly_cross((double)x1, (double)y1, (double)x2, (double)y2, (double)u1, (double)u2, (double)v1, (double)v2))
+						{
+							cout << "Segment " << j + 1 << "-" << j + 2 << ": U1[0]" << U1[0] << ", U1[1]" << U1[1] << ", U2[0]" << U2[0] << "U2[1]" << U1[1] << endl;
+							cout << "Vs Segment " << i + 1 << "-" << i + 2 << ": V1[0]" << V1[0] << ", V1[1]" << V1[1] << ", V2[0]" << V2[0] << "V2[1]" << V1[1] << endl;
+
+							valid = 0;
+						}
+					}
+				
+			}
+			//Last edge
+			const vtkVector2i &F = point_list[0]; //first point
+			const vtkVector2i &L = point_list[point_number - 1];//last point
+			x1 = (int)L[0];
+			x2 = (int)F[0];
+			y1 = (int)L[1];
+			y2 = (int)F[1];
+		
+			for (i = 1; i<point_number - 2; i++)
+			{
+				const vtkVector2i &V1 = point_list[i];
+				const vtkVector2i &V2 = point_list[i + 1];
+
+
+					u1 = (int)V1[0];
+					u2 = (int)V2[0];
+					v1 = (int)V1[1];
+					v2 = (int)V2[1];
+					//fprintf(stderr, "Segment %d - %d\n", point_number, i + 1);
+					
+					if (Poly_cross((double)x1, (double)y1, (double)x2, (double)y2, (double)u1, (double)u2, (double)v1, (double)v2))
+					{
+						cout << "Last " << point_number << "-" << 1 << ": F[0]" << F[0] << ", F[1]" << F[1] << ", L[0]" << L[0] << "L[1]" << L[1] << endl;
+						cout << "Vs Segment" << i + 1 << "-" << i + 2 << ": V1[0]" << V1[0] << ", V1[1]" << V1[1] << ", V2[0]" << V2[0] << "V2[1]" << V1[1] << endl;
+
+						valid = 0;
+					}
+				}
+
+			}
+		}
+		return valid;
+	}		
+
+};
+
+
 class  mqMorphoDigCore : public QObject
 {
 	Q_OBJECT
@@ -104,6 +314,7 @@ class  mqMorphoDigCore : public QObject
 public:
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
+	void RemoveScalar(QString scalarName, int onlySelectedObjects);
 	void GetDisplayToWorld(double x, double y, double z, double worldPt[4]);
 	void GetWorldToDisplay(double x, double y, double z, double displayPt[3]);
 	double GetHundredPxSU();
@@ -118,10 +329,10 @@ public:
 	int Getmui_DefaultScalarVisibility();
 	int Getmui_ScalarVisibility();
 
-	void Setmui_MoveAll(int moveall);
-	int Getmui_MoveAll();
-	int Getmui_DefaultMoveAll();
-
+	void Setmui_MoveMode(int movemode);
+	int Getmui_MoveMode();
+	int Getmui_DefaultMoveMode();
+	void SwitchMoveMode();
 	void Setmui_ShowGrid(int showgrid);
 	int Getmui_ShowGrid();
 	int Getmui_DefaultShowGrid();
@@ -187,7 +398,7 @@ public:
 	
 	int SaveShapeMeasures(QString fileName, int mode);
 	
-	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, int save_norms = 0, vtkMDActor *myActor = NULL);
+	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt=0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
 	void DeleteSelectedActors();
@@ -252,10 +463,13 @@ public:
 	void Getmui_DefaultBackGroundColor(double bg[3]);
 	void Setmui_BackGroundColor(double bg1, double bg2, double bg3);
 	void Setmui_BackGroundColor(double background[3]);
-
-
+	void EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString oldScalarName, QString newScalarName);
+	void DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName);
+	ExistingScalars *Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDActor> actor);
+	ExistingScalars *Getmui_ScalarsOfSelectedObjects(int onlyfirst=0);
 	ExistingScalars* Getmui_ExistingScalars();
-	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp);
+	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int toglobalList =1);
+	
 	void Initmui_ExistingScalars();
 	void Setmui_ActiveScalars(QString Scalar, int dataType, int numComp);
 
@@ -283,7 +497,9 @@ public:
 	void UpdateLandmarkSettings();
 	void UpdateLandmarkSettings(vtkLMActor *myActor);
 	void SetMainWindow(QMainWindow *_mainWindow);
+	void SetProjectWindow(QMainWindow *_projectWindow);
 	QMainWindow* GetMainWindow();
+	QMainWindow* GetProjectWindow();
 	void LandmarksMoveUp();
 	void ChangeClippingPlane();
 	int Getmui_ClippinPlane();
@@ -331,8 +547,23 @@ public:
   void addDecimate(int quadric, double factor);
   void addInvert();// create an inverted surface for each selected surface
   void addKeepLargest();// create for each selected surface an object which keeps only the largest "independent" region of the corresponding object.
+  vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
+	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
+  void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit);
+  void scalarsCurvature(int curvatureType, QString scalarName);
+  void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
+  vtkMDActor * getFirstActorFromName(QString actorName);
+  std::vector<std::string> getActorNames();
+  
+  void scalarsCameraDistance(); //compute camera distance for each selected scalar.
+  void scalarsGaussianBlur(); //compute gaussian blur of current scalars
+  void scalarsRGB(QString newRGB);
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
+  void lassoCutSelectedActors(int keep_inside);
+  void startLasso(int lasso_mode);//change interaction style
+  void setCurrentCursor(int cursor); //changes mouse cursor
+  void stopLasso();//change interaction style back to normal
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
   void Redo(); // calls the undoStack Redo function
   void Undo(); // callse the undoStack Undo function
@@ -365,12 +596,15 @@ public:
   void CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type = -1);
   void UpdateFirstSelectedLandmark(double coord[3], double ori[3]);
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
+  static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);
+  
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
   void signal_projectionModeChanged();
   void signal_zoomChanged();
   void signal_existingScalarsChanged();
   void signal_activeScalarChanged();
+  //void signal_ActorsMightHaveChanged();
   double GetScalarRangeMin();
   void UpddateLookupTablesRanges(double min, double max);
 	double GetScalarRangeMax();
@@ -378,8 +612,14 @@ public:
 	double GetSuggestedScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
+  void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
+  
+  QVTKOpenGLWidget* getQVTKWidget();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
+  void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
+  void SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyleDrawPolygon> mLassoStyle);
+  //void SetCurrentInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
 signals:
@@ -390,8 +630,9 @@ signals:
   void actorSelectionChanged();
   void existingScalarsChanged();
   void activeScalarChanged();
-
-
+  void actorsMightHaveChanged();
+  void modeModeChanged();
+  void thicknessProgression(int percent);
 protected:
 	
 	~mqMorphoDigCore();
@@ -399,6 +640,8 @@ protected:
 	vtkSmartPointer<vtkLookupTable> TagLut;
 	int TagTableSize;
 
+	vtkSmartPointer<vtkMDInteractorStyle> Style;
+	vtkSmartPointer<vtkInteractorStyleDrawPolygon> LassoStyle;
 	vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRedLut;
@@ -431,6 +674,7 @@ protected:
 	vtkSmartPointer<vtkLMActor> LMActor;
 	vtkSmartPointer<vtkLMActor> LMActor2;
 	QMainWindow* MainWindow;
+	QMainWindow* ProjectWindow;
 	//vtkUndoStack* UndoStack;
 	mqUndoStack* UndoStack;
 	//vtkSmartPointer<vtkUndoStack> UndoStack;
@@ -438,12 +682,13 @@ protected:
 	//QString mui_ActiveScalars;
 	ActiveScalars *mui_ActiveScalars;
 	ExistingScalars *mui_ExistingScalars;
+	ExistingScalars *mui_ScalarsList; //can be of a given actor, or of selected objects
 
 	ActiveColorMap *mui_ActiveColorMap;
 	ExistingColorMaps *mui_ExistingColorMaps;
 
 	QString mui_LastUsedDir;
-	int mui_MoveAll;
+	int mui_MoveMode;
 	int mui_ShowGrid;
 	double mui_GridSpacing;
 	QString mui_SizeUnit;
@@ -476,7 +721,7 @@ protected:
 	QString mui_DefaultZ2Label;
 
 	int mui_DefaultShowGrid;
-	int mui_DefaultMoveAll;
+	int mui_DefaultMoveMode;
 	int mui_DefaultAnaglyph;
 	int mui_DefaultShowOrientationHelper;
 	int mui_DefaultCameraCentreOfMassAtOrigin;
@@ -519,9 +764,17 @@ public slots:
 	virtual void slotLandmarkMoveDown();
 	virtual void slotUpdateAllSelectedFlagsColors();
 	virtual void slotConvexHULL();
+	
+	virtual void slotLassoCutKeepInside();
+	virtual void slotLassoCutKeepOutside();
+	virtual void slotLassoTagInside();
+	virtual void slotLassoTagOutside();
 	virtual void slotMirror();
 	virtual void slotInvert();
 	virtual void slotKeepLargest();
+	virtual void slotScalarsCameraDistance();
+	virtual void slotScalarsRGB();
+	virtual void slotScalarsGaussianBlur();
 	virtual void  slotGrey();
 	virtual void slotYellow();
 	virtual void slotRed();
@@ -539,10 +792,10 @@ public slots:
 
 private:
 	static mqMorphoDigCore* Instance;
-
-	
-	int selected_file_exists(std::string path, std::string ext, std::string postfix);
-	int context_file_exists(std::string path, std::string ext, std::string postfix);
+	QVTKOpenGLWidget *qvtkWidget;
+	int currentLassoMode;
+	int selected_file_exists(QString path, QString ext, QString postfix);
+	int context_file_exists(QString path, QString ext, QString postfix);
 
 };
 

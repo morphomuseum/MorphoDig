@@ -7,15 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>1002</width>
-    <height>700</height>
+    <height>666</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MeshTools</string>
+   <string>MorphoDig</string>
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:/Icons/MeshTools.ico</normaloff>:/Icons/MeshTools.ico</iconset>
+    <normaloff>:/Icons/MorphoDig.ico</normaloff>:/Icons/MorphoDig.ico</iconset>
   </property>
   <property name="iconSize">
    <size>
@@ -38,42 +38,19 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>1</number>
+     <widget class="QVTKOpenGLWidget" name="qvtkWidget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
       </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Tab 1</string>
-       </attribute>
-       <widget class="QVTKWidget" name="qvtkWidget" native="true">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>996</width>
-          <height>659</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>1</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>300</width>
-          <height>300</height>
-         </size>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Tab 2</string>
-       </attribute>
-      </widget>
+      <property name="minimumSize">
+       <size>
+        <width>300</width>
+        <height>300</height>
+       </size>
+      </property>
      </widget>
     </item>
    </layout>
@@ -136,9 +113,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QVTKWidget</class>
+   <class>QVTKOpenGLWidget</class>
    <extends>QWidget</extends>
-   <header>QVTKWidget.h</header>
+   <header>QVTKOpenGLWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

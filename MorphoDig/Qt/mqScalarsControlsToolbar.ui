@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Main Controls</string>
+   <string>Scalar Controls</string>
   </property>
   <property name="orientation">
    <enum>Qt::Horizontal</enum>

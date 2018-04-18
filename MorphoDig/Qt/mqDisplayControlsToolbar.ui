@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mqDisplayControlsToolbar</class>
+ <widget class="QToolBar" name="mqDisplayControlsToolbar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>170</width>
+    <height>34</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Display controls</string>
+  </property>
+  <property name="orientation">
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <action name="actionGridToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/grid.png</normaloff>
+     <normalon>:/Icons/grid.png</normalon>:/Icons/grid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Grid: show/hide</string>
+   </property>
+   <property name="toolTip">
+    <string>Grid : show or hide</string>
+   </property>
+  </action>
+  <action name="actionOrientationHelperToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/orientation_helper.png</normaloff>
+     <normalon>:/Icons/orientation_helper.png</normalon>:/Icons/orientation_helper.png</iconset>
+   </property>
+   <property name="text">
+    <string>Orientation helper: show/hide</string>
+   </property>
+   <property name="toolTip">
+    <string>Orientation helper : show or hide</string>
+   </property>
+  </action>
+  <action name="actionRendererAnaglyphToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/renderer_anaglyph.png</normaloff>
+     <normalon>:/Icons/renderer_anaglyph.png</normalon>:/Icons/renderer_anaglyph.png</iconset>
+   </property>
+   <property name="text">
+    <string>Anaglyph : toggle</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle renderer : normal or anaglyph (red-blue)</string>
+   </property>
+  </action>
+  <action name="actionClippingPlaneOnOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/clipping_plane_off.png</normaloff>
+     <normalon>:/Icons/clipping_plane_on.png</normalon>:/Icons/clipping_plane_off.png</iconset>
+   </property>
+   <property name="text">
+    <string>Scalar visibility on/off</string>
+   </property>
+   <property name="toolTip">
+    <string>Clipping plane On/Off toggle</string>
+   </property>
+  </action>
+  <action name="actionBackfaceCullingOnOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/backface_on.png</normaloff>
+     <normalon>:/Icons/backface_off.png</normalon>:/Icons/backface_on.png</iconset>
+   </property>
+   <property name="text">
+    <string>Backface visibility on/off</string>
+   </property>
+   <property name="toolTip">
+    <string>Backface culling On/Off toggle</string>
+   </property>
+  </action>
+  <addaction name="actionGridToggle"/>
+  <addaction name="actionOrientationHelperToggle"/>
+  <addaction name="actionRendererAnaglyphToggle"/>
+  <addaction name="separator"/>
+  <addaction name="actionClippingPlaneOnOff"/>
+  <addaction name="actionBackfaceCullingOnOff"/>
+ </widget>
+ <resources>
+  <include location="../Icons/icons.qrc"/>
+  <include location="../Icons/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

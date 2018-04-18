@@ -17,7 +17,10 @@
 #include "mqMorphoDigMenuBuilders.h"
 #include "mqCameraControlsToolbar.h"
 #include "mqMainControlsToolbar.h"
+#include "mqInteractionControlsToolbar.h"
+#include "mqDisplayControlsToolbar.h"
 #include "mqLightControlsToolbar.h"
+#include "mqActorTreePanel.h"
 #include "mqObjectsControlsToolbar.h"
 #include "mqScalarsControlsToolbar.h"
 #include "mqDesktopServicesReaction.h"
@@ -39,7 +42,12 @@
 #include "mqFillHolesDialogReaction.h"
 #include "mqTPSDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
+#include "mqScalarsThicknessDialogReaction.h"
+#include "mqScalarsCurvatureDialogReaction.h"
+#include "mqScalarsThicknessBetweenDialogReaction.h"
+
 #include "mqSetName.h"
+#include "mqViewMenuManager.h"
 
 //#include "ui_mqEditMenuBuilder.h" // no .ui Edit menu file yet
 //#include "ui_mqFileMenuBuilder.h" // no .ui File menu yet
@@ -58,6 +66,18 @@
 #include <QMainWindow>
 #include <QMenu>
 
+void mqMorphoDigMenuBuilders::buildViewMenu(QMenu& menu, QMainWindow& window, QMainWindow& projectwindow)
+{
+/*	QString objectName = menu.objectName();
+	std::cout << "Menu object name" << objectName.toStdString() << std::endl;
+	m_p_Act_Button1 = new QAction("Super Button 1", this);
+	m_p_Act_Button1->setCheckable(true);
+	m_p_Act_Button1->setChecked(true);
+	connect(m_p_Act_Button1, SIGNAL(triggered()), this, SLOT(slot_SomethingChecked()));*/
+	
+	new mqViewMenuManager(&window, &menu, &projectwindow);
+
+}
 //-----------------------------------------------------------------------------
 //void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu, QMainWindow* mainWindow = 0)
 void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
@@ -175,8 +195,11 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Invert = submenuStructureModification->addAction("Invert each selected surface");
 	QAction *Mirror = submenuStructureModification->addAction("Mirror each selected surface along Y plane");
 	QAction *ConvexHULL = submenuStructureModification->addAction("Create convex hull for each selected surface");
-
+	QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
+	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");
 	QMenu* submenuRenderingModification = menu.addMenu("Rendering modification");
+	
+
 	new mqEditAlphaDialogReaction(submenuRenderingModification->addAction("Change transparency") << mqSetName("actionEditAlpha"));
 
 	QMenu* submenuChangeObjectColor = submenuRenderingModification->addMenu("Change object color");
@@ -196,11 +219,14 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Orange = submenuChangeObjectColor->addAction("Orange");
 	QAction *Brown = submenuChangeObjectColor->addAction("Brown");
 	
+	
+
 	QAction::connect(KeepLargest, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotKeepLargest()));
 	QAction::connect(Invert, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotInvert()));
 	QAction::connect(Mirror, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirror()));
 	QAction::connect(ConvexHULL, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotConvexHULL()));
-
+	QAction::connect(Lasso, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
+	QAction::connect(Lasso2, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
 	
 	QAction::connect(Grey, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotGrey()));
 	QAction::connect(Yellow, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotYellow()));
@@ -216,7 +242,22 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(Orange, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotOrange()));
 	QAction::connect(Brown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotBrown()));
 	
-	
+	QMenu* submenuScalarModification = menu.addMenu("Scalar computation");
+	//new mqThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickness"));
+	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
+	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance from camera");
+	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
+
+	QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
+	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
+
+
+	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
+	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness between two objects") << mqSetName("actionThickessBetween"));
+	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
+	QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
+	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
+
 }
 void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 {
@@ -280,13 +321,82 @@ void mqMorphoDigMenuBuilders::buildHelpMenu(QMenu& menu)
   new mqAboutDialogReaction(menu.addAction("About...") << mqSetName("actionAbout"));
 }
 
+void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
+{
+	
+
+	//auto dock3 = new QDockWidget(&projectWindow);
+	
+	
+	//@@ ADD BACK ACTOR TREEE
+	
+	/*
+	auto dock3 = new QDockWidget("Actors", &projectWindow);
+	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock3);	
+	auto window = new QMainWindow(0);	
+	dock3->setAllowedAreas(Qt::AllDockWidgetAreas);	
+	QWidget* actor_panel = new mqActorTreePanel(window);	
+	window->setCentralWidget(actor_panel);
+	dock3->setWidget(window);*/
+	//@@
+
+	
+	QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
+		<< mqSetName("MainControlsToolbar");
+	mainToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
+	cout << "end create main tool bar" << endl;
+
+	//cout << "create interaction tool bar" << endl;
+	QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow)
+		<< mqSetName("InteractionControlsToolbar");
+	interactionToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::TopToolBarArea, interactionToolBar);
+
+	//cout << "create display tool bar" << endl;
+	QToolBar*displayToolBar = new mqDisplayControlsToolbar(&projectWindow)
+		<< mqSetName("DisplayControlsToolbar");
+	displayToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::TopToolBarArea, displayToolBar);
+	
+	
+	//cout << "create light tool bar" << endl;
+	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
+		<< mqSetName("LightControlsToolbar");
+	lightToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);
+	//cout << "create objects tool bar" << endl;
+
+	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
+		<< mqSetName("ObjectsControlsToolbar");
+	ObjectsToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);
+
+	//cout << "create scalars tool bar" << endl;
+	QToolBar* scalarsToolBar = new mqScalarsControlsToolbar(&projectWindow)
+		<< mqSetName("ScalarsControlsToolbar");
+	scalarsToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::TopToolBarArea, scalarsToolBar);
+	//cout << "create camera tool bar" << endl;
+	QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow)
+		<< mqSetName("CameraControlsToolbar");
+	cameraToolBar->layout()->setSpacing(0);
+	projectWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);
+
+}
+
 //-----------------------------------------------------------------------------
 void mqMorphoDigMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 {
+	/*cout << "create main tool bar" << endl;
 	QToolBar* mainToolBar = new mqMainControlsToolbar(&mainWindow)
 		<< mqSetName("MainControlsToolbar");
 	mainToolBar->layout()->setSpacing(0);
 	mainWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
+	cout << "end create main tool bar" << endl;*/
+
+
+	/*
 
 	QToolBar* lightToolBar = new mqLightControlsToolbar(&mainWindow)
 		<< mqSetName("LightControlsToolbar");
@@ -307,6 +417,6 @@ void mqMorphoDigMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 		<< mqSetName("CameraControlsToolbar");
 	cameraToolBar->layout()->setSpacing(0);
 	mainWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);
-
+	*/
 }
 

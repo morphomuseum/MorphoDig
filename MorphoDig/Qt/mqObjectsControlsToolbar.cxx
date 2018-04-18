@@ -35,21 +35,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // For later!
 #include "QReleaseSlider.h"
 //#include "QReleaseSliderValue.h"
-#include "mqUndoStack.h"
-#include "mqSaveNTWDialogReaction.h"
-#include "mqUndoRedoReaction.h"
+
 #include "mqEditLMKDialogReaction.h"
 #include "mqCreateLMKDialogReaction.h"
 #include "mqEditFLGDialogReaction.h"
 #include "mqEditACTORDialogReaction.h"
+
+#include "mqUndoStack.h"
+
+#include "mqUndoRedoReaction.h"
+
 #include "mqMorphoDigCore.h"
-#include "mqOpenDataReaction.h"
-#include "mqCameraReaction.h"
-#include "mqDisplayReaction.h"
+
 #include "vtkLMActor.h"
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
+//#include <vtkRenderWindowInteractor.h>
 #include <vtkProp3D.h>
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
@@ -70,6 +71,8 @@ void mqObjectsControlsToolbar::constructor()
  // Ui::mqObjectsControlsToolbar ui;
  // ui.setupUi(this);
   this->ui = new Ui_mqObjectsControlsToolbar;
+  
+  
   this->oldrotval = 0;
   this->oldtrval = 0;
   this->ui->setupUi(this);
@@ -188,6 +191,14 @@ void mqObjectsControlsToolbar::constructor()
   connect(zTr, SIGNAL(sliderPressed()), this, SLOT(slotZtrPressed()));
   connect(yTr, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
   connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));
+  
+  connect(this->ui->actionLassoCutKeepInside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
+  connect(this->ui->actionLassoCutKeepOutside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
+
+  new mqEditLMKDialogReaction(this->ui->actionEditLandmarks);
+  new mqCreateLMKDialogReaction(this->ui->actionCreateLandmark);
+  new mqEditFLGDialogReaction(this->ui->actionEditFlags);
+  new mqEditACTORDialogReaction(this->ui->actionEditActors);
  
 }
 

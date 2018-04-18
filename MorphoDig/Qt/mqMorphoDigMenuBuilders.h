@@ -36,13 +36,15 @@ public:
   */
   //static void buildEditMenu(QMenu& menu, QMainWindow* mainWindow = 0);
   static void buildEditMenu(QMenu& menu);
+  //static void buildViewMenu(QMenu& menu);
+  static void  buildViewMenu(QMenu& menu, QMainWindow& window, QMainWindow& projectwindow);
 
   /**
   * Builds the help menu.
   */
   //static void buildHelpMenu(QMenu& menu, QMainWindow* mainWindow = 0);
   static void buildHelpMenu(QMenu& menu);
-
+  static void buildProjectDocks(QMainWindow& projectWindow);
   /**
   * Builds and adds all standard MorphoDig toolbars.
   */

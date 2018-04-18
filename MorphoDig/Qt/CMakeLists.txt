@@ -1,4 +1,8 @@
 set (Qt_SRCS
+mqViewMenuManager.h
+mqViewMenuManager.cxx
+  mqActorTreePanel.cxx
+  mqActorTreePanel.h
   mqAboutDialog.cxx
   mqAboutDialog.h
   mqAboutDialogReaction.cxx
@@ -37,7 +41,7 @@ set (Qt_SRCS
   mqEditAllFLGColorDialogReaction.cxx
   mqEditAllFLGColorDialog.h
   mqEditAllFLGColorDialog.cxx
-mqEditAllFLGLengthDialogReaction.h
+  mqEditAllFLGLengthDialogReaction.h
   mqEditAllFLGLengthDialogReaction.cxx
   mqEditAllFLGLengthDialog.h
   mqEditAllFLGLengthDialog.cxx
@@ -81,6 +85,10 @@ mqEditAllFLGLengthDialogReaction.h
   mqCameraControlsToolbar.cxx
   mqMainControlsToolbar.h
   mqMainControlsToolbar.cxx
+  mqDisplayControlsToolbar.h
+  mqDisplayControlsToolbar.cxx
+  mqInteractionControlsToolbar.h
+  mqInteractionControlsToolbar.cxx
   mqLightControlsToolbar.h
   mqLightControlsToolbar.cxx
   mqScalarsControlsToolbar.h
@@ -169,6 +177,20 @@ QReleaseSliderValue.h
   mqDecomposeDialog.h
   mqDecomposeDialogReaction.cxx
   mqDecomposeDialogReaction.h
+mqScalarsThicknessDialog.h
+mqScalarsThicknessDialog.cxx
+mqScalarsThicknessDialogReaction.h
+mqScalarsThicknessDialogReaction.cxx
+mqScalarsThicknessBetweenDialog.h
+mqScalarsThicknessBetweenDialog.cxx
+mqScalarsThicknessBetweenDialogReaction.h
+mqScalarsThicknessBetweenDialogReaction.cxx
+mqScalarsCurvatureDialog.h
+mqScalarsCurvatureDialog.cxx
+mqScalarsCurvatureDialogReaction.h
+mqScalarsCurvatureDialogReaction.cxx
+
+
 )
 
 set (Qt_MOC_HDRS
@@ -201,6 +223,8 @@ mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
 mqSelectLandmarkRangeDialog.ui
 mqLightControlsToolbar.ui
+mqInteractionControlsToolbar.ui
+mqDisplayControlsToolbar.ui
 mqScalarsControlsToolbar.ui
 mqGridSizeDialog.ui
 mqOrientationLabelsDialog.ui
@@ -211,6 +235,10 @@ mqDensifyDialog.ui
 mqFillHolesDialog.ui
 mqTPSDialog.ui
 mqDecomposeDialog.ui
+mqActorTreePanel.ui
+mqScalarsThicknessDialog.ui
+mqScalarsThicknessBetweenDialog.ui
+mqScalarsCurvatureDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

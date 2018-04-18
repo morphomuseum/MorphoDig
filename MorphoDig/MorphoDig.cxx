@@ -16,7 +16,9 @@
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
+#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
+#include <QVTKOpenGLWidget.h>
 //#include "vtkUndoStack.h"
 //#include "vtkUndoSet.h"
 //#include "vtkUndoElement.h"
@@ -25,6 +27,7 @@
 #include <sstream>
 #include <iostream>
 
+#include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkPoints.h>
 #include <vtkCylinderSource.h> 
@@ -81,6 +84,11 @@
 #include <vtkBoxWidget.h>
 #include <vtkCommand.h>
 
+#include <QMdiArea>
+#include <QDockWidget>
+//#include <QLabel>
+#include <QTreeView>
+
 //-----------------------------------------------------------------------------
 //MorphoDig* MorphoDig::Instance = 0;
 
@@ -128,6 +136,15 @@ public:
 	}
 };
 
+void lassoselect(vtkObject* caller,
+	long unsigned int vtkNotUsed(eventId),
+	void* vtkNotUsed(clientData),
+	void* vtkNotUsed(callData))
+{
+	cout << "Lasso selection changed!" << endl;
+	mqMorphoDigCore::instance()->stopLasso();
+
+}
 
 //Select meshes, landmarks and tags ... first try!
 void RubberBandSelect(vtkObject* caller,
@@ -212,7 +229,8 @@ void RubberBandSelect(vtkObject* caller,
 			
 		}
 
-		if (mqMorphoDigCore::instance()->Getmui_MoveAll() == 1)
+		//if not "only select landmarks".
+		if (mqMorphoDigCore::instance()->Getmui_MoveMode() != 0)
 		{
 			std::string str2("vtkMDActor");
 			if (str2.compare(myprop3D->GetClassName()) == 0)
@@ -275,10 +293,65 @@ void RubberBandSelect(vtkObject* caller,
 
 // Constructor
 MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {  
-setupUi(this); 
+
+	setupUi(this); 
 //MorphoDig::MorphoDig(){
 	
 
+	
+	auto projectWindow = new QMainWindow(this->tabWidget);
+	
+	
+	//this
+	QWidget *projectTab = new QWidget();
+	QHBoxLayout *projectLayout = new QHBoxLayout;
+	projectLayout->addWidget(projectWindow);
+
+	projectTab->setLayout(projectLayout);
+	this->tabWidget->addTab(projectTab, "Project");
+
+
+
+	//auto projectWindow = new QMainWindow();
+	
+	//this->mdiArea->addSubWindow(projectWindow);
+	/*auto dock1 = new QDockWidget("3D viewer");
+	dock1->setWidget(qvtkWidget2);
+	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);
+	projectWindow->setCentralWidget(dock1);
+	*/
+	this->qvtkWidget2 = new QVTKOpenGLWidget();
+
+
+
+	qvtkWidget2->setObjectName(QStringLiteral("qvtkWidget"));
+	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	sizePolicy.setHorizontalStretch(1);
+	sizePolicy.setVerticalStretch(1);
+	sizePolicy.setHeightForWidth(qvtkWidget2->sizePolicy().hasHeightForWidth());
+	qvtkWidget2->setSizePolicy(sizePolicy);
+	qvtkWidget2->setMinimumSize(QSize(300, 300));
+
+		
+	projectWindow->setCentralWidget(qvtkWidget2);
+
+	
+
+
+	//projectWindow->Maximise
+	projectWindow->showMaximized();
+	//auto mytree = new QTreeView(this->TabProject);
+	/*auto mytree = new QTreeView(this->tabWidget);
+	auto dock2 = new QDockWidget("Actors");
+	dock2->setWidget(mytree);
+	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
+	projectWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);*/
+
+	projectWindow->setWindowModality(Qt::WindowModal);
+	/*Qt::WindowFlags flags = windowFlags();
+	Qt::WindowFlags closeFlag = Qt::WindowCloseButtonHint;
+	flags = flags & (~closeFlag);
+	projectWindow->setWindowFlags(flags);*/
 
 	cout << "Try to set render window" << endl;
   auto window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
@@ -288,7 +361,11 @@ setupUi(this);
 
 	vtkObject::GlobalWarningDisplayOff();
 	this->MorphoDigCore =  new mqMorphoDigCore();
+	this->MorphoDigCore->setQVTKWidget(this->qvtkWidget2);
+	MorphoDigCore->SetProjectWindow(projectWindow);
 	window->AddRenderer(this->MorphoDigCore->getRenderer());
+
+	this->MorphoDigCore->setCurrentCursor(0);
 	//vtkUndoStack* undoStack = vtkUndoStack::New();
 
 	//@@@
@@ -304,8 +381,8 @@ setupUi(this);
 	this->MorphoDigCore->Setmui_LastUsedDir(settings.value("LastUsedDir", QDir::currentPath()).toString());
 	settings.endGroup();
 	settings.beginGroup("interaction_mode");
-	this->MorphoDigCore->Setmui_MoveAll(settings.value("MoveAll",
-		this->MorphoDigCore->Getmui_DefaultMoveAll()
+	this->MorphoDigCore->Setmui_MoveMode(settings.value("MoveMode",
+		this->MorphoDigCore->Getmui_DefaultMoveMode()
 	).toInt());
 	settings.endGroup();
 
@@ -450,7 +527,7 @@ setupUi(this);
 	// Place the table view in the designer form
 	//this->ui->tableFrame->layout()->addWidget(this->TableView->GetWidget());
 	
-	this->qvtkWidget->SetRenderWindow(window);
+	this->qvtkWidget2->SetRenderWindow(window);
 
 	//this->MorphoDigCore->SetRenderWindow(this->ui->qvtkWidget->GetRenderWindow());
 	this->MorphoDigCore->SetRenderWindow(window);
@@ -535,8 +612,9 @@ setupUi(this);
 	mqMorphoDigMenuBuilders::buildLandmarksMenu(*this->menuLandmarks);
 	mqMorphoDigMenuBuilders::buildHelpMenu(*this->menuHelp);
 	mqMorphoDigMenuBuilders::buildToolbars(*this);
-
-	
+	mqMorphoDigMenuBuilders::buildProjectDocks(*projectWindow);
+	cout << "About to build view Menu!" << endl;
+	mqMorphoDigMenuBuilders::buildViewMenu(*this->menuView, *this, *projectWindow);
 
 
 	double myorigin[3];
@@ -552,17 +630,38 @@ setupUi(this);
 	
 	 vtkSmartPointer<vtkMDInteractorStyle> style =
     vtkSmartPointer<vtkMDInteractorStyle>::New();
+
+	 /*vtkSmartPointer<vtkMDLassoInteractorStyle> lassostyle =
+		 vtkSmartPointer<vtkMDLassoInteractorStyle>::New();*/
+
+	 vtkSmartPointer<vtkInteractorStyleDrawPolygon> lassostyle =
+		 vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
+
 	 style->SetActorCollection(this->MorphoDigCore->getActorCollection());
 	 style->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
 	 style->SetTargetLandmarkCollection(this->MorphoDigCore->getTargetLandmarkCollection());
 	 style->SetNodeLandmarkCollection(this->MorphoDigCore->getNodeLandmarkCollection());
 	 style->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
 	 style->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());
+
+	/* lassostyle->SetActorCollection(this->MorphoDigCore->getActorCollection());
+	 lassostyle->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
+	 lassostyle->SetTargetLandmarkCollection(this->MorphoDigCore->getTargetLandmarkCollection());
+	 lassostyle->SetNodeLandmarkCollection(this->MorphoDigCore->getNodeLandmarkCollection());
+	 lassostyle->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
+	 lassostyle->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());*/
+
 	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
 	//vtkSmartPointer<vtkInteractorStyleTrackballActor> style =
 	//	vtkSmartPointer<vtkInteractorStyleTrackballActor>::New();
 	//vtkSmartPointer<vtkInteractorStyleSwitch> style =
 	//	vtkSmartPointer<vtkInteractorStyleSwitch>::New();
+
+	 vtkSmartPointer<vtkCallbackCommand> lassoselectionCallback =
+		 vtkSmartPointer<vtkCallbackCommand>::New();
+	 lassoselectionCallback->SetCallback(lassoselect);
+	 lassostyle->AddObserver(vtkCommand::SelectionChangedEvent, lassoselectionCallback);
+
 	 vtkSmartPointer<vtkCallbackCommand> pickCallback =
 		 vtkSmartPointer<vtkCallbackCommand>::New();
 
@@ -575,12 +674,16 @@ setupUi(this);
 	 this->AreaPicker->AddObserver(vtkCommand::EndPickEvent, pickCallback);
 	
  style->SetCurrentRenderer(this->MorphoDigCore->getRenderer());
-  this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
-  this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+  //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
+  //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   
+ //same thing !!!!
   window->GetInteractor()->SetPicker(this->AreaPicker);
   window->GetInteractor()->SetInteractorStyle(style);
 
+  // mqMorphoDigCore should be aware of the 2 coexisting interactor styles (so that we can switch between them
+  mqMorphoDigCore::instance()->SetNormalInteractorStyle(style);
+  mqMorphoDigCore::instance()->SetLassoInteractorStyle(lassostyle);
 
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetHandles(mqMorphoDigCore::instance()->getHandleLandmarkCollection());
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetNodes(mqMorphoDigCore::instance()->getNodeLandmarkCollection());
@@ -603,7 +706,7 @@ setupUi(this);
   this->MorphoDigCore->SetGridInfos();
   this->MorphoDigCore->InitializeOrientationHelper(); // creates orientation helper...
   this->MorphoDigCore->SetOrientationHelperVisibility();
-  this->qvtkWidget->SetRenderWindow(window);
+  this->qvtkWidget2->SetRenderWindow(window);
   
   //EXAMPLE vtkBoxWidget
 
@@ -732,7 +835,7 @@ void MorphoDig::saveSettings()
 	settings.setValue("LastUsedDir", this->MorphoDigCore->Getmui_LastUsedDir());
 	settings.endGroup();
 	settings.beginGroup("interaction_mode");
-	settings.setValue("MoveAll", this->MorphoDigCore->Getmui_MoveAll());
+	settings.setValue("MoveMode", this->MorphoDigCore->Getmui_MoveMode());
 	settings.endGroup();
 	settings.beginGroup("display_options");
 	settings.setValue("ShowGrid", this->MorphoDigCore->Getmui_ShowGrid());

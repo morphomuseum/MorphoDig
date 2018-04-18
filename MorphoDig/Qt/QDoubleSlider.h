@@ -23,12 +23,20 @@ public:
 	{
 		return m_DoubleStep;
 	}
-
+	double getDoubleMinimum()
+	{
+		return m_DoubleMin;
+	}
+	double getDoubleMaximum()
+	{
+		return m_DoubleMax;
+	}
 	void setDoubleMinimum(double value)
 	{
 		m_DoubleMin = value;
 		updateRange();
 	}
+
 
 	void setDoubleMaximum(double value)
 	{

@@ -219,8 +219,7 @@ void mqCameraControlsToolbar::constructor()
   //this->ui->actionClippingPlaneOnOff->setDisabled(true);
   //connect(mqMorphoDigCore::instance(), SIGNAL(clippingPlaneChanged(int)), this, SLOT(slotClippingPlaneChanged(int)));
 
-  connect(this->ui->actionBackfaceCullingOnOff, SIGNAL(triggered()), this, SLOT(slotBackfaceCullingOnOff()));
-  connect(this->ui->actionClippingPlaneOnOff, SIGNAL(triggered()), this, SLOT(slotClippingPlaneOnOff()));
+  
  
   connect(cP, SIGNAL(valueChanged(int)), this, SLOT(slotCp(int)));
   connect(zRot, SIGNAL(valueChanged(int)), this, SLOT(slotZrot(int)));
@@ -328,21 +327,7 @@ void mqCameraControlsToolbar::slotZrot(int val)
 	mqMorphoDigCore::instance()->Render();*/
 }
 
-void mqCameraControlsToolbar::slotClippingPlaneOnOff()
-{
-	mqMorphoDigCore::instance()->getRenderer()->ResetCameraClippingRange();
-	mqMorphoDigCore::instance()->ChangeClippingPlane();
-	mqMorphoDigCore::instance()->Render();
-	//mqMorphoDigCore::instance()->Render();
-}
 
-void mqCameraControlsToolbar::slotBackfaceCullingOnOff()
-{
-	
-	mqMorphoDigCore::instance()->ChangeBackfaceCulling();
-	mqMorphoDigCore::instance()->Render();
-	//mqMorphoDigCore::instance()->Render();
-}
 	
 
 	

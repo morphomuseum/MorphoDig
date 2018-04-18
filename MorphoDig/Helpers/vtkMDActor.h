@@ -14,21 +14,24 @@ Module:    vtkMDActor.h
 
 #include <vtkOpenGLActor.h>
 #include <vtkMatrix4x4.h>
+#include <vtkDataArray.h>
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
 #include <vector>
-
+#include <QString>
 class vtkMDActorUndoRedo
 {
 public:
 	struct Element
 	{
 		vtkSmartPointer<vtkMatrix4x4> Matrix;
+		vtkSmartPointer<vtkDataArray> sauvArray;
+		QString arrayName;
 		double Color[4];
 		int Selected;
 		int UndoCount;
 		std::string Name;
-		Element(vtkSmartPointer<vtkMatrix4x4> m, double c[4], int selected, int Count, std::string name)
+		Element(vtkSmartPointer<vtkMatrix4x4> m, double c[4], int selected, int Count, std::string name, QString marrayName, vtkSmartPointer<vtkDataArray> marray)
 		{
 			this->Matrix =m;
 			this->UndoCount = Count;
@@ -38,6 +41,8 @@ public:
 			this->Color[3] = c[3];
 			this->Selected = selected;
 			this->Name = name;
+			this->sauvArray = marray;
+			this->arrayName = marrayName;
 		}
 	};
 	typedef std::vector<Element> VectorOfElements;
@@ -77,7 +82,7 @@ public:
 	vtkIdType GetNumberOfPoints();
 	void Render(vtkRenderer *ren, vtkMapper *mapper);
 	virtual void SetSelected(int selected);
-	virtual void SaveState(int mCount);
+	virtual void SaveState(int mCount, QString arrayToSave = QString());
 	virtual void Redo(int mCount); // Try to redo (if exists) "mCount" event
 	virtual void Erase(int mCount); // Try to erase (if exists) "mCount" event
 	virtual void Undo(int mCount); // Try to undo (if exists) "mCount" event

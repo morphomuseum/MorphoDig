@@ -8,6 +8,7 @@ vtkMDActorCollection.cxx
 vtkLMActorCollection.cxx 
 vtkOrientationHelperWidget.cxx 
 vtkMDInteractorStyle.cxx 
+vtkMDLassoInteractorStyle.cxx 
 vtkUndoStack.cxx 
 vtkUndoStackBuilder.cxx 
 vtkProbeSource.cxx 
@@ -27,6 +28,7 @@ vtkLMActorCollection.h
 vtkGridActor.h 
 vtkOrientationHelperWidget.h 
 vtkMDInteractorStyle.h 
+vtkMDLassoInteractorStyle.h
 vtkUndoStack.h 
 vtkUndoStackBuilder.h 
 vtkUndoStackInternal.h

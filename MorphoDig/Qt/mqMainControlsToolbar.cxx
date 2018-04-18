@@ -35,14 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // For later!
 #include "mqSaveNTWDialogReaction.h"
 #include "mqUndoRedoReaction.h"
-#include "mqEditLMKDialogReaction.h"
-#include "mqCreateLMKDialogReaction.h"
-#include "mqEditFLGDialogReaction.h"
-#include "mqEditACTORDialogReaction.h"
+
 #include "mqMorphoDigCore.h"
 #include "mqOpenDataReaction.h"
 
-#include "mqDisplayReaction.h"
+
 
 #include <QToolButton>
 
@@ -57,10 +54,6 @@ void mqMainControlsToolbar::constructor()
   new mqSaveNTWDialogReaction(this->ui->actionSaveData);
   new mqOpenDataReaction(this->ui->actionOpenData, 0);//0= open data (generic)
  
-  new mqEditLMKDialogReaction(this->ui->actionEditLandmarks);
-  new mqCreateLMKDialogReaction(this->ui->actionCreateLandmark);
-  new mqEditFLGDialogReaction(this->ui->actionEditFlags);
-  new mqEditACTORDialogReaction(this->ui->actionEditActors);
   //new mqSaveDataReaction(this->ui->actionSaveData);
  
   new mqUndoRedoReaction(this->ui->actionUndo, true);
@@ -68,53 +61,7 @@ void mqMainControlsToolbar::constructor()
 
   
 
-  if (mqMorphoDigCore::instance()->Getmui_Anaglyph() == 1)
-  {
 
-	  this->ui->actionRendererAnaglyphToggle->setChecked(true);
-  }
-
-  if (mqMorphoDigCore::instance()->Getmui_ShowGrid() == 1)
-  {
-
-	  this->ui->actionGridToggle->setChecked(true);
-  }
-  if (mqMorphoDigCore::instance()->Getmui_ShowOrientationHelper() == 1)
-  {
-
-	  this->ui->actionOrientationHelperToggle->setChecked(true);
-  }
-
-
-  if (mqMorphoDigCore::instance()->Getmui_MoveAll() == 1)
-  {
-
-	  this->ui->actionMoveAll->setChecked(true);
-  }
-  else
-  {
-	  this->ui->actionMoveOnlyLandmarks->setChecked(true);
-  }
-
-
-  new mqDisplayReaction(this->ui->actionGridToggle, 0); //0 = display Grid Toggle
-  new mqDisplayReaction(this->ui->actionOrientationHelperToggle, 1); //1 = display Orientation Helper Toggle
-  new mqDisplayReaction(this->ui->actionRendererAnaglyphToggle, 2); //2 = display Anaglyph mode Toggle
-
-  int landmark_mode = mqMorphoDigCore::instance()->Getmui_LandmarkMode();
-  if (landmark_mode == 0) { this->ui->actionLandmarksModeNormal->setChecked(true); }
-  else if (landmark_mode == 1) { this->ui->actionLandmarksModeTarget->setChecked(true); }
-  else if (landmark_mode == 2) { this->ui->actionLandmarksModeNode->setChecked(true); }
-  else if (landmark_mode == 3) { this->ui->actionLandmarksModeHandle->setChecked(true); }
-  else { this->ui->actionLandmarksModeFlag->setChecked(true); }//4
-
-  connect(this->ui->actionLandmarksModeNormal, SIGNAL(triggered()), this, SLOT(slotLandmarkNormalMode()));
-  connect(this->ui->actionLandmarksModeTarget, SIGNAL(triggered()), this, SLOT(slotLandmarkTargetMode()));
-  connect(this->ui->actionLandmarksModeHandle, SIGNAL(triggered()), this, SLOT(slotLandmarkHandleMode()));
-  connect(this->ui->actionLandmarksModeNode, SIGNAL(triggered()), this, SLOT(slotLandmarkNodeMode()));
-  connect(this->ui->actionLandmarksModeFlag, SIGNAL(triggered()), this, SLOT(slotFlagMode()));
-  connect(this->ui->actionMoveAll, SIGNAL(triggered()), this, SLOT(slotMoveAll()));
-  connect(this->ui->actionMoveOnlyLandmarks, SIGNAL(triggered()), this, SLOT(slotMoveOnlyLandmarks()));
   
   
 }
@@ -122,82 +69,4 @@ void mqMainControlsToolbar::constructor()
 
 
 
-void mqMainControlsToolbar::slotMoveAll()
-{
-	
-		this->ui->actionMoveAll->setChecked(true);
-		this->ui->actionMoveOnlyLandmarks->setChecked(false);
 
-	
-	mqMorphoDigCore::instance()->Setmui_MoveAll(1);
-
-}
-
-void mqMainControlsToolbar::slotMoveOnlyLandmarks()
-{
-	
-
-		this->ui->actionMoveAll->setChecked(false);
-		this->ui->actionMoveOnlyLandmarks->setChecked(true);
-
-
-	
-
-	mqMorphoDigCore::instance()->Setmui_MoveAll(0);
-	mqMorphoDigCore::instance()->Render();
-
-}
-
-void mqMainControlsToolbar::slotLandmarkNormalMode()
-{
-	cout << "Landmark setting mode: 0" << endl;
-	
-	this->ui->actionLandmarksModeTarget->setChecked(false);
-	this->ui->actionLandmarksModeNode->setChecked(false);
-	this->ui->actionLandmarksModeHandle->setChecked(false);
-	this->ui->actionLandmarksModeFlag->setChecked(false);
-	mqMorphoDigCore::instance()->Setmui_LandmarkMode(0);
-	
-}
-void mqMainControlsToolbar::slotLandmarkTargetMode()
-{
-	cout << "Landmark setting mode: 1" << endl;
-	this->ui->actionLandmarksModeNormal->setChecked(false);
-	this->ui->actionLandmarksModeNode->setChecked(false);
-	this->ui->actionLandmarksModeHandle->setChecked(false);
-	this->ui->actionLandmarksModeFlag->setChecked(false);
-	mqMorphoDigCore::instance()->Setmui_LandmarkMode(1);
-
-}
-void mqMainControlsToolbar::slotLandmarkNodeMode()
-{
-	cout << "Landmark setting mode: 2" << endl;
-	this->ui->actionLandmarksModeNormal->setChecked(false);
-	this->ui->actionLandmarksModeTarget->setChecked(false);
-	this->ui->actionLandmarksModeHandle->setChecked(false);
-	this->ui->actionLandmarksModeFlag->setChecked(false);
-	mqMorphoDigCore::instance()->Setmui_LandmarkMode(2);
-}
-void mqMainControlsToolbar::slotLandmarkHandleMode()
-{
-	cout << "Landmark setting mode: 3" << endl;
-	this->ui->actionLandmarksModeNormal->setChecked(false);
-	this->ui->actionLandmarksModeTarget->setChecked(false);
-	this->ui->actionLandmarksModeNode->setChecked(false);
-	this->ui->actionLandmarksModeFlag->setChecked(false);
-	mqMorphoDigCore::instance()->Setmui_LandmarkMode(3);
-	
-
-}
-void mqMainControlsToolbar::slotFlagMode()
-{
-	cout << "Landmark setting mode: 4=flags" << endl;
-	this->ui->actionLandmarksModeNormal->setChecked(false);
-	this->ui->actionLandmarksModeTarget->setChecked(false);
-	this->ui->actionLandmarksModeNode->setChecked(false);
-	this->ui->actionLandmarksModeHandle->setChecked(false);
-	
-	mqMorphoDigCore::instance()->Setmui_LandmarkMode(4);
-
-
-}

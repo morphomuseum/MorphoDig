@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mqInteractionControlsToolbar</class>
+ <widget class="QToolBar" name="mqInteractionControlsToolbar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>268</width>
+    <height>34</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Interaction controls</string>
+  </property>
+  <property name="orientation">
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <action name="actionLandmarksModeNormal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks9.png</normaloff>
+     <normalon>:/Icons/landmarks9.png</normalon>:/Icons/landmarks9.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set &quot;normal&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Normal landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeTarget">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks6.png</normaloff>
+     <normalon>:/Icons/landmarks6.png</normalon>:/Icons/landmarks6.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set &quot;target&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Target landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeNode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks7.png</normaloff>
+     <normalon>:/Icons/landmarks7.png</normalon>:/Icons/landmarks7.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set curve &quot;node&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Curve Node landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeHandle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks5.png</normaloff>
+     <normalon>:/Icons/landmarks5.png</normalon>:/Icons/landmarks5.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set curve &quot;handle&quot; landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Curve Handle landmarks</string>
+   </property>
+  </action>
+  <action name="actionLandmarksModeFlag">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Flag01.png</normaloff>
+     <normalon>:/Icons/Flag01.png</normalon>:/Icons/Flag01.png</iconset>
+   </property>
+   <property name="text">
+    <string>Set Flag</string>
+   </property>
+   <property name="toolTip">
+    <string>Set Flag landmark</string>
+   </property>
+  </action>
+  <action name="actionMoveCamera">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/move3.png</normaloff>
+     <normalon>:/Icons/move3.png</normalon>:/Icons/move3.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move camera </string>
+   </property>
+   <property name="toolTip">
+    <string>Move camera (drag left click). Allows to select (drag right click) and subsequently move all objects (CTRL + drag left click)</string>
+   </property>
+  </action>
+  <action name="actionMoveOnlyLandmarks">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/landmarks2.png</normaloff>
+     <normalon>:/Icons/landmarks2.png</normalon>:/Icons/landmarks2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move only landmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Allow to select (right click) and subsequently move only landmarks (CTRL + mouse move)</string>
+   </property>
+  </action>
+  <action name="actionMoveObjects">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/move_mode2.png</normaloff>
+     <normalon>:/Icons/move_mode2.png</normalon>:/Icons/move_mode2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move all objects</string>
+   </property>
+   <property name="toolTip">
+    <string>Move selected objects (drag left click). Allows to select (drag right click). Camera can also be moved  (CTRL + drag left click).</string>
+   </property>
+  </action>
+  <addaction name="actionMoveCamera"/>
+  <addaction name="actionMoveObjects"/>
+  <addaction name="actionMoveOnlyLandmarks"/>
+  <addaction name="separator"/>
+  <addaction name="actionLandmarksModeNormal"/>
+  <addaction name="actionLandmarksModeTarget"/>
+  <addaction name="actionLandmarksModeNode"/>
+  <addaction name="actionLandmarksModeHandle"/>
+  <addaction name="actionLandmarksModeFlag"/>
+ </widget>
+ <resources>
+  <include location="../Icons/icons.qrc"/>
+  <include location="../Icons/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

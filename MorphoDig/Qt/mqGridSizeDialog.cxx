@@ -84,7 +84,7 @@ mqGridSizeDialog::mqGridSizeDialog(QWidget* Parent)
 	if (QString::compare(myUnit, nm, Qt::CaseInsensitive) == 0) { this->Ui->nm->setChecked(true); }
 	if (QString::compare(myUnit, m, Qt::CaseInsensitive) == 0) { this->Ui->m->setChecked(true); }
   
-	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditGridSize()));
+	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotEditGridSize()));
 	 connect(this->Ui->reinit, SIGNAL(clicked()), this, SLOT(slotReinitialize()));
 	 connect(this->Ui->hundredpxsu, SIGNAL(valueChanged(double)), this, SLOT(slotEditHundredPxSu()));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(zoomChanged()), this, SLOT(slotRefresh()));

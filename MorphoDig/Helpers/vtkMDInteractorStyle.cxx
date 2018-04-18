@@ -48,6 +48,24 @@
 vtkStandardNewMacro(vtkMDInteractorStyle);
 
 
+#define MOVECAM_CURSOR 0
+#define MOVEOBJ_CURSOR 1
+#define LMK_CURSOR 2
+#define SELECT_CURSOR 3
+#define LASSO_CURSOR 4
+#define PENCIL_CURSOR 5
+#define MAGICWAND_CURSOR 6
+#define PAINTBUCKET_CURSOR 7
+
+#define CAM 0
+#define OBJ 1
+
+#define MOVELMK_MODE 0
+#define MOVECAM_MODE 1
+#define MOVEOBJ_MODE 2
+
+
+
 #define NORMAL_LMK 0
 #define TARGET_LMK 1
 #define NODE_LMK 2
@@ -61,7 +79,7 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define LBUTTON_UP 1
 
 #define VTKISMT_ORIENT 0
-#define VTKISMT_SELECT 1
+#define VTKISMD_SELECT 1
 #define CTRL_RELEASED 0
 #define CTRL_PRESSED 1
 #define ALT_PRESSED 4
@@ -77,8 +95,9 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 {
 	this->CurrentMode = VTKISMT_ORIENT;
 	this->Alt = ALT_RELEASED;
-
+	//this->MoveMode = MOVECAM_MODE;
 	this->L = L_RELEASED;
+	this->MoveWhat = CAM;
 	this->Ctrl = CTRL_RELEASED;
 	this->LM_Button = LBUTTON_UP;
 	this->StartPosition[0] = this->StartPosition[1] = 0;
@@ -237,8 +256,8 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::StartSelect()
 {
-	this->CurrentMode = VTKISMT_SELECT;
-
+	this->CurrentMode = VTKISMD_SELECT;
+	mqMorphoDigCore::instance()->setCurrentCursor(4);
 }
 //--------------------------------------------------------------------------
   void vtkMDInteractorStyle::OnKeyPress()
@@ -249,6 +268,10 @@ void vtkMDInteractorStyle::StartSelect()
 	
 	// Output the key that was pressed
 	//cout << key << endl;
+	if (key.compare("Escape") == 0)
+	{
+		mqMorphoDigCore::instance()->SwitchMoveMode();
+	}
 	if (key.compare("Alt_L")==0)
 	{
 		this->Alt = ALT_PRESSED;
@@ -261,7 +284,10 @@ void vtkMDInteractorStyle::StartSelect()
 	if (key.compare("Control_L") == 0)
 	{
 		this->Ctrl = CTRL_PRESSED;
-		//std::cout << key<< "Pressed" << '\n';
+		
+		/*QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
+		QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+		//std::cout << key<< "Pressed" << '\n';*/
 	}
 	//cout << this->Interactor->GetKeyCode() << endl;
 	//cout << rwi->GetKeySym() << endl;
@@ -439,174 +465,184 @@ void vtkMDInteractorStyle::StartSelect()
 		{
 			this->Ctrl = CTRL_RELEASED;
 			cout << "Open Data!" << endl;
+			//mqMorphoDigCore::instance()->getUndoStack();
+			cout << "Open Data!" << endl;
 
-			QString fileName = QFileDialog::getOpenFileName(mqCoreUtilities::mainWidget(),
+
+			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
 				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.vtp)"));
 
-			//cout << fileName.toStdString() << endl;
-			if (fileName.isEmpty()) return;
-			QFileInfo fileInfo(fileName);
-			mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+			if (!filenames.isEmpty())
+			{
+				for (int i = 0; i < filenames.count(); i++)
+				{
+					QString fileName = filenames.at(i);
+					cout << fileName.toStdString() << endl;
+					if (fileName.isEmpty()) return;
+					QFileInfo fileInfo(fileName);
+					mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
 
-			std::string STLext(".stl");
-			std::string STLext2(".STL");
-			std::string VTKext(".vtk");
-			std::string VTKext2(".VTK");
-			std::string VTKext3(".vtp");
-			std::string VTKext4(".VTP");
-			std::string PLYext(".ply");
-			std::string PLYext2(".PLY");
-			std::string NTWext(".ntw");
-			std::string NTWext2(".NTW");
-			std::string VERext(".ver");
-			std::string VERext2(".VER");
-			std::string CURext(".cur");
-			std::string CURext2(".CUR");
-			std::string FLGext(".flg");
-			std::string FLGext2(".FLG");
-			std::string LMKext(".lmk");
-			std::string LMKext2(".LMK");
-			std::string TAGext(".tag");
-			std::string TAGext2(".TAG");
-			std::string STVext(".stv");
-			std::string STVext2(".STV");
-			std::string ORIext(".ori");
-			std::string ORIext2(".ORI");
-			std::string POSext(".pos");
-			std::string POSext2(".POS");
+					std::string STLext(".stl");
+					std::string STLext2(".STL");
+					std::string VTKext(".vtk");
+					std::string VTKext2(".VTK");
+					std::string VTKext3(".vtp");
+					std::string VTKext4(".VTP");
+					std::string PLYext(".ply");
+					std::string PLYext2(".PLY");
+					std::string NTWext(".ntw");
+					std::string NTWext2(".NTW");
+					std::string VERext(".ver");
+					std::string VERext2(".VER");
+					std::string CURext(".cur");
+					std::string CURext2(".CUR");
+					std::string FLGext(".flg");
+					std::string FLGext2(".FLG");
+					std::string LMKext(".lmk");
+					std::string LMKext2(".LMK");
+					std::string TAGext(".tag");
+					std::string TAGext2(".TAG");
+					std::string STVext(".stv");
+					std::string STVext2(".STV");
+					std::string ORIext(".ori");
+					std::string ORIext2(".ORI");
+					std::string POSext(".pos");
+					std::string POSext2(".POS");
 
-			int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
-			std::size_t found = fileName.toStdString().find(STLext);
-			std::size_t found2 = fileName.toStdString().find(STLext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 0;
-				//STL
-			}
+					int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
+					std::size_t found = fileName.toStdString().find(STLext);
+					std::size_t found2 = fileName.toStdString().find(STLext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 0;
+						//STL
+					}
 
-			found = fileName.toStdString().find(VTKext);
-			found2 = fileName.toStdString().find(VTKext2);
-			std::size_t found3 = fileName.toStdString().find(VTKext3);
-			std::size_t found4 = fileName.toStdString().find(VTKext4);
-			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
-			{
-				type = 1; //VTK
-			}
+					found = fileName.toStdString().find(VTKext);
+					found2 = fileName.toStdString().find(VTKext2);
+					std::size_t found3 = fileName.toStdString().find(VTKext3);
+					std::size_t found4 = fileName.toStdString().find(VTKext4);
+					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+					{
+						type = 1; //VTK
+					}
 
-			//std::cout << "2Type= " <<type<< std::endl;
-			found = fileName.toStdString().find(PLYext);
-			found2 = fileName.toStdString().find(PLYext2);
+					//std::cout << "2Type= " <<type<< std::endl;
+					found = fileName.toStdString().find(PLYext);
+					found2 = fileName.toStdString().find(PLYext2);
 
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 2; //PLY
-			}
-
-
-			//0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk
-			found = fileName.toStdString().find(NTWext);
-			found2 = fileName.toStdString().find(NTWext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 3; //NTW
-			}
-
-			//4 ver, 5 cur, 6 flg, 7 lmk
-			found = fileName.toStdString().find(VERext);
-			found2 = fileName.toStdString().find(VERext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 4; //VER
-			}
-
-			found = fileName.toStdString().find(CURext);
-			found2 = fileName.toStdString().find(CURext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 5; //CUR
-			}
-			found = fileName.toStdString().find(FLGext);
-			found2 = fileName.toStdString().find(FLGext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 6; //FLG
-			}
-			found = fileName.toStdString().find(LMKext);
-			found2 = fileName.toStdString().find(LMKext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 7; //LMK
-			}
-			found = fileName.toStdString().find(TAGext);
-			found2 = fileName.toStdString().find(TAGext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 8; //TAG
-			}
-			found = fileName.toStdString().find(STVext);
-			found2 = fileName.toStdString().find(STVext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 9; //STV
-			}
-			//8 tag, 9 stv, 10 ori, 11 pos
-			found = fileName.toStdString().find(ORIext);
-			found2 = fileName.toStdString().find(ORIext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 10; //ORI
-			}
-			found = fileName.toStdString().find(POSext);
-			found2 = fileName.toStdString().find(POSext2);
-			if (found != std::string::npos || found2 != std::string::npos)
-			{
-				type = 11; //POS
-			}
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 2; //PLY
+					}
 
 
-			if (type < 3)
-			{
-				mqMorphoDigCore::instance()->OpenMesh(fileName);
-			}
-			else if (type == 3)
-			{
-				mqMorphoDigCore::instance()->OpenNTW(fileName);
-			}
-			else if (type == 4)
-			{
-				mqMorphoDigCore::instance()->OpenVER(fileName, 0);
-			}
-			else if (type == 5)
-			{
-				mqMorphoDigCore::instance()->OpenCUR(fileName);
-			}
-			else if (type == 6)
-			{
-				mqMorphoDigCore::instance()->OpenFLG(fileName);
-			}
-			else if (type == 7)
-			{
-				mqMorphoDigCore::instance()->OpenLMK(fileName, 0);
-			}
-			else if (type == 8)
-			{
-				mqMorphoDigCore::instance()->OpenTAG(fileName);
-			}
-			else if (type == 9)
-			{
-				mqMorphoDigCore::instance()->OpenSTV(fileName);
-			}
-			else if (type == 10)
-			{
-				mqMorphoDigCore::instance()->OpenORI(fileName);
-			}
-			else if (type == 11)
-			{
-				mqMorphoDigCore::instance()->OpenPOS(fileName, 1);
-			}
+					//0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk
+					found = fileName.toStdString().find(NTWext);
+					found2 = fileName.toStdString().find(NTWext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 3; //NTW
+					}
+
+					//4 ver, 5 cur, 6 flg, 7 lmk
+					found = fileName.toStdString().find(VERext);
+					found2 = fileName.toStdString().find(VERext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 4; //VER
+					}
+
+					found = fileName.toStdString().find(CURext);
+					found2 = fileName.toStdString().find(CURext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 5; //CUR
+					}
+					found = fileName.toStdString().find(FLGext);
+					found2 = fileName.toStdString().find(FLGext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 6; //FLG
+					}
+					found = fileName.toStdString().find(LMKext);
+					found2 = fileName.toStdString().find(LMKext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 7; //LMK
+					}
+					found = fileName.toStdString().find(TAGext);
+					found2 = fileName.toStdString().find(TAGext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 8; //TAG
+					}
+					found = fileName.toStdString().find(STVext);
+					found2 = fileName.toStdString().find(STVext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 9; //STV
+					}
+					//8 tag, 9 stv, 10 ori, 11 pos
+					found = fileName.toStdString().find(ORIext);
+					found2 = fileName.toStdString().find(ORIext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 10; //ORI
+					}
+					found = fileName.toStdString().find(POSext);
+					found2 = fileName.toStdString().find(POSext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 11; //POS
+					}
 
 
+					if (type < 3)
+					{
+						mqMorphoDigCore::instance()->OpenMesh(fileName);
+					}
+					else if (type == 3)
+					{
+						mqMorphoDigCore::instance()->OpenNTW(fileName);
+					}
+					else if (type == 4)
+					{
+						mqMorphoDigCore::instance()->OpenVER(fileName, 0);
+					}
+					else if (type == 5)
+					{
+						mqMorphoDigCore::instance()->OpenCUR(fileName);
+					}
+					else if (type == 6)
+					{
+						mqMorphoDigCore::instance()->OpenFLG(fileName);
+					}
+					else if (type == 7)
+					{
+						mqMorphoDigCore::instance()->OpenLMK(fileName, 0);
+					}
+					else if (type == 8)
+					{
+						mqMorphoDigCore::instance()->OpenTAG(fileName);
+					}
+					else if (type == 9)
+					{
+						mqMorphoDigCore::instance()->OpenSTV(fileName);
+					}
+					else if (type == 10)
+					{
+						mqMorphoDigCore::instance()->OpenORI(fileName);
+					}
+					else if (type == 11)
+					{
+						mqMorphoDigCore::instance()->OpenPOS(fileName, 1);
+					}
+				}
+			}
+
+		
 			//  @@ to do!
 
 
@@ -736,6 +772,7 @@ void vtkMDInteractorStyle::StartSelect()
 	  {
 		  this->Alt = ALT_RELEASED;
 	  }
+
 	  if (key.compare("l") == 0)
 	  {
 		  this->L = L_RELEASED;
@@ -757,7 +794,7 @@ void vtkMDInteractorStyle::OnChar()
 		//r toggles the rubber band selection mode for mouse button 1
 		if (this->CurrentMode == VTKISMT_ORIENT)
 		{
-			this->CurrentMode = VTKISMT_SELECT;
+			this->CurrentMode = VTKISMD_SELECT;
 		}
 		else
 		{
@@ -821,6 +858,7 @@ void vtkMDInteractorStyle::Dolly(double factor)
 }
 void vtkMDInteractorStyle::RubberStart()
 {
+	mqMorphoDigCore::instance()->setCurrentCursor(4);
 	if (!this->Interactor)
 	{
 		return;
@@ -849,171 +887,239 @@ void vtkMDInteractorStyle::RubberStart()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnRightButtonDown()
 {
-	
+	//Special case: move landmark
+	if (this->L == L_PRESSED)
+	{
+		//int* clickPos = this->GetInteractor()->GetEventPosition();
+		int x = this->Interactor->GetEventPosition()[0];
+		int y = this->Interactor->GetEventPosition()[1];
+		//std::cout << "Clicked at "
+		//	<< x << " " << y << std::endl;
+		if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+		if (this->CurrentRenderer != NULL)
+		{
+			//std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+			// Pick from this location.
+			/* vtkSmartPointer<vtkPropPicker>  picker =
+			vtkSmartPointer<vtkPropPicker>::New();*/
+
+			vtkSmartPointer<vtkCellPicker> picker =
+				vtkSmartPointer<vtkCellPicker>::New();
+
+			picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+			double* pos = picker->GetPickPosition();
+			//std::cout << "Pick position (world coordinates) is: "
+			//	<< pos[0] << " " << pos[1]
+			//	<< " " << pos[2] << std::endl;
+			double* norm = picker->GetPickNormal();
+			//std::cout << "Pick normal : "
+			//	<< norm[0] << " " << norm[1]
+			//	<< " " << norm[2] << std::endl;
+
+			//std::cout << "Picked actor: " << picker->GetActor() << std::endl;
+			if (picker->GetActor() == NULL) {
+				cout << "Picked Null actor" << endl;
+			}
+			else
+			{
+				mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
+
+				mqMorphoDigCore::instance()->Render();
+			}
+
+		}
+		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+
+
+	}
+	else
+	{
+
+		this->ResetMoveWhat();
+		//Right drag:
+		// CAM mode: draw rubber band
+		// OBJ mode: draw rubber band if alt is not pressed
+		// OBJ mode : if alt is pressed, spin rotate actors 
+		if (this->MoveWhat == CAM || this->Alt != ALT_PRESSED)
+		
+		{
+			
+			if (this->Alt == ALT_PRESSED)
+			{
+				this->StartSpin();
+				this->Superclass::OnRightButtonDown();
+			}
+			else
+			{
+				this->CurrentMode = VTKISMD_SELECT;
+
+				this->RubberStart();
+			}
+		}
+		else // spin actors
+		{
+			this->ActorsPositionsSaved = 0;//allow to save position
+			int x = this->Interactor->GetEventPosition()[0];
+			int y = this->Interactor->GetEventPosition()[1];
+
+			this->FindPokedRenderer(x, y);
+			if (this->CurrentRenderer == NULL)
+			{
+				return;
+			}
+
+			this->GrabFocus(this->EventCallbackCommand);
+			this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
+			this->StartSpin();
+		}
+
+	}
+}
+void vtkMDInteractorStyle::ResetMoveWhat()
+{
+	int movemode = mqMorphoDigCore::instance()->Getmui_MoveMode();
 	if (this->Ctrl != CTRL_PRESSED)
 	{
-		if (this->L == L_PRESSED)
+		if (movemode != MOVEOBJ_MODE)
 		{
-				//int* clickPos = this->GetInteractor()->GetEventPosition();
-				int x = this->Interactor->GetEventPosition()[0];
-				int y = this->Interactor->GetEventPosition()[1];
-				//std::cout << "Clicked at "
-				//	<< x << " " << y << std::endl;
-				if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
-				if (this->CurrentRenderer != NULL)
-				{
-					//std::cout << "Current renderer:" << this->CurrentRenderer << endl;
-					// Pick from this location.
-					/* vtkSmartPointer<vtkPropPicker>  picker =
-					vtkSmartPointer<vtkPropPicker>::New();*/
-
-					vtkSmartPointer<vtkCellPicker> picker =
-						vtkSmartPointer<vtkCellPicker>::New();
-
-					picker->Pick(x, y, 0, this->CurrentRenderer);
-
-
-
-					double* pos = picker->GetPickPosition();
-					//std::cout << "Pick position (world coordinates) is: "
-					//	<< pos[0] << " " << pos[1]
-					//	<< " " << pos[2] << std::endl;
-					double* norm = picker->GetPickNormal();
-					//std::cout << "Pick normal : "
-					//	<< norm[0] << " " << norm[1]
-					//	<< " " << norm[2] << std::endl;
-
-					//std::cout << "Picked actor: " << picker->GetActor() << std::endl;
-					if (picker->GetActor() == NULL) { 
-						cout << "Picked Null actor" << endl; 
-					}
-					else
-					{
-						mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
-
-						mqMorphoDigCore::instance()->Render();
-					}
-
-				}
-				//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-
-
-			}
+			this->MoveWhat = CAM;
+		}
 		else
 		{
-
-			this->CurrentMode = VTKISMT_SELECT;
-			this->RubberStart();
+			this->MoveWhat = OBJ;
 		}
 	}
 	else
 	{
-		this->ActorsPositionsSaved = 0;//allow to save position
-		int x = this->Interactor->GetEventPosition()[0];
-		int y = this->Interactor->GetEventPosition()[1];
-
-		this->FindPokedRenderer(x, y);
-		if (this->CurrentRenderer == NULL)
+		if (movemode != MOVEOBJ_MODE)
 		{
-			return;
+			this->MoveWhat = OBJ;
+		}
+		else
+		{
+			this->MoveWhat = CAM;
 		}
 
-		this->GrabFocus(this->EventCallbackCommand);
-		this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
-		this->StartSpin();
 	}
-
+	if (this->MoveWhat == CAM)
+	{
+		mqMorphoDigCore::instance()->setCurrentCursor(CAM);
+	}
+	else
+	{
+		mqMorphoDigCore::instance()->setCurrentCursor(OBJ);
+	}
 	
 }
 void vtkMDInteractorStyle::OnLeftButtonDown()
 {
 	//cout << "Left button down!" << endl;
 	this->LM_Button = LBUTTON_DOWN;
-  if (this->CurrentMode != VTKISMT_SELECT)
+	
+  if (this->CurrentMode != VTKISMD_SELECT)
   {
     //if not in rubber band mode, let the parent class handle it
 	  //this->Interactor->GetControlKey()
-	  if (this->Ctrl != CTRL_PRESSED)
+
+	  //special case : landmark setting!
+	  if (this->L == L_PRESSED && this->Ctrl != CTRL_PRESSED)
 	  {
-		  if (this->L==L_PRESSED)
-		  { 
-		  
-			  //int* clickPos = this->GetInteractor()->GetEventPosition();
-			  int x = this->Interactor->GetEventPosition()[0];
-			  int y = this->Interactor->GetEventPosition()[1];
-			 // std::cout << "Clicked at "
-			//	  << x << " " << y   << std::endl;
-			  if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
-			  if (this->CurrentRenderer != NULL)
+
+		  //int* clickPos = this->GetInteractor()->GetEventPosition();
+		  int x = this->Interactor->GetEventPosition()[0];
+		  int y = this->Interactor->GetEventPosition()[1];
+		  // std::cout << "Clicked at "
+		  //	  << x << " " << y   << std::endl;
+		  if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+		  if (this->CurrentRenderer != NULL)
+		  {
+			  //	  std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+			  // Pick from this location.
+			  /* vtkSmartPointer<vtkPropPicker>  picker =
+			  vtkSmartPointer<vtkPropPicker>::New();*/
+
+			  vtkSmartPointer<vtkCellPicker> picker =
+				  vtkSmartPointer<vtkCellPicker>::New();
+
+			  picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+			  double* pos = picker->GetPickPosition();
+			  //  std::cout << "Pick position (world coordinates) is: "
+			  //	  << pos[0] << " " << pos[1]
+			  //	  << " " << pos[2] << std::endl;
+			  double* norm = picker->GetPickNormal();
+			  //  std::cout << "Pick normal : "
+			  //	  << norm[0] << " " << norm[1]
+			  //	  << " " << norm[2] << std::endl;
+
+			  //  std::cout << "Picked actor: " << picker->GetActor() << std::endl;
+			  if (picker->GetActor() == NULL) { cout << "Picked Null actor" << endl; }
+			  else
 			  {
-			//	  std::cout << "Current renderer:" << this->CurrentRenderer << endl;
-				  // Pick from this location.
-				 /* vtkSmartPointer<vtkPropPicker>  picker =
-					  vtkSmartPointer<vtkPropPicker>::New();*/
-				
-				  vtkSmartPointer<vtkCellPicker> picker =
-					  vtkSmartPointer<vtkCellPicker>::New();
+				  mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
 
-				  picker->Pick(x, y, 0, this->CurrentRenderer);
-
-
-				 
-				  double* pos = picker->GetPickPosition();
-				//  std::cout << "Pick position (world coordinates) is: "
-				//	  << pos[0] << " " << pos[1]
-				//	  << " " << pos[2] << std::endl;
-				  double* norm = picker->GetPickNormal();
-				//  std::cout << "Pick normal : "
-				//	  << norm[0] << " " << norm[1]
-				//	  << " " << norm[2] << std::endl;
-
-				//  std::cout << "Picked actor: " << picker->GetActor() << std::endl;
-				  if (picker->GetActor() == NULL) { cout << "Picked Null actor" << endl; }
-				  else
-				  {
-					  mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
-
-					  mqMorphoDigCore::instance()->Render();
-				  }
-
+				  mqMorphoDigCore::instance()->Render();
 			  }
-			  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-			
+
+		  }
+		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+
+
+	  }//left button down, no landmark 
+	  else
+	  { // left mouse pressed, no 
+		  this->ResetMoveWhat();
 		  
-		  }		  
-		  else
+
+		  if (this->MoveWhat==CAM)
 		  {
 			  if (this->Alt == ALT_PRESSED)
 			  {
 				  this->StartSpin();
 			  }
-			  this->Superclass::OnLeftButtonDown();		
-			
-		  }
-	  }
-	  else
-	  {
-		  this->ActorsPositionsSaved = 0;//allow to save position
-		  int x = this->Interactor->GetEventPosition()[0];
-		  int y = this->Interactor->GetEventPosition()[1];
+			  this->Superclass::OnLeftButtonDown();
 
-		  this->FindPokedRenderer(x, y);
-		  //this->FindPickedActor(x, y);
-		  if (this->CurrentRenderer == NULL )
+
+		  }
+		  else
 		  {
-			  return;
+			  this->ActorsPositionsSaved = 0;//allow to save position
+			  int x = this->Interactor->GetEventPosition()[0];
+			  int y = this->Interactor->GetEventPosition()[1];
+
+			  this->FindPokedRenderer(x, y);
+			  //this->FindPickedActor(x, y);
+			  if (this->CurrentRenderer == NULL)
+			  {
+				  return;
+			  }
+
+			  this->GrabFocus(this->EventCallbackCommand);
+
+			  //cout << "Start Rotate CTRL" << endl;
+			  this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
+			  if (this->Alt == ALT_PRESSED)
+			  {
+				  this->StartSpin();
+			  }
+			  else
+			  {
+				  this->StartRotate();
+			  }
+			  
+
+
 		  }
-
-		  this->GrabFocus(this->EventCallbackCommand);
-		 
-		  //cout << "Start Rotate CTRL" << endl;
-		  this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
-		  this->StartRotate();
-		 
-
+		  
 	  }
-    return;
+	  return;
   }
+  //REALLY??? 
   this->RubberStart();
 
   
@@ -1205,9 +1311,11 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnMouseMove()
 {
-  if (this->CurrentMode != VTKISMT_SELECT )
+  if (this->CurrentMode != VTKISMD_SELECT )
   {
-	  if (this->Ctrl != CTRL_PRESSED)
+	 // this->ResetMoveWhat();
+	  //if (this->Ctrl != CTRL_PRESSED)
+	  if (this->MoveWhat == CAM)
 	  {
 		  //let the parent class handle it
 		  this->Superclass::OnMouseMove();
@@ -1217,7 +1325,7 @@ void vtkMDInteractorStyle::OnMouseMove()
 			  mqMorphoDigCore::instance()->ActivateClippingPlane();
 		  }
 	  }
-	  else
+	  else // MoveWhat = objects
 	  {
 		 
 		  //copied from Trackball Actor
@@ -1288,6 +1396,8 @@ void vtkMDInteractorStyle::OnMouseMove()
 
 void vtkMDInteractorStyle::RubberStop()
 {
+	
+	mqMorphoDigCore::instance()->setCurrentCursor(this->MoveWhat);
 	if (!this->Interactor || !this->Moving)
 	{
 		return;
@@ -1304,12 +1414,17 @@ this->Moving = 0;
 
 void vtkMDInteractorStyle::OnRightButtonUp()
 {	
-	if (this->CurrentMode != VTKISMT_SELECT)
+	if (this->CurrentMode != VTKISMD_SELECT)
 	{
 		
-		if (this->Ctrl != CTRL_PRESSED)
+		//this->ResetMoveWhat();
+
+		//if (this->Ctrl != CTRL_PRESSED)
+		if (this->MoveWhat == CAM)
 		{
 			//if not in rubber band mode,  let the parent class handle it
+			
+			
 			this->Superclass::OnRightButtonUp();
 		}
 		else
@@ -1342,15 +1457,20 @@ void vtkMDInteractorStyle::OnRightButtonUp()
 	}
 	this->RubberStop();	
 	this->CurrentMode = VTKISMT_ORIENT;
+	this->Alt = ALT_RELEASED;
 }
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnLeftButtonUp()
 {
 	this->LM_Button = LBUTTON_UP;
-  if (this->CurrentMode != VTKISMT_SELECT)
+  if (this->CurrentMode != VTKISMD_SELECT)
   {
-	  if (this->Ctrl != CTRL_PRESSED)
-	  {
+	 // this->ResetMoveWhat();
+
+	  //if (this->Ctrl != CTRL_PRESSED)
+	  if (this->MoveWhat == CAM)
+	  {	  
+	  
 		  //if not in rubber band mode,  let the parent class handle it
 		  this->Superclass::OnLeftButtonUp();
 	  }
@@ -1380,13 +1500,18 @@ void vtkMDInteractorStyle::OnLeftButtonUp()
     return;
   }
   this->RubberStop();
+  this->Alt = ALT_RELEASED;
 
 }
 
 void vtkMDInteractorStyle::OnMiddleButtonDown()
 {
-	if (this->Ctrl != CTRL_PRESSED)
+	this->ResetMoveWhat();
+
+	//if (this->Ctrl != CTRL_PRESSED)
+	if (this->MoveWhat == CAM)
 	{
+		
 		//if not in rubber band mode,  let the parent class handle it
 		this->Superclass::OnMiddleButtonDown();
 	}
@@ -1416,11 +1541,14 @@ void vtkMDInteractorStyle::OnMiddleButtonDown()
 //----------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnMiddleButtonUp()
 {
-	if (this->CurrentMode != VTKISMT_SELECT)
+	if (this->CurrentMode != VTKISMD_SELECT)
 	{
+		//this->ResetMoveWhat();
 
-		if (this->Ctrl != CTRL_PRESSED)
+		//if (this->Ctrl != CTRL_PRESSED)
+		if (this->MoveWhat == CAM)
 		{
+
 			//if not in rubber band mode,  let the parent class handle it
 			this->Superclass::OnMiddleButtonUp();
 		}

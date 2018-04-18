@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>35</width>
-    <height>43</height>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Light controls</string>
+   <string>Actors controls</string>
   </property>
   <property name="orientation">
    <enum>Qt::Vertical</enum>
@@ -29,7 +29,94 @@
     <string>Delete selected objects</string>
    </property>
   </action>
+  <action name="actionEditLandmarks">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lmk_edit.png</normaloff>
+     <normalon>:/Icons/Lmk_edit.png</normalon>:/Icons/Lmk_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit first selected landmarks coordinates</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit first selected landmarks coordinates</string>
+   </property>
+  </action>
+  <action name="actionCreateLandmark">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lmk_xyz.png</normaloff>
+     <normalon>:/Icons/Lmk_xyz.png</normalon>:/Icons/Lmk_xyz.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create landmark at X,Y,Z</string>
+   </property>
+   <property name="toolTip">
+    <string>Create landmark at X,Y,Z</string>
+   </property>
+  </action>
+  <action name="actionEditFlags">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Flag02.png</normaloff>
+     <normalon>:/Icons/Flag02.png</normalon>:/Icons/Flag02.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit first selected flag label length and color</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit first selected flag label length and color</string>
+   </property>
+  </action>
+  <action name="actionEditActors">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/actor_edit.png</normaloff>
+     <normalon>:/Icons/actor_edit.png</normalon>:/Icons/actor_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit first selected surface object</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit first selected object name, color and matrix</string>
+   </property>
+  </action>
+  <action name="actionLassoCutKeepInside">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lasso_keepinside.png</normaloff>
+     <normalon>:/Icons/Lasso_keepinside.png</normalon>:/Icons/Lasso_keepinside.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lasso cut: keep inside selected area</string>
+   </property>
+   <property name="toolTip">
+    <string>Lasso cut : keep inside selected area</string>
+   </property>
+  </action>
+  <action name="actionLassoCutKeepOutside">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/Lasso_keepoutside.png</normaloff>
+     <normalon>:/Icons/Lasso_keepoutside.png</normalon>:/Icons/Lasso_keepoutside.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lasso cut: keep outside selected area</string>
+   </property>
+   <property name="toolTip">
+    <string>Lasso cut : keep outside selected area</string>
+   </property>
+  </action>
   <addaction name="actionDelete"/>
+  <addaction name="separator"/>
+  <addaction name="actionCreateLandmark"/>
+  <addaction name="separator"/>
+  <addaction name="actionEditActors"/>
+  <addaction name="actionEditLandmarks"/>
+  <addaction name="actionEditFlags"/>
+  <addaction name="separator"/>
+  <addaction name="actionLassoCutKeepInside"/>
+  <addaction name="actionLassoCutKeepOutside"/>
  </widget>
  <resources>
   <include location="../Icons/icons.qrc"/>

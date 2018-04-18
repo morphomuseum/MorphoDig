@@ -8,15 +8,24 @@ Module:    vtkMDActor.cxx
 
 #include <vtkObjectFactory.h>
 #include <vtkMath.h>
+#include <vtkDataArray.h>
+#include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkProperty.h>
 #include <vtkTexture.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
+#include <vtkPointData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkTransform.h>
 #include <vtkPolyData.h>
+#include <vtkDoubleArray.h>
+#include <vtkUnsignedIntArray.h>
+#include <vtkFloatArray.h>
+#include <vtkIntArray.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkPlane.h>
+#include <QString>
 vtkStandardNewMacro(vtkMDActor);
 
 
@@ -27,7 +36,7 @@ vtkMDActor::vtkMDActor()
 	vtkSmartPointer<vtkProperty> backFaces =
 		vtkSmartPointer<vtkProperty>::New();
 	//backFaces->SetDiffuseColor(.8, .8, .8);
-	backFaces->SetColor(.8, .8, .8);
+	backFaces->SetColor(.7, .7, .7);
 	backFaces->SetOpacity(0.5);
 
 	this->SetBackfaceProperty(backFaces);
@@ -262,10 +271,83 @@ void vtkMDActor::PopUndoStack()
 	vtkSmartPointer<vtkMatrix4x4> SavedMat = vtkSmartPointer<vtkMatrix4x4>::New();
 	SavedMat->DeepCopy(Mat);
 	// Now put undo Matrix inside object : 
+	vtkSmartPointer<vtkDataArray> toRestoreArray = nullptr;
+	//auto toRestoreArray = vtkSmartPointer<vtkDataArray>::New();	
+	vtkDataArray *toSaveArray;
+	toSaveArray = NULL;
+	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
+	//savedArray = NULL;
+
+	if (this->UndoRedo->UndoStack.back().arrayName.isEmpty() == false)
+	{ // potentially, we have to replace current scalar.
+		toSaveArray = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->UndoStack.back().arrayName.toStdString().c_str());;
+		
+		if (toSaveArray != NULL)
+		{
+			cout << "Here something wrong! deep copy array " << this->UndoRedo->UndoStack.back().arrayName.toStdString() << endl;
+			
+			int dataType = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->UndoStack.back().arrayName.toStdString().c_str())->GetDataType();
+
+			if (dataType == VTK_UNSIGNED_CHAR) {
+				savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+			}
+			else if (dataType == VTK_UNSIGNED_INT) {
+				savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
+			}
+			else if (dataType == VTK_INT) {
+				savedArray = vtkSmartPointer<vtkIntArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//cout << "Array" << i << " contains INTs" << endl; 
+			}
+			else if (dataType == VTK_FLOAT) {
+				savedArray = vtkSmartPointer<vtkFloatArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+
+				//cout << "Array" << i << " contains FLOATs" << endl; 
+			}
+			else if (dataType == VTK_DOUBLE) {
+				savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				savedArray->DeepCopy(toSaveArray);
+				//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+			}
+			else
+			{
+				//savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				//savedArray->DeepCopy(toSaveArray);
+			}
+
+			
+
+			/*savedArray= vtkSmartPointer<vtkDoubleArray>::New();
+			savedArray->DeepCopy(toSaveArray);*/
+		}
+		
+		toRestoreArray = this->UndoRedo->UndoStack.back().sauvArray;
+		cout << "try to remove array" << this->UndoRedo->UndoStack.back().arrayName.toStdString() << endl;
+		this->GetMapper()->GetInput()->GetPointData()->RemoveArray(this->UndoRedo->UndoStack.back().arrayName.toStdString().c_str());
+		if (toRestoreArray !=nullptr)
+		{
+			cout << "try to restore array found in undo stack" << endl;
+			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
+			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
+		}
+		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+		
+		
+		
+	}
+
+
+
+
 	Mat->DeepCopy(this->UndoRedo->UndoStack.back().Matrix);
 	
-	std::cout << "Old Matrix: " << endl << *SavedMat << std::endl;
-	std::cout << "New Matrix: " << endl << *Mat << std::endl;
+	//std::cout << "Old Matrix: " << endl << *SavedMat << std::endl;
+	//std::cout << "New Matrix: " << endl << *Mat << std::endl;
 
 	/*vtkProp3D *prop3D = vtkProp3D::SafeDownCast(this);
 	vtkTransform *newTransform = vtkTransform::New();
@@ -279,7 +361,7 @@ void vtkMDActor::PopUndoStack()
 
 
 	this->GetMatrix(Mat);
-	std::cout << "Real Matrix: " << endl << *Mat << std::endl;
+	//std::cout << "Real Matrix: " << endl << *Mat << std::endl;
 
 	
 	
@@ -297,7 +379,7 @@ void vtkMDActor::PopUndoStack()
 	this->Name = this->UndoRedo->UndoStack.back().Name;
 	//cout << "Undo name: " << this->UndoRedo->UndoStack.back().Name;
 	cout << "PopUndoStack Set Selected: " << mCurrentSelected << endl;
-	this->UndoRedo->RedoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name));
+	this->UndoRedo->RedoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name, this->UndoRedo->UndoStack.back().arrayName, savedArray));
 	this->UndoRedo->UndoStack.pop_back();
 	this->Modified();
 }
@@ -311,6 +393,40 @@ void vtkMDActor::PopRedoStack()
 	this->GetMatrix(Mat);
 	vtkSmartPointer<vtkMatrix4x4> SavedMat = vtkSmartPointer<vtkMatrix4x4>::New();
 	SavedMat->DeepCopy(Mat);
+
+	vtkSmartPointer<vtkDataArray> toRestoreArray = nullptr;
+	//auto toRestoreArray = vtkSmartPointer<vtkDataArray>::New();	
+	vtkDataArray *toSaveArray;
+	toSaveArray = NULL;
+	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
+	
+
+	if (this->UndoRedo->RedoStack.back().arrayName.isEmpty() == false)
+	{ // potentially, we have to replace current scalar.
+		toSaveArray = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->RedoStack.back().arrayName.toStdString().c_str());;
+
+		if (toSaveArray != NULL)
+		{
+			savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+			savedArray->DeepCopy(toSaveArray);
+			cout << "POPREDO: deep copy array" << this->UndoRedo->RedoStack.back().arrayName.toStdString() << endl;
+		}
+
+		toRestoreArray = this->UndoRedo->RedoStack.back().sauvArray;
+		cout << "POPREDO: try to remove array" << this->UndoRedo->RedoStack.back().arrayName.toStdString() << endl;
+		this->GetMapper()->GetInput()->GetPointData()->RemoveArray(this->UndoRedo->RedoStack.back().arrayName.toStdString().c_str());
+		if (toRestoreArray != nullptr)
+		{
+			cout << "POPREDO: try to restor array found in redo stack"  << endl;
+			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
+			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
+		}
+		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+
+	}
+
+	
+
 	// Now put redp Matrix inside object : 
 	Mat->DeepCopy(this->UndoRedo->RedoStack.back().Matrix);
 	/*vtkProp3D *prop3D = vtkProp3D::SafeDownCast(this);
@@ -322,7 +438,7 @@ void vtkMDActor::PopRedoStack()
 	prop3D->SetOrientation(newTransform->GetOrientation());
 	newTransform->Delete();*/
 	this->ApplyMatrix(Mat);
-
+	
 	double myCurrentColor[4];
 	int mCurrentSelected = this->Selected;
 	myCurrentColor[0] = this->mColor[0];
@@ -336,19 +452,20 @@ void vtkMDActor::PopRedoStack()
 	this->SetSelected(this->UndoRedo->RedoStack.back().Selected);
 	cout << "PopRedoStack Set Selected: " << mCurrentSelected << endl;
 	this->Name = this->UndoRedo->RedoStack.back().Name;
-	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name));
+
+
+	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name, this->UndoRedo->RedoStack.back().arrayName, savedArray));
 	this->UndoRedo->RedoStack.pop_back();
 	this->Modified();
 }
 
-void vtkMDActor::SaveState(int mCount)
+void vtkMDActor::SaveState(int mCount, QString arrayToSave)
 {
 	//cout << "myActor Save Position: redostack clear." << endl;
 	this->UndoRedo->RedoStack.clear();
 
 	//int Count = 2;//MorphoDig::instance()->GetUndoCount()+1;
 	int Count = mCount;
-
 	
 	// détruit ce qui est trop vieux dans le vector!
 	//to do!
@@ -365,8 +482,32 @@ void vtkMDActor::SaveState(int mCount)
 	//cout << "Save name=" << name << endl;
 	vtkSmartPointer<vtkMatrix4x4> SavedMat = vtkSmartPointer<vtkMatrix4x4>::New();
 	SavedMat->DeepCopy(Mat);
+
+	vtkDataArray *myArray;
+	myArray = NULL;
+	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
+	
+	if (arrayToSave.isEmpty() == false)
+	{ // potentially, we have to replace current scalar.
+		
+		myArray = this->GetMapper()->GetInput()->GetPointData()->GetScalars(arrayToSave.toStdString().c_str());;
+		cout << "Try to get " << arrayToSave.toStdString() << "array" << endl;
+		if (myArray != NULL)
+		{
+			savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+			savedArray->DeepCopy(myArray);
+			cout << "Have deep copied " << arrayToSave.toStdString() << "array" << endl;
+		
+		}
+		
+
+		//toRestoreArray = this->GetMapper()->GetInput()->GetPointData()->
+		//vtkDataArray *mScalars = actor->GetMapper()->GetInput()->GetPointData()->GetScalars(oldScalarName.toStdString().c_str());
+	}
+
+
 	//std::cout << "Saved Matrix Copy: " << endl << *SavedMat << std::endl;
-	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myColor, mSelected, mCount, name));
+	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myColor, mSelected, mCount, name, arrayToSave, savedArray));
 
 }
 //----------------------------------------------------------------------------

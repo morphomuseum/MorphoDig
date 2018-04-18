@@ -1,5 +1,18 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
+ <qresource prefix="/Cursors">
+ <file>Lasso_add.png</file>
+ <file>move3.png</file>
+ <file>move_mode2.png</file>
+ <file>select_mode2.png</file>
+   <file>Lasso_keepinside.png</file>
+   <file>Lasso_keepoutside.png</file>
+   <file>pencil.png</file>
+   <file>Flood_fill.png</file>
+   <file>magic_wand.png</file>
+
+
+  </qresource>
   <qresource prefix="/Logos">
 <file>Logo_software.png</file>
   </qresource>
@@ -7,9 +20,12 @@
   <!-- Application Icon. -->
  <file>MorphoDig.ico</file>
     <!-- Typical file operations. -->
+   <file>Lasso_sub.png</file>
+   <file>Lasso_keepinside.png</file>
+   <file>Lasso_keepoutside.png</file>
     <file>fileopen.png</file>
     <file>filesave.png</file>
- 
+
     <file>delete.png</file>
     <file>delete2.png</file>
     <!-- Help -->
@@ -40,6 +56,9 @@
   <file>grid.png</file>
   <file>orientation_helper.png</file>
  <file>move.png</file>
+ <file>move2.png</file>
+ <file>move3.png</file>
+ <file>move_mode2.png</file>
  <file>move_cam.png</file>
  <file>move_cam2.png</file>
  <file>camera_ortho.png</file>

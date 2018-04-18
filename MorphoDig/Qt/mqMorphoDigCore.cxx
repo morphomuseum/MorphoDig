@@ -11,6 +11,9 @@
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
+#include <vtkRenderWindowInteractor.h>
+#include <vtkKdTreePointLocator.h>
+#include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
 #include <vtkMaskFields.h>
 #include <vtkActor.h>
@@ -27,6 +30,7 @@
 #include <vtkPiecewiseFunction.h>
 #include <vtkCellPicker.h>
 #include <vtkProperty.h>
+#include <vtkCurvatures.h>
 #include <vtkPointData.h>
 #include <vtkCellData.h>
 #include <vtkPolyDataMapper.h>
@@ -67,6 +71,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QInputDialog>
 #include <QProgressDialog>
 
 #include "mqUndoStack.h"
@@ -98,6 +103,10 @@ mqMorphoDigCore::mqMorphoDigCore()
 {
 
 	mqMorphoDigCore::Instance = this;
+	this->qvtkWidget = NULL;
+	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
+	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
+	this->currentLassoMode = 0; // 
 	this->ScalarRangeMin = 0;
 	this->ScalarRangeMax = 1;
 	this->mui_ClippingPlane = 0; // no x=0 clipping plane by default
@@ -113,7 +122,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	cout << "try to create mui_ActiveScalars" << endl;
 	this->mui_ActiveScalars = new ActiveScalars;
 	this->mui_ExistingScalars = new ExistingScalars;
-
+	this->mui_ScalarsList = new ExistingScalars;
 	this->ScalarBarActor = vtkSmartPointer<vtkScalarBarActor>::New();
 	this->ScalarBarActor->SetOrientationToHorizontal();
 	this->ScalarBarActor->SetHeight(0.1);
@@ -144,7 +153,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_GridSpacing = this->mui_DefaultGridSpacing = 10;
 	this->mui_SizeUnit = this->mui_DefaultSizeUnit = "mm";
 
-	this->mui_MoveAll = this->mui_DefaultMoveAll = 1;
+	this->mui_MoveMode = this->mui_DefaultMoveMode = 1;
 	this->mui_FlagColor[0] = this->mui_DefaultFlagColor[0] = 0;
 	this->mui_FlagColor[1] = this->mui_DefaultFlagColor[1] = 0.7;
 	this->mui_FlagColor[2] = this->mui_DefaultFlagColor[2] = 0.7;
@@ -324,6 +333,8 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	//this->ActorCollection->Delete();
 	this->mui_ExistingScalars->Stack.clear();
 	delete this->mui_ExistingScalars;
+	this->mui_ScalarsList->Stack.clear();
+	delete this->mui_ScalarsList;
 	delete this->mui_ActiveScalars;
 
 	this->mui_ExistingColorMaps->Stack.clear();
@@ -334,6 +345,22 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	{
 		mqMorphoDigCore::Instance = 0;
 	}
+}
+
+
+void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget) 
+{
+	this->qvtkWidget = mqvtkWidget;
+}
+
+QVTKOpenGLWidget* mqMorphoDigCore::getQVTKWidget() { return this->qvtkWidget; }
+void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
+{
+	this->Style = mStyle;
+}
+void mqMorphoDigCore::SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyleDrawPolygon> mLassoStyle)
+{
+	this->LassoStyle = mLassoStyle;
 }
 void mqMorphoDigCore::ActivateClippingPlane()
 {
@@ -346,10 +373,9 @@ void mqMorphoDigCore::ActivateClippingPlane()
 		
 		this->getRenderer()->GetActiveCamera()->GetPosition(cameracentre);
 		this->getRenderer()->GetActiveCamera()->GetFocalPoint(camerafocalpoint);
-		double dist = sqrt((cameracentre[0] - camerafocalpoint[0])*(cameracentre[0] - camerafocalpoint[0])
-		+ (cameracentre[1] - camerafocalpoint[1])*(cameracentre[1] - camerafocalpoint[1])
-			+ (cameracentre[2] - camerafocalpoint[2])*(cameracentre[2] - camerafocalpoint[2])
-		);
+	
+
+		double dist = sqrt(vtkMath::Distance2BetweenPoints(cameracentre, camerafocalpoint));
 		this->getRenderer()->GetActiveCamera()->GetClippingRange(cr);
 
 		this->getRenderer()->GetActiveCamera()->SetClippingRange(dist, cr[1]);
@@ -626,10 +652,11 @@ void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
 		{
 			double curr = pts[4 * j];
 			cout << "x" << j << "=" << curr << endl;
-			//if (curr < old_min) { old_min = curr; }
+			if (curr < old_min) { old_min = curr; }
 			if (curr > old_max) { old_max = curr; }
 
 		}
+		cout << "old max:" << old_max << ", old min:" << old_min << endl;
 		if (old_max > old_min)
 		{
 			double old_range = old_max - old_min;
@@ -639,7 +666,7 @@ void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
 			for (int k = 0; k < numnodes; k++)
 			{
 				pts[4 * k] = pts[4 * k] * mult + c;
-				//cout << "nx" << k << "=" << pts[4 * k] << endl;
+				cout << "nx" << k << "=" << pts[4 * k] << endl;
 			}
 			CM->FillFromDataPointer(numnodes, pts);
 
@@ -707,12 +734,12 @@ void mqMorphoDigCore::InitLuts()
 	this->ScalarRainbowLut->AddRGBPoint(0.8, 1.0, 1.0, 0.0); //# yellow
 	this->ScalarRainbowLut->AddRGBPoint(1.0, 1.0, 0.0, 0.0); //# red
 	vtkSmartPointer<vtkPiecewiseFunction> opacityRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
-
+	
 	opacityRfunction->AddPoint(0, 0.3);
 	opacityRfunction->AddPoint(0.2, 0.6);
 	opacityRfunction->AddPoint(0.8, 0.8);
 	opacityRfunction->AddPoint(1, 1);
-
+	//opacityRfunction->AddPoint(1.0001, 0);
 	this->ScalarRainbowLut->SetScalarOpacityFunction(opacityRfunction);
 	this->ScalarRainbowLut->EnableOpacityMappingOn();
 	this->ScalarRainbowLut->Build();
@@ -833,20 +860,20 @@ void mqMorphoDigCore::ComputeSelectedNamesLists()
 	
 }
 
-int mqMorphoDigCore::context_file_exists(std::string path, std::string ext, std::string postfix)
+int mqMorphoDigCore::context_file_exists(QString path, QString ext, QString postfix)
 {
 	// used by the save NTW function : 
 	//looks whether a non-mesh related file = context file (.ori, .flg, .tag, .ver, .cur, .stv) constructed with only a postfix + extension (project name) already exists 
-	std::string filename;
+	QString filename;
 	int exists = 0;
 
-	filename = path.c_str();
+	filename = path;
 	if (postfix.length()>0)
 	{
-		filename.append(postfix.c_str());
+		filename = filename + postfix;
 	}
-	filename.append(ext.c_str());
-	ifstream file(filename.c_str());
+	filename += ext;
+	ifstream file(filename.toLocal8Bit());
 	if (file)
 	{
 		file.close();
@@ -855,22 +882,22 @@ int mqMorphoDigCore::context_file_exists(std::string path, std::string ext, std:
 	return exists;
 }
 
-int mqMorphoDigCore::selected_file_exists(std::string path, std::string ext, std::string postfix)
+int mqMorphoDigCore::selected_file_exists(QString path, QString ext, QString postfix)
 {
 	// used by the save NTW function : 
 	//looks whether mesh related files (vtk, vtp, stl, ply, pos) constructed with a prefix (object name) and a postfix (project name) already exist 
-	std::string filename;
+	QString filename;
 	int exists = 0;
 	for (int i = 0; i<g_distinct_selected_names.size(); i++)
 	{
-		filename = path.c_str();
+		filename = path;
 		filename.append(g_distinct_selected_names.at(i).c_str());
 		if (postfix.length()>0)
 		{
-			filename.append(postfix.c_str());
+			filename += postfix;
 		}
-		filename.append(ext.c_str());
-		ifstream file(filename.c_str());
+		filename += ext;;
+		ifstream file(filename.toLocal8Bit());
 		if (file)
 		{
 			file.close();
@@ -1177,16 +1204,16 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 	//Open a landmark file!
 
 
-	size_t  length;
+	int  length;
 
 
-	length = fileName.toStdString().length();
+	length = fileName.length();
 
 	int done = 0;
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1195,7 +1222,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
 			file_exists = 0;
 		}
 
@@ -1222,7 +1249,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 			{
 
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1292,10 +1319,10 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 	//Open a position file!
 
 	int i, j, l;
-	size_t  length;
+	int  length;
 
 
-	length = fileName.toStdString().length();
+	length = fileName.length();
 
 	union {
 		float f;
@@ -1308,7 +1335,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1317,7 +1344,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
 			file_exists = 0;
 		}
 
@@ -1357,7 +1384,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 			if (type == 1)
 			{
 				FILE	*filein;									// Filename To Open
-				filein = fopen(fileName.toStdString().c_str(), "rb");
+				filein = fopen(fileName.toLocal8Bit(), "rb");
 				for (i = 0; i<4; i++)
 					for (j = 0; j<4; j++)
 					{
@@ -1385,7 +1412,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 			}
 			else
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1440,10 +1467,10 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 	//Open a position file!
 
 	int i, j, l;
-	size_t  length;
+	int  length;
 
 
-	length = fileName.toStdString().length();
+	length = fileName.length();
 
 	union {
 		float f;
@@ -1456,7 +1483,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1507,7 +1534,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 				FILE	*filein;									// Filename To Open
 
 
-				filein = fopen(fileName.toStdString().c_str(), "rb");
+				filein = fopen(fileName.toLocal8Bit(), "rb");
 				for (i = 0; i<4; i++)
 					for (j = 0; j<4; j++)
 					{
@@ -1534,7 +1561,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 			}
 			else
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1623,7 +1650,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1632,7 +1659,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
 			file_exists = 0;
 		}
 
@@ -1647,7 +1674,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 			if (found != std::string::npos || found2 != std::string::npos)
 			{
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1705,7 +1732,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -1752,7 +1779,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 			}
 			else
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -1868,7 +1895,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			vtkSmartPointer<vtkSTLReader> reader =
 				vtkSmartPointer<vtkSTLReader>::New();
 
-			reader->SetFileName(fileName.toStdString().c_str());
+			reader->SetFileName(fileName.toLocal8Bit());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -1878,7 +1905,9 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 
 			vtkSmartPointer<vtkPolyDataReader> reader =
 				vtkSmartPointer<vtkPolyDataReader>::New();
-			reader->SetFileName(fileName.toStdString().c_str());
+			reader->SetFileName(fileName.toLocal8Bit());
+			cout << "inside open mesh:"<<fileName.toStdString().c_str() << endl;
+			//reader->SetFileName(fileName.toUtf8());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -1887,7 +1916,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 
 			vtkSmartPointer<vtkPLYReader> reader =
 				vtkSmartPointer<vtkPLYReader>::New();
-			reader->SetFileName(fileName.toStdString().c_str());
+			reader->SetFileName(fileName.toLocal8Bit());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -2075,6 +2104,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			actor->SetSelected(1);
 			actor->SetName(newname);
 			this->getActorCollection()->AddItem(actor);
+			emit this->actorsMightHaveChanged(); 
 			this->Initmui_ExistingScalars();
 			std::string action = "Load mesh file";
 			int mCount = BEGIN_UNDO_SET(action);
@@ -2258,7 +2288,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 
 	/*	if (fileName.isEmpty()) return;
 
-	//if (img.loadImage(fileName.toStdString().c_str()))
+	//if (img.loadImage(fileName.toLocal8Bit()))
 
 	fileName = QFileDialog::getOpenFileName(this,
 	tr("Open File"), "/home/jana", tr("Surface Files (*.vtk *.stl *.ply)"));
@@ -2311,6 +2341,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 		if (inputFile.open(QIODevice::ReadOnly))
 		{
 			QTextStream in(&inputFile);
+			in.setCodec("UTF-8");
 			while (!in.atEnd())
 			{
 				QString line = in.readLine();
@@ -2584,7 +2615,7 @@ void mqMorphoDigCore::OpenORI(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -2620,7 +2651,7 @@ void mqMorphoDigCore::OpenORI(QString fileName)
 			if (type == 1)
 			{
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -2678,7 +2709,7 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -2713,7 +2744,7 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 			if (type == 1)
 			{
 
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 
@@ -2769,7 +2800,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -2800,7 +2831,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 
 			if (type == 1)
 			{
-				//filein = fopen(fileName.toStdString().c_str(), "rt");
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
 				if (inputFile.open(QIODevice::ReadOnly))
@@ -2962,31 +2993,34 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 	QFileInfo fileInfo(fileName);
 	QString onlyfilename(fileInfo.fileName());
-
-
-
+	QString onlypath = fileName.left(fileName.length() - onlyfilename.length());
+	QString projectname = onlyfilename.left(onlyfilename.lastIndexOf("."));
+	cout << "QString onlyfilename: " << onlyfilename.toStdString() << endl;;
+	cout << "QString onlypath: " << onlypath.toStdString() << endl;;
+	cout << "QString projectname: " << projectname.toStdString() << endl;;
 	QFile file(fileName);
 	QTextStream stream(&file);
+	//stream.setCodec("UTF-8");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		std::string only_filename = onlyfilename.toStdString();
-		std::string project_name = only_filename.c_str();
-		size_t nPos = project_name.find_last_of(".");
-		if (nPos > 0 && nPos <= project_name.length())
-		{
-			project_name = project_name.substr(0, nPos);
-		}
-		std::string path = fileName.toStdString().substr(0, (fileName.toStdString().length() - only_filename.length()));
-		std::string posExt = ".pos";
+		//std::string only_filename = onlyfilename.toStdString();
+		//std::string project_name = only_filename.c_str();
+		//size_t nPos = project_name.find_last_of(".");
+		//if (nPos > 0 && nPos <= project_name.length())
+		//{
+		//	project_name = project_name.substr(0, nPos);
+		//}
+		//std::string path = fileName.toStdString().substr(0, (fileName.toStdString().length() - only_filename.length()));
+		QString posExt = ".pos";
 		//std::string vtpExt = ".vtp";
-		std::string vtkExt = ".vtk";
-		std::string plyExt = ".ply";
-		std::string tagExt = ".tag";
-		std::string oriExt = ".ori";
-		std::string flgExt = ".flg";
-		std::string verExt = ".ver";
-		std::string stvExt = ".stv";
-		std::string curExt = ".cur";
+		QString vtkExt = ".vtk";
+		QString plyExt = ".ply";
+		QString tagExt = ".tag";
+		QString oriExt = ".ori";
+		QString flgExt = ".flg";
+		QString verExt = ".ver";
+		QString stvExt = ".stv";
+		QString curExt = ".cur";
 		int overwrite_pos = 1;
 		int overwrite_mesh = 1;
 		int overwrite_ori = 1;
@@ -2997,37 +3031,37 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		int overwrite_stv = 1;
 
 		this->ComputeSelectedNamesLists();
-		std::string postfix = "_";
-		postfix.append(project_name.c_str());
-		std::string no_postfix = "";
+		QString postfix = "_";
+		postfix.append(projectname.toStdString().c_str());
+		QString no_postfix = "";
 		int pos_exists = 0;
 		int pos_special = 0;
-		if (g_distinct_selected_names.size() == 1 && project_name.compare(g_distinct_selected_names.at(0)) == 0)
+		if (g_distinct_selected_names.size() == 1 && projectname.toStdString().compare(g_distinct_selected_names.at(0)) == 0)
 		{
 			pos_special = 1;
-			pos_exists = this->selected_file_exists(path, posExt, no_postfix);
+			pos_exists = this->selected_file_exists(onlypath, posExt, no_postfix);
 		}
 		else
 		{
-			pos_exists = this->selected_file_exists(path, posExt, postfix);
+			pos_exists = this->selected_file_exists(onlypath, posExt, postfix);
 		}
 			
 
 		int mesh_exists = 0;
 		if (save_surfaces_as_ply == 0)
 		{
-			mesh_exists = this->selected_file_exists(path, vtkExt, no_postfix);
+			mesh_exists = this->selected_file_exists(onlypath, vtkExt, no_postfix);
 		}
 		else
 		{
-			mesh_exists = this->selected_file_exists(path, plyExt, no_postfix);
+			mesh_exists = this->selected_file_exists(onlypath, plyExt, no_postfix);
 		}
 
 		if (save_ori == 1)
 		{
-			std::string _ori_fullpath;
-			std::string _ori_file;
-			int ori_exists = this->context_file_exists(path, oriExt, project_name);
+			QString _ori_fullpath;
+			QString _ori_file;
+			int ori_exists = this->context_file_exists(onlypath, oriExt, projectname);
 			if (ori_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3040,19 +3074,21 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			}
 			
 
-			_ori_file = project_name.c_str();
+			/*_ori_file = projectname.toStdString().c_str();
 			_ori_file.append(".ori");
-			_ori_fullpath = path.c_str();
-			_ori_fullpath.append(_ori_file.c_str());
+			_ori_fullpath = onlypath.toStdString.c_str();
+			_ori_fullpath.append(_ori_file.c_str());*/
+			_ori_file = projectname + oriExt;
+			_ori_fullpath = onlypath + _ori_file;
 			int write = 1;
-			QString qori(_ori_fullpath.c_str());
+			//QString qori(_ori_fullpath.c_str());
 			
 			if (overwrite_ori == 1)
 			{
 				//write or overwrite ORI file without further question (0)
-				this->SaveORI(qori);
+				this->SaveORI(_ori_fullpath);
 			}
-			stream << _ori_file.c_str() << endl;
+			stream << _ori_file.toStdString().c_str() << endl;
 
 		}
 		if (mesh_exists == 1)
@@ -3080,9 +3116,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 		if (save_tag == 1)
 		{
-			std::string _tag_fullpath;
-			std::string _tag_file;
-			int tag_exists = this->context_file_exists(path, tagExt, project_name);
+			QString _tag_fullpath;
+			QString _tag_file;
+			int tag_exists = this->context_file_exists(onlypath, tagExt, projectname);
 			if (tag_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3094,10 +3130,10 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				
 			}
 
-			_tag_file = project_name.c_str();
+			_tag_file = projectname;
 			_tag_file.append(".tag");
-			_tag_fullpath = path.c_str();
-			_tag_fullpath.append(_tag_file.c_str());
+			_tag_fullpath = onlypath;
+			_tag_fullpath += _tag_file;
 			int write = 1;
 			
 			if (overwrite_tag == 1)
@@ -3106,7 +3142,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				//@@ TODO!
 				//this->SaveTAG(_tag_fullpath);
 			}
-			stream << _tag_file.c_str() << endl;
+			stream << _tag_file.toLocal8Bit() << endl;
 			
 
 		}
@@ -3115,9 +3151,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		vtkIdType selectedflags = this->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
 		if (selectedflags>0)
 		{
-			std::string _flg_fullpath;
-			std::string _flg_file;
-			int flg_exists = this->context_file_exists(path, flgExt, project_name);
+			QString _flg_fullpath;
+			QString _flg_file;
+			int flg_exists = this->context_file_exists(onlypath, flgExt, projectname);
 			if (flg_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3129,18 +3165,18 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				
 			}
 
-			_flg_file = project_name.c_str();
+			_flg_file = projectname;
 			_flg_file.append(".flg");
-			_flg_fullpath = path.c_str();
-			_flg_fullpath.append(_flg_file.c_str());
+			_flg_fullpath = onlypath;
+			_flg_fullpath+=_flg_file;
 			if (overwrite_flg == 1)			
 			{
 				//cout << "Try to save FLG file" << endl;
 				//write or overwrite FLG file without further question (0)
-				QString qflg(_flg_fullpath.c_str());
-				this->SaveFlagFile(qflg, 1);
+				//QString qflg(_flg_fullpath.c_str());
+				this->SaveFlagFile(_flg_fullpath, 1);
 			}
-			stream << _flg_file.c_str() << endl;
+			stream << _flg_file.toStdString().c_str() << endl;
 
 		}
 
@@ -3150,9 +3186,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		int nselhan = this->HandleLandmarkCollection->GetNumberOfSelectedActors();
 		if (nselnor > 0 || nseltar > 0|| nselnod > 0|| nselhan > 0)
 		{
-			std::string _stv_fullpath;
-			std::string _stv_file;
-			int stv_exists = this->context_file_exists(path, stvExt, project_name);
+			QString _stv_fullpath;
+			QString _stv_file;
+			int stv_exists = this->context_file_exists(onlypath, stvExt, projectname);
 			if (stv_exists == 1)
 			{
 				QMessageBox msgBox;
@@ -3164,18 +3200,17 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				
 			}
 
-			_stv_file = project_name.c_str();
+			_stv_file = projectname;
 			_stv_file.append(".stv");
-			_stv_fullpath = path.c_str();
-			_stv_fullpath.append(_stv_file.c_str());
+			_stv_fullpath = onlypath+_stv_file;
 			int write = 1;
 			if (overwrite_stv == 1)
 			{
 				//write or overwrite stv file without further question (0)
-				QString qstv(_stv_fullpath.c_str());
-				this->SaveSTVFile(qstv,1);
+				//QString qstv(_stv_fullpath.c_str());
+				this->SaveSTVFile(_stv_fullpath,1);
 			}
-			stream << _stv_file.c_str() << endl;
+			stream << _stv_file.toStdString().c_str() << endl;
 			
 		}
 
@@ -3185,12 +3220,12 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
-				std::string _mesh_fullpath;
-				std::string _pos_fullpath;
-				std::string _mesh_file;
-				std::string _pos_file;												
-				_mesh_file = myActor->GetName();
-				_pos_file = myActor->GetName();
+				QString _mesh_fullpath;
+				QString _pos_fullpath;
+				QString _mesh_file;
+				QString _pos_file;
+				_mesh_file.append(myActor->GetName().c_str());
+				_pos_file.append(myActor->GetName().c_str());
 				if (save_surfaces_as_ply == 0)
 				{
 					_mesh_file.append(".vtk");
@@ -3201,21 +3236,21 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				}
 				if (pos_special==0)
 				{
-					_pos_file.append(postfix.c_str());
+					_pos_file+=postfix;
 				}
 				_pos_file.append(".pos");
 
-				_mesh_fullpath = path.c_str();
-					_mesh_fullpath.append(_mesh_file.c_str());
+				_mesh_fullpath = onlypath;
+				_mesh_fullpath+=_mesh_file;
 
-				_pos_fullpath = path.c_str();
-				_pos_fullpath.append(_pos_file.c_str());
+				_pos_fullpath = onlypath;
+				_pos_fullpath+=_pos_file;
 
 				int write = 1;
 				if (overwrite_mesh == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_mesh_fullpath.c_str());
+					ifstream file2(_mesh_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -3228,8 +3263,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 					int File_type = 1; //: vtk-vtp
 
 					if (save_surfaces_as_ply == 1) { File_type = 2; }//2 = PLY
-	
-					this->SaveSurfaceFile(QString(_mesh_fullpath.c_str()),0 , apply_position_to_surfaces, File_type, 0, myActor);
+					std::vector<std::string> mscalarsToBeRemoved; // no scalar to be removed here for the moment...
+					int RGBopt = 0; //now: keep current RGB color
+					this->SaveSurfaceFile(_mesh_fullpath ,0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, RGBopt, 0, myActor);
 				}
 
 				
@@ -3238,7 +3274,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_pos == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_pos_fullpath.c_str());
+					ifstream file2(_pos_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -3251,18 +3287,19 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 					if (apply_position_to_surfaces == 0)
 					{
 						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
-						this->SavePOS(Mat, QString(_pos_fullpath.c_str()));
+						this->SavePOS(Mat, _pos_fullpath);
 					}
 					else
 					{
 						vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 						Mat->Identity();
-						this->SavePOS(Mat, QString(_pos_fullpath.c_str()));
+						this->SavePOS(Mat,_pos_fullpath);
 
 					}
 				}
-				stream << _mesh_file.c_str() << endl;
-				stream << _pos_file.c_str() << endl;
+
+				stream << _mesh_file.toStdString().c_str() << endl;
+				stream << _pos_file.toStdString().c_str() << endl;
 				
 				double colors[4];
 				myActor->GetmColor(colors);
@@ -3679,8 +3716,8 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 							intvv2[1] = (1 - t)*(1 - t)*(1 - t)*nn1[1] + 3 * (1 - t)*(1 - t)*t*hh1[1] + 3 * (1 - t)*t*t*hh2[1] + t*t*t*nn2[1];
 							intvv2[2] = (1 - t)*(1 - t)*(1 - t)*nn1[2] + 3 * (1 - t)*(1 - t)*t*hh1[2] + 3 * (1 - t)*t*t*hh2[2] + t*t*t*nn2[2];
 
-							double len = sqrt((intvv[0] - intvv2[0])*(intvv[0] - intvv2[0]) + (intvv[1] - intvv2[1])*(intvv[1] - intvv2[1]) + (intvv[2] - intvv2[2])*(intvv[2] - intvv2[2]));
-
+							
+							double len = sqrt(vtkMath::Distance2BetweenPoints(intvv, intvv2));
 							// cout << "connect:" << ls[0] << "," << ls[1] << endl;
 							current_length += len;
 							//glVertex3d(intvv2[0], intvv2[1], intvv2[2]);
@@ -3976,6 +4013,8 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 							vtkSmartPointer<vtkQuadricDecimation> decimate =
 								vtkSmartPointer<vtkQuadricDecimation>::New();
 
+						
+							
 							vtkSmartPointer<vtkDelaunay3D> delaunay3D =
 								vtkSmartPointer<vtkDelaunay3D>::New();
 							decimate->SetInputData(mapper->GetInput());
@@ -4055,6 +4094,406 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 	}
 	file.close();
 	return 1;
+}
+
+void mqMorphoDigCore::startLasso(int lasso_mode)
+{
+	// lasso_mode 0: = lasso cut (for selected surfaces), and we will only keep the outside of the selection
+	//lasso_mode 1: = lasso cut (for selected surfaces), and we will only keep the inside of the selection
+	//lasso_mode 2: = lasso tag and we will only tag the outside of the selection
+	//lasso_mode 3: = lasso tag and we will only tag the inside of the selection
+	
+	//cout << "Set Lasso style as current interaction style!" << endl;
+	//1 change interaction mode
+	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->LassoStyle);
+	this->currentLassoMode = lasso_mode;
+	if (lasso_mode == 0) { this->setCurrentCursor(3); }
+	if (lasso_mode == 1) { this->setCurrentCursor(2); }
+// 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
+}
+void mqMorphoDigCore::SwitchMoveMode()
+{
+	if (this->Getmui_MoveMode() == 0 || this->Getmui_MoveMode() == 1) //0 lmk movemode //1 camera //2 move objects
+	{
+		this->Setmui_MoveMode(2); // switch to move objects
+		this->setCurrentCursor(1); //appropriate cursor
+
+	}
+	
+	else
+	{
+		this->Setmui_MoveMode(1);// swtich to camera mve mode
+		this->setCurrentCursor(0);//appropriate cursor
+	}
+	emit this->modeModeChanged();
+}
+void mqMorphoDigCore::stopLasso()
+{
+	if (this->Getmui_MoveMode()==0 || this->Getmui_MoveMode() == 1)
+	{
+		this->setCurrentCursor(0);
+	}
+	else
+	{
+		this->setCurrentCursor(1);
+	}
+	
+	//bacl to normal selection mode
+	if (this->currentLassoMode == 0|| this->currentLassoMode == 1)// lasso cut
+	{
+		int keep_inside = this->currentLassoMode;
+		this->lassoCutSelectedActors(keep_inside);
+	}
+	
+	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
+
+}
+void mqMorphoDigCore::setCurrentCursor(int cursor)
+
+{
+//0 = hande cursor (move3.png)
+//1 = move pointer (move_mode2.png)
+//2 = lasso cut keep inside
+//3 = lasso cut keep outside
+//4 = select mode
+//5 = pencil
+//6 = paint bucket
+//7 = set landmark
+	if (this->getQVTKWidget() != NULL)
+	{
+		if (cursor == 0)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 1)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/move_mode2.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 2)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_keepinside.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 3)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_keepoutside.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 4)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/select_mode2.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 5)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/pencil.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 6)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/Flood_fill.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 7)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/magic_wand.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+
+		}
+	}
+
+}
+//changes mouse cursor
+void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
+{
+	POLYGON_LIST poly;
+	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
+	cout << "Poly valide: " << poly.state << endl;
+	if (poly.state == 1)// only for valid lasso selections!
+	{
+
+
+		vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		int modified = 0;
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				//myActor->SetSelected(0); we don't unselect after a cut
+
+
+				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+				{
+					vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+				
+					vtkSmartPointer<vtkIntArray> newCuts =
+						vtkSmartPointer<vtkIntArray>::New();
+
+					newCuts->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					newCuts->SetNumberOfTuples(myPD->GetNumberOfPoints());
+					
+					double ve_init_pos[3];;
+					double ve_final_pos[3];
+					double ve_proj_screen[3];
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+					POLYGON_VERTEX proj_screen;
+					int proj_is_inside;
+					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						myPD->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
+						if (i < 10)
+						{
+							cout << "ve_proj_screen "<<i<<"=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+						}
+						proj_screen.x = ve_proj_screen[0];
+						proj_screen.y = ve_proj_screen[1];
+						proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+						if (i < 10)
+						{
+						}
+						
+						if (keep_inside == 0)
+						{
+							if (proj_is_inside == 0) { proj_is_inside = 1; }
+							else
+							{
+								proj_is_inside = 0;
+							}
+						}
+						if ((ve_proj_screen[2] > -1.0) && ve_proj_screen[2] < 1.0 && (proj_is_inside == 1))
+						{
+							newCuts->InsertTuple1(i, 1);
+						}
+
+					}
+					newCuts->SetName("Cuts");
+					myPD->GetPointData()->AddArray(newCuts);
+					myPD->GetPointData()->SetActiveScalars("Cuts");
+					
+					vtkSmartPointer<vtkThreshold> selector =
+						vtkSmartPointer<vtkThreshold>::New();
+					vtkSmartPointer<vtkMaskFields> scalarsOff =
+						vtkSmartPointer<vtkMaskFields>::New();
+					vtkSmartPointer<vtkGeometryFilter> geometry =
+						vtkSmartPointer<vtkGeometryFilter>::New();
+					selector->SetInputData((vtkPolyData*)myPD);
+					selector->SetInputArrayToProcess(0, 0, 0,
+						vtkDataObject::FIELD_ASSOCIATION_CELLS,
+						vtkDataSetAttributes::SCALARS);
+					selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
+					selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
+					selector->ThresholdBetween(0.9, 1.1);
+					selector->Update();
+					std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
+					std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
+
+					scalarsOff->SetInputData(selector->GetOutput());
+					scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->Update();
+					geometry->SetInputData(scalarsOff->GetOutput());
+					geometry->Update();
+
+
+					
+					vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+
+
+					MyObj = geometry->GetOutput();
+					myPD->GetPointData()->RemoveArray("Cuts");
+
+					std::cout << "\nLasso new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
+					std::cout << "\nLasso  new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
+
+					if (MyObj->GetNumberOfPoints() > 10)
+					{
+						VTK_CREATE(vtkMDActor, newactor);
+						if (this->mui_BackfaceCulling == 0)
+						{
+							newactor->GetProperty()->BackfaceCullingOff();
+						}
+						else
+						{
+							newactor->GetProperty()->BackfaceCullingOn();
+						}
+
+
+						//VTK_CREATE(vtkDataSetMapper, newmapper);
+						VTK_CREATE(vtkPolyDataMapper, newmapper);
+						//VTK_CREATE(vtkSmartPointer<vtkDataSetMapper>
+						//newmapper->ImmediateModeRenderingOn();
+						newmapper->SetColorModeToDefault();
+
+						if (
+							(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+							&& this->mui_ActiveScalars->NumComp == 1
+							)
+						{
+							newmapper->SetScalarRange(0, this->TagTableSize - 1);
+							newmapper->SetLookupTable(this->GetTagLut());
+						}
+						else
+						{
+							newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+						}
+
+
+						newmapper->ScalarVisibilityOn();
+						
+						cout << "cut object" << MyObj->GetNumberOfPoints() << endl;
+						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+						newmapper->SetInputData(MyObj);
+
+						//VTK_CREATE(vtkActor, actor);
+
+						int num = 2;
+
+						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+						vtkTransform *newTransform = vtkTransform::New();
+						newTransform->PostMultiply();
+
+						newTransform->SetMatrix(Mat);
+						newactor->SetPosition(newTransform->GetPosition());
+						newactor->SetScale(newTransform->GetScale());
+						newactor->SetOrientation(newTransform->GetOrientation());
+						newTransform->Delete();
+
+
+						double color[4] = { 0.5, 0.5, 0.5, 1 };
+						myActor->GetmColor(color);
+						/*double trans = 100* color[3];
+						if (trans >= 0 && trans <= 100)
+						{
+							color[3] = (double)((double)trans / 100);
+
+
+						}*/
+
+						newactor->SetmColor(color);
+
+						newactor->SetMapper(newmapper);
+						newactor->SetSelected(0);
+
+
+						newactor->SetName("LC" + myActor->GetName());
+						cout << "try to add new actor=" << endl;
+						newcoll->AddTmpItem(newactor);
+						modified = 1;
+					}
+
+
+					
+
+
+				}
+			}
+		}
+		if (modified == 1)
+		{
+			newcoll->InitTraversal();
+			vtkIdType num = newcoll->GetNumberOfItems();
+			for (vtkIdType i = 0; i < num; i++)
+			{
+				cout << "try to get next actor from newcoll:" << i << endl;
+				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+
+
+				this->getActorCollection()->AddItem(myActor);
+				emit this->actorsMightHaveChanged();
+				std::string action = "Convex Hull added: " + myActor->GetName();
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+
+			}
+			//cout << "camera and grid adjusted" << endl;
+			cout << "new actor(s) added" << endl;
+			this->Initmui_ExistingScalars();
+
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			this->Render();
+		}
+
+	}
 }
 
 void mqMorphoDigCore::addConvexHull()
@@ -4208,6 +4647,7 @@ void mqMorphoDigCore::addConvexHull()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Convex Hull added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -4389,6 +4829,7 @@ void mqMorphoDigCore::addMirrorXZ()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Mirror object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -4553,7 +4994,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+				
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -4586,7 +5027,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 				cout << "TPS basis=" << r<< endl;
 			
-				///@@@ TPS
+				/// TPS
 				vtkSmartPointer<vtkThinPlateSplineTransform> tps =
 				vtkSmartPointer<vtkThinPlateSplineTransform>::New();
 
@@ -4735,6 +5176,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "TPS object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -4780,7 +5222,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+				
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -4894,6 +5336,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Hole filled object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -4937,7 +5380,7 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+				
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -5048,6 +5491,7 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Densified object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5091,7 +5535,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
+			
 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -5155,7 +5599,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 				{
 					ObjNormals->SetInputData(decimate2->GetOutput());
 				}
-				ObjNormals->ComputePointNormalsOff();
+				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				//ObjNormals->AutoOrientNormalsOff();
 				ObjNormals->ConsistencyOff();
@@ -5229,6 +5673,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Decimated object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5276,8 +5721,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
-
+			
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
 				{
@@ -5390,6 +5834,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Smoothed object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5450,6 +5895,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 				cfilter->Update();
 				int regions = cfilter->GetNumberOfExtractedRegions();
 				QProgressDialog progress("Surface decomposition into non connex subregions.", "Abort decomposition", 0, regions);
+				progress.setCancelButton(0);
 				progress.setWindowModality(Qt::WindowModal);
 				std::cout << "\nVtkConnectivity number of regions:" << regions << std::endl;
 				vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
@@ -5631,6 +6077,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Largest region object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5659,6 +6106,1201 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 }
+
+void mqMorphoDigCore::scalarsRGB(QString newRGB)
+{
+	std::string mScalarName = "RGB";
+	if (newRGB.length() > 0)
+	{
+		mScalarName = newRGB.toStdString();
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	std::string action = "Compute RGB scalar";
+	int Count = BEGIN_UNDO_SET(action);
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "RGB distance" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+
+			myActor->SetSelected(0);
+			myActor->SaveState(Count, QString(mScalarName.c_str()));
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				double numvert =mPD->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkUnsignedCharArray> newcolors =
+					vtkSmartPointer<vtkUnsignedCharArray>::New();
+				newcolors->SetNumberOfComponents(4);
+				newcolors->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
+
+				vtkIdType iRGB = 0;
+				int nr, ng, nb, na;
+				this->ActorCollection->InitTraversal();
+				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+				QString none = QString("none");
+				QString RGB = QString("RGB");
+				
+				// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
+				int RGB_fromglobal = 1;
+				// if current active scalar is not the "none" one, and if the actor as current active scalar.
+				//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+				if (ActiveScalar != none && 	mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+				{
+					RGB_fromglobal = 0;
+				}
+
+				//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
+				//colors->SetNumberOfComponents(4);
+				//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars("RGB");
+				//vtkFloatArray *currentFScalars = (vtkFloatArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				vtkFloatArray *currentFScalars = (vtkFloatArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+
+
+
+
+
+
+					// on cherche la scalar active pour ce maillage
+					
+					for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+					{
+						//Fill nr ng nb with at least something... 
+						nr = (unsigned char)(255 * myActor->GetmColor()[0]);
+						ng = (unsigned char)(255 * myActor->GetmColor()[1]);
+						nb = (unsigned char)(255 * myActor->GetmColor()[2]);
+						na = (unsigned char)(255 * myActor->GetmColor()[3]);
+
+						//1st case  : the current actor has not the currently active scalar.
+						if (RGB_fromglobal == 1)
+						{
+							//do nothing here as nr ng nb na have already been correctly instantiated just above
+
+						}
+						else
+						{
+							// 2 cases : 
+							//      A: active scalar = RGB => so we retake RGB... as we have started to do so earlier!
+							if(this->mui_ActiveScalars->DataType == VTK_UNSIGNED_CHAR
+								&&  this->mui_ActiveScalars->NumComp >= 3)
+							{
+								if (colors != NULL)
+								{
+									nr = (unsigned char)(colors->GetTuple(j)[0]);
+									ng = (unsigned char)(colors->GetTuple(j)[1]);
+									nb = (unsigned char)(colors->GetTuple(j)[2]);
+									if (this->mui_ActiveScalars->NumComp == 4)
+									{
+										na = (unsigned char)(colors->GetTuple(j)[3]);
+									}
+									else
+									{
+										na = 1;
+									}
+								}
+								// else we keep global RGB as instantiated above.
+
+							}
+							else
+							{
+								//      B: active scalar = 1 scalar or tag => we translate scalar or tag as RGB
+								if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+									this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+									)
+									&& this->Getmui_ActiveScalars()->NumComp == 1)
+								{
+
+									double cscalar = 0;
+									if (currentFScalars != NULL)
+									{
+										cscalar = (double)currentFScalars->GetTuple(j)[0];
+									}
+									if (currentDScalars != NULL)
+									{
+										cscalar = currentDScalars->GetTuple(j)[0];
+									}
+									// retrieve scalar value
+
+									double cRGB[3];
+									double cOpac = 1;
+									mymapper->GetLookupTable()->GetColor(cscalar, cRGB);
+									nr = (unsigned char)(255 * cRGB[0]);
+									ng = (unsigned char)(255 * cRGB[1]);
+									nb = (unsigned char)(255 * cRGB[2]);
+									na = (unsigned char)(255 * mymapper->GetLookupTable()->GetOpacity(cscalar));
+
+									// translate it as RGB
+
+
+								}
+								// else we keep global RGB as instantiated above.
+
+							}
+
+
+
+						}
+
+
+
+						newcolors->InsertTuple4(iRGB, nr, ng, nb, na);
+						iRGB++;
+
+				}
+					
+
+				
+				
+
+
+				newcolors->SetName(mScalarName.c_str());
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mPD->GetPointData()->AddArray(newcolors);
+				mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+				//g_active_scalar = 0;
+				// 0 => depth
+				// 1 =>	"Maximum_Curvature"
+				// 2 => "Minimum_Curvature"
+				// 3 => "Gauss_Curvature"
+				// 4 => "Mean_Curvature"
+
+				modified = 1;
+
+			}
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "RGB scalars created" << endl;
+
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_UNSIGNED_CHAR, 4);
+
+
+	}
+	END_UNDO_SET();
+
+
+}
+void mqMorphoDigCore::scalarsCurvature(int curvatureType, QString scalarName)
+{
+	std::string mScalarName = "Curvature";
+	if (scalarName.length() > 0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	std::string action = "Compute curvature scalar";
+	int Count = BEGIN_UNDO_SET(action);
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Curvature " << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+
+			myActor->SetSelected(0);
+			myActor->SaveState(Count, QString(mScalarName.c_str()));
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				double numvert =mPD->GetNumberOfPoints();
+
+				vtkSmartPointer<vtkCurvatures> curvaturesFilter =
+					vtkSmartPointer<vtkCurvatures>::New();
+				curvaturesFilter->SetCurvatureType(curvatureType);
+
+
+				curvaturesFilter->SetInputData(mPD);
+				curvaturesFilter->Update();
+				vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+				MyObj = curvaturesFilter->GetOutput();
+
+				//cout << "curv   c" << endl;
+				// Get active scalars of output
+				vtkFloatArray *freshScalars;
+				freshScalars = (vtkFloatArray*)MyObj->GetPointData()->GetScalars();
+
+
+				vtkSmartPointer<vtkFloatArray> newScalars =
+					vtkSmartPointer<vtkFloatArray>::New();
+
+				newScalars->DeepCopy(freshScalars);
+
+
+
+				newScalars->SetName(mScalarName.c_str());
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mPD->GetPointData()->AddArray(newScalars);
+				mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+				
+
+				modified = 1;
+
+			}
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars updated " << endl;
+
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_FLOAT, 1);
+
+
+	}
+	END_UNDO_SET();
+
+
+}
+void mqMorphoDigCore::scalarsCameraDistance()
+{
+		
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	std::string action = "Compute depth scalar";
+	int Count = BEGIN_UNDO_SET(action);
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Camera distance" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			
+			myActor->SetSelected(0);
+			myActor->SaveState(Count, QString("Depth"));
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+				
+
+				double numvert = mymapper->GetInput()->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);
+
+				newScalars->SetNumberOfTuples(numvert);
+
+			
+
+				
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+				double ve_init_pos[3];;
+				double ve_final_pos[3];
+				double distance_from_camera;
+				vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+				distance_from_camera = 3;
+				double campos[3];
+				this->getCamera()->GetPosition(campos);
+
+				for (vtkIdType i = 0; i < numvert; i++)	// for each vertex of this
+
+				{									
+						mPD->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+											
+						distance_from_camera = sqrt(vtkMath::Distance2BetweenPoints(campos, ve_final_pos));
+				
+					newScalars->InsertTuple1(i, distance_from_camera);
+
+
+				}
+				newScalars->SetName("Depth");
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray("Depth");
+				mPD->GetPointData()->AddArray(newScalars);
+				mPD->GetPointData()->SetActiveScalars("Depth");
+				//g_active_scalar = 0;
+				// 0 => depth
+				// 1 =>	"Maximum_Curvature"
+				// 2 => "Minimum_Curvature"
+				// 3 => "Gauss_Curvature"
+				// 4 => "Mean_Curvature"
+
+				modified = 1;
+
+			}
+			
+		}
+	}
+	if (modified == 1)
+	{
+		
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars updated " << endl;
+
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender("Depth", VTK_DOUBLE, 1);
+		
+		
+	}
+	END_UNDO_SET();
+
+
+
+}
+
+vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
+	double sc, vtkIdType id, int tool_mode, int compute_avg_norm)
+{
+	vtkSmartPointer<vtkIdList> connectedVertices =
+		vtkSmartPointer<vtkIdList>::New();
+	connectedVertices->InsertNextId(id);
+	vtkSmartPointer<vtkIdList> cellIdList =
+		vtkSmartPointer<vtkIdList>::New();
+	mesh->GetPointCells(id, cellIdList);
+
+	for (vtkIdType i = 0; i < cellIdList->GetNumberOfIds(); i++)
+	{
+		vtkSmartPointer<vtkIdList> pointIdList =
+			vtkSmartPointer<vtkIdList>::New();
+		mesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
+
+		vtkIdType newid;
+
+		if (pointIdList->GetId(0) != id)
+		{
+			newid = pointIdList->GetId(0);
+		}
+		else
+		{
+			newid = pointIdList->GetId(1);
+
+		}
+		if (tool_mode == -1) //  no tool (-1) 
+		{
+			connectedVertices->InsertNextId(newid);
+		}
+
+		/*else if (tool_mode == 2 || (tool_mode == 1 && g_magic_wand_extension == 180) || (tool_mode == 0)) // flood bucket or magic wand with maximal extension or pencil
+		{
+			// get tag value of current id
+			vtkFloatArray *currentTags;
+			currentTags = (vtkFloatArray*)this->GetPointData()->GetScalars("Tags");
+			if (currentTags == NULL)
+			{
+				connectedVertices->InsertNextId(newid);
+			}
+			else
+			{
+				double currentTag = currentTags->GetTuple(newid)[0];
+				//std::cout<<"Current tag ="<<currentTag<<std::endl;
+				//std::cout<<"sc ="<<sc<<std::endl;
+
+				if (currentTag == sc || g_magic_wand_over == 1 || currentTag == 0.0) // Tag 0 is special! Overriden...
+				{
+					connectedVertices->InsertNextId(newid);
+				}
+			}
+		}
+		else // magic wand : consider both current tag value and normal angle limit extension
+		{
+
+			vtkFloatArray *currentTags;
+			currentTags = (vtkFloatArray*)this->GetPointData()->GetScalars("Tags");
+			int oktag = 0;
+			if (g_magic_wand_over == 1)
+			{
+				oktag = 1;
+			}
+			if (currentTags == NULL)
+			{
+				oktag = 1;
+			}
+			else
+			{
+				double currentTag = currentTags->GetTuple(newid)[0];
+				if (currentTag == sc || currentTag == 0.0) // Tag 0 is special! Overriden...
+				{
+					oktag = 1;
+				}
+			}
+			if (oktag == 1)
+			{
+				// now check normal
+				double *vn2;
+				float vvn1[3];
+				float vvn[3];
+
+
+				vtkFloatArray* norms = vtkFloatArray::SafeDownCast
+				(this->GetPointData()->GetNormals());
+				if (norms != NULL)
+				{
+					vn2 = norms->GetTuple(newid);
+					vvn1[0] = (float)vn2[0];
+					vvn1[1] = (float)vn2[1];
+					vvn1[2] = (float)vn2[2];
+					glMatrix wc_mat;
+					glMatrix screen_mat;
+					glPushMatrix();
+					glLoadIdentity();
+					glMultMatrixf((GLfloat*) this->Mat2);
+					glTranslated(
+						this->mean[0],
+						this->mean[1],
+						this->mean[2]
+					);
+					glMultMatrixf((GLfloat *)this->Mat1);
+					glTranslated(
+						-this->mean[0],
+						-this->mean[1],
+						-this->mean[2]
+					);
+					this->get_world_coordinates_matrix(wc_mat);
+					this->get_screen_projection_matrix(screen_mat);
+					glPopMatrix();
+
+					ApplyRotation(vvn1, vvn, wc_mat);	//rotation of the normals..
+
+
+					double curr_cos = vn[0] * (double)vvn[0] + vn[1] * (double)vvn[1] + vn[2] * (double)vvn[2];
+					if (curr_cos>g_magic_wand_extension_min_cos)
+					{
+						connectedVertices->InsertNextId(newid);
+					}
+
+				}
+				else
+				{
+					std::cout << "Norm NULL..." << std::endl;
+				}
+
+			}
+		}*/
+
+	}
+	// now I compute a mean vn.
+	if (compute_avg_norm)
+	{
+		auto norms = vtkFloatArray::SafeDownCast(mesh->GetPointData()->GetNormals());
+
+		//cout << "Have tried to get norms" << endl;
+		//cout << "Safe point downcast done ! " << endl;
+		if (norms)
+		{
+			//if (ve<10){std::cout << "Connected vertices: ";}		
+			double *norm = norms->GetTuple3(id);
+			double newn[3];
+			newn[0] = norm [0];
+			newn[1] = norm[1];
+			newn[2] = norm[2];
+			int n_vertices = connectedVertices->GetNumberOfIds();
+
+
+			for (vtkIdType j = 0; j < n_vertices; j++)
+			{	// for all neighbouring vertices							
+				norm = norms->GetTuple3(connectedVertices->GetId(j));
+				newn[0] += norm[0];
+				newn[1] += norm[1];
+				newn[2] += norm[2];
+												
+
+			}
+			
+			/*newnx /= (n_vertices+1);
+			newny /= (n_vertices + 1);
+			newnz /= (n_vertices + 1);*/
+			vtkMath::Normalize(newn);
+			
+			vn[0] = newn[0];
+			vn[1] = newn[1];
+			vn[2] = newn[2];
+		}
+	}
+
+	return connectedVertices;
+}
+void mqMorphoDigCore::RemoveScalar(QString scalarName, int onlySelectedObjects)
+{
+	std::string mScalarName = "RGB";
+	if (scalarName.length() >0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
+	else
+	{
+		return;
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1 || onlySelectedObjects==0)
+		{
+			myActor->SetSelected(0);
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+					mPD = mymapper->GetInput();
+					mPD->GetPointData()->RemoveArray(mScalarName.c_str());									
+					modified = 1;
+			}
+				
+
+
+		}
+
+		
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars modified " << endl;
+		this->Initmui_ExistingScalars();		
+
+	}
+
+
+}
+
+void mqMorphoDigCore::EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString oldScalarName, QString newScalarName)
+{
+	vtkSmartPointer<vtkDoubleArray> newScalars = vtkSmartPointer<vtkDoubleArray>::New();
+	vtkDataArray *mScalars = actor->GetMapper()->GetInput()->GetPointData()->GetScalars(oldScalarName.toStdString().c_str());
+	mScalars->SetName(newScalarName.toStdString().c_str());
+	this->Initmui_ExistingScalars();
+}
+void mqMorphoDigCore::DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName)
+{
+	//this->Getmui_ActiveScalars
+	//this->Getmui_ActiveScalars()->Name
+	 actor->GetMapper()->GetInput()->GetPointData()->RemoveArray(ScalarName.toStdString().c_str());
+	
+	 cout << "Try to init mui scalars" << endl;
+	this->Initmui_ExistingScalars();
+	cout << "Try to init mui scalars ok" << endl;
+
+	
+}
+void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
+{
+	if (impactedActor != NULL && observedActor != NULL)
+	{
+		std::string action = "Compute thickness for ";
+		action.append(impactedActor->GetName().c_str());
+		int Count = BEGIN_UNDO_SET(action);
+
+		std::string mScalarName = "Thickness";
+		if (scalarName.length() > 0)
+		{
+			mScalarName = scalarName.toStdString();
+		}
+		impactedActor->SaveState(Count, QString(mScalarName.c_str()));
+		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
+		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
+		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
+		{
+
+			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPD = myImpactedMapper->GetInput();
+
+			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPD = myObservedMapper->GetInput();
+
+
+
+
+			double numvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
+
+
+			vtkSmartPointer<vtkDoubleArray> newScalars =
+				vtkSmartPointer<vtkDoubleArray>::New();
+
+			newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+			newScalars->SetNumberOfTuples(numvert);
+			vtkIdType ve;
+
+			double ve_obs_init_pos[3];;			
+			double ve_obs_final_pos[3];;
+			double ven_obs_init_pos[3];;
+			
+			double ve_imp_init_pos[3];;
+			double ven_imp_init_pos[3];;
+
+
+			vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
+			vtkSmartPointer<vtkMatrix4x4> obsMat = observedActor->GetMatrix();
+
+			/*vtkSmartPointer<vtkPolyData> toSave = vtkSmartPointer<vtkPolyData>::New();
+			toSave->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
+			double ve_init_pos[3];;
+			double ve_final_pos[3];
+			vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+
+
+			for (vtkIdType i = 0; i < toSave->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				toSave->GetPoint(i, ve_init_pos);
+				mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+
+				toSave->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+			}*/
+
+			double pt[3] = { 0,0,1 };
+			double pt2[3] = { 0,0,1 };
+			double projected_pt2[3] = { 0,0,1 };
+			double ptn[3];
+			double *ptn2;
+			double ptn2obs[3];
+			double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
+			if (angularLimit > 0 && angularLimit <= 180)
+			{
+				min_cos = cos(angularLimit*vtkMath::Pi() / 180);
+			}
+			cout << "min_cos=" << min_cos << endl;
+			double cur_cos = 1.0; // compare ve1's normal and ve2's normal
+			double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
+			double AB[3];
+			double AC[3];
+			double ABnorm[3];
+
+			double picked_value = 0;
+			double min_dist = max_thickness;
+			double tmp_dist = 0;
+			auto impactedNorms = vtkFloatArray::SafeDownCast(mImpactedPD->GetPointData()->GetNormals());
+			auto observedNorms = vtkFloatArray::SafeDownCast(mObservedPD->GetPointData()->GetNormals());
+
+			//	cout << "Have tried to get norms" << endl;
+			//cout << "Safe point downcast done ! " << endl;
+			if (impactedNorms && observedNorms)
+			{
+				//	cout << "We have found some norms" << endl;
+
+				//QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
+				//progress.setWindowModality(Qt::WindowModal);
+				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+					vtkSmartPointer<vtkKdTreePointLocator>::New();
+				
+				vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
+				observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
+				
+
+				for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
+					// for every triangle 
+					observedMoved->GetPoint(i, ve_obs_init_pos);
+					mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
+
+					observedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_obs_final_pos);
+				}
+
+
+				kDTree->SetDataSet(observedMoved);
+				
+				kDTree->BuildLocator();
+
+				for (ve = 0; ve < numvert; ve++)
+				{
+					min_dist = max_thickness;
+					emit thicknessProgression((int)(100 * ve / numvert));
+					//progress.setValue(ve);
+					/*if (progress.wasCanceled())
+					break;*/
+
+					mImpactedPD->GetPoint(ve, ve_imp_init_pos);
+					mqMorphoDigCore::TransformPoint(impMat, ve_imp_init_pos, pt);
+					double *mImpactedptn = impactedNorms->GetTuple3(ve);
+					ven_imp_init_pos[0] = mImpactedptn[0];
+					ven_imp_init_pos[1] = mImpactedptn[1];
+					ven_imp_init_pos[2] = mImpactedptn[2];
+					
+					
+					/*ptn[0] = mImpactedptn[0];
+					ptn[1] = mImpactedptn[1];
+					ptn[2] = mImpactedptn[2];*/
+
+					if (ve < 10)
+					{
+						//cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+					}
+					vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+					//ptn will be the average norm of all connected vertices.
+					if (smooth_normales)
+					{
+						connectedVertices = GetConnectedVertices(mImpactedPD, ptn, picked_value, ve, -1, 1); //	int tool_mode=-1; //no pencil! no magic wand!
+					}
+					else
+					{
+						if (ve < 10)
+						{
+							//cout << "no ptn avg!" << endl;
+						}
+
+
+					}
+					mqMorphoDigCore::RotateNorm(impMat, ven_imp_init_pos, ptn);
+					if (ve < 10) {
+					//	cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << endl;
+					//	cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << endl;
+
+					}
+
+					if (ve < 10)
+					{
+						//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+					}
+
+						////self thickness : look for norms in other directions!
+						ptn[0] = -ptn[0];
+						ptn[1] = -ptn[1];
+						ptn[2] = -ptn[2];
+					
+					// here we will look at the neighbour vertices of pt to compute an average ptn (otherwise this filter is extremely sensitive with non planar/rough surfaces with changing normals)
+
+
+
+					// get all neighbouring vertices within a max_thickness radius
+					//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+					double Radius = 1.1*max_thickness;
+					kDTree->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+
+
+
+
+					//if (ve<10){std::cout << "Connected vertices: ";}
+					double newscalar = 0;
+					/*if (ve < 10)
+					{
+					cout << "found" << neighbours->GetNumberOfIds() << " neighbours" << endl;
+					}*/
+
+					std::vector<double> thicknesses;
+					int cpt = 0;
+
+
+
+
+
+					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+					{
+
+						//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+						vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+						if (ve != observedConnectedVertex || impactedActor != observedActor)// to cases: 1) self observation= we don't want to compare 1 vertex with itself; 2) comparison, then impacted and observed lists do not have links
+						{
+							observedMoved->GetPoint(observedConnectedVertex, pt2);
+							ptn2 = observedNorms->GetTuple3(observedConnectedVertex);
+
+							ven_obs_init_pos[0] = ptn2[0]; 
+							ven_obs_init_pos[1] = ptn2[1];
+							ven_obs_init_pos[2] = ptn2[2];
+							mqMorphoDigCore::RotateNorm(obsMat, ven_obs_init_pos, ptn2obs);
+							if (ve<10 && j < 3) {
+							//	cout << "j=" << j << endl;
+							//	cout << "ven_obs_init_pos=" << ven_obs_init_pos[0] << "|" << ven_obs_init_pos[1] << "|" << ven_obs_init_pos[2] << "|" << endl;
+							//	cout << "ptn2obs=" << ptn2obs[0] << "|" << ptn2obs[1] << "|" << ptn2obs[2] << "|" << endl;
+
+							}
+
+							// do not forget to rotate observed norms!
+							/*ptn2obs[0] = ptn2[0];
+							ptn2obs[1] = ptn2[1];
+							ptn2obs[2] = ptn2[2];*/
+
+							if (observedActor != impactedActor && invertObservedNormales==1)
+							{
+								ptn2obs[0] = -ptn2obs[0];
+								ptn2obs[1] = -ptn2obs[1];
+								ptn2obs[2] = -ptn2obs[2];
+
+							}
+							AB[0] = pt2[0] - pt[0];
+							AB[1] = pt2[1] - pt[1];
+							AB[2] = pt2[2] - pt[2];
+							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+							ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
+							if (curr_dist > 0)
+							{
+								ABnorm[0] = AB[0] / curr_dist;
+								ABnorm[1] = AB[1] / curr_dist;
+								ABnorm[2] = AB[2] / curr_dist;
+							}
+							if (curr_dist < max_thickness)
+							{
+								// calculate projected point along the normal of point 1 
+								// towards point 2
+								// seach if vv1n et vv2n sont suffisamment dans la bonne direction.
+								cur_cos = ptn[0] * ptn2obs[0] + ptn[1] * ptn2obs[1] + ptn[2] * ptn2obs[2];
+								cur_cos2 = ABnorm[0] * ptn[0] + ABnorm[1] * ptn[1] + ABnorm[2] * ptn[2];
+
+								if (ve < 10 && j < 3) {
+								//	cout << "cur_cos=" << cur_cos << endl;
+								//	cout << "cur_cos2=" << cur_cos2 << endl;
+								}
+
+								if (cur_cos > min_cos && cur_cos2 > min_cos )																	
+								{
+									// we have a candidate!
+									// compute projected point 2 along vvn1 !
+
+								
+										
+									projected_pt2[0] = pt[0] + ptn[0] * AB[0];
+									projected_pt2[1] = pt[1] + ptn[1] * AB[1];
+									projected_pt2[2] = pt[2] + ptn[2] * AB[2];
+									AC[0] = projected_pt2[0] - pt[0];
+									AC[1] = projected_pt2[1] - pt[1];
+									AC[2] = projected_pt2[2] - pt[2];
+									//tmp_dist = (float)sqrt(AC[0]*AC[0]+AC[1]*AC[1]+AC[2]*AC[2]);
+									// well I am not sure I want this distance!!!
+									tmp_dist = curr_dist;
+									thicknesses.push_back(tmp_dist);
+									cpt++;
+
+								}
+								else
+								{
+									tmp_dist = max_thickness;
+								}
+							}
+							else
+							{
+								tmp_dist = max_thickness;
+							}
+							if (tmp_dist < min_dist) { min_dist = tmp_dist; }
+
+						}
+
+					}
+
+					// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+					if (avg <= 1 || cpt == 0 )
+					{
+
+						newScalars->InsertTuple1(ve, min_dist);
+					}
+					else
+					{
+						/*if (ve < 10)
+						{
+						cout << "try to sort thicknesses"  << endl;
+						}*/
+						std::sort(thicknesses.begin(), thicknesses.end());
+						double thick_avg = 0;
+						double mavg = avg;// in some cases there are less thickness candidates thant avg => the avg thickness will be done using less than "avg" nr of candidates.
+						if (cpt < avg) { mavg = cpt; }
+						for (int i = 0; i < mavg; i++)
+						{
+							thick_avg += thicknesses.at(i);
+						}
+						thick_avg /= mavg;
+						newScalars->InsertTuple1(ve, thick_avg);
+						if (ve < 10)
+						{
+							//cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << endl;
+						}
+
+					}
+
+
+				}
+				//std::cout<<"New Scalar computation done "<<std::endl;
+
+				newScalars->SetName(mScalarName.c_str());
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mImpactedPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mImpactedPD->GetPointData()->AddArray(newScalars);
+				mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+				//g_active_scalar = 0;
+				// 0 => depth
+				// 1 =>	"Maximum_Curvature"
+				// 2 => "Minimum_Curvature"
+				// 3 => "Gauss_Curvature"
+				// 4 => "Mean_Curvature"
+
+				//modified = 1;
+			}
+			else
+			{
+				cout << "found no norms!" << endl;
+
+			}
+
+
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "thickness scalars between computed " << endl;
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+
+	
+		END_UNDO_SET();
+}
+	
+
+		
+	
+}
+
+std::vector<std::string> mqMorphoDigCore::getActorNames()
+{
+	std::vector<std::string> myList;
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Scalar thickness:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		myList.push_back(myActor->GetName());
+	}
+	return myList;
+}
+
+vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
+{
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Scalar thickness:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetName().compare(actorName.toStdString())==0)
+		{
+			return myActor;
+		}
+	}
+
+
+	return NULL;
+}
+void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit )
+{
+	std::string mScalarName = "Thickness";
+	if (scalarName.length() >0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
+	
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Scalar thickness:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			myActor->SetSelected(0);
+			// here we can call : 
+			this->scalarsThicknessBetween( max_thickness,  smooth_normales,  avg,  scalarName,  myActor, myActor, angularLimit);
+			modified = 1;
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "thickness scalars computed " << endl;
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+		
+	}
+}
+void mqMorphoDigCore::scalarsGaussianBlur()
+{
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Largest region of next actor:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			myActor->SetSelected(0);
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+				vtkDoubleArray *currentScalars;
+				currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
+
+
+				double numvert = mymapper->GetInput()->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);
+				newScalars->SetNumberOfTuples(numvert);
+
+
+				if (currentScalars != NULL)
+				{
+					std::string scname = mPD->GetPointData()->GetScalars()->GetName();
+					std::string sTags("Tags");
+					std::size_t found = scname.find(sTags);
+
+					if (found == std::string::npos)
+					{
+						vtkSmartPointer<vtkExtractEdges> extractEdges =
+							vtkSmartPointer<vtkExtractEdges>::New();
+						extractEdges->SetInputData((vtkPolyData*)mPD);
+						extractEdges->Update();
+
+						vtkSmartPointer<vtkPolyData> mesh = extractEdges->GetOutput();
+
+						vtkSmartPointer<vtkFloatArray> newScalars =
+							vtkSmartPointer<vtkFloatArray>::New();
+
+						newScalars->SetNumberOfComponents(1);
+						newScalars->SetNumberOfTuples(numvert);
+
+						vtkIdType ve;
+
+
+						double vn[3];
+						vn[0] = 0;
+						vn[1] = 0;
+						vn[2] = 1;
+						double picked_value = 0;
+						for (ve = 0; ve<numvert; ve++)
+						{
+							// get all vertices connected to this point (neighbouring vertices).
+							//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+							vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+							connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
+
+							vtkSmartPointer<vtkIdTypeArray> ids =
+								vtkSmartPointer<vtkIdTypeArray>::New();
+							ids->SetNumberOfComponents(1);
+							//if (ve<10){std::cout << "Connected vertices: ";}
+							for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
+							{
+								//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+								ids->InsertNextValue(connectedVertices->GetId(j));
+							}
+							float newscalar = 0;
+							int n_vertices = connectedVertices->GetNumberOfIds();
+
+							newscalar = 0;
+
+							//on ajoute une fois la valeur actuelle.
+
+							// get all scalars 				
+							//if (ve<10){std::cout<<std::endl;}
+
+							for (vtkIdType j = 0; j<ids->GetNumberOfTuples(); j++)
+							{	// for all neighbouring vertices							
+								vtkIdType at = ids->GetTuple(j)[0];
+								//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
+								double curr_scalar = (double)(currentScalars->GetTuple(at))[0];
+								//std::cout<<curr_scalar<<std::endl;
+								newscalar += curr_scalar;
+
+							}
+							if (n_vertices>0)
+							{
+								newscalar /= n_vertices;
+							}
+
+							// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
+							newScalars->InsertTuple1(ve, newscalar);
+
+
+						}
+						//std::cout<<"New Scalar computation done "<<std::endl;
+						std::string sc_name = this->Getmui_ActiveScalars()->Name.toStdString();
+						newScalars->SetName(sc_name.c_str());
+						mPD->GetPointData()->RemoveArray(sc_name.c_str());
+						//std::cout<<"Add array "<<std::endl;
+						mPD->GetPointData()->AddArray(newScalars);
+						//std::cout<<"Set Active scalar"<<std::endl;
+						mPD->GetPointData()->SetActiveScalars(sc_name.c_str());
+					}// not scalar "Tags
+					else
+					{
+						std::cout << "Cannot smooth Tags" << std::endl;
+					}
+				}//scalars not null
+
+
+				modified = 1;
+
+			}
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars updated " << endl;		
+		this->Render();
+	}
+
+
+
+}
+
 void mqMorphoDigCore::addKeepLargest()
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -5680,8 +7322,7 @@ void mqMorphoDigCore::addKeepLargest()
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
-
+			
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
 				{
@@ -5784,6 +7425,7 @@ void mqMorphoDigCore::addKeepLargest()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Largest region object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -5818,6 +7460,7 @@ void mqMorphoDigCore::DeleteSelectedActors()
 	this->NodeLandmarkCollection->DeleteSelectedActors();
 	this->HandleLandmarkCollection->DeleteSelectedActors();
 	this->FlagLandmarkCollection->DeleteSelectedActors();
+	emit this->actorsMightHaveChanged();
 	
 }
 void mqMorphoDigCore::addInvert()
@@ -5841,8 +7484,7 @@ void mqMorphoDigCore::addInvert()
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
-				//		@@@
-
+		
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
 				{
@@ -5950,6 +7592,7 @@ void mqMorphoDigCore::addInvert()
 
 
 			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
 			std::string action = "Inverted object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
@@ -6093,12 +7736,15 @@ to achieve desired the correct rendering. Do not understand why yet.
 	}
 }
 */
-int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, int save_norms, vtkMDActor *myActor)
+int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt, int save_norms, vtkMDActor *myActor)
 {
 	// Write_Type 0 : Binary LE or "Default Binary"
 	// Write_Type 1 : Binary BE 
 	// Write_Type 2 : ASCII
-	
+
+
+	// if length = 1 and contains "all" or length = 0 => save all scalars.
+	// else : remove the selected scalars
 
 	// Position_mode 0 : orignal position
 	// Position_mode 1 : moved position
@@ -6106,7 +7752,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	// File_type 0 : stl
 	// File_type 1 : vtk-vtp
 	// File_type 2 : ply
-	
+
 	// If myActor is NULL : => what will be saved is an aggregation of all selected surface objects.
 	// If myActor is not NULL: => what will be saved is the underlying surface object.
 
@@ -6124,7 +7770,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
 	int Ok = 1;
 
-	
+
 	if (myActor == NULL)
 	{
 		//cout << "myActor is null" << endl;
@@ -6204,7 +7850,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			}
 
 		}
-		
+
 	}
 
 	Ok = 1;
@@ -6214,6 +7860,235 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		mergedObjects->GetOutput()->GetPointData()->SetNormals(NULL);
 		mergedObjects->GetOutput()->GetCellData()->SetNormals(NULL);
 	}
+	if (scalarsToBeRemoved.size() > 0)
+	{
+		for (int i = 0; i < scalarsToBeRemoved.size(); i++)
+		{
+			cout << "Removed scalar:" << scalarsToBeRemoved.at(i) << endl;
+				mergedObjects->GetOutput()->GetPointData()->RemoveArray(scalarsToBeRemoved.at(i).c_str());
+		}
+	}
+
+	// "RGB"
+	if (RGBopt == 0)
+	{
+		// then do nothing, as we will keep RGB scalars (if those exist), and if they don't we do not care
+	}
+	else if (RGBopt ==1)
+	{ 
+		//remove RGB scalars if they exist
+		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
+	}
+	else if (RGBopt == 2)
+	{
+		vtkSmartPointer<vtkUnsignedCharArray> newcolors =
+			vtkSmartPointer<vtkUnsignedCharArray>::New();
+		newcolors->SetNumberOfComponents(4);
+		newcolors->SetNumberOfTuples(mergedObjects->GetOutput()->GetNumberOfPoints());
+		
+		vtkIdType iRGB = 0;
+		int nr, ng, nb, na;
+		this->ActorCollection->InitTraversal();
+		QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+		QString none = QString("none");
+		QString RGB = QString("RGB");
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor2->GetSelected() == 1)
+			{
+				
+				
+
+
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
+				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+				{
+					// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
+					int RGB_fromglobal = 1;
+					// if current active scalar is not the "none" one, and if the actor as current active scalar.
+					//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+					if (ActiveScalar != none && 	mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+					{
+						RGB_fromglobal = 0;
+					}
+
+					//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
+					//colors->SetNumberOfComponents(4);
+					//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars("RGB");
+					//vtkFloatArray *currentFScalars = (vtkFloatArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mapper->GetInput()->GetPointData()->GetScalars("RGB");
+					vtkFloatArray *currentFScalars = (vtkFloatArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					
+
+						
+
+						
+					
+					// on cherche la scalar active pour ce maillage
+					vtkSmartPointer<vtkPolyData> toSave = mapper->GetInput();
+					for (vtkIdType j = 0; j < toSave->GetNumberOfPoints(); j++)
+					{
+						//Fill nr ng nb with at least something... 
+						nr = (unsigned char)(255 * myActor2->GetmColor()[0]);
+						ng = (unsigned char)(255 * myActor2->GetmColor()[1]);
+						nb = (unsigned char)(255 * myActor2->GetmColor()[2]);
+						na = (unsigned char)(255 * myActor2->GetmColor()[3]);
+
+						//1st case  : the current actor has not the currently active scalar.
+						if (RGB_fromglobal == 1)
+						{
+							//do nothing here as nr ng nb na have already been correctly instantiated just above
+						
+						}
+						else
+						{
+							// 2 cases : 
+							//      A: active scalar = RGB => so we retake RGB... as we have started to do so earlier!
+							if (ActiveScalar == RGB)
+							{
+								if (colors != NULL)
+								{
+									nr = (unsigned char)(colors->GetTuple(j)[0]);
+									ng = (unsigned char)( colors->GetTuple(j)[1]);
+									nb = (unsigned char)(colors->GetTuple(j)[2]);
+									na = (unsigned char)(colors->GetTuple(j)[3]);
+								}
+								// else we keep global RGB as instantiated above.
+								
+							}
+							else
+							{
+								//      B: active scalar = 1 scalar or tag => we translate scalar or tag as RGB
+								if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+									this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+									)
+									&& this->Getmui_ActiveScalars()->NumComp == 1)
+								{
+
+									double cscalar = 0;
+									if (currentFScalars!=NULL)
+									{
+										cscalar = (double)currentFScalars->GetTuple(j)[0];
+									}
+									if (currentDScalars != NULL)
+									{
+										cscalar = currentDScalars->GetTuple(j)[0];
+									}
+									// retrieve scalar value
+									
+									double cRGB[3];
+									double cOpac=1;
+									mapper->GetLookupTable()->GetColor(cscalar, cRGB);
+									nr = (unsigned char)(255 * cRGB[0]);
+									ng = (unsigned char)(255 * cRGB[1]);
+									nb = (unsigned char)(255 * cRGB[2]);
+									na= (unsigned char)(255 * mapper->GetLookupTable()->GetOpacity(cscalar));
+									
+									// translate it as RGB
+
+
+								}
+								// else we keep global RGB as instantiated above.
+								
+							}
+							
+							
+
+						}
+
+
+
+						newcolors->InsertTuple4(iRGB, nr, ng, nb, na);
+						iRGB++;
+
+					}
+				}
+
+			}
+
+		}
+		newcolors->SetName("RGB");
+		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
+		mergedObjects->GetOutput()->GetPointData()->AddArray(newcolors);
+
+		// And YES...  NR NG NB should be a 0.. 255 value !!!! For the moment, color[] is a 0.0 ... 1.0 range
+		//std::cout<<"currentScalars null "<<std::endl;
+		
+		
+
+		//create a new RGB scalar!
+		/*
+		From MeshTools 1.3
+		//std::cout<<"Update RGB of "<<this->name<<std::endl;
+		vtkSmartPointer<vtkUnsignedCharArray> newcolors =
+		vtkSmartPointer<vtkUnsignedCharArray>::New();
+		newcolors->SetNumberOfComponents(4);
+		newcolors->SetNumberOfTuples(this->GetNumberOfPoints());
+		vtkFloatArray *currentScalars;
+		currentScalars =(vtkFloatArray*)this->GetPointData()->GetScalars();  // couleur des courbure
+		GLfloat cv[4];
+		// now we create and populate RGB and Tags
+		//std::cout<<"g_scalar_display_mode= "<<g_scalar_display_mode<<std::endl;
+		//std::cout<<"g_tag_display_mode= "<<g_tag_display_mode<<std::endl;
+		if (currentScalars!=NULL && (g_scalar_display_mode ==1 || g_tag_display_mode ==1))
+		{
+		//	std::cout<<"currentScalars not null "<<std::endl;
+		}
+		else
+		{
+		//	std::cout<<"currentScalars null "<<std::endl;
+		}
+		for (int i=0;i<this->GetNumberOfPoints();i++)	// for each vertex
+		{
+		//@@@@@
+		int nr,ng,nb,na;
+
+		//Colour scale!
+		if (currentScalars!=NULL && (g_scalar_display_mode ==1 || g_tag_display_mode ==1))
+		{
+		//std::cout<<"currentScalars not null "<<std::endl;
+		double cur_t = currentScalars->GetTuple(i)[0];
+
+		ConvertScalarToColor((float)cur_t, cv, 1);
+		nr= (unsigned char)(mround(255*cv[0]));
+		ng= (unsigned char)(mround(255*cv[1]));
+		nb= (unsigned char)(mround(255*cv[2]));
+		na= (unsigned char)(mround(255*cv[3]));
+
+
+		}
+		else
+		{
+		// And YES...  NR NG NB should be a 0.. 255 value !!!! For the moment, color[] is a 0.0 ... 1.0 range
+		//std::cout<<"currentScalars null "<<std::endl;
+		nr= (unsigned char)(mround(255*this->color[0]));
+		ng= (unsigned char)(mround(255*this->color[1]));
+		nb= (unsigned char)(mround(255*this->color[2]));
+		na= (unsigned char)(mround(255*this->blend));
+
+		}
+		if (i<500)
+		{
+		//std::cout<<"nr="<<nr<<", ng="<<ng<<", nb="<<nb<<std::endl;
+		}
+		////newcolors->InsertTuple3(i, (unsigned char)mround(255*cv[0]),(unsigned char)mround(255*cv[1]),(unsigned char)mround(255*cv[2]));
+		//newcolors->InsertTuple3(i, 0,0,255);
+		if(i<10)
+		{
+		//std::cout<<"nr="<<nr<<", ng="<<ng<<", nb="<<nb<<", na="<<na<<std::endl;
+		}
+		newcolors->InsertTuple4(i, nr,ng,nb,na);
+		newcolors->InsertTuple4(i, nr,ng,nb,na);
+		}
+		newcolors->SetName("RGB");
+
+		*/
+	}
+
+
 	if (file_type == 0)
 	{
 		vtkSmartPointer<vtkSTLWriter> Writer =
@@ -6238,7 +8113,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 		}
 		
-			Writer->SetFileName(fileName.toStdString().c_str());
+			Writer->SetFileName(fileName.toLocal8Bit());
 			Writer->SetInputData(mergedObjects->GetOutput());
 			//  stlWrite->Update();
 			Writer->Write();
@@ -6266,8 +8141,15 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		{
 			fileName.append(".vtk");
 		}
+		//cout << "fileName utf8" << fileName.toUtf8().toStdString() << endl;
+		//cout << "fileName local 8bits" << fileName.toLocal8Bit().toStdString() << endl;
+		//cout << "fileName local 8bits raw" << fileName.toLocal8Bit().toStdString << endl;
+		//fileName = QString::fromUtf8(fileName.toLocal8Bit());
+		//fileName = QString::fromLocal8Bit(fileName.toLocal8Bit());
 		
-		Writer->SetFileName(fileName.toStdString().c_str());
+	//	cout << "fileName raw toSTD" << fileName.toStdString()<< endl;
+		
+			Writer->SetFileName(fileName.toLocal8Bit());
 		Writer->SetInputData(mergedObjects->GetOutput());
 		//  stlWrite->Update();
 		Writer->Write();
@@ -6303,7 +8185,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		vtkUnsignedCharArray* test = (vtkUnsignedCharArray*)MyMergedObject->GetPointData()->GetScalars("RGB");
 		if (test != NULL)
 		{
-			// std::cout<<"Colors found!"<<std::endl;
+			// for the moment: useless piece of code... 
+			 std::cout<<"Save Surface file: colors found inside merged object!"<<std::endl;
 
 			vtkSmartPointer<vtkUnsignedCharArray> colors =
 				vtkSmartPointer<vtkUnsignedCharArray>::New();
@@ -6329,7 +8212,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			colorsRGB->SetName("Colors");
 			MyMergedObject->GetPointData()->AddArray(colorsRGB);
 			//colors->SetName("Colors");	  
-			//std::cout << "Colors num of tuples :" << colors->GetNumberOfTuples() << std::endl;
+			std::cout << "Colors num of tuples :" << colors->GetNumberOfTuples() << std::endl;
 			for (int i = 0; i<10; i++)
 			{
 				//std::cout<<"RGB stuff i:"<<colors->GetTuple(i)[0]<<","<<colors->GetTuple(i)[1]<<","<<colors->GetTuple(i)[2]<<std::endl;
@@ -6337,6 +8220,15 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			}
 			Writer->SetArrayName("Colors");
 		}
+		else
+		{
+
+			cout << "Save surface file: No 4 colors found inside merged object" << endl;
+
+		}
+
+
+	
 
 
 		std::size_t found = fileName.toStdString().find(PLYext);
@@ -6345,10 +8237,10 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		{
 			fileName.append(".ply");
 		}
-		ifstream file(fileName.toStdString().c_str());
+		ifstream file(fileName.toLocal8Bit());
 		
 		
-			Writer->SetFileName(fileName.toStdString().c_str());
+			Writer->SetFileName(fileName.toLocal8Bit());
 			//
 			Writer->SetInputData(MyMergedObject);
 			//Writer->SetInputData((vtkPolyData*)My_Obj);	
@@ -6634,6 +8526,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		
 		
 		this->NormalLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NormalLandmarkCollection->SetChanged(1);
 		std::string action = "Create Normal landmark";
@@ -6646,6 +8539,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	{
 
 		this->TargetLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->TargetLandmarkCollection->SetChanged(1);
 		std::string action = "Create Target landmark";
@@ -6657,6 +8551,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	else if (lmk_type == NODE_LMK)
 	{
 		this->NodeLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NodeLandmarkCollection->SetChanged(1);
 		std::string action = "Create Curve Node";
@@ -6668,6 +8563,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	else if (lmk_type == HANDLE_LMK)
 	{
 		this->HandleLandmarkCollection->AddItem(myLM);
+		emit this->actorsMightHaveChanged();
 		this->HandleLandmarkCollection->ReorderLandmarks();
 		this->HandleLandmarkCollection->SetChanged(1);
 		std::string action = "Create Curve Handle";
@@ -6677,7 +8573,8 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	}
 	else if (lmk_type == FLAG_LMK)
 	{
-		this->FlagLandmarkCollection->AddItem(myLM);		
+		this->FlagLandmarkCollection->AddItem(myLM);	
+		emit this->actorsMightHaveChanged();
 		this->FlagLandmarkCollection->SetChanged(1);
 		std::string action = "Create Flag Landmark";
 		int mCount = BEGIN_UNDO_SET(action);
@@ -6805,7 +8702,13 @@ void mqMorphoDigCore::SetMainWindow(QMainWindow *_mainWindow)
 QMainWindow* mqMorphoDigCore::GetMainWindow() {
 	return this->MainWindow	;
 }
-
+void mqMorphoDigCore::SetProjectWindow(QMainWindow *_projectWindow)
+{
+	this->ProjectWindow = _projectWindow;
+}
+QMainWindow* mqMorphoDigCore::GetProjectWindow() {
+	return this->ProjectWindow;
+}
 //Called to repplace camera and grid positions when switching from "orange grid mode" to "blue grid mode"
 //= when camera focalpoint and grid center are changed between 0,0,0 and COM of all opened meshes.
 void mqMorphoDigCore::ReplaceCameraAndGrid()
@@ -7088,7 +8991,8 @@ void mqMorphoDigCore::ResetCameraOrthoPerspective()
 	//cout << "Camera Position:" << campos[0] <<","<<campos[1]<<","<<campos[2]<< endl;
 	this->getCamera()->GetFocalPoint(foc);
 	//cout << "Camera Position:" << foc[0] << "," << foc[1] << "," << foc[2] << endl;
-	dist = sqrt(pow((campos[0] - foc[0]), 2) + pow((campos[1] - foc[1]), 2) + pow((campos[2] - foc[2]), 2));
+	
+	dist = sqrt(vtkMath::Distance2BetweenPoints(campos, foc));
 	//cout << "Distance between camera and focal point:" << dist << endl;
 
 	//cout << "Camera viewing angle:" << this->MorphoDigCore->getCamera()->GetViewAngle() << endl;
@@ -7112,7 +9016,7 @@ void mqMorphoDigCore::DollyCameraForParallelScale()
 	this->getCamera()->GetPosition(campos);
 	this->getCamera()->GetFocalPoint(foc);
 	double dist = sqrt(vtkMath::Distance2BetweenPoints(campos, foc));
-	//double dist = sqrt(pow((campos[0] - foc[0]), 2) + pow((campos[1] - foc[1]), 2) + pow((campos[2] - foc[2]), 2));
+	
 	double multfactor = 1 / tan(this->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
 
 	double newparallelscale = dist / multfactor;
@@ -7318,7 +9222,7 @@ void mqMorphoDigCore::SetGridInfos()
 
 	}
 	this->Render();*/
-	//this->Render();
+	this->Render();
 }
 
 void mqMorphoDigCore::SetOrientationHelperVisibility()
@@ -7644,11 +9548,11 @@ void mqMorphoDigCore::Setmui_SizeUnit(QString unit) { this->mui_SizeUnit = unit;
 QString mqMorphoDigCore::Getmui_SizeUnit() { return this->mui_SizeUnit; }
 QString mqMorphoDigCore::Getmui_DefaultSizeUnit() { return this->mui_DefaultSizeUnit; }
 
-void mqMorphoDigCore::Setmui_MoveAll(int moveall) { this->mui_MoveAll= moveall;
-if (moveall == 0) { this->UnselectAll(-1);  }
+void mqMorphoDigCore::Setmui_MoveMode(int movemode) { this->mui_MoveMode= movemode;
+if (movemode == 0) { this->UnselectAll(-1);  }
 }
-int mqMorphoDigCore::Getmui_MoveAll() { return this->mui_MoveAll; }
-int mqMorphoDigCore::Getmui_DefaultMoveAll() { return this->mui_DefaultMoveAll; };
+int mqMorphoDigCore::Getmui_MoveMode() { return this->mui_MoveMode; }
+int mqMorphoDigCore::Getmui_DefaultMoveMode() { return this->mui_DefaultMoveMode; };
 
 void mqMorphoDigCore::Setmui_ScalarVisibility(int scalarvisibility)
 {
@@ -7730,14 +9634,139 @@ ExistingScalars * mqMorphoDigCore::Getmui_ExistingScalars()
 	return this->mui_ExistingScalars;
 }
 
+
+ExistingScalars * mqMorphoDigCore::Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDActor> actor)
+{
+	// browse through all actors and check for existing scalar
+	// add
+	cout << "Init mui scalars of selected objects" << endl;
+	QStringList existing;
+	this->mui_ScalarsList->Stack.clear();
+	QString none = QString("none");
+	this->mui_ScalarsList->Stack.push_back(ExistingScalars::Element(none, -1, 0));
+	
+	vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+
+	if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+	{
+		vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+		int nbarrays = myPD->GetPointData()->GetNumberOfArrays();
+		for (int i = 0; i < nbarrays; i++)
+		{
+			//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << endl;
+			int num_comp = myPD->GetPointData()->GetArray(i)->GetNumberOfComponents();
+			//cout << "Array" << i << " has "<<myPD->GetPointData()->GetArray(i)->GetNumberOfComponents()<< " components"<<endl;
+			//std::cout << VTK_UNSIGNED_CHAR << " unsigned char" << std::endl;
+			//std::cout << VTK_UNSIGNED_INT << " unsigned int" << std::endl;
+			//std::cout << VTK_FLOAT << " float" << std::endl;
+			//std::cout << VTK_DOUBLE << " double" << std::endl;
+			int dataType = myPD->GetPointData()->GetArray(i)->GetDataType();
+
+			if (dataType == VTK_UNSIGNED_CHAR && (num_comp == 3 || num_comp == 4))
+			{
+				// ok to add RGB like scalars
+				cout << "Found RGB like" << endl;
+				QString RGBlike = QString(myPD->GetPointData()->GetArrayName(i));
+				this->Addmui_ExistingScalars(RGBlike, dataType, num_comp, 0);
+			}
+			if ((dataType == VTK_UNSIGNED_INT || dataType == VTK_INT) && (num_comp == 1))
+			{
+				// ok to add TAG like scalars
+				QString Taglike = QString(myPD->GetPointData()->GetArrayName(i));
+				this->Addmui_ExistingScalars(Taglike, dataType, num_comp, 0);
+			}
+			if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 1))
+			{
+				// ok to add conventional scalars (like curvature, thickness, height etc... )
+				QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
+				this->Addmui_ExistingScalars(ConvScalar, dataType, num_comp, 0);
+			}
+
+		}
+
+	}			
+	int exists = 0;
+	return this->mui_ScalarsList;
+}
+ExistingScalars * mqMorphoDigCore::Getmui_ScalarsOfSelectedObjects(int onlyfirst)
+{
+	
+		// browse through all actors and check for existing scalar
+	// add
+	cout << "Init mui scalars of selected objects" << endl;
+	QStringList existing;
+	this->ActorCollection->InitTraversal();
+	this->mui_ScalarsList->Stack.clear();
+	QString none = QString("none");
+	this->mui_ScalarsList->Stack.push_back(ExistingScalars::Element(none,-1,0));
+	int stop = 0;
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if(myActor->GetSelected()==1 &&stop ==0)
+		{
+			if (onlyfirst == 1) { stop = 1; }
+			vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		
+			if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+			{
+				vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+				int nbarrays = myPD->GetPointData()->GetNumberOfArrays();
+				for (int i = 0; i < nbarrays; i++)
+				{
+					//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << endl;
+					int num_comp = myPD->GetPointData()->GetArray(i)->GetNumberOfComponents();
+					//cout << "Array" << i << " has "<<myPD->GetPointData()->GetArray(i)->GetNumberOfComponents()<< " components"<<endl;
+					//std::cout << VTK_UNSIGNED_CHAR << " unsigned char" << std::endl;
+					//std::cout << VTK_UNSIGNED_INT << " unsigned int" << std::endl;
+					//std::cout << VTK_FLOAT << " float" << std::endl;
+					//std::cout << VTK_DOUBLE << " double" << std::endl;
+					int dataType = myPD->GetPointData()->GetArray(i)->GetDataType();
+
+
+					if (dataType == VTK_UNSIGNED_CHAR && (num_comp == 3 || num_comp == 4))
+					{
+						// ok to add RGB like scalars
+						QString RGBlike = QString(myPD->GetPointData()->GetArrayName(i));
+						this->Addmui_ExistingScalars(RGBlike, dataType, num_comp, 0);
+					}
+					if ((dataType == VTK_UNSIGNED_INT || dataType == VTK_INT) && (num_comp == 1))
+					{
+						// ok to add TAG like scalars
+						QString Taglike = QString(myPD->GetPointData()->GetArrayName(i));
+						this->Addmui_ExistingScalars(Taglike, dataType, num_comp, 0);
+					}
+					if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 1))
+					{
+						// ok to add conventional scalars (like curvature, thickness, height etc... )
+						QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
+						this->Addmui_ExistingScalars(ConvScalar, dataType, num_comp, 0);
+					}
+
+				}
+
+			}
+		}
+
+
+	}
+	int exists = 0;
+
+
+	
+	return this->mui_ScalarsList;
+
+}
+
 ExistingColorMaps * mqMorphoDigCore::Getmui_ExistingColorMaps()
 {
 	return this->mui_ExistingColorMaps;
 
 }
 
-void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int numComp)
+void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int toglobalList)
 {
+	// if only_selected == 1 : populate the list of scalars of selected actors
 	int exists = 0;
 	QString none = QString("none");
 	/*if (this->mui_ExistingScalars.size() == 1 && this->mui_ExistingScalars.at(0) == none)
@@ -7751,9 +9780,19 @@ void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int n
 	{*/
 		
 		//check first if Scalar already exists!
-		for (int i = 0; i < this->mui_ExistingScalars->Stack.size(); i++)
+	ExistingScalars * myCurrentScalarList;
+	if (toglobalList ==1)
+	{
+		myCurrentScalarList = this->mui_ExistingScalars;
+	}
+	else
+	{
+		myCurrentScalarList = this->mui_ScalarsList;
+	}
+
+		for (int i = 0; i < myCurrentScalarList->Stack.size(); i++)
 		{
-			QString myScalar = this->mui_ExistingScalars->Stack.at(i).Name;
+			QString myScalar = myCurrentScalarList->Stack.at(i).Name;
 			if (myScalar == Scalar)
 			{
 				exists = 1;
@@ -7763,11 +9802,13 @@ void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int n
 		}
 		if (exists == 0)
 		{
-			this->mui_ExistingScalars->Stack.push_back(ExistingScalars::Element(Scalar, dataType, numComp));
+			myCurrentScalarList->Stack.push_back(ExistingScalars::Element(Scalar, dataType, numComp));
 			
 		}
 	/*}*/
 }
+
+
 void mqMorphoDigCore::Initmui_ExistingScalars()
 {
 	// browse through all actors and check for existing scalar
@@ -7870,7 +9911,7 @@ void mqMorphoDigCore::Initmui_ExistingScalars()
 	}
 
 	// if RGB exists, and this->mui_ActiveScalars ==none, set active scalar to RGB
-	QString RGB = QString("RGB");
+	/*QString RGB = QString("RGB");
 	for (int i = 0; i < this->mui_ExistingScalars->Stack.size(); i++)
 	{
 		QString myScalar = this->mui_ExistingScalars->Stack.at(i).Name;
@@ -7881,7 +9922,7 @@ void mqMorphoDigCore::Initmui_ExistingScalars()
 
 		}
 
-	}
+	}*/
 	
 	// last case : no RGB and none is not set as the active scalar before.
 	if (exists == 0)
@@ -8062,6 +10103,8 @@ void mqMorphoDigCore::Setmui_ActiveScalars(QString Scalar, int dataType, int num
 			}*/
 
 }
+
+
 
 
 int mqMorphoDigCore::Getmui_DefaultAnaglyph() { return this->mui_DefaultAnaglyph; }
@@ -8428,6 +10471,7 @@ void mqMorphoDigCore::Undo()
 	//this->ActorCollection->Undo(MySet);
 	//cout << "Root Undo!" << endl;
 	this->UndoStack->undo(); // removes the next undo set.. 
+	emit this->actorsMightHaveChanged();
 
 }
 void mqMorphoDigCore::Undo(int Count)
@@ -8507,6 +10551,7 @@ void mqMorphoDigCore::Redo()
 {
 	//cout << "Root Redo!" << endl;
 	this->UndoStack->redo(); // removes the next undo set.. 
+	emit this->actorsMightHaveChanged();
 }
 
 void mqMorphoDigCore::Redo(int Count)
@@ -8669,24 +10714,24 @@ void mqMorphoDigCore::setUndoStack(mqUndoStack* stack)
 
 void mqMorphoDigCore::signal_existingScalarsChanged()
 {
-	cout << "Emit existing scalars changed" << endl;
+	//cout << "Emit existing scalars changed" << endl;
 	emit this->existingScalarsChanged();
 }
 
 void mqMorphoDigCore::signal_projectionModeChanged()
 {
-	cout << "Emit projection Mode Changed" << endl;
+	//cout << "Emit projection Mode Changed" << endl;
 	emit this->projectionModeChanged();
 }
 void mqMorphoDigCore::signal_zoomChanged()
 {
-	cout << "Emit projection Mode Changed" << endl;
+	//cout << "Emit projection Mode Changed" << endl;
 	emit this->zoomChanged();
 }
 
 void mqMorphoDigCore::signal_actorSelectionChanged()
 {
-	cout << "Emit actor Selection changed" << endl;
+	//cout << "Emit actor Selection changed" << endl;
 	emit this->actorSelectionChanged();
 }
 void mqMorphoDigCore::signal_lmSelectionChanged()
@@ -8771,6 +10816,19 @@ void mqMorphoDigCore::TransformPoint(vtkMatrix4x4* matrix, double pointin[3], do
 	pointout[2] = pointNew[2];
 }
 
+void mqMorphoDigCore::RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]) {
+	/*result[0] = input[0]*mat[0][0] + input[1]*mat[1][0] + input[2]*mat[2][0];	
+	result[1] = input[0]*mat[0][1] + input[1]*mat[1][1] + input[2]*mat[2][1];	
+	result[2] = input[0]*mat[0][2] + input[1]*mat[1][2] + input[2]*mat[2][2];	*/
+	
+	normout[0] = normin[0] * matrix->GetElement(0, 0) + normin[1] * matrix->GetElement(0, 1) + normin[2] * matrix->GetElement(0, 2);
+	normout[1] = normin[0] * matrix->GetElement(1, 0) + normin[1] * matrix->GetElement(1, 1) + normin[2] * matrix->GetElement(1, 2);
+	normout[2] = normin[0] * matrix->GetElement(2, 0) + normin[1] * matrix->GetElement(2, 1) + normin[2] * matrix->GetElement(2, 2);
+	/*normout[0] = normin[0] * matrix->GetElement(0, 0) + normin[1] * matrix->GetElement(1, 0) + normin[2] * matrix->GetElement(2, 0);
+	normout[1] = normin[0] * matrix->GetElement(0, 1) + normin[1] * matrix->GetElement(1, 1) + normin[2] * matrix->GetElement(2, 1);
+	normout[2] = normin[0] * matrix->GetElement(0, 2) + normin[1] * matrix->GetElement(1, 2) + normin[2] * matrix->GetElement(2, 2);*/
+
+}
 void mqMorphoDigCore::SetSelectedActorsColor(int r, int g, int b) 
 {
 	int num_selected = this->ActorCollection->GetNumberOfSelectedActors();
@@ -8881,11 +10939,48 @@ void mqMorphoDigCore::slotLandmarkMoveDown()
 	this->LandmarksMoveDown();
 }
 
+void mqMorphoDigCore::slotLassoCutKeepInside() { this->startLasso(1); }
+void mqMorphoDigCore::slotLassoCutKeepOutside() { this->startLasso(0); }
+void mqMorphoDigCore::slotLassoTagInside() { this->startLasso(3); }
+void mqMorphoDigCore::slotLassoTagOutside() { this->startLasso(2); }
+
 void mqMorphoDigCore::slotConvexHULL() { this->addConvexHull(); }
 void mqMorphoDigCore::slotMirror() { this->addMirrorXZ(); }
 void mqMorphoDigCore::slotInvert() { 
 		this->addInvert(); 
 
+}
+
+
+void mqMorphoDigCore::slotScalarsRGB()
+{
+	QString RGB = QString("RGB");
+	QInputDialog *newRGBName= new QInputDialog();
+	bool dialogResult;
+	QString newRGB = newRGBName->getText(0, "RGB array name", "name:", QLineEdit::Normal,
+		RGB, &dialogResult);
+	if (dialogResult)
+	{
+		cout << "RGB chosen name:" << newRGB.toStdString() << endl;
+		mqMorphoDigCore::instance()->scalarsRGB(newRGB);		
+	}
+	else
+	{
+		cout << "cancel " << endl;
+	}
+
+
+	
+}
+
+void mqMorphoDigCore::slotScalarsCameraDistance()
+{
+	this->scalarsCameraDistance();
+}
+
+void mqMorphoDigCore::slotScalarsGaussianBlur()
+{
+	this->scalarsGaussianBlur();
 }
 
 void mqMorphoDigCore::slotKeepLargest() {

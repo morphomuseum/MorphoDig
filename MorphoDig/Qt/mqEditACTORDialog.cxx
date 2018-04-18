@@ -24,6 +24,8 @@
 #include <QFileDialog>
 #include <QCheckBox>
 #include <QHeaderView>
+#include <QListWidgetItem>
+#include <QInputDialog>
 
 
 #include <sstream>
@@ -197,12 +199,17 @@ mqEditACTORDialog::mqEditACTORDialog(QWidget* Parent)
 	this->Ui->M31->setValue(0);
 	this->Ui->M32->setValue(0);
 	this->Ui->M33->setValue(1);
+
+
+
 	this->UpdateUI();
 	
  
 	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedActors()));
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveActor()));
  connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
+connect(this->Ui->deleteScalar, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()));
+connect(this->Ui->editScalar, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
 
 }
 
@@ -429,6 +436,52 @@ void mqEditACTORDialog::UpdateUI()
 		this->Ui->M31->setValue(Mat->GetElement(3, 1));
 		this->Ui->M32->setValue(Mat->GetElement(3, 2));
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
+		//QListView
+		//QItemDelegate
+
+		this->Ui->scalarList->clear();
+		ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfActor(this->ACTOR);
+		for (int i = 0; i < MyList->Stack.size(); i++)
+		{
+			if (
+				((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+				|| (MyList->Stack.at(i).DataType == VTK_UNSIGNED_CHAR  && MyList->Stack.at(i).NumComp >= 3)
+				
+				
+				)
+			{
+				
+				
+				QListWidgetItem* item = new QListWidgetItem(MyList->Stack.at(i).Name, this->Ui->scalarList);
+				
+				/*QWidget* widget = new QWidget();
+				QLabel* widgetText = new QLabel(MyList->Stack.at(i).Name);						
+				//QPushButton* widgetButtonDelete = new QPushButton("D");
+				//QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
+				//widgetButtonDelete->setFixedWidth(20);
+				//widgetButtonDelete->setAccessibleName
+				//QPushButton* widgetButtonEdit = new QPushButton("E");
+				//widgetButtonEdit->setFixedWidth(20);
+				QHBoxLayout * widgetLayout = new QHBoxLayout();
+				widgetLayout->addWidget(widgetText);
+				//widgetLayout->addWidget(widgetButtonEdit);
+				//widgetLayout->addWidget(widgetButtonDelete);
+				widgetLayout->addStretch();
+
+				//connect(widgetButtonDelete, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()));
+				//connect(widgetButtonEdit, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
+
+				widgetLayout->setSizeConstraint(QLayout::SetFixedSize);
+				widget->setLayout(widgetLayout);					
+				item->setSizeHint(widget->sizeHint());
+				this->Ui->scalarList->addItem(item);
+				this->Ui->scalarList->setItemWidget(item, widget);*/
+			
+				
+			}
+
+		}
+
 		/*stream << Mat->GetElement(0, 0) << " " << Mat->GetElement(1, 0) << " " << Mat->GetElement(2, 0) << " " << Mat->GetElement(3, 0) << endl;
 		stream << Mat->GetElement(0, 1) << " " << Mat->GetElement(1, 1) << " " << Mat->GetElement(2, 1) << " " << Mat->GetElement(3, 1) << endl;
 		stream << Mat->GetElement(0, 2) << " " << Mat->GetElement(1, 2) << " " << Mat->GetElement(2, 2) << " " << Mat->GetElement(3, 2) << endl;
@@ -486,6 +539,46 @@ void mqEditACTORDialog::GetPrecedingActor()
 			this->ACTOR= vtkMDActor::SafeDownCast(this->ACTOR_Coll->GetLastActor());
 			this->ACTOR->SetSelected(1);
 		}
+	}
+
+}
+void mqEditACTORDialog::slotEditScalar()
+{
+	int row = this->Ui->scalarList->currentIndex().row();
+	if (this->ACTOR != NULL && row >= 0)
+	{
+		QString oldScalarName = this->Ui->scalarList->item(row)->text();
+		cout << "try to edit scalar" << endl;
+		cout << "try to edit scalar " << row << ":" << this->Ui->scalarList->item(row)->text().toStdString() << endl;
+		QInputDialog *renameDialog = new QInputDialog();
+		bool dialogResult;
+		QString newScalarName = renameDialog->getText(0, "Rename Label", "New name:", QLineEdit::Normal,
+			this->Ui->scalarList->item(row)->text(), &dialogResult);
+		if (dialogResult)
+		{
+			cout << "new name given:" << newScalarName.toStdString() << endl;
+			mqMorphoDigCore::instance()->EditScalarName(this->ACTOR, oldScalarName, newScalarName);
+			this->UpdateUI();
+		}
+		else
+		{
+			cout << "cancel " << endl;
+		}
+	}
+}
+void mqEditACTORDialog::slotDeleteScalar()
+{
+	int row = this->Ui->scalarList->currentIndex().row();
+	cout << "try to delete scalar " << row << ":";
+
+	
+	if (this->ACTOR != NULL && row>=0)
+	{
+		cout << this->Ui->scalarList->item(row)->text().toStdString() << endl;
+		mqMorphoDigCore::instance()->DeleteScalar(this->ACTOR, this->Ui->scalarList->item(row)->text());
+		cout << "Try to update UI" << endl;
+		this->UpdateUI();
+		cout << "Try to update UI ok" << endl;
 	}
 
 }

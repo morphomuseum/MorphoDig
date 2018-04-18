@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>446</width>
-    <height>332</height>
+    <height>495</height>
    </rect>
   </property>
   <property name="palette">
@@ -431,24 +431,13 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>290</y>
+     <x>110</x>
+     <y>440</y>
      <width>161</width>
      <height>25</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QDialogButtonBox" name="buttonBox">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <layout class="QHBoxLayout" name="horizontalLayout_2"/>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
@@ -456,11 +445,11 @@
      <x>10</x>
      <y>10</y>
      <width>421</width>
-     <height>271</height>
+     <height>401</height>
     </rect>
    </property>
    <property name="title">
-    <string>Edit actor</string>
+    <string>Edit selected actor</string>
    </property>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -626,8 +615,8 @@
       <height>20</height>
      </rect>
     </property>
-   </widget>   
-     <widget class="QDoubleSpinBox" name="M31">
+   </widget>
+   <widget class="QDoubleSpinBox" name="M31">
     <property name="geometry">
      <rect>
       <x>310</x>
@@ -637,7 +626,7 @@
      </rect>
     </property>
    </widget>
-    <widget class="QDoubleSpinBox" name="M02">
+   <widget class="QDoubleSpinBox" name="M02">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -656,7 +645,7 @@
       <height>20</height>
      </rect>
     </property>
-   </widget>  
+   </widget>
    <widget class="QDoubleSpinBox" name="M22">
     <property name="geometry">
      <rect>
@@ -667,7 +656,6 @@
      </rect>
     </property>
    </widget>
-   
    <widget class="QDoubleSpinBox" name="M32">
     <property name="geometry">
      <rect>
@@ -688,7 +676,7 @@
      </rect>
     </property>
    </widget>
-    <widget class="QDoubleSpinBox" name="M13">
+   <widget class="QDoubleSpinBox" name="M13">
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -697,7 +685,7 @@
       <height>20</height>
      </rect>
     </property>
-   </widget> 
+   </widget>
    <widget class="QDoubleSpinBox" name="M23">
     <property name="geometry">
      <rect>
@@ -757,11 +745,72 @@
      <string>Apply matrix to all selected actors</string>
     </property>
    </widget>
+   <widget class="QGroupBox" name="ActorScalars">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>260</y>
+      <width>331</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Existing scalars</string>
+    </property>
+    <widget class="QListWidget" name="scalarList">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>301</width>
+       <height>61</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>90</y>
+       <width>261</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="editScalar">
+        <property name="text">
+         <string>Edit scalar name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deleteScalar">
+        <property name="text">
+         <string>Delete scalar</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
   </widget>
-  <zorder>layoutWidget</zorder>
-  <zorder>groupBox</zorder>
-  <zorder>buttonBox</zorder>
-  <zorder>buttonBox</zorder>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>440</y>
+     <width>159</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>

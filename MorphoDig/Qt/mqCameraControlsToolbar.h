@@ -41,8 +41,7 @@ public:
  
 
   public slots :
-  virtual void slotClippingPlaneOnOff();
-  virtual void slotBackfaceCullingOnOff();
+  
   virtual void slotZrot(int val);
   //virtual void slotZoom(double val);
   virtual void slotZoom();

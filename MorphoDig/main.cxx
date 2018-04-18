@@ -10,7 +10,10 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QVTKOpenGLWidget.h>
+
+#include <QTextCodec>
 #if QT_VERSION < 0x050000
+
   #include <QCleanlooksStyle>
 #endif
 
@@ -27,7 +30,7 @@ int main( int argc, char* argv[] )
 	fmt.setSamples(0);
 	QSurfaceFormat::setDefaultFormat(fmt);
   QApplication app( argc, argv );
-
+  //QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
   #if QT_VERSION >= 0x050000
     QApplication::setStyle("fusion");
   #else

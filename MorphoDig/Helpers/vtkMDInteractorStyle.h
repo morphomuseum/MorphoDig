@@ -92,7 +92,7 @@ protected:
 
   int StartPosition[2];
   int EndPosition[2];
-
+  int MoveWhat;
   int Moving;
   int ActorsPositionsSaved;
   void SaveSelectedActorsPositions();
@@ -103,6 +103,7 @@ protected:
   void GetCenterOfMassOfSelectedActors(double com[3]);
   vtkUnsignedCharArray *PixelArray;
   void ChangeAttachmentPoint(vtkMatrix4x4 *NewMat, vtkLMActor *LMActor);
+  void ResetMoveWhat();
   int CurrentMode;
   int Ctrl;
   int L;
