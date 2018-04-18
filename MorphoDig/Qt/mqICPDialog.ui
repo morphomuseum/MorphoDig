@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqScalarsCurvatureDialog</class>
- <widget class="QDialog" name="mqScalarsCurvatureDialog">
+ <class>mqICPDialog</class>
+ <widget class="QDialog" name="mqICPDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>241</height>
+    <height>333</height>
    </rect>
   </property>
   <property name="palette">
@@ -426,13 +426,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalars: compute curvature</string>
+   <string>Mesh alignment using ICP</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>200</y>
+     <y>290</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -460,26 +460,104 @@
      <x>10</x>
      <y>10</y>
      <width>411</width>
-     <height>181</height>
+     <height>261</height>
     </rect>
    </property>
    <property name="title">
-    <string>Compute</string>
+    <string>Mesh alignment (iterative closest point algorithm)</string>
    </property>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>100</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximal number of iterations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="impactedObject">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>30</y>
+      <width>161</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>30</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Impacted object:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="observedObject">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>60</y>
+      <width>161</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>60</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Observed object:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="iter">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>100</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>500</number>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>59</x>
-      <y>30</y>
-      <width>291</width>
-      <height>91</height>
+      <x>50</x>
+      <y>160</y>
+      <width>341</width>
+      <height>81</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="meanCurvature">
+      <widget class="QRadioButton" name="rigid">
        <property name="text">
-        <string>Mean curvature</string>
+        <string>Rigid body transformation (rotation, translation)</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -487,53 +565,20 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="maximalCurvature">
+      <widget class="QRadioButton" name="similarity">
        <property name="text">
-        <string>Principal maximal curvature</string>
+        <string>Similarity transformation (rotation, translation,  isotropic scaling)</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="minimalCurvature">
+      <widget class="QRadioButton" name="affine">
        <property name="text">
-        <string>Principal minimal curvature</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="gaussianCurvature">
-       <property name="text">
-        <string>Gaussian curvature</string>
+        <string>Affine transformation (collinearity is preserved)</string>
        </property>
       </widget>
      </item>
     </layout>
-   </widget>
-   <widget class="QLineEdit" name="scalarName">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>150</y>
-      <width>113</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Curvature</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>150</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scalar name:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
    </widget>
   </widget>
  </widget>

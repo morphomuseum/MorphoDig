@@ -27,6 +27,7 @@
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
 //#include "vtkUndoStackInternal.h"
 
+
 #include <QVTKOpenGLWidget.h>
 #include <vtkScalarBarActor.h>
 #include <vtkDiscretizableColorTransferFunction.h>
@@ -552,6 +553,8 @@ public:
   void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit);
   void scalarsCurvature(int curvatureType, QString scalarName);
   void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
+  void scalarsDistance(double maxDist, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor);
+  void ICP(int transformationMode, int iterationNumber, vtkMDActor *impactedActor, vtkMDActor* observedActor);
   vtkMDActor * getFirstActorFromName(QString actorName);
   std::vector<std::string> getActorNames();
   
@@ -633,6 +636,7 @@ signals:
   void actorsMightHaveChanged();
   void modeModeChanged();
   void thicknessProgression(int percent);
+  void distanceProgression(int percent);
 protected:
 	
 	~mqMorphoDigCore();

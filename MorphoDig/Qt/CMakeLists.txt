@@ -189,7 +189,14 @@ mqScalarsCurvatureDialog.h
 mqScalarsCurvatureDialog.cxx
 mqScalarsCurvatureDialogReaction.h
 mqScalarsCurvatureDialogReaction.cxx
-
+mqICPDialog.h
+mqICPDialog.cxx
+mqICPDialogReaction.h
+mqICPDialogReaction.cxx
+mqScalarsDistanceDialog.h
+mqScalarsDistanceDialog.cxx
+mqScalarsDistanceDialogReaction.h
+mqScalarsDistanceDialogReaction.cxx
 
 )
 
@@ -239,6 +246,8 @@ mqActorTreePanel.ui
 mqScalarsThicknessDialog.ui
 mqScalarsThicknessBetweenDialog.ui
 mqScalarsCurvatureDialog.ui
+mqScalarsDistanceDialog.ui
+mqICPDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )
