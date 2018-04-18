@@ -30,6 +30,7 @@
 #include <vtkPiecewiseFunction.h>
 #include <vtkCellPicker.h>
 #include <vtkProperty.h>
+#include <vtkCurvatures.h>
 #include <vtkPointData.h>
 #include <vtkCellData.h>
 #include <vtkPolyDataMapper.h>
@@ -6303,7 +6304,92 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 
 
 }
+void mqMorphoDigCore::scalarsCurvature(int curvatureType, QString scalarName)
+{
+	std::string mScalarName = "Curvature";
+	if (scalarName.length() > 0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
 
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	std::string action = "Compute curvature scalar";
+	int Count = BEGIN_UNDO_SET(action);
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "Curvature " << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+
+			myActor->SetSelected(0);
+			myActor->SaveState(Count, QString(mScalarName.c_str()));
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				double numvert =mPD->GetNumberOfPoints();
+
+				vtkSmartPointer<vtkCurvatures> curvaturesFilter =
+					vtkSmartPointer<vtkCurvatures>::New();
+				curvaturesFilter->SetCurvatureType(curvatureType);
+
+
+				curvaturesFilter->SetInputData(mPD);
+				curvaturesFilter->Update();
+				vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+				MyObj = curvaturesFilter->GetOutput();
+
+				//cout << "curv   c" << endl;
+				// Get active scalars of output
+				vtkFloatArray *freshScalars;
+				freshScalars = (vtkFloatArray*)MyObj->GetPointData()->GetScalars();
+
+
+				vtkSmartPointer<vtkFloatArray> newScalars =
+					vtkSmartPointer<vtkFloatArray>::New();
+
+				newScalars->DeepCopy(freshScalars);
+
+
+
+				newScalars->SetName(mScalarName.c_str());
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mPD->GetPointData()->AddArray(newScalars);
+				mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+				
+
+				modified = 1;
+
+			}
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "scalars updated " << endl;
+
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_FLOAT, 1);
+
+
+	}
+	END_UNDO_SET();
+
+
+}
 void mqMorphoDigCore::scalarsCameraDistance()
 {
 		

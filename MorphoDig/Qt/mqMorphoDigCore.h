@@ -550,6 +550,7 @@ public:
   vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
   void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit);
+  void scalarsCurvature(int curvatureType, QString scalarName);
   void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
   vtkMDActor * getFirstActorFromName(QString actorName);
   std::vector<std::string> getActorNames();

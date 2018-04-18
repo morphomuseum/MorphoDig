@@ -43,6 +43,7 @@
 #include "mqTPSDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
 #include "mqScalarsThicknessDialogReaction.h"
+#include "mqScalarsCurvatureDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
 
 #include "mqSetName.h"
@@ -250,9 +251,10 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
 	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
 
+
 	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
 	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness between two objects") << mqSetName("actionThickessBetween"));
-
+	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
 	QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
 

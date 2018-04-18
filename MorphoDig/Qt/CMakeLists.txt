@@ -185,6 +185,11 @@ mqScalarsThicknessBetweenDialog.h
 mqScalarsThicknessBetweenDialog.cxx
 mqScalarsThicknessBetweenDialogReaction.h
 mqScalarsThicknessBetweenDialogReaction.cxx
+mqScalarsCurvatureDialog.h
+mqScalarsCurvatureDialog.cxx
+mqScalarsCurvatureDialogReaction.h
+mqScalarsCurvatureDialogReaction.cxx
+
 
 )
 
@@ -233,6 +238,7 @@ mqDecomposeDialog.ui
 mqActorTreePanel.ui
 mqScalarsThicknessDialog.ui
 mqScalarsThicknessBetweenDialog.ui
+mqScalarsCurvatureDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )
