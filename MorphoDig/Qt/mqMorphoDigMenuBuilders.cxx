@@ -8,6 +8,7 @@
 #include "mqAboutDialogReaction.h"
 #include "mqChangeNodeReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
+#include "mqICPDialogReaction.h"
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqSavePLYDialogReaction.h"
 #include "mqSaveVTKDialogReaction.h"
@@ -44,6 +45,7 @@
 #include "mqDecomposeDialogReaction.h"
 #include "mqScalarsThicknessDialogReaction.h"
 #include "mqScalarsCurvatureDialogReaction.h"
+#include "mqScalarsDistanceDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
 
 #include "mqSetName.h"
@@ -197,6 +199,10 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *ConvexHULL = submenuStructureModification->addAction("Create convex hull for each selected surface");
 	QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
 	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");
+	
+	
+	QMenu* submenuAlignment = menu.addMenu("Surface alignment");
+	new mqICPDialogReaction(submenuAlignment->addAction("Align 2 surfaces (iterative closest point algorithm)") << mqSetName("actionICP"));
 	QMenu* submenuRenderingModification = menu.addMenu("Rendering modification");
 	
 
@@ -242,10 +248,10 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(Orange, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotOrange()));
 	QAction::connect(Brown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotBrown()));
 	
-	QMenu* submenuScalarModification = menu.addMenu("Scalar computation");
+	QMenu* submenuScalarModification = menu.addMenu("Scalars and colors");
 	//new mqThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickness"));
 	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
-	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance from camera");
+	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance map from camera");
 	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
 
 	QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
@@ -253,8 +259,9 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 
 	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
-	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness between two objects") << mqSetName("actionThickessBetween"));
-	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
+	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness map between two objects") << mqSetName("actionThickessBetween"));
+	new mqScalarsDistanceDialogReaction(submenuScalarModification->addAction("Compute distance map between two objects") << mqSetName("actionDistanceBetween"));
+	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature map") << mqSetName("actionCurvature"));
 	QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
 

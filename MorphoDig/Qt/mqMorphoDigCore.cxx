@@ -11,6 +11,8 @@
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
+#include <vtkLandmarkTransform.h>
+#include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkExtractEdges.h>
@@ -6726,6 +6728,266 @@ void mqMorphoDigCore::DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString Sc
 	cout << "Try to init mui scalars ok" << endl;
 
 	
+}
+
+void mqMorphoDigCore::ICP(int transformationMode, int iterationNumber, vtkMDActor *impactedActor, vtkMDActor* observedActor)
+{
+	if (impactedActor != NULL && observedActor != NULL && (impactedActor != observedActor))
+	{
+		std::string action = "ICP transform for ";
+		action.append(impactedActor->GetName().c_str());
+		int Count = BEGIN_UNDO_SET(action);
+		impactedActor->SaveState(Count);
+		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
+		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
+		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
+		{
+
+			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPD = myImpactedMapper->GetInput();
+			vtkSmartPointer<vtkPolyData> mImpactedPDPos = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPDPos->DeepCopy(vtkPolyData::SafeDownCast(mImpactedPD));
+			double ve_init_pos[3];;
+			double ve_final_pos[3];
+			/*vtkSmartPointer<vtkMatrix4x4> Mat = impactedActor->GetMatrix();
+			vtkSmartPointer<vtkMatrix4x4> impMat = vtkSmartPointer<vtkMatrix4x4>::New();
+			impMat->DeepCopy(Mat);*/
+			vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
+			
+			for (vtkIdType i = 0; i < mImpactedPDPos->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				mImpactedPDPos->GetPoint(i, ve_init_pos);
+				mqMorphoDigCore::TransformPoint(impMat, ve_init_pos, ve_final_pos);
+
+				mImpactedPDPos->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+			}
+			
+			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPD = myObservedMapper->GetInput();
+			vtkSmartPointer<vtkPolyData> mObservedPDPos = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPDPos->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));			
+			vtkSmartPointer<vtkMatrix4x4> obsMat = observedActor->GetMatrix();
+			
+			for (vtkIdType i = 0; i < mObservedPDPos->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				mObservedPDPos->GetPoint(i, ve_init_pos);
+				mqMorphoDigCore::TransformPoint(obsMat, ve_init_pos, ve_final_pos);
+
+				mObservedPDPos->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+			}
+
+
+			// now : apply current matrix to 
+
+			vtkSmartPointer<vtkIterativeClosestPointTransform> icp =
+				vtkSmartPointer<vtkIterativeClosestPointTransform>::New();
+
+			icp->SetSource(mImpactedPDPos);
+			icp->SetTarget(mObservedPDPos);
+			icp->GetLandmarkTransform()->SetMode(transformationMode);
+			icp->SetMaximumNumberOfIterations(20);
+			//icp->StartByMatchingCentroidsOn();
+			icp->Modified();
+			icp->Update();
+			vtkSmartPointer<vtkMatrix4x4> m = icp->GetMatrix();
+
+			vtkSmartPointer<vtkMatrix4x4> finalMat = vtkSmartPointer<vtkMatrix4x4>::New();
+			vtkMatrix4x4::Multiply4x4(m, impMat, finalMat);
+			impactedActor->ApplyMatrix(finalMat);
+		}
+
+		END_UNDO_SET();
+		this->Render();
+	}
+}
+void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor)
+{
+	if (impactedActor != NULL && observedActor != NULL &&observedActor!=impactedActor)
+	{
+		std::string action = "Compute distance for ";
+		action.append(impactedActor->GetName().c_str());
+		int Count = BEGIN_UNDO_SET(action);
+
+		std::string mScalarName = "Distance";
+		if (scalarName.length() > 0)
+		{
+			mScalarName = scalarName.toStdString();
+		}
+		impactedActor->SetSelected(0);
+		impactedActor->SaveState(Count, QString(mScalarName.c_str()));
+		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
+		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
+		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
+		{
+
+			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPD = myImpactedMapper->GetInput();
+
+			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPD = myObservedMapper->GetInput();
+
+
+			double numvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
+
+
+			vtkSmartPointer<vtkDoubleArray> newScalars =
+				vtkSmartPointer<vtkDoubleArray>::New();
+
+			newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+			newScalars->SetNumberOfTuples(numvert);
+			vtkIdType ve;
+
+			double ve_obs_init_pos[3];;
+			double ve_obs_final_pos[3];;
+			
+			double ve_imp_init_pos[3];;
+			double ve_imp_final_pos[3];;
+
+
+			vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
+			vtkSmartPointer<vtkMatrix4x4> obsMat = observedActor->GetMatrix();
+	
+			
+			double AB[3];
+			double min_dist = maxDist;
+			double tmp_dist = 0;
+			
+			vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+				vtkSmartPointer<vtkKdTreePointLocator>::New();
+
+			vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
+			observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
+
+
+			for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				observedMoved->GetPoint(i, ve_obs_init_pos);
+				mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
+
+				observedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_obs_final_pos);
+			}
+
+
+			kDTree->SetDataSet(observedMoved);
+
+			kDTree->BuildLocator();
+
+			for (ve = 0; ve < numvert; ve++)
+			{
+				min_dist = maxDist;
+				emit distanceProgression((int)(100 * ve / numvert));
+				//progress.setValue(ve);
+				/*if (progress.wasCanceled())
+				break;*/
+
+				mImpactedPD->GetPoint(ve, ve_imp_init_pos);
+				mqMorphoDigCore::TransformPoint(impMat, ve_imp_init_pos, ve_imp_final_pos);
+		
+				vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+				// get all neighbouring vertices within a maxDist radius
+				vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+				double Radius = 1.1*maxDist;
+				kDTree->FindPointsWithinRadius(Radius, ve_imp_final_pos, observedNeighbours);
+
+				double newscalar = 0;
+		
+				std::vector<double> distances;
+				int cpt = 0;
+
+
+				for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+				{
+
+					//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+					vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+					if (ve != observedConnectedVertex || impactedActor != observedActor)// to cases: 1) self observation= we don't want to compare 1 vertex with itself; 2) comparison, then impacted and observed lists do not have links
+					{
+						observedMoved->GetPoint(observedConnectedVertex, ve_obs_final_pos);
+						
+						
+						AB[0] = ve_obs_final_pos[0] - ve_imp_final_pos[0];
+						AB[1] = ve_obs_final_pos[1] - ve_imp_final_pos[1];
+						AB[2] = ve_obs_final_pos[2] - ve_imp_final_pos[2];
+						double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+						//ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
+						
+						if (curr_dist < maxDist)
+						{
+							
+								tmp_dist = curr_dist;
+								distances.push_back(tmp_dist);
+								cpt++;
+
+							}
+							else
+							{
+								tmp_dist = maxDist;
+							}
+						}
+						else
+						{
+							tmp_dist = maxDist;
+						}
+						if (tmp_dist < min_dist) { min_dist = tmp_dist; }
+
+					
+
+				}
+
+				// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+				if (avg <= 1 || cpt == 0)
+				{
+
+					newScalars->InsertTuple1(ve, min_dist);
+				}
+				else
+				{
+					/*if (ve < 10)
+					{
+					cout << "try to sort thicknesses"  << endl;
+					}*/
+					std::sort(distances.begin(), distances.end());
+					double dist_avg = 0;
+					double mavg = avg;// in some cases there are less thickness candidates thant avg => the avg thickness will be done using less than "avg" nr of candidates.
+					if (cpt < avg) { mavg = cpt; }
+					for (int i = 0; i < mavg; i++)
+					{
+						dist_avg += distances.at(i);
+					}
+					dist_avg /= mavg;
+					newScalars->InsertTuple1(ve, dist_avg);					
+
+				}
+
+
+			}
+			//std::cout<<"New Scalar computation done "<<std::endl;
+
+			newScalars->SetName(mScalarName.c_str());
+			// test if exists...
+			//
+			int exists = 0;
+
+			// remove this scalar
+			//this->GetPointData()->SetScalars(newScalars);
+			mImpactedPD->GetPointData()->RemoveArray(mScalarName.c_str());
+			mImpactedPD->GetPointData()->AddArray(newScalars);
+			mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+			
+
+		
+
+
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "DISTANCE scalars computed " << endl;
+		this->Initmui_ExistingScalars();
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+
+
+		END_UNDO_SET();
+	}
+
 }
 void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
 {
