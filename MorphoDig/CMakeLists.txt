@@ -172,6 +172,8 @@ install(
 "${VTK_DIR}/bin/Release/vtkRenderingContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkChartsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkInfovisCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkViewsContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkViewsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
 "${VTK_DIR}/bin/Release/vtkCommonComputationalGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkCommonMisc-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
