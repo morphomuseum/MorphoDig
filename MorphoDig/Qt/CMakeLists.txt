@@ -197,6 +197,8 @@ mqScalarsDistanceDialog.h
 mqScalarsDistanceDialog.cxx
 mqScalarsDistanceDialogReaction.h
 mqScalarsDistanceDialogReaction.cxx
+mqTransferFunctionWidget.h
+mqTransferFunctionWidget.cxx
 
 )
 

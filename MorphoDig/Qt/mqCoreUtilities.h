@@ -10,7 +10,7 @@
 #define mqCoreUtilities_h
 
 
-
+#include <vtkObject.h>
 
 #include <QDir>
 #include <QEventLoop>
@@ -26,6 +26,28 @@
 * pqCoreUtilities is a collection of arbitrary utility functions that can be
 * used by the application.
 */
+
+class mqCoreUtilitiesEventHelper : public QObject
+{
+	Q_OBJECT;
+	typedef QObject Superclass;
+
+public:
+	mqCoreUtilitiesEventHelper(QObject* parent);
+	~mqCoreUtilitiesEventHelper() override;
+
+signals:
+	void eventInvoked(vtkObject*, unsigned long, void*);
+
+private:
+	Q_DISABLE_COPY(mqCoreUtilitiesEventHelper)
+
+		void executeEvent(vtkObject*, unsigned long, void*);
+	class mqInternal;
+	mqInternal* Interal;
+	friend class mqCoreUtilities;
+};
+
 class  mqCoreUtilities
 {
 public:
@@ -50,6 +72,18 @@ public:
   * Return the path of the root ParaView user specific configuration directory
   */
   static QString getMorphoDigUserDirectory();
+
+  /**
+  * Method used to connect VTK events to Qt slots (or signals).
+  * This is an alternative to using vtkEventQtSlotConnect. This method gives a
+  * cleaner API to connect vtk-events to Qt slots. It manages cleanup
+  * correctly i.e. either vtk-object or the qt-object can be deleted and the
+  * observers will be cleaned up correctly. One can disconnect the connection
+  * made explicitly by vtk_object->RemoveObserver(eventId) where eventId is
+  * the returned value.
+  */
+  static unsigned long connect(vtkObject* vtk_object, int vtk_event_id, QObject* qobject,
+	  const char* signal_or_slot, Qt::ConnectionType type = Qt::AutoConnection);
 
   /**
   * Return the path of the launched application

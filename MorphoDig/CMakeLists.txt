@@ -60,6 +60,7 @@ find_package(VTK COMPONENTS
   vtkRenderingCore
   # vtkRenderingOpenGL
   vtkIOPLY
+  vtkViewsContext2D
 )
 include(${VTK_USE_FILE})
 
@@ -168,7 +169,9 @@ install(
 "${VTK_DIR}/bin/Release/vtkRenderingAnnotation-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkIOLegacy-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkIOPLY-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-
+"${VTK_DIR}/bin/Release/vtkRenderingContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkChartsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkInfovisCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
 "${VTK_DIR}/bin/Release/vtkCommonComputationalGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkCommonMisc-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
