@@ -47,15 +47,23 @@
 class vtkTransferFunctionChartXY : public vtkChartXY
 {
   double XRange[2];
-  //bool DataValid;
+  bool DataValid;
 
- /* bool IsDataRangeValid(const double r[2]) const
+  bool IsDataRangeValid(const double r[2]) const
   {
     double mr[2] = { r[0], r[1] };
     // If vtkSMCoreUtilities::AdjustRange() decided to adjust a valid range, it means the numbers
     // are too close to each other.
-    return r[1] < r[0] ? false : (vtkSMCoreUtilities::AdjustRange(mr) == false);
-  }*/
+	if (r[1]<r[0])
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+	
+  }
 
 public:
   static vtkTransferFunctionChartXY* New();
@@ -78,7 +86,7 @@ public:
       {
         this->XRange[0] = bounds[0];
         this->XRange[1] = bounds[1];
-       // this->DataValid = this->IsDataRangeValid(this->XRange);
+        this->DataValid = this->IsDataRangeValid(this->XRange);
         this->RecalculateBounds();
       }
     }
@@ -87,55 +95,55 @@ public:
 
   bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
   {
-   // if (this->DataValid)
-    //{
+    if (this->DataValid)
+   {
       return this->Superclass::PaintChildren(painter);
-   // }
+    }
     painter->DrawString(5, 5, "Data range too small to render.");
     return true;
   }
 
   bool MouseEnterEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
-    //return (this->DataValid ? this->Superclass::MouseEnterEvent(mouse) : false);
-	  return this->Superclass::MouseEnterEvent(mouse);
+    return (this->DataValid ? this->Superclass::MouseEnterEvent(mouse) : false);
+	 // return this->Superclass::MouseEnterEvent(mouse);
   }
   bool MouseMoveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
-   // return (this->DataValid ? this->Superclass::MouseMoveEvent(mouse) : false);
-	  return  this->Superclass::MouseMoveEvent(mouse);
+   return (this->DataValid ? this->Superclass::MouseMoveEvent(mouse) : false);
+	 // return  this->Superclass::MouseMoveEvent(mouse);
   }
   bool MouseLeaveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
-   // return (this->DataValid ? this->Superclass::MouseLeaveEvent(mouse) : false);
-	  return this->Superclass::MouseLeaveEvent(mouse) ;
+    return (this->DataValid ? this->Superclass::MouseLeaveEvent(mouse) : false);
+	 // return this->Superclass::MouseLeaveEvent(mouse) ;
   }
   bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
-    //return (this->DataValid ? this->Superclass::MouseButtonPressEvent(mouse) : false);
-	return this->Superclass::MouseButtonPressEvent(mouse);
+    return (this->DataValid ? this->Superclass::MouseButtonPressEvent(mouse) : false);
+	//return this->Superclass::MouseButtonPressEvent(mouse);
   }
   bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
-    //return (this->DataValid ? this->Superclass::MouseButtonReleaseEvent(mouse) : false);
-	  return this->Superclass::MouseButtonReleaseEvent(mouse);
+    return (this->DataValid ? this->Superclass::MouseButtonReleaseEvent(mouse) : false);
+	//  return this->Superclass::MouseButtonReleaseEvent(mouse);
   }
   bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta) VTK_OVERRIDE
   {
-   // return (this->DataValid ? this->Superclass::MouseWheelEvent(mouse, delta) : false);
-	  return this->Superclass::MouseWheelEvent(mouse, delta);
+    return (this->DataValid ? this->Superclass::MouseWheelEvent(mouse, delta) : false);
+	 // return this->Superclass::MouseWheelEvent(mouse, delta);
   }
   bool KeyPressEvent(const vtkContextKeyEvent& key) VTK_OVERRIDE
   {
-	  return this->Superclass::KeyPressEvent(key);
-   // return (this->DataValid ? this->Superclass::KeyPressEvent(key) : false);
+	//  return this->Superclass::KeyPressEvent(key);
+    return (this->DataValid ? this->Superclass::KeyPressEvent(key) : false);
   }
 
 protected:
   vtkTransferFunctionChartXY()
   {
     this->XRange[0] = this->XRange[1] = 0.0;
-    //this->DataValid = false;
+   this->DataValid = false;
     this->ZoomWithMouseWheelOff();
   }
   ~vtkTransferFunctionChartXY() override {}

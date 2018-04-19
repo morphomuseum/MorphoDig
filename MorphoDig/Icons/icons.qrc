@@ -20,6 +20,14 @@
   <!-- Application Icon. -->
  <file>MorphoDig.ico</file>
     <!-- Typical file operations. -->
+   <file>ResetRange24.png</file>
+   <file>ResetRangeCustom24.png</file>
+   <file>Invert24.png</file>
+   <file>ResetRangeTemporal24.png</file>
+   <file>ResetToVisibleRange32.png</file>
+   <file>Advanced26.png</file>
+   <file>Favorites16.png</file>
+   <file>Save16.png</file>
    <file>Lasso_sub.png</file>
    <file>Lasso_keepinside.png</file>
    <file>Lasso_keepoutside.png</file>

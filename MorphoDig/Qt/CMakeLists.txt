@@ -199,7 +199,18 @@ mqScalarsDistanceDialogReaction.h
 mqScalarsDistanceDialogReaction.cxx
 mqTransferFunctionWidget.h
 mqTransferFunctionWidget.cxx
-
+mqExpandableTableView.cxx
+mqExpandableTableView.h
+mqTableView.cxx
+mqTableView.h
+mqColorTableModel.h
+mqColorTableModel.cxx
+mqOpacityTableModel.cxx
+mqOpacityTableModel.h
+mqLineEdit.h
+mqLineEdit.cxx
+mqColorOpacityEditorWidget.cxx
+mqColorOpacityEditorWidget.h
 )
 
 set (Qt_MOC_HDRS
@@ -250,6 +261,7 @@ mqScalarsThicknessBetweenDialog.ui
 mqScalarsCurvatureDialog.ui
 mqScalarsDistanceDialog.ui
 mqICPDialog.ui
+mqColorOpacityEditorWidget.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

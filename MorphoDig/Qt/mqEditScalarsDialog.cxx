@@ -57,6 +57,15 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
   : QDialog(Parent)
   , Ui(new Ui::mqEditScalarsDialog())
 {
+	//ui.ColorEditor->initialize(stc, true, NULL, false);
+	/*   QObject::connect(&this->Internals->ColorTableModel,
+      SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
+      SIGNAL(xrgbPointsChanged()));
+    QObject::connect(&this->Internals->OpacityTableModel,
+      SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
+      SIGNAL(xvmsPointsChanged()));*/
+
+
 
 	//1 populate active scalar combo box, and check which scalar is the active one!
 	this->Ui->setupUi(this);
