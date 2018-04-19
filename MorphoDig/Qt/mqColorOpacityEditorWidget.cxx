@@ -116,6 +116,7 @@ public:
 
   void render()
   {
+	  cout << "mqColorOpacityEditorWidget render" << endl;
 	  //@@ do not think this is needed!
     /*pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
     if (repr)
@@ -140,9 +141,10 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   , Internals(new mqInternals(this))
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
- 
+  this->STC = stc;
   if (stc!=NULL)
   {
+
     ui.ColorEditor->initialize(stc, true, NULL, false);
     QObject::connect(&this->Internals->ColorTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
@@ -150,6 +152,12 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     QObject::connect(&this->Internals->OpacityTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
       SIGNAL(xvmsPointsChanged()));
+	this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
+  }
+  else
+  {
+	  cout << "STC is not null, that is something... " << endl;
+
   }
   //Not sure this is needed!
  /* QObject::connect(&pqActiveObjects::instance(), SIGNAL(representationChanged(pqRepresentation*)),
@@ -172,21 +180,21 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   QObject::connect(
     ui.OpacityEditor, SIGNAL(controlPointsModified()), this, SLOT(updateCurrentData()));
 
-  QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
+  //QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
 
-  QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
+ // QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
 
-  QObject::connect(
-    ui.ResetRangeToDataOverTime, SIGNAL(clicked()), this, SLOT(resetRangeToDataOverTime()));
+ /* QObject::connect(
+    ui.ResetRangeToDataOverTime, SIGNAL(clicked()), this, SLOT(resetRangeToDataOverTime()));*/
 
-  QObject::connect(
-    ui.ResetRangeToVisibleData, SIGNAL(clicked()), this, SLOT(resetRangeToVisibleData()));
+ /* QObject::connect(
+    ui.ResetRangeToVisibleData, SIGNAL(clicked()), this, SLOT(resetRangeToVisibleData()));*/
 
 /*  QObject::connect(
     ui.InvertTransferFunctions, SIGNAL(clicked()), this, SLOT(invertTransferFunctions()));*/
 
-  QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
-  QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
+ // QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
+  //QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
  // this->connect(
@@ -263,8 +271,9 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     this->Internals->Ui.AdvancedButton->setChecked(
       settings->value("showAdvancedPropertiesColorOpacityEditorWidget", false).toBool());
   }*/
-
+  cout << "Will call updateCurrentData... " << endl;
   this->updateCurrentData();
+  cout << "Will call updatePanel... " << endl;
   this->updatePanel();
 }
 
@@ -414,12 +423,15 @@ void mqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* p
   {
     stc = vtkScalarsToColors::SafeDownCast(this->proxy()->GetClientSideObject());
   }*/
-  ui.OpacityEditor->initialize(this->STC, false, pwf, true);
+  cout << "mqColorOpacityEditorWidget initializeOpacityEditor" << endl;
+  //ui.OpacityEditor->initialize(this->STC, false, pwf, true);
+  ui.OpacityEditor->initialize(NULL, false, pwf, true);
 }
 
 //-----------------------------------------------------------------------------
 void mqColorOpacityEditorWidget::opacityCurrentChanged(vtkIdType index)
 {
+	cout << "mqColorOpacityEditorWidget opacityCurrentChanged" << endl;
   if (index != -1)
   {
     Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
@@ -431,6 +443,7 @@ void mqColorOpacityEditorWidget::opacityCurrentChanged(vtkIdType index)
 //-----------------------------------------------------------------------------
 void mqColorOpacityEditorWidget::colorCurrentChanged(vtkIdType index)
 {
+	cout << "mqColorOpacityEditorWidget colorCurrentChanged" << endl;
   if (index != -1)
   {
     Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
@@ -442,6 +455,7 @@ void mqColorOpacityEditorWidget::colorCurrentChanged(vtkIdType index)
 //-----------------------------------------------------------------------------
 void mqColorOpacityEditorWidget::updatePanel()
 {
+	cout << "mqColorOpacityEditorWidget updatePanel" << endl;
   if (this->Internals)
   {
     bool advancedVisible = this->Internals->Ui.AdvancedButton->isChecked();
@@ -455,15 +469,22 @@ void mqColorOpacityEditorWidget::updatePanel()
 //-----------------------------------------------------------------------------
 void mqColorOpacityEditorWidget::updateCurrentData()
 {
+	cout << "mqColorOpacityEditorWidget updateCurrentData" << endl;
   vtkDiscretizableColorTransferFunction* stc =
     vtkDiscretizableColorTransferFunction::SafeDownCast(this->STC);
+  
   //vtkSMProxy* pwfProxy = this->scalarOpacityFunctionProxy();
-  vtkPiecewiseFunction* pwf = this->STC->GetScalarOpacityFunction();
+  //vtkPiecewiseFunction* pwf = NULL;
+  //èif (stc !=NULL)
+  //vtkPiecewiseFunction* pwf = vtkPiecewiseFunction::SafeDownCast(this->STC); 
+  vtkPiecewiseFunction* pwf = this->STC->GetScalarOpacityFunction(); 
     //pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : NULL;
-
+  
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+
   if (ui.ColorEditor->currentPoint() >= 0 && stc)
   {
+	  cout << "Case 1" << endl;
     double xrgbms[6];
     stc->GetNodeValue(ui.ColorEditor->currentPoint(), xrgbms);
     ui.CurrentDataValue->setText(QString::number(xrgbms[0]));
@@ -475,6 +496,7 @@ void mqColorOpacityEditorWidget::updateCurrentData()
   }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
   {
+	  cout << "Case 2" << endl;
     double xvms[4];
     pwf->GetNodeValue(ui.OpacityEditor->currentPoint(), xvms);
     ui.CurrentDataValue->setText(QString::number(xvms[0]));
@@ -486,16 +508,20 @@ void mqColorOpacityEditorWidget::updateCurrentData()
   }
   else
   {
+	  cout << "Case 3" << endl;
     ui.CurrentDataValue->setEnabled(false);
   }
-
+  cout << "Refresh color model... " << endl;
   this->Internals->ColorTableModel.refresh();
+  cout << "Refresh opacity model... " << endl;
   this->Internals->OpacityTableModel.refresh();
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> mqColorOpacityEditorWidget::xrgbPoints() const
 {
+	cout << "mqColorOpacityEditorWidget xrgbPoints" << endl;
+	
   vtkDiscretizableColorTransferFunction* stc =
     vtkDiscretizableColorTransferFunction::SafeDownCast(this->STC);
   QList<QVariant> values;
@@ -516,6 +542,7 @@ QList<QVariant> mqColorOpacityEditorWidget::xrgbPoints() const
 //-----------------------------------------------------------------------------
 QList<QVariant> mqColorOpacityEditorWidget::xvmsPoints() const
 {
+	cout << "mqColorOpacityEditorWidget xvmsPoints" << endl;
   //vtkSMProxy* pwfProxy = this->scalarOpacityFunctionProxy();
 	vtkPiecewiseFunction* pwf = this->STC->GetScalarOpacityFunction();
     //pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : NULL;
@@ -635,6 +662,7 @@ void mqColorOpacityEditorWidget::setXrgbPoints(const QList<QVariant>& values)
 
 void mqColorOpacityEditorWidget::currentDataEdited()
 {
+	cout << "mqColorOpacityEditorWidget currentDataEdited" << endl;
   vtkDiscretizableColorTransferFunction* stc =
     vtkDiscretizableColorTransferFunction::SafeDownCast(this->STC);
   //vtkSMProxy* pwfProxy = this->scalarOpacityFunctionProxy();

@@ -12,10 +12,10 @@
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "QDoubleSlider.h"
-
+#include "mqColorOpacityEditorWidget.h"
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
-
+#include <vtkDiscretizableColorTransferFunction.h>
 // we actually do not need glew...
 //#include <GL/glew.h>
 #include <QApplication>
@@ -71,7 +71,12 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	this->Ui->setupUi(this);
 	this->setObjectName("mqEditScalarsDialog");
 	this->Ui->comboActiveScalar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	
+	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
+	this->Ui->frame->setVisible(false);
+	mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
+
+	//this->Ui->frame = NULL;
+	//this->Ui->frame->ins
 	//this->Ui->ColorEditor-
 	this->Ui->comboColorMap->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));

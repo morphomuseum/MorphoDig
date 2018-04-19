@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>159</width>
+    <width>133</width>
     <height>34</height>
    </rect>
   </property>
@@ -58,9 +58,23 @@
     <string>Edit tags</string>
    </property>
   </action>
+  <action name="actionLookUpTableEdit">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/ScalarBar24.png</normaloff>
+     <normalon>:/Icons/ScalarBar24.png</normalon>:/Icons/ScalarBar24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit lookup table</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit lookup table</string>
+   </property>
+  </action>
   <addaction name="actionScalarVisibility"/>
   <addaction name="actionColorScaleEdit"/>
   <addaction name="actionTagEdit"/>
+  <addaction name="actionLookUpTableEdit"/>
  </widget>
  <resources>
   <include location="../Icons/icons.qrc"/>

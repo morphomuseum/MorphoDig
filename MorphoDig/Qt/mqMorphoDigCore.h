@@ -609,6 +609,7 @@ public:
   void signal_activeScalarChanged();
   //void signal_ActorsMightHaveChanged();
   double GetScalarRangeMin();
+  vtkDiscretizableColorTransferFunction* GetOneColorMap();
   void UpddateLookupTablesRanges(double min, double max);
 	double GetScalarRangeMax();
 	double GetSuggestedScalarRangeMin();

@@ -638,6 +638,20 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMax()
 	
 }
 
+vtkDiscretizableColorTransferFunction* mqMorphoDigCore::GetOneColorMap()
+{
+	if (this->mui_ExistingColorMaps->Stack.size() > 0)
+	{
+		cout <<"GetOneColorMap returns "<< this->mui_ExistingColorMaps->Stack.at(0).Name.toStdString()<< endl;
+		return this->mui_ExistingColorMaps->Stack.at(0).ColorMap;
+	}
+	else
+	{
+		cout << "GetOneColorMap returns NULL" << endl;
+		return NULL;
+	}
+
+}
 void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
 {
 	for (int i = 0; i < this->mui_ExistingColorMaps->Stack.size(); i++)
@@ -742,6 +756,7 @@ void mqMorphoDigCore::InitLuts()
 	opacityRfunction->AddPoint(0.8, 0.8);
 	opacityRfunction->AddPoint(1, 1);
 	//opacityRfunction->AddPoint(1.0001, 0);
+	cout << "Rainbow scalar has opacity function!!!" << endl;
 	this->ScalarRainbowLut->SetScalarOpacityFunction(opacityRfunction);
 	this->ScalarRainbowLut->EnableOpacityMappingOn();
 	this->ScalarRainbowLut->Build();
