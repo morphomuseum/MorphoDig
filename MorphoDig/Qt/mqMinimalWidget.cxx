@@ -3,7 +3,7 @@
    Program: MorphoDig 
 
 ========================================================================*/
-#include "mqTransferFunctionWidget.h"
+#include "mqMinimalWidget.h"
 
 #include "mqCoreUtilities.h"
 //#include "pqQVTKWidgetBase.h"
@@ -45,7 +45,7 @@
 //-----------------------------------------------------------------------------
 // We extend vtkChartXY to add logic to reset view bounds automatically. This
 // ensures that when LUT changes, we are always showing the complete LUT.
-class vtkTransferFunctionChartXY : public vtkChartXY
+class vtkMinimalChartXY : public vtkChartXY
 {
   double XRange[2];
   bool DataValid;
@@ -67,8 +67,8 @@ class vtkTransferFunctionChartXY : public vtkChartXY
   }
 
 public:
-  static vtkTransferFunctionChartXY* New();
-  vtkTypeMacro(vtkTransferFunctionChartXY, vtkChartXY);
+  static vtkMinimalChartXY* New();
+  vtkTypeMacro(vtkMinimalChartXY, vtkChartXY);
   vtkWeakPointer<vtkControlPointsItem> ControlPointsItem;
 
   // Description:
@@ -77,7 +77,7 @@ public:
   // Paint function is invoked.
   void Update() VTK_OVERRIDE
   {
-	  cout << "mqTransferFunctionWidget Update" << endl;
+	  cout << "mqMinimalWidget Update" << endl;
     if (this->ControlPointsItem)
     {
       // Reset bounds if the control points' bounds have changed.
@@ -97,7 +97,7 @@ public:
 
   bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
   {
-	  cout << "mqTransferFunctionWidget PaintChildren" << endl;
+	  cout << "mqMinimalWidget PaintChildren" << endl;
     if (this->DataValid)
    {
       return this->Superclass::PaintChildren(painter);
@@ -143,32 +143,32 @@ public:
   }
 
 protected:
-  vtkTransferFunctionChartXY()
+  vtkMinimalChartXY()
   {
-	  cout << "mqTransferFunctionWidget ChartXY creation" << endl;
+	  cout << "mqMinimalWidget ChartXY creation" << endl;
     this->XRange[0] = this->XRange[1] = 0.0;
    this->DataValid = false;
     this->ZoomWithMouseWheelOff();
   }
-  ~vtkTransferFunctionChartXY() override {}
+  ~vtkMinimalChartXY() override {}
 
 private:
-  vtkTransferFunctionChartXY(const vtkTransferFunctionChartXY&);
-  void operator=(const vtkTransferFunctionChartXY&);
+  vtkMinimalChartXY(const vtkMinimalChartXY&);
+  void operator=(const vtkMinimalChartXY&);
 };
 
-vtkStandardNewMacro(vtkTransferFunctionChartXY);
+vtkStandardNewMacro(vtkMinimalChartXY);
 
 //-----------------------------------------------------------------------------
 
-class mqTransferFunctionWidget::mqInternals
+class mqMinimalWidget::mqInternals
 {
   vtkNew<vtkGenericOpenGLRenderWindow> Window;
 
 public:
   //QPointer<QVTKWidget> Widget;
 	QPointer<QVTKOpenGLWidget> Widget;
-  vtkNew<vtkTransferFunctionChartXY> ChartXY;
+  vtkNew<vtkMinimalChartXY> ChartXY;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
 
@@ -178,11 +178,11 @@ public:
   vtkSmartPointer<vtkControlPointsItem> ControlPointsItem;
   unsigned long CurrentPointEditEventId;
 
-  mqInternals(mqTransferFunctionWidget* editor)
+  mqInternals(mqMinimalWidget* editor)
     : Widget(new QVTKOpenGLWidget(editor))
     , CurrentPointEditEventId(0)
   {
-	  cout << "mqTransferFunctionWidget Internals Creator" << endl;
+	  cout << "mqMinimalWidget Internals Creator" << endl;
     this->Timer.setSingleShot(true);
     this->Timer.setInterval(0);
 
@@ -226,7 +226,7 @@ public:
 
   void cleanup()
   {
-	  cout << "mqTransferFunctionWidget Cleanup" << endl;
+	  cout << "mqMinimalWidget Cleanup" << endl;
     this->VTKConnect->Disconnect();
     this->ChartXY->ClearPlots();
     if (this->ControlPointsItem && this->CurrentPointEditEventId)
@@ -240,26 +240,26 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-mqTransferFunctionWidget::mqTransferFunctionWidget(QWidget* parentObject)
+mqMinimalWidget::mqMinimalWidget(QWidget* parentObject)
   : Superclass(parentObject)
   , Internals(new mqInternals(this))
 {
-	cout << "mqTransferFunctionWidget Widget constructor" << endl;
+	cout << "mqMinimalWidget Widget constructor" << endl;
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(renderInternal()));
 }
 
 //-----------------------------------------------------------------------------
-mqTransferFunctionWidget::~mqTransferFunctionWidget()
+mqMinimalWidget::~mqMinimalWidget()
 {
   delete this->Internals;
   this->Internals = NULL;
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::initialize(
+void mqMinimalWidget::initialize(
   vtkScalarsToColors* stc, bool stc_editable, vtkPiecewiseFunction* pwf, bool pwf_editable)
 {
-	cout << "mqTransferFunctionWidget Initialize " << endl;
+	cout << "mqMinimalWidget Initialize " << endl;
   this->Internals->cleanup();
 
   // TODO: If needed, we can support vtkLookupTable.
@@ -267,7 +267,7 @@ void mqTransferFunctionWidget::initialize(
 
   if (ctf != NULL && pwf == NULL)
   {
-	  cout << "mqTransferFunctionWidget Initialize 1" << endl;
+	  cout << "mqMinimalWidget Initialize 1" << endl;
     vtkNew<vtkColorTransferFunctionItem> item;
     item->SetColorTransferFunction(ctf);
 
@@ -285,12 +285,12 @@ void mqTransferFunctionWidget::initialize(
 
       this->Internals->CurrentPointEditEventId =
         cpItem->AddObserver(vtkControlPointsItem::CurrentPointEditEvent, this,
-          &mqTransferFunctionWidget::onCurrentPointEditEvent);
+          &mqMinimalWidget::onCurrentPointEditEvent);
     }
   }
   else if (ctf == NULL && pwf != NULL)
   {
-	  cout << "mqTransferFunctionWidget Initialize 2" << endl;
+	  cout << "mqMinimalWidget Initialize 2" << endl;
     vtkNew<vtkPiecewiseFunctionItem> item;
     item->SetPiecewiseFunction(pwf);
 
@@ -308,7 +308,7 @@ void mqTransferFunctionWidget::initialize(
   }
   else if (ctf != NULL && pwf != NULL)
   {
-	  cout << "mqTransferFunctionWidget Initialize 3" << endl;
+	  cout << "mqMinimalWidget Initialize 3" << endl;
     vtkNew<vtkCompositeTransferFunctionItem> item;
     item->SetOpacityFunction(pwf);
     item->SetColorTransferFunction(ctf);
@@ -345,12 +345,12 @@ void mqTransferFunctionWidget::initialize(
   {
     return;
   }
-  cout << "mqTransferFunctionWidget Initialize suite" << endl;
+  cout << "mqMinimalWidget Initialize suite" << endl;
   this->Internals->ChartXY->AddPlot(this->Internals->TransferFunctionItem);
 
   if (this->Internals->ControlPointsItem)
   {
-	  cout << "mqTransferFunctionWidget we have control points item" << endl;
+	  cout << "mqMinimalWidget we have control points item" << endl;
 
     this->Internals->ChartXY->ControlPointsItem = this->Internals->ControlPointsItem;
     this->Internals->ControlPointsItem->SetEndPointsRemovable(false);
@@ -362,28 +362,28 @@ void mqTransferFunctionWidget::initialize(
       vtkControlPointsItem::CurrentPointChangedEvent, this, SLOT(onCurrentChangedEvent()));
     mqCoreUtilities::connect(this->Internals->ControlPointsItem, vtkCommand::EndEvent, this,
       SIGNAL(controlPointsModified()));
-	cout << "mqTransferFunctionWidget OK?" << endl;
+	cout << "mqMinimalWidget OK?" << endl;
   }
 
   // If the transfer functions change, we need to re-render the view. This
   // ensures that.
   if (ctf)
   {
-	  cout << "mqTransferFunctionWidget conect ctf with slot render" << endl;
+	  cout << "mqMinimalWidget conect ctf with slot render" << endl;
 
     this->Internals->VTKConnect->Connect(ctf, vtkCommand::ModifiedEvent, this, SLOT(render()));
   }
   if (pwf)
   {
-	  cout << "mqTransferFunctionWidget conect pwf with slot render" << endl;
+	  cout << "mqMinimalWidget conect pwf with slot render" << endl;
     this->Internals->VTKConnect->Connect(pwf, vtkCommand::ModifiedEvent, this, SLOT(render()));
   }
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::onCurrentPointEditEvent()
+void mqMinimalWidget::onCurrentPointEditEvent()
 {
-	cout << "mqTransferFunctionWidget editPT " << endl;
+	cout << "mqMinimalWidget editPT " << endl;
   vtkColorTransferControlPointsItem* cpitem =
     vtkColorTransferControlPointsItem::SafeDownCast(this->Internals->ControlPointsItem);
   if (cpitem == NULL)
@@ -416,9 +416,9 @@ void mqTransferFunctionWidget::onCurrentPointEditEvent()
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::onCurrentChangedEvent()
+void mqMinimalWidget::onCurrentChangedEvent()
 {
-	cout << "mqTransferFunctionWidget Changed " << endl;
+	cout << "mqMinimalWidget Changed " << endl;
   if (this->Internals->ControlPointsItem)
   {
     emit this->currentPointChanged(this->Internals->ControlPointsItem->GetCurrentPoint());
@@ -426,9 +426,9 @@ void mqTransferFunctionWidget::onCurrentChangedEvent()
 }
 
 //-----------------------------------------------------------------------------
-vtkIdType mqTransferFunctionWidget::currentPoint() const
+vtkIdType mqMinimalWidget::currentPoint() const
 {
-	cout << "mqTransferFunctionWidget currPt" << endl;
+	cout << "mqMinimalWidget currPt" << endl;
   if (this->Internals->ControlPointsItem)
   {
     return this->Internals->ControlPointsItem->GetCurrentPoint();
@@ -438,9 +438,9 @@ vtkIdType mqTransferFunctionWidget::currentPoint() const
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::setCurrentPoint(vtkIdType index)
+void mqMinimalWidget::setCurrentPoint(vtkIdType index)
 {
-	cout << "mqTransferFunctionWidget setCurrPt " << endl;
+	cout << "mqMinimalWidget setCurrPt " << endl;
   if (this->Internals->ControlPointsItem)
   {
     if (index < -1 || index >= this->Internals->ControlPointsItem->GetNumberOfPoints())
@@ -452,31 +452,31 @@ void mqTransferFunctionWidget::setCurrentPoint(vtkIdType index)
 }
 
 //-----------------------------------------------------------------------------
-vtkIdType mqTransferFunctionWidget::numberOfControlPoints() const
+vtkIdType mqMinimalWidget::numberOfControlPoints() const
 {
-	cout << "mqTransferFunctionWidget nrCtrlPT" << endl;
+	cout << "mqMinimalWidget nrCtrlPT" << endl;
   return this->Internals->ControlPointsItem
     ? this->Internals->ControlPointsItem->GetNumberOfPoints()
     : 0;
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::SetLogScaleXAxis(bool logScale)
+void mqMinimalWidget::SetLogScaleXAxis(bool logScale)
 {
 
   this->Internals->ChartXY->GetAxis(vtkAxis::BOTTOM)->SetLogScale(logScale);
 }
 
 //-----------------------------------------------------------------------------
-bool mqTransferFunctionWidget::GetLogScaleXAxis() const
+bool mqMinimalWidget::GetLogScaleXAxis() const
 {
   return this->Internals->ChartXY->GetAxis(vtkAxis::BOTTOM)->GetLogScale();
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::render()
+void mqMinimalWidget::render()
 {
- cout << "mqTransferFunctionWidget render" << endl;
+ cout << "mqMinimalWidget render" << endl;
   this->Internals->Timer.start();
 	/*if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
 	{
@@ -485,9 +485,9 @@ void mqTransferFunctionWidget::render()
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::renderInternal()
+void mqMinimalWidget::renderInternal()
 {
-	cout << "mqTransferFunctionWidget renderInternal" << endl;
+	cout << "mqMinimalWidget renderInternal" << endl;
   if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
   {
     this->Internals->ContextView->GetRenderWindow()->Render();
@@ -495,9 +495,9 @@ void mqTransferFunctionWidget::renderInternal()
 }
 
 //-----------------------------------------------------------------------------
-void mqTransferFunctionWidget::setCurrentPointPosition(double xpos)
+void mqMinimalWidget::setCurrentPointPosition(double xpos)
 {
-	cout << "mqTransferFunctionWidget currPT Position " << endl;
+	cout << "mqMinimalWidget currPT Position " << endl;
   vtkIdType currentPid = this->currentPoint();
   if (currentPid < 0)
   {

@@ -13,6 +13,8 @@
 #include "mqUndoStack.h"
 #include "QDoubleSlider.h"
 #include "mqColorOpacityEditorWidget.h"
+#include "mqTransferFunctionWidget.h"
+#include "mqMinimalWidget.h"
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
 #include <vtkDiscretizableColorTransferFunction.h>
@@ -72,9 +74,16 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	this->setObjectName("mqEditScalarsDialog");
 	this->Ui->comboActiveScalar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
-	this->Ui->frame->setVisible(false);
-	mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
-
+	//this->Ui->frame->setVisible(false);
+	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
+	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
+	this->Ui->ColorEditor->initialize(STC, true, NULL, false);
+	this->Ui->ColorEditor->render();
+	//this->Ui->OpacityEditor->initialize(NULL, false, STC->GetScalarOpacityFunction(), true);
+	//mColorScale->setVisible(true);
+	
+	//mColorScale->render();
+	//this->Ui->frame->setVisible(true);
 	//this->Ui->frame = NULL;
 	//this->Ui->frame->ins
 	//this->Ui->ColorEditor-
