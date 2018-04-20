@@ -12,6 +12,9 @@
 #include <QVTKOpenGLWidget.h>
 //#include <QVTKWidget.h>
 #include <vtkAxis.h>
+#include <vtkFloatArray.h>
+#include <vtkTable.h>
+#include <vtkRenderer.h>
 #include <vtkBoundingBox.h>
 #include <vtkChartXY.h>
 #include <vtkColorTransferControlPointsItem.h>
@@ -42,210 +45,148 @@
 #include <QSurfaceFormat>
 #endif
 
-//-----------------------------------------------------------------------------
-// We extend vtkChartXY to add logic to reset view bounds automatically. This
-// ensures that when LUT changes, we are always showing the complete LUT.
-class vtkMinimalChartXY : public vtkChartXY
-{
-  double XRange[2];
-  bool DataValid;
 
-  bool IsDataRangeValid(const double r[2]) const
-  {
-    double mr[2] = { r[0], r[1] };
-    // If vtkSMCoreUtilities::AdjustRange() decided to adjust a valid range, it means the numbers
-    // are too close to each other.
-	if (r[1]<r[0])
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-	
-  }
+//-----------------------------------------------------------------------------
+
+class mqMinimalWidget::pqInternals
+{
+	vtkNew<vtkGenericOpenGLRenderWindow> Window;
+	vtkNew<vtkRenderer> Renderer;
 
 public:
-  static vtkMinimalChartXY* New();
-  vtkTypeMacro(vtkMinimalChartXY, vtkChartXY);
-  vtkWeakPointer<vtkControlPointsItem> ControlPointsItem;
+	QPointer<QVTKOpenGLWidget> Widget;
+	vtkNew<vtkChartXY> ChartXY;
+	vtkNew<vtkContextView> ContextView;
+	
 
-  // Description:
-  // Perform any updates to the item that may be necessary before rendering.
-  // The scene should take care of calling this on all items before their
-  // Paint function is invoked.
-  void Update() VTK_OVERRIDE
-  {
-	  cout << "mqMinimalWidget Update" << endl;
-    if (this->ControlPointsItem)
-    {
-      // Reset bounds if the control points' bounds have changed.
-      double bounds[4];
-      this->ControlPointsItem->GetBounds(bounds);
-      this->SetVisible(true);
-      if (bounds[0] <= bounds[1] && (bounds[0] != this->XRange[0] || bounds[1] != this->XRange[1]))
-      {
-        this->XRange[0] = bounds[0];
-        this->XRange[1] = bounds[1];
-        this->DataValid = this->IsDataRangeValid(this->XRange);
-        this->RecalculateBounds();
-      }
-    }
-    this->Superclass::Update();
-  }
+	
 
-  bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
-  {
-	  cout << "mqMinimalWidget PaintChildren" << endl;
-    if (this->DataValid)
-   {
-      return this->Superclass::PaintChildren(painter);
-    }
-    painter->DrawString(5, 5, "Data range too small to render.");
-    return true;
-  }
+	pqInternals(mqMinimalWidget* editor)
+		: Widget(new QVTKOpenGLWidget(editor))
+		
+	{
+		this->Window->AddRenderer(Renderer.Get());
+	
+		QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
+		//fmt.setSamples(8);
+		fmt.setSamples(0);
+		this->Widget->setFormat(fmt);
+		this->Widget->setEnableHiDPI(true);
+		cout << "mqMinimalWidget Widget constructor" << endl;
+		//vtkSmartPointer<vtkGenericOpenGLRenderWindow> totoche
+		//vtkSmartPointer<vtkGenericOpenGLRenderWindow> oneWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
-  bool MouseEnterEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
-  {
-    return (this->DataValid ? this->Superclass::MouseEnterEvent(mouse) : false);
-	 // return this->Superclass::MouseEnterEvent(mouse);
-  }
-  bool MouseMoveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
-  {
-   return (this->DataValid ? this->Superclass::MouseMoveEvent(mouse) : false);
-	 // return  this->Superclass::MouseMoveEvent(mouse);
-  }
-  bool MouseLeaveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
-  {
-    return (this->DataValid ? this->Superclass::MouseLeaveEvent(mouse) : false);
-	 // return this->Superclass::MouseLeaveEvent(mouse) ;
-  }
-  bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
-  {
-    return (this->DataValid ? this->Superclass::MouseButtonPressEvent(mouse) : false);
-	//return this->Superclass::MouseButtonPressEvent(mouse);
-  }
-  bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
-  {
-    return (this->DataValid ? this->Superclass::MouseButtonReleaseEvent(mouse) : false);
-	//  return this->Superclass::MouseButtonReleaseEvent(mouse);
-  }
-  bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta) VTK_OVERRIDE
-  {
-    return (this->DataValid ? this->Superclass::MouseWheelEvent(mouse, delta) : false);
-	 // return this->Superclass::MouseWheelEvent(mouse, delta);
-  }
-  bool KeyPressEvent(const vtkContextKeyEvent& key) VTK_OVERRIDE
-  {
-	//  return this->Superclass::KeyPressEvent(key);
-    return (this->DataValid ? this->Superclass::KeyPressEvent(key) : false);
-  }
 
-protected:
-  vtkMinimalChartXY()
-  {
-	  cout << "mqMinimalWidget ChartXY creation" << endl;
-    this->XRange[0] = this->XRange[1] = 0.0;
-   this->DataValid = false;
-    this->ZoomWithMouseWheelOff();
-  }
-  ~vtkMinimalChartXY() override {}
+		cout << "mqMinimalWidget Widget constructor 1" << endl;
+		vtkSmartPointer<vtkTable> table =
+			vtkSmartPointer<vtkTable>::New();
 
-private:
-  vtkMinimalChartXY(const vtkMinimalChartXY&);
-  void operator=(const vtkMinimalChartXY&);
+		vtkSmartPointer<vtkFloatArray> arrX =
+			vtkSmartPointer<vtkFloatArray>::New();
+		arrX->SetName("X Axis");
+		table->AddColumn(arrX);
+
+		vtkSmartPointer<vtkFloatArray> arrC =
+			vtkSmartPointer<vtkFloatArray>::New();
+		arrC->SetName("Cosine");
+		table->AddColumn(arrC);
+
+		vtkSmartPointer<vtkFloatArray> arrS =
+			vtkSmartPointer<vtkFloatArray>::New();
+		arrS->SetName("Sine");
+		table->AddColumn(arrS);
+
+		// Fill in the table with some example values
+		int numPoints = 69;
+		float inc = 7.5 / (numPoints - 1);
+		table->SetNumberOfRows(numPoints);
+		for (int i = 0; i < numPoints; ++i)
+		{
+			table->SetValue(i, 0, i * inc);
+			table->SetValue(i, 1, cos(i * inc));
+			table->SetValue(i, 2, sin(i * inc));
+		}
+
+		//this->ChartXY = vtkSmartPointer<vtkChartXY>::New();
+		cout << "mqMinimalWidget Widget constructor 6" << endl;
+		vtkPlot *line = ChartXY->AddPlot(vtkChart::LINE);
+
+		line->SetInputData(table, 0, 1);
+		line->SetColor(0, 255, 0, 255);
+		line->SetWidth(1.0);
+		line = ChartXY->AddPlot(vtkChart::LINE);
+		line->SetInputData(table, 0, 2);
+		line->SetColor(255, 0, 0, 255);
+		line->SetWidth(5.0);
+
+		cout << "mqMinimalWidget Widget constructor 2" << endl;
+
+		QVBoxLayout* layout = new QVBoxLayout(editor);
+		layout->setMargin(0);
+
+		cout << "mqMinimalWidget Widget constructor 3" << endl;
+		//this->Window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+		//this->mren = vtkSmartPointer<vtkRenderer>::New();
+		//Window->AddRenderer(mren);
+
+		cout << "mqMinimalWidget Widget constructor 4" << endl;
+		//this->Widget = new QVTKWidget(this);
+		cout << "mqMinimalWidget Widget constructor 5" << endl;
+
+		//this->ContextView = vtkSmartPointer<vtkContextView>::New();
+		/* QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
+		fmt.setSamples(8);
+		Widget->setFormat(fmt);
+		Widget->setEnableHiDPI(true);	*/
+
+		this->Widget->setObjectName("1QVTKWidget0");
+		cout << "mqMinimalWidget Widget constructor 7" << endl;
+		this->Widget->SetRenderWindow(this->Window.Get());
+		cout << "mqMinimalWidget Widget constructor 8" << endl;
+		this->ContextView->SetRenderWindow(this->Window.Get());
+
+		cout << "mqMinimalWidget Widget constructor 9" << endl;
+		//this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
+		cout << "mqMinimalWidget Widget constructor 10" << endl;
+		this->ContextView->SetInteractor(this->Widget->GetInteractor());
+		cout << "mqMinimalWidget Widget constructor 11" << endl;
+
+		this->Widget->setParent(editor);
+
+		cout << "mqMinimalWidget Widget constructor 12" << endl;
+		layout->addWidget(this->Widget);
+
+		cout << "mqMinimalWidget Widget constructor 13" << endl;
+	}
+	~pqInternals() { this->cleanup(); }
+
+	void cleanup()
+	{
+		this->ChartXY->ClearPlots();
+		
+	}
 };
 
-vtkStandardNewMacro(vtkMinimalChartXY);
 
-//-----------------------------------------------------------------------------
-
-class mqMinimalWidget::mqInternals
-{
-  vtkNew<vtkGenericOpenGLRenderWindow> Window;
-
-public:
-  //QPointer<QVTKWidget> Widget;
-	QPointer<QVTKOpenGLWidget> Widget;
-  vtkNew<vtkMinimalChartXY> ChartXY;
-  vtkNew<vtkContextView> ContextView;
-  vtkNew<vtkEventQtSlotConnect> VTKConnect;
 
  // pqTimer Timer;
-  QTimer Timer;
-  vtkSmartPointer<vtkScalarsToColorsItem> TransferFunctionItem;
-  vtkSmartPointer<vtkControlPointsItem> ControlPointsItem;
-  unsigned long CurrentPointEditEventId;
-
-  mqInternals(mqMinimalWidget* editor)
-    : Widget(new QVTKOpenGLWidget(editor))
-    , CurrentPointEditEventId(0)
-  {
-	  cout << "mqMinimalWidget Internals Creator" << endl;
-    this->Timer.setSingleShot(true);
-    this->Timer.setInterval(0);
-
-#if QT_VERSION >= 0x050000
-    QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
-    fmt.setSamples(8);
-    this->Widget->setFormat(fmt);
-    this->Widget->setEnableHiDPI(true);
-#endif
-
-    this->Widget->setObjectName("1QVTKWidget0");
-    this->Widget->SetRenderWindow(this->Window.Get());
-    this->ContextView->SetRenderWindow(this->Window.Get());
-
-    this->ChartXY->SetAutoSize(true);
-    this->ChartXY->SetShowLegend(false);
-    this->ChartXY->SetForceAxesToBounds(true);
-    this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
-    this->ContextView->SetInteractor(this->Widget->GetInteractor());
-    this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
-
-    this->ChartXY->SetActionToButton(vtkChart::PAN, -1);
-    this->ChartXY->SetActionToButton(vtkChart::ZOOM, -1);
-    this->ChartXY->SetActionToButton(vtkChart::SELECT, vtkContextMouseEvent::RIGHT_BUTTON);
-    this->ChartXY->SetActionToButton(vtkChart::SELECT_POLYGON, -1);
-
-    this->Widget->setParent(editor);
-    QVBoxLayout* layout = new QVBoxLayout(editor);
-    layout->setMargin(0);
-    layout->addWidget(this->Widget);
-
-    this->ChartXY->SetAutoAxes(false);
-    this->ChartXY->SetHiddenAxisBorder(8);
-    for (int cc = 0; cc < 4; cc++)
-    {
-      this->ChartXY->GetAxis(cc)->SetVisible(false);
-      this->ChartXY->GetAxis(cc)->SetBehavior(vtkAxis::AUTO);
-    }
-  }
-  ~mqInternals() { this->cleanup(); }
-
-  void cleanup()
-  {
-	  cout << "mqMinimalWidget Cleanup" << endl;
-    this->VTKConnect->Disconnect();
-    this->ChartXY->ClearPlots();
-    if (this->ControlPointsItem && this->CurrentPointEditEventId)
-    {
-      this->ControlPointsItem->RemoveObserver(this->CurrentPointEditEventId);
-      this->CurrentPointEditEventId = 0;
-    }
-    this->TransferFunctionItem = NULL;
-    this->ControlPointsItem = NULL;
-  }
-};
+  
 
 //-----------------------------------------------------------------------------
 mqMinimalWidget::mqMinimalWidget(QWidget* parentObject)
   : Superclass(parentObject)
-  , Internals(new mqInternals(this))
+	//, Internals(new pqInternals(this)) @@ put it back to retest this class... 
+ 
 {
-	cout << "mqMinimalWidget Widget constructor" << endl;
-  QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(renderInternal()));
+	cout << "mqMinimalWidget Widget Try to render?" << endl;
+	//this->Internals->ContextView->GetRenderWindow()->Render();
+	cout << "Rendered or not ?" << endl;
+	
+	//ContextView->GetRenderer()->SetBackground(1.0, 0.0, 0.0);
+//	ContextView->GetInteractor()->Initialize();
+//	ContextView->GetInteractor()->Start();
+
+  //QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(renderInternal()));
 }
 
 //-----------------------------------------------------------------------------
@@ -256,273 +197,15 @@ mqMinimalWidget::~mqMinimalWidget()
 }
 
 //-----------------------------------------------------------------------------
-void mqMinimalWidget::initialize(
-  vtkScalarsToColors* stc, bool stc_editable, vtkPiecewiseFunction* pwf, bool pwf_editable)
-{
-	cout << "mqMinimalWidget Initialize " << endl;
-  this->Internals->cleanup();
 
-  // TODO: If needed, we can support vtkLookupTable.
-  vtkColorTransferFunction* ctf = vtkColorTransferFunction::SafeDownCast(stc);
 
-  if (ctf != NULL && pwf == NULL)
-  {
-	  cout << "mqMinimalWidget Initialize 1" << endl;
-    vtkNew<vtkColorTransferFunctionItem> item;
-    item->SetColorTransferFunction(ctf);
-
-    this->Internals->TransferFunctionItem = item.GetPointer();
-
-    if (stc_editable)
-    {
-      vtkNew<vtkColorTransferControlPointsItem> cpItem;
-      cpItem->SetColorTransferFunction(ctf);
-      cpItem->SetColorFill(true);
-      cpItem->SetEndPointsXMovable(false);
-      cpItem->SetEndPointsYMovable(false);
-      cpItem->SetLabelFormat("%.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
-
-      this->Internals->CurrentPointEditEventId =
-        cpItem->AddObserver(vtkControlPointsItem::CurrentPointEditEvent, this,
-          &mqMinimalWidget::onCurrentPointEditEvent);
-    }
-  }
-  else if (ctf == NULL && pwf != NULL)
-  {
-	  cout << "mqMinimalWidget Initialize 2" << endl;
-    vtkNew<vtkPiecewiseFunctionItem> item;
-    item->SetPiecewiseFunction(pwf);
-
-    this->Internals->TransferFunctionItem = item.GetPointer();
-
-    if (pwf_editable)
-    {
-      vtkNew<vtkPiecewiseControlPointsItem> cpItem;
-      cpItem->SetPiecewiseFunction(pwf);
-      cpItem->SetEndPointsXMovable(false);
-      cpItem->SetEndPointsYMovable(true);
-      cpItem->SetLabelFormat("%.3f: %.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
-    }
-  }
-  else if (ctf != NULL && pwf != NULL)
-  {
-	  cout << "mqMinimalWidget Initialize 3" << endl;
-    vtkNew<vtkCompositeTransferFunctionItem> item;
-    item->SetOpacityFunction(pwf);
-    item->SetColorTransferFunction(ctf);
-    item->SetMaskAboveCurve(true);
-
-    this->Internals->TransferFunctionItem = item.GetPointer();
-    if (pwf_editable && stc_editable)
-    {
-      // NOTE: this hasn't been tested yet.
-      vtkNew<vtkCompositeControlPointsItem> cpItem;
-      cpItem->SetPointsFunction(vtkCompositeControlPointsItem::ColorAndOpacityPointsFunction);
-      cpItem->SetOpacityFunction(pwf);
-      cpItem->SetColorTransferFunction(ctf);
-      cpItem->SetEndPointsXMovable(false);
-      cpItem->SetEndPointsYMovable(true);
-      cpItem->SetUseOpacityPointHandles(true);
-      cpItem->SetLabelFormat("%.3f: %.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
-    }
-    else if (pwf_editable)
-    {
-      vtkNew<vtkCompositeControlPointsItem> cpItem;
-      cpItem->SetPointsFunction(vtkCompositeControlPointsItem::OpacityPointsFunction);
-      cpItem->SetOpacityFunction(pwf);
-      cpItem->SetColorTransferFunction(ctf);
-      cpItem->SetEndPointsXMovable(false);
-      cpItem->SetEndPointsYMovable(true);
-      cpItem->SetUseOpacityPointHandles(true);
-      cpItem->SetLabelFormat("%.3f: %.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
-    }
-  }
-  else
-  {
-    return;
-  }
-  cout << "mqMinimalWidget Initialize suite" << endl;
-  this->Internals->ChartXY->AddPlot(this->Internals->TransferFunctionItem);
-
-  if (this->Internals->ControlPointsItem)
-  {
-	  cout << "mqMinimalWidget we have control points item" << endl;
-
-    this->Internals->ChartXY->ControlPointsItem = this->Internals->ControlPointsItem;
-    this->Internals->ControlPointsItem->SetEndPointsRemovable(false);
-    this->Internals->ControlPointsItem->SetShowLabels(true);
-    this->Internals->ChartXY->AddPlot(this->Internals->ControlPointsItem);
-
-	// Have to check the utility of that!
-    mqCoreUtilities::connect(this->Internals->ControlPointsItem,
-      vtkControlPointsItem::CurrentPointChangedEvent, this, SLOT(onCurrentChangedEvent()));
-    mqCoreUtilities::connect(this->Internals->ControlPointsItem, vtkCommand::EndEvent, this,
-      SIGNAL(controlPointsModified()));
-	cout << "mqMinimalWidget OK?" << endl;
-  }
-
-  // If the transfer functions change, we need to re-render the view. This
-  // ensures that.
-  if (ctf)
-  {
-	  cout << "mqMinimalWidget conect ctf with slot render" << endl;
-
-    this->Internals->VTKConnect->Connect(ctf, vtkCommand::ModifiedEvent, this, SLOT(render()));
-  }
-  if (pwf)
-  {
-	  cout << "mqMinimalWidget conect pwf with slot render" << endl;
-    this->Internals->VTKConnect->Connect(pwf, vtkCommand::ModifiedEvent, this, SLOT(render()));
-  }
-}
-
-//-----------------------------------------------------------------------------
-void mqMinimalWidget::onCurrentPointEditEvent()
-{
-	cout << "mqMinimalWidget editPT " << endl;
-  vtkColorTransferControlPointsItem* cpitem =
-    vtkColorTransferControlPointsItem::SafeDownCast(this->Internals->ControlPointsItem);
-  if (cpitem == NULL)
-  {
-    return;
-  }
-
-  vtkIdType currentIdx = cpitem->GetCurrentPoint();
-  if (currentIdx < 0)
-  {
-    return;
-  }
-
-  vtkColorTransferFunction* ctf = cpitem->GetColorTransferFunction();
-  Q_ASSERT(ctf != NULL);
-
-  double xrgbms[6];
-  ctf->GetNodeValue(currentIdx, xrgbms);
-  QColor color = QColorDialog::getColor(QColor::fromRgbF(xrgbms[1], xrgbms[2], xrgbms[3]), this,
-    "Select Color", QColorDialog::DontUseNativeDialog);
-  if (color.isValid())
-  {
-    xrgbms[1] = color.redF();
-    xrgbms[2] = color.greenF();
-    xrgbms[3] = color.blueF();
-    ctf->SetNodeValue(currentIdx, xrgbms);
-
-    emit this->controlPointsModified();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void mqMinimalWidget::onCurrentChangedEvent()
-{
-	cout << "mqMinimalWidget Changed " << endl;
-  if (this->Internals->ControlPointsItem)
-  {
-    emit this->currentPointChanged(this->Internals->ControlPointsItem->GetCurrentPoint());
-  }
-}
-
-//-----------------------------------------------------------------------------
-vtkIdType mqMinimalWidget::currentPoint() const
-{
-	cout << "mqMinimalWidget currPt" << endl;
-  if (this->Internals->ControlPointsItem)
-  {
-    return this->Internals->ControlPointsItem->GetCurrentPoint();
-  }
-
-  return -1;
-}
-
-//-----------------------------------------------------------------------------
-void mqMinimalWidget::setCurrentPoint(vtkIdType index)
-{
-	cout << "mqMinimalWidget setCurrPt " << endl;
-  if (this->Internals->ControlPointsItem)
-  {
-    if (index < -1 || index >= this->Internals->ControlPointsItem->GetNumberOfPoints())
-    {
-      index = -1;
-    }
-    this->Internals->ControlPointsItem->SetCurrentPoint(index);
-  }
-}
-
-//-----------------------------------------------------------------------------
-vtkIdType mqMinimalWidget::numberOfControlPoints() const
-{
-	cout << "mqMinimalWidget nrCtrlPT" << endl;
-  return this->Internals->ControlPointsItem
-    ? this->Internals->ControlPointsItem->GetNumberOfPoints()
-    : 0;
-}
-
-//-----------------------------------------------------------------------------
-void mqMinimalWidget::SetLogScaleXAxis(bool logScale)
-{
-
-  this->Internals->ChartXY->GetAxis(vtkAxis::BOTTOM)->SetLogScale(logScale);
-}
-
-//-----------------------------------------------------------------------------
-bool mqMinimalWidget::GetLogScaleXAxis() const
-{
-  return this->Internals->ChartXY->GetAxis(vtkAxis::BOTTOM)->GetLogScale();
-}
-
-//-----------------------------------------------------------------------------
-void mqMinimalWidget::render()
-{
- cout << "mqMinimalWidget render" << endl;
-  this->Internals->Timer.start();
-	/*if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
-	{
-		this->Internals->ContextView->GetRenderWindow()->Render();
-	}*/
-}
 
 //-----------------------------------------------------------------------------
 void mqMinimalWidget::renderInternal()
 {
-	cout << "mqMinimalWidget renderInternal" << endl;
+	/*cout << "mqMinimalWidget renderInternal" << endl;
   if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
   {
     this->Internals->ContextView->GetRenderWindow()->Render();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void mqMinimalWidget::setCurrentPointPosition(double xpos)
-{
-	cout << "mqMinimalWidget currPT Position " << endl;
-  vtkIdType currentPid = this->currentPoint();
-  if (currentPid < 0)
-  {
-    return;
-  }
-
-  vtkIdType numPts = this->Internals->ControlPointsItem->GetNumberOfPoints();
-  if (currentPid >= 0)
-  {
-    double start_point[4];
-    this->Internals->ControlPointsItem->GetControlPoint(0, start_point);
-    xpos = std::max(start_point[0], xpos);
-  }
-  if (currentPid <= (numPts - 1))
-  {
-    double end_point[4];
-    this->Internals->ControlPointsItem->GetControlPoint(numPts - 1, end_point);
-    xpos = std::min(end_point[0], xpos);
-  }
-
-  double point[4];
-  this->Internals->ControlPointsItem->GetControlPoint(currentPid, point);
-  if (point[0] != xpos)
-  {
-    point[0] = xpos;
-    this->Internals->ControlPointsItem->SetControlPoint(currentPid, point);
-  }
+  }*/
 }

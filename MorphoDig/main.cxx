@@ -26,9 +26,9 @@ int main( int argc, char* argv[] )
 
   // QT Stuff
  //QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
-	QSurfaceFormat fmt = QVTKOpenGLWidget::defaultFormat();
-	fmt.setSamples(0);
-	QSurfaceFormat::setDefaultFormat(fmt);
+	//QSurfaceFormat fmt = QVTKOpenGLWidget::defaultFormat();
+	//fmt.setSamples(0);
+	//QSurfaceFormat::setDefaultFormat(fmt);
   QApplication app( argc, argv );
   //QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
   #if QT_VERSION >= 0x050000

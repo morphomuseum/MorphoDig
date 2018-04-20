@@ -77,8 +77,8 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	//this->Ui->frame->setVisible(false);
 	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
-	this->Ui->ColorEditor->initialize(STC, true, NULL, false);
-	this->Ui->ColorEditor->render();
+	//this->Ui->ColorEditor->initialize(STC, true, NULL, false);
+	//this->Ui->ColorEditor->render();
 	//this->Ui->OpacityEditor->initialize(NULL, false, STC->GetScalarOpacityFunction(), true);
 	//mColorScale->setVisible(true);
 	
