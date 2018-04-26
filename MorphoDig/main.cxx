@@ -16,7 +16,7 @@
 
   #include <QCleanlooksStyle>
 #endif
-
+#include "mqMinimalWidget.h"
 #include "MorphoDig.h"
 
 extern int qInitResources_icons();
@@ -39,7 +39,8 @@ int main( int argc, char* argv[] )
 
   qInitResources_icons();
 
-
+  //mqMinimalWidget mymin;
+  //mymin.show();
   
 
   MorphoDig myMorphoDig;

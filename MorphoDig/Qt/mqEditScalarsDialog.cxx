@@ -66,7 +66,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
     QObject::connect(&this->Internals->OpacityTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
       SIGNAL(xvmsPointsChanged()));*/
-
+	
 
 
 	//1 populate active scalar combo box, and check which scalar is the active one!
@@ -74,6 +74,11 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	this->setObjectName("mqEditScalarsDialog");
 	this->Ui->comboActiveScalar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
+
+	//mqTransferFunctionWidget ColorEditor;
+	//ColorEditor.initialize(STC, true, NULL, false);
+	//ColorEditor.show();
+
 	//this->Ui->frame->setVisible(false);
 	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);

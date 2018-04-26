@@ -706,7 +706,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   this->MorphoDigCore->SetGridInfos();
   this->MorphoDigCore->InitializeOrientationHelper(); // creates orientation helper...
   this->MorphoDigCore->SetOrientationHelperVisibility();
-  this->qvtkWidget2->SetRenderWindow(window);
+  //this->qvtkWidget2->SetRenderWindow(window);
   
   //EXAMPLE vtkBoxWidget
 
