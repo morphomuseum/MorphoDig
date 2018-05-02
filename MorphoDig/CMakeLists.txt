@@ -34,34 +34,7 @@ configure_file (
 # so that we will find TutorialConfig.h
 include_directories("${PROJECT_BINARY_DIR}")
 
-find_package(VTK COMPONENTS
-  vtkCommonCore
-  vtkIOCore
-  vtkFiltersCore
-  vtkInfovisCore
-  vtkInteractionStyle
-  vtkViewsQt
-  vtkCommonComputationalGeometry
-  vtkCommonCore
-  vtkCommonDataModel
-  vtkCommonExecutionModel
-  vtkCommonMath
-  vtkCommonMisc
-  vtkCommonSystem
-  vtkCommonTransforms
-  vtkFiltersGeneral  
-  vtkIOGeometry
-  vtkIOLegacy
-  vtkIOXML
-  vtkIOXMLParser
-  vtkFiltersModeling
-  vtkFiltersHybrid
-  vtkIOImport
-  vtkRenderingCore
-  # vtkRenderingOpenGL
-  vtkIOPLY
-  vtkViewsContext2D
-)
+find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
 if("${VTK_QT_VERSION}" STREQUAL "")
@@ -203,6 +176,11 @@ install(
 "${VTK_DIR}/bin/Release/vtkRenderingVolume-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtksys-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtklz4-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkRenderingContextOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkRenderingGL2PSOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkgl2ps-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+
+
 
 
 		"${qtcore}"
