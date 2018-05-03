@@ -74,17 +74,18 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	this->setObjectName("mqEditScalarsDialog");
 	this->Ui->comboActiveScalar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
+	//ui.ColorEditor->initialize(stc, true, NULL, false);
 
-	//mqTransferFunctionWidget ColorEditor;
-	//ColorEditor.initialize(STC, true, NULL, false);
-	//ColorEditor.show();
+	/*mqTransferFunctionWidget ColorEditor;
+	ColorEditor.initialize(STC, true, NULL, false);
+	ColorEditor.show();*/
 
 	//this->Ui->frame->setVisible(false);
 	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
-	//this->Ui->ColorEditor->initialize(STC, true, NULL, false);
+	this->Ui->ColorEditor->initialize(STC, true, NULL, false);
 	//this->Ui->ColorEditor->render();
-	//this->Ui->OpacityEditor->initialize(NULL, false, STC->GetScalarOpacityFunction(), true);
+	this->Ui->OpacityEditor->initialize(STC, false, STC->GetScalarOpacityFunction(), true);
 	//mColorScale->setVisible(true);
 	
 	//mColorScale->render();
