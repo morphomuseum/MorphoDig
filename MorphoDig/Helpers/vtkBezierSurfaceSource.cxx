@@ -26,7 +26,7 @@
 
    Credits:
    The bezier surface algorithm is based on the code and concepts presented in
-   this page: "B�zier Surface (in 3D)"
+   this page: "Bézier Surface (in 3D)"
    http://local.wasp.uwa.edu.au/~pbourke/geometry/bezier/index.html
 
    Credits to Paul Bourke for explaining Bezier surfaces so well.
@@ -355,7 +355,7 @@ void vtkBezierSurfaceSource::UpdateControlPointsPolyData(vtkPolyData* pd)
 
 /*
   The bezier surface algorithm is based on the code and concepts presented in
-  this page: "B�zier Surface (in 3D)"
+  this page: "Bézier Surface (in 3D)"
   http://local.wasp.uwa.edu.au/~pbourke/geometry/bezier/index.html
 
   Credits to Paul Bourke for explaining Bezier surfaces so well.

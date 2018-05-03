@@ -739,12 +739,13 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   
 
   //EXAMPLE BEZIER SOURCE + BEZIER WIDGET
-  /*
+  
   unsigned int controlPointsX = 4;
   unsigned int controlPointsY = 4;
   
   // Create an arbitrary plane that we can use
   // to initialize the control points for the Bezier surface
+  /*
   vtkSmartPointer<vtkPlaneSource> planeSource =
 	  vtkSmartPointer<vtkPlaneSource>::New();
   planeSource->SetOrigin(0, 0, 0);
@@ -788,7 +789,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   
   vtkBezierSurfaceWidget *widget = vtkBezierSurfaceWidget::New();
 	  
-  widget->SetInteractor(this->ui->qvtkWidget->GetRenderWindow()->GetInteractor());
+  widget->SetInteractor(this->qvtkWidget2->GetRenderWindow()->GetInteractor());
   widget->SetBezierSource(bezierSource);
   widget->SetHandleSize(0.1);
   widget->On();
@@ -802,8 +803,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   Bactor->SetMapper(Bmapper);
   
   this->MorphoDigCore->getRenderer()->AddActor(Bactor);
+  
   */
-
  
 
   //@@ end rubber band selection!
