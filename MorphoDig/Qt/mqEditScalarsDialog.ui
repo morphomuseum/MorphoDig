@@ -707,55 +707,93 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget_2">
+   <widget class="QFrame" name="PropertiesFrame">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>150</y>
-      <width>311</width>
-      <height>141</height>
+      <x>270</x>
+      <y>130</y>
+      <width>372</width>
+      <height>10</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
-     <property name="spacing">
-      <number>0</number>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>150</y>
+      <width>372</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>372</width>
+       <height>131</height>
+      </rect>
      </property>
-     <property name="sizeConstraint">
-      <enum>QLayout::SetMinimumSize</enum>
-     </property>
-     <item>
-      <widget class="mqTransferFunctionWidget" name="OpacityEditor" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>80</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="mqTransferFunctionWidget" name="ColorEditor" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>40</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>40</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="PropertiesFrame_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
  </widget>
@@ -764,12 +802,6 @@
    <class>QDoubleSlider</class>
    <extends>QSlider</extends>
    <header>QDoubleSlider.h</header>
-  </customwidget>
-  <customwidget>
-   <class>mqTransferFunctionWidget</class>
-   <extends>QWidget</extends>
-   <header>mqTransferFunctionWidget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

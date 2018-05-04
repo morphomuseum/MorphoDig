@@ -83,10 +83,30 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	//this->Ui->frame->setVisible(false);
 	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
-	this->Ui->ColorEditor->initialize(STC, true, NULL, false);
-	//this->Ui->ColorEditor->render();
-	this->Ui->OpacityEditor->initialize(STC, false, STC->GetScalarOpacityFunction(), true);
-	//mColorScale->setVisible(true);
+
+	mqTransferFunctionWidget *ColorEditor = new mqTransferFunctionWidget ();
+	ColorEditor->initialize(STC, true, NULL, false);
+	mqTransferFunctionWidget *OpacityEditor = new mqTransferFunctionWidget();
+	OpacityEditor->initialize(STC, false, STC->GetScalarOpacityFunction(), true);
+	/*auto layout = new QVBoxLayout;
+	layout->setMargin(0);
+	layout->addWidget(ColorEditor);
+	layout->addWidget(OpacityEditor);*/
+	//this->Ui->scrollAreaWidgetContents->setLayout(layout);
+	this->Ui->verticalLayout->addWidget(ColorEditor);
+	this->Ui->verticalLayout->addWidget(OpacityEditor);
+	this->Ui->verticalLayout->addWidget(OpacityEditor);
+
+	//this->Ui->scrollAreaWidgetContents->addWidget(ColorEditor);
+	//this->Ui->scrollAreaWidgetContents->addWidget(OpacityEditor);
+	//layout->addWidget(ColorEditor);
+	//layout->addWidget(OpacityEditor);
+	//this->Ui->scrollAreaWidgetContents->setLayout(layout);
+	//this->Ui->editor->setLayout(layout);
+	//this->Ui->editor->setVisible(true);
+	//this->Ui->ColorEditor->initialize(STC, true, NULL, false);
+	//this->Ui->OpacityEditor->initialize(STC, false, STC->GetScalarOpacityFunction(), true);
+	
 	
 	//mColorScale->render();
 	//this->Ui->frame->setVisible(true);
