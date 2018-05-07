@@ -47,7 +47,7 @@ public:
   public slots:
   virtual void slotActiveScalarChanged(int idx);
   virtual void slotActiveColorMapChanged(int idx);
-  
+  virtual void slotRefreshSuggestedRange();
   virtual void slotRefreshDialog();
   virtual void slotAccepted();
   virtual void slotRefreshComboScalars();
