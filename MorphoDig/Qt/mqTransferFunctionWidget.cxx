@@ -6,6 +6,7 @@
 #include "mqTransferFunctionWidget.h"
 
 #include "mqCoreUtilities.h"
+#include "mqMorphoDigCore.h"
 //#include "pqQVTKWidgetBase.h"
 //#include "pqTimer.h"
 #include <QTimer>
@@ -77,7 +78,7 @@ public:
   // Paint function is invoked.
   void Update() VTK_OVERRIDE
   {
-	  cout << "mqTransferFunctionWidget Update" << endl;
+	//  cout << "mqTransferFunctionWidget Update" << endl;
     if (this->ControlPointsItem)
     {
       // Reset bounds if the control points' bounds have changed.
@@ -97,7 +98,7 @@ public:
 
   bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
   {
-	  cout << "mqTransferFunctionWidget PaintChildren" << endl;
+	 // cout << "mqTransferFunctionWidget PaintChildren" << endl;
     if (this->DataValid)
    {
       return this->Superclass::PaintChildren(painter);
@@ -491,6 +492,7 @@ void mqTransferFunctionWidget::renderInternal()
   if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
   {
     this->Internals->ContextView->GetRenderWindow()->Render();
+	mqMorphoDigCore::instance()->Render();
   }
 }
 
