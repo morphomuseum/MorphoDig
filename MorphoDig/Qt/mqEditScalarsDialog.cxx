@@ -173,7 +173,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->pushRemoveScalar, SIGNAL(pressed()), this, SLOT(slotRemoveScalar()));
-	
+	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 
 	this->RefreshSliders();
 	/*
@@ -666,7 +666,7 @@ void mqEditScalarsDialog::slotAccepted()
 }
 void mqEditScalarsDialog::UpdateLookupTables()
 {
-	mqMorphoDigCore::instance()->UpddateLookupTablesRanges(this->Ui->currentMin->value(), this->Ui->currentMax->value());
+	mqMorphoDigCore::instance()->UpdateLookupTablesRanges(this->Ui->currentMin->value(), this->Ui->currentMax->value());
 }
 void mqEditScalarsDialog::slotCurrentMinMaxEdited()
 {

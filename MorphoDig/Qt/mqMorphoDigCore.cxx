@@ -652,7 +652,7 @@ vtkDiscretizableColorTransferFunction* mqMorphoDigCore::GetOneColorMap()
 	}
 
 }
-void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
+void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 {
 	for (int i = 0; i < this->mui_ExistingColorMaps->Stack.size(); i++)
 	{
@@ -717,6 +717,21 @@ void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
 		}
 	}
 	this->Render();
+
+}
+void mqMorphoDigCore::UpdateLookupTablesToData()
+{
+	
+	double min; double max;
+	min = DBL_MAX;
+	max = DBL_MIN;
+	min = this->GetScalarRangeMin();
+	max = this->GetScalarRangeMax();
+	if (min <DBL_MAX && max>DBL_MIN && min < max)
+	{
+		this->UpdateLookupTablesRanges(min, max);
+	}
+	
 
 }
 

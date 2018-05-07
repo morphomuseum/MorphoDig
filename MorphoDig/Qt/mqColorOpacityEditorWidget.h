@@ -113,7 +113,8 @@ public:
   * used, if any.
   */
   //pqSMProxy scalarOpacityFunctionProxy() const;
-
+signals:
+  void changeFinished();
 public slots:
   /**
   * Sets the xvmsPoints that control the opacity transfer function.
@@ -143,7 +144,7 @@ public slots:
   /**
   * Reset the transfer function ranges to active data source.
   */
-  //void resetRangeToData();
+  void resetRangeToData();
 
   /**
   * Reset the transfer function ranges to custom values.

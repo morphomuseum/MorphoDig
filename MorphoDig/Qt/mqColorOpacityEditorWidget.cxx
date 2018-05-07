@@ -193,7 +193,7 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   QObject::connect(
     ui.OpacityEditor, SIGNAL(controlPointsModified()), this, SLOT(updateCurrentData()));
 
-  //QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
+  QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
 
  // QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
 
@@ -731,20 +731,23 @@ void mqColorOpacityEditorWidget::currentDataEdited()
 
 //-----------------------------------------------------------------------------
 
-/*
+
 
 //-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::resetRangeToData()
+void mqColorOpacityEditorWidget::resetRangeToData()
 {
+	//this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax());
+	//this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin());
   // passing in NULL ensure pqResetScalarRangeReaction simply uses active representation.
-  if (pqResetScalarRangeReaction::resetScalarRangeToData(NULL))
-  {
-    this->Internals->render();
+  //if (pqResetScalarRangeReaction::resetScalarRangeToData(NULL))
+  //{
+   // this->Internals->render();
+	mqMorphoDigCore::instance()->UpdateLookupTablesToData();
     emit this->changeFinished();
-  }
+  //}
 }
 
-*/
+
 
 //-----------------------------------------------------------------------------
 

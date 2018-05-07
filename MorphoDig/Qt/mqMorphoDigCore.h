@@ -608,12 +608,14 @@ public:
   void signal_existingScalarsChanged();
   void signal_activeScalarChanged();
   //void signal_ActorsMightHaveChanged();
-  double GetScalarRangeMin();
   vtkDiscretizableColorTransferFunction* GetOneColorMap();
-  void UpddateLookupTablesRanges(double min, double max);
-	double GetScalarRangeMax();
+  void UpdateLookupTablesRanges(double min, double max);
+  void UpdateLookupTablesToData();
+	
 	double GetSuggestedScalarRangeMin();
 	double GetSuggestedScalarRangeMax();
+	double GetScalarRangeMin();
+	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
   void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
