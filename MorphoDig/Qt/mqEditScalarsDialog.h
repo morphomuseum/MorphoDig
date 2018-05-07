@@ -11,6 +11,8 @@
 #include "vtkLMActorCollection.h"
 #include <vtkSmartPointer.h>
 #include <QDialog>
+#include "mqColorOpacityEditorWidget.h"
+
 
 namespace Ui
 {
@@ -61,7 +63,7 @@ public:
 protected:
 	
 private:
-	
+	mqColorOpacityEditorWidget *mColorMap; 
 
   Q_DISABLE_COPY(mqEditScalarsDialog)
   Ui::mqEditScalarsDialog* const Ui;

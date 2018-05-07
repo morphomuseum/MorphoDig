@@ -82,7 +82,7 @@ class  mqColorOpacityEditorWidget : public QWidget
 public:
   mqColorOpacityEditorWidget(vtkDiscretizableColorTransferFunction* stc, QWidget* parent = 0);
   ~mqColorOpacityEditorWidget() override;
-
+  void reInitialize(vtkDiscretizableColorTransferFunction *stc);
   /**
   * Returns the current list of control points for the color transfer
   * function. This a list of 4-tuples.

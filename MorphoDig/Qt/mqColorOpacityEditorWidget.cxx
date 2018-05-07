@@ -134,6 +134,19 @@ public:
   }
 };
 
+void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunction *stc)
+{
+	this->STC = stc;
+	if (stc != NULL)
+	{
+		this->Internals->Ui.ColorEditor->initialize(stc, true, NULL, false);
+		this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
+		cout << "reinitialize: updateCurrentData... " << endl;
+		this->updateCurrentData();
+		cout << "reinitialize:  updatePanel... " << endl;
+		this->updatePanel();
+	}
+}
 //-----------------------------------------------------------------------------
 mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 	vtkDiscretizableColorTransferFunction *stc, QWidget* parentObject)

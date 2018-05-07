@@ -85,8 +85,12 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	QVBoxLayout* vbox = new QVBoxLayout(this->Ui->PropertiesFrame);
 	vbox->setMargin(0);
 	vbox->setSpacing(0);
-	mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this);
-	this->Ui->PropertiesFrame->layout()->addWidget(mColorMap);
+	cout << "Try this!" << endl;
+	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this);
+	cout << "Try that!" << endl;
+	this->mColorMap = someMap;
+	cout << "And?" << endl;
+	this->Ui->PropertiesFrame->layout()->addWidget(this->mColorMap);
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
 
 	/*mqTransferFunctionWidget *ColorEditor = new mqTransferFunctionWidget ();
@@ -419,7 +423,8 @@ void mqEditScalarsDialog::RefreshComboColorMaps()
 	if (exists > -1) {
 		cout << "DIAL Now current index of combo box is " << exists << endl;
 		this->Ui->comboColorMap->setCurrentIndex(exists);
-
+		vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap;
+		//this->mColorMap
 
 	}
 }
@@ -526,6 +531,7 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 			mqMorphoDigCore::instance()->Setmui_ActiveColorMapAndRender(NewActiveColorMap,
 				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap
 			);
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
 		
 
 
