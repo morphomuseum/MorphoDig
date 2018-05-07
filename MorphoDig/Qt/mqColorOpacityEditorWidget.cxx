@@ -424,8 +424,8 @@ void mqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* p
     stc = vtkScalarsToColors::SafeDownCast(this->proxy()->GetClientSideObject());
   }*/
   cout << "mqColorOpacityEditorWidget initializeOpacityEditor" << endl;
-  //ui.OpacityEditor->initialize(this->STC, false, pwf, true);
-  ui.OpacityEditor->initialize(NULL, false, pwf, true);
+  ui.OpacityEditor->initialize(this->STC, false, pwf, true);
+ // ui.OpacityEditor->initialize(NULL, false, pwf, true);
 }
 
 //-----------------------------------------------------------------------------

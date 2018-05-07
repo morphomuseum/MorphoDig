@@ -159,7 +159,7 @@ public:
 		this->ChartXY->SetShowLegend(true);
 		this->ChartXY->SetForceAxesToBounds(true);
 		this->ChartXY->Update();
-		this->ContextView->GetScene()->AddItem(this->ChartXY);
+		//this->ContextView->GetScene()->AddItem(this->ChartXY);
 		cout << "mqMinimalWidget Widget constructor 10" << endl;
 		//this->ContextView->SetInteractor(this->Widget->GetInteractor());
 		cout << "mqMinimalWidget Widget constructor 11" << endl;
