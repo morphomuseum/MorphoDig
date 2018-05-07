@@ -85,11 +85,11 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	QVBoxLayout* vbox = new QVBoxLayout(this->Ui->PropertiesFrame);
 	vbox->setMargin(0);
 	vbox->setSpacing(0);
-	cout << "Try this!" << endl;
+	//cout << "Try this!" << endl;
 	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this);
-	cout << "Try that!" << endl;
+	//cout << "Try that!" << endl;
 	this->mColorMap = someMap;
-	cout << "And?" << endl;
+	//cout << "And?" << endl;
 	this->Ui->PropertiesFrame->layout()->addWidget(this->mColorMap);
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
 
