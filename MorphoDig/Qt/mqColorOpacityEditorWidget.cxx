@@ -506,6 +506,10 @@ void mqColorOpacityEditorWidget::updateCurrentData()
     // rescale the transfer function manually
     ui.CurrentDataValue->setEnabled(ui.ColorEditor->currentPoint() != 0 &&
       ui.ColorEditor->currentPoint() != (ui.ColorEditor->numberOfControlPoints() - 1));
+
+
+
+
   }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
   {
