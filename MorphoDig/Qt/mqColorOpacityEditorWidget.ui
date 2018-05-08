@@ -173,7 +173,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout3" stretch="0,0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout3" stretch="0,0,0">
      <item>
       <widget class="QLabel" name="label2">
        <property name="text">
@@ -182,21 +182,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QSlider" name="horizontalSlider">
+      <widget class="QSlider" name="discretizeSlider">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="mqLineEdit" name="CurrentDiscretizeValue">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
+      <widget class="QSpinBox" name="currentDiscretizeValue"/>
      </item>
     </layout>
    </item>

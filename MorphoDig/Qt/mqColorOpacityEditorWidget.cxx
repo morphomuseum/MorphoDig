@@ -112,6 +112,11 @@ public:
     this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
+	this->Ui.Discretize->setChecked(false);
+	this->Ui.currentDiscretizeValue->setValue(256);
+	this->Ui.discretizeSlider->setMinimum(1);
+	this->Ui.discretizeSlider->setMaximum(1024);
+	this->Ui.discretizeSlider->setValue(256);
   }
 
   void render()
