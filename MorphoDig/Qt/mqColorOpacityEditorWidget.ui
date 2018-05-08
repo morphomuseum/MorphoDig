@@ -159,6 +159,48 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="EnableOpacityMapping">
+     <property name="text">
+      <string>Enable opacity mapping for surfaces</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="Discretize">
+     <property name="text">
+      <string>Discretize</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout3" stretch="0,0,1">
+     <item>
+      <widget class="QLabel" name="label2">
+       <property name="text">
+        <string>Nr of values:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="horizontalSlider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="mqLineEdit" name="CurrentDiscretizeValue">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QLabel" name="ColorLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">

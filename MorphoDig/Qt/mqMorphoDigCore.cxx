@@ -446,13 +446,184 @@ vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScala
 double mqMorphoDigCore::GetScalarRangeMin()
 {
 
-	return this->ScalarRangeMin;
+	//return this->ScalarRangeMin;
+	double my_min;
+	double my_currmin;
+
+	my_min = DBL_MAX;
+	my_currmin = DBL_MAX;
+
+	this->ActorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+		{
+			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+				&& (
+					this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+					this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+
+					)
+				&& this->Getmui_ActiveScalars()->NumComp == 1
+				)
+			{
+				if (this->Getmui_ActiveScalars()->DataType == VTK_FLOAT)
+				{
+					vtkFloatArray *currentScalars = (vtkFloatArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+						my_currmin = DBL_MAX;
+						my_currmin = (double)currentScalars->GetTuple(0)[0];
+
+
+						std::vector<float> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						//int iQ = (int)(0.05*myPD->GetNumberOfPoints());
+						my_currmin = (double)vals.at(0);
+
+						if (my_currmin < my_min) { my_min = my_currmin; }
+					}
+				}
+				else
+				{
+					vtkDoubleArray *currentScalars = (vtkDoubleArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+						my_currmin = DBL_MAX;
+						my_currmin = currentScalars->GetTuple(0)[0];
+
+
+						std::vector<double> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						//int iQ = (int)(0.05*myPD->GetNumberOfPoints());
+						my_currmin = vals.at(0);
+
+						if (my_currmin < my_min) { my_min = my_currmin; }
+					}
+
+				}
+
+			}
+		}
+	}
+	if (my_min == VTK_DOUBLE_MAX || my_min == VTK_FLOAT_MAX)
+	{
+		cout << "Strange!!!" << endl;
+		return 0;
+	}
+	else
+	{
+		return my_min;
+	}
 }
 
 double mqMorphoDigCore::GetScalarRangeMax()
 {
 
-	return this->ScalarRangeMax;
+	//return this->ScalarRangeMax;
+	double my_max;
+	double my_currmax;
+
+	my_max = -DBL_MAX;
+
+	my_currmax = -DBL_MAX;
+
+	this->ActorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+		{
+			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+				&& (
+					this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+					this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+
+					)
+				&& this->Getmui_ActiveScalars()->NumComp == 1
+				)
+			{
+				if (this->Getmui_ActiveScalars()->DataType == VTK_FLOAT)
+				{
+					vtkFloatArray *currentScalars = (vtkFloatArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+
+						my_currmax = (double)currentScalars->GetTuple(0)[0];
+
+						std::vector<float> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						int iQ = (int)(myPD->GetNumberOfPoints()-1);
+
+						my_currmax = (double)vals.at(iQ);
+						if (my_currmax > my_max) { my_max = my_currmax; }
+
+					}
+				}
+				else
+				{
+					vtkDoubleArray *currentScalars = (vtkDoubleArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+
+						my_currmax = currentScalars->GetTuple(0)[0];
+
+
+						std::vector<double> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						int iQ = (int)(myPD->GetNumberOfPoints()-1);
+						my_currmax = vals.at(iQ);
+
+						if (my_currmax > my_max) { my_max = my_currmax; }
+					}
+
+				}
+
+			}
+		}
+	}
+	if (my_max == VTK_DOUBLE_MIN || my_max == VTK_FLOAT_MIN)
+	{
+		return 1;
+	}
+	else
+	{
+		cout << "my_max=" << my_max << endl;
+		return my_max;
+	}
 }
 
 double mqMorphoDigCore::GetSuggestedScalarRangeMin()
@@ -724,11 +895,16 @@ void mqMorphoDigCore::UpdateLookupTablesToData()
 	
 	double min; double max;
 	min = DBL_MAX;
-	max = DBL_MIN;
+	max = -DBL_MAX;
+	
 	min = this->GetScalarRangeMin();
+	cout << "min=" << min << endl;
 	max = this->GetScalarRangeMax();
-	if (min <DBL_MAX && max>DBL_MIN && min < max)
+	
+	cout << "max=" << max << endl;
+	if (min <DBL_MAX && max>-DBL_MAX && min < max)
 	{
+		cout << "Update look up tables ranges"  << endl;
 		this->UpdateLookupTablesRanges(min, max);
 	}
 	

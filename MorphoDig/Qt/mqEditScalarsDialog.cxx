@@ -74,6 +74,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	this->setObjectName("mqEditScalarsDialog");
 	this->Ui->comboActiveScalar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
+	
 	//ui.ColorEditor->initialize(stc, true, NULL, false);
 
 	/*mqTransferFunctionWidget ColorEditor;
@@ -689,8 +690,18 @@ void mqEditScalarsDialog::slotCurrentMinMaxEdited()
 }
 void mqEditScalarsDialog::slotRefreshDialog()
 {
-	
-	this->RefreshDialog();
+	cout << "Let's refresh dialog!"		<< endl;
+
+	//Dirty hack here! Replace "mqMorphoDigCore::instance()->GetScalarRangeMax()" by something which finds the bounds
+	// of the currently used lookup table
+	double min = mqMorphoDigCore::instance()->GetScalarRangeMin();
+	double max = mqMorphoDigCore::instance()->GetScalarRangeMax();
+	/*this->Ui->currentMin->setValue(min);
+	this->Ui->currentMax->setValue(max);*/
+	this->Ui->sliderMin->setDoubleValue(min);
+	this->Ui->sliderMax->setDoubleValue(max);
+	this->RefreshSliders();
+	//this->RefreshDialog();
 }
 
 
