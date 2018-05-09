@@ -112,11 +112,18 @@ public:
     this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
+	this->Ui.EnableOpacityMapping->setChecked(true);
 	this->Ui.Discretize->setChecked(false);
+	this->Ui.currentDiscretizeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui.currentDiscretizeValue->setMinimum(1);
+	this->Ui.currentDiscretizeValue->setMaximum(1024);
 	this->Ui.currentDiscretizeValue->setValue(256);
+	this->Ui.currentDiscretizeValue->setEnabled(false);
 	this->Ui.discretizeSlider->setMinimum(1);
 	this->Ui.discretizeSlider->setMaximum(1024);
 	this->Ui.discretizeSlider->setValue(256);
+	this->Ui.discretizeSlider->setEnabled(false);
+
   }
 
   void render()
@@ -144,14 +151,26 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 	this->STC = stc;
 	if (stc != NULL)
 	{
-		if (stc->GetEnableOpacityMapping()) { this->Internals->Ui.EnableOpacityMapping->setChecked(true); }
+		if (stc->GetEnableOpacityMapping()) { this->Internals->Ui.EnableOpacityMapping->setChecked(true); }		
 		else { this->Internals->Ui.EnableOpacityMapping->setChecked(false); }
-		
+		this->Internals->Ui.discretizeSlider->setValue(this->STC->GetNumberOfValues());
+		this->Internals->Ui.currentDiscretizeValue->setValue(this->STC->GetNumberOfValues());
+		if (stc->GetDiscretize()) { 
+			this->Internals->Ui.Discretize->setChecked(true); 
+			this->Internals->Ui.discretizeSlider->setDisabled(false);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(false);
+		}
+		else{ 
+			this->Internals->Ui.Discretize->setChecked(false); 
+			this->Internals->Ui.discretizeSlider->setDisabled(true);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(true);
+		}
+
 		this->Internals->Ui.ColorEditor->initialize(stc, true, NULL, false);
 		this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
 		cout << "reinitialize: updateCurrentData... " << endl;
 		this->updateCurrentData();
-		cout << "reinitialize:  updatePanel... " << endl;
+		cout << "reinitialize: updatePanel... " << endl;
 		this->updatePanel();
 	}
 }
@@ -203,7 +222,19 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 
   QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
   QObject::connect(ui.EnableOpacityMapping, SIGNAL(clicked()), this, SLOT(changedEnableOpacity()));
+  QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changeDiscretize()));
+//  QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changedDiscretize()));
   
+  QObject::connect(ui.discretizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changedDiscretizeValue(int)));
+  QObject::connect(ui.discretizeSlider, SIGNAL(valueChanged(int)), ui.currentDiscretizeValue, SLOT(setValue(int)));
+  QObject::connect(ui.currentDiscretizeValue, SIGNAL(valueChanged(int)), this, SLOT(changedDiscretizeValue(int)));
+  QObject::connect(ui.currentDiscretizeValue, SIGNAL(valueChanged(int)), ui.discretizeSlider, SLOT(setValue(int)));
+
+  //QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changedDiscretize()));
+
+ // connect(slider, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
+ // connect(slider, SIGNAL(valueChanged(int)), this, SIGNAL(valueChanged(int)));
+
 
 
  // QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
@@ -762,9 +793,36 @@ void mqColorOpacityEditorWidget::resetRangeToData()
   //}
 }
 
+void mqColorOpacityEditorWidget::changeDiscretize() 
+{
+	if (this->STC != NULL)
+	{
+		if (this->Internals->Ui.Discretize->isChecked()) {
+			this->Internals->Ui.Discretize->setChecked(true);
+			this->STC->DiscretizeOn();
+			cout << "Discretize is on and STC has " << STC->GetNumberOfValues() << endl;
+			this->Internals->Ui.discretizeSlider->setDisabled(false);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(false);
+		}
+		else {
+			this->STC->DiscretizeOff();
+			
+			this->Internals->Ui.discretizeSlider->setDisabled(true);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(true);
+		}
+	}
+}
+void  mqColorOpacityEditorWidget::changedDiscretizeValue(int value)
+{
+	//this->Internals->Ui.currentDiscretizeValue->setValue(value);
+	if (this->STC != NULL)
+	{
+		this->STC->SetNumberOfValues(value);
+	}
+}
 void mqColorOpacityEditorWidget::changedEnableOpacity()
 {
-	cout << "changeEnableOpacity" << endl;
+	cout << "change EnableOpacity" << endl;
 	if (this->STC != NULL)
 	{
 		if (this->Internals->Ui.EnableOpacityMapping->isChecked())

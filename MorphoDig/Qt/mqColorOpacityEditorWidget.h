@@ -146,6 +146,8 @@ public slots:
   */
   void resetRangeToData();
   void changedEnableOpacity();
+  void changeDiscretize();
+  void  changedDiscretizeValue(int value);
 
   /**
   * Reset the transfer function ranges to custom values.
