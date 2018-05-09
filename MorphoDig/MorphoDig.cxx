@@ -514,10 +514,125 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//	this->MorphoDigCore->Getmui_DefaultAdjustScaleFactor()
 	//	).toDouble() << endl;
 	settings.endGroup();
-
+	/*[colormaps]
+nr=3
+cm0=CustomColorMap1
+cm0nc=4
+cm0no=3
+cm0cx0=0
+cm0r0=0.1
+cm0g0=0.5
+cm0b0=0.8
+cm0cx1=0.2
+cm0r1=1
+cm0g1=0.5
+cm0b1=0
+cm0cx2=0.6
+cm0r2=0
+cm0g2=1
+cm0b2=1
+cm0cx3=1
+cm0r3=0.3
+cm0g3=0.2
+cm0b3=0.1
+cm0ox0=0
+cm0ov0=0.2
+cm0ox1=0.5
+cm0ov1=0.9
+cm0ox2=1
+cm0ov2=0.9
+cm1=CustomColorMap2
+cm1nc=4
+cm1no=3
+cm1cx0=0
+cm1r0=0.1
+cm1g0=0.1
+cm1b0=0.1
+cm1cx1=0.2
+cm1r1=0.3
+cm1g1=0.3
+cm1b1=0.3
+cm1cx2=0.6
+cm1r2=0.6
+cm1g2=0.6
+cm1b2=0.6
+cm1cx3=1
+cm1r3=1
+cm1g3=1
+cm1b3=1
+cm1ox0=0
+cm1ov0=0.5
+cm1ox1=0.5
+cm1ov1=0.5
+cm1ox2=1
+cm1ov2=1
+cm2=CustomColorMap3
+cm2nc=4
+cm2no=3
+cm2cx0=0
+cm2r0=0.1
+cm2g0=0.1
+cm2b0=0.7
+cm2cx1=0.2
+cm2r1=0.3
+cm2g1=0.3
+cm2b1=0.7
+cm2cx2=0.6
+cm2r2=0.6
+cm2g2=0.6
+cm2b2=0.7
+cm2cx3=1
+cm2r3=1
+cm2g3=1
+cm2b3=0.7
+cm2ox0=0
+cm2ov0=0.1
+cm2ox1=0.5
+cm2ov1=0.5
+cm2ox2=1
+cm2ov2=1
+*/
+	settings.beginGroup("colormaps");
+	cout<<"Number of custom colormaps:"<<settings.value("nr", 0).toInt()<<endl;
+	int nr = settings.value("nr", 0).toInt();
+	if (nr > 0)
+	{
+		for (int i = 0; i < nr; i++)
+		{
+			QString cm = QString("cm");
+			cm = cm + QString::number(i);
+			cout << "Color map" << i << ":" << settings.value(cm, "Colormap").toString().toStdString() << endl;
+			// Name : settings.value(cm, "Colormap").toString()
+			QString cmnc = cm + "nc";
+			int nc = settings.value(cmnc, 0).toInt();
+			cout << "Color nodes:" << endl;
+			for (int j = 0; j < nc; j++)
+			{
+				QString cmcx = cm + "cx" + QString::number(j);
+				QString cmr = cm + "r" + QString::number(j);
+				QString cmg = cm + "g" + QString::number(j);
+				QString cmb = cm + "b" + QString::number(j);
+				cout << "cx" << j << ":" << settings.value(cmcx, 0).toDouble() << ",";
+				cout << "rgb:"<< settings.value(cmr, 0).toDouble() << ",";
+				cout  << settings.value(cmg, 0).toDouble() << ",";
+				cout  << settings.value(cmb, 0).toDouble() << endl;
+				
+			}
+			QString cmno = cm + "no";
+			int no = settings.value(cmno, 0).toInt();
+			cout << "Opacity nodes:" << endl;
+			for (int j = 0; j < no; j++)
+			{
+				QString cmox = cm + "ox" + QString::number(j);
+				QString cmov = cm + "ov" + QString::number(j);
+				
+				cout << "ox" << j << ":" << settings.value(cmox, 0).toDouble() << ",";
+				cout << "ov=" << j << ":" << settings.value(cmov, 0).toDouble() << endl;
+			}
+		}
+	}
 	
-
-	
+	settings.endGroup();
 
 	
 

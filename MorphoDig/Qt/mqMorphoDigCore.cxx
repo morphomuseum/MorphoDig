@@ -929,7 +929,7 @@ void mqMorphoDigCore::InitLuts()
 	TagLut->SetTableValue(8, 0.7400, 0.9900, 0.7900, 1); // Mint
 	TagLut->SetTableValue(9, 0.2000, 0.6300, 0.7900, 1);
 	
-	this->ScalarRainbowLut->DiscretizeOn();
+	this->ScalarRainbowLut->DiscretizeOff();
 	this->ScalarRainbowLut->SetColorSpaceToRGB();
 	//this->ScalarRainbowLut->EnableOpacityMappingOn();
 
@@ -940,6 +940,7 @@ void mqMorphoDigCore::InitLuts()
 	this->ScalarRainbowLut->AddRGBPoint(0.6, 0.0, 1.0, 0.0); //# green
 	this->ScalarRainbowLut->AddRGBPoint(0.8, 1.0, 1.0, 0.0); //# yellow
 	this->ScalarRainbowLut->AddRGBPoint(1.0, 1.0, 0.0, 0.0); //# red
+	this->ScalarRainbowLut->GetNumberOfValues();
 	vtkSmartPointer<vtkPiecewiseFunction> opacityRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 	
 	opacityRfunction->AddPoint(0, 0.3);
