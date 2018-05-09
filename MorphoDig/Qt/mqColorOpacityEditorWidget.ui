@@ -163,6 +163,9 @@
      <property name="text">
       <string>Enable opacity mapping for surfaces</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>

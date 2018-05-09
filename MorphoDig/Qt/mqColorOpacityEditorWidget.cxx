@@ -144,6 +144,9 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 	this->STC = stc;
 	if (stc != NULL)
 	{
+		if (stc->GetEnableOpacityMapping()) { this->Internals->Ui.EnableOpacityMapping->setChecked(true); }
+		else { this->Internals->Ui.EnableOpacityMapping->setChecked(false); }
+		
 		this->Internals->Ui.ColorEditor->initialize(stc, true, NULL, false);
 		this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
 		cout << "reinitialize: updateCurrentData... " << endl;
@@ -199,6 +202,9 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     ui.OpacityEditor, SIGNAL(controlPointsModified()), this, SLOT(updateCurrentData()));
 
   QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
+  QObject::connect(ui.EnableOpacityMapping, SIGNAL(clicked()), this, SLOT(changedEnableOpacity()));
+  
+
 
  // QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
 
@@ -756,7 +762,24 @@ void mqColorOpacityEditorWidget::resetRangeToData()
   //}
 }
 
+void mqColorOpacityEditorWidget::changedEnableOpacity()
+{
+	cout << "changeEnableOpacity" << endl;
+	if (this->STC != NULL)
+	{
+		if (this->Internals->Ui.EnableOpacityMapping->isChecked())
+		{
+			this->STC->EnableOpacityMappingOn();
+		}
+		else
+		{
+			this->STC->EnableOpacityMappingOff();
+		}
+	}
+	
 
+
+}
 
 //-----------------------------------------------------------------------------
 

@@ -145,6 +145,7 @@ public slots:
   * Reset the transfer function ranges to active data source.
   */
   void resetRangeToData();
+  void changedEnableOpacity();
 
   /**
   * Reset the transfer function ranges to custom values.
