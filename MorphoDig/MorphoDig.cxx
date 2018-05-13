@@ -519,6 +519,9 @@ nr=3
 cm0=CustomColorMap1
 cm0nc=4
 cm0no=3
+cm0discretize=1
+cm0discretizenr=10
+cm0enableopacity=1
 cm0cx0=0
 cm0r0=0.1
 cm0g0=0.5
@@ -606,6 +609,16 @@ cm2ov2=1
 			QString cmnc = cm + "nc";
 			int nc = settings.value(cmnc, 0).toInt();
 			cout << "Color nodes:" << endl;
+			//cm0discretize = 1
+			//cm0discretizenr = 10
+			//cm0enableopacity = 1
+			QString cmdiscretize = cm + "discretize";
+			QString cmdiscretizenr = cm + "discretizenr";
+			QString cmenableopacity = cm + "enableopacity";
+
+			int discretize = settings.value(cmdiscretize, 0).toInt();
+			int discretizenr = settings.value(cmdiscretizenr, 256).toInt();
+			int enableopacity = settings.value(cmenableopacity, 1).toInt();
 			for (int j = 0; j < nc; j++)
 			{
 				QString cmcx = cm + "cx" + QString::number(j);
