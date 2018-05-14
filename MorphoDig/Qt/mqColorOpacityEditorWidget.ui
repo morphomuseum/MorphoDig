@@ -77,7 +77,7 @@
        </property>
        <item>
         <widget class="QToolButton" name="ResetRangeToData">
-        <property name="toolTip">
+         <property name="toolTip">
           <string>Rescale to data range</string>
          </property>
          <property name="text">
@@ -102,7 +102,7 @@
            <normaloff>:/Icons/Invert24.png</normaloff>:/Icons/Invert24.png</iconset>
          </property>
          <property name="checkable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -120,7 +120,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QToolButton" name="SaveAsPreset">
+        <widget class="QToolButton" name="SaveAsCustom">
          <property name="toolTip">
           <string>Save to preset</string>
          </property>

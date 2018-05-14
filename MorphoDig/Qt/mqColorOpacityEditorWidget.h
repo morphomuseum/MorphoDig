@@ -144,6 +144,7 @@ public slots:
   /**
   * Reset the transfer function ranges to active data source.
   */
+  void invertTransferFunction();
   void resetRangeToData();
   void changedEnableOpacity();
   void changeDiscretize();
@@ -179,7 +180,7 @@ public slots:
   /**
   * save current transfer function as preset.
   */
-  //void saveAsPreset();
+  void saveAsCustom();
 
 signals:
   /**

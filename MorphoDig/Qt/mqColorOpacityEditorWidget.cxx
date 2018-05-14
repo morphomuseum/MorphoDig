@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 #include <QMessageBox>
 #include <QPointer>
+#include <QInputDialog>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtDebug>
@@ -221,6 +222,9 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     ui.OpacityEditor, SIGNAL(controlPointsModified()), this, SLOT(updateCurrentData()));
 
   QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
+  QObject::connect(ui.InvertTransferFunctionButton, SIGNAL(clicked()), this, SLOT(invertTransferFunction()));
+  
+
   QObject::connect(ui.EnableOpacityMapping, SIGNAL(clicked()), this, SLOT(changedEnableOpacity()));
   QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changeDiscretize()));
 //  QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changedDiscretize()));
@@ -250,6 +254,8 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 
  // QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
   //QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
+  QObject::connect(ui.SaveAsCustom, SIGNAL(clicked()), this, SLOT(saveAsCustom()));
+  
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
  // this->connect(
@@ -778,6 +784,14 @@ void mqColorOpacityEditorWidget::currentDataEdited()
 //-----------------------------------------------------------------------------
 
 
+void mqColorOpacityEditorWidget::invertTransferFunction()
+{
+	if (this->STC != NULL)
+	{
+		mqMorphoDigCore::instance()->invertTransferFunction(this->STC);
+		this->reInitialize(STC);
+	}
+}
 
 //-----------------------------------------------------------------------------
 void mqColorOpacityEditorWidget::resetRangeToData()
@@ -938,7 +952,27 @@ void pqColorOpacityEditorWidget::presetApplied()
   this->Internals->OpacityTableModel.refresh();
 }
 */
+void mqColorOpacityEditorWidget::saveAsCustom()
+{
+	QInputDialog *giveNameDialog = new QInputDialog();
+	bool dialogResult;
+	QString newColormapName = giveNameDialog->getText(0, "Color map name", "Name:", QLineEdit::Normal,
+		"Custom_color_map", &dialogResult);
+	if (dialogResult)
+	{
+		cout << "color map given:" << newColormapName.toStdString() << endl;
+		mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC); 
+		//this->UpdateUI();
+	}
+	else
+	{
+		cout << "cancel " << endl;
+	}
+
+}
+
 /*
+
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::saveAsPreset()
 {

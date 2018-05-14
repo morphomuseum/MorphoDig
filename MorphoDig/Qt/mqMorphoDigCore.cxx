@@ -911,6 +911,45 @@ void mqMorphoDigCore::UpdateLookupTablesToData()
 
 }
 
+void mqMorphoDigCore::createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC)
+{
+//@@ TO DO!
+}
+
+void mqMorphoDigCore::invertTransferFunction(vtkDiscretizableColorTransferFunction *STC)
+{
+	if (STC != NULL)
+	{
+		double *pts = STC->GetDataPointer();
+
+		int numnodes = STC->GetSize();
+		cout << ": num nodes = " << numnodes << endl;
+		double min = DBL_MAX;
+		double max = -DBL_MAX;
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < min) { min = curr; }
+			if (curr > max) { max = curr; }
+
+		}
+		cout << "max:" << max << ", old min:" << min << endl;
+		if (max > min)
+		{
+			double mult = -1;
+			double c = max+min;
+			for (int k = 0; k < numnodes; k++)
+			{
+				pts[4 * k] = pts[4 * k] * mult + c;
+				cout << "nx" << k << "=" << pts[4 * k] << endl;
+			}
+			STC->FillFromDataPointer(numnodes, pts);
+
+		}
+	}
+}
+
 void mqMorphoDigCore::InitLuts()
 {
 	cout << "Start Init LUTS!" << endl;

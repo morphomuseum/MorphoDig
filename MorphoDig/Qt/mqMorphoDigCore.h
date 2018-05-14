@@ -610,8 +610,10 @@ public:
   //void signal_ActorsMightHaveChanged();
   vtkDiscretizableColorTransferFunction* GetOneColorMap();
   void UpdateLookupTablesRanges(double min, double max);
+
   void UpdateLookupTablesToData();
-	
+  void createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC);
+  void invertTransferFunction(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin();
 	double GetSuggestedScalarRangeMax();
 	double GetScalarRangeMin();
