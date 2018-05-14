@@ -701,6 +701,7 @@ void mqEditScalarsDialog::slotRefreshDialog()
 	this->Ui->sliderMin->setDoubleValue(min);
 	this->Ui->sliderMax->setDoubleValue(max);
 	this->RefreshSliders();
+	this->RefreshComboColorMaps();
 	//this->RefreshDialog();
 }
 

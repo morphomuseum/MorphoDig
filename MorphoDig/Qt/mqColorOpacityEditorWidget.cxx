@@ -970,6 +970,7 @@ void mqColorOpacityEditorWidget::saveAsCustom()
 	{
 		cout << "color map given:" << newColormapName.toStdString() << endl;
 		mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC); 
+		emit this->changeFinished();
 		//this->UpdateUI();
 	}
 	else
