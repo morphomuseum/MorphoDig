@@ -29,6 +29,8 @@
 #include <vtkStructuredGrid.h>
 #include <vtkBillboardTextActor3D.h>
 #include <QMainWindow>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFileDialog>
 
 
@@ -52,7 +54,8 @@ public:
   ~MorphoDig();
   
   mqMorphoDigCore* MorphoDigCore;
-  
+  void dragEnterEvent(QDragEnterEvent *e);
+  void dropEvent(QDropEvent *e);
   //vtkSmartPointer<vtkRenderedAreaPicker> AreaPicker;
  vtkSmartPointer<vtkAreaPicker> AreaPicker;
 
