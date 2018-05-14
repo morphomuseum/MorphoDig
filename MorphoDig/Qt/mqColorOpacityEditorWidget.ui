@@ -89,10 +89,27 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QToolButton" name="InvertTransferFunctionButton">
+	   <item>
+        <widget class="QToolButton" name="InvertRGB">
          <property name="toolTip">
           <string>Invert transfer function colors</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/InvertRGB24.png</normaloff>:/Icons/InvertRGB24.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="InvertOpacity">
+         <property name="toolTip">
+          <string>Invert transfer function opacity</string>
          </property>
          <property name="text">
           <string/>

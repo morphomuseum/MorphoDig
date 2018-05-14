@@ -916,7 +916,7 @@ void mqMorphoDigCore::createCustomColorMap(QString name, vtkDiscretizableColorTr
 //@@ TO DO!
 }
 
-void mqMorphoDigCore::invertTransferFunction(vtkDiscretizableColorTransferFunction *STC)
+void mqMorphoDigCore::invertRGB(vtkDiscretizableColorTransferFunction *STC)
 {
 	if (STC != NULL)
 	{
@@ -949,7 +949,38 @@ void mqMorphoDigCore::invertTransferFunction(vtkDiscretizableColorTransferFuncti
 		}
 	}
 }
+void mqMorphoDigCore::invertOpacity(vtkDiscretizableColorTransferFunction *STC)
+{
+	if (STC != NULL)
+	{
+		vtkPiecewiseFunction* OF = STC->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		double min2 = DBL_MAX;
+		double max2 = -DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			//cout << "x" << j << "=" << curr << endl;
+			if (curr < min2) { min2 = curr; }
+			if (curr > max2) { max2 = curr; }
 
+		}
+		if (max2 > min2)
+		{
+			double mult = -1;
+			double c = min2+max2;
+			for (int k = 0; k < numnodes2; k++)
+			{
+				pts2[2 * k] = pts2[2 * k] * mult + c;
+				//cout << "nx" << k << "=" << pts2[2*k] << endl;
+			}
+			OF->FillFromDataPointer(numnodes2, pts2);
+
+		}
+	}
+}
 void mqMorphoDigCore::InitLuts()
 {
 	cout << "Start Init LUTS!" << endl;
@@ -1023,12 +1054,12 @@ void mqMorphoDigCore::InitLuts()
 	this->mui_ActiveColorMap->Name = Rainbow;
 
 	cout << "Try to set existing color maps!!" << endl;
-	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(Rainbow, this->ScalarRainbowLut));
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(Rainbow, this->ScalarRainbowLut, 0));
 
 	cout << "Try to set existing color maps 2!!" << endl;
 	QString BRWA = QString("Black-Red-White_Alpha");
 
-	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(BRWA,this->ScalarRedLut));
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(BRWA,this->ScalarRedLut, 0));
 	cout << "Try to set existing color maps 3!!" << endl;
 
 

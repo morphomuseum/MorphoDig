@@ -222,8 +222,8 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     ui.OpacityEditor, SIGNAL(controlPointsModified()), this, SLOT(updateCurrentData()));
 
   QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
-  QObject::connect(ui.InvertTransferFunctionButton, SIGNAL(clicked()), this, SLOT(invertTransferFunction()));
-  
+  QObject::connect(ui.InvertRGB, SIGNAL(clicked()), this, SLOT(invertRGB()));
+  QObject::connect(ui.InvertOpacity, SIGNAL(clicked()), this, SLOT(invertOpacity()));
 
   QObject::connect(ui.EnableOpacityMapping, SIGNAL(clicked()), this, SLOT(changedEnableOpacity()));
   QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changeDiscretize()));
@@ -784,11 +784,19 @@ void mqColorOpacityEditorWidget::currentDataEdited()
 //-----------------------------------------------------------------------------
 
 
-void mqColorOpacityEditorWidget::invertTransferFunction()
+void mqColorOpacityEditorWidget::invertRGB()
 {
 	if (this->STC != NULL)
 	{
-		mqMorphoDigCore::instance()->invertTransferFunction(this->STC);
+		mqMorphoDigCore::instance()->invertRGB(this->STC);
+		this->reInitialize(STC);
+	}
+}
+void mqColorOpacityEditorWidget::invertOpacity()
+{
+	if (this->STC != NULL)
+	{
+		mqMorphoDigCore::instance()->invertOpacity(this->STC);
 		this->reInitialize(STC);
 	}
 }

@@ -66,13 +66,13 @@ public:
 	{
 		QString Name;
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap;
+		int isCustom;
 
-
-		Element(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colormap)
+		Element(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colormap, int custom=0)
 		{
 			this->Name = name;
 			this->ColorMap = colormap;
-
+			this->isCustom = custom;
 
 		}
 	};
@@ -613,7 +613,8 @@ public:
 
   void UpdateLookupTablesToData();
   void createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC);
-  void invertTransferFunction(vtkDiscretizableColorTransferFunction *STC);
+  void invertRGB(vtkDiscretizableColorTransferFunction *STC);
+  void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin();
 	double GetSuggestedScalarRangeMax();
 	double GetScalarRangeMin();

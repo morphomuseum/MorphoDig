@@ -26,6 +26,8 @@
    <file>ResetRangeCustom24.png</file>
    <file>Invert24.png</file>
    <file>Invert32.png</file>
+   <file>InvertRGB24.png</file>
+   <file>InvertRGB32.png</file>
    <file>ResetRangeTemporal24.png</file>
    <file>ResetToVisibleRange32.png</file>
    <file>Advanced32.png</file>

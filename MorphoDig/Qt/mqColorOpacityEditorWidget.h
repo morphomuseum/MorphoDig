@@ -144,7 +144,8 @@ public slots:
   /**
   * Reset the transfer function ranges to active data source.
   */
-  void invertTransferFunction();
+  void invertRGB();
+  void invertOpacity();
   void resetRangeToData();
   void changedEnableOpacity();
   void changeDiscretize();
