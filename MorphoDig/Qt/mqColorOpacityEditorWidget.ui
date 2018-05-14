@@ -77,7 +77,7 @@
        </property>
        <item>
         <widget class="QToolButton" name="ResetRangeToData">
-         <property name="toolTip">
+        <property name="toolTip">
           <string>Rescale to data range</string>
          </property>
          <property name="text">
@@ -86,6 +86,23 @@
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/ResetRange24.png</normaloff>:/Icons/ResetRange24.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="InvertTransferFunctionButton">
+         <property name="toolTip">
+          <string>Invert transfer function colors</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/Invert24.png</normaloff>:/Icons/Invert24.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -112,7 +129,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/Save16.png</normaloff>:/Icons/Save16.png</iconset>
+           <normaloff>:/Icons/filesave22.png</normaloff>:/Icons/filesave22.png</iconset>
          </property>
         </widget>
        </item>
@@ -126,7 +143,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/Advanced26.png</normaloff>:/Icons/Advanced26.png</iconset>
+           <normaloff>:/Icons/Advanced32.png</normaloff>:/Icons/Advanced32.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
