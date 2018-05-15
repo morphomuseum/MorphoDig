@@ -631,6 +631,8 @@ public:
   //void SetCurrentInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
+  int colorMapNameAlreadyExists(QString proposed_name);
+  void deleteColorMap(int i);
 signals:
 
   void projectionModeChanged();

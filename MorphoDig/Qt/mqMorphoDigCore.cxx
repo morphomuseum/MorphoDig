@@ -1121,6 +1121,35 @@ void mqMorphoDigCore::InitLuts()
 	
 
 }
+void mqMorphoDigCore::deleteColorMap(int i)
+{
+	ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+	size_t size = colorMaps->Stack.size();
+	if (i < size && i>=0)
+	{
+		colorMaps->Stack.erase(colorMaps->Stack.begin() + i);
+		if (colorMaps->Stack.size() > 0)
+		{
+			this->Setmui_ActiveColorMap(colorMaps->Stack.at(0).Name, colorMaps->Stack.at(0).ColorMap);
+		}
+	}
+}
+int mqMorphoDigCore::colorMapNameAlreadyExists(QString proposed_name)
+{
+	ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+	size_t size = colorMaps->Stack.size();
+	int exists = 0;
+	for (int i = 0; i < size; i++)
+	{
+		if (colorMaps->Stack.at(i).Name == proposed_name)
+		{
+			exists = 1;
+		}
+	}
+	return exists;
+
+}
+
 void mqMorphoDigCore::ComputeSelectedNamesLists()
 {
 	

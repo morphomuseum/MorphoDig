@@ -22,6 +22,7 @@
     <!-- Typical file operations. -->
 <file>ScalarBar24.png</file>
    <file>ResetRange32.png</file>
+   <file>edit.png</file>
    <file>ResetRange24.png</file>
    <file>ResetRangeCustom24.png</file>
    <file>Invert24.png</file>

@@ -45,6 +45,8 @@ public:
  void MoveSliders();
  void RefreshRange();
   public slots:
+  virtual void slotEditColorMapName();
+  virtual void slotDeleteColorMap();
   virtual void slotActiveScalarChanged(int idx);
   virtual void slotActiveColorMapChanged(int idx);
   virtual void slotRefreshSuggestedRange();

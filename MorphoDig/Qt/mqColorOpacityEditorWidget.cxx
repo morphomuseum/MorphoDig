@@ -968,7 +968,22 @@ void mqColorOpacityEditorWidget::saveAsCustom()
 		"Custom_color_map", &dialogResult);
 	if (dialogResult)
 	{
+		
 		cout << "color map given:" << newColormapName.toStdString() << endl;
+		if (mqMorphoDigCore::instance()->colorMapNameAlreadyExists(newColormapName) == 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Can't save custom map : name already exists.");
+			msgBox.exec();
+			return;
+		}
+		if (newColormapName.length()==0)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Can't save custom map: name length =0.");
+			msgBox.exec();
+			return;
+		}
 		mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC); 
 		emit this->changeFinished();
 		//this->UpdateUI();

@@ -511,16 +511,6 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose active scalar&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboColorMap">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>90</y>
-      <width>69</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
@@ -766,6 +756,84 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>90</y>
+      <width>291</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QComboBox" name="comboColorMap"/>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="editColorMap">
+       <property name="toolTip">
+        <string>Rescale to data range</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/edit.png</normaloff>:/Icons/edit.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="deleteColorMap">
+       <property name="toolTip">
+        <string>Rescale to data range</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/delete2.png</normaloff>:/Icons/delete2.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <zorder>label_2</zorder>
+   <zorder>pushRemoveScalar</zorder>
+   <zorder>comboActiveScalar</zorder>
+   <zorder>label_6</zorder>
+   <zorder>label_7</zorder>
+   <zorder>suggestedMin</zorder>
+   <zorder>suggestedMax</zorder>
+   <zorder>label_5</zorder>
+   <zorder>pushScalarSuggestedMin</zorder>
+   <zorder>pushScalarSuggestedMax</zorder>
+   <zorder>label_8</zorder>
+   <zorder>label_9</zorder>
+   <zorder>currentMin</zorder>
+   <zorder>currentMax</zorder>
+   <zorder>label_3</zorder>
+   <zorder>sliderMax</zorder>
+   <zorder>label_4</zorder>
+   <zorder>sliderMin</zorder>
+   <zorder>selectedObjects</zorder>
+   <zorder>scrollArea</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
+   <zorder>comboColorMap</zorder>
   </widget>
  </widget>
  <customwidgets>

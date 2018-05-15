@@ -21,6 +21,8 @@
 // we actually do not need glew...
 //#include <GL/glew.h>
 #include <QApplication>
+#include <QMessageBox>
+#include <QInputDialog>
 #include <QFile>
 #include <QRadioButton>
 #include <QFileDialog>
@@ -174,6 +176,13 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->pushRemoveScalar, SIGNAL(pressed()), this, SLOT(slotRemoveScalar()));
+
+	this->Ui->editColorMap->setDisabled(true);
+	this->Ui->deleteColorMap->setDisabled(true);
+
+	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
+	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
+
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 
 	this->RefreshSliders();
@@ -283,6 +292,86 @@ void mqEditScalarsDialog::UpdateUI()
 	this->RefreshSuggestedRange();
 	
 	
+}
+void mqEditScalarsDialog::slotEditColorMapName()
+{
+	QString ActiveColorMap = this->Ui->comboColorMap->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom;
+		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+		if (ActiveColorMap == myExisingColorMapName && iscustom)
+		{
+			QInputDialog *giveNameDialog = new QInputDialog();
+			bool dialogResult;
+			QString newColormapName = giveNameDialog->getText(0, "Change color map name", "Name:", QLineEdit::Normal,
+				myExisingColorMapName, &dialogResult);
+			if (dialogResult)
+			{
+
+				cout << "new color map given:" << newColormapName.toStdString() << endl;
+				if (mqMorphoDigCore::instance()->colorMapNameAlreadyExists(newColormapName) == 1)
+				{
+					QMessageBox msgBox;
+					msgBox.setText("Can't change custom map name : name already exists.");
+					msgBox.exec();
+					return;
+				}
+				if (newColormapName.length() == 0)
+				{
+					QMessageBox msgBox;
+					msgBox.setText("Can't save custom map: name length =0.");
+					msgBox.exec();
+					return;
+				}
+				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name = newColormapName;
+				mqMorphoDigCore::instance()->Setmui_ActiveColorMap(newColormapName, mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+				this->RefreshComboColorMaps();
+				//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
+				//this->UpdateUI();
+			}
+			else
+			{
+				cout << "cancel " << endl;
+			}
+			
+			//this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+
+
+		}
+	}
+
+}
+
+void mqEditScalarsDialog::slotDeleteColorMap()
+{
+
+	QString ActiveColorMap = this->Ui->comboColorMap->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom;
+		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+		if (ActiveColorMap == myExisingColorMapName && iscustom)
+		{
+		
+			mqMorphoDigCore::instance()->deleteColorMap(i);
+			//mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.erase(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.begin() + i);
+			//mqMorphoDigCore::instance()->Setmui_ActiveColorMap(newColormapName, mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+			this->RefreshComboColorMaps();
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap);
+			mqMorphoDigCore::instance()->Render();
+				//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
+				//this->UpdateUI();
+			
+
+			//this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+
+
+		}
+	}
 }
 void mqEditScalarsDialog::slotRefreshSuggestedRange()
 {
@@ -514,6 +603,7 @@ void mqEditScalarsDialog::slotActiveScalarChanged(int idx)
 				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).DataType,
 				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).NumComp
 			);
+			
 			this->RefreshSuggestedRange();
 
 		}
@@ -533,7 +623,17 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 		if (NewActiveColorMap == myExisingColorMapName)
 		{
 			
+			if (mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom==1)
+			{
+				this->Ui->deleteColorMap->setDisabled(false);
+				this->Ui->editColorMap->setDisabled(false);
+			}
+			else
+			{
+				this->Ui->deleteColorMap->setDisabled(true);
+				this->Ui->editColorMap->setDisabled(true);
 
+			}
 			mqMorphoDigCore::instance()->Setmui_ActiveColorMapAndRender(NewActiveColorMap,
 				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap
 			);
