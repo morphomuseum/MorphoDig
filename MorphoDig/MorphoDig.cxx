@@ -26,7 +26,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include <vtkPiecewiseFunction.h>
 #include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkPoints.h>
@@ -603,9 +603,32 @@ cm2ov2=1
 	{
 		for (int i = 0; i < nr; i++)
 		{
+			/*vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	newSTC->DeepCopy(STC);
+	
+
+	vtkSmartPointer<vtkPiecewiseFunction> opacityfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	opacityfunction->DeepCopy(STC->GetScalarOpacityFunction());
+	
+
+	newSTC->SetScalarOpacityFunction(opacityfunction);
+	newSTC->Build();
+
+
+	this->mui_ActiveColorMap->ColorMap = newSTC;
+	cout << "Active color map = newSTC!" << endl;
+	this->mui_ActiveColorMap->Name = name;
+
+	cout << "Add this map to !!" << endl;
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));*/
+			vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+
 			QString cm = QString("cm");
 			cm = cm + QString::number(i);
 			cout << "Color map" << i << ":" << settings.value(cm, "Colormap").toString().toStdString() << endl;
+			
+			QString name = settings.value(cm, "Colormap").toString();
+			
 			// Name : settings.value(cm, "Colormap").toString()
 			QString cmnc = cm + "nc";
 			int nc = settings.value(cmnc, 0).toInt();
@@ -617,21 +640,37 @@ cm2ov2=1
 			QString cmdiscretizenr = cm + "discretizenr";
 			QString cmenableopacity = cm + "enableopacity";
 
+			
+			newSTC->SetColorSpaceToRGB();
+
+
 			int discretize = settings.value(cmdiscretize, 0).toInt();
+			newSTC->SetDiscretize(discretize);
+
 			int discretizenr = settings.value(cmdiscretizenr, 256).toInt();
+			newSTC->SetNumberOfValues(discretizenr);
 			int enableopacity = settings.value(cmenableopacity, 1).toInt();
+			newSTC->SetEnableOpacityMapping(enableopacity);
+			
 			for (int j = 0; j < nc; j++)
 			{
 				QString cmcx = cm + "cx" + QString::number(j);
 				QString cmr = cm + "r" + QString::number(j);
 				QString cmg = cm + "g" + QString::number(j);
 				QString cmb = cm + "b" + QString::number(j);
+				double cx = settings.value(cmcx, 0).toDouble();
+				double r = settings.value(cmr, 0).toDouble();
+				double g = settings.value(cmg, 0).toDouble();
+				double b = settings.value(cmb, 0).toDouble();
 				cout << "cx" << j << ":" << settings.value(cmcx, 0).toDouble() << ",";
 				cout << "rgb:"<< settings.value(cmr, 0).toDouble() << ",";
 				cout  << settings.value(cmg, 0).toDouble() << ",";
 				cout  << settings.value(cmb, 0).toDouble() << endl;
+				newSTC->AddRGBPoint(cx, r, g, b);
 				
 			}
+
+			vtkSmartPointer<vtkPiecewiseFunction> opacityfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			QString cmno = cm + "no";
 			int no = settings.value(cmno, 0).toInt();
 			cout << "Opacity nodes:" << endl;
@@ -639,10 +678,20 @@ cm2ov2=1
 			{
 				QString cmox = cm + "ox" + QString::number(j);
 				QString cmov = cm + "ov" + QString::number(j);
-				
+				double ox = settings.value(cmox, 0).toDouble();
+				double ov = settings.value(cmov, 0).toDouble();
 				cout << "ox" << j << ":" << settings.value(cmox, 0).toDouble() << ",";
 				cout << "ov=" << j << ":" << settings.value(cmov, 0).toDouble() << endl;
+				opacityfunction->AddPoint(ox, ov);
 			}
+
+			newSTC->SetScalarOpacityFunction(opacityfunction);
+			newSTC->Build();
+
+
+			cout << "Add this map to !!" << endl;
+			this->MorphoDigCore->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));
+
 		}
 	}
 	
@@ -1130,6 +1179,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 void MorphoDig::saveSettings()
 {
+	
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MorphoMuseuM", "MorphoDig");
 	//cout<<"try save settings:" << m_sSettingsFile.toStdString();
 
@@ -1194,6 +1244,141 @@ void MorphoDig::saveSettings()
 	settings.endGroup();
 	settings.beginGroup("renderer_settings");
 	settings.setValue("Anaglyph", this->MorphoDigCore->Getmui_Anaglyph());	
+	settings.endGroup();
+	settings.beginGroup("colormaps");
+
+	ExistingColorMaps *colorMaps = this->MorphoDigCore->Getmui_ExistingColorMaps();
+	size_t size = colorMaps->Stack.size();
+	int cpt = 0;
+	int nr = 0;
+	for (int i = 0; i < size; i++)
+	{
+		if (colorMaps->Stack.at(i).isCustom == 1)
+		{
+			nr++;
+		}
+	}
+	//1 total number of custom colormaps
+	settings.setValue("nr", nr);
+	for (int i = 0; i < size; i++)
+	{
+		if (colorMaps->Stack.at(i).isCustom == 1)
+		{
+			//2 set the name of colormap(cpt), and whether it's discretizable and opacity is enabled
+			QString cm = QString("cm");
+			cm = cm + QString::number(cpt);
+			settings.setValue(cm, colorMaps->Stack.at(i).Name);
+			
+			QString cmdiscretize = cm + "discretize";
+			QString cmdiscretizenr = cm + "discretizenr";
+			QString cmenableopacity = cm + "enableopacity";
+			int discretize = colorMaps->Stack.at(i).ColorMap->GetDiscretize();
+			int discretizenr = colorMaps->Stack.at(i).ColorMap->GetNumberOfValues();
+			int enableopacity = colorMaps->Stack.at(i).ColorMap->GetEnableOpacityMapping();
+			settings.setValue(cmdiscretize, discretize);
+			settings.setValue(cmdiscretizenr, discretizenr);
+			settings.setValue(cmenableopacity, enableopacity);
+
+			//3 set numer of colors
+			QString cmnc = cm + "nc"; 
+			int nc = colorMaps->Stack.at(i).ColorMap->GetSize();
+			settings.setValue(cmnc, nc);
+
+			//4 set number of opacity nodes
+			int no = colorMaps->Stack.at(i).ColorMap->GetScalarOpacityFunction()->GetSize();
+			QString cmno = cm + "no";
+			settings.setValue(cmno, no);
+			double *pts = colorMaps->Stack.at(i).ColorMap->GetDataPointer();
+			//first : find max and min cx to reset cx range between 0 and 1
+			double cx_min = DBL_MAX;
+			double cx_max = -DBL_MAX;
+			for (int j = 0; j < nc; j++)
+			{
+				double curr = pts[4 * j];
+				cout << "x" << j << "=" << curr << endl;
+				if (curr < cx_min) { cx_min = curr; }
+				if (curr > cx_max) { cx_max = curr; }
+
+			}
+			double c = 0;
+			double mult = 1;
+			if (cx_max > cx_min)
+			{
+				double range = cx_max - cx_min;				
+				mult = 1/range;
+				c = -cx_min/range;
+
+			}
+
+			for (int j = 0; j < nc; j++)
+			{
+				double cx = mult*pts[4 * j]+c;				
+				double r = pts[4 * j + 1];
+				double g = pts[4 * j + 2];
+				double b = pts[4 * j + 3];
+				QString cmcx = cm + "cx" + QString::number(j);
+				QString cmr = cm + "r" + QString::number(j);
+				QString cmg = cm + "g" + QString::number(j);
+				QString cmb = cm + "b" + QString::number(j);
+				settings.setValue(cmcx, cx);
+				settings.setValue(cmr, r);
+				settings.setValue(cmg, g);
+				settings.setValue(cmb, b);
+			}
+			double *pts2 = colorMaps->Stack.at(i).ColorMap->GetScalarOpacityFunction()->GetDataPointer();
+
+			double ox_min = DBL_MAX;
+			double ox_max = -DBL_MAX;
+			for (int j = 0; j < no; j++)
+			{
+				double curr = pts2[2 * j];
+				//cout << "x" << j << "=" << curr << endl;
+				if (curr < ox_min) { ox_min = curr; }
+				if (curr > ox_max) { ox_max = curr; }
+
+			}
+
+			 c = 0;
+			 mult = 1;
+			if (ox_max > ox_min)
+			{
+				double range = ox_max - ox_min;
+				mult = 1/range;
+				c = -ox_min/range;
+
+			}
+
+			for (int j = 0; j < no; j++)
+			{
+				double ox = mult*pts2[2 * j]+c;
+				double ov = pts2[2 * j + 1];
+				QString cmox = cm + "ox" + QString::number(j);
+				QString cmov = cm + "ov" + QString::number(j);
+				settings.setValue(cmox, ox);
+				settings.setValue(cmov, ov);
+				
+			}
+			/*
+			
+			
+			QString cmno = cm + "no";
+			int no = settings.value(cmno, 0).toInt();
+			cout << "Opacity nodes:" << endl;
+			for (int j = 0; j < no; j++)
+			{
+				QString cmox = cm + "ox" + QString::number(j);
+				QString cmov = cm + "ov" + QString::number(j);
+				
+				cout << "ox" << j << ":" << settings.value(cmox, 0).toDouble() << ",";
+				cout << "ov=" << j << ":" << settings.value(cmov, 0).toDouble() << endl;
+			}
+		}*/
+
+			cpt++;
+			
+		}
+		
+	}
 	settings.endGroup();
 	//cout << "end save settings" << endl;
 }
