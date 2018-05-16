@@ -213,6 +213,10 @@ mqLineEdit.h
 mqLineEdit.cxx
 mqColorOpacityEditorWidget.cxx
 mqColorOpacityEditorWidget.h
+mqSaveMAPDialog.cxx
+mqSaveMAPDialog.h
+mqSaveMAPDialogReaction.cxx
+mqSaveMAPDialogReaction.h
 )
 
 set (Qt_MOC_HDRS
@@ -264,6 +268,7 @@ mqScalarsCurvatureDialog.ui
 mqScalarsDistanceDialog.ui
 mqICPDialog.ui
 mqColorOpacityEditorWidget.ui
+mqSaveMAPDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )
