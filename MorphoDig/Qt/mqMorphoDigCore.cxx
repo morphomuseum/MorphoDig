@@ -802,7 +802,7 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMax()
 	}
 	else 
 	{
-		cout << "my_max=" << my_max << endl;
+		cout << "suggested range my_max=" << my_max << endl;
 		return my_max;
 	}
 	
@@ -7318,6 +7318,7 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 }
 void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
 {
+	cout << "Call scalarsThicknessBetween" << endl;
 	if (impactedActor != NULL && observedActor != NULL)
 	{
 		std::string action = "Compute thickness for ";
@@ -7667,11 +7668,15 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "thickness scalars between computed " << endl;
-		this->Initmui_ExistingScalars();
-		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 
+		//cout << "camera and grid adjusted" << endl;
+		if (impactedActor != observedActor) // very important because in the opposite case, we call this function WITHIN A LOOP on the actor list... and InitMui_ExistingScalars also calls a LOOP on the actor list!
+		{
+			cout << "thickness scalars between computed: now call initmui_ExistingScalars " << endl;
+			this->Initmui_ExistingScalars();
+			cout << "set ActiveScalarAndRender" << endl;
+			this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+		}
 	
 		END_UNDO_SET();
 }
@@ -7689,7 +7694,7 @@ std::vector<std::string> mqMorphoDigCore::getActorNames()
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Scalar thickness:" << i << endl;
+		cout << "Get actor name :" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		myList.push_back(myActor->GetName());
 	}
@@ -7703,7 +7708,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Scalar thickness:" << i << endl;
+		cout << "Get first actor from name:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetName().compare(actorName.toStdString())==0)
 		{
@@ -7716,6 +7721,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 }
 void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit )
 {
+	cout << "thickness scalars start " << endl;
 	std::string mScalarName = "Thickness";
 	if (scalarName.length() >0)
 	{
@@ -7727,12 +7733,13 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Scalar thickness:" << i << endl;
+		cout << "scalarsThickness:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
 			myActor->SetSelected(0);
 			// here we can call : 
+			cout << "thickness scalars between called " << endl;
 			this->scalarsThicknessBetween( max_thickness,  smooth_normales,  avg,  scalarName,  myActor, myActor, angularLimit);
 			modified = 1;
 
@@ -7742,8 +7749,9 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 	{
 
 		//cout << "camera and grid adjusted" << endl;
-		cout << "thickness scalars computed " << endl;
+		cout << "thickness within scalars computed, call initExistingscalars " << endl;
 		this->Initmui_ExistingScalars();
+		cout << "Active scalars and render" << endl;
 		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 		
 	}
