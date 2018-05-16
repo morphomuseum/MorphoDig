@@ -8444,17 +8444,36 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 	Ok = 1;
 	mergedObjects->Update();
+	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+	ObjNormals->SetInputData(mergedObjects->GetOutput());
+	ObjNormals->ComputePointNormalsOn();
+	ObjNormals->ComputeCellNormalsOn();
+	//ObjNormals->AutoOrientNormalsOff();
+	ObjNormals->ConsistencyOff();
+
+	ObjNormals->Update();
+
+	vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+	cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+	cleanPolyDataFilter->PieceInvariantOff();
+	cleanPolyDataFilter->ConvertLinesToPointsOff();
+	cleanPolyDataFilter->ConvertPolysToLinesOff();
+	cleanPolyDataFilter->ConvertStripsToPolysOff();
+	cleanPolyDataFilter->PointMergingOn();
+	cleanPolyDataFilter->Update();
+
+
 	if (save_norms == 0)
 	{
-		mergedObjects->GetOutput()->GetPointData()->SetNormals(NULL);
-		mergedObjects->GetOutput()->GetCellData()->SetNormals(NULL);
+		cleanPolyDataFilter->GetOutput()->GetPointData()->SetNormals(NULL);
+		cleanPolyDataFilter->GetOutput()->GetCellData()->SetNormals(NULL);
 	}
 	if (scalarsToBeRemoved.size() > 0)
 	{
 		for (int i = 0; i < scalarsToBeRemoved.size(); i++)
 		{
 			cout << "Removed scalar:" << scalarsToBeRemoved.at(i) << endl;
-				mergedObjects->GetOutput()->GetPointData()->RemoveArray(scalarsToBeRemoved.at(i).c_str());
+			cleanPolyDataFilter->GetOutput()->GetPointData()->RemoveArray(scalarsToBeRemoved.at(i).c_str());
 		}
 	}
 
@@ -8466,14 +8485,14 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	else if (RGBopt ==1)
 	{ 
 		//remove RGB scalars if they exist
-		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
+		cleanPolyDataFilter->GetOutput()->GetPointData()->RemoveArray("RGB");
 	}
 	else if (RGBopt == 2)
 	{
 		vtkSmartPointer<vtkUnsignedCharArray> newcolors =
 			vtkSmartPointer<vtkUnsignedCharArray>::New();
 		newcolors->SetNumberOfComponents(4);
-		newcolors->SetNumberOfTuples(mergedObjects->GetOutput()->GetNumberOfPoints());
+		newcolors->SetNumberOfTuples(cleanPolyDataFilter->GetOutput()->GetNumberOfPoints());
 		
 		vtkIdType iRGB = 0;
 		int nr, ng, nb, na;
@@ -8496,7 +8515,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 					// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
 					int RGB_fromglobal = 1;
 					// if current active scalar is not the "none" one, and if the actor as current active scalar.
-					//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+					//if (ActiveScalar != none && 	cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
 					if (ActiveScalar != none && 	mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
 					{
 						RGB_fromglobal = 0;
@@ -8504,9 +8523,9 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 					//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
 					//colors->SetNumberOfComponents(4);
-					//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars("RGB");
-					//vtkFloatArray *currentFScalars = (vtkFloatArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-					//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars("RGB");
+					//vtkFloatArray *currentFScalars = (vtkFloatArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
 					vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mapper->GetInput()->GetPointData()->GetScalars("RGB");
 					vtkFloatArray *currentFScalars = (vtkFloatArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
 					vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
@@ -8600,8 +8619,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 		}
 		newcolors->SetName("RGB");
-		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
-		mergedObjects->GetOutput()->GetPointData()->AddArray(newcolors);
+		cleanPolyDataFilter->GetOutput()->GetPointData()->RemoveArray("RGB");
+		cleanPolyDataFilter->GetOutput()->GetPointData()->AddArray(newcolors);
 
 		// And YES...  NR NG NB should be a 0.. 255 value !!!! For the moment, color[] is a 0.0 ... 1.0 range
 		//std::cout<<"currentScalars null "<<std::endl;
@@ -8703,7 +8722,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		}
 		
 			Writer->SetFileName(fileName.toLocal8Bit());
-			Writer->SetInputData(mergedObjects->GetOutput());
+			Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 			//  stlWrite->Update();
 			Writer->Write();
 		
@@ -8739,7 +8758,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	//	cout << "fileName raw toSTD" << fileName.toStdString()<< endl;
 		
 			Writer->SetFileName(fileName.toLocal8Bit());
-		Writer->SetInputData(mergedObjects->GetOutput());
+		Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 		//  stlWrite->Update();
 		Writer->Write();
 		
@@ -8768,7 +8787,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			//std::cout << "\nASCII";
 		}
 		
-		vtkPolyData *MyMergedObject = mergedObjects->GetOutput();
+		vtkPolyData *MyMergedObject = cleanPolyDataFilter->GetOutput();
 
 		// Test if RGB scalar exists.
 		vtkUnsignedCharArray* test = (vtkUnsignedCharArray*)MyMergedObject->GetPointData()->GetScalars("RGB");
