@@ -175,7 +175,10 @@ void mqObjectsControlsToolbar::constructor()
   this->addWidget(xgrid);
 
   connect(this->ui->actionDelete, SIGNAL(triggered()), this, SLOT(slotDeleteObjects()));
-  
+  connect(this->ui->actionDelete, SIGNAL(triggered()), this, SLOT(slotDeleteObjects()));
+  connect(this->ui->actioLandmarkMoveUp, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMoveUp()));
+  connect(this->ui->actioLandmarkMoveDown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMoveDown()));
+
   connect(zRot, SIGNAL(valueChanged(int)), this, SLOT(slotZrot(int)));
   connect(yRot, SIGNAL(valueChanged(int)), this, SLOT(slotYrot(int)));
   connect(xRot, SIGNAL(valueChanged(int)), this, SLOT(slotXrot(int)));
@@ -710,10 +713,7 @@ void mqObjectsControlsToolbar::slotDeleteObjects()
 {
 	mqMorphoDigCore::instance()->DeleteSelectedActors();
 	mqMorphoDigCore::instance()->Render();
-
-
-	
-	
+		
 	
 }
 

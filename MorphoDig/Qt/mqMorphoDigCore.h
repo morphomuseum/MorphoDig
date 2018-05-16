@@ -30,6 +30,7 @@
 
 #include <QVTKOpenGLWidget.h>
 #include <vtkScalarBarActor.h>
+#include <vtkKdTreePointLocator.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkSmartPointer.h>    
 #include <vtkCornerAnnotation.h>
@@ -502,6 +503,12 @@ public:
 	QMainWindow* GetMainWindow();
 	QMainWindow* GetProjectWindow();
 	void LandmarksMoveUp();
+	void LandmarksPushBack();
+	void LandmarksReorient();
+	void LandmarksPushBackOrReorient(int mode);
+	void LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree,  vtkSmartPointer<vtkPolyData> PD, int mcount);
+	
+	
 	void ChangeClippingPlane();
 	int Getmui_ClippinPlane();
 	void Setmui_ClippinPlane(int on_off);
@@ -774,6 +781,8 @@ protected:
 public slots:
 	virtual void slotLandmarkMoveUp();
 	virtual void slotLandmarkMoveDown();
+	virtual void slotLandmarkPushBack();
+	virtual void slotLandmarkReorient();
 	virtual void slotUpdateAllSelectedFlagsColors();
 	virtual void slotConvexHULL();
 	

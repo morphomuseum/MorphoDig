@@ -25,6 +25,8 @@
    <file>edit.png</file>
    <file>ResetRange24.png</file>
    <file>ResetRangeCustom24.png</file>
+   <file>move_up.png</file>
+   <file>move_down.png</file>
    <file>Invert24.png</file>
    <file>Invert32.png</file>
    <file>InvertRGB24.png</file>

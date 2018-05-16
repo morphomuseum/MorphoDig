@@ -279,10 +279,16 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	//new mqOpenDataReaction(openNtw, 1);//1= open NTW 
 	new mqSelectLandmarkRangeDialogReaction(menu.addAction("Select landmark range") << mqSetName("actionSelectLandmarkRange"));
 	QAction *MoveUp = menu.addAction("Selected landmarks : move up (decrease landmark number)");
-	QAction *MoveDown = menu.addAction("Selected landmarks move down (increase landmark number)");
-	
+	QAction *MoveDown = menu.addAction("Selected landmarks : move down (increase landmark number)");
+	QAction *PushBack = menu.addAction("Selected landmarks : push back on object surface");
+	QAction *ReOrient = menu.addAction("Selected landmarks : change orientation accordin to surface normal");
 	QAction::connect(MoveUp, SIGNAL(triggered()), mqMorphoDigCore::instance() , SLOT(slotLandmarkMoveUp()));
 	QAction::connect(MoveDown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMoveDown()));
+
+	QAction::connect(PushBack, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkPushBack()));
+	QAction::connect(ReOrient, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkReorient()));
+
+
 	//actionLandmarskMoveUp
 
 

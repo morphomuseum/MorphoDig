@@ -8879,6 +8879,219 @@ void mqMorphoDigCore::Setmui_Z2Label(QString label) { this->mui_Z2Label = label;
 QString mqMorphoDigCore::Getmui_DefaultZ2Label() { return this->mui_DefaultZ2Label; }
 QString mqMorphoDigCore::Getmui_Z2Label() { return this->mui_Z2Label; }
 
+
+void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
+{
+	//mode0: pushback
+	//mode 1: reorient
+
+	//strategy
+	//1) create a merged object of all opened objects... I guess normales should be reoriented!
+	//2) create a kdtree on the merged object
+	//3) call "loop" function foar each landmark list, passing the Kdtree as an argument: find closest vertex 
+
+	vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
+	int Ok = 1;
+	
+		//cout << "myActor is null" << endl;
+	cout << "Try to create merged object landmarks" << endl;
+	if (this->ActorCollection->GetNumberOfItems() == 0) { return; }
+
+		this->ActorCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+		vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+						
+			vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
+			if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+			{
+				vtkSmartPointer<vtkPolyData> toSave = vtkSmartPointer<vtkPolyData>::New();
+				toSave->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
+				double ve_init_pos[3];;
+				double ve_final_pos[3];
+
+				double ven_init_pos[3];;
+				double ven_final_pos[3];
+				vtkSmartPointer<vtkMatrix4x4> Mat = myActor2->GetMatrix();
+				auto impactedNorms = vtkFloatArray::SafeDownCast(toSave->GetPointData()->GetNormals());
+
+
+				for (vtkIdType i = 0; i < toSave->GetNumberOfPoints(); i++) {
+					// for every triangle 
+					toSave->GetPoint(i, ve_init_pos);
+					double *mImpactedptn = impactedNorms->GetTuple3(i);
+					ven_init_pos[0] = mImpactedptn[0];
+					ven_init_pos[1] = mImpactedptn[1];
+					ven_init_pos[2] = mImpactedptn[2];
+
+					mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+					
+					mqMorphoDigCore::RotateNorm(Mat, ven_init_pos, ven_final_pos);
+					if (i < 50 || i== 14044)
+					{
+						cout << "Pt init:" << endl;
+						cout << ve_init_pos[0] << ", " << ve_init_pos[1] << "," << ve_init_pos[2] << endl;
+						cout << "Pt final:" << endl;
+						cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << endl;
+						cout << "Ori init:" << endl;
+						cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
+						cout << "Ori final:" << endl;
+						cout << ven_final_pos[0] << ", " << ven_final_pos[1] << "," << ven_final_pos[2] << endl;
+
+					}
+					
+					toSave->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+					impactedNorms->SetTuple3(i, ve_final_pos[0], ve_final_pos[1], ve_final_pos[2]);
+				}
+				mergedObjects->AddInputData(toSave);
+			}
+
+				
+			
+		}		
+	
+	cout << "Update merged object" << endl;
+	mergedObjects->Update();
+	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+	ObjNormals->SetInputData(mergedObjects->GetOutput());
+	ObjNormals->ComputePointNormalsOn();
+	ObjNormals->ComputeCellNormalsOn();
+	//ObjNormals->AutoOrientNormalsOff();
+	ObjNormals->ConsistencyOff();
+
+	ObjNormals->Update();
+
+	vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+	cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+	cleanPolyDataFilter->PieceInvariantOff();
+	cleanPolyDataFilter->ConvertLinesToPointsOff();
+	cleanPolyDataFilter->ConvertPolysToLinesOff();
+	cleanPolyDataFilter->ConvertStripsToPolysOff();
+	cleanPolyDataFilter->PointMergingOn();
+	cleanPolyDataFilter->Update();
+
+	
+
+
+	//Just some tests
+	double ven_init_pos[3];;
+	auto impactedNorms = vtkFloatArray::SafeDownCast(cleanPolyDataFilter->GetOutput()->GetPointData()->GetNormals());
+	double *mImpactedptn = impactedNorms->GetTuple3(14044);
+	ven_init_pos[0] = mImpactedptn[0];
+	ven_init_pos[1] = mImpactedptn[1];
+	ven_init_pos[2] = mImpactedptn[2];
+	cout << "Normale 14044 of merged object:" << endl;
+	cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
+
+	// 2 : build kdtree on merged object
+	vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+		vtkSmartPointer<vtkKdTreePointLocator>::New();
+	cout << "Try to set KDTree" << endl;
+	kDTree->SetDataSet(cleanPolyDataFilter->GetOutput());
+	cout << "Try to build locator" << endl;
+	kDTree->BuildLocator();
+	
+	std::string action;
+	if (mode == 0)
+	{
+		action = "Push back landmarks on surface";
+	}
+	else
+	{
+		action = "Reorient landmarks according to closest point's normale";
+	}
+
+	cout << "Begin undo set" << endl;
+	int mCount = BEGIN_UNDO_SET(action);
+
+	//double Radius = this->ActorCollection->GetBoundingBoxLength()/20;
+	cout << "Normal landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->NormalLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Target landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->TargetLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Node landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->NodeLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Handle landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->HandleLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Flag landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->FlagLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+
+	END_UNDO_SET();
+	cout << "Done!" << endl;
+	//kDTree->FindPointsWithinRadius(Radius, ve_imp_final_pos, observedNeighbours);
+}
+void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree, vtkSmartPointer<vtkPolyData> PD, int mcount)
+{
+	//mode0: pushback
+	//mode 1: reorient
+	LmkCollection->InitTraversal();
+	cout << "Get impacted norms" << endl;
+	auto impactedNorms = vtkFloatArray::SafeDownCast(PD->GetPointData()->GetNormals());
+
+	for (vtkIdType i = 0; i < LmkCollection->GetNumberOfItems(); i++)
+	{
+		vtkLMActor *myLMK = vtkLMActor::SafeDownCast(LmkCollection->GetNextActor());
+		
+		if (myLMK->GetSelected() == 1 )
+		{
+
+			double lmpos[3];
+			myLMK->GetLMOrigin(lmpos);
+			double lmori[3];
+			myLMK->GetLMOrientation(lmori);
+			cout << "Try to find closest point!" << endl;
+			vtkIdType k = kDTree->FindClosestPoint(lmpos);
+			cout << k << " is the closest"<< endl;
+			
+			myLMK->SaveState(mcount);
+			
+			if (mode == 0)
+			{
+				double ve_final_pos[3];
+				cout << "Get point " <<k << endl;
+				PD->GetPoint(k, ve_final_pos);
+				cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << endl;
+				myLMK->SetLMOrigin(ve_final_pos);
+			}
+			else
+			{
+				cout << "Get norm " << k << endl;
+				double *mImpactedptn = impactedNorms->GetTuple3(k);
+				double ven_final_pos[3];
+				ven_final_pos[0] = mImpactedptn[0];
+				ven_final_pos[1] = mImpactedptn[1];
+				ven_final_pos[2] = mImpactedptn[2];
+				cout << "Ori init:" << endl;
+				cout << lmori[0] << ", " << lmori[1] << "," << lmori[2] << endl;
+				cout << "Ori final:" << endl;
+				cout << ven_final_pos[0] << ", " << ven_final_pos[1]<<","<< ven_final_pos[2] << endl;
+				myLMK->SetLMOrientation(ven_final_pos);
+			}
+			myLMK->Modified();
+			LmkCollection->Modified();
+		
+			
+			
+			//cpt++;
+		}
+
+	}
+
+	
+}
+void mqMorphoDigCore::LandmarksReorient()
+{
+//mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
+	
+	this->LandmarksPushBackOrReorient(1);
+	this->Render();
+}
+
+void mqMorphoDigCore::LandmarksPushBack()
+{
+	this->LandmarksPushBackOrReorient(0);
+	this->Render();
+}
 void mqMorphoDigCore::LandmarksMoveUp()
 {
 	this->NormalLandmarkCollection->LandmarksMoveUp();
@@ -10385,7 +10598,7 @@ void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int n
 			if (myScalar == Scalar)
 			{
 				exists = 1;
-				cout << Scalar.toStdString() << " already exists" << endl;
+				//cout << Scalar.toStdString() << " already exists" << endl;
 			}
 
 		}
@@ -11518,6 +11731,16 @@ void mqMorphoDigCore::slotLandmarkMoveUp()
 
 	this->LandmarksMoveUp();
 }
+void mqMorphoDigCore::slotLandmarkPushBack()
+{
+	this->LandmarksPushBack();
+}
+
+void mqMorphoDigCore::slotLandmarkReorient()
+{
+	this->LandmarksReorient();
+}
+
 void mqMorphoDigCore::slotUpdateAllSelectedFlagsColors()
 {
 	this->UpdateAllSelectedFlagsColors();
