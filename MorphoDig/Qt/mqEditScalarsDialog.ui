@@ -783,9 +783,23 @@
       </spacer>
      </item>
      <item>
+      <widget class="QToolButton" name="exportColorMap">
+       <property name="toolTip">
+        <string>Export color map</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/ExportMap22.png</normaloff>:/Icons/ExportMap22.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="editColorMap">
        <property name="toolTip">
-        <string>Rescale to data range</string>
+        <string>Edit color map name</string>
        </property>
        <property name="text">
         <string/>
@@ -799,7 +813,7 @@
      <item>
       <widget class="QToolButton" name="deleteColorMap">
        <property name="toolTip">
-        <string>Rescale to data range</string>
+        <string>Delete color map</string>
        </property>
        <property name="text">
         <string/>
@@ -812,28 +826,6 @@
      </item>
     </layout>
    </widget>
-   <zorder>label_2</zorder>
-   <zorder>pushRemoveScalar</zorder>
-   <zorder>comboActiveScalar</zorder>
-   <zorder>label_6</zorder>
-   <zorder>label_7</zorder>
-   <zorder>suggestedMin</zorder>
-   <zorder>suggestedMax</zorder>
-   <zorder>label_5</zorder>
-   <zorder>pushScalarSuggestedMin</zorder>
-   <zorder>pushScalarSuggestedMax</zorder>
-   <zorder>label_8</zorder>
-   <zorder>label_9</zorder>
-   <zorder>currentMin</zorder>
-   <zorder>currentMax</zorder>
-   <zorder>label_3</zorder>
-   <zorder>sliderMax</zorder>
-   <zorder>label_4</zorder>
-   <zorder>sliderMin</zorder>
-   <zorder>selectedObjects</zorder>
-   <zorder>scrollArea</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
-   <zorder>comboColorMap</zorder>
   </widget>
  </widget>
  <customwidgets>
