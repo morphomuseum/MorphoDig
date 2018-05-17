@@ -128,6 +128,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	//this->Ui->frame->ins
 	//this->Ui->ColorEditor-
 	this->Ui->comboColorMap->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps));
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboScalars()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(actorsMightHaveChanged()), this, SLOT(slotRefreshSuggestedRange()));
@@ -182,11 +183,15 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 
 	this->Ui->editColorMap->setDisabled(true);
 	this->Ui->deleteColorMap->setDisabled(true);
+
 	QAction* exportAction = new QAction(tr("&Export"), this);
 	exportAction->setToolTip(tr("Toggles recording."));
 	this->Ui->exportColorMap->addAction(exportAction);
 	this->Ui->exportColorMap->setDefaultAction(exportAction);
-	
+	QIcon icon;
+	icon.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	//  exportColorMap->setIcon(icon);
+	exportAction->setIcon(icon);
 	new mqSaveMAPDialogReaction(exportAction);
 	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
@@ -300,6 +305,11 @@ void mqEditScalarsDialog::UpdateUI()
 	this->RefreshSuggestedRange();
 	
 	
+}
+void mqEditScalarsDialog::slotRefreshColorMaps()
+{
+	cout << "slotRefreshColorMaps" << endl;
+	this->RefreshComboColorMaps();
 }
 void mqEditScalarsDialog::slotEditColorMapName()
 {
@@ -501,8 +511,10 @@ void mqEditScalarsDialog::RefreshComboScalars()
 
 void mqEditScalarsDialog::RefreshComboColorMaps() 
 {
+	cout << "RefreshComboColorMaps" << endl;
 	this->Ui->comboColorMap->clear();
 	ExistingColorMaps *MyCM = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps();
+	cout << "Found" << MyCM->Stack.size() << "color maps" << endl;
 	for (int i = 0; i < MyCM->Stack.size(); i++)
 	{
 

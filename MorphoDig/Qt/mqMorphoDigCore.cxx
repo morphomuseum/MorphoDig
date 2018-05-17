@@ -3307,6 +3307,191 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 		*/
 
 }
+void mqMorphoDigCore::OpenMAP(QString fileName)
+{
+	int nr, discretize, discretizenr, enableopacity, nc, no; 
+	double  cx, r, g, b, ox, ov;
+	QString ColorMapName;
+	QString SomeText;
+	//Open a STV file!
+
+	cout << "start: " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+	size_t  length;
+
+	int type = 1;
+	length = fileName.toStdString().length();
+
+	int done = 0;
+	if (length>0)
+	{
+		int file_exists = 1;
+		ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
+			file.close();
+		}
+		else
+		{
+
+			std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+
+		if (file_exists == 1)
+		{
+
+
+			std::string MAPext(".map");
+			std::string MAPext2(".MAP");
+
+
+			std::size_t found = fileName.toStdString().find(MAPext);
+			std::size_t found2 = fileName.toStdString().find(MAPext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				type = 1;
+				//MAP
+			}
+			if (type == 1)
+			{
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				QFile inputFile(fileName);
+				int ok = 0;
+				if (inputFile.open(QIODevice::ReadOnly))
+				{
+					QTextStream in(&inputFile);
+					int cpt_line = 0;
+					QString line = in.readLine();
+					QTextStream myteststream(&line);
+
+					myteststream >> SomeText >> nr;
+					
+					if (nr > 0)
+					{
+						for (int i = 0; i < nr; i++)
+						{
+							vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+
+							QString cm = QString("cm");
+							cm = cm + QString::number(i);
+							
+							line = in.readLine();
+							myteststream.setString(&line); 
+							myteststream >> SomeText >> ColorMapName;
+							cout << "Found a name: " << ColorMapName.toStdString() << endl;							
+
+							line = in.readLine();
+							myteststream.setString(&line);
+							myteststream >> SomeText >> discretize;
+							cout << "Discretize: " << discretize << endl;
+							
+							line = in.readLine();
+							myteststream.setString(&line);
+							myteststream >> SomeText >> discretizenr;
+							cout << "Discretizenr: " << discretizenr << endl;
+							
+							line = in.readLine();
+							myteststream.setString(&line);							
+							myteststream >> SomeText >> enableopacity;
+							cout << "enableopacity: " << enableopacity << endl;
+							
+							line = in.readLine();
+							myteststream.setString(&line);
+							
+							myteststream >> SomeText >> nc;
+							cout << "nc: " << nc << endl;
+
+							line = in.readLine();
+							myteststream.setString(&line);
+							
+							myteststream >> SomeText >> no;
+							cout << "no: " << no << endl;
+							
+							
+
+							newSTC->SetColorSpaceToRGB();						
+							newSTC->SetDiscretize(discretize);							
+							newSTC->SetNumberOfValues(discretizenr);							
+							newSTC->SetEnableOpacityMapping(enableopacity);
+
+							for (int j = 0; j < nc; j++)
+							{
+								line = in.readLine();
+								myteststream.setString(&line);
+								
+								myteststream >> SomeText >> cx >> r >> g >> b;
+								
+								cout << "cx" << j << ":" << cx << ",";
+								cout << "rgb:" << r << ",";
+								cout << g << ",";
+								cout << b << endl;
+								newSTC->AddRGBPoint(cx, r, g, b);
+
+							}
+
+							vtkSmartPointer<vtkPiecewiseFunction> opacityfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();														
+							
+							for (int j = 0; j < no; j++)
+							{
+								line = in.readLine();
+								myteststream.setString(&line);
+								
+								myteststream >> SomeText >> ox >> ov;
+								cout << "ox" << j << ":" << ox << ",";
+								cout << "ov=" << j << ":" << ov << endl;
+								opacityfunction->AddPoint(ox, ov);
+							}
+
+							newSTC->SetScalarOpacityFunction(opacityfunction);
+							newSTC->Build();
+
+
+							cout << "Add this map to !!" << endl;
+							int num = 2;
+							if (this->colorMapNameAlreadyExists(ColorMapName) == 1)
+							{
+								int exists = 1;
+								while (exists == 1)
+								{
+									QString NewColorMapName = ColorMapName + "_" + QString::number(num);
+									if (this->colorMapNameAlreadyExists(NewColorMapName) == 0)
+									{
+										exists = 0;
+										ColorMapName = NewColorMapName;
+									}
+									else
+									{
+										num++;
+									}
+								}
+							}
+							
+							cout << "here: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+
+							this->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(ColorMapName, newSTC, 1));
+							cout << "and now: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+							
+
+						}
+					
+						cout << "have Just Imported "<<nr<<" ColorMaps" << endl;
+						cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+						this->signal_colorMapsChanged();// emit this->colorMapsChanged();
+					}
+
+				}
+					/**/
+
+					inputFile.close();
+
+
+			}
+		}																	
+
+	}
+}	
+
 
 int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces)
 {
@@ -3741,6 +3926,155 @@ int mqMorphoDigCore::SaveFlagFile(QString fileName, int save_only_selected)
 	}
 	file.close();
 	return 1;
+
+}
+int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active)
+{
+	//save_only_active 
+	// 1: save only active color map
+	// 0: save ALL colormaps (custom + "hard coded native" ones)
+	// 2 : save ALL custom colormaps
+
+	std::string MAPext = ".map";
+	std::string MAPext2 = ".MAP";
+	std::size_t found = fileName.toStdString().find(MAPext);
+	std::size_t found2 = fileName.toStdString().find(MAPext2);
+	if (found == std::string::npos && found2 == std::string::npos)
+	{
+		fileName.append(".map");
+	}
+
+	
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+			QTextStream stream(&file);
+		if (save_only_active ==1)
+		{
+			stream << "nr: 1" << endl;
+			file.close();
+			this->SaveMAP(fileName, this->Getmui_ActiveColorMap()->Name, this->Getmui_ActiveColorMap()->ColorMap);
+		}
+		else if (save_only_active == 0)//save all
+		{
+			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+			size_t size = colorMaps->Stack.size();
+
+			stream << "nr: " << size<< endl;
+			file.close();
+			for (int i = 0; i < size; i++)
+			{
+				this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+			}			
+		}
+		else // save all customs
+		{
+			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+			size_t size = colorMaps->Stack.size();
+			int sizec = 0;
+			for (int i = 0; i < size; i++)
+			{
+				if (colorMaps->Stack.at(i).isCustom == 1)
+				{
+					sizec++;
+				}				
+			}
+
+			stream << "nr: " << sizec << endl;
+			file.close();
+			for (int i = 0; i < size; i++)
+			{
+				if (colorMaps->Stack.at(i).isCustom == 1)
+				{
+					this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+				}
+			}			
+		}						
+	}
+	
+	return 1;
+
+}
+void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
+	{
+		QTextStream stream(&file);
+		stream << "name: " << Name << endl;
+				
+		stream << "discretize: " << ColorMap->GetDiscretize() << endl;
+		stream << "discretizenr: " << ColorMap->GetNumberOfValues() << endl;
+		stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << endl;
+		
+		//3 set numer of colors
+		
+		int nc = ColorMap->GetSize();
+		stream << "nc: " << nc<< endl;
+
+		//4 set number of opacity nodes
+		int no = ColorMap->GetScalarOpacityFunction()->GetSize();
+		stream << "no: " << no << endl;
+				
+		double *pts = ColorMap->GetDataPointer();
+		//first : find max and min cx to reset cx range between 0 and 1
+		double cx_min = DBL_MAX;
+		double cx_max = -DBL_MAX;
+		for (int j = 0; j < nc; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < cx_min) { cx_min = curr; }
+			if (curr > cx_max) { cx_max = curr; }
+
+		}
+		double c = 0;
+		double mult = 1;
+		if (cx_max > cx_min)
+		{
+			double range = cx_max - cx_min;
+			mult = 1 / range;
+			c = -cx_min / range;
+		}
+
+		for (int j = 0; j < nc; j++)
+		{
+			double cx = mult*pts[4 * j] + c;
+			double r = pts[4 * j + 1];
+			double g = pts[4 * j + 2];
+			double b = pts[4 * j + 3];
+			stream << "c"<< j<< ": "<< cx << " "<< r <<" "<<g<<" "<< b << endl;
+		}
+		double *pts2 = ColorMap->GetScalarOpacityFunction()->GetDataPointer();
+
+		double ox_min = DBL_MAX;
+		double ox_max = -DBL_MAX;
+		for (int j = 0; j < no; j++)
+		{
+			double curr = pts2[2 * j];
+			if (curr < ox_min) { ox_min = curr; }
+			if (curr > ox_max) { ox_max = curr; }
+		}
+		c = 0;
+		mult = 1;
+		if (ox_max > ox_min)
+		{
+			double range = ox_max - ox_min;
+			mult = 1 / range;
+			c = -ox_min / range;
+		}
+
+		for (int j = 0; j < no; j++)
+		{
+			double ox = mult*pts2[2 * j] + c;
+			double ov = pts2[2 * j + 1];
+			stream << "op" << j << ": " <<  ox << " " << ov << endl;
+			
+
+		}
+
+	}
+	file.close();
 
 }
 
@@ -11551,6 +11885,12 @@ void mqMorphoDigCore::signal_projectionModeChanged()
 {
 	//cout << "Emit projection Mode Changed" << endl;
 	emit this->projectionModeChanged();
+}
+
+void mqMorphoDigCore::signal_colorMapsChanged()
+{
+	//cout << "Emit projection Mode Changed" << endl;
+	emit this->colorMapsChanged();
 }
 void mqMorphoDigCore::signal_zoomChanged()
 {

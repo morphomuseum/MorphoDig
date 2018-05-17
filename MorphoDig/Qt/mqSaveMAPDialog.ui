@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Save landmarks and curve elements</string>
+   <string>Export colormaps</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -460,22 +460,22 @@
     </rect>
    </property>
    <property name="title">
-    <string>Which colormap(s) shoul be exported ?</string>
+    <string>Which colormap(s) should be exported ?</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget_8">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>290</width>
+      <width>261</width>
       <height>65</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout1_4">
      <item>
-      <widget class="QRadioButton" name="SaveOnlySelected">
+      <widget class="QRadioButton" name="SaveActive">
        <property name="text">
-        <string>Save active color map</string>
+        <string>Export active color map</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -485,14 +485,14 @@
      <item>
       <widget class="QRadioButton" name="SaveAll">
        <property name="text">
-        <string>Save all color maps</string>
+        <string>Export all color maps</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QRadioButton" name="SaveAllCustom">
        <property name="text">
-        <string>Save all custom color maps</string>
+        <string>Export all custom color maps</string>
        </property>
       </widget>
      </item>

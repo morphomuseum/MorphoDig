@@ -603,24 +603,6 @@ cm2ov2=1
 	{
 		for (int i = 0; i < nr; i++)
 		{
-			/*vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
-	newSTC->DeepCopy(STC);
-	
-
-	vtkSmartPointer<vtkPiecewiseFunction> opacityfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
-	opacityfunction->DeepCopy(STC->GetScalarOpacityFunction());
-	
-
-	newSTC->SetScalarOpacityFunction(opacityfunction);
-	newSTC->Build();
-
-
-	this->mui_ActiveColorMap->ColorMap = newSTC;
-	cout << "Active color map = newSTC!" << endl;
-	this->mui_ActiveColorMap->Name = name;
-
-	cout << "Add this map to !!" << endl;
-	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));*/
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 
 			QString cm = QString("cm");

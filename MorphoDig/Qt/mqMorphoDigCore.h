@@ -395,6 +395,9 @@ public:
 	void SaveORI(QString fileName);
 	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces =0);
 	int SaveSTVFile(QString fileName, int save_only_selected);
+	int SaveMAPFile(QString fileName, int save_only_active);
+	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
+	void OpenMAP(QString fileName);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
 	
@@ -608,6 +611,7 @@ public:
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
   static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);
   
+  void signal_colorMapsChanged();
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
   void signal_projectionModeChanged();
@@ -641,8 +645,9 @@ public:
   int colorMapNameAlreadyExists(QString proposed_name);
   void deleteColorMap(int i);
 signals:
-
+  
   void projectionModeChanged();
+  void colorMapsChanged();
   void zoomChanged();
   void lmSelectionChanged();
   void actorSelectionChanged();

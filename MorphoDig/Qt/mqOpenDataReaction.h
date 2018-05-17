@@ -38,6 +38,7 @@ public:
    void OpenFLG();
    void OpenCUR();
    void OpenSTV();
+   void OpenMAP();
    void OpenTAG();
    void OpenORI();
    
@@ -116,6 +117,10 @@ protected:
 	else if (this->Mode == 16)
 	{
 		this->OpenSTV();
+	}
+	else if (this->Mode == 17)
+	{
+		this->OpenMAP();
 	}
   }
 

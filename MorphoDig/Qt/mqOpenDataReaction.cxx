@@ -110,7 +110,7 @@ void mqOpenDataReaction::OpenSTV()
 	cout << "Open STV!" << endl;
 
 	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
-		tr("Load meshtool landmarks/curve files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("Load MorphoDig landmarks/curve files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
 		tr("Landmark files(*.stv)"));
 
 	cout << fileName.toStdString();
@@ -141,7 +141,43 @@ void mqOpenDataReaction::OpenSTV()
 	
 
 }
+void mqOpenDataReaction::OpenMAP()
+{
+	//mqMorphoDigCore::instance()->getUndoStack();
+	cout << "Open MAP!" << endl;
 
+	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
+		tr("Import MorphoDig color maps"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("color map files(*.map)"));
+
+	cout << fileName.toStdString();
+	if (fileName.isEmpty()) return;
+
+	QFileInfo fileInfo(fileName);
+	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+	std::string MAPext(".map");
+	std::string MAPext2(".MAP");
+
+
+	int type = 0;
+	std::size_t found = fileName.toStdString().find(MAPext);
+	std::size_t found2 = fileName.toStdString().find(MAPext2);
+	if (found != std::string::npos || found2 != std::string::npos)
+	{
+		type = 0; //MAP
+	}
+
+
+
+	if (type == 0)
+	{
+
+		mqMorphoDigCore::instance()->OpenMAP(fileName);
+	}
+
+
+}
 
 void mqOpenDataReaction::OpenPOS(int mode)
 {
