@@ -128,7 +128,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	//this->Ui->frame->ins
 	//this->Ui->ColorEditor-
 	this->Ui->comboColorMap->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps));
+	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboScalars()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(actorsMightHaveChanged()), this, SLOT(slotRefreshSuggestedRange()));
