@@ -13,6 +13,7 @@
 #include "vtkBezierCurveSource.h"
 #include "vtkMDActor.h"
 #include "vtkLMActor.h"
+#include "mqObjectsControlsToolbar.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
@@ -312,15 +313,12 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->tabWidget->addTab(projectTab, "Project");
 
 
-
+	
 	//auto projectWindow = new QMainWindow();
 	
 	//this->mdiArea->addSubWindow(projectWindow);
-	/*auto dock1 = new QDockWidget("3D viewer");
-	dock1->setWidget(qvtkWidget2);
-	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);
-	projectWindow->setCentralWidget(dock1);
-	*/
+
+	
 	this->qvtkWidget2 = new QVTKOpenGLWidget();
 
 
@@ -336,6 +334,12 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 		
 	projectWindow->setCentralWidget(qvtkWidget2);
 
+
+	/*auto dock1 = new QDockWidget("3D viewer");
+	dock1->setWidget(qvtkWidget2);
+	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);*/
+	
+	//projectWindow->setCentralWidget(dock1);
 	
 
 

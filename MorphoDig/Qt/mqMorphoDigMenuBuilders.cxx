@@ -113,8 +113,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSavePLYDialogReaction(submenuSurface->addAction("Save selected surfaces in one single .PLY file") << mqSetName("actionSavePLY"));
   new mqSaveVTKDialogReaction(submenuSurface->addAction("Save selected surfaces in one single VTK PolyData (.VTK or .VTP) file") << mqSetName("actionSaveVTP"));
   new mqSaveSTLDialogReaction(submenuSurface->addAction("Save selected surfaces in one single .STL file") << mqSetName("actionSaveSTL"));
-  
-  
+    
   new mqOpenDataReaction(submenuLandmark->addAction("Open MorphoDig Landmark/Curve file (STV)") << mqSetName("actionOpenSTV"), 16);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Landmarks") << mqSetName("actionOpenNormalLMK"), 3);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Target Landmarks") << mqSetName("actionOpenNormalLMK"), 4);
@@ -385,11 +384,21 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	lightToolBar->layout()->setSpacing(0);
 	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);
 	//cout << "create objects tool bar" << endl;
-
+	/*
 	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
 		<< mqSetName("ObjectsControlsToolbar");
 	ObjectsToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);
+	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);*/
+	auto dock1 = new QDockWidget("3D viewer");
+	dock1->setAllowedAreas(Qt::RightDockWidgetArea|Qt::LeftDockWidgetArea);
+	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow);
+	//ObjectsToolBar->layout()->setSpacing(0);
+	dock1->setWidget(ObjectsToolBar);
+	//<< mqSetName("ObjectsControlsToolbar");
+
+	//projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);
+
+	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock1);
 
 	//cout << "create scalars tool bar" << endl;
 	QToolBar* scalarsToolBar = new mqScalarsControlsToolbar(&projectWindow)
