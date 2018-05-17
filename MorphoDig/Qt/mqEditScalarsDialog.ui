@@ -827,6 +827,19 @@
     </layout>
    </widget>
   </widget>
+  <action name="actionExportColorMaps">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/ExportMap22.png</normaloff>
+     <normalon>:/Icons/ExportMap22.png</normalon>:/Icons/ExportMap22.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export color map(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Export color maps</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

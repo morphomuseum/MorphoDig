@@ -8,8 +8,10 @@
 
 #include "mqEditScalarsDialog.h"
 #include "ui_mqEditScalarsDialog.h"
+#include "mqSetName.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
+#include "mqSaveMAPDialogReaction.h"
 #include "mqUndoStack.h"
 #include "QDoubleSlider.h"
 #include "mqColorOpacityEditorWidget.h"
@@ -180,7 +182,12 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 
 	this->Ui->editColorMap->setDisabled(true);
 	this->Ui->deleteColorMap->setDisabled(true);
-
+	QAction* exportAction = new QAction(tr("&Export"), this);
+	exportAction->setToolTip(tr("Toggles recording."));
+	this->Ui->exportColorMap->addAction(exportAction);
+	this->Ui->exportColorMap->setDefaultAction(exportAction);
+	
+	new mqSaveMAPDialogReaction(exportAction);
 	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
 
