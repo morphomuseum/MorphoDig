@@ -357,48 +357,78 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	window->setCentralWidget(actor_panel);
 	dock3->setWidget(window);*/
 	//@@
-
-	
-	QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
+	auto dock1 = new QDockWidget("MainControlsToolbar", &projectWindow);
+	dock1->setAllowedAreas(Qt::TopDockWidgetArea);
+	QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow);
+	mainToolBar->layout()->setSpacing(0);
+	dock1->setWidget(mainToolBar);
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock1);
+	/*QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
 		<< mqSetName("MainControlsToolbar");
 	mainToolBar->layout()->setSpacing(0);
 	projectWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
-	cout << "end create main tool bar" << endl;
+	cout << "end create main tool bar" << endl;*/
 
+
+	auto dock2 = new QDockWidget("InteractionControlsToolbar", &projectWindow);
+	dock2->setAllowedAreas(Qt::TopDockWidgetArea| Qt::BottomDockWidgetArea);
+	QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow);
+	interactionToolBar->layout()->setSpacing(0);
+	dock2->setWidget(interactionToolBar);
+
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock2);
 	//cout << "create interaction tool bar" << endl;
-	QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow)
+	/*QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow)
 		<< mqSetName("InteractionControlsToolbar");
 	interactionToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::TopToolBarArea, interactionToolBar);
+	projectWindow.addToolBar(Qt::TopToolBarArea, interactionToolBar);*/
 
+
+	auto dock3 = new QDockWidget("DisplayControlsToolbar", &projectWindow);
+	dock3->setAllowedAreas(Qt::TopDockWidgetArea| Qt::BottomDockWidgetArea);
+	QToolBar* displayToolBar = new mqDisplayControlsToolbar(&projectWindow);
+	displayToolBar->layout()->setSpacing(0);
+	dock3->setWidget(displayToolBar);
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock3);
 	//cout << "create display tool bar" << endl;
-	QToolBar*displayToolBar = new mqDisplayControlsToolbar(&projectWindow)
+
+	/*QToolBar*displayToolBar = new mqDisplayControlsToolbar(&projectWindow)
 		<< mqSetName("DisplayControlsToolbar");
 	displayToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::TopToolBarArea, displayToolBar);
-	
+	projectWindow.addToolBar(Qt::TopToolBarArea, displayToolBar);*/
+
+	auto dock4 = new QDockWidget("LightControlsToolbar", &projectWindow);
+	dock4->setAllowedAreas(Qt::BottomDockWidgetArea| Qt::TopDockWidgetArea);
+	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow);
+	lightToolBar->layout()->setSpacing(0);
+	dock4->setWidget(lightToolBar);
+	projectWindow.addDockWidget(Qt::BottomDockWidgetArea, dock4);
 	
 	//cout << "create light tool bar" << endl;
-	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
+	/*QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
 		<< mqSetName("LightControlsToolbar");
 	lightToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);
+	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);*/
+
 	//cout << "create objects tool bar" << endl;
+
+	auto dock5 = new QDockWidget(&projectWindow);
+	dock5->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow);
+	ObjectsToolBar->layout()->setSpacing(0);
+	dock5->setWidget(ObjectsToolBar);
+	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock5);
 	/*
 	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
 		<< mqSetName("ObjectsControlsToolbar");
 	ObjectsToolBar->layout()->setSpacing(0);
 	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);*/
-	auto dock1 = new QDockWidget("3D viewer");
-	dock1->setAllowedAreas(Qt::RightDockWidgetArea|Qt::LeftDockWidgetArea);
-	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow);
-	//ObjectsToolBar->layout()->setSpacing(0);
-	dock1->setWidget(ObjectsToolBar);
+	
 	//<< mqSetName("ObjectsControlsToolbar");
 
 	//projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);
 
-	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock1);
+	
 
 	//cout << "create scalars tool bar" << endl;
 	QToolBar* scalarsToolBar = new mqScalarsControlsToolbar(&projectWindow)
