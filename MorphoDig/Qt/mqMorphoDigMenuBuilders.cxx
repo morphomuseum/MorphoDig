@@ -18,9 +18,9 @@
 #include "mqMorphoDigMenuBuilders.h"
 #include "mqCameraControlsToolbar.h"
 #include "mqMainControlsToolbar.h"
-#include "mqInteractionControlsToolbar.h"
 #include "mqInteractionControlsWidget.h"
-#include "mqDisplayControlsToolbar.h"
+#include "mqDisplayControlsWidget.h"
+//#include "mqDisplayControlsToolbar.h"
 #include "mqLightControlsToolbar.h"
 #include "mqActorTreePanel.h"
 #include "mqObjectsControlsToolbar.h"
@@ -393,14 +393,14 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	projectWindow.addToolBar(Qt::TopToolBarArea, interactionToolBar);*/
 
 
-	auto dock3 = new QDockWidget("DisplayControlsToolbar", &projectWindow);	
+	auto dock3 = new QDockWidget("Display", &projectWindow);	
 	QWidget* titleBarWidget3 = new QWidget;
 	dock3->setTitleBarWidget(titleBarWidget3);
 	dock3->titleBarWidget()->hide();
 	dock3->setAllowedAreas(Qt::AllDockWidgetAreas);
-	QToolBar* displayToolBar = new mqDisplayControlsToolbar(&projectWindow);
-	displayToolBar->layout()->setSpacing(0);
-	dock3->setWidget(displayToolBar);
+	QWidget* displayWidget = new mqDisplayControlsWidget(&projectWindow);
+	displayWidget->layout()->setSpacing(0);
+	dock3->setWidget(displayWidget);
 	
 	//cout << "create display tool bar" << endl;
 
@@ -488,10 +488,10 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	//projectWindow.tabifyDockWidget(dock7, dock5);
 
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock2);
-	//projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock3);
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock3);
 	projectWindow.addDockWidget(Qt::BottomDockWidgetArea, dock4);
 	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock5);
-	//projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock6);
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock6);
 	projectWindow.addDockWidget(Qt::LeftDockWidgetArea, dock7);
 	
 	/*QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow)

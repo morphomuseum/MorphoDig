@@ -87,8 +87,8 @@ mqViewMenuManager.cxx
   mqMainControlsToolbar.cxx
   mqDisplayControlsToolbar.h
   mqDisplayControlsToolbar.cxx
-  mqInteractionControlsToolbar.h
-  mqInteractionControlsToolbar.cxx
+  mqDisplayControlsWidget.h
+  mqDisplayControlsWidget.cxx
   mqInteractionControlsWidget.h
   mqInteractionControlsWidget.cxx
   mqLightControlsToolbar.h
@@ -251,9 +251,8 @@ mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
 mqSelectLandmarkRangeDialog.ui
 mqLightControlsToolbar.ui
-mqInteractionControlsToolbar.ui
 mqInteractionControlsWidget.ui
-mqDisplayControlsToolbar.ui
+mqDisplayControlsWidget.ui
 mqScalarsControlsToolbar.ui
 mqGridSizeDialog.ui
 mqOrientationLabelsDialog.ui
