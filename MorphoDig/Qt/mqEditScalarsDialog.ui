@@ -766,6 +766,9 @@
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QComboBox" name="comboColorMap"/>
      </item>
