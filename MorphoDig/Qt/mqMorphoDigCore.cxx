@@ -8090,6 +8090,239 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 		
 	}
 }
+void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode)
+{
+	double defaultSearchSize = this->ActorCollection->GetBoundingBoxLengthOfSelectedActors()/20;
+	cout << "COmplexity scalars start " << endl;
+	std::string mScalarName = "Complexity";
+	if (scalarName.length() >0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "scalarsComplexity:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			double searchSize = defaultSearchSize;
+			
+			if (customLocalAreaLimit == 1 && localAreaLimit > 0)
+			{
+				searchSize = localAreaLimit;
+			}
+			cout << "searchSize=" << searchSize;
+			myActor->SetSelected(0);
+			// here we can call : 
+			cout << "scalars complexity start" << endl;
+			std::string action = "Compute complexity for ";
+			action.append(myActor->GetName().c_str());
+			int Count = BEGIN_UNDO_SET(action);
+			std::string mScalarName = "Complexity";
+			if (scalarName.length() > 0)
+			{
+				mScalarName = scalarName.toStdString();
+			}
+			myActor->SaveState(Count, QString(mScalarName.c_str()));
+			vtkPolyDataMapper *myMapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (myMapper != NULL && vtkPolyData::SafeDownCast(myMapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = myMapper->GetInput();
+				double numvert = mPD->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);
+				
+				double ve_pos[3];
+				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+					vtkSmartPointer<vtkKdTreePointLocator>::New();
+				kDTree->SetDataSet(mPD);
+
+				kDTree->BuildLocator();
+			
+				for (vtkIdType i = 0; i < numvert; i++) {
+					cout << "complexity, vertex:" << i << endl;
+					// for every triangle 
+					mPD->GetPoint(i, ve_pos);
+					double currentComplexity = 0;
+					emit complexityProgression((int)(100 * i / numvert));
+					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+					double Radius = searchSize;
+					kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
+					cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds()<< endl;
+					//cout << "mode = " << mode << endl;
+					// now extract surface
+					//compute surface
+					currentComplexity = this->ComputeComplexity(mPD, observedNeighbours, mode);
+					cout << "currentComplexity:" << currentComplexity << endl;
+
+					newScalars->InsertTuple1(i, currentComplexity);
+					//@@@@
+				}
+
+				newScalars->SetName(mScalarName.c_str());
+				// test if exists...
+			
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mPD->GetPointData()->AddArray(newScalars);
+				mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
+				
+			}
+
+			
+
+		END_UNDO_SET(); 
+			//@@ ok!
+		
+		// test if exists...
+		//
+	
+		// remove this scalar
+		
+			modified = 1;
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "thickness within scalars computed, call initExistingscalars " << endl;
+		this->Initmui_ExistingScalars();
+		cout << "Active scalars and render" << endl;
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+
+	}
+}
+
+double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int mode)
+{
+	//mode = 0: convex hull area ratio
+	//mode = 1: convex hull shape index
+	vtkSmartPointer<vtkIntArray> newCuts =
+		vtkSmartPointer<vtkIntArray>::New();
+
+	newCuts->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+	newCuts->SetNumberOfTuples(mPD->GetNumberOfPoints());
+
+	
+	for (vtkIdType i = 0; i < mPD->GetNumberOfPoints(); i++) {
+		newCuts->InsertTuple1(i, 0);
+	}
+	for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
+	{
+		newCuts->SetTuple1(list->GetId(j), 1);
+	}
+		
+
+	
+	newCuts->SetName("Cuts");
+	mPD->GetPointData()->AddArray(newCuts);
+	mPD->GetPointData()->SetActiveScalars("Cuts");
+
+	vtkSmartPointer<vtkThreshold> selector =
+		vtkSmartPointer<vtkThreshold>::New();
+	vtkSmartPointer<vtkMaskFields> scalarsOff =
+		vtkSmartPointer<vtkMaskFields>::New();
+	vtkSmartPointer<vtkGeometryFilter> geometry =
+		vtkSmartPointer<vtkGeometryFilter>::New();
+	selector->SetInputData((vtkPolyData*)mPD);
+	selector->SetInputArrayToProcess(0, 0, 0,
+		vtkDataObject::FIELD_ASSOCIATION_CELLS,
+		vtkDataSetAttributes::SCALARS);
+	selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
+	selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
+	selector->ThresholdBetween(0.9, 1.1);
+	selector->Update();
+	//std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
+	//std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
+
+	scalarsOff->SetInputData(selector->GetOutput());
+	scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+	scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+	scalarsOff->Update();
+	geometry->SetInputData(scalarsOff->GetOutput());
+	geometry->Update();
+
+	vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+
+
+	MyObj = geometry->GetOutput();
+	mPD->GetPointData()->RemoveArray("Cuts");
+	vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+	vtkSmartPointer<vtkMassProperties> massPropConvexHull = vtkSmartPointer<vtkMassProperties>::New();
+	vtkSmartPointer<vtkQuadricDecimation> decimate =
+		vtkSmartPointer<vtkQuadricDecimation>::New();
+
+	vtkSmartPointer<vtkDelaunay3D> delaunay3D =
+		vtkSmartPointer<vtkDelaunay3D>::New();
+	decimate->SetInputData(MyObj);
+	decimate->SetVolumePreservation(1);
+	double numvert = MyObj->GetNumberOfPoints();
+	double reduction_factor = 0.1;
+	double target_number = 10000;//max 10 000 points for local convex hull
+	double new_factor = target_number / numvert;
+	if (new_factor < 1)
+	{
+		reduction_factor = 1 - new_factor;
+	}
+
+	if (new_factor < 1)
+	{
+		decimate->SetTargetReduction(reduction_factor);
+		decimate->Update();
+		delaunay3D->SetInputData(decimate->GetOutput());
+	}
+	else
+	{
+		delaunay3D->SetInputData(MyObj);
+	}
+	delaunay3D->Update();
+	vtkSmartPointer<vtkGeometryFilter> geometryFilter =
+		vtkSmartPointer<vtkGeometryFilter>::New();
+
+	geometryFilter->SetInputConnection(delaunay3D->GetOutputPort());
+	geometryFilter->Update();
+	massProp->SetInputData(MyObj);
+	massProp->Update();
+
+	massPropConvexHull->SetInputData(geometryFilter->GetOutput());
+	massPropConvexHull->Update();
+	double surface_area = massProp->GetSurfaceArea();
+	double sqrt_surface_area = sqrt(surface_area);
+
+	double surface_area_convex_hull = massPropConvexHull->GetSurfaceArea();
+	double sqrt_surface_area_convex_hull = sqrt(surface_area_convex_hull);
+
+
+	double volume_convex_hull = massPropConvexHull->GetVolume();
+	//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+	double cbrt_volume_convex_hull = cbrt(volume_convex_hull);
+	double custom_complexity = sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233);
+	double surface_ratio = 1;
+	if (surface_area_convex_hull > 0) {
+		surface_ratio = surface_area / surface_area_convex_hull;
+	}
+
+	if (mode == 0) { return custom_complexity; }
+	else { return surface_ratio; }
+	//Complexity process is computed on MyObj
+	
+}
+
 void mqMorphoDigCore::scalarsGaussianBlur()
 {
 

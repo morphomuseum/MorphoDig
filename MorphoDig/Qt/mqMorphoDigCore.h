@@ -561,6 +561,7 @@ public:
   vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
   void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit);
+  void scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode);
   void scalarsCurvature(int curvatureType, QString scalarName);
   void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
   void scalarsDistance(double maxDist, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor);
@@ -644,6 +645,7 @@ public:
   void ComputeSelectedNamesLists();
   int colorMapNameAlreadyExists(QString proposed_name);
   void deleteColorMap(int i);
+  double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int mode);
 signals:
   
   void projectionModeChanged();
@@ -656,6 +658,7 @@ signals:
   void actorsMightHaveChanged();
   void modeModeChanged();
   void thicknessProgression(int percent);
+  void complexityProgression(int percent);
   void distanceProgression(int percent);
 protected:
 	

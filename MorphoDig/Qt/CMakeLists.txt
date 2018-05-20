@@ -179,6 +179,10 @@ QReleaseSliderValue.h
   mqDecomposeDialog.h
   mqDecomposeDialogReaction.cxx
   mqDecomposeDialogReaction.h
+mqScalarsComplexityDialog.h
+mqScalarsComplexityDialog.cxx
+mqScalarsComplexityDialogReaction.h
+mqScalarsComplexityDialogReaction.cxx
 mqScalarsThicknessDialog.h
 mqScalarsThicknessDialog.cxx
 mqScalarsThicknessDialogReaction.h
@@ -264,6 +268,7 @@ mqFillHolesDialog.ui
 mqTPSDialog.ui
 mqDecomposeDialog.ui
 mqActorTreePanel.ui
+mqScalarsComplexityDialog.ui
 mqScalarsThicknessDialog.ui
 mqScalarsThicknessBetweenDialog.ui
 mqScalarsCurvatureDialog.ui
