@@ -8199,6 +8199,10 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 					{
 						//printmode = 1;
 					}
+					if (Radius <=0)
+					{
+						Radius = 1;
+					}
 					currentComplexity = this->ComputeComplexity(mPD, observedNeighbours,Radius,  mode, printmode);
 					if (i % 1000 == 0)
 					{
@@ -8424,8 +8428,14 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 
 		double volume_sphere = 4* vtkMath::Pi() * sphere_radius*sphere_radius*sphere_radius/3;
 		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
-		double cbrt_volume_sphere = cbrt(volume_sphere);
-		double custom_complexity = sqrt_surface_area / (cbrt_volume_sphere*2.199085233);
+		double cbrt_volume_sphere = 1;
+		double custom_complexity = 1;
+		if (volume_sphere > 0)
+		{
+			cbrt_volume_sphere = cbrt(volume_sphere);
+			custom_complexity = sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
+		}
+		
 		double surface_ratio = 1;
 		if (surface_area_sphere > 0) {
 			surface_ratio = surface_area / surface_area_sphere;
