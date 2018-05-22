@@ -464,7 +464,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Local convex hull area ratio</string>
+    <string>Local convex hull area ratio (advice: surfaces &lt; 100 000 vertices)</string>
    </property>
    <widget class="QDoubleSpinBox" name="localAreaLimit">
     <property name="enabled">
@@ -521,7 +521,7 @@
      <item>
       <widget class="QRadioButton" name="sphereShapeIndex">
        <property name="text">
-        <string>local sphere shape index</string>
+        <string>local sphere shape index (slow)</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -531,7 +531,7 @@
      <item>
       <widget class="QRadioButton" name="sphereArea">
        <property name="text">
-        <string>local area / local sphere area</string>
+        <string>local area / local sphere area (slow)</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -541,7 +541,7 @@
      <item>
       <widget class="QRadioButton" name="convexHullShapeIndex">
        <property name="text">
-        <string> local convex hull  shape index (extremely slow)</string>
+        <string> local convex hull  shape index (slower)</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -551,7 +551,7 @@
      <item>
       <widget class="QRadioButton" name="convexHullArea">
        <property name="text">
-        <string>local convex hull area ratio (extremely slow)</string>
+        <string>local convex hull area ratio (slower)</string>
        </property>
        <property name="checked">
         <bool>false</bool>
