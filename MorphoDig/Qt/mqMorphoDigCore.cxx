@@ -8433,7 +8433,7 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 		if (volume_sphere > 0)
 		{
 			cbrt_volume_sphere = cbrt(volume_sphere);
-			custom_complexity = sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
+			custom_complexity = sqrt_surface_area / (cbrt_volume_sphere*2.199085233);
 		}
 		
 		double surface_ratio = 1;
