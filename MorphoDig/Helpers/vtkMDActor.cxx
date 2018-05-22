@@ -115,6 +115,31 @@ vtkIdType vtkMDActor::GetNumberOfPoints()
 	
 	return nv;
 }
+double vtkMDActor::GetBoundingBoxLength()
+{
+
+	
+		double bounds[6];
+
+		this->GetBounds(bounds);
+		double A[3];//min
+		double B[3];//max
+
+	A[0] = bounds[0];
+	A[1] = bounds[2];
+	A[2] = bounds[4];
+	B[0] = bounds[1];
+	B[1] = bounds[3];
+	B[2] = bounds[5];
+	
+	double diag[3];
+	diag[0] = B[0] - A[0];
+	diag[1] = B[1] - A[1];
+	diag[2] = B[2] - A[2];
+	double lengthxyz = sqrt((diag[0])*(diag[0]) + (diag[1])*(diag[1]) + (diag[2])*(diag[2]));
+
+	return lengthxyz;
+}
 void vtkMDActor::SetSelected(int selected)
 {
 	this->Selected = selected;

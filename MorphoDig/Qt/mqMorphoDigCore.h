@@ -645,7 +645,7 @@ public:
   void ComputeSelectedNamesLists();
   int colorMapNameAlreadyExists(QString proposed_name);
   void deleteColorMap(int i);
-  double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int mode);
+  double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);
 signals:
   
   void projectionModeChanged();

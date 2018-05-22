@@ -11,6 +11,7 @@
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
+#include <time.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
@@ -8092,7 +8093,11 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 }
 void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode)
 {
-	double defaultSearchSize = this->ActorCollection->GetBoundingBoxLengthOfSelectedActors()/20;
+	//mode = 0: convex hull area ratio ( surface_area / surface_area_convex_hull ) 
+	//mode = 1: convex hull shape index (sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233)
+	//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
+	//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
+	double defaultSearchSize = this->ActorCollection->GetBoundingBoxLengthOfSelectedActors()/40;
 	cout << "COmplexity scalars start " << endl;
 	std::string mScalarName = "Complexity";
 	if (scalarName.length() >0)
@@ -8114,7 +8119,15 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 			if (customLocalAreaLimit == 1 && localAreaLimit > 0)
 			{
 				searchSize = localAreaLimit;
+				cout << "Custom search size :" << searchSize << endl;
 			}
+			else
+			{
+				
+				searchSize = myActor->GetBoundingBoxLength()/40;
+				cout << "Search size base on myActor BoundingBoxLength:" << searchSize << endl;
+			}
+
 			cout << "searchSize=" << searchSize;
 			myActor->SetSelected(0);
 			// here we can call : 
@@ -8151,23 +8164,56 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 				kDTree->BuildLocator();
 			
 				for (vtkIdType i = 0; i < numvert; i++) {
-					cout << "complexity, vertex:" << i << endl;
+					clock_t t0, t1, tt0, tt1;
+					tt0 = clock();
+					if (i % 1000 == 0)
+					{
+						cout << "complexity, vertex:" << i << endl;
+					}
 					// for every triangle 
 					mPD->GetPoint(i, ve_pos);
 					double currentComplexity = 0;
 					emit complexityProgression((int)(100 * i / numvert));
 					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 					double Radius = searchSize;
+
+					
+					double sec0;
+					double ssec0;
+					//mode = 0: convex hull area ratio
+					//mode = 1: convex hull shape index
+					t0 = clock();
 					kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
-					cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds()<< endl;
+					t1 = clock();
+					if (i % 1000 == 0)
+					{
+						cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds() << endl;
+					//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
+					//	cout << "sec0=" << sec0 << endl;
+					}
 					//cout << "mode = " << mode << endl;
 					// now extract surface
 					//compute surface
-					currentComplexity = this->ComputeComplexity(mPD, observedNeighbours, mode);
-					cout << "currentComplexity:" << currentComplexity << endl;
+					int printmode = 0;
+					if (i%1000 ==0)
+					{
+						//printmode = 1;
+					}
+					currentComplexity = this->ComputeComplexity(mPD, observedNeighbours,Radius,  mode, printmode);
+					if (i % 1000 == 0)
+					{
+						cout << "currentComplexity:" << currentComplexity << endl;
+					}
 
 					newScalars->InsertTuple1(i, currentComplexity);
+					tt1 = clock();
 					//@@@@
+					if (i % 1000 == 0)
+					{
+						ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
+						cout << "Total time for 1 vertex:" << ssec0 << endl;
+						
+					}
 				}
 
 				newScalars->SetName(mScalarName.c_str());
@@ -8208,16 +8254,39 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 	}
 }
 
-double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int mode)
+double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode)
 {
-	//mode = 0: convex hull area ratio
-	//mode = 1: convex hull shape index
+	clock_t t1, t2,t3,t4,t5;
+	double sec1, sec2, sec3, sec4;
+	
+	//mode = 0: convex hull area ratio ( surface_area / surface_area_convex_hull ) 
+	//mode = 1: convex hull shape index (sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233)
+	//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
+	//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
+	t1 = clock();
+
+	/*vtkSmartPointer<vtkPolyDataConnectivityFilter> cfilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+	cfilter->SetInputData(mPD);
+	cfilter->SetExtractionModeToPointSeededRegions();
+
+	for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
+	{
+		//newCuts->SetTuple1(list->GetId(j), 1);
+		cfilter->AddSeed(list->GetId(j));
+	}
+
+	cfilter->Update();*/
+
+
 	vtkSmartPointer<vtkIntArray> newCuts =
 		vtkSmartPointer<vtkIntArray>::New();
 
 	newCuts->SetNumberOfComponents(1); //3d normals (ie x,y,z)
 	newCuts->SetNumberOfTuples(mPD->GetNumberOfPoints());
 
+
+	
+	
 	
 	for (vtkIdType i = 0; i < mPD->GetNumberOfPoints(); i++) {
 		newCuts->InsertTuple1(i, 0);
@@ -8225,8 +8294,9 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 	for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
 	{
 		newCuts->SetTuple1(list->GetId(j), 1);
-	}
 		
+	}
+	
 
 	
 	newCuts->SetName("Cuts");
@@ -8247,78 +8317,134 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 	selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
 	selector->ThresholdBetween(0.9, 1.1);
 	selector->Update();
+
+
+	t2 = clock();
+	sec1 = (double)(t2 - t1) / CLOCKS_PER_SEC;
 	//std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
 	//std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
-
+	
 	scalarsOff->SetInputData(selector->GetOutput());
 	scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
 	scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
 	scalarsOff->Update();
 	geometry->SetInputData(scalarsOff->GetOutput());
 	geometry->Update();
+	
 
 	vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
 
 
 	MyObj = geometry->GetOutput();
-	mPD->GetPointData()->RemoveArray("Cuts");
+	//MyObj = cfilter->GetOutput();
+	t3 = clock();
+	sec2 = (double)(t3 - t2) / CLOCKS_PER_SEC;
+	//mPD->GetPointData()->RemoveArray("Cuts");
 	vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
-	vtkSmartPointer<vtkMassProperties> massPropConvexHull = vtkSmartPointer<vtkMassProperties>::New();
-	vtkSmartPointer<vtkQuadricDecimation> decimate =
-		vtkSmartPointer<vtkQuadricDecimation>::New();
-
-	vtkSmartPointer<vtkDelaunay3D> delaunay3D =
-		vtkSmartPointer<vtkDelaunay3D>::New();
-	decimate->SetInputData(MyObj);
-	decimate->SetVolumePreservation(1);
-	double numvert = MyObj->GetNumberOfPoints();
-	double reduction_factor = 0.1;
-	double target_number = 10000;//max 10 000 points for local convex hull
-	double new_factor = target_number / numvert;
-	if (new_factor < 1)
-	{
-		reduction_factor = 1 - new_factor;
-	}
-
-	if (new_factor < 1)
-	{
-		decimate->SetTargetReduction(reduction_factor);
-		decimate->Update();
-		delaunay3D->SetInputData(decimate->GetOutput());
-	}
-	else
-	{
-		delaunay3D->SetInputData(MyObj);
-	}
-	delaunay3D->Update();
-	vtkSmartPointer<vtkGeometryFilter> geometryFilter =
-		vtkSmartPointer<vtkGeometryFilter>::New();
-
-	geometryFilter->SetInputConnection(delaunay3D->GetOutputPort());
-	geometryFilter->Update();
 	massProp->SetInputData(MyObj);
 	massProp->Update();
-
-	massPropConvexHull->SetInputData(geometryFilter->GetOutput());
-	massPropConvexHull->Update();
 	double surface_area = massProp->GetSurfaceArea();
 	double sqrt_surface_area = sqrt(surface_area);
 
-	double surface_area_convex_hull = massPropConvexHull->GetSurfaceArea();
-	double sqrt_surface_area_convex_hull = sqrt(surface_area_convex_hull);
+	
+	if (mode < 2) // use of CPU TIME CONSUMING delaunay3D = convex hulls
+	{
+		vtkSmartPointer<vtkMassProperties> massPropConvexHull = vtkSmartPointer<vtkMassProperties>::New();
+		vtkSmartPointer<vtkQuadricDecimation> decimate =
+		vtkSmartPointer<vtkQuadricDecimation>::New();
+		vtkSmartPointer<vtkDelaunay3D> delaunay3D =
+			vtkSmartPointer<vtkDelaunay3D>::New();
+		decimate->SetInputData(MyObj);
+		decimate->SetVolumePreservation(1);
+		double numvert = MyObj->GetNumberOfPoints();
+		double reduction_factor = 0.1;
+		double target_number = 10000;//max 10 000 points for local convex hull
+		double new_factor = target_number / numvert;
+		if (new_factor < 1)
+		{
+			reduction_factor = 1 - new_factor;
+		}
+
+		if (new_factor < 1)
+		{
+			decimate->SetTargetReduction(reduction_factor);
+			decimate->Update();
+			delaunay3D->SetInputData(decimate->GetOutput());
+		}
+		else
+		{
+			delaunay3D->SetInputData(MyObj);
+		}
+		delaunay3D->Update();
+		t4 = clock();
+		sec3 = (double)(t4 - t3) / CLOCKS_PER_SEC;
+		vtkSmartPointer<vtkGeometryFilter> geometryFilter =
+			vtkSmartPointer<vtkGeometryFilter>::New();
+
+		geometryFilter->SetInputConnection(delaunay3D->GetOutputPort());
+		geometryFilter->Update();
+		
+		massPropConvexHull->SetInputData(geometryFilter->GetOutput());
+		massPropConvexHull->Update();
+		
+		double surface_area_convex_hull = massPropConvexHull->GetSurfaceArea();
+		double sqrt_surface_area_convex_hull = sqrt(surface_area_convex_hull);
 
 
-	double volume_convex_hull = massPropConvexHull->GetVolume();
-	//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
-	double cbrt_volume_convex_hull = cbrt(volume_convex_hull);
-	double custom_complexity = sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233);
-	double surface_ratio = 1;
-	if (surface_area_convex_hull > 0) {
-		surface_ratio = surface_area / surface_area_convex_hull;
+		double volume_convex_hull = massPropConvexHull->GetVolume();
+		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+		double cbrt_volume_convex_hull = cbrt(volume_convex_hull);
+		double custom_complexity = sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233);
+		double surface_ratio = 1;
+		if (surface_area_convex_hull > 0) {
+			surface_ratio = surface_area / surface_area_convex_hull;
+		}
+		t5 = clock();
+		sec4 = (double)(t5 - t4) / CLOCKS_PER_SEC;
+		if (printmode == 1)
+		{
+			cout << "convex hulls were computed... mode=" << mode <<  endl;
+			cout << "sec1:" << sec1 << endl;
+			cout << "sec2:" << sec2 << endl;
+			cout << "sec3:" << sec3 << endl;
+			cout << "sec4:" << sec4 << endl;
+		}
+		if (mode == 1) { return custom_complexity; }
+		else { return surface_ratio; }
 	}
+	else
+	{
 
-	if (mode == 0) { return custom_complexity; }
-	else { return surface_ratio; }
+		t4 = clock();
+		sec3 = (double)(t4 - t3) / CLOCKS_PER_SEC;
+
+		double surface_area_sphere = 4 * vtkMath::Pi() * sphere_radius*sphere_radius;
+		double sqrt_surface_area_sphere = sqrt(surface_area_sphere);
+
+
+		double volume_sphere = 4* vtkMath::Pi() * sphere_radius*sphere_radius*sphere_radius/3;
+		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+		double cbrt_volume_sphere = cbrt(volume_sphere);
+		double custom_complexity = sqrt_surface_area / (cbrt_volume_sphere*2.199085233);
+		double surface_ratio = 1;
+		if (surface_area_sphere > 0) {
+			surface_ratio = surface_area / surface_area_sphere;
+		}
+		t5 = clock();
+		sec4 = (double)(t5 - t4) / CLOCKS_PER_SEC;
+		if (printmode == 1)
+		{
+			cout << "sphere ratios... mode=" <<mode<< endl;
+			cout << "sec1:" << sec1 << endl;
+			cout << "sec2:" << sec2 << endl;
+			cout << "sec3:" << sec3 << endl;
+			cout << "sec4:" << sec4 << endl;
+		}
+		if (mode == 3) { return custom_complexity; }
+		else { return surface_ratio; }
+
+	}
+	
 	//Complexity process is computed on MyObj
 	
 }

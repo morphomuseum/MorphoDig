@@ -60,7 +60,7 @@ mqScalarsComplexityDialog::mqScalarsComplexityDialog(QWidget* Parent)
 	this->Ui->localAreaLimit->setMinimum(0);
 	this->Ui->localAreaLimit->setMaximum(DBL_MAX);
 	this->Ui->localAreaLimit->setSingleStep(0.1);
-	double localAreaLimit = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLengthOfSelectedActors() / 20;
+	double localAreaLimit = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLengthOfSelectedActors()/40;
 	this->Ui->localAreaLimit->setValue(localAreaLimit);
 	this->Ui->progressBar->setVisible(false);
 	
@@ -92,8 +92,16 @@ void mqScalarsComplexityDialog::editComplexity()
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
 	{
 		std::string action = "Update Complexity";
-		
-		mqMorphoDigCore::instance()->scalarsComplexity(this->Ui->localAreaLimit->value(), this->Ui->customLocalAreaLimit->isChecked(), this->Ui->scalarName->text(), this->Ui->convexHullArea->isChecked());// to update Complexity
+		int mode = 3;
+		//mode = 0: convex hull area ratio ( surface_area / surface_area_convex_hull ) 
+		//mode = 1: convex hull shape index (sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233)
+		//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
+		//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
+		if (this->Ui->convexHullArea->isChecked()) { mode = 0; }
+		if (this->Ui->convexHullShapeIndex->isChecked()) { mode = 1; }
+		if (this->Ui->sphereArea->isChecked()) { mode = 2; }
+		if (this->Ui->sphereShapeIndex->isChecked()) { mode = 3; }
+		mqMorphoDigCore::instance()->scalarsComplexity(this->Ui->localAreaLimit->value(), this->Ui->customLocalAreaLimit->isChecked(), this->Ui->scalarName->text(), mode);// to update Complexity
 		
 	}
 

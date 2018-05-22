@@ -77,6 +77,8 @@ public:
 	vtkGetVector4Macro(mColor, double);
 	void SetmColor(double r, double g, double b, double a);
 	void SetmColor(double c[4]);
+
+	double GetBoundingBoxLength();
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
 	// Actual actor render method.
 	vtkIdType GetNumberOfPoints();
