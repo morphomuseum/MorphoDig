@@ -402,7 +402,7 @@ public:
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
 	
 	int SaveShapeMeasures(QString fileName, int mode);
-	
+	void SaveMeshSize(QString fileName);
 	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt=0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);

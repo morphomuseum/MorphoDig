@@ -12,11 +12,16 @@ Module:    vtkMDActor.cxx
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkProperty.h>
+
+#include <vtkTable.h>
+#include <vtkPCAStatistics.h>
+#include <vtkLine.h>
 #include <vtkTexture.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 #include <vtkPointData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkCenterOfMass.h>
 #include <vtkTransform.h>
 #include <vtkPolyData.h>
 #include <vtkDoubleArray.h>
@@ -115,6 +120,186 @@ vtkIdType vtkMDActor::GetNumberOfPoints()
 	
 	return nv;
 }
+double vtkMDActor::GetAvgCentroidDistance()
+{
+	double avgCD = 0;
+	vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+	{
+		vtkPolyData *mPD =  vtkPolyData::SafeDownCast(mapper->GetInput());
+		vtkSmartPointer<vtkCenterOfMass> centerOfMassFilter =
+			vtkSmartPointer<vtkCenterOfMass>::New();
+	
+		centerOfMassFilter->SetInputData(mPD);
+		centerOfMassFilter->SetUseScalarsAsWeights(false);
+		centerOfMassFilter->Update();
+		double center[3];
+		double pt[3];
+		centerOfMassFilter->GetCenter(center);
+		
+		for (vtkIdType i = 0; i < mPD->GetNumberOfPoints(); i++)
+		{
+			mPD->GetPoint(i, pt);
+			avgCD += sqrt((center[0] - pt[0])*(center[0] - pt[0]) + (center[1] - pt[1])*(center[1] - pt[1]) + (center[2] - pt[2])*(center[2] - pt[2]));
+		}
+		if (mPD->GetNumberOfPoints() > 0) { avgCD /= mPD->GetNumberOfPoints(); }
+		//if (cs > 0) { cs = sqrt(cs); }
+
+	}
+	
+		return avgCD;
+}
+double vtkMDActor::GetXYZAvgPCLength()
+{
+	double pc1 = this->GetXYZPCLength(0);
+	double pc2 = this->GetXYZPCLength(1);
+	double pc3 = this->GetXYZPCLength(2);
+	double meanpc = (pc1 + pc2 + pc3) / 3;
+	return meanpc;
+
+
+}
+double vtkMDActor::GetXYZPCLength(int pc)
+{
+	// gives a measure "size" of the mesh. Length of the vtkPolyData projected on PC1, PC2 or PC3 of a PCA of x,y,z coordinates of the VTK PolyData
+	//as we perform a PCA on x,y,z coordinates, we can only compute 3 PCs : only PC1 (pc =0), PC2 (pc=1) or PC3 (pc=2)
+	if (pc < 0 || pc>2) { pc = 0; }
+	double pcL = 0;
+
+	double maxCD = -DBL_MAX;
+	vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+	{
+		vtkPolyData *mPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+				
+		double pt[3];		
+
+		// These are all the "x" values.
+		vtkSmartPointer<vtkDoubleArray> xArray =
+			vtkSmartPointer<vtkDoubleArray>::New();
+		xArray->SetNumberOfComponents(1);
+		xArray->SetName("x");
+
+		// These are all the "y" values.
+		vtkSmartPointer<vtkDoubleArray> yArray =
+			vtkSmartPointer<vtkDoubleArray>::New();
+		yArray->SetNumberOfComponents(1);
+		yArray->SetName("y");
+
+		// These are all the "z" values.
+		vtkSmartPointer<vtkDoubleArray> zArray =
+			vtkSmartPointer<vtkDoubleArray>::New();
+		zArray->SetNumberOfComponents(1);
+		zArray->SetName("z");
+
+		for (vtkIdType i = 0; i < mPD->GetNumberOfPoints(); i++)
+		{
+			mPD->GetPoint(i, pt);					
+			xArray->InsertNextValue(pt[0]);
+			yArray->InsertNextValue(pt[1]);
+			zArray->InsertNextValue(pt[2]);
+		}
+
+		vtkSmartPointer<vtkTable> datasetTable =
+			vtkSmartPointer<vtkTable>::New();
+		datasetTable->AddColumn(xArray);
+		datasetTable->AddColumn(yArray);
+		datasetTable->AddColumn(zArray);
+
+		vtkSmartPointer<vtkPCAStatistics> pcaStatistics = vtkSmartPointer<vtkPCAStatistics>::New();
+
+		pcaStatistics->SetInputData(vtkStatisticsAlgorithm::INPUT_DATA, datasetTable);
+
+		pcaStatistics->SetColumnStatus("x", 1);
+		pcaStatistics->SetColumnStatus("y", 1);
+		pcaStatistics->SetColumnStatus("z", 1);
+
+		pcaStatistics->RequestSelectedColumns();
+		pcaStatistics->SetDeriveOption(true);
+		pcaStatistics->Update();
+
+		///////// Eigenvalues ////////////
+		vtkSmartPointer<vtkDoubleArray> eigenvalues =
+			vtkSmartPointer<vtkDoubleArray>::New();
+		pcaStatistics->GetEigenvalues(eigenvalues);
+		for (vtkIdType i = 0; i < eigenvalues->GetNumberOfTuples(); i++)
+		{
+			std::cout << "Eigenvalue " << i << " = " << eigenvalues->GetValue(i) << std::endl;
+		}
+
+		///////// Eigenvectors ////////////
+		vtkSmartPointer<vtkDoubleArray> eigenvectors =
+			vtkSmartPointer<vtkDoubleArray>::New();
+
+		pcaStatistics->GetEigenvectors(eigenvectors);
+
+		vtkSmartPointer<vtkDoubleArray> evec =
+			vtkSmartPointer<vtkDoubleArray>::New();
+		pcaStatistics->GetEigenvector(pc, evec);
+			
+
+		// Project all of the points onto the desired eigenvector
+
+		double v[3];
+		v[0] = evec->GetValue(0);
+		v[1] =  evec->GetValue(1);
+		v[2] =  evec->GetValue(2);
+
+		vtkMath::Normalize(v); // just in case this would not be normalized!
+		cout << "PC" << pc << " eigvect:" << v[0] << "," << v[1] << "," << v[2] << endl;
+
+		
+
+		
+		double tmin = DBL_MAX;
+		double tmax = -DBL_MAX;
+		for (vtkIdType i = 0; i < mPD->GetNumberOfPoints(); i++)
+		{
+			mPD->GetPoint(i, pt);			
+			double t = v[0] * pt[0] + v[1] * pt[1] + v[2] * pt[2];
+			if (t < tmin) { tmin = t; }
+			if (t > tmax) { tmax = t; }
+		}
+		cout << "tmin=" << tmin << ", tmax=" << tmax << endl;
+		pcL = tmax - tmin;
+
+
+
+	}
+	return pcL;
+
+}
+double vtkMDActor::GetMaxCentroidDistance()
+{
+	double maxCD = -DBL_MAX;
+	vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+	{
+		vtkPolyData *mPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+		vtkSmartPointer<vtkCenterOfMass> centerOfMassFilter =
+			vtkSmartPointer<vtkCenterOfMass>::New();
+
+		centerOfMassFilter->SetInputData(mPD);
+		centerOfMassFilter->SetUseScalarsAsWeights(false);
+		centerOfMassFilter->Update();
+		double center[3];
+		double pt[3];
+		centerOfMassFilter->GetCenter(center);
+
+		for (vtkIdType i = 0; i < mPD->GetNumberOfPoints(); i++)
+		{
+			mPD->GetPoint(i, pt);
+			double currCD= sqrt((center[0] - pt[0])*(center[0] - pt[0]) + (center[1] - pt[1])*(center[1] - pt[1]) + (center[2] - pt[2])*(center[2] - pt[2]));
+			if (currCD > maxCD) { maxCD = currCD; }
+		}
+		
+		
+
+	}
+
+	return maxCD;
+}
+
 double vtkMDActor::GetBoundingBoxLength()
 {
 

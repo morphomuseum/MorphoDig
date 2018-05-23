@@ -4588,6 +4588,61 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 	return 1;
 
 }
+void mqMorphoDigCore::SaveMeshSize(QString fileName)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+	
+			stream << "Name	Bounding_box_length	Mean_Dist_To_Cendroid	Max_Dist_To_Cendroid	PC1_Length	PC2_Length	PC3_Length	AVG_PC_Length" << endl;
+		
+
+		//this->ComputeSelectedNamesLists();
+
+		this->ActorCollection->InitTraversal();
+
+
+
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+				{
+
+					double bbl = myActor->GetBoundingBoxLength();
+					double meanCDist = myActor->GetAvgCentroidDistance();
+					double maxCDist = myActor->GetMaxCentroidDistance();
+					double pc1 = myActor->GetXYZPCLength(0);
+					double pc2 = myActor->GetXYZPCLength(1);
+					double pc3 = myActor->GetXYZPCLength(2);
+					double avgpc = (pc1 + pc2 + pc3) / 3;
+					//vtkSmartPointer<vtkPolyData> toMeasure = vtkSmartPointer<vtkPolyData>::New();
+					vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+
+					massProp->SetInputData(mapper->GetInput());
+					massProp->Update();
+					double surface_area = massProp->GetSurfaceArea();
+					double volume = massProp->GetVolume();
+					
+
+						//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
+						stream << myActor->GetName().c_str() << "	" << bbl << "	" << meanCDist<<  "	" << maxCDist << "	" << pc1 << "	" << pc2 << "	" << pc3 << "	" << avgpc<< endl;
+					
+
+				}
+
+
+			}
+		}
+	}
+	file.close();
+
+}
 
 int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 {
@@ -8124,8 +8179,8 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 			else
 			{
 				
-				searchSize = myActor->GetBoundingBoxLength()/40;
-				cout << "Search size base on myActor BoundingBoxLength:" << searchSize << endl;
+				searchSize = myActor->GetXYZAvgPCLength()/18; // looks like a reasonable neighbourhood sphere radius size.
+				cout << "Search size based on myActor GetXYZAvgPCLength / 18:" << searchSize << endl;
 			}
 
 			cout << "searchSize=" << searchSize;

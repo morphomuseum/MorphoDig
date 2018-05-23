@@ -38,6 +38,7 @@ public:
    
    void SaveCURInfos();
    void SaveShapeMeasures(int mode);
+   void SaveMeshSize();
    void SaveORI();
    
    
@@ -117,6 +118,10 @@ protected:
 	else if (this->Mode == 20)
 	{
 		this->SaveShapeMeasures(3);
+	}
+	else if (this->Mode == 21)
+	{
+		this->SaveMeshSize();
 	}
   }
 

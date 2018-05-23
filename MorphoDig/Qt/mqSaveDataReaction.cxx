@@ -202,6 +202,42 @@ void mqSaveDataReaction::SaveShapeMeasures(int mode)
 
 
 }
+void mqSaveDataReaction::SaveMeshSize()
+{
+	
+	QString myText;
+	
+		cout << "Save  mesh size " << endl;
+		myText = tr("Save mesh size");
+	
+
+
+
+	QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
+		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("text file (*.txt)"));
+
+	cout << fileName.toStdString() << endl;;
+	if (fileName.isEmpty()) return;
+	QFileInfo fileInfo(fileName);
+	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+	
+
+	std::string TXText = ".txt";
+	std::string TXText2 = ".TXT";
+	std::size_t found = fileName.toStdString().find(TXText);
+	std::size_t found2 = fileName.toStdString().find(TXText2);
+	if (found == std::string::npos && found2 == std::string::npos)
+	{
+		fileName.append(".txt");
+	}
+
+	mqMorphoDigCore::instance()->SaveMeshSize(fileName);
+
+
+
+}
 
 
 //-----------------------------------------------------------------------------

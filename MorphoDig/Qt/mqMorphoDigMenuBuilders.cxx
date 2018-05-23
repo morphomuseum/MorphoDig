@@ -155,6 +155,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveDataReaction(submenuMeasurements->addAction("Save area and volume of selected surfaces") << mqSetName("actionSaveAV"), 18);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save normalized shape index of selected surfaces") << mqSetName("actionSaveNSI"), 19);  
   new mqSaveDataReaction(submenuMeasurements->addAction("Save convex hull area ratio and normalized shape index of selected surfaces (warning: slow)") << mqSetName("actionSaveCHNSI"), 20);
+  new mqSaveDataReaction(submenuMeasurements->addAction("Save size measurements (max length in xyz direction etc.) of selected surfaces") << mqSetName("actionSaveSize"), 21);
 
   new mqOpenDataReaction(submenuTagsAndFlags->addAction("Open Tag") << mqSetName("actionOpenTAG"), 9);
 
