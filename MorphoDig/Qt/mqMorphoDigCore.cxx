@@ -7592,7 +7592,10 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 			for (ve = 0; ve < numvert; ve++)
 			{
 				min_dist = maxDist;
-				emit distanceProgression((int)(100 * ve / numvert));
+				if ((ve % (int)(numvert / 100)) == 0)
+				{
+					emit distanceProgression((int)(100 * ve / numvert));
+				}
 				//progress.setValue(ve);
 				/*if (progress.wasCanceled())
 				break;*/
@@ -7826,7 +7829,10 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 				for (ve = 0; ve < numvert; ve++)
 				{
 					min_dist = max_thickness;
-					emit thicknessProgression((int)(100 * ve / numvert));
+					if ((ve % (int)(numvert / 100)) == 0)
+					{
+						emit thicknessProgression((int)(100 * ve / numvert));
+					}
 					//progress.setValue(ve);
 					/*if (progress.wasCanceled())
 					break;*/
@@ -8228,7 +8234,10 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 					// for every triangle 
 					mPD->GetPoint(i, ve_pos);
 					double currentComplexity = 0;
-					emit complexityProgression((int)(100 * i / numvert));
+					if ((i % (int)(numvert / 100)) == 0)
+					{
+						emit complexityProgression((int)(100 * i / numvert));
+					}
 					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 					double Radius = searchSize;
 
@@ -8398,7 +8407,7 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 	//MyObj = cfilter->GetOutput();
 	t3 = clock();
 	sec2 = (double)(t3 - t2) / CLOCKS_PER_SEC;
-	//mPD->GetPointData()->RemoveArray("Cuts");
+	mPD->GetPointData()->RemoveArray("Cuts");
 	vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
 	massProp->SetInputData(MyObj);
 	massProp->Update();
