@@ -83,6 +83,9 @@ mqViewMenuManager.cxx
   mqObjectsControlsToolbar.cxx
   mqCameraControlsToolbar.h
   mqCameraControlsToolbar.cxx
+  mqCameraControlsWidget.h
+  mqCameraControlsWidget.cxx
+
   mqMainControlsToolbar.h
   mqMainControlsToolbar.cxx
   mqDisplayControlsToolbar.h
@@ -238,6 +241,7 @@ set (Qt_UIs mqAboutDialog.ui
 mqColorDialog.ui 
 mqLandmarkDialog.ui  
 mqCameraControlsToolbar.ui 
+mqCameraControlsWidget.ui 
 mqObjectsControlsToolbar.ui 
 mqMainControlsToolbar.ui 
 mqSavePLYDialog.ui 

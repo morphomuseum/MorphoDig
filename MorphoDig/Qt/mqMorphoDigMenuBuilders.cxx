@@ -16,7 +16,8 @@
 #include "mqColorDialogReaction.h"
 #include "mqLandmarkDialogReaction.h"
 #include "mqMorphoDigMenuBuilders.h"
-#include "mqCameraControlsToolbar.h"
+//#include "mqCameraControlsToolbar.h"
+#include "mqCameraControlsWidget.h"
 #include "mqMainControlsToolbar.h"
 #include "mqInteractionControlsWidget.h"
 #include "mqDisplayControlsWidget.h"
@@ -498,9 +499,10 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	dock7->setTitleBarWidget(titleBarWidget7);
 
 	dock7->titleBarWidget()->hide();
-	QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow);
-	cameraToolBar->layout()->setSpacing(0);
-	dock7->setWidget(cameraToolBar);
+	//QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow);
+	QWidget* cameraWidget = new mqCameraControlsWidget(&projectWindow);
+	cameraWidget->layout()->setSpacing(0);
+	dock7->setWidget(cameraWidget);
 	
 
 	//projectWindow.tabifyDockWidget(dock7, dock5);
