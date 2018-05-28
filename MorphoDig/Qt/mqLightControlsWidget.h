@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    Copied from Paraview pqMainControlsToolbar.h
+   Module:    Copied from Paraview pqMainControlsWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef mqDisplayControlsToolbar_h
-#define mqDisplayControlsToolbar_h
+#ifndef mqLightControlsWidget_h
+#define mqLightControlsWidget_h
 
 
-#include <QToolBar>
-class Ui_mqDisplayControlsToolbar;
+#include <QWidget>
+class Ui_mqLightControlsWidget;
 
-/**
-* mqDiplayControlsToolbar is the toolbar with actions (and reactions) related to display environment(show grid, show orientatioun helper, stereo, show backface, show clipping)
-* "
-* QMainWindow to use it.
-*/
-class  mqDisplayControlsToolbar : public QToolBar
+
+class  mqLightControlsWidget : public QWidget
 {
   Q_OBJECT
-  typedef QToolBar Superclass;
+  typedef QWidget Superclass;
 
 public:
-  mqDisplayControlsToolbar(const QString& title, QWidget* parentObject = 0)
-    : Superclass(title, parentObject)
-  {
-    this->constructor();
-  }
-  mqDisplayControlsToolbar(QWidget* parentObject = 0)
+  
+  mqLightControlsWidget(QWidget* parentObject = 0)
     : Superclass(parentObject)
   {
     this->constructor();
@@ -60,11 +52,17 @@ public:
   
 
   public slots :
-
-private:
-	Q_DISABLE_COPY(mqDisplayControlsToolbar)
+  virtual void slotFrontLight();
+  virtual void slotBackLight();
+  virtual void slotAboveLight();
+  virtual void slotBelowLight();
+  virtual void slotLeftLight();
+  virtual void slotRightLight();
   
-  Ui_mqDisplayControlsToolbar *ui;
+private:
+	Q_DISABLE_COPY(mqLightControlsWidget)
+  
+  Ui_mqLightControlsWidget *ui;
   void constructor();
 };
 

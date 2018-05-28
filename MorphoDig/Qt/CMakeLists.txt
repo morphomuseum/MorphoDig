@@ -93,8 +93,12 @@ mqViewMenuManager.cxx
   mqInteractionControlsWidget.cxx
   mqLightControlsToolbar.h
   mqLightControlsToolbar.cxx
+  mqLightControlsWidget.h
+  mqLightControlsWidget.cxx
   mqScalarsControlsToolbar.h
   mqScalarsControlsToolbar.cxx
+  mqScalarsControlsWidget.h
+  mqScalarsControlsWidget.cxx
   mqMorphoDigCore.h
   mqMorphoDigCore.cxx
   mqSavePLYDialog.cxx
@@ -255,9 +259,12 @@ mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
 mqSelectLandmarkRangeDialog.ui
 mqLightControlsToolbar.ui
+mqLightControlsWidget.ui
 mqInteractionControlsWidget.ui
 mqDisplayControlsWidget.ui
+mqDisplayControlsToolbar.ui
 mqScalarsControlsToolbar.ui
+mqScalarsControlsWidget.ui
 mqGridSizeDialog.ui
 mqOrientationLabelsDialog.ui
 mqEditScalarsDialog.ui

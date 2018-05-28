@@ -54,49 +54,9 @@ void mqDisplayControlsToolbar::constructor()
 
   
 
-  if (mqMorphoDigCore::instance()->Getmui_Anaglyph() == 1)
-  {
-
-	  this->ui->actionRendererAnaglyphToggle->setChecked(true);
-  }
-
-  if (mqMorphoDigCore::instance()->Getmui_ShowGrid() == 1)
-  {
-
-	  this->ui->actionGridToggle->setChecked(true);
-  }
-  if (mqMorphoDigCore::instance()->Getmui_ShowOrientationHelper() == 1)
-  {
-
-	  this->ui->actionOrientationHelperToggle->setChecked(true);
-  }
-
-
-
-  new mqDisplayReaction(this->ui->actionGridToggle, 0); //0 = display Grid Toggle
-  new mqDisplayReaction(this->ui->actionOrientationHelperToggle, 1); //1 = display Orientation Helper Toggle
-  new mqDisplayReaction(this->ui->actionRendererAnaglyphToggle, 2); //2 = display Anaglyph mode Toggle
-
-  connect(this->ui->actionBackfaceCullingOnOff, SIGNAL(triggered()), this, SLOT(slotBackfaceCullingOnOff()));
-  connect(this->ui->actionClippingPlaneOnOff, SIGNAL(triggered()), this, SLOT(slotClippingPlaneOnOff()));
-
   
   
 }
 
-void mqDisplayControlsToolbar::slotClippingPlaneOnOff()
-{
-	mqMorphoDigCore::instance()->getRenderer()->ResetCameraClippingRange();
-	mqMorphoDigCore::instance()->ChangeClippingPlane();
-	mqMorphoDigCore::instance()->Render();
-	//mqMorphoDigCore::instance()->Render();
-}
 
-void mqDisplayControlsToolbar::slotBackfaceCullingOnOff()
-{
-
-	mqMorphoDigCore::instance()->ChangeBackfaceCulling();
-	mqMorphoDigCore::instance()->Render();
-	//mqMorphoDigCore::instance()->Render();
-}
 
