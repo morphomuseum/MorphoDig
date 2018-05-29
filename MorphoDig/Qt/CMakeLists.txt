@@ -81,11 +81,12 @@ mqViewMenuManager.cxx
   mqUndoStack.cxx
   mqObjectsControlsToolbar.h
   mqObjectsControlsToolbar.cxx
+  mqObjectsControlsWidget.h
+  mqObjectsControlsWidget.cxx
   mqCameraControlsToolbar.h
   mqCameraControlsToolbar.cxx
   mqCameraControlsWidget.h
   mqCameraControlsWidget.cxx
-
   mqMainControlsToolbar.h
   mqMainControlsToolbar.cxx
   mqDisplayControlsToolbar.h
@@ -243,6 +244,7 @@ mqLandmarkDialog.ui
 mqCameraControlsToolbar.ui 
 mqCameraControlsWidget.ui 
 mqObjectsControlsToolbar.ui 
+mqObjectsControlsWidget.ui 
 mqMainControlsToolbar.ui 
 mqSavePLYDialog.ui 
 mqSaveVTKDialog.ui 

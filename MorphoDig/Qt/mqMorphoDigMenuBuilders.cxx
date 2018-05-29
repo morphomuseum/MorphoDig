@@ -25,7 +25,8 @@
 //#include "mqLightControlsToolbar.h"
 #include "mqLightControlsWidget.h"
 #include "mqActorTreePanel.h"
-#include "mqObjectsControlsToolbar.h"
+//#include "mqObjectsControlsToolbar.h"
+#include "mqObjectsControlsWidget.h"
 //#include "mqScalarsControlsToolbar.h"
 #include "mqScalarsControlsWidget.h"
 #include "mqDesktopServicesReaction.h"
@@ -454,9 +455,10 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	dock5->setTitleBarWidget(titleBarWidget5);
 	
 	dock5->titleBarWidget()->hide();
-	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow);
-	ObjectsToolBar->layout()->setSpacing(0);
-	dock5->setWidget(ObjectsToolBar);
+	//QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow);
+	QWidget* ObjectsWidget= new mqObjectsControlsWidget(&projectWindow);
+	ObjectsWidget->layout()->setSpacing(0);
+	dock5->setWidget(ObjectsWidget);
 	
 	//
 	/*
