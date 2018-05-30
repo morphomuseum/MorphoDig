@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    Copied from Paraview pqMainControlsToolbar.h
+   Module:    Copied from Paraview pqMainControlsWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,32 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef mqMainControlsToolbar_h
-#define mqMainControlsToolbar_h
+#ifndef mqMainControlsWidget_h
+#define mqMainControlsWidget_h
 
 
-#include <QToolbar>
-class Ui_mqMainControlsToolbar;
+#include <QWidget>
+class Ui_mqMainControlsWidget;
 
 /**
-* pqMainControlsToolbar is the toolbar with actions (and reactions) for the
-* "Main Controls" toolbar in ParaView. It includes buttons like "Open Data",
+* pqMainControlsWidget is the Widget with actions (and reactions) for the
+* "Main Controls" Widget in ParaView. It includes buttons like "Open Data",
 * "Save Data", "Connect", "Disconnect", "Undo", "Redo".
 * Simply instantiate this and put it in your application UI file or
 * QMainWindow to use it.
 */
-class  mqMainControlsToolbar : public QToolBar
+class  mqMainControlsWidget : public QWidget
 {
   Q_OBJECT
-  typedef QToolBar Superclass;
+  typedef QWidget Superclass;
 
 public:
-  mqMainControlsToolbar(const QString& title, QWidget* parentObject = 0)
-    : Superclass(title, parentObject)
-  {
-    this->constructor();
-  }
-  mqMainControlsToolbar(QWidget* parentObject = 0)
+ 
+  mqMainControlsWidget(QWidget* parentObject = 0)
     : Superclass(parentObject)
   {
     this->constructor();
@@ -64,9 +60,9 @@ public:
   public slots :
   
 private:
-	Q_DISABLE_COPY(mqMainControlsToolbar)
+	Q_DISABLE_COPY(mqMainControlsWidget)
   
-  Ui_mqMainControlsToolbar *ui;
+  Ui_mqMainControlsWidget *ui;
   void constructor();
 };
 

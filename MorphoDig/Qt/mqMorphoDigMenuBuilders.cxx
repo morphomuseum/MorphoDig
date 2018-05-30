@@ -18,7 +18,8 @@
 #include "mqMorphoDigMenuBuilders.h"
 //#include "mqCameraControlsToolbar.h"
 #include "mqCameraControlsWidget.h"
-#include "mqMainControlsToolbar.h"
+//#include "mqMainControlsToolbar.h"
+#include "mqMainControlsWidget.h"
 #include "mqInteractionControlsWidget.h"
 #include "mqDisplayControlsWidget.h"
 #include "mqDisplayControlsToolbar.h"
@@ -367,21 +368,25 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	window->setCentralWidget(actor_panel);
 	dock3->setWidget(window);*/
 	//@@
+	
 	auto dock1 = new QDockWidget("MainControlsToolbar", &projectWindow);
+	QWidget* titleBarWidget1 = new QWidget;
+	dock1->setTitleBarWidget(titleBarWidget1);
+
+	dock1->titleBarWidget()->hide();
 	dock1->setAllowedAreas(Qt::TopDockWidgetArea);
 
 
-	/*QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow);
-	mainToolBar->layout()->setSpacing(0);
-	dock1->setTitleBarWidget(0);
-	dock1->setWidget(mainToolBar);
-	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock1);*/
+	QWidget* mainControlsWidget = new mqMainControlsWidget(&projectWindow);
+	mainControlsWidget->layout()->setSpacing(0);	
+	dock1->setWidget(mainControlsWidget);
+	
 
-	QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
+	/*QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
 		<< mqSetName("MainControlsToolbar");
 	mainToolBar->layout()->setSpacing(0);
 	projectWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
-	cout << "end create main tool bar" << endl;
+	cout << "end create main tool bar" << endl;*/
 
 
 	auto dock2 = new QDockWidget("InteractionControlsToolbar", &projectWindow);
@@ -509,7 +514,6 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 
 	//projectWindow.tabifyDockWidget(dock7, dock5);
 
-	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock2);// interaction widget
 	auto dock8 = new QDockWidget("Line", &projectWindow);
 
 	dock8->setAllowedAreas(Qt::TopDockWidgetArea);
@@ -536,6 +540,9 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 line->setFrameShape(QFrame::HLine);
 line->setFrameShadow(QFrame::Sunken);
 	*/
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock1);
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock2);// interaction widget
+
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock8);
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock3);
 	
