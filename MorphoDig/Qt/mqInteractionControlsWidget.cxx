@@ -24,7 +24,9 @@ void mqInteractionControlsWidget::constructor()
  // ui.setupUi(this);
   this->ui = new Ui_mqInteractionControlsWidget;
   this->ui->setupUi(this);
-  
+  this->ui->MoveCamera->setCheckable(true);
+  this->ui->MoveObjects->setCheckable(true);
+  this->ui->MoveOnlyLandmarks->setCheckable(true);
   
  
   
@@ -68,6 +70,7 @@ void mqInteractionControlsWidget::constructor()
 
 void mqInteractionControlsWidget::slotMoveModeChanged()
 {
+	cout << "Slot move mode changed" << endl;
 	// move mode was changed externally (ex: "Escape" pressed)
 	if (mqMorphoDigCore::instance()->Getmui_MoveMode() == 0 || mqMorphoDigCore::instance()->Getmui_MoveMode() == 1) //0 lmk movemode //1 camera //2 move objects
 	{
@@ -87,7 +90,12 @@ void mqInteractionControlsWidget::slotMoveCamera()
 {
 	cout << "Slot move camera" << endl;
 	
-		this->ui->MoveCamera->setChecked(true);
+	//	this->ui->MoveCamera->setChecked(true);
+	if (this->ui->MoveCamera->isChecked())
+	{
+		this->ui->MoveCamera->setChecked(false);
+	}
+
 		this->ui->MoveOnlyLandmarks->setChecked(false);
 		this->ui->MoveObjects->setChecked(false);
 	
@@ -99,10 +107,14 @@ void mqInteractionControlsWidget::slotMoveCamera()
 void mqInteractionControlsWidget::slotMoveObjects()
 {
 	cout << "Slot move objects" << endl;
-	this->ui->MoveObjects->setChecked(true);
+	if (this->ui->MoveObjects->isChecked())
+	{
+		this->ui->MoveObjects->setChecked(false);
+	}
+	/*
+	*/
 	this->ui->MoveOnlyLandmarks->setChecked(false);
 	this->ui->MoveCamera->setChecked(false);
-
 	mqMorphoDigCore::instance()->Setmui_MoveMode(2);
 	mqMorphoDigCore::instance()->setCurrentCursor(1);
 
@@ -112,7 +124,11 @@ void mqInteractionControlsWidget::slotMoveOnlyLandmarks()
 {
 	
 	cout << "Slot move only landmarks" << endl;
-		this->ui->MoveOnlyLandmarks->setChecked(true);
+	if (this->ui->MoveOnlyLandmarks->isChecked())
+	{
+		this->ui->MoveOnlyLandmarks->setChecked(false);
+	}
+		//this->ui->MoveOnlyLandmarks->setChecked(true);
 		this->ui->MoveCamera->setChecked(false);		
 		this->ui->MoveObjects->setChecked(false);
 		mqMorphoDigCore::instance()->setCurrentCursor(0);
@@ -126,7 +142,10 @@ void mqInteractionControlsWidget::slotMoveOnlyLandmarks()
 void mqInteractionControlsWidget::slotLandmarkNormalMode()
 {
 	cout << "Landmark setting mode: 0" << endl;
-	
+	if (this->ui->LandmarksModeNormal->isChecked())
+	{
+		this->ui->LandmarksModeNormal->setChecked(false);
+	}
 	this->ui->LandmarksModeTarget->setChecked(false);
 	this->ui->LandmarksModeNode->setChecked(false);
 	this->ui->LandmarksModeHandle->setChecked(false);
@@ -137,6 +156,10 @@ void mqInteractionControlsWidget::slotLandmarkNormalMode()
 void mqInteractionControlsWidget::slotLandmarkTargetMode()
 {
 	cout << "Landmark setting mode: 1" << endl;
+	if (this->ui->LandmarksModeTarget->isChecked())
+	{
+		this->ui->LandmarksModeTarget->setChecked(false);
+	}
 	this->ui->LandmarksModeNormal->setChecked(false);
 	this->ui->LandmarksModeNode->setChecked(false);
 	this->ui->LandmarksModeHandle->setChecked(false);
@@ -146,6 +169,10 @@ void mqInteractionControlsWidget::slotLandmarkTargetMode()
 }
 void mqInteractionControlsWidget::slotLandmarkNodeMode()
 {
+	if (this->ui->LandmarksModeNode->isChecked())
+	{
+		this->ui->LandmarksModeNode->setChecked(false);
+	}
 	cout << "Landmark setting mode: 2" << endl;
 	this->ui->LandmarksModeNormal->setChecked(false);
 	this->ui->LandmarksModeTarget->setChecked(false);
@@ -155,6 +182,10 @@ void mqInteractionControlsWidget::slotLandmarkNodeMode()
 }
 void mqInteractionControlsWidget::slotLandmarkHandleMode()
 {
+	if (this->ui->LandmarksModeHandle->isChecked())
+	{
+		this->ui->LandmarksModeHandle->setChecked(false);
+	}
 	cout << "Landmark setting mode: 3" << endl;
 	this->ui->LandmarksModeNormal->setChecked(false);
 	this->ui->LandmarksModeTarget->setChecked(false);
@@ -166,6 +197,10 @@ void mqInteractionControlsWidget::slotLandmarkHandleMode()
 }
 void mqInteractionControlsWidget::slotFlagMode()
 {
+	if (this->ui->LandmarksModeFlag->isChecked())
+	{
+		this->ui->LandmarksModeFlag->setChecked(false);
+	}
 	cout << "Landmark setting mode: 4=flags" << endl;
 	this->ui->LandmarksModeNormal->setChecked(false);
 	this->ui->LandmarksModeTarget->setChecked(false);
