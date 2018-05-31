@@ -15,8 +15,6 @@ vtkProbeSource.cxx
 vtkBezierSurfaceSource.cxx
 vtkBezierSurfaceWidget.cxx
 vtkBezierCurveSource.cxx
-
-
 )
 
 set( Helpers_HDRS 
