@@ -85,6 +85,7 @@ private:
 	Q_DISABLE_COPY(mqCameraReaction)
 	QMainWindow* MainWindow;
   int Mode;
+  QAction *parentObject;
 };
 
 #endif

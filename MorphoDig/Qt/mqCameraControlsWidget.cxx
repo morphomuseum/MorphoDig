@@ -136,22 +136,10 @@ void mqCameraControlsWidget::constructor()
 
   new mqCameraReaction(actionCameraBelow, 5); //5 = camera Below
 
-  if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
-  {
-
-	  this->ui->CameraCentreOfMassToggle->setChecked(true);
-  }
-
-
-
-  if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 0)
-  {
-
-	  this->ui->CameraOrthoPerspectiveToggle->setChecked(true);
-  }
-
+  
   QAction* actionCameraCentreOfMassToggle = new QAction(tr("&CameraCenterOfMass"), this);
   actionCameraCentreOfMassToggle->setToolTip(tr("Toggle camera : centered at (x,y,z) = (0,0,0) / or at the centre of mass of all opened objects."));
+  actionCameraCentreOfMassToggle->setCheckable(true);
   this->ui->CameraCentreOfMassToggle->addAction(actionCameraCentreOfMassToggle);
   this->ui->CameraCentreOfMassToggle->setDefaultAction(actionCameraCentreOfMassToggle);
   QIcon icon7;
@@ -168,6 +156,7 @@ void mqCameraControlsWidget::constructor()
 
 
   QAction* actionCameraOrthoPerspectiveToggle = new QAction(tr("&OrthoPersp"), this);
+  actionCameraOrthoPerspectiveToggle->setCheckable(true);
   actionCameraOrthoPerspectiveToggle->setToolTip(tr("Toggle camera : orthographic or perspective projection."));
   this->ui->CameraOrthoPerspectiveToggle->addAction(actionCameraOrthoPerspectiveToggle);
   this->ui->CameraOrthoPerspectiveToggle->setDefaultAction(actionCameraOrthoPerspectiveToggle);
@@ -177,6 +166,20 @@ void mqCameraControlsWidget::constructor()
   //  exportColorMap->setIcon(icon);
   actionCameraOrthoPerspectiveToggle->setIcon(icon8);
   new mqCameraReaction(actionCameraOrthoPerspectiveToggle, 7); //7 = camera OrthoPerspective toggle
+
+  if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
+  {
+
+	  this->ui->CameraCentreOfMassToggle->setChecked(true);
+  }
+
+
+
+  if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 0)
+  {
+
+	  this->ui->CameraOrthoPerspectiveToggle->setChecked(true);
+  }
 
 
 

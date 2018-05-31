@@ -64,7 +64,7 @@
            <normaloff>:/Icons/delete2.png</normaloff>:/Icons/delete2.png</iconset>
          </property>
          <property name="checkable">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
