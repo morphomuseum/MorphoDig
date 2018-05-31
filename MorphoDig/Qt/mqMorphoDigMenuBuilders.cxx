@@ -542,10 +542,9 @@ line->setFrameShadow(QFrame::Sunken);
 	*/
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock1); // main controls (open save undo redo)
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock2);// interaction widget (cam obj land modes, norm targ curn curh flg)
-
-	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock8); //line (=> pour le moment, ça ne fait que séparer des groupes d'icones sans mettre de ligne)
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock3); // display controls : show grid, orientation helper, anaglyph
-	
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock8); //line (=> pour le moment, ça ne fait que séparer des groupes d'icones sans mettre de ligne)
+
 	projectWindow.addDockWidget(Qt::BottomDockWidgetArea, dock4); // light controls widget
 	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock5); //objets controls
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock6); // scalars widget
