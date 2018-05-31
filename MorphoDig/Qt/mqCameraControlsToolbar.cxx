@@ -11,7 +11,6 @@
 
 #include "mqUndoRedoReaction.h"
 #include "mqMorphoDigCore.h"
-#include "mqDisplayReaction.h"
 #include "mqCameraReaction.h"
 #include <vtkRenderer.h>
 #include "QDoubleSlider.h"

@@ -11,7 +11,7 @@
 #include "mqEditScalarsDialogReaction.h"
 #include "mqUndoRedoReaction.h"
 #include "mqMorphoDigCore.h"
-#include "mqDisplayReaction.h"
+
 
 #include <QToolButton>
 #include <QComboBox>
@@ -34,15 +34,19 @@ void mqScalarsControlsWidget::constructor()
   this->ui->horizontalLayout->addWidget(this->comboActiveScalars);
   if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
   {
-
+	  this->comboActiveScalars->setDisabled(false);
 	  this->ui->ScalarsVisibility->setChecked(true);
+	 
   }
   else
   {
 	  this->comboActiveScalars->setDisabled(true);
+	  this->ui->ScalarsVisibility->setChecked(false);
+	 
   }
+  
   this->ui->TagEdit->setDisabled(true);
-  this->ui->ColorScaleEdit->setDisabled(true);
+  
   connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));
 
   connect(this->ui->ScalarsVisibility, SIGNAL(pressed()), this, SLOT(slotScalarVisitiliby()));
@@ -64,7 +68,9 @@ void mqScalarsControlsWidget::constructor()
   
 
   new mqEditScalarsDialogReaction(colorScaleAction);
-  
+  this->ui->ColorScaleEdit->setDisabled(true);
+
+
 }
 
 void mqScalarsControlsWidget::slotActiveScalarChanged(int idx)
@@ -94,19 +100,22 @@ void mqScalarsControlsWidget::RefreshEditButtons()
 
 	this->ui->TagEdit->setEnabled(false);
 	this->ui->ColorScaleEdit->setEnabled(false);
-	if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_INT ||
-		mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT)
-		&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1
-		)
+	if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
 	{
-		this->ui->TagEdit->setEnabled(true);
-	}
-	if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
-		mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE)
-		&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1
-		)
-	{
-		this->ui->ColorScaleEdit->setEnabled(true);
+		if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_INT ||
+			mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT)
+			&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1
+			)
+		{
+			this->ui->TagEdit->setEnabled(true);
+		}
+		if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+			mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE)
+			&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1
+			)
+		{
+			this->ui->ColorScaleEdit->setEnabled(true);
+		}
 	}
 }
 
@@ -145,15 +154,16 @@ void mqScalarsControlsWidget::slotRefreshComboScalars()
 }
 void mqScalarsControlsWidget::slotScalarVisitiliby()
 {
-
-	if (this->ui->ScalarsVisibility->isChecked())
+	if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility()==0)	
 	{
 		mqMorphoDigCore::instance()->Setmui_ScalarVisibility(1);
+		this->ui->ScalarsVisibility->setChecked(false);// this should be "true"... but the ui has decided otherwise... 
 		this->comboActiveScalars->setDisabled(false);
 	}
 	else
 	{
 		mqMorphoDigCore::instance()->Setmui_ScalarVisibility(0);
+		this->ui->ScalarsVisibility->setChecked(true);// this should be "false"... but the ui has decided otherwise... 
 		this->comboActiveScalars->setDisabled(true);
 	}
 	

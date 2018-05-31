@@ -40,6 +40,13 @@ protected:
   */
   virtual void onTriggered()
   {
+
+	 
+
+		
+		
+	 
+
     if (this->Mode ==0)
     {
       	this->GridToggle();
@@ -60,6 +67,8 @@ private:
 	Q_DISABLE_COPY(mqDisplayReaction)
 	QMainWindow* MainWindow;
   int Mode;
+  QAction *parentObject;
+ 
 };
 
 #endif

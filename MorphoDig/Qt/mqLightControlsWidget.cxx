@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mqMorphoDigCore.h"
 #include "mqOpenDataReaction.h"
 #include "mqCameraReaction.h"
-#include "mqDisplayReaction.h"
 #include <vtkLight.h>
 #include <vtkRenderer.h>
 

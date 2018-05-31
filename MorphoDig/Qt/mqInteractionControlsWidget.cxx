@@ -12,7 +12,6 @@
 #include "mqMorphoDigCore.h"
 
 
-#include "mqDisplayReaction.h"
 
 #include <QToolButton>
 
