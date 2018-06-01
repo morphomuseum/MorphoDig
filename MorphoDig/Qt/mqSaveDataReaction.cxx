@@ -153,6 +153,104 @@ void mqSaveDataReaction::SaveCURInfos()
 
 }
 
+void mqSaveDataReaction::SaveSelectedSurfaceScalars()
+{
+	int numsel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (numsel == 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select at least one mesh ");
+		msgBox.exec();
+		return;
+
+	}
+	else
+	{
+		vtkMDActor * myActor = mqMorphoDigCore::instance()->GetFirstSelectedActor();
+
+		QString actorName = QString(myActor->GetName().c_str());
+		QString myText;
+
+		myText = tr("Save scalars of ") + actorName;
+
+
+
+
+		QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
+			myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + actorName + "_scalars.txt",
+			tr("text file (*.txt)"));
+
+		cout << fileName.toStdString() << endl;;
+		if (fileName.isEmpty()) return;
+		QFileInfo fileInfo(fileName);
+		mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+
+		std::string TXText = ".txt";
+		std::string TXText2 = ".TXT";
+		std::size_t found = fileName.toStdString().find(TXText);
+		std::size_t found2 = fileName.toStdString().find(TXText2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".txt");
+		}
+
+		mqMorphoDigCore::instance()->SaveSelectedSurfaceScalars(myActor, fileName);
+
+	}
+}
+void mqSaveDataReaction::SaveActiveScalarSummary()
+{
+	int numsel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (numsel>0&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1 &&
+
+		(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT
+			|| mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+			)
+		)
+
+	{
+
+		QString activeScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+		QString myText;
+	
+		myText = tr("Save summary of scalars ")+activeScalar;
+		
+
+
+
+		QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
+			myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir()+ QDir::separator()+activeScalar+"_summary.txt",
+			tr("text file (*.txt)"));
+
+		cout << fileName.toStdString() << endl;;
+		if (fileName.isEmpty()) return;
+		QFileInfo fileInfo(fileName);
+		mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+		
+		std::string TXText = ".txt";
+		std::string TXText2 = ".TXT";
+		std::size_t found = fileName.toStdString().find(TXText);
+		std::size_t found2 = fileName.toStdString().find(TXText2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".txt");
+		}
+
+		mqMorphoDigCore::instance()->SaveActiveScalarSummary(fileName);
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select at least one mesh and activate existing scalars to use this option");
+		msgBox.exec();
+		return;
+
+	}
+
+}
+
 void mqSaveDataReaction::SaveShapeMeasures(int mode)
 {
 	//mode: 1: area and volume 

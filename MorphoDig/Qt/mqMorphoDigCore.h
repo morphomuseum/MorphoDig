@@ -403,6 +403,8 @@ public:
 	
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
+	void SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName);
+	void SaveActiveScalarSummary(QString fileName);
 	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt=0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
@@ -570,7 +572,7 @@ public:
   std::vector<std::string> getActorNames();
   
   void scalarsCameraDistance(); //compute camera distance for each selected scalar.
-  void scalarsSmooth(double localAreaLimit, int mode); //compute gaussian blur of current scalars
+  void scalarsSmooth(double localAreaLimit, int cutMinMax, double cutPercent, int mode); //compute gaussian blur of current scalars
   void scalarsRGB(QString newRGB);
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface

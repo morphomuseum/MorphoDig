@@ -39,7 +39,7 @@ public:
   virtual void slotClose();
   virtual void slotProgressBar(int val);
   virtual void slotEnableDisableCustomArea();
-
+  virtual void slotEnableDisableCutPercent();
 protected:
 	
 private:

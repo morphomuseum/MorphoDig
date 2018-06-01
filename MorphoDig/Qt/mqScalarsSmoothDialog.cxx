@@ -64,13 +64,18 @@ mqScalarsSmoothDialog::mqScalarsSmoothDialog(QWidget* Parent)
 	this->Ui->localAreaLimit->setValue(localAreaLimit);
 	this->Ui->progressBar->setVisible(false);
 	
-	
+	this->Ui->cutPercent->setDisabled(true);
   
 	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditSmooth()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditSmooth()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 connect(this->Ui->localCustom, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
-	 connect(mqMorphoDigCore::instance(), SIGNAL(smoothProgression(int)), this, SLOT(slotProgressBar(int)));
+	 connect(this->Ui->localAuto, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
+	 connect(this->Ui->localNeighbours, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
+
+	 connect(this->Ui->cutMinMax, SIGNAL(pressed()), this, SLOT(slotEnableDisableCutPercent()));
+
+	 connect(mqMorphoDigCore::instance(), SIGNAL(smoothingProgression(int)), this, SLOT(slotProgressBar(int)));
 }
 
 
@@ -100,13 +105,28 @@ void mqScalarsSmoothDialog::editSmooth()
 		if (this->Ui->localNeighbours->isChecked()) { mode = 0; }
 		if (this->Ui->localAuto->isChecked()) { mode = 1; }
 		if (this->Ui->localCustom->isChecked()) { mode = 2; }
-		
-		mqMorphoDigCore::instance()->scalarsSmooth(this->Ui->localAreaLimit->value(), mode);// to update Smooth
+		int cut = 0;
+		if (this->Ui->cutMinMax->isChecked()) { cut = 1; }
+		mqMorphoDigCore::instance()->scalarsSmooth(this->Ui->localAreaLimit->value(), cut, this->Ui->cutPercent->value(),mode);// to update Smooth
 		
 	}
 
 }
 
+
+
+void mqScalarsSmoothDialog::slotEnableDisableCutPercent()
+{
+	if (this->Ui->cutMinMax->isChecked())
+	{
+		this->Ui->cutPercent->setDisabled(true);
+	}
+	else
+	{
+		this->Ui->cutPercent->setDisabled(false);
+	}
+
+}
 void mqScalarsSmoothDialog::slotEnableDisableCustomArea()
 {
 	if (this->Ui->localCustom->isChecked())

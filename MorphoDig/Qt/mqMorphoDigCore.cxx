@@ -4588,6 +4588,184 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 	return 1;
 
 }
+void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName)
+{
+	ExistingScalars *MyList = this->Getmui_ScalarsOfSelectedObjects(1); // get scalar list of first selected ofject
+
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+		stream << "Vertex_id	";
+		for (size_t i = 0; i < MyList->Stack.size(); i++)
+		{
+		
+			if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+			{
+
+				stream << MyList->Stack.at(i).Name << "	";
+			}
+			
+
+		}
+		stream << endl;
+
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		vtkPolyData *mPD = mapper->GetInput();
+		for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+		{
+			stream <<j<< "	";
+
+			for (size_t i = 0; i < MyList->Stack.size(); i++)
+			{
+				if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+				{
+					vtkDataArray *currentScalars;
+					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(MyList->Stack.at(i).Name.toStdString().c_str());
+					if (currentScalars == NULL)
+					{
+						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(MyList->Stack.at(i).Name.toStdString().c_str());
+
+					}
+
+					if (currentScalars != NULL)
+					{
+						stream << currentScalars->GetTuple1(j)<<"	";
+					}
+					else
+					{
+						stream << "NAN	";
+					}
+
+
+					
+				}
+
+
+			}
+			stream << endl;
+
+
+		}
+		//stream << "Name	Mean Median	Variance Min Max Q5 Q15 Q90 Q95" << endl;
+
+
+		//this->ComputeSelectedNamesLists();
+
+
+		
+	}
+	file.close();
+
+}
+void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+
+		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q15	Q90	Q95" << endl;
+
+
+		//this->ComputeSelectedNamesLists();
+
+		this->ActorCollection->InitTraversal();
+
+
+
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				vtkPolyData *mPD = mapper->GetInput();
+				
+				vtkDataArray *currentScalars;
+				currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
+				if (currentScalars ==NULL)
+				{
+					currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars();
+					
+				}
+
+								
+
+				if (currentScalars != NULL)				
+				{
+
+
+					double Mean = 0;
+					double Median = 0;
+					double Variance = 0;
+					double StdDev = 0;
+					double Min = DBL_MAX;
+					double Max = -DBL_MAX;
+					double Q5 = 0;
+					double Q10 = 0;
+					double Q90 = 0;
+					double Q95 = 0;
+
+					if (mPD->GetNumberOfPoints() > 10)
+					{
+
+						std::vector<float> vals;
+
+						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						{
+							Mean += currentScalars->GetTuple1(j);
+							vals.push_back(currentScalars->GetTuple1(j));
+						}
+						Mean /= mPD->GetNumberOfPoints();
+
+
+						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						{
+							Variance += (currentScalars->GetTuple1(j)-Mean)*(currentScalars->GetTuple1(j) - Mean);							
+						}
+						Variance/= mPD->GetNumberOfPoints();
+						StdDev = sqrt(Variance);
+						std::sort(vals.begin(), vals.end());
+
+						int iMin = 0;
+						int iMax = mPD->GetNumberOfPoints() - 1;
+						int iQ5 = (int)(0.05*mPD->GetNumberOfPoints());
+						int iQ10 = (int)(0.1*mPD->GetNumberOfPoints());
+						int iQ50 = (int)(0.5*mPD->GetNumberOfPoints());
+						int iQ90 = (int)(0.9*mPD->GetNumberOfPoints());
+						int iQ95 = (int)(0.95*mPD->GetNumberOfPoints());
+						Median = (double)vals.at(iQ50);
+						Min = (double)vals.at(iMin);
+						Max = (double)vals.at(iMax);
+						Q5 = (double)vals.at(iQ5);
+						Q10 = (double)vals.at(iQ10);
+						Q90 = (double)vals.at(iQ90);
+						Q95 = (double)vals.at(iQ95);
+
+					}
+					
+
+
+					//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
+					stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << endl;
+
+
+				}
+				else
+				{
+					stream << myActor->GetName().c_str() << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << endl;
+				}
+
+
+			}
+		}
+	}
+	file.close();
+
+}
+
 void mqMorphoDigCore::SaveMeshSize(QString fileName)
 {
 	QFile file(fileName);
@@ -8275,7 +8453,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 
 					newScalars->InsertTuple1(i, currentComplexity);
 					tt1 = clock();
-					//@@@@
+				
 					if (i % 1000 == 0)
 					{
 						ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
@@ -8569,8 +8747,14 @@ double mqMorphoDigCore::ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mP
 	//Complexity process is computed on MyObj
 
 }
-void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
+void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double cutPercent, int mode)
 {
+	//mode = 0: raw smoothing (average of direct neighbours)
+	//mode = 1: smooth within local sphere of radius ~ mesh avg size / 40
+	//mode = 2: smooth within local sphere of radius defined by the user
+
+	// cut = 0 : cut ctuPercert% of Min and Max "abherent" values (for instance : vtkCurvatures yields extreme Min and Max values which make smoothing difficult)
+
 
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -8623,6 +8807,27 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 							mScalarName = scname;
 						}
 						myActor->SaveState(Count, QString(mScalarName.c_str()));
+						double cutMin = DBL_MAX;
+						double cutMax = -DBL_MAX;
+						if (cutMinMax == 1)
+						{
+							std::vector<float> vals;
+							for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+							{								
+								vals.push_back(currentScalars->GetTuple1(j));
+							}
+							std::sort(vals.begin(), vals.end());
+							int iMin = (int)(cutPercent*mPD->GetNumberOfPoints()/100);
+							int iMax = (int)((100-cutPercent)*mPD->GetNumberOfPoints() / 100);
+							if (iMax == mPD->GetNumberOfPoints()) {
+								iMax = mPD->GetNumberOfPoints() - 1;
+							}
+							cutMin = (double)vals.at(iMin);
+							cutMax = (double)vals.at(iMax);
+							cout << "Will cut between " << cutMin << ", and " << cutMax << endl;
+							
+						}
+
 						if (mode == 0)
 						{
 							
@@ -8679,7 +8884,12 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 									newscalar /= n_vertices;
 								}
 
-								// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
+								// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+								if (cutMinMax == 1)
+								{
+									if (newscalar < cutMin) { newscalar = cutMin; }
+									if (newscalar > cutMax) { newscalar = cutMax; }
+								}
 								newScalars->InsertTuple1(ve, newscalar);
 
 
@@ -8696,12 +8906,15 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 						}
 						else
 						{
+							/*	
+					if (this->Ui->localAuto->isChecked()) { mode = 1; }
+					if (this->Ui->localCustom->isChecked()) { mode = 2; }*/
 							double searchSize = localAreaLimit;
 							if (mode == 1 || localAreaLimit<=0) 
 							{
 								searchSize = myActor->GetXYZAvgPCLength()/40; // looks like a reasonable neighbourhood sphere radius size.
 							}
-														
+							cout << "mode=" << mode << ", searchSize=" << searchSize << endl;
 							double numvert = mPD->GetNumberOfPoints();
 
 
@@ -8721,10 +8934,10 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 							for (vtkIdType i = 0; i < numvert; i++) {
 								clock_t t0, t1, tt0, tt1;
 								tt0 = clock();
-								if (i % 1000 == 0)
+								/*if (i % 1000 == 0)
 								{
 									cout << "complexity, vertex:" << i << endl;
-								}
+								}*/
 								// for every triangle 
 								mPD->GetPoint(i, ve_pos);
 								double currentMean = 0;
@@ -8736,19 +8949,19 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 								double Radius = searchSize;
 
 
-								double sec0;
+								//double sec0;
 								double ssec0;
 								//mode = 0: convex hull area ratio
 								//mode = 1: convex hull shape index
 								t0 = clock();
 								kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
 								t1 = clock();
-								if (i % 1000 == 0)
+								/*if (i % 1000 == 0)
 								{
 									cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds() << endl;
 									//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
 									//	cout << "sec0=" << sec0 << endl;
-								}
+								}*/
 								//cout << "mode = " << mode << endl;
 								// now extract surface
 								//compute surface
@@ -8762,20 +8975,25 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 									Radius = 1;
 								}
 								currentMean = this->ComputeActiveScalarsMean(mPD, observedNeighbours);
-								if (i % 1000 == 0)
+								/*if (i % 1000 == 0)
 								{
 									cout << "currentMean:" << currentMean<< endl;
+								}*/
+								if (cutMinMax == 1)
+								{
+									if (currentMean < cutMin) { currentMean = cutMin; }
+									if (currentMean > cutMax) { currentMean = cutMax; }
 								}
 
 								newScalars->InsertTuple1(i, currentMean);
 								tt1 = clock();
 								//@@@@
-								if (i % 1000 == 0)
+								/*if (i % 1000 == 0)
 								{
 									ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
 									cout << "Total time for 1 vertex:" << ssec0 << endl;
 
-								}
+								}*/
 							}
 
 							newScalars->SetName(mScalarName.c_str());
