@@ -8242,7 +8242,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 					double Radius = searchSize;
 
 					
-					double sec0;
+					//double sec0;
 					double ssec0;
 					//mode = 0: convex hull area ratio
 					//mode = 1: convex hull shape index
@@ -8522,6 +8522,53 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 	//Complexity process is computed on MyObj
 	
 }
+double mqMorphoDigCore::ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list)
+{
+
+	vtkDoubleArray *currentScalars;
+	currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
+
+	vtkFloatArray *currentFScalars;
+	currentFScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars();
+
+
+	if (currentScalars != NULL&& list->GetNumberOfIds()>0)
+	{
+
+
+		double currMean = 0;
+
+
+		for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
+		{
+			currMean+= currentScalars->GetTuple1(list->GetId(j));
+
+		}
+		currMean /= list->GetNumberOfIds();
+		return currMean;
+	}
+	else if (currentFScalars != NULL&& list->GetNumberOfIds() > 0)
+	{
+		double currMean = 0;
+
+
+		for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
+		{
+			currMean += (double)currentFScalars->GetTuple1(list->GetId(j));
+
+		}
+		currMean /= list->GetNumberOfIds();
+		return currMean;
+	}
+	else
+	{
+		return 0;
+	}
+
+
+	//Complexity process is computed on MyObj
+
+}
 void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 {
 
@@ -8534,6 +8581,8 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
+			
+
 			myActor->SetSelected(0);
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
@@ -8564,83 +8613,191 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 
 					if (found == std::string::npos)
 					{
-						vtkSmartPointer<vtkExtractEdges> extractEdges =
-							vtkSmartPointer<vtkExtractEdges>::New();
-						extractEdges->SetInputData((vtkPolyData*)mPD);
-						extractEdges->Update();
 
-						vtkSmartPointer<vtkPolyData> mesh = extractEdges->GetOutput();
-
-						vtkSmartPointer<vtkFloatArray> newScalars =
-							vtkSmartPointer<vtkFloatArray>::New();
-
-						newScalars->SetNumberOfComponents(1);
-						newScalars->SetNumberOfTuples(numvert);
-
-						vtkIdType ve;
-
-
-						double vn[3];
-						vn[0] = 0;
-						vn[1] = 0;
-						vn[2] = 1;
-						double picked_value = 0;
-						for (ve = 0; ve<numvert; ve++)
+						std::string action = "Smooth active scalars";
+						action.append(myActor->GetName().c_str());
+						int Count = BEGIN_UNDO_SET(action);
+						std::string mScalarName = "ActiveScalars";
+						if (scname.length() > 0)
 						{
-							// get all vertices connected to this point (neighbouring vertices).
-							//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
-							vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
-							connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
+							mScalarName = scname;
+						}
+						myActor->SaveState(Count, QString(mScalarName.c_str()));
+						if (mode == 0)
+						{
+							
 
-							vtkSmartPointer<vtkIdTypeArray> ids =
-								vtkSmartPointer<vtkIdTypeArray>::New();
-							ids->SetNumberOfComponents(1);
-							//if (ve<10){std::cout << "Connected vertices: ";}
-							for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
+							vtkSmartPointer<vtkFloatArray> newScalars =
+								vtkSmartPointer<vtkFloatArray>::New();
+							newScalars->SetNumberOfComponents(1);
+							newScalars->SetNumberOfTuples(numvert);
+							vtkIdType ve;
+
+
+							double vn[3];
+							vn[0] = 0;
+							vn[1] = 0;
+							vn[2] = 1;
+							double picked_value = 0;
+							for (ve = 0; ve < numvert; ve++)
 							{
-								//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
-								ids->InsertNextValue(connectedVertices->GetId(j));
+								// get all vertices connected to this point (neighbouring vertices).
+								//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+								vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+								connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
+
+								vtkSmartPointer<vtkIdTypeArray> ids =
+									vtkSmartPointer<vtkIdTypeArray>::New();
+								ids->SetNumberOfComponents(1);
+								//if (ve<10){std::cout << "Connected vertices: ";}
+								for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
+								{
+									//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+									ids->InsertNextValue(connectedVertices->GetId(j));
+								}
+								float newscalar = 0;
+								int n_vertices = connectedVertices->GetNumberOfIds();
+
+								newscalar = 0;
+
+								//on ajoute une fois la valeur actuelle.
+
+								// get all scalars 				
+								//if (ve<10){std::cout<<std::endl;}
+
+								for (vtkIdType j = 0; j < ids->GetNumberOfTuples(); j++)
+								{	// for all neighbouring vertices							
+									vtkIdType at = ids->GetTuple(j)[0];
+									//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
+									double curr_scalar = (double)(currentScalars->GetTuple(at))[0];
+									//std::cout<<curr_scalar<<std::endl;
+									newscalar += curr_scalar;
+
+								}
+								if (n_vertices > 0)
+								{
+									newscalar /= n_vertices;
+								}
+
+								// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
+								newScalars->InsertTuple1(ve, newscalar);
+
+
 							}
-							float newscalar = 0;
-							int n_vertices = connectedVertices->GetNumberOfIds();
+							//std::cout<<"New Scalar computation done "<<std::endl;
+							std::string sc_name = this->Getmui_ActiveScalars()->Name.toStdString();
+							newScalars->SetName(sc_name.c_str());
+							mPD->GetPointData()->RemoveArray(sc_name.c_str());
+							//std::cout<<"Add array "<<std::endl;
+							mPD->GetPointData()->AddArray(newScalars);
+							//std::cout<<"Set Active scalar"<<std::endl;
+							mPD->GetPointData()->SetActiveScalars(sc_name.c_str());
 
-							newscalar = 0;
-
-							//on ajoute une fois la valeur actuelle.
-
-							// get all scalars 				
-							//if (ve<10){std::cout<<std::endl;}
-
-							for (vtkIdType j = 0; j<ids->GetNumberOfTuples(); j++)
-							{	// for all neighbouring vertices							
-								vtkIdType at = ids->GetTuple(j)[0];
-								//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
-								double curr_scalar = (double)(currentScalars->GetTuple(at))[0];
-								//std::cout<<curr_scalar<<std::endl;
-								newscalar += curr_scalar;
-
-							}
-							if (n_vertices>0)
+						}
+						else
+						{
+							double searchSize = localAreaLimit;
+							if (mode == 1 || localAreaLimit<=0) 
 							{
-								newscalar /= n_vertices;
+								searchSize = myActor->GetXYZAvgPCLength()/40; // looks like a reasonable neighbourhood sphere radius size.
+							}
+														
+							double numvert = mPD->GetNumberOfPoints();
+
+
+							vtkSmartPointer<vtkDoubleArray> newScalars =
+								vtkSmartPointer<vtkDoubleArray>::New();
+
+							newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+							newScalars->SetNumberOfTuples(numvert);
+
+							double ve_pos[3];
+							vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+								vtkSmartPointer<vtkKdTreePointLocator>::New();
+							kDTree->SetDataSet(mPD);
+
+							kDTree->BuildLocator();
+
+							for (vtkIdType i = 0; i < numvert; i++) {
+								clock_t t0, t1, tt0, tt1;
+								tt0 = clock();
+								if (i % 1000 == 0)
+								{
+									cout << "complexity, vertex:" << i << endl;
+								}
+								// for every triangle 
+								mPD->GetPoint(i, ve_pos);
+								double currentMean = 0;
+								if ((i % (int)(numvert / 100)) == 0)
+								{
+									emit smoothingProgression((int)(100 * i / numvert));
+								}
+								vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+								double Radius = searchSize;
+
+
+								double sec0;
+								double ssec0;
+								//mode = 0: convex hull area ratio
+								//mode = 1: convex hull shape index
+								t0 = clock();
+								kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
+								t1 = clock();
+								if (i % 1000 == 0)
+								{
+									cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds() << endl;
+									//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
+									//	cout << "sec0=" << sec0 << endl;
+								}
+								//cout << "mode = " << mode << endl;
+								// now extract surface
+								//compute surface
+								int printmode = 0;
+								if (i % 1000 == 0)
+								{
+									//printmode = 1;
+								}
+								if (Radius <= 0)
+								{
+									Radius = 1;
+								}
+								currentMean = this->ComputeActiveScalarsMean(mPD, observedNeighbours);
+								if (i % 1000 == 0)
+								{
+									cout << "currentMean:" << currentMean<< endl;
+								}
+
+								newScalars->InsertTuple1(i, currentMean);
+								tt1 = clock();
+								//@@@@
+								if (i % 1000 == 0)
+								{
+									ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
+									cout << "Total time for 1 vertex:" << ssec0 << endl;
+
+								}
 							}
 
-							// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
-							newScalars->InsertTuple1(ve, newscalar);
+							newScalars->SetName(mScalarName.c_str());
+							// test if exists...
+
+							// remove this scalar
+							//this->GetPointData()->SetScalars(newScalars);
+							mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+							mPD->GetPointData()->AddArray(newScalars);
+							mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
 
 
 						}
-						//std::cout<<"New Scalar computation done "<<std::endl;
-						std::string sc_name = this->Getmui_ActiveScalars()->Name.toStdString();
-						newScalars->SetName(sc_name.c_str());
-						mPD->GetPointData()->RemoveArray(sc_name.c_str());
-						//std::cout<<"Add array "<<std::endl;
-						mPD->GetPointData()->AddArray(newScalars);
-						//std::cout<<"Set Active scalar"<<std::endl;
-						mPD->GetPointData()->SetActiveScalars(sc_name.c_str());
+
+
+
+						END_UNDO_SET();
 					}// not scalar "Tags
 					else
 					{
+					
 						std::cout << "Cannot smooth Tags" << std::endl;
 					}
 				}//scalars not null
@@ -12077,7 +12234,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-	//	cout << "MyActor undo!" << endl;
+		cout << "MyActor" << myActor->GetName()<< "undo " <<Count<< endl;
 		myActor->Undo(Count);		
 	}
 	this->ActorCollection->Undo(Count);
@@ -12141,6 +12298,7 @@ void mqMorphoDigCore::Undo(int Count)
 	}
 	// To update to take into account reorder!
 	this->FlagLandmarkCollection->Undo(Count);
+	this->Initmui_ExistingScalars();
 }
 void mqMorphoDigCore::Redo()
 {
@@ -12219,7 +12377,7 @@ void mqMorphoDigCore::Redo(int Count)
 	}
 	// To update to take into account reorder!
 	this->FlagLandmarkCollection->Redo(Count);
-
+	this->Initmui_ExistingScalars();
 }
 
 void mqMorphoDigCore::Erase(int Count)

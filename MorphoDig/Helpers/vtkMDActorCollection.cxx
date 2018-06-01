@@ -327,7 +327,7 @@ void vtkMDActorCollection::Erase(int mCount) {
 } // Try to erase (if exists) "mCount" event
 void vtkMDActorCollection::Undo(int mCount) 
 {
-	cout << "Inside MTActorCollection Undo" << endl;
+	cout << "Inside MDActorCollection Undo " <<mCount<< endl;
 	if (this->UndoRedo->UndoStack.empty())
 	{
 		return;

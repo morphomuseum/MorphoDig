@@ -646,6 +646,7 @@ public:
   int colorMapNameAlreadyExists(QString proposed_name);
   void deleteColorMap(int i);
   double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);
+  double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list);
 signals:
   
   void projectionModeChanged();
@@ -659,6 +660,7 @@ signals:
   void modeModeChanged();
   void thicknessProgression(int percent);
   void complexityProgression(int percent);
+  void smoothingProgression(int percent);
   void distanceProgression(int percent);
 protected:
 	

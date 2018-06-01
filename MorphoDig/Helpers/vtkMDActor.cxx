@@ -406,7 +406,7 @@ void vtkMDActor::SetmColor(double r, double g, double b, double a)
 void vtkMDActor::Undo(int mCount)
 {
 
-	cout << "Inside MT actor Undo count" << endl;
+	cout << "Inside MT actor "<< this->GetName()<<" Undo " << mCount<<  endl;
 	if (this->UndoRedo->UndoStack.empty())
 	{
 		return;
@@ -470,7 +470,7 @@ void vtkMDActor::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat)
 
 void vtkMDActor::PopUndoStack()
 {
-	cout << "Inside MT actor PopUndoStack" << endl;
+	cout << "Inside MT actor "<< this->GetName()<<" PopUndoStack" << endl;
 	if (this->UndoRedo->UndoStack.empty())
 	{
 		return;
@@ -494,7 +494,7 @@ void vtkMDActor::PopUndoStack()
 		
 		if (toSaveArray != NULL)
 		{
-			cout << "Here something wrong! deep copy array " << this->UndoRedo->UndoStack.back().arrayName.toStdString() << endl;
+			cout << "Here something we have scalars to save! deep copy array " << this->UndoRedo->UndoStack.back().arrayName.toStdString() << endl;
 			
 			int dataType = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->UndoStack.back().arrayName.toStdString().c_str())->GetDataType();
 
@@ -545,7 +545,8 @@ void vtkMDActor::PopUndoStack()
 			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
 			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
 		}
-		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+
+		//mqMorphoDigCore::instance()->Initmui_ExistingScalars();
 		
 		
 		
@@ -631,7 +632,7 @@ void vtkMDActor::PopRedoStack()
 			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
 			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
 		}
-		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+		//mqMorphoDigCore::instance()->Initmui_ExistingScalars();
 
 	}
 
