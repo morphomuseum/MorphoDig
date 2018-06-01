@@ -577,6 +577,7 @@ public:
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
+  void groupSelectedActors();
   void startLasso(int lasso_mode);//change interaction style
   void setCurrentCursor(int cursor); //changes mouse cursor
   void stopLasso();//change interaction style back to normal
@@ -797,7 +798,7 @@ public slots:
 	virtual void slotLandmarkReorient();
 	virtual void slotUpdateAllSelectedFlagsColors();
 	virtual void slotConvexHULL();
-	
+	virtual void slotGroup();
 	virtual void slotLassoCutKeepInside();
 	virtual void slotLassoCutKeepOutside();
 	virtual void slotLassoTagInside();

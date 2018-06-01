@@ -8950,7 +8950,7 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 
 
 								//double sec0;
-								double ssec0;
+								//double ssec0;
 								//mode = 0: convex hull area ratio
 								//mode = 1: convex hull shape index
 								t0 = clock();
@@ -9474,6 +9474,143 @@ to achieve desired the correct rendering. Do not understand why yet.
 	}
 }
 */
+
+void mqMorphoDigCore::groupSelectedActors()
+{
+	int numsel = this->ActorCollection->GetNumberOfSelectedActors();
+	if (numsel < 2)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select at least two surfaces to use this function!");
+		msgBox.exec();
+
+		return;
+	}
+	else
+	{
+		QInputDialog *nameDialog = new QInputDialog();
+		bool dialogResult;
+		QString newActorName = nameDialog->getText(0, "Name", "New surface name:", QLineEdit::Normal,
+			"Group", &dialogResult);
+		if (!dialogResult)
+		{
+			return;
+			
+		
+		}
+		
+
+		vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
+		int Ok = 1;
+		int modified = 0;
+
+		//cout << "myActor is null" << endl;
+
+		this->ActorCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor2->GetSelected() == 1)
+			{
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
+				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+				{
+					vtkSmartPointer<vtkPolyData> toSave = vtkSmartPointer<vtkPolyData>::New();
+					toSave->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
+					double ve_init_pos[3];;
+					double ve_final_pos[3];
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor2->GetMatrix();
+
+
+					for (vtkIdType i = 0; i < toSave->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						toSave->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+
+						toSave->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+					}
+					mergedObjects->AddInputData(toSave);
+					modified = 1;
+				}
+
+
+			}
+		}
+		if (modified == 1)
+		{
+			mergedObjects->Update();
+			VTK_CREATE(vtkMDActor, newactor);
+			if (this->mui_BackfaceCulling == 0)
+			{
+				newactor->GetProperty()->BackfaceCullingOff();
+			}
+			else
+			{
+				newactor->GetProperty()->BackfaceCullingOn();
+			}
+			VTK_CREATE(vtkPolyDataMapper, newmapper);
+			newmapper->SetColorModeToDefault();
+
+			if (
+				(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+				&& this->mui_ActiveScalars->NumComp == 1
+				)
+			{
+				newmapper->SetScalarRange(0, this->TagTableSize - 1);
+				newmapper->SetLookupTable(this->GetTagLut());
+			}
+			else
+			{
+				newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+			}
+
+			newmapper->ScalarVisibilityOn();
+
+
+			newmapper->SetInputData(mergedObjects->GetOutput());
+
+
+			int num = 2;
+
+
+
+
+			double color[4] = { 0.3, 0.4, 0.5, 1 };
+
+
+			newactor->SetmColor(color);
+
+			newactor->SetMapper(newmapper);
+			newactor->SetSelected(0);
+
+			std::string actorName = this->CheckingName(newActorName.toStdString());
+			newactor->SetName(actorName);
+			cout << "try to add new actor=" << endl;
+			this->getActorCollection()->AddItem(newactor);
+			std::string action = "Grouped actor added: " + newactor->GetName();
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+			cout << "new actor(s) added" << endl;
+			this->Initmui_ExistingScalars();
+
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			this->Render();
+
+		}
+
+	}
+}
 int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt, int save_norms, vtkMDActor *myActor)
 {
 	// Write_Type 0 : Binary LE or "Default Binary"
@@ -12925,6 +13062,7 @@ void mqMorphoDigCore::slotLandmarkMoveDown()
 
 	this->LandmarksMoveDown();
 }
+void mqMorphoDigCore::slotGroup() { this->groupSelectedActors(); }
 
 void mqMorphoDigCore::slotLassoCutKeepInside() { this->startLasso(1); }
 void mqMorphoDigCore::slotLassoCutKeepOutside() { this->startLasso(0); }
