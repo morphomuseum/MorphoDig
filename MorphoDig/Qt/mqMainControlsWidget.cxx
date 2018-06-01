@@ -59,17 +59,17 @@ void mqMainControlsWidget::constructor()
   this->ui->SaveData->addAction(actionSaveData);
   this->ui->SaveData->setDefaultAction(actionSaveData);
   QIcon icon;
-  icon.addFile(QStringLiteral(":/Icons/fileopen22.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon.addFile(QStringLiteral(":/Icons/filesave22.png"), QSize(), QIcon::Normal, QIcon::Off);
   actionSaveData->setIcon(icon);
   
   new mqSaveNTWDialogReaction(actionSaveData);
   
   QAction* actionOpenData = new QAction(tr("&OpenDATA"), this);
-  actionOpenData->setToolTip(tr("Save project."));
+  actionOpenData->setToolTip(tr("Open data."));
   this->ui->OpenData->addAction(actionOpenData);
   this->ui->OpenData->setDefaultAction(actionOpenData);
   QIcon icon2;
-  icon2.addFile(QStringLiteral(":/Icons/filesave22.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon2.addFile(QStringLiteral(":/Icons/fileopen22.png"), QSize(), QIcon::Normal, QIcon::Off);
   actionOpenData->setIcon(icon2);
 
   new mqOpenDataReaction(actionOpenData, 0);//0= open data (generic)
