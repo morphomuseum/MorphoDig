@@ -464,7 +464,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Scalar smoothing options</string>
+    <string>Active scalar smoothing options</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">

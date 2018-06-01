@@ -8522,8 +8522,7 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 	//Complexity process is computed on MyObj
 	
 }
-
-void mqMorphoDigCore::scalarsGaussianBlur()
+void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int mode)
 {
 
 	this->ActorCollection->InitTraversal();
@@ -12590,10 +12589,6 @@ void mqMorphoDigCore::slotScalarsCameraDistance()
 	this->scalarsCameraDistance();
 }
 
-void mqMorphoDigCore::slotScalarsGaussianBlur()
-{
-	this->scalarsGaussianBlur();
-}
 
 void mqMorphoDigCore::slotKeepLargest() {
 	this->addKeepLargest();

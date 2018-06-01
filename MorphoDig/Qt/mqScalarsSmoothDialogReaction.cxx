@@ -1,32 +1,32 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqScalarsComplexityDialogReaction.cxx
+   Module:    mqScalarsSmoothDialogReaction.cxx
 
 
 ========================================================================*/
-#include "mqScalarsComplexityDialogReaction.h"
+#include "mqScalarsSmoothDialogReaction.h"
 #include "mqCoreUtilities.h"
-#include "mqScalarsComplexityDialog.h"
+#include "mqScalarsSmoothDialog.h"
 #include "mqReaction.h"
 
 
 //-----------------------------------------------------------------------------
-mqScalarsComplexityDialogReaction::mqScalarsComplexityDialogReaction(QAction* parentObject)
+mqScalarsSmoothDialogReaction::mqScalarsSmoothDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-	//this->Complexity_dialog = new mqScalarsComplexityDialog(mqCoreUtilities::mainWidget());
+	//this->Smooth_dialog = new mqScalarsSmoothDialog(mqCoreUtilities::mainWidget());
 
 	
 }
 
 
 //-----------------------------------------------------------------------------
-//void mqScalarsComplexityDialogReaction::showScalarsComplexityDialog(mqScalarsComplexityDialog *Complexity_dialog)
-void mqScalarsComplexityDialogReaction::showScalarsComplexityDialog()
+//void mqScalarsSmoothDialogReaction::showScalarsSmoothDialog(mqScalarsSmoothDialog *Smooth_dialog)
+void mqScalarsSmoothDialogReaction::showScalarsSmoothDialog()
 {
-	mqScalarsComplexityDialog mqComplexity(mqCoreUtilities::mainWidget());
-	mqComplexity.exec();
+	mqScalarsSmoothDialog mqSmooth(mqCoreUtilities::mainWidget());
+	mqSmooth.exec();
   
-  //Complexity_dialog->show();
+  //Smooth_dialog->show();
 }

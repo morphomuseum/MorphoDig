@@ -570,7 +570,7 @@ public:
   std::vector<std::string> getActorNames();
   
   void scalarsCameraDistance(); //compute camera distance for each selected scalar.
-  void scalarsGaussianBlur(); //compute gaussian blur of current scalars
+  void scalarsSmooth(double localAreaLimit, int mode); //compute gaussian blur of current scalars
   void scalarsRGB(QString newRGB);
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
@@ -803,7 +803,6 @@ public slots:
 	virtual void slotKeepLargest();
 	virtual void slotScalarsCameraDistance();
 	virtual void slotScalarsRGB();
-	virtual void slotScalarsGaussianBlur();
 	virtual void  slotGrey();
 	virtual void slotYellow();
 	virtual void slotRed();

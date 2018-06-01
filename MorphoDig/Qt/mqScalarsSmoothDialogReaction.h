@@ -1,46 +1,46 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqScalarsComplexityDialogReaction.h
+   Module:    mqScalarsSmoothDialogReaction.h
 
 
 ========================================================================*/
-#ifndef mqScalarsComplexityDialogReaction_h
-#define mqScalarsComplexityDialogReaction_h
+#ifndef mqScalarsSmoothDialogReaction_h
+#define mqScalarsSmoothDialogReaction_h
 
 #include "mqReaction.h"
-#include "mqScalarsComplexityDialog.h"
+#include "mqScalarsSmoothDialog.h"
 /**
 * @ingroup Reactions
-* mqScalarsComplexityDialogReaction used to show the standard Alpha change dialog for the
+* mqScalarsSmoothDialogReaction used to show the standard scalar smoothing dialog for the
 * application.
 */
-class  mqScalarsComplexityDialogReaction : public mqReaction
+class  mqScalarsSmoothDialogReaction : public mqReaction
 {
   Q_OBJECT
   typedef mqReaction Superclass;
 
 public:
-  mqScalarsComplexityDialogReaction(QAction* parent);
+  mqScalarsSmoothDialogReaction(QAction* parent);
 
   /**
   * Shows the FLG dialog for the application.
   */
-  //static void showScalarsComplexityDialog(mqScalarsComplexityDialog *FLG_dialog);
-  static void showScalarsComplexityDialog();
+  //static void showScalarsSmoothDialog(mqScalarsSmoothDialog *FLG_dialog);
+  static void showScalarsSmoothDialog();
 
 protected:
   /**
   * Called when the action is triggered.
   */
-	virtual void onTriggered() { mqScalarsComplexityDialogReaction::showScalarsComplexityDialog(); }
+	virtual void onTriggered() { mqScalarsSmoothDialogReaction::showScalarsSmoothDialog(); }
   
 	//For an non modal dialog
-	//virtual void onTriggered() { mqScalarsComplexityDialogReaction::showScalarsComplexityDialog(this->Complexity_dialog); }
+	//virtual void onTriggered() { mqScalarsSmoothDialogReaction::showScalarsSmoothDialog(this->Smooth_dialog); }
 
 private:
-	Q_DISABLE_COPY(mqScalarsComplexityDialogReaction)
-		//mqScalarsComplexityDialog *Complexity_dialog;
+	Q_DISABLE_COPY(mqScalarsSmoothDialogReaction)
+		//mqScalarsSmoothDialog *Smooth_dialog;
 };
 
 #endif

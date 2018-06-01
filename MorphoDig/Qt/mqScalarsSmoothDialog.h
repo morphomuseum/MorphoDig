@@ -4,38 +4,38 @@
    
 
 =========================================================================*/
-#ifndef _mqScalarsComplexityDialog_h
-#define _mqScalarsComplexityDialog_h
+#ifndef _mqScalarsSmoothDialog_h
+#define _mqScalarsSmoothDialog_h
 
 
 #include <QDialog>
 
 namespace Ui
 {
-class mqScalarsComplexityDialog;
+class mqScalarsSmoothDialog;
 }
 
 
 
 
 /**
-* mqScalarsComplexityDialog is the dialog used by MorphoDig to compute complexity .
+* mqScalarsSmoothDialog is the dialog used by MorphoDig to compute Smooth .
 */
-class  mqScalarsComplexityDialog : public QDialog
+class  mqScalarsSmoothDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  mqScalarsComplexityDialog(QWidget* Parent);
+  mqScalarsSmoothDialog(QWidget* Parent);
   
-  ~mqScalarsComplexityDialog();
-  void editComplexity();
+  ~mqScalarsSmoothDialog();
+  void editSmooth();
   
   public slots:
   
   
   
-  virtual void sloteditComplexity();
+  virtual void sloteditSmooth();
   virtual void slotClose();
   virtual void slotProgressBar(int val);
   virtual void slotEnableDisableCustomArea();
@@ -45,8 +45,8 @@ protected:
 private:
 	
 
-  Q_DISABLE_COPY(mqScalarsComplexityDialog)
-  Ui::mqScalarsComplexityDialog* const Ui;
+  Q_DISABLE_COPY(mqScalarsSmoothDialog)
+  Ui::mqScalarsSmoothDialog* const Ui;
  
   // Here we should have the file name, no ?
 };

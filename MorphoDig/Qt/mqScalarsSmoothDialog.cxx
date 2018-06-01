@@ -6,8 +6,8 @@
  
 =========================================================================*/
 
-#include "mqScalarsComplexityDialog.h"
-#include "ui_mqScalarsComplexityDialog.h"
+#include "mqScalarsSmoothDialog.h"
+#include "ui_mqScalarsSmoothDialog.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
@@ -51,12 +51,12 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqScalarsComplexityDialog::mqScalarsComplexityDialog(QWidget* Parent)
+mqScalarsSmoothDialog::mqScalarsSmoothDialog(QWidget* Parent)
   : QDialog(Parent)
-  , Ui(new Ui::mqScalarsComplexityDialog())
+  , Ui(new Ui::mqScalarsSmoothDialog())
 {
 	this->Ui->setupUi(this);
-	this->setObjectName("mqScalarsComplexityDialog");	
+	this->setObjectName("mqScalarsSmoothDialog");	
 	this->Ui->localAreaLimit->setMinimum(0);
 	this->Ui->localAreaLimit->setMaximum(DBL_MAX);
 	this->Ui->localAreaLimit->setSingleStep(0.1);
@@ -66,50 +66,50 @@ mqScalarsComplexityDialog::mqScalarsComplexityDialog(QWidget* Parent)
 	
 	
   
-	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditComplexity()));
-	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditComplexity()));
+	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditSmooth()));
+	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditSmooth()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
-	 connect(this->Ui->customLocalAreaLimit, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
-	 connect(mqMorphoDigCore::instance(), SIGNAL(complexityProgression(int)), this, SLOT(slotProgressBar(int)));
+	 connect(this->Ui->localCustom, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
+	 connect(mqMorphoDigCore::instance(), SIGNAL(smoothProgression(int)), this, SLOT(slotProgressBar(int)));
 }
 
 
 
 
 //-----------------------------------------------------------------------------
-mqScalarsComplexityDialog::~mqScalarsComplexityDialog()
+mqScalarsSmoothDialog::~mqScalarsSmoothDialog()
 {
 
  //depending on what is 
 	
   delete this->Ui;
 }
-void mqScalarsComplexityDialog::editComplexity()
+void mqScalarsSmoothDialog::editSmooth()
 {
-	cout << "Edit Complexity" << endl;
+	cout << "Edit Smooth" << endl;
 	this->Ui->cancel->setDisabled(true);
 	
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
 	{
-		std::string action = "Update Complexity";
+		std::string action = "Smooth scalars";
 		int mode = 3;
-		//mode = 0: convex hull area ratio ( surface_area / surface_area_convex_hull ) 
-		//mode = 1: convex hull shape index (sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233)
-		//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
-		//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
-		if (this->Ui->convexHullArea->isChecked()) { mode = 0; }
-		if (this->Ui->convexHullShapeIndex->isChecked()) { mode = 1; }
-		if (this->Ui->sphereArea->isChecked()) { mode = 2; }
-		if (this->Ui->sphereShapeIndex->isChecked()) { mode = 3; }
-		mqMorphoDigCore::instance()->scalarsComplexity(this->Ui->localAreaLimit->value(), this->Ui->customLocalAreaLimit->isChecked(), this->Ui->scalarName->text(), mode);// to update Complexity
+		//mode = 0: raw smoothing (average of direct neighbours)
+		//mode = 1: smooth within local sphere of radius ~ mesh avg size / 40
+		//mode = 2: smooth within local sphere of radius defined by the user
+		
+		if (this->Ui->localNeighbours->isChecked()) { mode = 0; }
+		if (this->Ui->localAuto->isChecked()) { mode = 1; }
+		if (this->Ui->localCustom->isChecked()) { mode = 2; }
+		
+		mqMorphoDigCore::instance()->scalarsSmooth(this->Ui->localAreaLimit->value(), mode);// to update Smooth
 		
 	}
 
 }
 
-void mqScalarsComplexityDialog::slotEnableDisableCustomArea()
+void mqScalarsSmoothDialog::slotEnableDisableCustomArea()
 {
-	if (this->Ui->customLocalAreaLimit->isChecked())
+	if (this->Ui->localCustom->isChecked())
 	{
 		this->Ui->localAreaLimit->setDisabled(true);
 	}
@@ -119,24 +119,24 @@ void mqScalarsComplexityDialog::slotEnableDisableCustomArea()
 	}
 
 }
-void mqScalarsComplexityDialog::slotProgressBar(int val)
+void mqScalarsSmoothDialog::slotProgressBar(int val)
 {
 	this->Ui->progressBar->setValue(val);
 }
 
 
-void mqScalarsComplexityDialog::slotClose()
+void mqScalarsSmoothDialog::slotClose()
 {
 	
 	this->close();
 }
 
 
-void mqScalarsComplexityDialog::sloteditComplexity()
+void mqScalarsSmoothDialog::sloteditSmooth()
 {
 	//cout << "Set visible true!!!" << endl;
 	this->Ui->progressBar->setVisible(true);
-	this->editComplexity();
+	this->editSmooth();
 	this->close();
 }
 

@@ -193,6 +193,10 @@ mqScalarsComplexityDialog.h
 mqScalarsComplexityDialog.cxx
 mqScalarsComplexityDialogReaction.h
 mqScalarsComplexityDialogReaction.cxx
+mqScalarsSmoothDialog.h
+mqScalarsSmoothDialog.cxx
+mqScalarsSmoothDialogReaction.h
+mqScalarsSmoothDialogReaction.cxx
 mqScalarsThicknessDialog.h
 mqScalarsThicknessDialog.cxx
 mqScalarsThicknessDialogReaction.h
@@ -285,6 +289,7 @@ mqTPSDialog.ui
 mqDecomposeDialog.ui
 mqActorTreePanel.ui
 mqScalarsComplexityDialog.ui
+mqScalarsSmoothDialog.ui
 mqScalarsThicknessDialog.ui
 mqScalarsThicknessBetweenDialog.ui
 mqScalarsCurvatureDialog.ui
