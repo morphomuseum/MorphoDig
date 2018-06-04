@@ -153,6 +153,8 @@ mqSelectLandmarkRangeDialogReaction.cxx
   mqOrientationLabelsDialogReaction.h
 QDoubleSlider.cxx
 QDoubleSlider.h
+QRAMThread.cxx
+QRAMThread.h
 QReleaseSlider.cxx
 QReleaseSlider.h
 QReleaseDial.cxx

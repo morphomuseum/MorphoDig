@@ -379,7 +379,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//@@@
 
 	this->MorphoDigCore->SetMainWindow(this);
-	
+	this->MorphoDigCore->InitStatusBar();
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MorphoMuseuM", "MorphoDig");
 	cout<<".ini file path"<<  settings.fileName().toStdString()<<endl;
 	settings.beginGroup("paths");
@@ -776,6 +776,7 @@ cm2ov2=1
 	mqMorphoDigMenuBuilders::buildLandmarksMenu(*this->menuLandmarks);
 	mqMorphoDigMenuBuilders::buildHelpMenu(*this->menuHelp);
 	mqMorphoDigMenuBuilders::buildToolbars(*this);
+	mqMorphoDigMenuBuilders::buildStatusBar(*this);
 	mqMorphoDigMenuBuilders::buildProjectDocks(*projectWindow);
 	cout << "About to build view Menu!" << endl;
 	mqMorphoDigMenuBuilders::buildViewMenu(*this->menuView, *this, *projectWindow);

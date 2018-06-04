@@ -15,6 +15,7 @@
 #define mqMorphoDigCore_h
 #include <QObject>
 #include <QPointer>
+#include "QRAMThread.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkMDActorCollection.h"
 #include "vtkBezierCurveSource.h"
@@ -27,7 +28,7 @@
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
 //#include "vtkUndoStackInternal.h"
 
-
+#include <QProgressBar>
 #include <QVTKOpenGLWidget.h>
 #include <vtkScalarBarActor.h>
 #include <vtkKdTreePointLocator.h>
@@ -37,6 +38,7 @@
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include <QMainWindow>
+
 
 
 class ExistingScalars
@@ -314,6 +316,8 @@ class  mqMorphoDigCore : public QObject
 	Q_OBJECT
 		typedef QObject Superclass;
 public:
+	QRAMThread *myRAMThread;
+	QProgressBar *myRAMProgressBar;
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
 	void RemoveScalar(QString scalarName, int onlySelectedObjects);
@@ -504,6 +508,7 @@ public:
 	void UpdateLandmarkSettings();
 	void UpdateLandmarkSettings(vtkLMActor *myActor);
 	void SetMainWindow(QMainWindow *_mainWindow);
+	void InitStatusBar();
 	void SetProjectWindow(QMainWindow *_projectWindow);
 	QMainWindow* GetMainWindow();
 	QMainWindow* GetProjectWindow();
@@ -822,7 +827,7 @@ public slots:
 	virtual void slotOrange();
 	virtual void slotBrown();
 	virtual void slotEditGridInfos();
-
+	virtual void slotRAMProgressBar(int percent);
 private:
 	static mqMorphoDigCore* Instance;
 	QVTKOpenGLWidget *qvtkWidget;

@@ -4,6 +4,25 @@
    Module:    mqMorphoDigMenuBuilders.cxx
 
 ========================================================================*/
+/*
+
+#ifdef _WIN32
+#include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
+
+#define DIV 1048576 
+#define WIDTH 7
+#endif
+
+#ifdef linux
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#endif
+*/
+
 #include "mqMorphoDigCore.h"
 #include "mqAboutDialogReaction.h"
 #include "mqChangeNodeReaction.h"
@@ -59,6 +78,7 @@
 
 #include "mqSetName.h"
 #include "mqViewMenuManager.h"
+#include "QRAMThread.h"
 
 //#include "ui_mqEditMenuBuilder.h" // no .ui Edit menu file yet
 //#include "ui_mqFileMenuBuilder.h" // no .ui File menu yet
@@ -67,6 +87,10 @@
 //#include "pqAboutDialogReaction.h"
 
 #include <iostream>
+#include <QProgressBar>
+#include <QLabel>
+#include <QThread>
+#include <QStatusBar>
 #include <QDesktopServices>
 #include <QFrame>
 #include <QUrl>
@@ -77,6 +101,8 @@
 #include <QPalette>
 #include <QMainWindow>
 #include <QMenu>
+
+
 
 void mqMorphoDigMenuBuilders::buildViewMenu(QMenu& menu, QMainWindow& window, QMainWindow& projectwindow)
 {
@@ -545,6 +571,7 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 line->setFrameShape(QFrame::HLine);
 line->setFrameShadow(QFrame::Sunken);
 	*/
+	
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock1); // main controls (open save undo redo)
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock2);// interaction widget (cam obj land modes, norm targ curn curh flg)
 	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock3); // display controls : show grid, orientation helper, anaglyph
@@ -563,6 +590,42 @@ line->setFrameShadow(QFrame::Sunken);
 }
 
 //-----------------------------------------------------------------------------
+void mqMorphoDigMenuBuilders::buildStatusBar(QMainWindow& mainWindow)
+{
+	
+	/*#ifdef _WIN32
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof(statex);
+	GlobalMemoryStatusEx(&statex);
+
+	
+	QString mram = QString::number(statex.dwMemoryLoad);
+
+	QStatusBar *statusBar = mainWindow.statusBar();
+
+	QProgressBar *progressBar = new QProgressBar();
+	QLabel *mode = new QLabel("My ram");
+	QLabel *modified = new QLabel("  Y  ");
+	QLabel *size = new QLabel("  999999kB  ");
+
+	mode->setMinimumSize(mode->sizeHint());
+	mode->setAlignment(Qt::AlignCenter);
+	mode->setText(mram+"%");
+	mode->setToolTip("Currently used ram.");
+
+	statusBar->addPermanentWidget(mode);
+	//RAMThread *mythread= new RAMThread();
+	//nnect(mythread, &mythread::resultReady, this, &MyObject::handleResults);
+	//statex.dwMemoryLoad
+	//mythread->start();
+#endif
+	*/
+	//QRAMThread*mythread = new QRAMThread();
+	//nnect(mythread, &mythread::resultReady, this, &MyObject::handleResults);
+	//statex.dwMemoryLoad
+	//mythread->start();
+
+}
 void mqMorphoDigMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 {
 	/*cout << "create main tool bar" << endl;

@@ -76,7 +76,9 @@
 #include <QTextStream>
 #include <QInputDialog>
 #include <QProgressDialog>
-
+#include <QProgressBar>
+#include <QStatusBar>
+#include <QLabel>
 #include "mqUndoStack.h"
 
 #define NORMAL_LMK 0
@@ -106,6 +108,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 {
 
 	mqMorphoDigCore::Instance = this;
+
+
 	this->qvtkWidget = NULL;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
 	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
@@ -4683,15 +4687,18 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
 				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 				vtkPolyData *mPD = mapper->GetInput();
 				
-				vtkDataArray *currentScalars;
-				currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
-				if (currentScalars ==NULL)
-				{
-					currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars();
 					
-				}
+				vtkDataArray *currentScalars=NULL;
+				if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
+				{
 
-								
+					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars == NULL)
+					{
+						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					}
+
+				}
 
 				if (currentScalars != NULL)				
 				{
@@ -8702,37 +8709,28 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 }
 double mqMorphoDigCore::ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list)
 {
+	vtkDataArray *currentScalars = NULL;
+	if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
+	{
 
-	vtkDoubleArray *currentScalars;
-	currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
+		currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+		if (currentScalars == NULL)
+		{
+			currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+		}
 
-	vtkFloatArray *currentFScalars;
-	currentFScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars();
+	}
 
+	
 
 	if (currentScalars != NULL&& list->GetNumberOfIds()>0)
 	{
-
-
 		double currMean = 0;
 
 
 		for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
 		{
-			currMean+= currentScalars->GetTuple1(list->GetId(j));
-
-		}
-		currMean /= list->GetNumberOfIds();
-		return currMean;
-	}
-	else if (currentFScalars != NULL&& list->GetNumberOfIds() > 0)
-	{
-		double currMean = 0;
-
-
-		for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
-		{
-			currMean += (double)currentFScalars->GetTuple1(list->GetId(j));
+			currMean += (double)currentScalars->GetTuple1(list->GetId(j));
 
 		}
 		currMean /= list->GetNumberOfIds();
@@ -8774,9 +8772,18 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 
 				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
 				mPD = mymapper->GetInput();
-				vtkDoubleArray *currentScalars;
-				currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
+				
+				vtkDataArray *currentScalars = NULL;
+				if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
+				{
 
+					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars == NULL)
+					{
+						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					}
+
+				}
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
@@ -8791,7 +8798,7 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 
 				if (currentScalars != NULL)
 				{
-					std::string scname = mPD->GetPointData()->GetScalars()->GetName();
+					std::string scname = currentScalars->GetName();
 					std::string sTags("Tags");
 					std::size_t found = scname.find(sTags);
 
@@ -10806,6 +10813,26 @@ void mqMorphoDigCore::SetMainWindow(QMainWindow *_mainWindow)
 {
 	this->MainWindow = _mainWindow;
 }
+void mqMorphoDigCore::InitStatusBar()
+{
+	this->myRAMThread = new QRAMThread();
+	
+	this->myRAMProgressBar = new QProgressBar();
+	QStatusBar *statusBar = this->GetMainWindow()->statusBar();
+	QLabel *mode = new QLabel("My ram");
+	
+
+	mode->setMinimumSize(mode->sizeHint());
+	mode->setAlignment(Qt::AlignCenter);
+	mode->setText("Used RAM:");
+	mode->setToolTip("Currently used ram.");
+	statusBar->addPermanentWidget(mode);
+	this->myRAMProgressBar->setMaximumWidth(50);
+	statusBar->addPermanentWidget(this->myRAMProgressBar);
+	connect(this->myRAMThread, SIGNAL(usedRAM(int)), this, SLOT(slotRAMProgressBar(int)));
+	this->myRAMThread->start();
+}
+
 QMainWindow* mqMorphoDigCore::GetMainWindow() {
 	return this->MainWindow	;
 }
@@ -13032,6 +13059,11 @@ void mqMorphoDigCore::SetSelectedActorsTransparency(int trans) {
 		END_UNDO_SET();
 		this->Render();
 	}
+}
+void mqMorphoDigCore::slotRAMProgressBar(int percent)
+{
+	this->myRAMProgressBar->setValue(percent);
+
 }
 void mqMorphoDigCore::slotEditGridInfos()
 {
