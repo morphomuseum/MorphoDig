@@ -34,10 +34,11 @@ public:
    void SaveSTL();
    void SaveVTP();*/
    void SavePOS();
-   
-   
+   void SaveActiveScalarSummary();
+   void SaveSelectedSurfaceScalars();
    void SaveCURInfos();
    void SaveShapeMeasures(int mode);
+   void SaveMeshSize();
    void SaveORI();
    
    
@@ -117,6 +118,18 @@ protected:
 	else if (this->Mode == 20)
 	{
 		this->SaveShapeMeasures(3);
+	}
+	else if (this->Mode == 21)
+	{
+		this->SaveMeshSize();
+	}
+	else if (this->Mode == 22)
+	{
+		this->SaveActiveScalarSummary();
+	}
+	else if (this->Mode == 23)
+	{
+		this->SaveSelectedSurfaceScalars();
 	}
   }
 

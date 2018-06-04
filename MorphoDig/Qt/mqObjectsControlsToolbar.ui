@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>35</width>
-    <height>237</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,9 +107,37 @@
     <string>Lasso cut : keep outside selected area</string>
    </property>
   </action>
+  <action name="actioLandmarkMoveUp">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/move_up.png</normaloff>
+     <normalon>:/Icons/move_up.png</normalon>:/Icons/move_up.png</iconset>
+   </property>
+   <property name="text">
+    <string>LandmarkMoveUp</string>
+   </property>
+   <property name="toolTip">
+    <string>Move up selected landmarks into list</string>
+   </property>
+  </action>
+  <action name="actioLandmarkMoveDown">
+   <property name="icon">
+    <iconset resource="../Icons/icons.qrc">
+     <normaloff>:/Icons/move_down.png</normaloff>
+     <normalon>:/Icons/move_down.png</normalon>:/Icons/move_down.png</iconset>
+   </property>
+   <property name="text">
+    <string>LandmarkMoveDown</string>
+   </property>
+   <property name="toolTip">
+    <string>Move down selected landmarks into list</string>
+   </property>
+  </action>
   <addaction name="actionDelete"/>
   <addaction name="separator"/>
   <addaction name="actionCreateLandmark"/>
+  <addaction name="actioLandmarkMoveUp"/>
+  <addaction name="actioLandmarkMoveDown"/>
   <addaction name="separator"/>
   <addaction name="actionEditActors"/>
   <addaction name="actionEditLandmarks"/>

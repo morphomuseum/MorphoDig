@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QVTKOpenGLWidget.h>
 //#include <QVTKWidget.h>
+//#include <vtkAutoInit.h>
 #include <vtkAxis.h>
 #include <vtkFloatArray.h>
 #include <vtkTable.h>
@@ -22,7 +23,7 @@
 #include <vtkColorTransferFunctionItem.h>
 #include <vtkCompositeControlPointsItem.h>
 #include <vtkCompositeTransferFunctionItem.h>
-#include <vtkContext2D.h>
+//#include <vtkContext2D.h>
 #include <vtkContextMouseEvent.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
@@ -46,12 +47,13 @@
 #endif
 
 
+
 //-----------------------------------------------------------------------------
 
 class mqMinimalWidget::pqInternals
 {
 	vtkNew<vtkGenericOpenGLRenderWindow> Window;
-	vtkNew<vtkRenderer> Renderer;
+	//vtkNew<vtkRenderer> Renderer;
 
 public:
 	QPointer<QVTKOpenGLWidget> Widget;
@@ -65,18 +67,19 @@ public:
 		: Widget(new QVTKOpenGLWidget(editor))
 		
 	{
-		this->Window->AddRenderer(Renderer.Get());
+		//this->Window->AddRenderer(Renderer.Get());
+		//this->Window->SetMultiSamples(0);
 	
 		QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
-		//fmt.setSamples(8);
-		fmt.setSamples(0);
+		fmt.setSamples(8);
+		//fmt.setSamples(0);
 		this->Widget->setFormat(fmt);
 		this->Widget->setEnableHiDPI(true);
 		cout << "mqMinimalWidget Widget constructor" << endl;
 		//vtkSmartPointer<vtkGenericOpenGLRenderWindow> totoche
 		//vtkSmartPointer<vtkGenericOpenGLRenderWindow> oneWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
-
+		
 		cout << "mqMinimalWidget Widget constructor 1" << endl;
 		vtkSmartPointer<vtkTable> table =
 			vtkSmartPointer<vtkTable>::New();
@@ -119,10 +122,13 @@ public:
 		line->SetColor(255, 0, 0, 255);
 		line->SetWidth(5.0);
 
+		#ifndef WIN32
+		line->GetPen()->SetLineType(vtkPen::DASH_LINE);
+		#endif
+
 		cout << "mqMinimalWidget Widget constructor 2" << endl;
 
-		QVBoxLayout* layout = new QVBoxLayout(editor);
-		layout->setMargin(0);
+		
 
 		cout << "mqMinimalWidget Widget constructor 3" << endl;
 		//this->Window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
@@ -143,19 +149,30 @@ public:
 		cout << "mqMinimalWidget Widget constructor 7" << endl;
 		this->Widget->SetRenderWindow(this->Window.Get());
 		cout << "mqMinimalWidget Widget constructor 8" << endl;
+		cout << "ContextView has a null renderer?" << endl;
+		cout << ContextView->GetRenderer() << endl;
 		this->ContextView->SetRenderWindow(this->Window.Get());
-
+		//this->ContextView->SetRenderer(this->Renderer.Get());
+		this->ContextView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
 		cout << "mqMinimalWidget Widget constructor 9" << endl;
-		//this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
+		this->ChartXY->SetAutoSize(true);
+		this->ChartXY->SetShowLegend(true);
+		this->ChartXY->SetForceAxesToBounds(true);
+		this->ChartXY->Update();
+		//this->ContextView->GetScene()->AddItem(this->ChartXY);
 		cout << "mqMinimalWidget Widget constructor 10" << endl;
-		this->ContextView->SetInteractor(this->Widget->GetInteractor());
+		//this->ContextView->SetInteractor(this->Widget->GetInteractor());
 		cout << "mqMinimalWidget Widget constructor 11" << endl;
 
 		this->Widget->setParent(editor);
 
 		cout << "mqMinimalWidget Widget constructor 12" << endl;
+		//QVBoxLayout* layout = new QVBoxLayout(editor);
+		QVBoxLayout* layout = new QVBoxLayout();
+		layout->setMargin(0);
 		layout->addWidget(this->Widget);
-
+		//this->Widget->setLayout(layout);
+		editor->setLayout(layout);
 		cout << "mqMinimalWidget Widget constructor 13" << endl;
 	}
 	~pqInternals() { this->cleanup(); }
@@ -175,17 +192,24 @@ public:
 //-----------------------------------------------------------------------------
 mqMinimalWidget::mqMinimalWidget(QWidget* parentObject)
   : Superclass(parentObject)
-	//, Internals(new pqInternals(this)) @@ put it back to retest this class... 
+	, Internals(new pqInternals(this)) //@@ put it back to retest this class... 
  
 {
 	cout << "mqMinimalWidget Widget Try to render?" << endl;
+	//this->Internals->ContextView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
+	cout << "mqMinimalWidget Widget Try to render 2?" << endl;
+	this->Internals->ContextView->GetInteractor()->Initialize();
+	cout << "mqMinimalWidget Widget Try to render 3?" << endl;
+	this->Internals->ContextView->GetInteractor()->Start();
 	//this->Internals->ContextView->GetRenderWindow()->Render();
+
 	cout << "Rendered or not ?" << endl;
 	
 	//ContextView->GetRenderer()->SetBackground(1.0, 0.0, 0.0);
 //	ContextView->GetInteractor()->Initialize();
 //	ContextView->GetInteractor()->Start();
-
+	cout << "Is drawable?" << this->Internals->ContextView->GetRenderWindow()->IsDrawable() << endl;
+	this->Internals->ContextView->GetRenderWindow()->Render();
   //QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(renderInternal()));
 }
 

@@ -11,6 +11,7 @@
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
+#include <time.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
@@ -75,7 +76,9 @@
 #include <QTextStream>
 #include <QInputDialog>
 #include <QProgressDialog>
-
+#include <QProgressBar>
+#include <QStatusBar>
+#include <QLabel>
 #include "mqUndoStack.h"
 
 #define NORMAL_LMK 0
@@ -105,6 +108,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 {
 
 	mqMorphoDigCore::Instance = this;
+
+
 	this->qvtkWidget = NULL;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
 	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
@@ -446,13 +451,184 @@ vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScala
 double mqMorphoDigCore::GetScalarRangeMin()
 {
 
-	return this->ScalarRangeMin;
+	//return this->ScalarRangeMin;
+	double my_min;
+	double my_currmin;
+
+	my_min = DBL_MAX;
+	my_currmin = DBL_MAX;
+
+	this->ActorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+		{
+			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+				&& (
+					this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+					this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+
+					)
+				&& this->Getmui_ActiveScalars()->NumComp == 1
+				)
+			{
+				if (this->Getmui_ActiveScalars()->DataType == VTK_FLOAT)
+				{
+					vtkFloatArray *currentScalars = (vtkFloatArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+						my_currmin = DBL_MAX;
+						my_currmin = (double)currentScalars->GetTuple(0)[0];
+
+
+						std::vector<float> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						//int iQ = (int)(0.05*myPD->GetNumberOfPoints());
+						my_currmin = (double)vals.at(0);
+
+						if (my_currmin < my_min) { my_min = my_currmin; }
+					}
+				}
+				else
+				{
+					vtkDoubleArray *currentScalars = (vtkDoubleArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+						my_currmin = DBL_MAX;
+						my_currmin = currentScalars->GetTuple(0)[0];
+
+
+						std::vector<double> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						//int iQ = (int)(0.05*myPD->GetNumberOfPoints());
+						my_currmin = vals.at(0);
+
+						if (my_currmin < my_min) { my_min = my_currmin; }
+					}
+
+				}
+
+			}
+		}
+	}
+	if (my_min == VTK_DOUBLE_MAX || my_min == VTK_FLOAT_MAX)
+	{
+		cout << "Strange!!!" << endl;
+		return 0;
+	}
+	else
+	{
+		return my_min;
+	}
 }
 
 double mqMorphoDigCore::GetScalarRangeMax()
 {
 
-	return this->ScalarRangeMax;
+	//return this->ScalarRangeMax;
+	double my_max;
+	double my_currmax;
+
+	my_max = -DBL_MAX;
+
+	my_currmax = -DBL_MAX;
+
+	this->ActorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+		{
+			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+				&& (
+					this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+					this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+
+					)
+				&& this->Getmui_ActiveScalars()->NumComp == 1
+				)
+			{
+				if (this->Getmui_ActiveScalars()->DataType == VTK_FLOAT)
+				{
+					vtkFloatArray *currentScalars = (vtkFloatArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+
+						my_currmax = (double)currentScalars->GetTuple(0)[0];
+
+						std::vector<float> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						int iQ = (int)(myPD->GetNumberOfPoints()-1);
+
+						my_currmax = (double)vals.at(iQ);
+						if (my_currmax > my_max) { my_max = my_currmax; }
+
+					}
+				}
+				else
+				{
+					vtkDoubleArray *currentScalars = (vtkDoubleArray*)myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars != NULL)
+					{
+
+						my_currmax = currentScalars->GetTuple(0)[0];
+
+
+						std::vector<double> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentScalars->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						int iQ = (int)(myPD->GetNumberOfPoints()-1);
+						my_currmax = vals.at(iQ);
+
+						if (my_currmax > my_max) { my_max = my_currmax; }
+					}
+
+				}
+
+			}
+		}
+	}
+	if (my_max == VTK_DOUBLE_MIN || my_max == VTK_FLOAT_MIN)
+	{
+		return 1;
+	}
+	else
+	{
+		cout << "my_max=" << my_max << endl;
+		return my_max;
+	}
 }
 
 double mqMorphoDigCore::GetSuggestedScalarRangeMin()
@@ -631,7 +807,7 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMax()
 	}
 	else 
 	{
-		cout << "my_max=" << my_max << endl;
+		cout << "suggested range my_max=" << my_max << endl;
 		return my_max;
 	}
 	
@@ -652,7 +828,7 @@ vtkDiscretizableColorTransferFunction* mqMorphoDigCore::GetOneColorMap()
 	}
 
 }
-void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
+void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 {
 	for (int i = 0; i < this->mui_ExistingColorMaps->Stack.size(); i++)
 	{
@@ -719,7 +895,118 @@ void mqMorphoDigCore::UpddateLookupTablesRanges(double min, double max)
 	this->Render();
 
 }
+void mqMorphoDigCore::UpdateLookupTablesToData()
+{
+	
+	double min; double max;
+	min = DBL_MAX;
+	max = -DBL_MAX;
+	
+	min = this->GetScalarRangeMin();
+	cout << "min=" << min << endl;
+	max = this->GetScalarRangeMax();
+	
+	cout << "max=" << max << endl;
+	if (min <DBL_MAX && max>-DBL_MAX && min < max)
+	{
+		cout << "Update look up tables ranges"  << endl;
+		this->UpdateLookupTablesRanges(min, max);
+	}
+	
 
+}
+
+void mqMorphoDigCore::createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC)
+{
+//@@ TO DO!
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	newSTC->DeepCopy(STC);
+	
+
+	vtkSmartPointer<vtkPiecewiseFunction> opacityfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	opacityfunction->DeepCopy(STC->GetScalarOpacityFunction());
+	
+
+	newSTC->SetScalarOpacityFunction(opacityfunction);
+	newSTC->Build();
+
+
+	this->mui_ActiveColorMap->ColorMap = newSTC;
+	cout << "Active color map = newSTC!" << endl;
+	this->mui_ActiveColorMap->Name = name;
+
+	cout << "Add this map to !!" << endl;
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));
+
+	
+
+}
+
+void mqMorphoDigCore::invertRGB(vtkDiscretizableColorTransferFunction *STC)
+{
+	if (STC != NULL)
+	{
+		double *pts = STC->GetDataPointer();
+
+		int numnodes = STC->GetSize();
+		cout << ": num nodes = " << numnodes << endl;
+		double min = DBL_MAX;
+		double max = -DBL_MAX;
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < min) { min = curr; }
+			if (curr > max) { max = curr; }
+
+		}
+		cout << "max:" << max << ", old min:" << min << endl;
+		if (max > min)
+		{
+			double mult = -1;
+			double c = max+min;
+			for (int k = 0; k < numnodes; k++)
+			{
+				pts[4 * k] = pts[4 * k] * mult + c;
+				cout << "nx" << k << "=" << pts[4 * k] << endl;
+			}
+			STC->FillFromDataPointer(numnodes, pts);
+
+		}
+	}
+}
+void mqMorphoDigCore::invertOpacity(vtkDiscretizableColorTransferFunction *STC)
+{
+	if (STC != NULL)
+	{
+		vtkPiecewiseFunction* OF = STC->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		double min2 = DBL_MAX;
+		double max2 = -DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			//cout << "x" << j << "=" << curr << endl;
+			if (curr < min2) { min2 = curr; }
+			if (curr > max2) { max2 = curr; }
+
+		}
+		if (max2 > min2)
+		{
+			double mult = -1;
+			double c = min2+max2;
+			for (int k = 0; k < numnodes2; k++)
+			{
+				pts2[2 * k] = pts2[2 * k] * mult + c;
+				//cout << "nx" << k << "=" << pts2[2*k] << endl;
+			}
+			OF->FillFromDataPointer(numnodes2, pts2);
+
+		}
+	}
+}
 void mqMorphoDigCore::InitLuts()
 {
 	cout << "Start Init LUTS!" << endl;
@@ -738,7 +1025,7 @@ void mqMorphoDigCore::InitLuts()
 	TagLut->SetTableValue(8, 0.7400, 0.9900, 0.7900, 1); // Mint
 	TagLut->SetTableValue(9, 0.2000, 0.6300, 0.7900, 1);
 	
-	this->ScalarRainbowLut->DiscretizeOn();
+	this->ScalarRainbowLut->DiscretizeOff();
 	this->ScalarRainbowLut->SetColorSpaceToRGB();
 	//this->ScalarRainbowLut->EnableOpacityMappingOn();
 
@@ -749,6 +1036,7 @@ void mqMorphoDigCore::InitLuts()
 	this->ScalarRainbowLut->AddRGBPoint(0.6, 0.0, 1.0, 0.0); //# green
 	this->ScalarRainbowLut->AddRGBPoint(0.8, 1.0, 1.0, 0.0); //# yellow
 	this->ScalarRainbowLut->AddRGBPoint(1.0, 1.0, 0.0, 0.0); //# red
+	this->ScalarRainbowLut->GetNumberOfValues();
 	vtkSmartPointer<vtkPiecewiseFunction> opacityRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 	
 	opacityRfunction->AddPoint(0, 0.3);
@@ -792,12 +1080,12 @@ void mqMorphoDigCore::InitLuts()
 	this->mui_ActiveColorMap->Name = Rainbow;
 
 	cout << "Try to set existing color maps!!" << endl;
-	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(Rainbow, this->ScalarRainbowLut));
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(Rainbow, this->ScalarRainbowLut, 0));
 
 	cout << "Try to set existing color maps 2!!" << endl;
-	QString BRWA = QString("Black-Red-White_Alpha");
+	QString BRWA = QString("Black-Red-White");
 
-	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(BRWA,this->ScalarRedLut));
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(BRWA,this->ScalarRedLut, 0));
 	cout << "Try to set existing color maps 3!!" << endl;
 
 
@@ -838,6 +1126,35 @@ void mqMorphoDigCore::InitLuts()
 	
 
 }
+void mqMorphoDigCore::deleteColorMap(int i)
+{
+	ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+	size_t size = colorMaps->Stack.size();
+	if (i < size && i>=0)
+	{
+		colorMaps->Stack.erase(colorMaps->Stack.begin() + i);
+		if (colorMaps->Stack.size() > 0)
+		{
+			this->Setmui_ActiveColorMap(colorMaps->Stack.at(0).Name, colorMaps->Stack.at(0).ColorMap);
+		}
+	}
+}
+int mqMorphoDigCore::colorMapNameAlreadyExists(QString proposed_name)
+{
+	ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+	size_t size = colorMaps->Stack.size();
+	int exists = 0;
+	for (int i = 0; i < size; i++)
+	{
+		if (colorMaps->Stack.at(i).Name == proposed_name)
+		{
+			exists = 1;
+		}
+	}
+	return exists;
+
+}
+
 void mqMorphoDigCore::ComputeSelectedNamesLists()
 {
 	
@@ -2995,6 +3312,191 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 		*/
 
 }
+void mqMorphoDigCore::OpenMAP(QString fileName)
+{
+	int nr, discretize, discretizenr, enableopacity, nc, no; 
+	double  cx, r, g, b, ox, ov;
+	QString ColorMapName;
+	QString SomeText;
+	//Open a STV file!
+
+	cout << "start: " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+	size_t  length;
+
+	int type = 1;
+	length = fileName.toStdString().length();
+
+	int done = 0;
+	if (length>0)
+	{
+		int file_exists = 1;
+		ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
+			file.close();
+		}
+		else
+		{
+
+			std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+
+		if (file_exists == 1)
+		{
+
+
+			std::string MAPext(".map");
+			std::string MAPext2(".MAP");
+
+
+			std::size_t found = fileName.toStdString().find(MAPext);
+			std::size_t found2 = fileName.toStdString().find(MAPext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				type = 1;
+				//MAP
+			}
+			if (type == 1)
+			{
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				QFile inputFile(fileName);
+				int ok = 0;
+				if (inputFile.open(QIODevice::ReadOnly))
+				{
+					QTextStream in(&inputFile);
+					int cpt_line = 0;
+					QString line = in.readLine();
+					QTextStream myteststream(&line);
+
+					myteststream >> SomeText >> nr;
+					
+					if (nr > 0)
+					{
+						for (int i = 0; i < nr; i++)
+						{
+							vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+
+							QString cm = QString("cm");
+							cm = cm + QString::number(i);
+							
+							line = in.readLine();
+							myteststream.setString(&line); 
+							myteststream >> SomeText >> ColorMapName;
+							cout << "Found a name: " << ColorMapName.toStdString() << endl;							
+
+							line = in.readLine();
+							myteststream.setString(&line);
+							myteststream >> SomeText >> discretize;
+							cout << "Discretize: " << discretize << endl;
+							
+							line = in.readLine();
+							myteststream.setString(&line);
+							myteststream >> SomeText >> discretizenr;
+							cout << "Discretizenr: " << discretizenr << endl;
+							
+							line = in.readLine();
+							myteststream.setString(&line);							
+							myteststream >> SomeText >> enableopacity;
+							cout << "enableopacity: " << enableopacity << endl;
+							
+							line = in.readLine();
+							myteststream.setString(&line);
+							
+							myteststream >> SomeText >> nc;
+							cout << "nc: " << nc << endl;
+
+							line = in.readLine();
+							myteststream.setString(&line);
+							
+							myteststream >> SomeText >> no;
+							cout << "no: " << no << endl;
+							
+							
+
+							newSTC->SetColorSpaceToRGB();						
+							newSTC->SetDiscretize(discretize);							
+							newSTC->SetNumberOfValues(discretizenr);							
+							newSTC->SetEnableOpacityMapping(enableopacity);
+
+							for (int j = 0; j < nc; j++)
+							{
+								line = in.readLine();
+								myteststream.setString(&line);
+								
+								myteststream >> SomeText >> cx >> r >> g >> b;
+								
+								cout << "cx" << j << ":" << cx << ",";
+								cout << "rgb:" << r << ",";
+								cout << g << ",";
+								cout << b << endl;
+								newSTC->AddRGBPoint(cx, r, g, b);
+
+							}
+
+							vtkSmartPointer<vtkPiecewiseFunction> opacityfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();														
+							
+							for (int j = 0; j < no; j++)
+							{
+								line = in.readLine();
+								myteststream.setString(&line);
+								
+								myteststream >> SomeText >> ox >> ov;
+								cout << "ox" << j << ":" << ox << ",";
+								cout << "ov=" << j << ":" << ov << endl;
+								opacityfunction->AddPoint(ox, ov);
+							}
+
+							newSTC->SetScalarOpacityFunction(opacityfunction);
+							newSTC->Build();
+
+
+							cout << "Add this map to !!" << endl;
+							int num = 2;
+							if (this->colorMapNameAlreadyExists(ColorMapName) == 1)
+							{
+								int exists = 1;
+								while (exists == 1)
+								{
+									QString NewColorMapName = ColorMapName + "_" + QString::number(num);
+									if (this->colorMapNameAlreadyExists(NewColorMapName) == 0)
+									{
+										exists = 0;
+										ColorMapName = NewColorMapName;
+									}
+									else
+									{
+										num++;
+									}
+								}
+							}
+							
+							cout << "here: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+
+							this->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(ColorMapName, newSTC, 1));
+							cout << "and now: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+							
+
+						}
+					
+						cout << "have Just Imported "<<nr<<" ColorMaps" << endl;
+						cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+						this->signal_colorMapsChanged();// emit this->colorMapsChanged();
+					}
+
+				}
+					/**/
+
+					inputFile.close();
+
+
+			}
+		}																	
+
+	}
+}	
+
 
 int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces)
 {
@@ -3429,6 +3931,155 @@ int mqMorphoDigCore::SaveFlagFile(QString fileName, int save_only_selected)
 	}
 	file.close();
 	return 1;
+
+}
+int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active)
+{
+	//save_only_active 
+	// 1: save only active color map
+	// 0: save ALL colormaps (custom + "hard coded native" ones)
+	// 2 : save ALL custom colormaps
+
+	std::string MAPext = ".map";
+	std::string MAPext2 = ".MAP";
+	std::size_t found = fileName.toStdString().find(MAPext);
+	std::size_t found2 = fileName.toStdString().find(MAPext2);
+	if (found == std::string::npos && found2 == std::string::npos)
+	{
+		fileName.append(".map");
+	}
+
+	
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+			QTextStream stream(&file);
+		if (save_only_active ==1)
+		{
+			stream << "nr: 1" << endl;
+			file.close();
+			this->SaveMAP(fileName, this->Getmui_ActiveColorMap()->Name, this->Getmui_ActiveColorMap()->ColorMap);
+		}
+		else if (save_only_active == 0)//save all
+		{
+			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+			size_t size = colorMaps->Stack.size();
+
+			stream << "nr: " << size<< endl;
+			file.close();
+			for (int i = 0; i < size; i++)
+			{
+				this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+			}			
+		}
+		else // save all customs
+		{
+			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+			size_t size = colorMaps->Stack.size();
+			int sizec = 0;
+			for (int i = 0; i < size; i++)
+			{
+				if (colorMaps->Stack.at(i).isCustom == 1)
+				{
+					sizec++;
+				}				
+			}
+
+			stream << "nr: " << sizec << endl;
+			file.close();
+			for (int i = 0; i < size; i++)
+			{
+				if (colorMaps->Stack.at(i).isCustom == 1)
+				{
+					this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+				}
+			}			
+		}						
+	}
+	
+	return 1;
+
+}
+void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
+	{
+		QTextStream stream(&file);
+		stream << "name: " << Name << endl;
+				
+		stream << "discretize: " << ColorMap->GetDiscretize() << endl;
+		stream << "discretizenr: " << ColorMap->GetNumberOfValues() << endl;
+		stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << endl;
+		
+		//3 set numer of colors
+		
+		int nc = ColorMap->GetSize();
+		stream << "nc: " << nc<< endl;
+
+		//4 set number of opacity nodes
+		int no = ColorMap->GetScalarOpacityFunction()->GetSize();
+		stream << "no: " << no << endl;
+				
+		double *pts = ColorMap->GetDataPointer();
+		//first : find max and min cx to reset cx range between 0 and 1
+		double cx_min = DBL_MAX;
+		double cx_max = -DBL_MAX;
+		for (int j = 0; j < nc; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < cx_min) { cx_min = curr; }
+			if (curr > cx_max) { cx_max = curr; }
+
+		}
+		double c = 0;
+		double mult = 1;
+		if (cx_max > cx_min)
+		{
+			double range = cx_max - cx_min;
+			mult = 1 / range;
+			c = -cx_min / range;
+		}
+
+		for (int j = 0; j < nc; j++)
+		{
+			double cx = mult*pts[4 * j] + c;
+			double r = pts[4 * j + 1];
+			double g = pts[4 * j + 2];
+			double b = pts[4 * j + 3];
+			stream << "c"<< j<< ": "<< cx << " "<< r <<" "<<g<<" "<< b << endl;
+		}
+		double *pts2 = ColorMap->GetScalarOpacityFunction()->GetDataPointer();
+
+		double ox_min = DBL_MAX;
+		double ox_max = -DBL_MAX;
+		for (int j = 0; j < no; j++)
+		{
+			double curr = pts2[2 * j];
+			if (curr < ox_min) { ox_min = curr; }
+			if (curr > ox_max) { ox_max = curr; }
+		}
+		c = 0;
+		mult = 1;
+		if (ox_max > ox_min)
+		{
+			double range = ox_max - ox_min;
+			mult = 1 / range;
+			c = -ox_min / range;
+		}
+
+		for (int j = 0; j < no; j++)
+		{
+			double ox = mult*pts2[2 * j] + c;
+			double ov = pts2[2 * j + 1];
+			stream << "op" << j << ": " <<  ox << " " << ov << endl;
+			
+
+		}
+
+	}
+	file.close();
 
 }
 
@@ -3939,6 +4590,242 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 	}
 	file.close();
 	return 1;
+
+}
+void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName)
+{
+	ExistingScalars *MyList = this->Getmui_ScalarsOfSelectedObjects(1); // get scalar list of first selected ofject
+
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+		stream << "Vertex_id	";
+		for (size_t i = 0; i < MyList->Stack.size(); i++)
+		{
+		
+			if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+			{
+
+				stream << MyList->Stack.at(i).Name << "	";
+			}
+			
+
+		}
+		stream << endl;
+
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		vtkPolyData *mPD = mapper->GetInput();
+		for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+		{
+			stream <<j<< "	";
+
+			for (size_t i = 0; i < MyList->Stack.size(); i++)
+			{
+				if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+				{
+					vtkDataArray *currentScalars;
+					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(MyList->Stack.at(i).Name.toStdString().c_str());
+					if (currentScalars == NULL)
+					{
+						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(MyList->Stack.at(i).Name.toStdString().c_str());
+
+					}
+
+					if (currentScalars != NULL)
+					{
+						stream << currentScalars->GetTuple1(j)<<"	";
+					}
+					else
+					{
+						stream << "NAN	";
+					}
+
+
+					
+				}
+
+
+			}
+			stream << endl;
+
+
+		}
+		//stream << "Name	Mean Median	Variance Min Max Q5 Q15 Q90 Q95" << endl;
+
+
+		//this->ComputeSelectedNamesLists();
+
+
+		
+	}
+	file.close();
+
+}
+void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+
+		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q15	Q90	Q95" << endl;
+
+
+		//this->ComputeSelectedNamesLists();
+
+		this->ActorCollection->InitTraversal();
+
+
+
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				vtkPolyData *mPD = mapper->GetInput();
+				
+					
+				vtkDataArray *currentScalars=NULL;
+				if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
+				{
+
+					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars == NULL)
+					{
+						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					}
+
+				}
+
+				if (currentScalars != NULL)				
+				{
+
+
+					double Mean = 0;
+					double Median = 0;
+					double Variance = 0;
+					double StdDev = 0;
+					double Min = DBL_MAX;
+					double Max = -DBL_MAX;
+					double Q5 = 0;
+					double Q10 = 0;
+					double Q90 = 0;
+					double Q95 = 0;
+
+					if (mPD->GetNumberOfPoints() > 10)
+					{
+
+						std::vector<float> vals;
+
+						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						{
+							Mean += currentScalars->GetTuple1(j);
+							vals.push_back(currentScalars->GetTuple1(j));
+						}
+						Mean /= mPD->GetNumberOfPoints();
+
+
+						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						{
+							Variance += (currentScalars->GetTuple1(j)-Mean)*(currentScalars->GetTuple1(j) - Mean);							
+						}
+						Variance/= mPD->GetNumberOfPoints();
+						StdDev = sqrt(Variance);
+						std::sort(vals.begin(), vals.end());
+
+						int iMin = 0;
+						int iMax = mPD->GetNumberOfPoints() - 1;
+						int iQ5 = (int)(0.05*mPD->GetNumberOfPoints());
+						int iQ10 = (int)(0.1*mPD->GetNumberOfPoints());
+						int iQ50 = (int)(0.5*mPD->GetNumberOfPoints());
+						int iQ90 = (int)(0.9*mPD->GetNumberOfPoints());
+						int iQ95 = (int)(0.95*mPD->GetNumberOfPoints());
+						Median = (double)vals.at(iQ50);
+						Min = (double)vals.at(iMin);
+						Max = (double)vals.at(iMax);
+						Q5 = (double)vals.at(iQ5);
+						Q10 = (double)vals.at(iQ10);
+						Q90 = (double)vals.at(iQ90);
+						Q95 = (double)vals.at(iQ95);
+
+					}
+					
+
+
+					//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
+					stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << endl;
+
+
+				}
+				else
+				{
+					stream << myActor->GetName().c_str() << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << endl;
+				}
+
+
+			}
+		}
+	}
+	file.close();
+
+}
+
+void mqMorphoDigCore::SaveMeshSize(QString fileName)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+	
+			stream << "Name	Bounding_box_length	Mean_Dist_To_Cendroid	Max_Dist_To_Cendroid	PC1_Length	PC2_Length	PC3_Length	AVG_PC_Length" << endl;
+		
+
+		//this->ComputeSelectedNamesLists();
+
+		this->ActorCollection->InitTraversal();
+
+
+
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+				{
+
+					double bbl = myActor->GetBoundingBoxLength();
+					double meanCDist = myActor->GetAvgCentroidDistance();
+					double maxCDist = myActor->GetMaxCentroidDistance();
+					double pc1 = myActor->GetXYZPCLength(0);
+					double pc2 = myActor->GetXYZPCLength(1);
+					double pc3 = myActor->GetXYZPCLength(2);
+					double avgpc = (pc1 + pc2 + pc3) / 3;
+					//vtkSmartPointer<vtkPolyData> toMeasure = vtkSmartPointer<vtkPolyData>::New();
+					vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+
+					massProp->SetInputData(mapper->GetInput());
+					massProp->Update();
+					double surface_area = massProp->GetSurfaceArea();
+					double volume = massProp->GetVolume();
+					
+
+						//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
+						stream << myActor->GetName().c_str() << "	" << bbl << "	" << meanCDist<<  "	" << maxCDist << "	" << pc1 << "	" << pc2 << "	" << pc3 << "	" << avgpc<< endl;
+					
+
+				}
+
+
+			}
+		}
+	}
+	file.close();
 
 }
 
@@ -6890,7 +7777,10 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 			for (ve = 0; ve < numvert; ve++)
 			{
 				min_dist = maxDist;
-				emit distanceProgression((int)(100 * ve / numvert));
+				if ((ve % (int)(numvert / 100)) == 0)
+				{
+					emit distanceProgression((int)(100 * ve / numvert));
+				}
 				//progress.setValue(ve);
 				/*if (progress.wasCanceled())
 				break;*/
@@ -7006,6 +7896,7 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 }
 void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
 {
+	cout << "Call scalarsThicknessBetween" << endl;
 	if (impactedActor != NULL && observedActor != NULL)
 	{
 		std::string action = "Compute thickness for ";
@@ -7123,7 +8014,10 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 				for (ve = 0; ve < numvert; ve++)
 				{
 					min_dist = max_thickness;
-					emit thicknessProgression((int)(100 * ve / numvert));
+					if ((ve % (int)(numvert / 100)) == 0)
+					{
+						emit thicknessProgression((int)(100 * ve / numvert));
+					}
 					//progress.setValue(ve);
 					/*if (progress.wasCanceled())
 					break;*/
@@ -7355,11 +8249,15 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "thickness scalars between computed " << endl;
-		this->Initmui_ExistingScalars();
-		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 
+		//cout << "camera and grid adjusted" << endl;
+		if (impactedActor != observedActor) // very important because in the opposite case, we call this function WITHIN A LOOP on the actor list... and InitMui_ExistingScalars also calls a LOOP on the actor list!
+		{
+			cout << "thickness scalars between computed: now call initmui_ExistingScalars " << endl;
+			this->Initmui_ExistingScalars();
+			cout << "set ActiveScalarAndRender" << endl;
+			this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+		}
 	
 		END_UNDO_SET();
 }
@@ -7377,7 +8275,7 @@ std::vector<std::string> mqMorphoDigCore::getActorNames()
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Scalar thickness:" << i << endl;
+		cout << "Get actor name :" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		myList.push_back(myActor->GetName());
 	}
@@ -7391,7 +8289,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Scalar thickness:" << i << endl;
+		cout << "Get first actor from name:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetName().compare(actorName.toStdString())==0)
 		{
@@ -7404,6 +8302,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 }
 void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit )
 {
+	cout << "thickness scalars start " << endl;
 	std::string mScalarName = "Thickness";
 	if (scalarName.length() >0)
 	{
@@ -7415,12 +8314,13 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Scalar thickness:" << i << endl;
+		cout << "scalarsThickness:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
 			myActor->SetSelected(0);
 			// here we can call : 
+			cout << "thickness scalars between called " << endl;
 			this->scalarsThicknessBetween( max_thickness,  smooth_normales,  avg,  scalarName,  myActor, myActor, angularLimit);
 			modified = 1;
 
@@ -7430,14 +8330,429 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 	{
 
 		//cout << "camera and grid adjusted" << endl;
-		cout << "thickness scalars computed " << endl;
+		cout << "thickness within scalars computed, call initExistingscalars " << endl;
 		this->Initmui_ExistingScalars();
+		cout << "Active scalars and render" << endl;
 		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 		
 	}
 }
-void mqMorphoDigCore::scalarsGaussianBlur()
+void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode)
 {
+	//mode = 0: convex hull area ratio ( surface_area / surface_area_convex_hull ) 
+	//mode = 1: convex hull shape index (sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233)
+	//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
+	//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
+	double defaultSearchSize = this->ActorCollection->GetBoundingBoxLengthOfSelectedActors()/40;
+	cout << "COmplexity scalars start " << endl;
+	std::string mScalarName = "Complexity";
+	if (scalarName.length() >0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "scalarsComplexity:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			double searchSize = defaultSearchSize;
+			
+			if (customLocalAreaLimit == 1 && localAreaLimit > 0)
+			{
+				searchSize = localAreaLimit;
+				cout << "Custom search size :" << searchSize << endl;
+			}
+			else
+			{
+				
+				searchSize = myActor->GetXYZAvgPCLength()/18; // looks like a reasonable neighbourhood sphere radius size.
+				cout << "Search size based on myActor GetXYZAvgPCLength / 18:" << searchSize << endl;
+			}
+
+			cout << "searchSize=" << searchSize;
+			myActor->SetSelected(0);
+			// here we can call : 
+			cout << "scalars complexity start" << endl;
+			std::string action = "Compute complexity for ";
+			action.append(myActor->GetName().c_str());
+			int Count = BEGIN_UNDO_SET(action);
+			std::string mScalarName = "Complexity";
+			if (scalarName.length() > 0)
+			{
+				mScalarName = scalarName.toStdString();
+			}
+			myActor->SaveState(Count, QString(mScalarName.c_str()));
+			vtkPolyDataMapper *myMapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (myMapper != NULL && vtkPolyData::SafeDownCast(myMapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = myMapper->GetInput();
+				double numvert = mPD->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);
+				
+				double ve_pos[3];
+				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+					vtkSmartPointer<vtkKdTreePointLocator>::New();
+				kDTree->SetDataSet(mPD);
+
+				kDTree->BuildLocator();
+			
+				for (vtkIdType i = 0; i < numvert; i++) {
+					clock_t t0, t1, tt0, tt1;
+					tt0 = clock();
+					if (i % 1000 == 0)
+					{
+						cout << "complexity, vertex:" << i << endl;
+					}
+					// for every triangle 
+					mPD->GetPoint(i, ve_pos);
+					double currentComplexity = 0;
+					if ((i % (int)(numvert / 100)) == 0)
+					{
+						emit complexityProgression((int)(100 * i / numvert));
+					}
+					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+					double Radius = searchSize;
+
+					
+					//double sec0;
+					double ssec0;
+					//mode = 0: convex hull area ratio
+					//mode = 1: convex hull shape index
+					t0 = clock();
+					kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
+					t1 = clock();
+					if (i % 1000 == 0)
+					{
+						cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds() << endl;
+					//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
+					//	cout << "sec0=" << sec0 << endl;
+					}
+					//cout << "mode = " << mode << endl;
+					// now extract surface
+					//compute surface
+					int printmode = 0;
+					if (i%1000 ==0)
+					{
+						//printmode = 1;
+					}
+					if (Radius <=0)
+					{
+						Radius = 1;
+					}
+					currentComplexity = this->ComputeComplexity(mPD, observedNeighbours,Radius,  mode, printmode);
+					if (i % 1000 == 0)
+					{
+						cout << "currentComplexity:" << currentComplexity << endl;
+					}
+
+					newScalars->InsertTuple1(i, currentComplexity);
+					tt1 = clock();
+				
+					if (i % 1000 == 0)
+					{
+						ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
+						cout << "Total time for 1 vertex:" << ssec0 << endl;
+						
+					}
+				}
+
+				newScalars->SetName(mScalarName.c_str());
+				// test if exists...
+			
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+				mPD->GetPointData()->AddArray(newScalars);
+				mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
+				
+			}
+
+			
+
+		END_UNDO_SET(); 
+			//@@ ok!
+		
+		// test if exists...
+		//
+	
+		// remove this scalar
+		
+			modified = 1;
+
+		}
+	}
+	if (modified == 1)
+	{
+
+		//cout << "camera and grid adjusted" << endl;
+		cout << "thickness within scalars computed, call initExistingscalars " << endl;
+		this->Initmui_ExistingScalars();
+		cout << "Active scalars and render" << endl;
+		this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+
+	}
+}
+
+double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode)
+{
+	clock_t t1, t2,t3,t4,t5;
+	double sec1, sec2, sec3, sec4;
+	
+	//mode = 0: convex hull area ratio ( surface_area / surface_area_convex_hull ) 
+	//mode = 1: convex hull shape index (sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233)
+	//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
+	//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
+	t1 = clock();
+
+	/*vtkSmartPointer<vtkPolyDataConnectivityFilter> cfilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+	cfilter->SetInputData(mPD);
+	cfilter->SetExtractionModeToPointSeededRegions();
+
+	for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
+	{
+		//newCuts->SetTuple1(list->GetId(j), 1);
+		cfilter->AddSeed(list->GetId(j));
+	}
+
+	cfilter->Update();*/
+
+
+	vtkSmartPointer<vtkIntArray> newCuts =
+		vtkSmartPointer<vtkIntArray>::New();
+
+	newCuts->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+	newCuts->SetNumberOfTuples(mPD->GetNumberOfPoints());
+
+
+	
+	
+	
+	for (vtkIdType i = 0; i < mPD->GetNumberOfPoints(); i++) {
+		newCuts->InsertTuple1(i, 0);
+	}
+	for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
+	{
+		newCuts->SetTuple1(list->GetId(j), 1);
+		
+	}
+	
+
+	
+	newCuts->SetName("Cuts");
+	mPD->GetPointData()->AddArray(newCuts);
+	mPD->GetPointData()->SetActiveScalars("Cuts");
+
+	vtkSmartPointer<vtkThreshold> selector =
+		vtkSmartPointer<vtkThreshold>::New();
+	vtkSmartPointer<vtkMaskFields> scalarsOff =
+		vtkSmartPointer<vtkMaskFields>::New();
+	vtkSmartPointer<vtkGeometryFilter> geometry =
+		vtkSmartPointer<vtkGeometryFilter>::New();
+	selector->SetInputData((vtkPolyData*)mPD);
+	selector->SetInputArrayToProcess(0, 0, 0,
+		vtkDataObject::FIELD_ASSOCIATION_CELLS,
+		vtkDataSetAttributes::SCALARS);
+	selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
+	selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
+	selector->ThresholdBetween(0.9, 1.1);
+	selector->Update();
+
+
+	t2 = clock();
+	sec1 = (double)(t2 - t1) / CLOCKS_PER_SEC;
+	//std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
+	//std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
+	
+	scalarsOff->SetInputData(selector->GetOutput());
+	scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+	scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+	scalarsOff->Update();
+	geometry->SetInputData(scalarsOff->GetOutput());
+	geometry->Update();
+	
+
+	vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+
+
+	MyObj = geometry->GetOutput();
+	//MyObj = cfilter->GetOutput();
+	t3 = clock();
+	sec2 = (double)(t3 - t2) / CLOCKS_PER_SEC;
+	mPD->GetPointData()->RemoveArray("Cuts");
+	vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+	massProp->SetInputData(MyObj);
+	massProp->Update();
+	double surface_area = massProp->GetSurfaceArea();
+	double sqrt_surface_area = sqrt(surface_area);
+
+	
+	if (mode < 2) // use of CPU TIME CONSUMING delaunay3D = convex hulls
+	{
+		vtkSmartPointer<vtkMassProperties> massPropConvexHull = vtkSmartPointer<vtkMassProperties>::New();
+		vtkSmartPointer<vtkQuadricDecimation> decimate =
+		vtkSmartPointer<vtkQuadricDecimation>::New();
+		vtkSmartPointer<vtkDelaunay3D> delaunay3D =
+			vtkSmartPointer<vtkDelaunay3D>::New();
+		decimate->SetInputData(MyObj);
+		decimate->SetVolumePreservation(1);
+		double numvert = MyObj->GetNumberOfPoints();
+		double reduction_factor = 0.1;
+		double target_number = 10000;//max 10 000 points for local convex hull
+		double new_factor = target_number / numvert;
+		if (new_factor < 1)
+		{
+			reduction_factor = 1 - new_factor;
+		}
+
+		if (new_factor < 1)
+		{
+			decimate->SetTargetReduction(reduction_factor);
+			decimate->Update();
+			delaunay3D->SetInputData(decimate->GetOutput());
+		}
+		else
+		{
+			delaunay3D->SetInputData(MyObj);
+		}
+		delaunay3D->Update();
+		t4 = clock();
+		sec3 = (double)(t4 - t3) / CLOCKS_PER_SEC;
+		vtkSmartPointer<vtkGeometryFilter> geometryFilter =
+			vtkSmartPointer<vtkGeometryFilter>::New();
+
+		geometryFilter->SetInputConnection(delaunay3D->GetOutputPort());
+		geometryFilter->Update();
+		
+		massPropConvexHull->SetInputData(geometryFilter->GetOutput());
+		massPropConvexHull->Update();
+		
+		double surface_area_convex_hull = massPropConvexHull->GetSurfaceArea();
+		double sqrt_surface_area_convex_hull = sqrt(surface_area_convex_hull);
+
+
+		double volume_convex_hull = massPropConvexHull->GetVolume();
+		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+		double cbrt_volume_convex_hull = cbrt(volume_convex_hull);
+		double custom_complexity = sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233);
+		double surface_ratio = 1;
+		if (surface_area_convex_hull > 0) {
+			surface_ratio = surface_area / surface_area_convex_hull;
+		}
+		t5 = clock();
+		sec4 = (double)(t5 - t4) / CLOCKS_PER_SEC;
+		if (printmode == 1)
+		{
+			cout << "convex hulls were computed... mode=" << mode <<  endl;
+			cout << "sec1:" << sec1 << endl;
+			cout << "sec2:" << sec2 << endl;
+			cout << "sec3:" << sec3 << endl;
+			cout << "sec4:" << sec4 << endl;
+		}
+		if (mode == 1) { return custom_complexity; }
+		else { return surface_ratio; }
+	}
+	else
+	{
+
+		t4 = clock();
+		sec3 = (double)(t4 - t3) / CLOCKS_PER_SEC;
+
+		double surface_area_sphere = 4 * vtkMath::Pi() * sphere_radius*sphere_radius;
+		double sqrt_surface_area_sphere = sqrt(surface_area_sphere);
+
+
+		double volume_sphere = 4* vtkMath::Pi() * sphere_radius*sphere_radius*sphere_radius/3;
+		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+		double cbrt_volume_sphere = 1;
+		double custom_complexity = 1;
+		if (volume_sphere > 0)
+		{
+			cbrt_volume_sphere = cbrt(volume_sphere);
+			custom_complexity = sqrt_surface_area / (cbrt_volume_sphere*2.199085233);
+		}
+		
+		double surface_ratio = 1;
+		if (surface_area_sphere > 0) {
+			surface_ratio = surface_area / surface_area_sphere;
+		}
+		t5 = clock();
+		sec4 = (double)(t5 - t4) / CLOCKS_PER_SEC;
+		if (printmode == 1)
+		{
+			cout << "sphere ratios... mode=" <<mode<< endl;
+			cout << "sec1:" << sec1 << endl;
+			cout << "sec2:" << sec2 << endl;
+			cout << "sec3:" << sec3 << endl;
+			cout << "sec4:" << sec4 << endl;
+		}
+		if (mode == 3) { return custom_complexity; }
+		else { return surface_ratio; }
+
+	}
+	
+	//Complexity process is computed on MyObj
+	
+}
+double mqMorphoDigCore::ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list)
+{
+	vtkDataArray *currentScalars = NULL;
+	if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
+	{
+
+		currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+		if (currentScalars == NULL)
+		{
+			currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+		}
+
+	}
+
+	
+
+	if (currentScalars != NULL&& list->GetNumberOfIds()>0)
+	{
+		double currMean = 0;
+
+
+		for (vtkIdType j = 0; j < list->GetNumberOfIds(); j++)
+		{
+			currMean += (double)currentScalars->GetTuple1(list->GetId(j));
+
+		}
+		currMean /= list->GetNumberOfIds();
+		return currMean;
+	}
+	else
+	{
+		return 0;
+	}
+
+
+	//Complexity process is computed on MyObj
+
+}
+void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double cutPercent, int mode)
+{
+	//mode = 0: raw smoothing (average of direct neighbours)
+	//mode = 1: smooth within local sphere of radius ~ mesh avg size / 40
+	//mode = 2: smooth within local sphere of radius defined by the user
+
+	// cut = 0 : cut ctuPercert% of Min and Max "abherent" values (for instance : vtkCurvatures yields extreme Min and Max values which make smoothing difficult)
+
 
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -7448,6 +8763,8 @@ void mqMorphoDigCore::scalarsGaussianBlur()
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
+			
+
 			myActor->SetSelected(0);
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
@@ -7455,9 +8772,18 @@ void mqMorphoDigCore::scalarsGaussianBlur()
 
 				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
 				mPD = mymapper->GetInput();
-				vtkDoubleArray *currentScalars;
-				currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars();
+				
+				vtkDataArray *currentScalars = NULL;
+				if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
+				{
 
+					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentScalars == NULL)
+					{
+						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					}
+
+				}
 
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
@@ -7472,89 +8798,231 @@ void mqMorphoDigCore::scalarsGaussianBlur()
 
 				if (currentScalars != NULL)
 				{
-					std::string scname = mPD->GetPointData()->GetScalars()->GetName();
+					std::string scname = currentScalars->GetName();
 					std::string sTags("Tags");
 					std::size_t found = scname.find(sTags);
 
 					if (found == std::string::npos)
 					{
-						vtkSmartPointer<vtkExtractEdges> extractEdges =
-							vtkSmartPointer<vtkExtractEdges>::New();
-						extractEdges->SetInputData((vtkPolyData*)mPD);
-						extractEdges->Update();
 
-						vtkSmartPointer<vtkPolyData> mesh = extractEdges->GetOutput();
-
-						vtkSmartPointer<vtkFloatArray> newScalars =
-							vtkSmartPointer<vtkFloatArray>::New();
-
-						newScalars->SetNumberOfComponents(1);
-						newScalars->SetNumberOfTuples(numvert);
-
-						vtkIdType ve;
-
-
-						double vn[3];
-						vn[0] = 0;
-						vn[1] = 0;
-						vn[2] = 1;
-						double picked_value = 0;
-						for (ve = 0; ve<numvert; ve++)
+						std::string action = "Smooth active scalars";
+						action.append(myActor->GetName().c_str());
+						int Count = BEGIN_UNDO_SET(action);
+						std::string mScalarName = "ActiveScalars";
+						if (scname.length() > 0)
 						{
-							// get all vertices connected to this point (neighbouring vertices).
-							//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
-							vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
-							connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
+							mScalarName = scname;
+						}
+						myActor->SaveState(Count, QString(mScalarName.c_str()));
+						double cutMin = DBL_MAX;
+						double cutMax = -DBL_MAX;
+						if (cutMinMax == 1)
+						{
+							std::vector<float> vals;
+							for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+							{								
+								vals.push_back(currentScalars->GetTuple1(j));
+							}
+							std::sort(vals.begin(), vals.end());
+							int iMin = (int)(cutPercent*mPD->GetNumberOfPoints()/100);
+							int iMax = (int)((100-cutPercent)*mPD->GetNumberOfPoints() / 100);
+							if (iMax == mPD->GetNumberOfPoints()) {
+								iMax = mPD->GetNumberOfPoints() - 1;
+							}
+							cutMin = (double)vals.at(iMin);
+							cutMax = (double)vals.at(iMax);
+							cout << "Will cut between " << cutMin << ", and " << cutMax << endl;
+							
+						}
 
-							vtkSmartPointer<vtkIdTypeArray> ids =
-								vtkSmartPointer<vtkIdTypeArray>::New();
-							ids->SetNumberOfComponents(1);
-							//if (ve<10){std::cout << "Connected vertices: ";}
-							for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
+						if (mode == 0)
+						{
+							
+
+							vtkSmartPointer<vtkFloatArray> newScalars =
+								vtkSmartPointer<vtkFloatArray>::New();
+							newScalars->SetNumberOfComponents(1);
+							newScalars->SetNumberOfTuples(numvert);
+							vtkIdType ve;
+
+
+							double vn[3];
+							vn[0] = 0;
+							vn[1] = 0;
+							vn[2] = 1;
+							double picked_value = 0;
+							for (ve = 0; ve < numvert; ve++)
 							{
-								//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
-								ids->InsertNextValue(connectedVertices->GetId(j));
+								// get all vertices connected to this point (neighbouring vertices).
+								//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+								vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+								connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
+
+								vtkSmartPointer<vtkIdTypeArray> ids =
+									vtkSmartPointer<vtkIdTypeArray>::New();
+								ids->SetNumberOfComponents(1);
+								//if (ve<10){std::cout << "Connected vertices: ";}
+								for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
+								{
+									//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+									ids->InsertNextValue(connectedVertices->GetId(j));
+								}
+								float newscalar = 0;
+								int n_vertices = connectedVertices->GetNumberOfIds();
+
+								newscalar = 0;
+
+								//on ajoute une fois la valeur actuelle.
+
+								// get all scalars 				
+								//if (ve<10){std::cout<<std::endl;}
+
+								for (vtkIdType j = 0; j < ids->GetNumberOfTuples(); j++)
+								{	// for all neighbouring vertices							
+									vtkIdType at = ids->GetTuple(j)[0];
+									//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
+									double curr_scalar = (double)(currentScalars->GetTuple(at))[0];
+									//std::cout<<curr_scalar<<std::endl;
+									newscalar += curr_scalar;
+
+								}
+								if (n_vertices > 0)
+								{
+									newscalar /= n_vertices;
+								}
+
+								// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+								if (cutMinMax == 1)
+								{
+									if (newscalar < cutMin) { newscalar = cutMin; }
+									if (newscalar > cutMax) { newscalar = cutMax; }
+								}
+								newScalars->InsertTuple1(ve, newscalar);
+
+
 							}
-							float newscalar = 0;
-							int n_vertices = connectedVertices->GetNumberOfIds();
+							//std::cout<<"New Scalar computation done "<<std::endl;
+							std::string sc_name = this->Getmui_ActiveScalars()->Name.toStdString();
+							newScalars->SetName(sc_name.c_str());
+							mPD->GetPointData()->RemoveArray(sc_name.c_str());
+							//std::cout<<"Add array "<<std::endl;
+							mPD->GetPointData()->AddArray(newScalars);
+							//std::cout<<"Set Active scalar"<<std::endl;
+							mPD->GetPointData()->SetActiveScalars(sc_name.c_str());
 
-							newscalar = 0;
-
-							//on ajoute une fois la valeur actuelle.
-
-							// get all scalars 				
-							//if (ve<10){std::cout<<std::endl;}
-
-							for (vtkIdType j = 0; j<ids->GetNumberOfTuples(); j++)
-							{	// for all neighbouring vertices							
-								vtkIdType at = ids->GetTuple(j)[0];
-								//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
-								double curr_scalar = (double)(currentScalars->GetTuple(at))[0];
-								//std::cout<<curr_scalar<<std::endl;
-								newscalar += curr_scalar;
-
-							}
-							if (n_vertices>0)
+						}
+						else
+						{
+							/*	
+					if (this->Ui->localAuto->isChecked()) { mode = 1; }
+					if (this->Ui->localCustom->isChecked()) { mode = 2; }*/
+							double searchSize = localAreaLimit;
+							if (mode == 1 || localAreaLimit<=0) 
 							{
-								newscalar /= n_vertices;
+								searchSize = myActor->GetXYZAvgPCLength()/40; // looks like a reasonable neighbourhood sphere radius size.
+							}
+							cout << "mode=" << mode << ", searchSize=" << searchSize << endl;
+							double numvert = mPD->GetNumberOfPoints();
+
+
+							vtkSmartPointer<vtkDoubleArray> newScalars =
+								vtkSmartPointer<vtkDoubleArray>::New();
+
+							newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+							newScalars->SetNumberOfTuples(numvert);
+
+							double ve_pos[3];
+							vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+								vtkSmartPointer<vtkKdTreePointLocator>::New();
+							kDTree->SetDataSet(mPD);
+
+							kDTree->BuildLocator();
+
+							for (vtkIdType i = 0; i < numvert; i++) {
+								clock_t t0, t1, tt0, tt1;
+								tt0 = clock();
+								/*if (i % 1000 == 0)
+								{
+									cout << "complexity, vertex:" << i << endl;
+								}*/
+								// for every triangle 
+								mPD->GetPoint(i, ve_pos);
+								double currentMean = 0;
+								if ((i % (int)(numvert / 100)) == 0)
+								{
+									emit smoothingProgression((int)(100 * i / numvert));
+								}
+								vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+								double Radius = searchSize;
+
+
+								//double sec0;
+								//double ssec0;
+								//mode = 0: convex hull area ratio
+								//mode = 1: convex hull shape index
+								t0 = clock();
+								kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
+								t1 = clock();
+								/*if (i % 1000 == 0)
+								{
+									cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds() << endl;
+									//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
+									//	cout << "sec0=" << sec0 << endl;
+								}*/
+								//cout << "mode = " << mode << endl;
+								// now extract surface
+								//compute surface
+								int printmode = 0;
+								if (i % 1000 == 0)
+								{
+									//printmode = 1;
+								}
+								if (Radius <= 0)
+								{
+									Radius = 1;
+								}
+								currentMean = this->ComputeActiveScalarsMean(mPD, observedNeighbours);
+								/*if (i % 1000 == 0)
+								{
+									cout << "currentMean:" << currentMean<< endl;
+								}*/
+								if (cutMinMax == 1)
+								{
+									if (currentMean < cutMin) { currentMean = cutMin; }
+									if (currentMean > cutMax) { currentMean = cutMax; }
+								}
+
+								newScalars->InsertTuple1(i, currentMean);
+								tt1 = clock();
+								//@@@@
+								/*if (i % 1000 == 0)
+								{
+									ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
+									cout << "Total time for 1 vertex:" << ssec0 << endl;
+
+								}*/
 							}
 
-							// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}				 
-							newScalars->InsertTuple1(ve, newscalar);
+							newScalars->SetName(mScalarName.c_str());
+							// test if exists...
+
+							// remove this scalar
+							//this->GetPointData()->SetScalars(newScalars);
+							mPD->GetPointData()->RemoveArray(mScalarName.c_str());
+							mPD->GetPointData()->AddArray(newScalars);
+							mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
 
 
 						}
-						//std::cout<<"New Scalar computation done "<<std::endl;
-						std::string sc_name = this->Getmui_ActiveScalars()->Name.toStdString();
-						newScalars->SetName(sc_name.c_str());
-						mPD->GetPointData()->RemoveArray(sc_name.c_str());
-						//std::cout<<"Add array "<<std::endl;
-						mPD->GetPointData()->AddArray(newScalars);
-						//std::cout<<"Set Active scalar"<<std::endl;
-						mPD->GetPointData()->SetActiveScalars(sc_name.c_str());
+
+
+
+						END_UNDO_SET();
 					}// not scalar "Tags
 					else
 					{
+					
 						std::cout << "Cannot smooth Tags" << std::endl;
 					}
 				}//scalars not null
@@ -8013,6 +9481,143 @@ to achieve desired the correct rendering. Do not understand why yet.
 	}
 }
 */
+
+void mqMorphoDigCore::groupSelectedActors()
+{
+	int numsel = this->ActorCollection->GetNumberOfSelectedActors();
+	if (numsel < 2)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select at least two surfaces to use this function!");
+		msgBox.exec();
+
+		return;
+	}
+	else
+	{
+		QInputDialog *nameDialog = new QInputDialog();
+		bool dialogResult;
+		QString newActorName = nameDialog->getText(0, "Name", "New surface name:", QLineEdit::Normal,
+			"Group", &dialogResult);
+		if (!dialogResult)
+		{
+			return;
+			
+		
+		}
+		
+
+		vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
+		int Ok = 1;
+		int modified = 0;
+
+		//cout << "myActor is null" << endl;
+
+		this->ActorCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor2->GetSelected() == 1)
+			{
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
+				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+				{
+					vtkSmartPointer<vtkPolyData> toSave = vtkSmartPointer<vtkPolyData>::New();
+					toSave->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
+					double ve_init_pos[3];;
+					double ve_final_pos[3];
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor2->GetMatrix();
+
+
+					for (vtkIdType i = 0; i < toSave->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						toSave->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+
+						toSave->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+					}
+					mergedObjects->AddInputData(toSave);
+					modified = 1;
+				}
+
+
+			}
+		}
+		if (modified == 1)
+		{
+			mergedObjects->Update();
+			VTK_CREATE(vtkMDActor, newactor);
+			if (this->mui_BackfaceCulling == 0)
+			{
+				newactor->GetProperty()->BackfaceCullingOff();
+			}
+			else
+			{
+				newactor->GetProperty()->BackfaceCullingOn();
+			}
+			VTK_CREATE(vtkPolyDataMapper, newmapper);
+			newmapper->SetColorModeToDefault();
+
+			if (
+				(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+				&& this->mui_ActiveScalars->NumComp == 1
+				)
+			{
+				newmapper->SetScalarRange(0, this->TagTableSize - 1);
+				newmapper->SetLookupTable(this->GetTagLut());
+			}
+			else
+			{
+				newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+			}
+
+			newmapper->ScalarVisibilityOn();
+
+
+			newmapper->SetInputData(mergedObjects->GetOutput());
+
+
+			int num = 2;
+
+
+
+
+			double color[4] = { 0.3, 0.4, 0.5, 1 };
+
+
+			newactor->SetmColor(color);
+
+			newactor->SetMapper(newmapper);
+			newactor->SetSelected(0);
+
+			std::string actorName = this->CheckingName(newActorName.toStdString());
+			newactor->SetName(actorName);
+			cout << "try to add new actor=" << endl;
+			this->getActorCollection()->AddItem(newactor);
+			std::string action = "Grouped actor added: " + newactor->GetName();
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+			cout << "new actor(s) added" << endl;
+			this->Initmui_ExistingScalars();
+
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			this->Render();
+
+		}
+
+	}
+}
 int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt, int save_norms, vtkMDActor *myActor)
 {
 	// Write_Type 0 : Binary LE or "Default Binary"
@@ -8132,17 +9737,36 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 	Ok = 1;
 	mergedObjects->Update();
+	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+	ObjNormals->SetInputData(mergedObjects->GetOutput());
+	ObjNormals->ComputePointNormalsOn();
+	ObjNormals->ComputeCellNormalsOn();
+	//ObjNormals->AutoOrientNormalsOff();
+	ObjNormals->ConsistencyOff();
+
+	ObjNormals->Update();
+
+	vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+	cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+	cleanPolyDataFilter->PieceInvariantOff();
+	cleanPolyDataFilter->ConvertLinesToPointsOff();
+	cleanPolyDataFilter->ConvertPolysToLinesOff();
+	cleanPolyDataFilter->ConvertStripsToPolysOff();
+	cleanPolyDataFilter->PointMergingOn();
+	cleanPolyDataFilter->Update();
+
+
 	if (save_norms == 0)
 	{
-		mergedObjects->GetOutput()->GetPointData()->SetNormals(NULL);
-		mergedObjects->GetOutput()->GetCellData()->SetNormals(NULL);
+		cleanPolyDataFilter->GetOutput()->GetPointData()->SetNormals(NULL);
+		cleanPolyDataFilter->GetOutput()->GetCellData()->SetNormals(NULL);
 	}
 	if (scalarsToBeRemoved.size() > 0)
 	{
 		for (int i = 0; i < scalarsToBeRemoved.size(); i++)
 		{
 			cout << "Removed scalar:" << scalarsToBeRemoved.at(i) << endl;
-				mergedObjects->GetOutput()->GetPointData()->RemoveArray(scalarsToBeRemoved.at(i).c_str());
+			cleanPolyDataFilter->GetOutput()->GetPointData()->RemoveArray(scalarsToBeRemoved.at(i).c_str());
 		}
 	}
 
@@ -8154,14 +9778,14 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	else if (RGBopt ==1)
 	{ 
 		//remove RGB scalars if they exist
-		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
+		cleanPolyDataFilter->GetOutput()->GetPointData()->RemoveArray("RGB");
 	}
 	else if (RGBopt == 2)
 	{
 		vtkSmartPointer<vtkUnsignedCharArray> newcolors =
 			vtkSmartPointer<vtkUnsignedCharArray>::New();
 		newcolors->SetNumberOfComponents(4);
-		newcolors->SetNumberOfTuples(mergedObjects->GetOutput()->GetNumberOfPoints());
+		newcolors->SetNumberOfTuples(cleanPolyDataFilter->GetOutput()->GetNumberOfPoints());
 		
 		vtkIdType iRGB = 0;
 		int nr, ng, nb, na;
@@ -8184,7 +9808,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 					// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
 					int RGB_fromglobal = 1;
 					// if current active scalar is not the "none" one, and if the actor as current active scalar.
-					//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+					//if (ActiveScalar != none && 	cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
 					if (ActiveScalar != none && 	mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
 					{
 						RGB_fromglobal = 0;
@@ -8192,9 +9816,9 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 					//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
 					//colors->SetNumberOfComponents(4);
-					//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars("RGB");
-					//vtkFloatArray *currentFScalars = (vtkFloatArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-					//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars("RGB");
+					//vtkFloatArray *currentFScalars = (vtkFloatArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
 					vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mapper->GetInput()->GetPointData()->GetScalars("RGB");
 					vtkFloatArray *currentFScalars = (vtkFloatArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
 					vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
@@ -8288,8 +9912,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 		}
 		newcolors->SetName("RGB");
-		mergedObjects->GetOutput()->GetPointData()->RemoveArray("RGB");
-		mergedObjects->GetOutput()->GetPointData()->AddArray(newcolors);
+		cleanPolyDataFilter->GetOutput()->GetPointData()->RemoveArray("RGB");
+		cleanPolyDataFilter->GetOutput()->GetPointData()->AddArray(newcolors);
 
 		// And YES...  NR NG NB should be a 0.. 255 value !!!! For the moment, color[] is a 0.0 ... 1.0 range
 		//std::cout<<"currentScalars null "<<std::endl;
@@ -8391,7 +10015,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		}
 		
 			Writer->SetFileName(fileName.toLocal8Bit());
-			Writer->SetInputData(mergedObjects->GetOutput());
+			Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 			//  stlWrite->Update();
 			Writer->Write();
 		
@@ -8427,7 +10051,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	//	cout << "fileName raw toSTD" << fileName.toStdString()<< endl;
 		
 			Writer->SetFileName(fileName.toLocal8Bit());
-		Writer->SetInputData(mergedObjects->GetOutput());
+		Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 		//  stlWrite->Update();
 		Writer->Write();
 		
@@ -8456,7 +10080,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			//std::cout << "\nASCII";
 		}
 		
-		vtkPolyData *MyMergedObject = mergedObjects->GetOutput();
+		vtkPolyData *MyMergedObject = cleanPolyDataFilter->GetOutput();
 
 		// Test if RGB scalar exists.
 		vtkUnsignedCharArray* test = (vtkUnsignedCharArray*)MyMergedObject->GetPointData()->GetScalars("RGB");
@@ -8567,6 +10191,219 @@ void mqMorphoDigCore::Setmui_Z2Label(QString label) { this->mui_Z2Label = label;
 QString mqMorphoDigCore::Getmui_DefaultZ2Label() { return this->mui_DefaultZ2Label; }
 QString mqMorphoDigCore::Getmui_Z2Label() { return this->mui_Z2Label; }
 
+
+void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
+{
+	//mode0: pushback
+	//mode 1: reorient
+
+	//strategy
+	//1) create a merged object of all opened objects... I guess normales should be reoriented!
+	//2) create a kdtree on the merged object
+	//3) call "loop" function foar each landmark list, passing the Kdtree as an argument: find closest vertex 
+
+	vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
+	int Ok = 1;
+	
+		//cout << "myActor is null" << endl;
+	cout << "Try to create merged object landmarks" << endl;
+	if (this->ActorCollection->GetNumberOfItems() == 0) { return; }
+
+		this->ActorCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+		vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+						
+			vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
+			if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+			{
+				vtkSmartPointer<vtkPolyData> toSave = vtkSmartPointer<vtkPolyData>::New();
+				toSave->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
+				double ve_init_pos[3];;
+				double ve_final_pos[3];
+
+				double ven_init_pos[3];;
+				double ven_final_pos[3];
+				vtkSmartPointer<vtkMatrix4x4> Mat = myActor2->GetMatrix();
+				auto impactedNorms = vtkFloatArray::SafeDownCast(toSave->GetPointData()->GetNormals());
+
+
+				for (vtkIdType i = 0; i < toSave->GetNumberOfPoints(); i++) {
+					// for every triangle 
+					toSave->GetPoint(i, ve_init_pos);
+					double *mImpactedptn = impactedNorms->GetTuple3(i);
+					ven_init_pos[0] = mImpactedptn[0];
+					ven_init_pos[1] = mImpactedptn[1];
+					ven_init_pos[2] = mImpactedptn[2];
+
+					mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+					
+					mqMorphoDigCore::RotateNorm(Mat, ven_init_pos, ven_final_pos);
+					if (i < 50 || i== 14044)
+					{
+						cout << "Pt init:" << endl;
+						cout << ve_init_pos[0] << ", " << ve_init_pos[1] << "," << ve_init_pos[2] << endl;
+						cout << "Pt final:" << endl;
+						cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << endl;
+						cout << "Ori init:" << endl;
+						cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
+						cout << "Ori final:" << endl;
+						cout << ven_final_pos[0] << ", " << ven_final_pos[1] << "," << ven_final_pos[2] << endl;
+
+					}
+					
+					toSave->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+					impactedNorms->SetTuple3(i, ve_final_pos[0], ve_final_pos[1], ve_final_pos[2]);
+				}
+				mergedObjects->AddInputData(toSave);
+			}
+
+				
+			
+		}		
+	
+	cout << "Update merged object" << endl;
+	mergedObjects->Update();
+	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+	ObjNormals->SetInputData(mergedObjects->GetOutput());
+	ObjNormals->ComputePointNormalsOn();
+	ObjNormals->ComputeCellNormalsOn();
+	//ObjNormals->AutoOrientNormalsOff();
+	ObjNormals->ConsistencyOff();
+
+	ObjNormals->Update();
+
+	vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+	cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+	cleanPolyDataFilter->PieceInvariantOff();
+	cleanPolyDataFilter->ConvertLinesToPointsOff();
+	cleanPolyDataFilter->ConvertPolysToLinesOff();
+	cleanPolyDataFilter->ConvertStripsToPolysOff();
+	cleanPolyDataFilter->PointMergingOn();
+	cleanPolyDataFilter->Update();
+
+	
+
+
+	//Just some tests
+	double ven_init_pos[3];;
+	auto impactedNorms = vtkFloatArray::SafeDownCast(cleanPolyDataFilter->GetOutput()->GetPointData()->GetNormals());
+	double *mImpactedptn = impactedNorms->GetTuple3(14044);
+	ven_init_pos[0] = mImpactedptn[0];
+	ven_init_pos[1] = mImpactedptn[1];
+	ven_init_pos[2] = mImpactedptn[2];
+	cout << "Normale 14044 of merged object:" << endl;
+	cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
+
+	// 2 : build kdtree on merged object
+	vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+		vtkSmartPointer<vtkKdTreePointLocator>::New();
+	cout << "Try to set KDTree" << endl;
+	kDTree->SetDataSet(cleanPolyDataFilter->GetOutput());
+	cout << "Try to build locator" << endl;
+	kDTree->BuildLocator();
+	
+	std::string action;
+	if (mode == 0)
+	{
+		action = "Push back landmarks on surface";
+	}
+	else
+	{
+		action = "Reorient landmarks according to closest point's normale";
+	}
+
+	cout << "Begin undo set" << endl;
+	int mCount = BEGIN_UNDO_SET(action);
+
+	//double Radius = this->ActorCollection->GetBoundingBoxLength()/20;
+	cout << "Normal landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->NormalLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Target landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->TargetLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Node landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->NodeLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Handle landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->HandleLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+	cout << "Flag landmarks" << endl;
+	this->LandmarkPushBackOrReorient(mode, this->FlagLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
+
+	END_UNDO_SET();
+	cout << "Done!" << endl;
+	//kDTree->FindPointsWithinRadius(Radius, ve_imp_final_pos, observedNeighbours);
+}
+void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree, vtkSmartPointer<vtkPolyData> PD, int mcount)
+{
+	//mode0: pushback
+	//mode 1: reorient
+	LmkCollection->InitTraversal();
+	cout << "Get impacted norms" << endl;
+	auto impactedNorms = vtkFloatArray::SafeDownCast(PD->GetPointData()->GetNormals());
+
+	for (vtkIdType i = 0; i < LmkCollection->GetNumberOfItems(); i++)
+	{
+		vtkLMActor *myLMK = vtkLMActor::SafeDownCast(LmkCollection->GetNextActor());
+		
+		if (myLMK->GetSelected() == 1 )
+		{
+
+			double lmpos[3];
+			myLMK->GetLMOrigin(lmpos);
+			double lmori[3];
+			myLMK->GetLMOrientation(lmori);
+			cout << "Try to find closest point!" << endl;
+			vtkIdType k = kDTree->FindClosestPoint(lmpos);
+			cout << k << " is the closest"<< endl;
+			
+			myLMK->SaveState(mcount);
+			
+			if (mode == 0)
+			{
+				double ve_final_pos[3];
+				cout << "Get point " <<k << endl;
+				PD->GetPoint(k, ve_final_pos);
+				cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << endl;
+				myLMK->SetLMOrigin(ve_final_pos);
+			}
+			else
+			{
+				cout << "Get norm " << k << endl;
+				double *mImpactedptn = impactedNorms->GetTuple3(k);
+				double ven_final_pos[3];
+				ven_final_pos[0] = mImpactedptn[0];
+				ven_final_pos[1] = mImpactedptn[1];
+				ven_final_pos[2] = mImpactedptn[2];
+				cout << "Ori init:" << endl;
+				cout << lmori[0] << ", " << lmori[1] << "," << lmori[2] << endl;
+				cout << "Ori final:" << endl;
+				cout << ven_final_pos[0] << ", " << ven_final_pos[1]<<","<< ven_final_pos[2] << endl;
+				myLMK->SetLMOrientation(ven_final_pos);
+			}
+			myLMK->Modified();
+			LmkCollection->Modified();
+		
+			
+			
+			//cpt++;
+		}
+
+	}
+
+	
+}
+void mqMorphoDigCore::LandmarksReorient()
+{
+//mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
+	
+	this->LandmarksPushBackOrReorient(1);
+	this->Render();
+}
+
+void mqMorphoDigCore::LandmarksPushBack()
+{
+	this->LandmarksPushBackOrReorient(0);
+	this->Render();
+}
 void mqMorphoDigCore::LandmarksMoveUp()
 {
 	this->NormalLandmarkCollection->LandmarksMoveUp();
@@ -8976,6 +10813,26 @@ void mqMorphoDigCore::SetMainWindow(QMainWindow *_mainWindow)
 {
 	this->MainWindow = _mainWindow;
 }
+void mqMorphoDigCore::InitStatusBar()
+{
+	this->myRAMThread = new QRAMThread();
+	
+	this->myRAMProgressBar = new QProgressBar();
+	QStatusBar *statusBar = this->GetMainWindow()->statusBar();
+	QLabel *mode = new QLabel("My ram");
+	
+
+	mode->setMinimumSize(mode->sizeHint());
+	mode->setAlignment(Qt::AlignCenter);
+	mode->setText("Used RAM:");
+	mode->setToolTip("Currently used ram.");
+	statusBar->addPermanentWidget(mode);
+	this->myRAMProgressBar->setMaximumWidth(50);
+	statusBar->addPermanentWidget(this->myRAMProgressBar);
+	connect(this->myRAMThread, SIGNAL(usedRAM(int)), this, SLOT(slotRAMProgressBar(int)));
+	this->myRAMThread->start();
+}
+
 QMainWindow* mqMorphoDigCore::GetMainWindow() {
 	return this->MainWindow	;
 }
@@ -10073,7 +11930,7 @@ void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int n
 			if (myScalar == Scalar)
 			{
 				exists = 1;
-				cout << Scalar.toStdString() << " already exists" << endl;
+				//cout << Scalar.toStdString() << " already exists" << endl;
 			}
 
 		}
@@ -10759,7 +12616,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-	//	cout << "MyActor undo!" << endl;
+		cout << "MyActor" << myActor->GetName()<< "undo " <<Count<< endl;
 		myActor->Undo(Count);		
 	}
 	this->ActorCollection->Undo(Count);
@@ -10823,6 +12680,7 @@ void mqMorphoDigCore::Undo(int Count)
 	}
 	// To update to take into account reorder!
 	this->FlagLandmarkCollection->Undo(Count);
+	this->Initmui_ExistingScalars();
 }
 void mqMorphoDigCore::Redo()
 {
@@ -10901,7 +12759,7 @@ void mqMorphoDigCore::Redo(int Count)
 	}
 	// To update to take into account reorder!
 	this->FlagLandmarkCollection->Redo(Count);
-
+	this->Initmui_ExistingScalars();
 }
 
 void mqMorphoDigCore::Erase(int Count)
@@ -10999,6 +12857,12 @@ void mqMorphoDigCore::signal_projectionModeChanged()
 {
 	//cout << "Emit projection Mode Changed" << endl;
 	emit this->projectionModeChanged();
+}
+
+void mqMorphoDigCore::signal_colorMapsChanged()
+{
+	//cout << "Emit projection Mode Changed" << endl;
+	emit this->colorMapsChanged();
 }
 void mqMorphoDigCore::signal_zoomChanged()
 {
@@ -11196,6 +13060,11 @@ void mqMorphoDigCore::SetSelectedActorsTransparency(int trans) {
 		this->Render();
 	}
 }
+void mqMorphoDigCore::slotRAMProgressBar(int percent)
+{
+	this->myRAMProgressBar->setValue(percent);
+
+}
 void mqMorphoDigCore::slotEditGridInfos()
 {
 	this->SetGridInfos();
@@ -11206,6 +13075,16 @@ void mqMorphoDigCore::slotLandmarkMoveUp()
 
 	this->LandmarksMoveUp();
 }
+void mqMorphoDigCore::slotLandmarkPushBack()
+{
+	this->LandmarksPushBack();
+}
+
+void mqMorphoDigCore::slotLandmarkReorient()
+{
+	this->LandmarksReorient();
+}
+
 void mqMorphoDigCore::slotUpdateAllSelectedFlagsColors()
 {
 	this->UpdateAllSelectedFlagsColors();
@@ -11215,6 +13094,7 @@ void mqMorphoDigCore::slotLandmarkMoveDown()
 
 	this->LandmarksMoveDown();
 }
+void mqMorphoDigCore::slotGroup() { this->groupSelectedActors(); }
 
 void mqMorphoDigCore::slotLassoCutKeepInside() { this->startLasso(1); }
 void mqMorphoDigCore::slotLassoCutKeepOutside() { this->startLasso(0); }
@@ -11255,10 +13135,6 @@ void mqMorphoDigCore::slotScalarsCameraDistance()
 	this->scalarsCameraDistance();
 }
 
-void mqMorphoDigCore::slotScalarsGaussianBlur()
-{
-	this->scalarsGaussianBlur();
-}
 
 void mqMorphoDigCore::slotKeepLargest() {
 	this->addKeepLargest();

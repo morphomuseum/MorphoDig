@@ -13,6 +13,7 @@
 #include "vtkBezierCurveSource.h"
 #include "vtkMDActor.h"
 #include "vtkLMActor.h"
+#include "mqObjectsControlsToolbar.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
@@ -26,7 +27,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include <vtkPiecewiseFunction.h>
 #include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkPoints.h>
@@ -71,7 +72,8 @@
 #include <vtkLine.h>
 #include <vtkProp3DCollection.h>
 
-
+#include <QDragEnterEvent>
+#include <QMimeData>
 #include <QTemporaryFile>
 #include <QSettings>
 #include <QIcon>
@@ -311,15 +313,12 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->tabWidget->addTab(projectTab, "Project");
 
 
-
+	
 	//auto projectWindow = new QMainWindow();
 	
 	//this->mdiArea->addSubWindow(projectWindow);
-	/*auto dock1 = new QDockWidget("3D viewer");
-	dock1->setWidget(qvtkWidget2);
-	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);
-	projectWindow->setCentralWidget(dock1);
-	*/
+
+	
 	this->qvtkWidget2 = new QVTKOpenGLWidget();
 
 
@@ -335,6 +334,12 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 		
 	projectWindow->setCentralWidget(qvtkWidget2);
 
+
+	/*auto dock1 = new QDockWidget("3D viewer");
+	dock1->setWidget(qvtkWidget2);
+	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);*/
+	
+	//projectWindow->setCentralWidget(dock1);
 	
 
 
@@ -374,7 +379,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//@@@
 
 	this->MorphoDigCore->SetMainWindow(this);
-	
+	this->MorphoDigCore->InitStatusBar();
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MorphoMuseuM", "MorphoDig");
 	cout<<".ini file path"<<  settings.fileName().toStdString()<<endl;
 	settings.beginGroup("paths");
@@ -514,10 +519,169 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//	this->MorphoDigCore->Getmui_DefaultAdjustScaleFactor()
 	//	).toDouble() << endl;
 	settings.endGroup();
+	/*[colormaps]
+nr=3
+cm0=CustomColorMap1
+cm0nc=4
+cm0no=3
+cm0discretize=1
+cm0discretizenr=10
+cm0enableopacity=1
+cm0cx0=0
+cm0r0=0.1
+cm0g0=0.5
+cm0b0=0.8
+cm0cx1=0.2
+cm0r1=1
+cm0g1=0.5
+cm0b1=0
+cm0cx2=0.6
+cm0r2=0
+cm0g2=1
+cm0b2=1
+cm0cx3=1
+cm0r3=0.3
+cm0g3=0.2
+cm0b3=0.1
+cm0ox0=0
+cm0ov0=0.2
+cm0ox1=0.5
+cm0ov1=0.9
+cm0ox2=1
+cm0ov2=0.9
+cm1=CustomColorMap2
+cm1nc=4
+cm1no=3
+cm1cx0=0
+cm1r0=0.1
+cm1g0=0.1
+cm1b0=0.1
+cm1cx1=0.2
+cm1r1=0.3
+cm1g1=0.3
+cm1b1=0.3
+cm1cx2=0.6
+cm1r2=0.6
+cm1g2=0.6
+cm1b2=0.6
+cm1cx3=1
+cm1r3=1
+cm1g3=1
+cm1b3=1
+cm1ox0=0
+cm1ov0=0.5
+cm1ox1=0.5
+cm1ov1=0.5
+cm1ox2=1
+cm1ov2=1
+cm2=CustomColorMap3
+cm2nc=4
+cm2no=3
+cm2cx0=0
+cm2r0=0.1
+cm2g0=0.1
+cm2b0=0.7
+cm2cx1=0.2
+cm2r1=0.3
+cm2g1=0.3
+cm2b1=0.7
+cm2cx2=0.6
+cm2r2=0.6
+cm2g2=0.6
+cm2b2=0.7
+cm2cx3=1
+cm2r3=1
+cm2g3=1
+cm2b3=0.7
+cm2ox0=0
+cm2ov0=0.1
+cm2ox1=0.5
+cm2ov1=0.5
+cm2ox2=1
+cm2ov2=1
+*/
+	settings.beginGroup("colormaps");
+	cout<<"Number of custom colormaps:"<<settings.value("nr", 0).toInt()<<endl;
+	int nr = settings.value("nr", 0).toInt();
+	if (nr > 0)
+	{
+		for (int i = 0; i < nr; i++)
+		{
+			vtkSmartPointer<vtkDiscretizableColorTransferFunction> newSTC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 
-	
+			QString cm = QString("cm");
+			cm = cm + QString::number(i);
+			cout << "Color map" << i << ":" << settings.value(cm, "Colormap").toString().toStdString() << endl;
+			
+			QString name = settings.value(cm, "Colormap").toString();
+			
+			// Name : settings.value(cm, "Colormap").toString()
+			QString cmnc = cm + "nc";
+			int nc = settings.value(cmnc, 0).toInt();
+			cout << "Color nodes:" << endl;
+			//cm0discretize = 1
+			//cm0discretizenr = 10
+			//cm0enableopacity = 1
+			QString cmdiscretize = cm + "discretize";
+			QString cmdiscretizenr = cm + "discretizenr";
+			QString cmenableopacity = cm + "enableopacity";
 
+			
+			newSTC->SetColorSpaceToRGB();
+
+
+			int discretize = settings.value(cmdiscretize, 0).toInt();
+			newSTC->SetDiscretize(discretize);
+
+			int discretizenr = settings.value(cmdiscretizenr, 256).toInt();
+			newSTC->SetNumberOfValues(discretizenr);
+			int enableopacity = settings.value(cmenableopacity, 1).toInt();
+			newSTC->SetEnableOpacityMapping(enableopacity);
+			
+			for (int j = 0; j < nc; j++)
+			{
+				QString cmcx = cm + "cx" + QString::number(j);
+				QString cmr = cm + "r" + QString::number(j);
+				QString cmg = cm + "g" + QString::number(j);
+				QString cmb = cm + "b" + QString::number(j);
+				double cx = settings.value(cmcx, 0).toDouble();
+				double r = settings.value(cmr, 0).toDouble();
+				double g = settings.value(cmg, 0).toDouble();
+				double b = settings.value(cmb, 0).toDouble();
+				cout << "cx" << j << ":" << settings.value(cmcx, 0).toDouble() << ",";
+				cout << "rgb:"<< settings.value(cmr, 0).toDouble() << ",";
+				cout  << settings.value(cmg, 0).toDouble() << ",";
+				cout  << settings.value(cmb, 0).toDouble() << endl;
+				newSTC->AddRGBPoint(cx, r, g, b);
+				
+			}
+
+			vtkSmartPointer<vtkPiecewiseFunction> opacityfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+			QString cmno = cm + "no";
+			int no = settings.value(cmno, 0).toInt();
+			cout << "Opacity nodes:" << endl;
+			for (int j = 0; j < no; j++)
+			{
+				QString cmox = cm + "ox" + QString::number(j);
+				QString cmov = cm + "ov" + QString::number(j);
+				double ox = settings.value(cmox, 0).toDouble();
+				double ov = settings.value(cmov, 0).toDouble();
+				cout << "ox" << j << ":" << settings.value(cmox, 0).toDouble() << ",";
+				cout << "ov=" << j << ":" << settings.value(cmov, 0).toDouble() << endl;
+				opacityfunction->AddPoint(ox, ov);
+			}
+
+			newSTC->SetScalarOpacityFunction(opacityfunction);
+			newSTC->Build();
+
+
+			cout << "Add this map to !!" << endl;
+			this->MorphoDigCore->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));
+
+		}
+	}
 	
+	settings.endGroup();
 
 	
 
@@ -612,6 +776,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	mqMorphoDigMenuBuilders::buildLandmarksMenu(*this->menuLandmarks);
 	mqMorphoDigMenuBuilders::buildHelpMenu(*this->menuHelp);
 	mqMorphoDigMenuBuilders::buildToolbars(*this);
+	mqMorphoDigMenuBuilders::buildStatusBar(*this);
 	mqMorphoDigMenuBuilders::buildProjectDocks(*projectWindow);
 	cout << "About to build view Menu!" << endl;
 	mqMorphoDigMenuBuilders::buildViewMenu(*this->menuView, *this, *projectWindow);
@@ -706,7 +871,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   this->MorphoDigCore->SetGridInfos();
   this->MorphoDigCore->InitializeOrientationHelper(); // creates orientation helper...
   this->MorphoDigCore->SetOrientationHelperVisibility();
-  this->qvtkWidget2->SetRenderWindow(window);
+  //this->qvtkWidget2->SetRenderWindow(window);
   
   //EXAMPLE vtkBoxWidget
 
@@ -739,12 +904,13 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   
 
   //EXAMPLE BEZIER SOURCE + BEZIER WIDGET
-  /*
+  
   unsigned int controlPointsX = 4;
   unsigned int controlPointsY = 4;
   
   // Create an arbitrary plane that we can use
   // to initialize the control points for the Bezier surface
+  /*
   vtkSmartPointer<vtkPlaneSource> planeSource =
 	  vtkSmartPointer<vtkPlaneSource>::New();
   planeSource->SetOrigin(0, 0, 0);
@@ -788,7 +954,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   
   vtkBezierSurfaceWidget *widget = vtkBezierSurfaceWidget::New();
 	  
-  widget->SetInteractor(this->ui->qvtkWidget->GetRenderWindow()->GetInteractor());
+  widget->SetInteractor(this->qvtkWidget2->GetRenderWindow()->GetInteractor());
   widget->SetBezierSource(bezierSource);
   widget->SetHandleSize(0.1);
   widget->On();
@@ -802,13 +968,13 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   Bactor->SetMapper(Bmapper);
   
   this->MorphoDigCore->getRenderer()->AddActor(Bactor);
+  
   */
-
  
 
   //@@ end rubber band selection!
 
-
+  setAcceptDrops(true);
 };
 
 
@@ -824,10 +990,183 @@ MorphoDig::~MorphoDig()
 	// The smart pointers should clean up for up
 	//this->OrientationHelperWidget->Delete();
 }
+void MorphoDig::dragEnterEvent(QDragEnterEvent *e)
+{
+	if (e->mimeData()->hasUrls()) {
+		e->acceptProposedAction();
+	}
+}
+void MorphoDig::dropEvent(QDropEvent *e)
+{
+	foreach(const QUrl &url, e->mimeData()->urls()) {
+		QString fileName = url.toLocalFile();
+		//this->MorphoDigCore->Open
+		cout << "Dropped file:" << fileName.toStdString();
+		std::string STLext(".stl");
+		std::string STLext2(".STL");
+		std::string VTKext(".vtk");
+		std::string VTKext2(".VTK");
+		std::string VTKext3(".vtp");
+		std::string VTKext4(".VTP");
+		std::string PLYext(".ply");
+		std::string PLYext2(".PLY");
+		std::string NTWext(".ntw");
+		std::string NTWext2(".NTW");
+		std::string VERext(".ver");
+		std::string VERext2(".VER");
+		std::string CURext(".cur");
+		std::string CURext2(".CUR");
+		std::string FLGext(".flg");
+		std::string FLGext2(".FLG");
+		std::string LMKext(".lmk");
+		std::string LMKext2(".LMK");
+		std::string TAGext(".tag");
+		std::string TAGext2(".TAG");
+		std::string STVext(".stv");
+		std::string STVext2(".STV");
+		std::string ORIext(".ori");
+		std::string ORIext2(".ORI");
+		std::string POSext(".pos");
+		std::string POSext2(".POS");
+
+		int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
+		std::size_t found = fileName.toStdString().find(STLext);
+		std::size_t found2 = fileName.toStdString().find(STLext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 0;
+			//STL
+		}
+
+		found = fileName.toStdString().find(VTKext);
+		found2 = fileName.toStdString().find(VTKext2);
+		std::size_t found3 = fileName.toStdString().find(VTKext3);
+		std::size_t found4 = fileName.toStdString().find(VTKext4);
+		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		{
+			type = 1; //VTK
+		}
+
+		//std::cout << "2Type= " <<type<< std::endl;
+		found = fileName.toStdString().find(PLYext);
+		found2 = fileName.toStdString().find(PLYext2);
+
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 2; //PLY
+		}
+
+
+		//0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk
+		found = fileName.toStdString().find(NTWext);
+		found2 = fileName.toStdString().find(NTWext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 3; //NTW
+		}
+
+		//4 ver, 5 cur, 6 flg, 7 lmk
+		found = fileName.toStdString().find(VERext);
+		found2 = fileName.toStdString().find(VERext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 4; //VER
+		}
+
+		found = fileName.toStdString().find(CURext);
+		found2 = fileName.toStdString().find(CURext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 5; //CUR
+		}
+		found = fileName.toStdString().find(FLGext);
+		found2 = fileName.toStdString().find(FLGext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 6; //FLG
+		}
+		found = fileName.toStdString().find(LMKext);
+		found2 = fileName.toStdString().find(LMKext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 7; //LMK
+		}
+		found = fileName.toStdString().find(TAGext);
+		found2 = fileName.toStdString().find(TAGext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 8; //TAG
+		}
+		found = fileName.toStdString().find(STVext);
+		found2 = fileName.toStdString().find(STVext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 9; //STV
+		}
+		//8 tag, 9 stv, 10 ori, 11 pos
+		found = fileName.toStdString().find(ORIext);
+		found2 = fileName.toStdString().find(ORIext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 10; //ORI
+		}
+		found = fileName.toStdString().find(POSext);
+		found2 = fileName.toStdString().find(POSext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 11; //POS
+		}
+
+
+		if (type < 3)
+		{
+			mqMorphoDigCore::instance()->OpenMesh(fileName);
+		}
+		else if (type == 3)
+		{
+			mqMorphoDigCore::instance()->OpenNTW(fileName);
+		}
+		else if (type == 4)
+		{
+			mqMorphoDigCore::instance()->OpenVER(fileName, 0);
+		}
+		else if (type == 5)
+		{
+			mqMorphoDigCore::instance()->OpenCUR(fileName);
+		}
+		else if (type == 6)
+		{
+			mqMorphoDigCore::instance()->OpenFLG(fileName);
+		}
+		else if (type == 7)
+		{
+			mqMorphoDigCore::instance()->OpenLMK(fileName, 0);
+		}
+		else if (type == 8)
+		{
+			mqMorphoDigCore::instance()->OpenTAG(fileName);
+		}
+		else if (type == 9)
+		{
+			mqMorphoDigCore::instance()->OpenSTV(fileName);
+		}
+		else if (type == 10)
+		{
+			mqMorphoDigCore::instance()->OpenORI(fileName);
+		}
+		else if (type == 11)
+		{
+			mqMorphoDigCore::instance()->OpenPOS(fileName, 1);
+		}
+
+
+	}
+}
 
 
 void MorphoDig::saveSettings()
 {
+	
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "MorphoMuseuM", "MorphoDig");
 	//cout<<"try save settings:" << m_sSettingsFile.toStdString();
 
@@ -892,6 +1231,141 @@ void MorphoDig::saveSettings()
 	settings.endGroup();
 	settings.beginGroup("renderer_settings");
 	settings.setValue("Anaglyph", this->MorphoDigCore->Getmui_Anaglyph());	
+	settings.endGroup();
+	settings.beginGroup("colormaps");
+
+	ExistingColorMaps *colorMaps = this->MorphoDigCore->Getmui_ExistingColorMaps();
+	size_t size = colorMaps->Stack.size();
+	int cpt = 0;
+	int nr = 0;
+	for (int i = 0; i < size; i++)
+	{
+		if (colorMaps->Stack.at(i).isCustom == 1)
+		{
+			nr++;
+		}
+	}
+	//1 total number of custom colormaps
+	settings.setValue("nr", nr);
+	for (int i = 0; i < size; i++)
+	{
+		if (colorMaps->Stack.at(i).isCustom == 1)
+		{
+			//2 set the name of colormap(cpt), and whether it's discretizable and opacity is enabled
+			QString cm = QString("cm");
+			cm = cm + QString::number(cpt);
+			settings.setValue(cm, colorMaps->Stack.at(i).Name);
+			
+			QString cmdiscretize = cm + "discretize";
+			QString cmdiscretizenr = cm + "discretizenr";
+			QString cmenableopacity = cm + "enableopacity";
+			int discretize = colorMaps->Stack.at(i).ColorMap->GetDiscretize();
+			int discretizenr = colorMaps->Stack.at(i).ColorMap->GetNumberOfValues();
+			int enableopacity = colorMaps->Stack.at(i).ColorMap->GetEnableOpacityMapping();
+			settings.setValue(cmdiscretize, discretize);
+			settings.setValue(cmdiscretizenr, discretizenr);
+			settings.setValue(cmenableopacity, enableopacity);
+
+			//3 set numer of colors
+			QString cmnc = cm + "nc"; 
+			int nc = colorMaps->Stack.at(i).ColorMap->GetSize();
+			settings.setValue(cmnc, nc);
+
+			//4 set number of opacity nodes
+			int no = colorMaps->Stack.at(i).ColorMap->GetScalarOpacityFunction()->GetSize();
+			QString cmno = cm + "no";
+			settings.setValue(cmno, no);
+			double *pts = colorMaps->Stack.at(i).ColorMap->GetDataPointer();
+			//first : find max and min cx to reset cx range between 0 and 1
+			double cx_min = DBL_MAX;
+			double cx_max = -DBL_MAX;
+			for (int j = 0; j < nc; j++)
+			{
+				double curr = pts[4 * j];
+				cout << "x" << j << "=" << curr << endl;
+				if (curr < cx_min) { cx_min = curr; }
+				if (curr > cx_max) { cx_max = curr; }
+
+			}
+			double c = 0;
+			double mult = 1;
+			if (cx_max > cx_min)
+			{
+				double range = cx_max - cx_min;				
+				mult = 1/range;
+				c = -cx_min/range;
+
+			}
+
+			for (int j = 0; j < nc; j++)
+			{
+				double cx = mult*pts[4 * j]+c;				
+				double r = pts[4 * j + 1];
+				double g = pts[4 * j + 2];
+				double b = pts[4 * j + 3];
+				QString cmcx = cm + "cx" + QString::number(j);
+				QString cmr = cm + "r" + QString::number(j);
+				QString cmg = cm + "g" + QString::number(j);
+				QString cmb = cm + "b" + QString::number(j);
+				settings.setValue(cmcx, cx);
+				settings.setValue(cmr, r);
+				settings.setValue(cmg, g);
+				settings.setValue(cmb, b);
+			}
+			double *pts2 = colorMaps->Stack.at(i).ColorMap->GetScalarOpacityFunction()->GetDataPointer();
+
+			double ox_min = DBL_MAX;
+			double ox_max = -DBL_MAX;
+			for (int j = 0; j < no; j++)
+			{
+				double curr = pts2[2 * j];
+				//cout << "x" << j << "=" << curr << endl;
+				if (curr < ox_min) { ox_min = curr; }
+				if (curr > ox_max) { ox_max = curr; }
+
+			}
+
+			 c = 0;
+			 mult = 1;
+			if (ox_max > ox_min)
+			{
+				double range = ox_max - ox_min;
+				mult = 1/range;
+				c = -ox_min/range;
+
+			}
+
+			for (int j = 0; j < no; j++)
+			{
+				double ox = mult*pts2[2 * j]+c;
+				double ov = pts2[2 * j + 1];
+				QString cmox = cm + "ox" + QString::number(j);
+				QString cmov = cm + "ov" + QString::number(j);
+				settings.setValue(cmox, ox);
+				settings.setValue(cmov, ov);
+				
+			}
+			/*
+			
+			
+			QString cmno = cm + "no";
+			int no = settings.value(cmno, 0).toInt();
+			cout << "Opacity nodes:" << endl;
+			for (int j = 0; j < no; j++)
+			{
+				QString cmox = cm + "ox" + QString::number(j);
+				QString cmov = cm + "ov" + QString::number(j);
+				
+				cout << "ox" << j << ":" << settings.value(cmox, 0).toDouble() << ",";
+				cout << "ov=" << j << ":" << settings.value(cmov, 0).toDouble() << endl;
+			}
+		}*/
+
+			cpt++;
+			
+		}
+		
+	}
 	settings.endGroup();
 	//cout << "end save settings" << endl;
 }

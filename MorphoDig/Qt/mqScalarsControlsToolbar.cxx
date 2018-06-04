@@ -11,7 +11,7 @@
 #include "mqEditScalarsDialogReaction.h"
 #include "mqUndoRedoReaction.h"
 #include "mqMorphoDigCore.h"
-#include "mqDisplayReaction.h"
+
 
 #include <QToolButton>
 #include <QComboBox>

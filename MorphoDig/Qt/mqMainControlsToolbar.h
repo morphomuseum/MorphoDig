@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define mqMainControlsToolbar_h
 
 
-#include <QToolBar>
+#include <QToolbar>
 class Ui_mqMainControlsToolbar;
 
 /**

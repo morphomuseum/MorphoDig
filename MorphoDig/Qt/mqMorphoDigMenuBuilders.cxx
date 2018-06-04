@@ -4,6 +4,25 @@
    Module:    mqMorphoDigMenuBuilders.cxx
 
 ========================================================================*/
+/*
+
+#ifdef _WIN32
+#include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
+
+#define DIV 1048576 
+#define WIDTH 7
+#endif
+
+#ifdef linux
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#endif
+*/
+
 #include "mqMorphoDigCore.h"
 #include "mqAboutDialogReaction.h"
 #include "mqChangeNodeReaction.h"
@@ -16,14 +35,20 @@
 #include "mqColorDialogReaction.h"
 #include "mqLandmarkDialogReaction.h"
 #include "mqMorphoDigMenuBuilders.h"
-#include "mqCameraControlsToolbar.h"
-#include "mqMainControlsToolbar.h"
-#include "mqInteractionControlsToolbar.h"
+//#include "mqCameraControlsToolbar.h"
+#include "mqCameraControlsWidget.h"
+//#include "mqMainControlsToolbar.h"
+#include "mqMainControlsWidget.h"
+#include "mqInteractionControlsWidget.h"
+#include "mqDisplayControlsWidget.h"
 #include "mqDisplayControlsToolbar.h"
-#include "mqLightControlsToolbar.h"
+//#include "mqLightControlsToolbar.h"
+#include "mqLightControlsWidget.h"
 #include "mqActorTreePanel.h"
-#include "mqObjectsControlsToolbar.h"
-#include "mqScalarsControlsToolbar.h"
+//#include "mqObjectsControlsToolbar.h"
+#include "mqObjectsControlsWidget.h"
+//#include "mqScalarsControlsToolbar.h"
+#include "mqScalarsControlsWidget.h"
 #include "mqDesktopServicesReaction.h"
 #include "mqOpenDataReaction.h"
 #include "mqSaveDataReaction.h"
@@ -35,6 +60,7 @@
 #include "mqSaveCURasVERDialogReaction.h"
 #include "mqOrientationLabelsDialogReaction.h"
 #include "mqSaveSTVDialogReaction.h"
+#include "mqSaveMAPDialogReaction.h"
 #include "mqSaveNTWDialogReaction.h"
 #include "mqSelectLandmarkRangeDialogReaction.h"
 #include "mqSmoothDialogReaction.h"
@@ -44,12 +70,15 @@
 #include "mqTPSDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
 #include "mqScalarsThicknessDialogReaction.h"
+#include "mqScalarsComplexityDialogReaction.h"
+#include "mqScalarsSmoothDialogReaction.h"
 #include "mqScalarsCurvatureDialogReaction.h"
 #include "mqScalarsDistanceDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
 
 #include "mqSetName.h"
 #include "mqViewMenuManager.h"
+#include "QRAMThread.h"
 
 //#include "ui_mqEditMenuBuilder.h" // no .ui Edit menu file yet
 //#include "ui_mqFileMenuBuilder.h" // no .ui File menu yet
@@ -58,7 +87,12 @@
 //#include "pqAboutDialogReaction.h"
 
 #include <iostream>
+#include <QProgressBar>
+#include <QLabel>
+#include <QThread>
+#include <QStatusBar>
 #include <QDesktopServices>
+#include <QFrame>
 #include <QUrl>
 #include <QDockWidget>
 #include <QFileInfo>
@@ -67,6 +101,8 @@
 #include <QPalette>
 #include <QMainWindow>
 #include <QMenu>
+
+
 
 void mqMorphoDigMenuBuilders::buildViewMenu(QMenu& menu, QMainWindow& window, QMainWindow& projectwindow)
 {
@@ -103,6 +139,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   //QMenu* submenuFileInfos = menu.addMenu("Save infos (surface, area, volume)");
   QMenu* submenuOrientationLabels = menu.addMenu("Orientation helper labels");
   QMenu* submenuMeasurements = menu.addMenu("Measurements");
+  QMenu* submenuColorMaps = menu.addMenu("Color maps");
+
   new mqOpenDataReaction(submenuProject->addAction("Open Project") << mqSetName("actionOpenNTW"), 1);
   new mqSaveNTWDialogReaction(submenuProject->addAction("Save Project") << mqSetName("actionSaveNTW"));
   
@@ -110,12 +148,14 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSavePLYDialogReaction(submenuSurface->addAction("Save selected surfaces in one single .PLY file") << mqSetName("actionSavePLY"));
   new mqSaveVTKDialogReaction(submenuSurface->addAction("Save selected surfaces in one single VTK PolyData (.VTK or .VTP) file") << mqSetName("actionSaveVTP"));
   new mqSaveSTLDialogReaction(submenuSurface->addAction("Save selected surfaces in one single .STL file") << mqSetName("actionSaveSTL"));
-  
-  
+    
   new mqOpenDataReaction(submenuLandmark->addAction("Open MorphoDig Landmark/Curve file (STV)") << mqSetName("actionOpenSTV"), 16);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Landmarks") << mqSetName("actionOpenNormalLMK"), 3);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Target Landmarks") << mqSetName("actionOpenNormalLMK"), 4);
+  new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (MAP)") << mqSetName("actionOpenMAP"), 17);
+  new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (MAP)") << mqSetName("actionSaveMAP"));
   
+
   new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (STV)") << mqSetName("actionSaveSTV"));
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks") << mqSetName("actionSaveNormalLMK"), 0);
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Target Landmarks") << mqSetName("actionSaveTargetLMK"), 1);
@@ -148,6 +188,9 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveDataReaction(submenuMeasurements->addAction("Save area and volume of selected surfaces") << mqSetName("actionSaveAV"), 18);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save normalized shape index of selected surfaces") << mqSetName("actionSaveNSI"), 19);  
   new mqSaveDataReaction(submenuMeasurements->addAction("Save convex hull area ratio and normalized shape index of selected surfaces (warning: slow)") << mqSetName("actionSaveCHNSI"), 20);
+  new mqSaveDataReaction(submenuMeasurements->addAction("Save size measurements (max length in xyz direction etc.) of selected surfaces") << mqSetName("actionSaveSize"), 21);
+  new mqSaveDataReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"), 22);
+  new mqSaveDataReaction(submenuMeasurements->addAction("Save scalar values of first selected surface") << mqSetName("actionSaveSCInfos"), 23);
 
   new mqOpenDataReaction(submenuTagsAndFlags->addAction("Open Tag") << mqSetName("actionOpenTAG"), 9);
 
@@ -199,7 +242,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *ConvexHULL = submenuStructureModification->addAction("Create convex hull for each selected surface");
 	QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
 	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");
-	
+	QAction *Group = submenuStructureModification->addAction("Group selected meshes as one single mesh");
 	
 	QMenu* submenuAlignment = menu.addMenu("Surface alignment");
 	new mqICPDialogReaction(submenuAlignment->addAction("Align 2 surfaces (iterative closest point algorithm)") << mqSetName("actionICP"));
@@ -233,7 +276,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(ConvexHULL, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotConvexHULL()));
 	QAction::connect(Lasso, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
 	QAction::connect(Lasso2, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
-	
+	QAction::connect(Group, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotGroup()));
+
 	QAction::connect(Grey, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotGrey()));
 	QAction::connect(Yellow, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotYellow()));
 	QAction::connect(Red, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotRed()));
@@ -262,9 +306,12 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness map between two objects") << mqSetName("actionThickessBetween"));
 	new mqScalarsDistanceDialogReaction(submenuScalarModification->addAction("Compute distance map between two objects") << mqSetName("actionDistanceBetween"));
 	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature map") << mqSetName("actionCurvature"));
-	QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
-	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
+	new mqScalarsComplexityDialogReaction(submenuScalarModification->addAction("Compute complexity") << mqSetName("actionComplexity"));
+	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars") << mqSetName("actionSmooth"));
 
+	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
+	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
+	*/
 }
 void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 {
@@ -279,10 +326,16 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	//new mqOpenDataReaction(openNtw, 1);//1= open NTW 
 	new mqSelectLandmarkRangeDialogReaction(menu.addAction("Select landmark range") << mqSetName("actionSelectLandmarkRange"));
 	QAction *MoveUp = menu.addAction("Selected landmarks : move up (decrease landmark number)");
-	QAction *MoveDown = menu.addAction("Selected landmarks move down (increase landmark number)");
-	
+	QAction *MoveDown = menu.addAction("Selected landmarks : move down (increase landmark number)");
+	QAction *PushBack = menu.addAction("Selected landmarks : push back on object surface");
+	QAction *ReOrient = menu.addAction("Selected landmarks : change orientation accordin to surface normal");
 	QAction::connect(MoveUp, SIGNAL(triggered()), mqMorphoDigCore::instance() , SLOT(slotLandmarkMoveUp()));
 	QAction::connect(MoveDown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMoveDown()));
+
+	QAction::connect(PushBack, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkPushBack()));
+	QAction::connect(ReOrient, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkReorient()));
+
+
 	//actionLandmarskMoveUp
 
 
@@ -346,53 +399,233 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	window->setCentralWidget(actor_panel);
 	dock3->setWidget(window);*/
 	//@@
-
 	
-	QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
+	auto dock1 = new QDockWidget("MainControlsToolbar", &projectWindow);
+	QWidget* titleBarWidget1 = new QWidget;
+	dock1->setTitleBarWidget(titleBarWidget1);
+
+	dock1->titleBarWidget()->hide();
+	dock1->setAllowedAreas(Qt::TopDockWidgetArea);
+
+
+	QWidget* mainControlsWidget = new mqMainControlsWidget(&projectWindow);
+	mainControlsWidget->layout()->setSpacing(0);	
+	dock1->setWidget(mainControlsWidget);
+	
+
+	/*QToolBar* mainToolBar = new mqMainControlsToolbar(&projectWindow)
 		<< mqSetName("MainControlsToolbar");
 	mainToolBar->layout()->setSpacing(0);
 	projectWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
-	cout << "end create main tool bar" << endl;
+	cout << "end create main tool bar" << endl;*/
 
+
+	auto dock2 = new QDockWidget("InteractionControlsToolbar", &projectWindow);
+	QWidget* titleBarWidget2 = new QWidget;
+	dock2->setTitleBarWidget(titleBarWidget2);
+	dock2->titleBarWidget()->hide(); 
+	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
+	//QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow);
+	QWidget* interactionWidget = new mqInteractionControlsWidget(&projectWindow);
+	interactionWidget->layout()->setSpacing(0);
+	dock2->setWidget(interactionWidget);
+
+	
 	//cout << "create interaction tool bar" << endl;
-	QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow)
+	/*QToolBar* interactionToolBar = new mqInteractionControlsToolbar(&projectWindow)
 		<< mqSetName("InteractionControlsToolbar");
 	interactionToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::TopToolBarArea, interactionToolBar);
+	projectWindow.addToolBar(Qt::TopToolBarArea, interactionToolBar);*/
 
+
+	auto dock3 = new QDockWidget("Display", &projectWindow);	
+	QWidget* titleBarWidget3 = new QWidget;
+	dock3->setTitleBarWidget(titleBarWidget3);
+	dock3->titleBarWidget()->hide();
+	dock3->setAllowedAreas(Qt::AllDockWidgetAreas);
+/*	QToolBar*displayToolBar = new mqDisplayControlsToolbar(&projectWindow)
+		<< mqSetName("DisplayControlsToolbar");
+	displayToolBar->layout()->setSpacing(0);*/
+
+	QWidget* displayWidget = new mqDisplayControlsWidget(&projectWindow);
+	displayWidget->layout()->setSpacing(0);
+	//displayToolBar->addWidget(displayWidget);
+
+	dock3->setWidget(displayWidget);
+
+
+
+	//dock3->setWidget(displayToolBar);
 	//cout << "create display tool bar" << endl;
-	QToolBar*displayToolBar = new mqDisplayControlsToolbar(&projectWindow)
+
+	/*QToolBar*displayToolBar = new mqDisplayControlsToolbar(&projectWindow)
 		<< mqSetName("DisplayControlsToolbar");
 	displayToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::TopToolBarArea, displayToolBar);
+	projectWindow.addToolBar(Qt::TopToolBarArea, displayToolBar);*/
+
+	auto dock4 = new QDockWidget("LightControlsToolbar", &projectWindow);
+	//dock4->setTitleBarWidget(0);
+	QWidget* titleBarWidget4 = new QWidget;
+	dock4->setTitleBarWidget(titleBarWidget4);
+
+	dock4->titleBarWidget()->hide();
+	dock4->setAllowedAreas(Qt::AllDockWidgetAreas);
+	//QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow);
+	QWidget* lightWidget = new mqLightControlsWidget(&projectWindow);
+	lightWidget->layout()->setSpacing(0);
+	dock4->setWidget(lightWidget);
 	
 	
 	//cout << "create light tool bar" << endl;
-	QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
+	/*QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow)
 		<< mqSetName("LightControlsToolbar");
 	lightToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);
+	projectWindow.addToolBar(Qt::BottomToolBarArea, lightToolBar);*/
+
 	//cout << "create objects tool bar" << endl;
 
+	auto dock5 = new QDockWidget("Objects",&projectWindow);
+	
+	dock5->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+	QWidget* titleBarWidget5 = new QWidget;
+	dock5->setTitleBarWidget(titleBarWidget5);
+	
+	dock5->titleBarWidget()->hide();
+	//QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow);
+	QWidget* ObjectsWidget= new mqObjectsControlsWidget(&projectWindow);
+	ObjectsWidget->layout()->setSpacing(0);
+	dock5->setWidget(ObjectsWidget);
+	
+	//
+	/*
 	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
 		<< mqSetName("ObjectsControlsToolbar");
 	ObjectsToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);
+	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);*/
+	
+	//<< mqSetName("ObjectsControlsToolbar");
+
+	//projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);
+
+	
 
 	//cout << "create scalars tool bar" << endl;
+	auto dock6 = new QDockWidget("Scalars", &projectWindow);
+
+	dock6->setAllowedAreas(Qt::AllDockWidgetAreas);
+	QWidget* titleBarWidget6 = new QWidget;
+	dock6->setTitleBarWidget(titleBarWidget6);
+
+	dock6->titleBarWidget()->hide();
+	//QToolBar* scalarsToolBar = new mqScalarsControlsToolbar(&projectWindow);
+	QWidget* scalarsWidget= new mqScalarsControlsWidget(&projectWindow);
+	scalarsWidget->layout()->setSpacing(0);
+	dock6->setWidget(scalarsWidget);
+	
+
+	/*
 	QToolBar* scalarsToolBar = new mqScalarsControlsToolbar(&projectWindow)
 		<< mqSetName("ScalarsControlsToolbar");
 	scalarsToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::TopToolBarArea, scalarsToolBar);
+	projectWindow.addToolBar(Qt::TopToolBarArea, scalarsToolBar);*/
 	//cout << "create camera tool bar" << endl;
-	QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow)
+
+	auto dock7 = new QDockWidget("Camera", &projectWindow);
+
+	dock7->setAllowedAreas(Qt::LeftDockWidgetArea);
+	QWidget* titleBarWidget7 = new QWidget;
+	dock7->setTitleBarWidget(titleBarWidget7);
+
+	dock7->titleBarWidget()->hide();
+	//QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow);
+	QWidget* cameraWidget = new mqCameraControlsWidget(&projectWindow);
+	cameraWidget->layout()->setSpacing(0);
+	dock7->setWidget(cameraWidget);
+	
+
+	//projectWindow.tabifyDockWidget(dock7, dock5);
+
+	auto dock8 = new QDockWidget("Line", &projectWindow);
+
+	dock8->setAllowedAreas(Qt::TopDockWidgetArea);
+	QWidget* titleBarWidget8 = new QWidget;
+	dock8->setTitleBarWidget(titleBarWidget8);
+
+	dock8->titleBarWidget()->hide();
+	QFrame* line = new QFrame();
+	line->setFrameShape(QFrame::HLine);
+	line->setFrameShadow(QFrame::Sunken);
+	dock8->setWidget(line);
+
+	/*mqLightControlsToolbar
+	auto dock7 = new QDockWidget("Camera", &projectWindow);
+
+	dock7->setAllowedAreas(Qt::LeftDockWidgetArea);
+	QWidget* titleBarWidget7 = new QWidget;
+	dock7->setTitleBarWidget(titleBarWidget7);
+
+	dock7->titleBarWidget()->hide();
+
+
+	QFrame* line = new QFrame();
+line->setFrameShape(QFrame::HLine);
+line->setFrameShadow(QFrame::Sunken);
+	*/
+	
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock1); // main controls (open save undo redo)
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock2);// interaction widget (cam obj land modes, norm targ curn curh flg)
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock3); // display controls : show grid, orientation helper, anaglyph
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock8); //line (=> pour le moment, ça ne fait que séparer des groupes d'icones sans mettre de ligne)
+
+	projectWindow.addDockWidget(Qt::BottomDockWidgetArea, dock4); // light controls widget
+	projectWindow.addDockWidget(Qt::RightDockWidgetArea, dock5); //objets controls
+	projectWindow.addDockWidget(Qt::TopDockWidgetArea, dock6); // scalars widget
+	projectWindow.addDockWidget(Qt::LeftDockWidgetArea, dock7); // camera controls
+	
+	/*QToolBar* cameraToolBar = new mqCameraControlsToolbar(&projectWindow)
 		<< mqSetName("CameraControlsToolbar");
 	cameraToolBar->layout()->setSpacing(0);
-	projectWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);
+	projectWindow.addToolBar(Qt::LeftToolBarArea, cameraToolBar);*/
 
 }
 
 //-----------------------------------------------------------------------------
+void mqMorphoDigMenuBuilders::buildStatusBar(QMainWindow& mainWindow)
+{
+	
+	/*#ifdef _WIN32
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof(statex);
+	GlobalMemoryStatusEx(&statex);
+
+	
+	QString mram = QString::number(statex.dwMemoryLoad);
+
+	QStatusBar *statusBar = mainWindow.statusBar();
+
+	QProgressBar *progressBar = new QProgressBar();
+	QLabel *mode = new QLabel("My ram");
+	QLabel *modified = new QLabel("  Y  ");
+	QLabel *size = new QLabel("  999999kB  ");
+
+	mode->setMinimumSize(mode->sizeHint());
+	mode->setAlignment(Qt::AlignCenter);
+	mode->setText(mram+"%");
+	mode->setToolTip("Currently used ram.");
+
+	statusBar->addPermanentWidget(mode);
+	//RAMThread *mythread= new RAMThread();
+	//nnect(mythread, &mythread::resultReady, this, &MyObject::handleResults);
+	//statex.dwMemoryLoad
+	//mythread->start();
+#endif
+	*/
+	//QRAMThread*mythread = new QRAMThread();
+	//nnect(mythread, &mythread::resultReady, this, &MyObject::handleResults);
+	//statex.dwMemoryLoad
+	//mythread->start();
+
+}
 void mqMorphoDigMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 {
 	/*cout << "create main tool bar" << endl;

@@ -17,7 +17,7 @@ mqCameraReaction::mqCameraReaction(QAction* parentObject,  int _mode)
 {
   this->Mode = _mode;
   this->MainWindow = mqMorphoDigCore::instance()->GetMainWindow();
-  
+  this->parentObject = parentObject;
 }
 
 //@@TODO
@@ -174,10 +174,12 @@ void mqCameraReaction::CameraBelow() {
 void mqCameraReaction::CameraCentreOfMassToggle() {
 	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 1)
 	{
+		this->parentObject->setChecked(true);
 		mqMorphoDigCore::instance()->Setmui_CameraCentreOfMassAtOrigin(0);
 	}
 	else
 	{
+		this->parentObject->setChecked(false);
 		mqMorphoDigCore::instance()->Setmui_CameraCentreOfMassAtOrigin(1);
 	}
 
@@ -187,10 +189,12 @@ void mqCameraReaction::CameraCentreOfMassToggle() {
 void mqCameraReaction::CameraOrthoPerspectiveToggle() {
 	if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
 	{
+		this->parentObject->setChecked(true);
 		mqMorphoDigCore::instance()->Setmui_CameraOrtho(0);
 	}
 	else
 	{
+		this->parentObject->setChecked(false);
 		mqMorphoDigCore::instance()->Setmui_CameraOrtho(1);
 
 	}

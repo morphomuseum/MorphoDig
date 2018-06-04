@@ -773,7 +773,7 @@ void vtkMDInteractorStyle::StartSelect()
 		  this->Alt = ALT_RELEASED;
 	  }
 
-	  if (key.compare("l") == 0)
+	  if (key.compare("l") == 0 || key.compare("L") == 0)
 	  {
 		  this->L = L_RELEASED;
 		  // std::cout << key << "Released" << '\n';
@@ -932,7 +932,7 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 
 		}
 		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-
+		this->L = L_RELEASED;
 
 	}
 	else
@@ -1069,7 +1069,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  }
 		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 
-
+		  this->L = L_RELEASED;
 	  }//left button down, no landmark 
 	  else
 	  { // left mouse pressed, no 

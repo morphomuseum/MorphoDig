@@ -81,18 +81,30 @@ mqViewMenuManager.cxx
   mqUndoStack.cxx
   mqObjectsControlsToolbar.h
   mqObjectsControlsToolbar.cxx
+  mqObjectsControlsWidget.h
+  mqObjectsControlsWidget.cxx
   mqCameraControlsToolbar.h
   mqCameraControlsToolbar.cxx
+  mqCameraControlsWidget.h
+  mqCameraControlsWidget.cxx
   mqMainControlsToolbar.h
   mqMainControlsToolbar.cxx
+  mqMainControlsWidget.h
+  mqMainControlsWidget.cxx
   mqDisplayControlsToolbar.h
   mqDisplayControlsToolbar.cxx
-  mqInteractionControlsToolbar.h
-  mqInteractionControlsToolbar.cxx
+  mqDisplayControlsWidget.h
+  mqDisplayControlsWidget.cxx
+  mqInteractionControlsWidget.h
+  mqInteractionControlsWidget.cxx
   mqLightControlsToolbar.h
   mqLightControlsToolbar.cxx
+  mqLightControlsWidget.h
+  mqLightControlsWidget.cxx
   mqScalarsControlsToolbar.h
   mqScalarsControlsToolbar.cxx
+  mqScalarsControlsWidget.h
+  mqScalarsControlsWidget.cxx
   mqMorphoDigCore.h
   mqMorphoDigCore.cxx
   mqSavePLYDialog.cxx
@@ -141,6 +153,8 @@ mqSelectLandmarkRangeDialogReaction.cxx
   mqOrientationLabelsDialogReaction.h
 QDoubleSlider.cxx
 QDoubleSlider.h
+QRAMThread.cxx
+QRAMThread.h
 QReleaseSlider.cxx
 QReleaseSlider.h
 QReleaseDial.cxx
@@ -177,6 +191,14 @@ QReleaseSliderValue.h
   mqDecomposeDialog.h
   mqDecomposeDialogReaction.cxx
   mqDecomposeDialogReaction.h
+mqScalarsComplexityDialog.h
+mqScalarsComplexityDialog.cxx
+mqScalarsComplexityDialogReaction.h
+mqScalarsComplexityDialogReaction.cxx
+mqScalarsSmoothDialog.h
+mqScalarsSmoothDialog.cxx
+mqScalarsSmoothDialogReaction.h
+mqScalarsSmoothDialogReaction.cxx
 mqScalarsThicknessDialog.h
 mqScalarsThicknessDialog.cxx
 mqScalarsThicknessDialogReaction.h
@@ -213,6 +235,10 @@ mqLineEdit.h
 mqLineEdit.cxx
 mqColorOpacityEditorWidget.cxx
 mqColorOpacityEditorWidget.h
+mqSaveMAPDialog.cxx
+mqSaveMAPDialog.h
+mqSaveMAPDialogReaction.cxx
+mqSaveMAPDialogReaction.h
 )
 
 set (Qt_MOC_HDRS
@@ -224,8 +250,11 @@ set (Qt_UIs mqAboutDialog.ui
 mqColorDialog.ui 
 mqLandmarkDialog.ui  
 mqCameraControlsToolbar.ui 
+mqCameraControlsWidget.ui 
 mqObjectsControlsToolbar.ui 
+mqObjectsControlsWidget.ui 
 mqMainControlsToolbar.ui 
+mqMainControlsWidget.ui 
 mqSavePLYDialog.ui 
 mqSaveVTKDialog.ui 
 mqSaveSTLDialog.ui 
@@ -245,9 +274,12 @@ mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
 mqSelectLandmarkRangeDialog.ui
 mqLightControlsToolbar.ui
-mqInteractionControlsToolbar.ui
+mqLightControlsWidget.ui
+mqInteractionControlsWidget.ui
+mqDisplayControlsWidget.ui
 mqDisplayControlsToolbar.ui
 mqScalarsControlsToolbar.ui
+mqScalarsControlsWidget.ui
 mqGridSizeDialog.ui
 mqOrientationLabelsDialog.ui
 mqEditScalarsDialog.ui
@@ -258,12 +290,15 @@ mqFillHolesDialog.ui
 mqTPSDialog.ui
 mqDecomposeDialog.ui
 mqActorTreePanel.ui
+mqScalarsComplexityDialog.ui
+mqScalarsSmoothDialog.ui
 mqScalarsThicknessDialog.ui
 mqScalarsThicknessBetweenDialog.ui
 mqScalarsCurvatureDialog.ui
 mqScalarsDistanceDialog.ui
 mqICPDialog.ui
 mqColorOpacityEditorWidget.ui
+mqSaveMAPDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

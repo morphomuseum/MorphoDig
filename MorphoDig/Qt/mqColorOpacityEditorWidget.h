@@ -82,7 +82,7 @@ class  mqColorOpacityEditorWidget : public QWidget
 public:
   mqColorOpacityEditorWidget(vtkDiscretizableColorTransferFunction* stc, QWidget* parent = 0);
   ~mqColorOpacityEditorWidget() override;
-
+  void reInitialize(vtkDiscretizableColorTransferFunction *stc);
   /**
   * Returns the current list of control points for the color transfer
   * function. This a list of 4-tuples.
@@ -113,7 +113,8 @@ public:
   * used, if any.
   */
   //pqSMProxy scalarOpacityFunctionProxy() const;
-
+signals:
+  void changeFinished();
 public slots:
   /**
   * Sets the xvmsPoints that control the opacity transfer function.
@@ -143,7 +144,12 @@ public slots:
   /**
   * Reset the transfer function ranges to active data source.
   */
-  //void resetRangeToData();
+  void invertRGB();
+  void invertOpacity();
+  void resetRangeToData();
+  void changedEnableOpacity();
+  void changeDiscretize();
+  void  changedDiscretizeValue(int value);
 
   /**
   * Reset the transfer function ranges to custom values.
@@ -175,7 +181,7 @@ public slots:
   /**
   * save current transfer function as preset.
   */
-  //void saveAsPreset();
+  void saveAsCustom();
 
 signals:
   /**

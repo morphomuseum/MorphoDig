@@ -11,6 +11,8 @@
 #include "vtkLMActorCollection.h"
 #include <vtkSmartPointer.h>
 #include <QDialog>
+#include "mqColorOpacityEditorWidget.h"
+
 
 namespace Ui
 {
@@ -43,9 +45,11 @@ public:
  void MoveSliders();
  void RefreshRange();
   public slots:
+  virtual void slotEditColorMapName();
+  virtual void slotDeleteColorMap();
   virtual void slotActiveScalarChanged(int idx);
   virtual void slotActiveColorMapChanged(int idx);
-  
+  virtual void slotRefreshSuggestedRange();
   virtual void slotRefreshDialog();
   virtual void slotAccepted();
   virtual void slotRefreshComboScalars();
@@ -55,13 +59,14 @@ public:
   virtual void slotAcceptSuggestedMin();
   virtual void slotCurrentMinMaxEdited();
   virtual void slotRemoveScalar();
+  virtual void slotRefreshColorMaps();
  /* virtual void slotSliderMinValueChanged(int value);
   virtual void slotSliderMaxValueChanged(int value);*/
   
 protected:
 	
 private:
-	
+	mqColorOpacityEditorWidget *mColorMap; 
 
   Q_DISABLE_COPY(mqEditScalarsDialog)
   Ui::mqEditScalarsDialog* const Ui;

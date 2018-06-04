@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>133</width>
+    <width>102</width>
     <height>34</height>
    </rect>
   </property>
@@ -74,7 +74,6 @@
   <addaction name="actionScalarVisibility"/>
   <addaction name="actionColorScaleEdit"/>
   <addaction name="actionTagEdit"/>
-  <addaction name="actionLookUpTableEdit"/>
  </widget>
  <resources>
   <include location="../Icons/icons.qrc"/>

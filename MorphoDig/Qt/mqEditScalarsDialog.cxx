@@ -8,8 +8,10 @@
 
 #include "mqEditScalarsDialog.h"
 #include "ui_mqEditScalarsDialog.h"
+#include "mqSetName.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
+#include "mqSaveMAPDialogReaction.h"
 #include "mqUndoStack.h"
 #include "QDoubleSlider.h"
 #include "mqColorOpacityEditorWidget.h"
@@ -21,6 +23,8 @@
 // we actually do not need glew...
 //#include <GL/glew.h>
 #include <QApplication>
+#include <QMessageBox>
+#include <QInputDialog>
 #include <QFile>
 #include <QRadioButton>
 #include <QFileDialog>
@@ -66,7 +70,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
     QObject::connect(&this->Internals->OpacityTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
       SIGNAL(xvmsPointsChanged()));*/
-
+	
 
 
 	//1 populate active scalar combo box, and check which scalar is the active one!
@@ -74,13 +78,49 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	this->setObjectName("mqEditScalarsDialog");
 	this->Ui->comboActiveScalar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
+	
+	//ui.ColorEditor->initialize(stc, true, NULL, false);
+
+	/*mqTransferFunctionWidget ColorEditor;
+	ColorEditor.initialize(STC, true, NULL, false);
+	ColorEditor.show();*/
+
 	//this->Ui->frame->setVisible(false);
-	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->frame);
+	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->scrollAreaWidgetContents);
+	QVBoxLayout* vbox = new QVBoxLayout(this->Ui->PropertiesFrame);
+	vbox->setMargin(0);
+	vbox->setSpacing(0);
+	//cout << "Try this!" << endl;
+	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this);
+	//cout << "Try that!" << endl;
+	this->mColorMap = someMap;
+	//cout << "And?" << endl;
+	this->Ui->PropertiesFrame->layout()->addWidget(this->mColorMap);
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
+
+	/*mqTransferFunctionWidget *ColorEditor = new mqTransferFunctionWidget ();
+	ColorEditor->initialize(STC, true, NULL, false);
+	mqTransferFunctionWidget *OpacityEditor = new mqTransferFunctionWidget();
+	OpacityEditor->initialize(STC, false, STC->GetScalarOpacityFunction(), true);*/
+	/*auto layout = new QVBoxLayout;
+	layout->setMargin(0);
+	layout->addWidget(ColorEditor);
+	layout->addWidget(OpacityEditor);*/
+	//this->Ui->scrollAreaWidgetContents->setLayout(layout);
+	//this->Ui->verticalLayout->addWidget(ColorEditor);
+	//this->Ui->verticalLayout->addWidget(OpacityEditor);
+	//this->Ui->verticalLayout->addWidget(OpacityEditor);
+
+	//this->Ui->scrollAreaWidgetContents->addWidget(ColorEditor);
+	//this->Ui->scrollAreaWidgetContents->addWidget(OpacityEditor);
+	//layout->addWidget(ColorEditor);
+	//layout->addWidget(OpacityEditor);
+	//this->Ui->scrollAreaWidgetContents->setLayout(layout);
+	//this->Ui->editor->setLayout(layout);
+	//this->Ui->editor->setVisible(true);
 	//this->Ui->ColorEditor->initialize(STC, true, NULL, false);
-	//this->Ui->ColorEditor->render();
-	//this->Ui->OpacityEditor->initialize(NULL, false, STC->GetScalarOpacityFunction(), true);
-	//mColorScale->setVisible(true);
+	//this->Ui->OpacityEditor->initialize(STC, false, STC->GetScalarOpacityFunction(), true);
+	
 	
 	//mColorScale->render();
 	//this->Ui->frame->setVisible(true);
@@ -88,8 +128,11 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	//this->Ui->frame->ins
 	//this->Ui->ColorEditor-
 	this->Ui->comboColorMap->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboScalars()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(actorsMightHaveChanged()), this, SLOT(slotRefreshSuggestedRange()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->comboActiveScalar, SIGNAL(activated(int)), this, SLOT(slotActiveScalarChanged(int)));
 	connect(this->Ui->comboColorMap, SIGNAL(activated(int)), this, SLOT(slotActiveColorMapChanged(int)));
 	
@@ -137,7 +180,23 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->pushRemoveScalar, SIGNAL(pressed()), this, SLOT(slotRemoveScalar()));
-	
+
+	this->Ui->editColorMap->setDisabled(true);
+	this->Ui->deleteColorMap->setDisabled(true);
+
+	QAction* exportAction = new QAction(tr("&Export"), this);
+	exportAction->setToolTip(tr("Toggles recording."));
+	this->Ui->exportColorMap->addAction(exportAction);
+	this->Ui->exportColorMap->setDefaultAction(exportAction);
+	QIcon icon;
+	icon.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	//  exportColorMap->setIcon(icon);
+	exportAction->setIcon(icon);
+	new mqSaveMAPDialogReaction(exportAction);
+	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
+	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
+
+	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 
 	this->RefreshSliders();
 	/*
@@ -247,9 +306,99 @@ void mqEditScalarsDialog::UpdateUI()
 	
 	
 }
+void mqEditScalarsDialog::slotRefreshColorMaps()
+{
+	cout << "slotRefreshColorMaps" << endl;
+	this->RefreshComboColorMaps();
+}
+void mqEditScalarsDialog::slotEditColorMapName()
+{
+	QString ActiveColorMap = this->Ui->comboColorMap->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom;
+		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+		if (ActiveColorMap == myExisingColorMapName && iscustom)
+		{
+			QInputDialog *giveNameDialog = new QInputDialog();
+			bool dialogResult;
+			QString newColormapName = giveNameDialog->getText(0, "Change color map name", "Name:", QLineEdit::Normal,
+				myExisingColorMapName, &dialogResult);
+			if (dialogResult)
+			{
+
+				cout << "new color map given:" << newColormapName.toStdString() << endl;
+				if (mqMorphoDigCore::instance()->colorMapNameAlreadyExists(newColormapName) == 1)
+				{
+					QMessageBox msgBox;
+					msgBox.setText("Can't change custom map name : name already exists.");
+					msgBox.exec();
+					return;
+				}
+				if (newColormapName.length() == 0)
+				{
+					QMessageBox msgBox;
+					msgBox.setText("Can't save custom map: name length =0.");
+					msgBox.exec();
+					return;
+				}
+				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name = newColormapName;
+				mqMorphoDigCore::instance()->Setmui_ActiveColorMap(newColormapName, mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+				this->RefreshComboColorMaps();
+				//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
+				//this->UpdateUI();
+			}
+			else
+			{
+				cout << "cancel " << endl;
+			}
+			
+			//this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+
+
+		}
+	}
+
+}
+
+void mqEditScalarsDialog::slotDeleteColorMap()
+{
+
+	QString ActiveColorMap = this->Ui->comboColorMap->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom;
+		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+		if (ActiveColorMap == myExisingColorMapName && iscustom)
+		{
+		
+			mqMorphoDigCore::instance()->deleteColorMap(i);
+			//mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.erase(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.begin() + i);
+			//mqMorphoDigCore::instance()->Setmui_ActiveColorMap(newColormapName, mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+			this->RefreshComboColorMaps();
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap);
+			mqMorphoDigCore::instance()->Render();
+				//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
+				//this->UpdateUI();
+			
+
+			//this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+
+
+		}
+	}
+}
+void mqEditScalarsDialog::slotRefreshSuggestedRange()
+{
+	this->RefreshSuggestedRange();
+}
 
 void mqEditScalarsDialog::RefreshSuggestedRange() 
 {
+	cout << "DIAL refreshsuggestedRange" << endl;
 	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax());
 	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin());
 }
@@ -362,8 +511,10 @@ void mqEditScalarsDialog::RefreshComboScalars()
 
 void mqEditScalarsDialog::RefreshComboColorMaps() 
 {
+	cout << "RefreshComboColorMaps" << endl;
 	this->Ui->comboColorMap->clear();
 	ExistingColorMaps *MyCM = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps();
+	cout << "Found" << MyCM->Stack.size() << "color maps" << endl;
 	for (int i = 0; i < MyCM->Stack.size(); i++)
 	{
 
@@ -388,7 +539,8 @@ void mqEditScalarsDialog::RefreshComboColorMaps()
 	if (exists > -1) {
 		cout << "DIAL Now current index of combo box is " << exists << endl;
 		this->Ui->comboColorMap->setCurrentIndex(exists);
-
+		vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap;
+		//this->mColorMap
 
 	}
 }
@@ -472,6 +624,7 @@ void mqEditScalarsDialog::slotActiveScalarChanged(int idx)
 				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).DataType,
 				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).NumComp
 			);
+			
 			this->RefreshSuggestedRange();
 
 		}
@@ -491,10 +644,21 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 		if (NewActiveColorMap == myExisingColorMapName)
 		{
 			
+			if (mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom==1)
+			{
+				this->Ui->deleteColorMap->setDisabled(false);
+				this->Ui->editColorMap->setDisabled(false);
+			}
+			else
+			{
+				this->Ui->deleteColorMap->setDisabled(true);
+				this->Ui->editColorMap->setDisabled(true);
 
+			}
 			mqMorphoDigCore::instance()->Setmui_ActiveColorMapAndRender(NewActiveColorMap,
 				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap
 			);
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
 		
 
 
@@ -624,7 +788,7 @@ void mqEditScalarsDialog::slotAccepted()
 }
 void mqEditScalarsDialog::UpdateLookupTables()
 {
-	mqMorphoDigCore::instance()->UpddateLookupTablesRanges(this->Ui->currentMin->value(), this->Ui->currentMax->value());
+	mqMorphoDigCore::instance()->UpdateLookupTablesRanges(this->Ui->currentMin->value(), this->Ui->currentMax->value());
 }
 void mqEditScalarsDialog::slotCurrentMinMaxEdited()
 {
@@ -647,8 +811,19 @@ void mqEditScalarsDialog::slotCurrentMinMaxEdited()
 }
 void mqEditScalarsDialog::slotRefreshDialog()
 {
-	
-	this->RefreshDialog();
+	cout << "Let's refresh dialog!"		<< endl;
+
+	//Dirty hack here! Replace "mqMorphoDigCore::instance()->GetScalarRangeMax()" by something which finds the bounds
+	// of the currently used lookup table
+	double min = mqMorphoDigCore::instance()->GetScalarRangeMin();
+	double max = mqMorphoDigCore::instance()->GetScalarRangeMax();
+	/*this->Ui->currentMin->setValue(min);
+	this->Ui->currentMax->setValue(max);*/
+	this->Ui->sliderMin->setDoubleValue(min);
+	this->Ui->sliderMax->setDoubleValue(max);
+	this->RefreshSliders();
+	this->RefreshComboColorMaps();
+	//this->RefreshDialog();
 }
 
 

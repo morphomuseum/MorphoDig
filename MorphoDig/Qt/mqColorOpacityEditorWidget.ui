@@ -28,14 +28,20 @@
         <number>0</number>
        </property>
        <property name="sizeConstraint">
-        <enum>QLayout::SetMinimumSize</enum>
+        <enum>QLayout::SetFixedSize</enum>
        </property>
        <item>
         <widget class="mqTransferFunctionWidget" name="OpacityEditor" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>80</height>
+           <width>287</width>
+           <height>182</height>
           </size>
          </property>
         </widget>
@@ -43,7 +49,7 @@
        <item>
         <widget class="mqTransferFunctionWidget" name="ColorEditor" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -83,45 +89,37 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QToolButton" name="ResetRangeToCustom">
+	   <item>
+        <widget class="QToolButton" name="InvertRGB">
          <property name="toolTip">
-          <string>Rescale to custom range</string>
+          <string>Invert transfer function colors</string>
          </property>
          <property name="text">
           <string/>
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/ResetRangeCustom24.png</normaloff>:/Icons/ResetRangeCustom24.png</iconset>
+           <normaloff>:/Icons/InvertRGB24.png</normaloff>:/Icons/InvertRGB24.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="ResetRangeToDataOverTime">
+        <widget class="QToolButton" name="InvertOpacity">
          <property name="toolTip">
-          <string>Rescale to data range over all timesteps</string>
+          <string>Invert transfer function opacity</string>
          </property>
          <property name="text">
           <string/>
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/ResetRangeTemporal24.png</normaloff>:/Icons/ResetRangeTemporal24.png</iconset>
+           <normaloff>:/Icons/Invert24.png</normaloff>:/Icons/Invert24.png</iconset>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="ResetRangeToVisibleData">
-         <property name="toolTip">
-          <string>Rescale to visible range</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/ResetToVisibleRange32.png</normaloff>:/Icons/ResetToVisibleRange32.png</iconset>
+         <property name="checkable">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -139,21 +137,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QToolButton" name="ChoosePreset">
-         <property name="toolTip">
-          <string>Choose preset</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/Favorites16.png</normaloff>:/Icons/Favorites16.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="SaveAsPreset">
+        <widget class="QToolButton" name="SaveAsCustom">
          <property name="toolTip">
           <string>Save to preset</string>
          </property>
@@ -162,7 +146,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/Save16.png</normaloff>:/Icons/Save16.png</iconset>
+           <normaloff>:/Icons/filesave22.png</normaloff>:/Icons/filesave22.png</iconset>
          </property>
         </widget>
        </item>
@@ -176,7 +160,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/Advanced26.png</normaloff>:/Icons/Advanced26.png</iconset>
+           <normaloff>:/Icons/Advanced32.png</normaloff>:/Icons/Advanced32.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -205,6 +189,44 @@
         </sizepolicy>
        </property>
       </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="EnableOpacityMapping">
+     <property name="text">
+      <string>Enable opacity mapping for surfaces</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="Discretize">
+     <property name="text">
+      <string>Discretize</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout3" stretch="0,0,0">
+     <item>
+      <widget class="QLabel" name="label2">
+       <property name="text">
+        <string>Nr of values:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="discretizeSlider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="currentDiscretizeValue"/>
      </item>
     </layout>
    </item>

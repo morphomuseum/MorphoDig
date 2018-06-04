@@ -15,6 +15,7 @@
 #define mqMorphoDigCore_h
 #include <QObject>
 #include <QPointer>
+#include "QRAMThread.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkMDActorCollection.h"
 #include "vtkBezierCurveSource.h"
@@ -27,15 +28,17 @@
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
 //#include "vtkUndoStackInternal.h"
 
-
+#include <QProgressBar>
 #include <QVTKOpenGLWidget.h>
 #include <vtkScalarBarActor.h>
+#include <vtkKdTreePointLocator.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkSmartPointer.h>    
 #include <vtkCornerAnnotation.h>
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include <QMainWindow>
+
 
 
 class ExistingScalars
@@ -66,13 +69,13 @@ public:
 	{
 		QString Name;
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap;
+		int isCustom;
 
-
-		Element(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colormap)
+		Element(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colormap, int custom=0)
 		{
 			this->Name = name;
 			this->ColorMap = colormap;
-
+			this->isCustom = custom;
 
 		}
 	};
@@ -313,6 +316,8 @@ class  mqMorphoDigCore : public QObject
 	Q_OBJECT
 		typedef QObject Superclass;
 public:
+	QRAMThread *myRAMThread;
+	QProgressBar *myRAMProgressBar;
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
 	void RemoveScalar(QString scalarName, int onlySelectedObjects);
@@ -394,11 +399,16 @@ public:
 	void SaveORI(QString fileName);
 	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces =0);
 	int SaveSTVFile(QString fileName, int save_only_selected);
+	int SaveMAPFile(QString fileName, int save_only_active);
+	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
+	void OpenMAP(QString fileName);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
 	
 	int SaveShapeMeasures(QString fileName, int mode);
-	
+	void SaveMeshSize(QString fileName);
+	void SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName);
+	void SaveActiveScalarSummary(QString fileName);
 	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt=0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
@@ -498,10 +508,17 @@ public:
 	void UpdateLandmarkSettings();
 	void UpdateLandmarkSettings(vtkLMActor *myActor);
 	void SetMainWindow(QMainWindow *_mainWindow);
+	void InitStatusBar();
 	void SetProjectWindow(QMainWindow *_projectWindow);
 	QMainWindow* GetMainWindow();
 	QMainWindow* GetProjectWindow();
 	void LandmarksMoveUp();
+	void LandmarksPushBack();
+	void LandmarksReorient();
+	void LandmarksPushBackOrReorient(int mode);
+	void LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree,  vtkSmartPointer<vtkPolyData> PD, int mcount);
+	
+	
 	void ChangeClippingPlane();
 	int Getmui_ClippinPlane();
 	void Setmui_ClippinPlane(int on_off);
@@ -551,6 +568,7 @@ public:
   vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
   void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit);
+  void scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode);
   void scalarsCurvature(int curvatureType, QString scalarName);
   void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
   void scalarsDistance(double maxDist, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor);
@@ -559,11 +577,12 @@ public:
   std::vector<std::string> getActorNames();
   
   void scalarsCameraDistance(); //compute camera distance for each selected scalar.
-  void scalarsGaussianBlur(); //compute gaussian blur of current scalars
+  void scalarsSmooth(double localAreaLimit, int cutMinMax, double cutPercent, int mode); //compute gaussian blur of current scalars
   void scalarsRGB(QString newRGB);
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
+  void groupSelectedActors();
   void startLasso(int lasso_mode);//change interaction style
   void setCurrentCursor(int cursor); //changes mouse cursor
   void stopLasso();//change interaction style back to normal
@@ -601,6 +620,7 @@ public:
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
   static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);
   
+  void signal_colorMapsChanged();
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
   void signal_projectionModeChanged();
@@ -608,12 +628,17 @@ public:
   void signal_existingScalarsChanged();
   void signal_activeScalarChanged();
   //void signal_ActorsMightHaveChanged();
-  double GetScalarRangeMin();
   vtkDiscretizableColorTransferFunction* GetOneColorMap();
-  void UpddateLookupTablesRanges(double min, double max);
-	double GetScalarRangeMax();
+  void UpdateLookupTablesRanges(double min, double max);
+
+  void UpdateLookupTablesToData();
+  void createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC);
+  void invertRGB(vtkDiscretizableColorTransferFunction *STC);
+  void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin();
 	double GetSuggestedScalarRangeMax();
+	double GetScalarRangeMin();
+	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
   void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
@@ -626,9 +651,14 @@ public:
   //void SetCurrentInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
+  int colorMapNameAlreadyExists(QString proposed_name);
+  void deleteColorMap(int i);
+  double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);
+  double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list);
 signals:
-
+  
   void projectionModeChanged();
+  void colorMapsChanged();
   void zoomChanged();
   void lmSelectionChanged();
   void actorSelectionChanged();
@@ -637,6 +667,8 @@ signals:
   void actorsMightHaveChanged();
   void modeModeChanged();
   void thicknessProgression(int percent);
+  void complexityProgression(int percent);
+  void smoothingProgression(int percent);
   void distanceProgression(int percent);
 protected:
 	
@@ -767,9 +799,11 @@ protected:
 public slots:
 	virtual void slotLandmarkMoveUp();
 	virtual void slotLandmarkMoveDown();
+	virtual void slotLandmarkPushBack();
+	virtual void slotLandmarkReorient();
 	virtual void slotUpdateAllSelectedFlagsColors();
 	virtual void slotConvexHULL();
-	
+	virtual void slotGroup();
 	virtual void slotLassoCutKeepInside();
 	virtual void slotLassoCutKeepOutside();
 	virtual void slotLassoTagInside();
@@ -779,7 +813,6 @@ public slots:
 	virtual void slotKeepLargest();
 	virtual void slotScalarsCameraDistance();
 	virtual void slotScalarsRGB();
-	virtual void slotScalarsGaussianBlur();
 	virtual void  slotGrey();
 	virtual void slotYellow();
 	virtual void slotRed();
@@ -794,7 +827,7 @@ public slots:
 	virtual void slotOrange();
 	virtual void slotBrown();
 	virtual void slotEditGridInfos();
-
+	virtual void slotRAMProgressBar(int percent);
 private:
 	static mqMorphoDigCore* Instance;
 	QVTKOpenGLWidget *qvtkWidget;

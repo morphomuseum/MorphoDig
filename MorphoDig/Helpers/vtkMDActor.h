@@ -77,6 +77,12 @@ public:
 	vtkGetVector4Macro(mColor, double);
 	void SetmColor(double r, double g, double b, double a);
 	void SetmColor(double c[4]);
+
+	double GetBoundingBoxLength();
+	double GetAvgCentroidDistance();
+	double GetMaxCentroidDistance();
+	double GetXYZAvgPCLength();
+	double GetXYZPCLength(int pc);// gives a measure "size" of the mesh. Length of the vtkPolyData projected on PC1, PC2 or PC3 of a PCA of x,y,z coordinates of the VTK PolyData
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
 	// Actual actor render method.
 	vtkIdType GetNumberOfPoints();

@@ -6,6 +6,7 @@
 #include "mqTransferFunctionWidget.h"
 
 #include "mqCoreUtilities.h"
+#include "mqMorphoDigCore.h"
 //#include "pqQVTKWidgetBase.h"
 //#include "pqTimer.h"
 #include <QTimer>
@@ -77,7 +78,7 @@ public:
   // Paint function is invoked.
   void Update() VTK_OVERRIDE
   {
-	  cout << "mqTransferFunctionWidget Update" << endl;
+	//  cout << "mqTransferFunctionWidget Update" << endl;
     if (this->ControlPointsItem)
     {
       // Reset bounds if the control points' bounds have changed.
@@ -97,7 +98,7 @@ public:
 
   bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
   {
-	  cout << "mqTransferFunctionWidget PaintChildren" << endl;
+	 // cout << "mqTransferFunctionWidget PaintChildren" << endl;
     if (this->DataValid)
    {
       return this->Superclass::PaintChildren(painter);
@@ -145,7 +146,7 @@ public:
 protected:
   vtkTransferFunctionChartXY()
   {
-	  cout << "mqTransferFunctionWidget ChartXY creation" << endl;
+	//  cout << "mqTransferFunctionWidget ChartXY creation" << endl;
     this->XRange[0] = this->XRange[1] = 0.0;
    this->DataValid = false;
     this->ZoomWithMouseWheelOff();
@@ -182,7 +183,7 @@ public:
     : Widget(new QVTKOpenGLWidget(editor))
     , CurrentPointEditEventId(0)
   {
-	  cout << "mqTransferFunctionWidget Internals Creator" << endl;
+	//  cout << "mqTransferFunctionWidget Internals Creator" << endl;
     this->Timer.setSingleShot(true);
     this->Timer.setInterval(0);
 
@@ -226,7 +227,7 @@ public:
 
   void cleanup()
   {
-	  cout << "mqTransferFunctionWidget Cleanup" << endl;
+	 // cout << "mqTransferFunctionWidget Cleanup" << endl;
     this->VTKConnect->Disconnect();
     this->ChartXY->ClearPlots();
     if (this->ControlPointsItem && this->CurrentPointEditEventId)
@@ -244,7 +245,7 @@ mqTransferFunctionWidget::mqTransferFunctionWidget(QWidget* parentObject)
   : Superclass(parentObject)
   , Internals(new mqInternals(this))
 {
-	cout << "mqTransferFunctionWidget Widget constructor" << endl;
+//	cout << "mqTransferFunctionWidget Widget constructor" << endl;
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(renderInternal()));
 }
 
@@ -259,7 +260,7 @@ mqTransferFunctionWidget::~mqTransferFunctionWidget()
 void mqTransferFunctionWidget::initialize(
   vtkScalarsToColors* stc, bool stc_editable, vtkPiecewiseFunction* pwf, bool pwf_editable)
 {
-	cout << "mqTransferFunctionWidget Initialize " << endl;
+	//cout << "mqTransferFunctionWidget Initialize " << endl;
   this->Internals->cleanup();
 
   // TODO: If needed, we can support vtkLookupTable.
@@ -267,7 +268,7 @@ void mqTransferFunctionWidget::initialize(
 
   if (ctf != NULL && pwf == NULL)
   {
-	  cout << "mqTransferFunctionWidget Initialize 1" << endl;
+	//  cout << "mqTransferFunctionWidget Initialize 1" << endl;
     vtkNew<vtkColorTransferFunctionItem> item;
     item->SetColorTransferFunction(ctf);
 
@@ -290,7 +291,7 @@ void mqTransferFunctionWidget::initialize(
   }
   else if (ctf == NULL && pwf != NULL)
   {
-	  cout << "mqTransferFunctionWidget Initialize 2" << endl;
+	//  cout << "mqTransferFunctionWidget Initialize 2" << endl;
     vtkNew<vtkPiecewiseFunctionItem> item;
     item->SetPiecewiseFunction(pwf);
 
@@ -308,7 +309,7 @@ void mqTransferFunctionWidget::initialize(
   }
   else if (ctf != NULL && pwf != NULL)
   {
-	  cout << "mqTransferFunctionWidget Initialize 3" << endl;
+	//  cout << "mqTransferFunctionWidget Initialize 3" << endl;
     vtkNew<vtkCompositeTransferFunctionItem> item;
     item->SetOpacityFunction(pwf);
     item->SetColorTransferFunction(ctf);
@@ -345,12 +346,12 @@ void mqTransferFunctionWidget::initialize(
   {
     return;
   }
-  cout << "mqTransferFunctionWidget Initialize suite" << endl;
+ // cout << "mqTransferFunctionWidget Initialize suite" << endl;
   this->Internals->ChartXY->AddPlot(this->Internals->TransferFunctionItem);
 
   if (this->Internals->ControlPointsItem)
   {
-	  cout << "mqTransferFunctionWidget we have control points item" << endl;
+	 // cout << "mqTransferFunctionWidget we have control points item" << endl;
 
     this->Internals->ChartXY->ControlPointsItem = this->Internals->ControlPointsItem;
     this->Internals->ControlPointsItem->SetEndPointsRemovable(false);
@@ -362,20 +363,20 @@ void mqTransferFunctionWidget::initialize(
       vtkControlPointsItem::CurrentPointChangedEvent, this, SLOT(onCurrentChangedEvent()));
     mqCoreUtilities::connect(this->Internals->ControlPointsItem, vtkCommand::EndEvent, this,
       SIGNAL(controlPointsModified()));
-	cout << "mqTransferFunctionWidget OK?" << endl;
+	//cout << "mqTransferFunctionWidget OK?" << endl;
   }
 
   // If the transfer functions change, we need to re-render the view. This
   // ensures that.
   if (ctf)
   {
-	  cout << "mqTransferFunctionWidget conect ctf with slot render" << endl;
+	 // cout << "mqTransferFunctionWidget conect ctf with slot render" << endl;
 
     this->Internals->VTKConnect->Connect(ctf, vtkCommand::ModifiedEvent, this, SLOT(render()));
   }
   if (pwf)
   {
-	  cout << "mqTransferFunctionWidget conect pwf with slot render" << endl;
+	 // cout << "mqTransferFunctionWidget conect pwf with slot render" << endl;
     this->Internals->VTKConnect->Connect(pwf, vtkCommand::ModifiedEvent, this, SLOT(render()));
   }
 }
@@ -383,7 +384,7 @@ void mqTransferFunctionWidget::initialize(
 //-----------------------------------------------------------------------------
 void mqTransferFunctionWidget::onCurrentPointEditEvent()
 {
-	cout << "mqTransferFunctionWidget editPT " << endl;
+//	cout << "mqTransferFunctionWidget editPT " << endl;
   vtkColorTransferControlPointsItem* cpitem =
     vtkColorTransferControlPointsItem::SafeDownCast(this->Internals->ControlPointsItem);
   if (cpitem == NULL)
@@ -418,7 +419,7 @@ void mqTransferFunctionWidget::onCurrentPointEditEvent()
 //-----------------------------------------------------------------------------
 void mqTransferFunctionWidget::onCurrentChangedEvent()
 {
-	cout << "mqTransferFunctionWidget Changed " << endl;
+	//cout << "mqTransferFunctionWidget Changed " << endl;
   if (this->Internals->ControlPointsItem)
   {
     emit this->currentPointChanged(this->Internals->ControlPointsItem->GetCurrentPoint());
@@ -428,7 +429,7 @@ void mqTransferFunctionWidget::onCurrentChangedEvent()
 //-----------------------------------------------------------------------------
 vtkIdType mqTransferFunctionWidget::currentPoint() const
 {
-	cout << "mqTransferFunctionWidget currPt" << endl;
+	//cout << "mqTransferFunctionWidget currPt" << endl;
   if (this->Internals->ControlPointsItem)
   {
     return this->Internals->ControlPointsItem->GetCurrentPoint();
@@ -440,7 +441,7 @@ vtkIdType mqTransferFunctionWidget::currentPoint() const
 //-----------------------------------------------------------------------------
 void mqTransferFunctionWidget::setCurrentPoint(vtkIdType index)
 {
-	cout << "mqTransferFunctionWidget setCurrPt " << endl;
+	//cout << "mqTransferFunctionWidget setCurrPt " << endl;
   if (this->Internals->ControlPointsItem)
   {
     if (index < -1 || index >= this->Internals->ControlPointsItem->GetNumberOfPoints())
@@ -454,7 +455,7 @@ void mqTransferFunctionWidget::setCurrentPoint(vtkIdType index)
 //-----------------------------------------------------------------------------
 vtkIdType mqTransferFunctionWidget::numberOfControlPoints() const
 {
-	cout << "mqTransferFunctionWidget nrCtrlPT" << endl;
+	//cout << "mqTransferFunctionWidget nrCtrlPT" << endl;
   return this->Internals->ControlPointsItem
     ? this->Internals->ControlPointsItem->GetNumberOfPoints()
     : 0;
@@ -476,7 +477,7 @@ bool mqTransferFunctionWidget::GetLogScaleXAxis() const
 //-----------------------------------------------------------------------------
 void mqTransferFunctionWidget::render()
 {
- cout << "mqTransferFunctionWidget render" << endl;
+ //cout << "mqTransferFunctionWidget render" << endl;
   this->Internals->Timer.start();
 	/*if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
 	{
@@ -487,17 +488,18 @@ void mqTransferFunctionWidget::render()
 //-----------------------------------------------------------------------------
 void mqTransferFunctionWidget::renderInternal()
 {
-	cout << "mqTransferFunctionWidget renderInternal" << endl;
+	//cout << "mqTransferFunctionWidget renderInternal" << endl;
   if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
   {
     this->Internals->ContextView->GetRenderWindow()->Render();
+	mqMorphoDigCore::instance()->Render();
   }
 }
 
 //-----------------------------------------------------------------------------
 void mqTransferFunctionWidget::setCurrentPointPosition(double xpos)
 {
-	cout << "mqTransferFunctionWidget currPT Position " << endl;
+	//cout << "mqTransferFunctionWidget currPT Position " << endl;
   vtkIdType currentPid = this->currentPoint();
   if (currentPid < 0)
   {

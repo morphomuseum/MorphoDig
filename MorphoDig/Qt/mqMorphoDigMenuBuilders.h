@@ -50,6 +50,8 @@ public:
   */
   static void buildToolbars(QMainWindow& mainWindow);
 
+  static void buildStatusBar(QMainWindow& mainWindow);
+
   /*public slots:
   virtual void slotLandmarkMoveUp();
   virtual void slotLandmarkMoveDown();*/

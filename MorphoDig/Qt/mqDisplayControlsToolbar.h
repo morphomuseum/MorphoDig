@@ -60,8 +60,7 @@ public:
   
 
   public slots :
-  virtual void slotClippingPlaneOnOff();
-  virtual void slotBackfaceCullingOnOff();
+
 private:
 	Q_DISABLE_COPY(mqDisplayControlsToolbar)
   

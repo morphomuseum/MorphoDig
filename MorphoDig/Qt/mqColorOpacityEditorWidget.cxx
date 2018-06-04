@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 #include <QMessageBox>
 #include <QPointer>
+#include <QInputDialog>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtDebug>
@@ -112,6 +113,18 @@ public:
     this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
+	this->Ui.EnableOpacityMapping->setChecked(true);
+	this->Ui.Discretize->setChecked(false);
+	this->Ui.currentDiscretizeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui.currentDiscretizeValue->setMinimum(1);
+	this->Ui.currentDiscretizeValue->setMaximum(1024);
+	this->Ui.currentDiscretizeValue->setValue(256);
+	this->Ui.currentDiscretizeValue->setEnabled(false);
+	this->Ui.discretizeSlider->setMinimum(1);
+	this->Ui.discretizeSlider->setMaximum(1024);
+	this->Ui.discretizeSlider->setValue(256);
+	this->Ui.discretizeSlider->setEnabled(false);
+
   }
 
   void render()
@@ -134,6 +147,34 @@ public:
   }
 };
 
+void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunction *stc)
+{
+	this->STC = stc;
+	if (stc != NULL)
+	{
+		if (stc->GetEnableOpacityMapping()) { this->Internals->Ui.EnableOpacityMapping->setChecked(true); }		
+		else { this->Internals->Ui.EnableOpacityMapping->setChecked(false); }
+		this->Internals->Ui.discretizeSlider->setValue(this->STC->GetNumberOfValues());
+		this->Internals->Ui.currentDiscretizeValue->setValue(this->STC->GetNumberOfValues());
+		if (stc->GetDiscretize()) { 
+			this->Internals->Ui.Discretize->setChecked(true); 
+			this->Internals->Ui.discretizeSlider->setDisabled(false);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(false);
+		}
+		else{ 
+			this->Internals->Ui.Discretize->setChecked(false); 
+			this->Internals->Ui.discretizeSlider->setDisabled(true);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(true);
+		}
+
+		this->Internals->Ui.ColorEditor->initialize(stc, true, NULL, false);
+		this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
+		cout << "reinitialize: updateCurrentData... " << endl;
+		this->updateCurrentData();
+		cout << "reinitialize: updatePanel... " << endl;
+		this->updatePanel();
+	}
+}
 //-----------------------------------------------------------------------------
 mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 	vtkDiscretizableColorTransferFunction *stc, QWidget* parentObject)
@@ -180,7 +221,25 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   QObject::connect(
     ui.OpacityEditor, SIGNAL(controlPointsModified()), this, SLOT(updateCurrentData()));
 
-  //QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
+  QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
+  QObject::connect(ui.InvertRGB, SIGNAL(clicked()), this, SLOT(invertRGB()));
+  QObject::connect(ui.InvertOpacity, SIGNAL(clicked()), this, SLOT(invertOpacity()));
+
+  QObject::connect(ui.EnableOpacityMapping, SIGNAL(clicked()), this, SLOT(changedEnableOpacity()));
+  QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changeDiscretize()));
+//  QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changedDiscretize()));
+  
+  QObject::connect(ui.discretizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changedDiscretizeValue(int)));
+  QObject::connect(ui.discretizeSlider, SIGNAL(valueChanged(int)), ui.currentDiscretizeValue, SLOT(setValue(int)));
+  QObject::connect(ui.currentDiscretizeValue, SIGNAL(valueChanged(int)), this, SLOT(changedDiscretizeValue(int)));
+  QObject::connect(ui.currentDiscretizeValue, SIGNAL(valueChanged(int)), ui.discretizeSlider, SLOT(setValue(int)));
+
+  //QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changedDiscretize()));
+
+ // connect(slider, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
+ // connect(slider, SIGNAL(valueChanged(int)), this, SIGNAL(valueChanged(int)));
+
+
 
  // QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
 
@@ -195,6 +254,8 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 
  // QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
   //QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
+  QObject::connect(ui.SaveAsCustom, SIGNAL(clicked()), this, SLOT(saveAsCustom()));
+  
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
  // this->connect(
@@ -424,8 +485,8 @@ void mqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* p
     stc = vtkScalarsToColors::SafeDownCast(this->proxy()->GetClientSideObject());
   }*/
   cout << "mqColorOpacityEditorWidget initializeOpacityEditor" << endl;
-  //ui.OpacityEditor->initialize(this->STC, false, pwf, true);
-  ui.OpacityEditor->initialize(NULL, false, pwf, true);
+  ui.OpacityEditor->initialize(this->STC, false, pwf, true);
+ // ui.OpacityEditor->initialize(NULL, false, pwf, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -493,6 +554,10 @@ void mqColorOpacityEditorWidget::updateCurrentData()
     // rescale the transfer function manually
     ui.CurrentDataValue->setEnabled(ui.ColorEditor->currentPoint() != 0 &&
       ui.ColorEditor->currentPoint() != (ui.ColorEditor->numberOfControlPoints() - 1));
+
+
+
+
   }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
   {
@@ -718,20 +783,83 @@ void mqColorOpacityEditorWidget::currentDataEdited()
 
 //-----------------------------------------------------------------------------
 
-/*
 
-//-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::resetRangeToData()
+void mqColorOpacityEditorWidget::invertRGB()
 {
-  // passing in NULL ensure pqResetScalarRangeReaction simply uses active representation.
-  if (pqResetScalarRangeReaction::resetScalarRangeToData(NULL))
-  {
-    this->Internals->render();
-    emit this->changeFinished();
-  }
+	if (this->STC != NULL)
+	{
+		mqMorphoDigCore::instance()->invertRGB(this->STC);
+		this->reInitialize(STC);
+	}
+}
+void mqColorOpacityEditorWidget::invertOpacity()
+{
+	if (this->STC != NULL)
+	{
+		mqMorphoDigCore::instance()->invertOpacity(this->STC);
+		this->reInitialize(STC);
+	}
 }
 
-*/
+//-----------------------------------------------------------------------------
+void mqColorOpacityEditorWidget::resetRangeToData()
+{
+	//this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax());
+	//this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin());
+  // passing in NULL ensure pqResetScalarRangeReaction simply uses active representation.
+  //if (pqResetScalarRangeReaction::resetScalarRangeToData(NULL))
+  //{
+   // this->Internals->render();
+	mqMorphoDigCore::instance()->UpdateLookupTablesToData();
+    emit this->changeFinished();
+  //}
+}
+
+void mqColorOpacityEditorWidget::changeDiscretize() 
+{
+	if (this->STC != NULL)
+	{
+		if (this->Internals->Ui.Discretize->isChecked()) {
+			this->Internals->Ui.Discretize->setChecked(true);
+			this->STC->DiscretizeOn();
+			cout << "Discretize is on and STC has " << STC->GetNumberOfValues() << endl;
+			this->Internals->Ui.discretizeSlider->setDisabled(false);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(false);
+		}
+		else {
+			this->STC->DiscretizeOff();
+			
+			this->Internals->Ui.discretizeSlider->setDisabled(true);
+			this->Internals->Ui.currentDiscretizeValue->setDisabled(true);
+		}
+	}
+}
+void  mqColorOpacityEditorWidget::changedDiscretizeValue(int value)
+{
+	//this->Internals->Ui.currentDiscretizeValue->setValue(value);
+	if (this->STC != NULL)
+	{
+		this->STC->SetNumberOfValues(value);
+	}
+}
+void mqColorOpacityEditorWidget::changedEnableOpacity()
+{
+	cout << "change EnableOpacity" << endl;
+	if (this->STC != NULL)
+	{
+		if (this->Internals->Ui.EnableOpacityMapping->isChecked())
+		{
+			this->STC->EnableOpacityMappingOn();
+		}
+		else
+		{
+			this->STC->EnableOpacityMappingOff();
+		}
+	}
+	
+
+
+}
 
 //-----------------------------------------------------------------------------
 
@@ -832,7 +960,43 @@ void pqColorOpacityEditorWidget::presetApplied()
   this->Internals->OpacityTableModel.refresh();
 }
 */
+void mqColorOpacityEditorWidget::saveAsCustom()
+{
+	QInputDialog *giveNameDialog = new QInputDialog();
+	bool dialogResult;
+	QString newColormapName = giveNameDialog->getText(0, "Color map name", "Name:", QLineEdit::Normal,
+		"Custom_color_map", &dialogResult);
+	if (dialogResult)
+	{
+		
+		cout << "color map given:" << newColormapName.toStdString() << endl;
+		if (mqMorphoDigCore::instance()->colorMapNameAlreadyExists(newColormapName) == 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Can't save custom map : name already exists.");
+			msgBox.exec();
+			return;
+		}
+		if (newColormapName.length()==0)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Can't save custom map: name length =0.");
+			msgBox.exec();
+			return;
+		}
+		mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC); 
+		emit this->changeFinished();
+		//this->UpdateUI();
+	}
+	else
+	{
+		cout << "cancel " << endl;
+	}
+
+}
+
 /*
+
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::saveAsPreset()
 {
