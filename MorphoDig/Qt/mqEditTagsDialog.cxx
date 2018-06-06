@@ -14,6 +14,7 @@
 #include "mqSaveMAPDialogReaction.h"
 #include "mqUndoStack.h"
 #include "QDoubleSlider.h"
+#include "mqColorChooserButton.h"
 #include "mqColorOpacityEditorWidget.h"
 #include "mqTransferFunctionWidget.h"
 #include "mqMinimalWidget.h"
@@ -88,22 +89,27 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	// Test: fill the list
 
 
-	this->Ui->tableWidget->setColumnCount(4);
+	this->Ui->tableWidget->setColumnCount(5);
 	this->Ui->tableWidget->setRowCount(10);
 	cout << "Try this6" << endl;
 	QLabel *nom;
-	QRadioButton *radio1, *radio2, *radio3;
+	QRadioButton *radio;
+	QToolButton *clear;
+	mqColorChooserButton *colorbutton;
+	QToolButton *fill;
 	for (int i = 0; i < 10; i++) {
 		nom = new QLabel();
-		nom->setText(QString("Tag") + QString::number(i));
+		nom->setText(QString("Tag ") + QString::number(i));
 		this->Ui->tableWidget->setCellWidget(i, 0, nom);
 
-		radio1 = new QRadioButton();
-		radio2 = new QRadioButton();
-		radio3 = new QRadioButton();
-		this->Ui->tableWidget->setCellWidget(i, 1, radio1);
-		this->Ui->tableWidget->setCellWidget(i, 2, radio2);
-		this->Ui->tableWidget->setCellWidget(i, 3, radio3);
+		radio = new QRadioButton();
+		clear = new QToolButton();
+		fill = new QToolButton();
+		colorbutton = new mqColorChooserButton(this->Ui->tableWidget);
+		this->Ui->tableWidget->setCellWidget(i, 1, radio);
+		this->Ui->tableWidget->setCellWidget(i, 2, clear);
+		this->Ui->tableWidget->setCellWidget(i, 3, fill);
+		this->Ui->tableWidget->setCellWidget(i, 4, colorbutton);
 	}
 	
 	/*
