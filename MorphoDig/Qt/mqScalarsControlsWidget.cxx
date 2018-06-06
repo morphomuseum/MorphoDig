@@ -9,6 +9,7 @@
 
 // For later!
 #include "mqEditScalarsDialogReaction.h"
+#include "mqEditTagsDialogReaction.h"
 #include "mqUndoRedoReaction.h"
 #include "mqMorphoDigCore.h"
 
@@ -45,7 +46,7 @@ void mqScalarsControlsWidget::constructor()
 	 
   }
   
-  this->ui->TagEdit->setDisabled(true);
+  
   
   connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));
 
@@ -71,6 +72,17 @@ void mqScalarsControlsWidget::constructor()
   this->ui->ColorScaleEdit->setDisabled(true);
 
 
+  //@@@
+  QAction* TagEditAction = new QAction(tr("&TagEdit"), this);
+  TagEditAction->setToolTip(tr("Edit tags."));
+  this->ui->TagEdit->addAction(TagEditAction);
+  this->ui->TagEdit->setDefaultAction(TagEditAction);
+  QIcon icon2;
+  icon2.addFile(QStringLiteral(":/Icons/tag_edit.png"), QSize(), QIcon::Normal, QIcon::Off);
+  //  exportColorMap->setIcon(icon);
+  TagEditAction->setIcon(icon2);
+  new mqEditTagsDialogReaction(TagEditAction);
+  this->ui->TagEdit->setDisabled(true);
 }
 
 void mqScalarsControlsWidget::slotActiveScalarChanged(int idx)

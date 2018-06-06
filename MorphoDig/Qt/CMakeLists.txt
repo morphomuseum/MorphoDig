@@ -33,6 +33,10 @@ mqViewMenuManager.cxx
   mqEditScalarsDialog.cxx
   mqEditScalarsDialogReaction.h
   mqEditScalarsDialogReaction.cxx
+  mqEditTagsDialog.h
+  mqEditTagsDialog.cxx
+  mqEditTagsDialogReaction.h
+  mqEditTagsDialogReaction.cxx
   mqEditACTORDialogReaction.h
   mqEditACTORDialogReaction.cxx
   mqEditACTORDialog.h
@@ -270,6 +274,7 @@ mqEditAlphaDialog.ui
 mqCreateLMKDialog.ui
 mqEditFLGDialog.ui
 mqEditACTORDialog.ui
+mqEditTagsDialog.ui
 mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
 mqSelectLandmarkRangeDialog.ui
