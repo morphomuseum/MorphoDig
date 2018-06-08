@@ -41,7 +41,9 @@ mqOpacityTableModel::mqOpacityTableModel(mqColorOpacityEditorWidget* widget, QOb
   : Superclass(parentObject)
   , Widget(widget)
 {
-  this->NumberOfRowsCache = this->rowCount();
+   cout << "mqOpacityTableModel instantiation" << endl;	
+   this->NumberOfRowsCache = this->rowCount();
+   cout << "mqOpacityTableModel instantiation done" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,14 +112,17 @@ int mqOpacityTableModel::rowCount(const QModelIndex& parentIndex) const
   int size = 0;
   if (this->Widget && this->Widget->hasSTC())
   {
+	  cout << "mqOpacityTableModel try to get STC" << endl;
     vtkDiscretizableColorTransferFunction* stc =
       vtkDiscretizableColorTransferFunction::SafeDownCast(
 		  this->Widget->getSTC());
     if (stc)
     {
+		cout << "mqOpacityTableModel try to get pwf" << endl;
       vtkPiecewiseFunction* pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
       if (pwf)
       {
+		  cout << "mqOpacityTableModel try to get pwf size " << endl;
         size = pwf->GetSize();
       }
     }

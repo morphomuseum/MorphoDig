@@ -40,7 +40,9 @@ mqColorTableModel::mqColorTableModel(mqColorOpacityEditorWidget* widget, QObject
   : Superclass(parentObject)
   , Widget(widget)
 {
+	cout << "mqColorTableModel instantiation" << endl;
   this->NumberOfRowsCache = this->rowCount();
+  cout << "mqColorTableModel instantiation done" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -105,11 +107,13 @@ int mqColorTableModel::rowCount(const QModelIndex& parentIndex) const
   int size = 0;
   if (this->Widget && this->Widget->hasSTC())
   {
+	  cout << "mqColorTableModel try to get stc" << endl;
     vtkDiscretizableColorTransferFunction* stc =
       vtkDiscretizableColorTransferFunction::SafeDownCast(
         this->Widget->getSTC());
     if (stc)
     {
+		cout << "mqColorTableModel try to get size of stc" << endl;
       size = stc->GetSize();
     }
   }

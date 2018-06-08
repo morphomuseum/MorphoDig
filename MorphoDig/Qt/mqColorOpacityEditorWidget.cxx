@@ -96,19 +96,22 @@ public:
     : ColorTableModel(self)
     , OpacityTableModel(self)    
   {
+	  cout << "mqInternals instantiation" << endl;
     this->Ui.setupUi(self);
+	cout << "mqInternals instantiation : set validator" << endl;
     this->Ui.CurrentDataValue->setValidator(new QDoubleValidator(self));
     //this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     // this->Ui.mainLayout->setSpacing(
     //  pqPropertiesPanel::suggestedVerticalSpacing());
 
    // this->Decorator = new pqColorOpacityEditorWidgetDecorator(NULL, self);
-
+	cout << "mqInternals instantiation : create table model" << endl;
     this->Ui.ColorTable->setModel(&this->ColorTableModel);
+
     this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.ColorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.ColorTable->horizontalHeader()->setStretchLastSection(true);
-
+	cout << "mqInternals instantiation : create opaticy table model" << endl;
     this->Ui.OpacityTable->setModel(&this->OpacityTableModel);
     this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -124,7 +127,7 @@ public:
 	this->Ui.discretizeSlider->setMaximum(1024);
 	this->Ui.discretizeSlider->setValue(256);
 	this->Ui.discretizeSlider->setEnabled(false);
-
+	cout << "mqInternals instantiation : done" << endl;
   }
 
   void render()
@@ -185,7 +188,7 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   this->STC = stc;
   if (stc!=NULL)
   {
-
+	  cout << "Initialize ColorEditor widget. " << endl;
     ui.ColorEditor->initialize(stc, true, NULL, false);
     QObject::connect(&this->Internals->ColorTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
@@ -193,6 +196,7 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     QObject::connect(&this->Internals->OpacityTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
       SIGNAL(xvmsPointsChanged()));
+	cout << "Initialize OpacityEditor widget " << endl;
 	this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
   }
   else

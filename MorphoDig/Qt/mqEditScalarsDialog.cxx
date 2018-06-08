@@ -90,7 +90,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	QVBoxLayout* vbox = new QVBoxLayout(this->Ui->PropertiesFrame);
 	vbox->setMargin(0);
 	vbox->setSpacing(0);
-	//cout << "Try this!" << endl;
+	cout << "Create mqColorOpacityEditorWidget!" << endl;
 	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this);
 	//cout << "Try that!" << endl;
 	this->mColorMap = someMap;
