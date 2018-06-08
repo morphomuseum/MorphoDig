@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>334</width>
-    <height>774</height>
+    <height>346</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,7 +89,7 @@
          </property>
         </widget>
        </item>
-	   <item>
+       <item>
         <widget class="QToolButton" name="InvertRGB">
          <property name="toolTip">
           <string>Invert transfer function colors</string>
@@ -147,23 +147,6 @@
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/filesave22.png</normaloff>:/Icons/filesave22.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="AdvancedButton">
-         <property name="toolTip">
-          <string>Manually edit transfer functions</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/Advanced32.png</normaloff>:/Icons/Advanced32.png</iconset>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -230,66 +213,9 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QLabel" name="ColorLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Color transfer function values</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="mqExpandableTableView" name="ColorTable">
-     <property name="editTriggers">
-      <set>QAbstractItemView::DoubleClicked</set>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="maximumRowCountBeforeScrolling" stdset="0">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="OpacityLabel">
-     <property name="text">
-      <string>Opacity transfer function values</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="mqExpandableTableView" name="OpacityTable">
-     <property name="editTriggers">
-      <set>QAbstractItemView::DoubleClicked</set>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="maximumRowCountBeforeScrolling" stdset="0">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>mqExpandableTableView</class>
-   <extends>QTableView</extends>
-   <header>mqExpandableTableView.h</header>
-  </customwidget>
   <customwidget>
    <class>mqTransferFunctionWidget</class>
    <extends>QWidget</extends>

@@ -231,10 +231,6 @@ mqExpandableTableView.cxx
 mqExpandableTableView.h
 mqTableView.cxx
 mqTableView.h
-mqColorTableModel.h
-mqColorTableModel.cxx
-mqOpacityTableModel.cxx
-mqOpacityTableModel.h
 mqLineEdit.h
 mqLineEdit.cxx
 mqColorOpacityEditorWidget.cxx
