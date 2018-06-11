@@ -62,6 +62,8 @@ public:
 	VectorOfElements Stack;
 };
 
+
+
 class ExistingColorMaps
 {
 public:
@@ -84,6 +86,34 @@ public:
 	
 };
 
+class ExistingTagMaps
+{
+public:
+	struct Element
+	{
+		QString Name;
+		vtkSmartPointer<vtkLookupTable> TagMap;
+		int numTags;
+		std::vector<std::string> tagNames;
+		int isCustom;
+
+		Element(QString name, vtkSmartPointer<vtkLookupTable> tagmap, int numtags, std::vector<std::string> tagnames, int custom = 0)
+		{
+			this->Name = name;
+			this->TagMap = tagmap;
+			this->isCustom = custom;
+			this->tagNames = tagnames;
+			this->numTags = numtags;
+
+		}
+	};
+	typedef std::vector<Element> VectorOfElements;
+	VectorOfElements Stack;
+
+};
+
+
+
 class ActiveScalars
 {
 public:
@@ -91,6 +121,17 @@ public:
 	int DataType;
 	int NumComp;
 	
+};
+
+
+class ActiveTagMap
+{
+public:
+	QString Name;
+	vtkSmartPointer<vtkLookupTable> TagMap;
+	int numTags;
+	std::vector<std::string> tagNames;
+
 };
 
 
@@ -494,7 +535,15 @@ public:
 	void Setmui_ActiveColorMap(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colorMap);
 	void Setmui_ActiveColorMapAndRender(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colorMap);
 
-	
+
+
+	ExistingTagMaps* Getmui_ExistingTagMaps();
+	ActiveTagMap* Getmui_ActiveTagMap();
+
+	void Setmui_ActiveTagMap(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
+	void Setmui_ActiveTagMapAndRender(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
+
+
 
 	double* Getmui_BackGroundColor2();
 	void Getmui_BackGroundColor2(double bg[3]);
@@ -640,7 +689,7 @@ public:
 	double GetScalarRangeMin();
 	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
-  vtkSmartPointer<vtkLookupTable> GetTagLut();
+  //vtkSmartPointer<vtkLookupTable> GetTagLut();
   void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
   
   QVTKOpenGLWidget* getQVTKWidget();
@@ -675,7 +724,7 @@ protected:
 	~mqMorphoDigCore();
 	//vtkUndoStack* mUndoStack;
 	vtkSmartPointer<vtkLookupTable> TagLut;
-	int TagTableSize;
+	//int TagTableSize;
 
 	vtkSmartPointer<vtkMDInteractorStyle> Style;
 	vtkSmartPointer<vtkInteractorStyleDrawPolygon> LassoStyle;
@@ -723,6 +772,12 @@ protected:
 
 	ActiveColorMap *mui_ActiveColorMap;
 	ExistingColorMaps *mui_ExistingColorMaps;
+
+
+	ActiveTagMap *mui_ActiveTagMap;
+	ExistingTagMaps *mui_ExistingTagMaps;
+
+
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;
