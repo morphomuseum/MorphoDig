@@ -7109,10 +7109,8 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 				vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
 				vtkFloatArray *currentFScalars = (vtkFloatArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
 				vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-
-
-
-
+				vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				
 
 
 					// on cherche la scalar active pour ce maillage
@@ -7133,7 +7131,7 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 						}
 						else
 						{
-							// 2 cases : 
+							// 3 cases : 
 							//      A: active scalar = RGB => so we retake RGB... as we have started to do so earlier!
 							if(this->mui_ActiveScalars->DataType == VTK_UNSIGNED_CHAR
 								&&  this->mui_ActiveScalars->NumComp >= 3)
@@ -7159,20 +7157,36 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 							{
 								//      B: active scalar = 1 scalar or tag => we translate scalar or tag as RGB
 								if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
-									this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+									this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE ||
+									this->Getmui_ActiveScalars()->DataType == VTK_INT ||
+									this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
+
+
 									)
 									&& this->Getmui_ActiveScalars()->NumComp == 1)
 								{
 
 									double cscalar = 0;
-									if (currentFScalars != NULL)
+									if (this->Getmui_ActiveScalars()->DataType == VTK_INT ||
+										this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT)
 									{
-										cscalar = (double)currentFScalars->GetTuple(j)[0];
+										if (currentFScalars != NULL)
+										{
+											cscalar = (double)currentTags->GetTuple(j)[0];
+										}
 									}
-									if (currentDScalars != NULL)
+									else
 									{
-										cscalar = currentDScalars->GetTuple(j)[0];
+										if (currentFScalars != NULL)
+										{
+											cscalar = (double)currentFScalars->GetTuple(j)[0];
+										}
+										if (currentDScalars != NULL)
+										{
+											cscalar = currentDScalars->GetTuple(j)[0];
+										}
 									}
+									
 									// retrieve scalar value
 
 									double cRGB[3];
@@ -7651,11 +7665,67 @@ void mqMorphoDigCore::RemoveScalar(QString scalarName, int onlySelectedObjects)
 
 void mqMorphoDigCore::EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString oldScalarName, QString newScalarName)
 {
-	vtkSmartPointer<vtkDoubleArray> newScalars = vtkSmartPointer<vtkDoubleArray>::New();
+	//vtkSmartPointer<vtkDoubleArray> newScalars = vtkSmartPointer<vtkDoubleArray>::New();
 	vtkDataArray *mScalars = actor->GetMapper()->GetInput()->GetPointData()->GetScalars(oldScalarName.toStdString().c_str());
 	mScalars->SetName(newScalarName.toStdString().c_str());
 	this->Initmui_ExistingScalars();
 }
+
+void mqMorphoDigCore::DuplicateScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName, QString newScalarName)
+{
+	//no duplication of 
+	if (QString::compare(ScalarName, newScalarName, Qt::CaseInsensitive) ==0){ return; }
+	if (newScalarName.length() == 0) { return; }
+
+	int mode = 0;
+	//0 : scalars
+	//1 : RGB
+	//2 : tags
+
+	for (int i = 0; i < this->Getmui_ExistingScalars()->Stack.size(); i++)
+	{
+		QString myExisingScalarName =this->Getmui_ExistingScalars()->Stack.at(i).Name;
+		if (ScalarName == myExisingScalarName)
+		{
+
+		
+			int type = this->Getmui_ExistingScalars()->Stack.at(i).DataType;
+			int ncomp = this->Getmui_ExistingScalars()->Stack.at(i).NumComp;
+			if (ncomp == 1 && (type == VTK_FLOAT || type == VTK_DOUBLE)) { mode = 0; }
+			if (ncomp >= 3 && type == VTK_UNSIGNED_CHAR) { mode = 1; }
+			if (ncomp == 1 && (type == VTK_INT || type == VTK_UNSIGNED_INT)) { mode = 2; }
+
+		}
+	}
+
+
+	
+	//vtkDataArray* Scalars = actor->GetMapper()->GetInput()->GetPointData()->GetScalars(ScalarName.toStdString().c_str());
+
+	vtkSmartPointer<vtkDataArray> newScalars = nullptr;
+	if (mode == 0)
+	{
+		newScalars = vtkSmartPointer<vtkDoubleArray>::New();
+	}
+	if (mode == 1)
+	{
+		newScalars = vtkSmartPointer<vtkUnsignedCharArray>::New();
+	}
+	if (mode == 2)
+	{
+		newScalars = vtkSmartPointer<vtkIntArray>::New();
+	}
+	// now we have to decide what type of array this is!
+	 
+	 newScalars->DeepCopy(actor->GetMapper()->GetInput()->GetPointData()->GetScalars(ScalarName.toStdString().c_str()));	
+	//remove newScalarName array if exists.
+	 actor->GetMapper()->GetInput()->GetPointData()->RemoveArray(newScalarName.toStdString().c_str());
+	 newScalars->SetName(newScalarName.toStdString().c_str());
+	 actor->GetMapper()->GetInput()->GetPointData()->AddArray(newScalars);
+	this->Initmui_ExistingScalars();
+
+}
+
 void mqMorphoDigCore::DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName)
 {
 	//this->Getmui_ActiveScalars

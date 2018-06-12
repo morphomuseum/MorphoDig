@@ -292,14 +292,14 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(Orange, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotOrange()));
 	QAction::connect(Brown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotBrown()));
 	
-	QMenu* submenuScalarModification = menu.addMenu("Scalars and colors");
+	QMenu* submenuScalarModification = menu.addMenu("Scalar arrays");
 	//new mqThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickness"));
 	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
 	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance map from camera");
 	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
 
-	QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
-	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
+	//QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
+	
 
 
 	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
@@ -308,6 +308,13 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature map") << mqSetName("actionCurvature"));
 	new mqScalarsComplexityDialogReaction(submenuScalarModification->addAction("Compute complexity") << mqSetName("actionComplexity"));
 	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars") << mqSetName("actionSmooth"));
+
+
+	QMenu* submenuRGBModification = menu.addMenu("RGB arrays");
+	QAction *RGBFromCurrentColor = submenuRGBModification->addAction("Create/replace RGB array from current display color");
+	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
+
+	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
 
 	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));

@@ -516,6 +516,7 @@ public:
 	void Setmui_BackGroundColor(double bg1, double bg2, double bg3);
 	void Setmui_BackGroundColor(double background[3]);
 	void EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString oldScalarName, QString newScalarName);
+	void DuplicateScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName, QString newScalarName);
 	void DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName);
 	ExistingScalars *Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDActor> actor);
 	ExistingScalars *Getmui_ScalarsOfSelectedObjects(int onlyfirst=0);
