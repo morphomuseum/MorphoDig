@@ -1022,7 +1022,9 @@ void mqMorphoDigCore::InitLuts()
 	this->TagLut->Build();
 	std::vector<std::string> tagNames;
 	// Fill in a few known colors, the rest will be generated if needed
-	TagLut->SetTableValue(0, 0.5, 0.5, 0.5, 1);  //Grey
+
+	//TagLut->SetTableValue(0, 0.66, 0.33, 1, 1);  //Violet
+	TagLut->SetTableValue(0, 0.8, 0.8, 0.8, 1);  //Grey
 	tagNames.push_back("Exterior");
 	TagLut->SetTableValue(1, 0.8900, 0.8100, 0.3400, 1); // Banana
 	tagNames.push_back("Tag1");
@@ -7705,12 +7707,14 @@ void mqMorphoDigCore::createTags(QString newTags)
 				newTagsArray->SetName(newTags.toStdString().c_str());
 				mymapper->GetInput()->GetPointData()->RemoveArray(newTags.toStdString().c_str());
 				mymapper->GetInput()->GetPointData()->AddArray(newTagsArray);
+				mymapper->GetInput()->GetPointData()->SetActiveScalars(newTags.toStdString().c_str());
 				modified = 1;
 			}
 		}
 	}
 	if (modified ==1)
 	{
+		this->Setmui_ActiveScalars(newTags, VTK_INT, 1);
 		this->Initmui_ExistingScalars();
 
 	}
@@ -13305,7 +13309,7 @@ void mqMorphoDigCore::slotCreateTagArray()
 	if (dialogResult)
 	{
 		cout << "Tag array chosen name:" << newTags.toStdString() << endl;
-		mqMorphoDigCore::instance()->createTags(newTags);
+		this->createTags(newTags);
 	}
 	else
 	{
