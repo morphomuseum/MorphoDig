@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFile>
+#include <QTableWidgetItem>
 #include <QRadioButton>
 #include <QFileDialog>
 #include <QCheckBox>
@@ -215,7 +216,11 @@ void mqEditTagsDialog::RefreshTagMapTable()
   this->Ui->meshColorButton->setChosenColor(myColor);*/
 		colorbutton->setChosenColor(myColor);
 		this->Ui->tableWidget->setCellWidget(i, 0, colorbutton);
-		this->Ui->tableWidget->setCellWidget(i, 1, nom);
+		QTableWidgetItem *item = new QTableWidgetItem;
+		item->setFlags(item->flags() | Qt::ItemIsEditable);
+		item->setText(tagNames.at(i).c_str());
+		this->Ui->tableWidget->setItem(i, 1, item);
+		//this->Ui->tableWidget->setCellWidget(i, 1, nom);
 
 		this->Ui->tableWidget->setCellWidget(i, 2, radio);
 		this->Ui->tableWidget->setCellWidget(i, 3, clear);
