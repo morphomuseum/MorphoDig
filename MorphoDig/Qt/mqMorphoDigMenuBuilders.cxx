@@ -315,7 +315,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
 
 	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
-
+	QAction *CreateNewTagArray = submenuTagModification->addAction("Create new empty tag array");
+	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
 	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
 	*/

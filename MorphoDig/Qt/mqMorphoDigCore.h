@@ -361,6 +361,7 @@ public:
 	QProgressBar *myRAMProgressBar;
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
+	void createTags(QString newTags);
 	void RemoveScalar(QString scalarName, int onlySelectedObjects);
 	void GetDisplayToWorld(double x, double y, double z, double worldPt[4]);
 	void GetWorldToDisplay(double x, double y, double z, double displayPt[3]);
@@ -869,6 +870,7 @@ public slots:
 	virtual void slotKeepLargest();
 	virtual void slotScalarsCameraDistance();
 	virtual void slotScalarsRGB();
+	virtual void slotCreateTagArray();
 	virtual void  slotGrey();
 	virtual void slotYellow();
 	virtual void slotRed();

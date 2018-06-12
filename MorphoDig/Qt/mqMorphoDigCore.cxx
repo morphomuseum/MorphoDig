@@ -7671,6 +7671,51 @@ void mqMorphoDigCore::EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString 
 	this->Initmui_ExistingScalars();
 }
 
+void mqMorphoDigCore::createTags(QString newTags)
+{
+	if (newTags.length() == 0) { return; }
+	int modified = 0;
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+
+			myActor->SetSelected(0);			
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				double numvert = mPD->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkIntArray> newTagsArray =
+					vtkSmartPointer<vtkIntArray>::New();
+				newTagsArray->SetNumberOfComponents(1);
+				newTagsArray->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
+				for (vtkIdType j = 0; j < mymapper->GetInput()->GetNumberOfPoints(); j++)
+				{
+					newTagsArray->SetTuple1(j, 0);
+				}
+				newTagsArray->SetName(newTags.toStdString().c_str());
+				mymapper->GetInput()->GetPointData()->RemoveArray(newTags.toStdString().c_str());
+				mymapper->GetInput()->GetPointData()->AddArray(newTagsArray);
+				modified = 1;
+			}
+		}
+	}
+	if (modified ==1)
+	{
+		this->Initmui_ExistingScalars();
+
+	}
+
+}
 void mqMorphoDigCore::DuplicateScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName, QString newScalarName)
 {
 	//no duplication of 
@@ -13250,7 +13295,23 @@ void mqMorphoDigCore::slotInvert() {
 
 }
 
-
+void mqMorphoDigCore::slotCreateTagArray()
+{
+	QString TagArrayName = QString("Tags");
+	QInputDialog *newTagName = new QInputDialog();
+	bool dialogResult;
+	QString newTags = newTagName->getText(0, "Tag array name:", "name:", QLineEdit::Normal,
+		TagArrayName, &dialogResult);
+	if (dialogResult)
+	{
+		cout << "Tag array chosen name:" << newTags.toStdString() << endl;
+		mqMorphoDigCore::instance()->createTags(newTags);
+	}
+	else
+	{
+		cout << "cancel " << endl;
+	}
+}
 void mqMorphoDigCore::slotScalarsRGB()
 {
 	QString RGB = QString("RGB");
