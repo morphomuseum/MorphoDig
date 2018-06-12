@@ -1172,6 +1172,23 @@ void mqMorphoDigCore::deleteColorMap(int i)
 		}
 	}
 }
+
+
+int mqMorphoDigCore::tagMapNameAlreadyExists(QString proposed_name)
+{
+	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+	size_t size = tagMaps->Stack.size();
+	int exists = 0;
+	for (int i = 0; i < size; i++)
+	{
+		if (tagMaps->Stack.at(i).Name == proposed_name)
+		{
+			exists = 1;
+		}
+	}
+	return exists;
+
+}
 int mqMorphoDigCore::colorMapNameAlreadyExists(QString proposed_name)
 {
 	ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
@@ -13050,6 +13067,10 @@ void mqMorphoDigCore::signal_projectionModeChanged()
 	emit this->projectionModeChanged();
 }
 
+void mqMorphoDigCore::signal_tagMapsChanged()
+{
+	emit this->tagMapsChanged();
+}
 void mqMorphoDigCore::signal_colorMapsChanged()
 {
 	//cout << "Emit projection Mode Changed" << endl;

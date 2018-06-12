@@ -671,6 +671,7 @@ public:
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
   static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);
   
+  void signal_tagMapsChanged();
   void signal_colorMapsChanged();
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
@@ -703,12 +704,14 @@ public:
   void InitLuts();
   void ComputeSelectedNamesLists();
   int colorMapNameAlreadyExists(QString proposed_name);
+  int tagMapNameAlreadyExists(QString proposed_name);
   void deleteColorMap(int i);
   double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);
   double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list);
 signals:
   
   void projectionModeChanged();
+  void tagMapsChanged();
   void colorMapsChanged();
   void zoomChanged();
   void lmSelectionChanged();

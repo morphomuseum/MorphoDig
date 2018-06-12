@@ -37,9 +37,9 @@ public:
   void UpdateUI();
   
  void RefreshDialog();
- void RefreshComboTags();
+ void RefreshComboActiveTags();
  void RefreshComboTagMaps();
-
+ void RefreshTagMapTable();
  
  
   public slots:
