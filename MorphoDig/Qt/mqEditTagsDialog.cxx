@@ -33,7 +33,8 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHeaderView>
-
+#include <QSpinBox>
+#include <QStandardItemModel>
 
 #include <sstream>
 
@@ -72,6 +73,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	this->Ui->setupUi(this);
 	this->setObjectName("mqEditTagsDialog");
 	
+	this->activeTag = 1;
 	cout << "Try this0" << endl;
 	QHeaderView *header = this->Ui->tableWidget->horizontalHeader();
 	cout << "Try this1" << endl;
@@ -91,6 +93,8 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 
 
 	this->Ui->tableWidget->setColumnCount(5);
+	
+
 	this->Ui->tableWidget->setRowCount(255);
 	cout << "Try this6" << endl;
 	
@@ -119,6 +123,11 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->editTagMap, SIGNAL(pressed()), this, SLOT(slotEditTagMapName()));
 	connect(this->Ui->deleteTagMap, SIGNAL(pressed()), this, SLOT(slotDeleteTagMap()));
 
+	connect(this->Ui->tableWidget, SIGNAL(cellChanged(int, int)), this, SLOT(slotCellChanged(int, int)));
+	/*connect(this->Ui->tableWidget, SIGNAL(cellActivated(int, int)), this, SLOT(slotCellActivated(int, int)));
+	connect(this->Ui->tableWidget, SIGNAL(cellEntered(int, int)), this, SLOT(slotCellEntered(int, int)));
+	connect(this->Ui->tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(slotCellClicked(int, int)));
+	connect(this->Ui->tableWidget, SIGNAL(cellPressed(int, int)), this, SLOT(slotCellPressed(int, int)));*/
 
 	/*	
 			
@@ -140,11 +149,176 @@ mqEditTagsDialog::~mqEditTagsDialog()
   delete this->Ui;
 }
 
+//fonctionne sur la modification du nom. // problème : quand on remplit le tableau, ça appelle aussi la fonction
+void mqEditTagsDialog::slotCellChanged(int row, int column)
+{
+	//usually: works
+	cout << "Cell " << row << ", "<<column << " has changed" << endl;
+}
+/*void mqEditTagsDialog::slotCellActivated(int row, int column)
+{
+	//usually: works
+	cout << "Cell " << row << ", " << column << " has been activated" << endl;
+}
 
+void mqEditTagsDialog::slotCellClicked(int row, int column)
+{
+	//usually: works
+	cout << "Cell " << row << ", " << column << " has been clicked" << endl;
+}
+
+void mqEditTagsDialog::slotCellEntered(int row, int column)
+{
+	//usually: works
+	cout << "Cell " << row << ", " << column << " has been entered" << endl;
+}
+
+void mqEditTagsDialog::slotCellPressed(int row, int column)
+{
+	//usually: works
+	cout << "Cell " << row << ", " << column << " has been pressed" << endl;
+}*/
+
+void mqEditTagsDialog::slotColorChanged()
+{
+	//usually: works
+	/*QWidget *w = qobject_cast<QWidget *>(sender()->parent());
+	if (w) {
+		//int row = this->Ui->tableWidget->indexAt(w->pos()).row();
+		int row = w->objectName().toInt();
+		int col = this->Ui->tableWidget->indexAt(w->pos()).column();
+		cout << "Color changed at row " << row << endl;
+		cout << "Color changed at col " << col << endl;
+		//this->Ui->tableWidget->removeRow(row);
+		//this->Ui->tableWidget->setCurrentCell(0, 0);
+	}*/
+	mqColorChooserButton *color_btn = (mqColorChooserButton*)sender();
+	for (int i= 0; i < this->Ui->tableWidget->rowCount(); i++)
+	{
+		//for (int j = 0; j < this->Ui->tableWidget->columnCount(); j++)
+		//{
+		int j = 2; // column 3 = colors
+			if (this->Ui->tableWidget->cellWidget(i, j) == color_btn)
+			{
+				cout << "color changed	at row " << i << ", column" << j << endl;
+				QColor myNewColor = color_btn->chosenColor();
+				double color[3];
+				myNewColor.getRgbF(&color[0], &color[1], &color[2]);
+				cout << "new color is : " << color[0] << "," << color[1] << ","<<color[2]<<endl;
+				this->updateColor(i, color[0], color[1], color[2]);
+			}
+
+		//}
+	}
+
+
+	
+}
+
+void mqEditTagsDialog::slotActiveTagChanged()
+{
+	
+	QRadioButton *radiobutton = (QRadioButton*)sender();
+	for (int i = 0; i < this->Ui->tableWidget->rowCount(); i++)
+	{
+	
+		int j = 1; // column 2 = active tag
+		if (this->Ui->tableWidget->cellWidget(i, j) == radiobutton && radiobutton->isChecked())
+		{
+			cout << "Active tag at row " << i << ", column" << j << endl;
+			this->activeTag = i;
+			
+		}
+	}
+}
+
+void mqEditTagsDialog::updateLabel(int row, QString newLabel)
+{
+	
+}
+void mqEditTagsDialog::updateColor(int row, double r, double g, double b)
+{
+	QString currentTagMapName = this->Ui->comboTagMaps->currentText();
+	int numTags = 0;
+	std::vector<std::string> tagNames;
+	vtkSmartPointer<vtkLookupTable> TagMap;
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (currentTagMapName == myExisingTagMapName)
+		{
+			numTags = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).numTags;
+			tagNames = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).tagNames;
+			TagMap = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap;
+		}
+	}
+	double alpha = TagMap->GetTableValue(row)[3];
+	
+	cout << "r" << r << "g" << g << "b" << b << "alpha" << alpha << endl;
+	TagMap->SetTableValue(row, r, g, b, alpha);
+	mqMorphoDigCore::instance()->Render();
+}
+void mqEditTagsDialog::updateAlpha(int row, int newalpha)
+{
+	QString currentTagMapName = this->Ui->comboTagMaps->currentText();
+	int numTags = 0;
+	std::vector<std::string> tagNames;
+	vtkSmartPointer<vtkLookupTable> TagMap;
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (currentTagMapName == myExisingTagMapName)
+		{
+			numTags = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).numTags;
+			tagNames = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).tagNames;
+			TagMap = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap;
+		}
+	}
+	double alpha = (double)((double)newalpha/100);
+	double r = TagMap->GetTableValue(row)[0];
+	double g = TagMap->GetTableValue(row)[1];
+	double b = TagMap->GetTableValue(row)[2];
+	cout << "r" << r << "g" << g << "b" << b << "alpha" << alpha << endl;
+	TagMap->SetTableValue(row, r, g, b, alpha);
+	mqMorphoDigCore::instance()->Render();
+}
+
+void mqEditTagsDialog::slotAlphaChanged(int newalpha)
+{
+
+	QSpinBox *sb = (QSpinBox*)sender();
+	for (int i = 0; i < this->Ui->tableWidget->rowCount(); i++)
+	{
+
+		int j = 3; // column 4 = alpha
+		if (this->Ui->tableWidget->cellWidget(i, j) ==sb )
+		{
+			cout << "New alpha at row " << i << ", value=" << newalpha << endl;
+			this->updateAlpha(i, newalpha);
+		}
+	}
+}
 
 void mqEditTagsDialog::RefreshTagMapTable()
 {
+	SignalBlocker tagTableSignalBlocker(this->Ui->tableWidget); //blocks signals when populating the table! Blocking will stop 
 	this->Ui->tableWidget->clear();
+	this->Ui->tableWidget->setColumnCount(5);
+	QTableWidgetItem *header1 = new QTableWidgetItem();
+	header1->setText("Tag");
+	this->Ui->tableWidget->setHorizontalHeaderItem(0, header1);
+	QTableWidgetItem *header2 = new QTableWidgetItem();
+	header2->setText("Active");
+	this->Ui->tableWidget->setHorizontalHeaderItem(1, header2);
+	QTableWidgetItem *header3 = new QTableWidgetItem();
+	header3->setText("Color");
+	this->Ui->tableWidget->setHorizontalHeaderItem(2, header3);
+	QTableWidgetItem *header4 = new QTableWidgetItem();
+	header4->setText("Alpha");
+	this->Ui->tableWidget->setHorizontalHeaderItem(3, header4);
+	QTableWidgetItem *header5 = new QTableWidgetItem();
+	header5->setText("Clear");
+	this->Ui->tableWidget->setHorizontalHeaderItem(4, header5);
 
 	// f(Active Tag Map)
 	QString currentTagMapName = this->Ui->comboTagMaps->currentText(); 
@@ -155,76 +329,77 @@ void mqEditTagsDialog::RefreshTagMapTable()
 	{
 		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
 		if (currentTagMapName == myExisingTagMapName)
-		{
-
-			
+		{			
 			 numTags = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).numTags;
 			 tagNames = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).tagNames;
-
 			 TagMap = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap;
-
-
 		}
 	}
-	QLabel *nom;
+	//QLabel *nom;
+	//QLabel *alphaL;
 	QRadioButton *radio;
 	QToolButton *clear;
+	QSpinBox *alphaSB;
 	mqColorChooserButton *colorbutton;
-	QToolButton *fill;
 	if (numTags > 0)
 	{
 		this->Ui->tableWidget->setRowCount(numTags);
 	}
 	for (int i = 0; i < numTags; i++) {
-		nom = new QLabel();
-		nom->setText(tagNames.at(i).c_str());
+		//nom = new QLabel();
+		//nom->setText(tagNames.at(i).c_str());
 		
-
 		radio = new QRadioButton();
+		if (i == 1) { radio->setChecked(true); }
 		clear = new QToolButton();
-		fill = new QToolButton();
 		colorbutton = new mqColorChooserButton(this->Ui->tableWidget);
 		QColor myColor;
 		myColor.setRedF(TagMap->GetTableValue(i)[0]);
 		myColor.setGreenF(TagMap->GetTableValue(i)[1]);
 		myColor.setBlueF(TagMap->GetTableValue(i)[2]);
-		/* this->setObjectName("mqColorDialog");
-
-  QColor myBGColor;
-  QColor myBGColor2;
-  double meshcolor[4];
-  double backgroundcolor[3];
-  double backgroundcolor2[3];
-  this->Ui->meshColorButton->setShowAlphaChannel(true);
-  mqMorphoDigCore::instance()->Getmui_MeshColor(meshcolor);
-  mqMorphoDigCore::instance()->Getmui_BackGroundColor(backgroundcolor);
-  mqMorphoDigCore::instance()->Getmui_BackGroundColor2(backgroundcolor2);
-  myColor.setRedF(meshcolor[0]);
-  myColor.setGreenF(meshcolor[1]);
-  myColor.setBlueF(meshcolor[2]);
-  myColor.setAlphaF(meshcolor[3]);
-  myBGColor.setRedF(backgroundcolor[0]);
-  myBGColor.setGreenF(backgroundcolor[1]);
-  myBGColor.setBlueF(backgroundcolor[2]);
-  
-  myBGColor2.setRedF(backgroundcolor2[0]);
-  myBGColor2.setGreenF(backgroundcolor2[1]);
-  myBGColor2.setBlueF(backgroundcolor2[2]);
+		int alpha = (int)(100 * TagMap->GetTableValue(i)[3]);
+		alphaSB = new QSpinBox();
+		alphaSB->setMinimum(0);
+		alphaSB->setMaximum(100);
+		alphaSB->setValue(alpha);
+		//alphaL = new QLabel();
+		//alphaL->setText(QString::number(alpha).toStdString().c_str());
+	
 
 
-
-  this->Ui->meshColorButton->setChosenColor(myColor);*/
 		colorbutton->setChosenColor(myColor);
-		this->Ui->tableWidget->setCellWidget(i, 0, colorbutton);
-		QTableWidgetItem *item = new QTableWidgetItem;
-		item->setFlags(item->flags() | Qt::ItemIsEditable);
-		item->setText(tagNames.at(i).c_str());
-		this->Ui->tableWidget->setItem(i, 1, item);
-		//this->Ui->tableWidget->setCellWidget(i, 1, nom);
+		
 
-		this->Ui->tableWidget->setCellWidget(i, 2, radio);
-		this->Ui->tableWidget->setCellWidget(i, 3, clear);
-		this->Ui->tableWidget->setCellWidget(i, 4, fill);
+
+		/*QTableWidgetItem *item = new QTableWidgetItem;
+		item->setFlags(item->flags() | Qt::ItemIsEditable);
+		item->setText(QString::number(alpha).toStdString().c_str());*/
+
+		//this->Ui->tableWidget->setItem(i, 1, item); //TAG ALPHA
+		
+		QTableWidgetItem *item2 = new QTableWidgetItem;
+		item2->setFlags(item2->flags() | Qt::ItemIsEditable);
+		item2->setText(tagNames.at(i).c_str());
+
+
+		this->Ui->tableWidget->setItem(i, 0, item2); // TAG NAME
+													 //this->Ui->tableWidget->setCellWidget(i, 1, nom);
+
+		this->Ui->tableWidget->setCellWidget(i, 1, radio); // TAG ACTIVE
+
+		this->Ui->tableWidget->setCellWidget(i, 2, colorbutton); // TAG COLOR
+		this->Ui->tableWidget->setCellWidget(i, 3, alphaSB); //TAG ALPHA
+
+		if (i > 0)
+		{
+			this->Ui->tableWidget->setCellWidget(i, 4, clear);// TAG CLEAR
+		}
+		
+		colorbutton->setObjectName(QString(i));
+		connect(colorbutton, SIGNAL(colorChosen()), this, SLOT(slotColorChanged()));
+		connect(radio, SIGNAL(clicked()), this, SLOT(slotActiveTagChanged()));
+		connect(alphaSB, SIGNAL(valueChanged(int)), this, SLOT(slotAlphaChanged(int)));
+		
 		
 	}
 

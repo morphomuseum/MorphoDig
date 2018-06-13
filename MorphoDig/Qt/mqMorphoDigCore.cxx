@@ -1028,7 +1028,7 @@ void mqMorphoDigCore::InitLuts()
 	tagNames.push_back("Exterior");
 	TagLut->SetTableValue(1, 0.8900, 0.8100, 0.3400, 1); // Banana
 	tagNames.push_back("Tag1");
-	TagLut->SetTableValue(2, 1.0000, 0.3882, 0.2784, 1); // Tomato
+	TagLut->SetTableValue(2, 1.0000, 0.3882, 0.2784, 0.2); // Tomato
 	tagNames.push_back("Tag2");
 	TagLut->SetTableValue(3, 0.9608, 0.8706, 0.7020, 1); // Wheat
 	tagNames.push_back("Tag3");
