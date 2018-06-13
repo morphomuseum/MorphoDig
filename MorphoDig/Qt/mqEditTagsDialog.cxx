@@ -154,30 +154,11 @@ void mqEditTagsDialog::slotCellChanged(int row, int column)
 {
 	//usually: works
 	cout << "Cell " << row << ", "<<column << " has changed" << endl;
+	QTableWidgetItem *item = this->Ui->tableWidget->item(row, column);
+	QString mynewLabel = item->text();
+	cout << "New label" << mynewLabel.toStdString()<<endl;
+	this->updateLabel(row, mynewLabel);
 }
-/*void mqEditTagsDialog::slotCellActivated(int row, int column)
-{
-	//usually: works
-	cout << "Cell " << row << ", " << column << " has been activated" << endl;
-}
-
-void mqEditTagsDialog::slotCellClicked(int row, int column)
-{
-	//usually: works
-	cout << "Cell " << row << ", " << column << " has been clicked" << endl;
-}
-
-void mqEditTagsDialog::slotCellEntered(int row, int column)
-{
-	//usually: works
-	cout << "Cell " << row << ", " << column << " has been entered" << endl;
-}
-
-void mqEditTagsDialog::slotCellPressed(int row, int column)
-{
-	//usually: works
-	cout << "Cell " << row << ", " << column << " has been pressed" << endl;
-}*/
 
 void mqEditTagsDialog::slotColorChanged()
 {
@@ -234,7 +215,24 @@ void mqEditTagsDialog::slotActiveTagChanged()
 
 void mqEditTagsDialog::updateLabel(int row, QString newLabel)
 {
-	
+	QString currentTagMapName = this->Ui->comboTagMaps->currentText();
+	int numTags = 0;
+	std::vector<std::string> tagNames;
+	vtkSmartPointer<vtkLookupTable> TagMap;
+	int cpt = 0;
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (currentTagMapName == myExisingTagMapName)
+		{
+			cpt = i;
+			numTags = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).numTags;
+			tagNames = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).tagNames;
+			TagMap = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap;
+		}
+	}
+	tagNames.at(row) = newLabel.toStdString();
+	mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(cpt).tagNames = tagNames;
 }
 void mqEditTagsDialog::updateColor(int row, double r, double g, double b)
 {
