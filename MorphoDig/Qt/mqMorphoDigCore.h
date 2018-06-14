@@ -692,7 +692,8 @@ public:
 	double GetScalarRangeMin();
 	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
-  //vtkSmartPointer<vtkLookupTable> GetTagLut();
+  vtkSmartPointer<vtkLookupTable> GetTagLut();
+  void GetDefaultTagColor(int tagnr, double rgba[4]);
   void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
   
   QVTKOpenGLWidget* getQVTKWidget();

@@ -1018,7 +1018,7 @@ void mqMorphoDigCore::invertOpacity(vtkDiscretizableColorTransferFunction *STC)
 void mqMorphoDigCore::InitLuts()
 {
 	cout << "Start Init LUTS!" << endl;
-	this->TagLut->SetNumberOfTableValues(10);
+	/*this->TagLut->SetNumberOfTableValues(10);
 	this->TagLut->Build();
 	std::vector<std::string> tagNames;
 	// Fill in a few known colors, the rest will be generated if needed
@@ -1045,7 +1045,7 @@ void mqMorphoDigCore::InitLuts()
 	TagLut->SetTableValue(9, 0.2000, 0.6300, 0.7900, 1);
 	tagNames.push_back("Tag9");
 	
-
+	
 
 	QString TagMap = QString("TagMap");
 	cout << "Try to set existing color maps!!" << endl;
@@ -1057,7 +1057,7 @@ void mqMorphoDigCore::InitLuts()
 	this->mui_ActiveTagMap->Name = TagMap;
 	this->mui_ActiveTagMap->numTags = 10;
 	this->mui_ActiveTagMap->tagNames = tagNames;
-
+	*/
 	this->ScalarRainbowLut->DiscretizeOff();
 	this->ScalarRainbowLut->SetColorSpaceToRGB();
 	//this->ScalarRainbowLut->EnableOpacityMappingOn();
@@ -1328,6 +1328,81 @@ void mqMorphoDigCore::SaveORI(QString fileName)
 
 
 
+}
+
+void mqMorphoDigCore::GetDefaultTagColor(int tagnr, double rgba[4])
+{
+	std::vector<double> r;
+	
+	std::vector<double> g;
+	std::vector<double> b;
+	r.push_back(0.7); g.push_back(0.8); b.push_back(0.8);
+	r.push_back(0.64); g.push_back(0); b.push_back(0.8);
+	r.push_back(1); g.push_back(0); b.push_back(0);
+	r.push_back(0); g.push_back(1); b.push_back(0);
+	r.push_back(0); g.push_back(0); b.push_back(1);
+	r.push_back(0); g.push_back(1); b.push_back(1);
+	r.push_back(1); g.push_back(0); b.push_back(1);
+	r.push_back(1); g.push_back(1); b.push_back(0);
+	r.push_back(1); g.push_back(0.5); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(1); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(0.5); b.push_back(1);
+	r.push_back(1); g.push_back(0); b.push_back(0.5);
+	r.push_back(0); g.push_back(1); b.push_back(0.5);
+	r.push_back(0); g.push_back(0.5); b.push_back(1);
+	r.push_back(1); g.push_back(0.5); b.push_back(0);
+	r.push_back(0.5); g.push_back(1); b.push_back(0);
+	r.push_back(0.5); g.push_back(0); b.push_back(1);
+	r.push_back(0.5); g.push_back(1); b.push_back(1);
+	r.push_back(1); g.push_back(0.5); b.push_back(1);
+	r.push_back(1); g.push_back(1); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(0); b.push_back(0);
+	r.push_back(0); g.push_back(0.5); b.push_back(0);
+	r.push_back(0); g.push_back(0); b.push_back(0.5);
+	r.push_back(0); g.push_back(0.5); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(0); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(0.5); b.push_back(0);
+	r.push_back(0.5); g.push_back(0.25); b.push_back(0);
+	r.push_back(0.25); g.push_back(0.5); b.push_back(0);
+	r.push_back(0.25); g.push_back(0); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(0); b.push_back(0.25);
+	r.push_back(0); g.push_back(0.5); b.push_back(0.25);
+	r.push_back(0); g.push_back(0); b.push_back(0.5);
+	r.push_back(0.25); g.push_back(0.5); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(0.25); b.push_back(0.5);
+	r.push_back(0.5); g.push_back(0.5); b.push_back(0.25);
+	r.push_back(1); g.push_back(0.25); b.push_back(1);
+	r.push_back(1); g.push_back(1); b.push_back(0.25);
+	r.push_back(1); g.push_back(0.25); b.push_back(0.5);
+	r.push_back(0.25); g.push_back(1); b.push_back(0.5);
+	r.push_back(0.25); g.push_back(0.5); b.push_back(1);
+	r.push_back(1); g.push_back(0.5); b.push_back(0.25);
+	r.push_back(0.5); g.push_back(1); b.push_back(0.25);
+	r.push_back(0.5); g.push_back(0.25); b.push_back(1);
+	r.push_back(1); g.push_back(0.25); b.push_back(0);
+	r.push_back(0.25); g.push_back(1); b.push_back(0);
+	r.push_back(0.25); g.push_back(0); b.push_back(1);
+	r.push_back(0.25); g.push_back(1); b.push_back(1);
+	r.push_back(1); g.push_back(0); b.push_back(0.25);
+	r.push_back(0); g.push_back(1); b.push_back(0.25);
+	r.push_back(0); g.push_back(0.25); b.push_back(1);
+	
+	if (tagnr < r.size())
+	{
+		rgba[0] = r.at(tagnr);
+		rgba[1] = g.at(tagnr);
+		rgba[2] = b.at(tagnr);
+		rgba[3] = 0.8;
+
+	}
+	else
+	{
+		cout << "Try rand..." << endl;
+		rgba[0] = ((double)rand() / (double)RAND_MAX);
+		rgba[1] = ((double)rand() / (double)RAND_MAX);
+		rgba[2] = ((double)rand() / (double)RAND_MAX);
+		rgba[3] = 0.8;
+	}
 }
 void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 {
@@ -10655,7 +10730,10 @@ void mqMorphoDigCore::SelectLandmarkRange(int start, int end, int lm_type)
 	this->Render();
 }
 
-
+vtkSmartPointer<vtkLookupTable> mqMorphoDigCore::GetTagLut()
+{
+	return this->TagLut;
+}
 void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type)
 {
 	

@@ -219,6 +219,7 @@ void mqEditTagsDialog::updateLabel(int row, QString newLabel)
 	int numTags = 0;
 	std::vector<std::string> tagNames;
 	vtkSmartPointer<vtkLookupTable> TagMap;
+	QString TagMapName;
 	int cpt = 0;
 	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
 	{
@@ -226,6 +227,7 @@ void mqEditTagsDialog::updateLabel(int row, QString newLabel)
 		if (currentTagMapName == myExisingTagMapName)
 		{
 			cpt = i;
+			TagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
 			numTags = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).numTags;
 			tagNames = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).tagNames;
 			TagMap = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap;
@@ -233,6 +235,8 @@ void mqEditTagsDialog::updateLabel(int row, QString newLabel)
 	}
 	tagNames.at(row) = newLabel.toStdString();
 	mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(cpt).tagNames = tagNames;
+	mqMorphoDigCore::instance()->Setmui_ActiveTagMap(TagMapName, numTags, tagNames, TagMap);
+
 }
 void mqEditTagsDialog::updateColor(int row, double r, double g, double b)
 {
@@ -254,6 +258,7 @@ void mqEditTagsDialog::updateColor(int row, double r, double g, double b)
 	
 	cout << "r" << r << "g" << g << "b" << b << "alpha" << alpha << endl;
 	TagMap->SetTableValue(row, r, g, b, alpha);
+	//mqMorphoDigCore::instance()->Setmui_ActiveTagMap(TagMapName, numTags, tagNames, TagMap);
 	mqMorphoDigCore::instance()->Render();
 }
 void mqEditTagsDialog::updateAlpha(int row, int newalpha)

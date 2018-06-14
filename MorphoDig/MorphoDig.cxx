@@ -682,8 +682,215 @@ cm2ov2=1
 	}
 	
 	settings.endGroup();
+	/*[tagmaps]
+	nr=2
+	tm0=TagMap
+	tm0nt=10
+	tm0t0=Exterior
+	tm0t0r=1
+	tm0t0g=1
+	tm0t0b=0
+	tm0t0a=0.5
+	tm0t1=Tag1
+	tm0t1r=0
+	tm0t1g=1
+	tm0t1b=1
+	tm0t1a=1
+	tm0t2=Tag2
+	tm0t2r=1
+	tm0t2g=0
+	tm0t2b=1
+	tm0t2a=0.2
+	tm0t3=Tag3
+	tm0t3r=1
+	tm0t3g=0
+	tm0t3b=0
+	tm0t3a=0.2
+	tm0t4=Tag4
+	tm0t4r=0
+	tm0t4g=0
+	tm0t4b=1
+	tm0t4a=0.2
+	tm0t5=Tag5
+	tm0t5r=0
+	tm0t5g=1
+	tm0t5b=0
+	tm0t5a=0.2
+	tm0t6=Tag6
+	tm0t6r=0.5
+	tm0t6g=0
+	tm0t6b=0
+	tm0t6a=0.2
+	tm0t7=Tag7
+	tm0t7r=0
+	tm0t7g=0.5
+	tm0t7b=0
+	tm0t7a=0.2
+	tm0t8=Tag8
+	tm0t8r=0
+	tm0t8g=0
+	tm0t8b=0.5
+	tm0t8a=0.2
+	tm0t9=Tag9
+	tm0t9r=0.5
+	tm0t9g=0.5
+	tm0t9b=0
+	tm0t9a=0.2
+	tm1=CustomTagMap
+	tm1nt=5
+	tm1t0=NewStruct
+	tm1t0r=0.8
+	tm1t0g=0.8
+	tm1t0b=0
+	tm1t0a=0.4
+	tm1t1=MyStruct1
+	tm1t1r=0
+	tm1t1g=0.8
+	tm1t1b=0.8
+	tm1t1a=0.5
+	tm1t2=MyStruct2
+	tm1t2r=0.8
+	tm1t2g=0.1
+	tm1t2b=0.2
+	tm1t2a=0.6
+	tm1t3=MyStruct3
+	tm1t3r=0.1
+	tm1t3g=0.2
+	tm1t3b=0.3
+	tm1t3a=0.4
+	tm1t4=MyStruct4
+	tm1t4r=0
+	tm1t4g=0
+	tm1t4b=0.6
+	tm1t4a=0.3
+	*/
+
+	settings.beginGroup("tagmaps");
+	cout << "Number of tagmaps:" << settings.value("nr", 0).toInt() << endl;
+	 nr = settings.value("nr", 0).toInt();
+	 int cpt = 0;
+	 int custom = 0;
+	if (nr > 0)
+	{
+		for (int i = 0; i < nr; i++)
+		{
+			vtkSmartPointer<vtkLookupTable> TagLut = vtkSmartPointer<vtkLookupTable>::New();
+			std::vector<std::string> tagNames;
+			if (i == 0)
+			{
+				TagLut= this->MorphoDigCore->GetTagLut();
+			}
+			QString tm = QString("tm");
+
+			tm = tm + QString::number(i);
+			cout << "Tagmap map" << i << ":" << settings.value(tm, "TagMap").toString().toStdString() << endl;
+
+			QString TagMapName = settings.value(tm, "TagMap").toString();
+			if (i == 0)
+			{
+				TagMapName = "TagMap";
+			}
+
+			// Name : settings.value(cm, "Colormap").toString()
+			QString tmnt = tm + "nt";
+			int nt = settings.value(tmnt, 0).toInt();
+			cout << "Tags:" << endl;
+			//cm0discretize = 1
+			//cm0discretizenr = 10
+			//cm0enableopacity = 1
+			
+			TagLut->SetNumberOfTableValues(nt);
+			TagLut->Build();
+			for (int j = 0; j < nt; j++)
+			{
+				QString tmt = tm + "t" + QString::number(j); 
+				QString tmtr = tmt + "r";
+				QString tmtg = tmt + "g";
+				QString tmtb = tmt + "b";
+				QString tmta = tmt + "a";
+				QString Tag = "Tag"+ QString::number(j);
+				QString tname = settings.value(tmt, Tag).toString();				
+				double r = settings.value(tmtr, 0).toDouble();
+				double g = settings.value(tmtg, 0).toDouble();
+				double b = settings.value(tmtb, 0).toDouble();
+				double	a = settings.value(tmta, 1.0).toDouble();
+
+				cout << "Tag:" << j << ":" << tname.toStdString() << ",";
+				cout << "rgb:" << r << ",";
+				cout << g << ",";
+				cout << b << ",";
+				cout << a << endl;
+				TagLut->SetTableValue(j, r, g,b, a);  //Grey
+				tagNames.push_back(tname.toStdString());				
+			}
+			
+			if (i > 0) { custom = 1; }
+
+			this->MorphoDigCore->Getmui_ExistingTagMaps()->Stack.push_back(ExistingTagMaps::Element(TagMapName, TagLut, nt, tagNames, custom));
+			if (i == 0)
+			{
+				this->MorphoDigCore->Getmui_ActiveTagMap()->TagMap = TagLut;
+				cout << "Set Active color map2!" << endl;
+
+				this->MorphoDigCore->Getmui_ActiveTagMap()->Name = TagMapName;
+				this->MorphoDigCore->Getmui_ActiveTagMap()->numTags = nt;
+				this->MorphoDigCore->Getmui_ActiveTagMap()->tagNames = tagNames;
+			}
+
+			
+
+		}
+	}
+	else
+	{
+		// si rien dans le fichier .ini : 
+		int tagnr = 25;
+		vtkSmartPointer<vtkLookupTable> TagLut = vtkSmartPointer<vtkLookupTable>::New();		
+		TagLut = this->MorphoDigCore->GetTagLut();	
+
+		this->MorphoDigCore->GetTagLut()->SetNumberOfTableValues(tagnr);
+		this->MorphoDigCore->GetTagLut()->Build();
+		std::vector<std::string> tagNames;
+		// Fill in a few known colors, the rest will be generated if needed
+
+		//TagLut->SetTableValue(0, 0.66, 0.33, 1, 1);  //Violet
+		for (int i = 0; i < tagnr; i++)
+		{
+			double rgba[4];
+			cout << "i="<<i<< "try to get rgba" << endl;
+			this->MorphoDigCore->GetDefaultTagColor(i, rgba);
+			cout << "rgba:" << rgba[0] << ","<< rgba[1] << ","<< rgba[2] << "," <<rgba[3] << endl;
+			TagLut->SetTableValue(i, rgba[0], rgba[1], rgba[2], rgba[3]);
+			if (i == 0)
+			{
+				tagNames.push_back("Exterior");
+			}
+			else
+			{
+				QString TagName ="Tag" + QString::number(i);
+				tagNames.push_back(TagName.toStdString());
+			}
+		}
+		cout << "End i loop" << endl;
+		QString TagMap = QString("TagMap");
+		cout << "Try to set existing color maps!!" << endl;
+
+		this->MorphoDigCore->Getmui_ExistingTagMaps()->Stack.push_back(ExistingTagMaps::Element(TagMap, this->MorphoDigCore->GetTagLut(), tagnr, tagNames, 0));
+		this->MorphoDigCore->Getmui_ActiveTagMap()->TagMap = this->MorphoDigCore->GetTagLut();
+		cout << "Set Active color map2!" << endl;
+
+		this->MorphoDigCore->Getmui_ActiveTagMap()->Name = TagMap;
+		this->MorphoDigCore->Getmui_ActiveTagMap()->numTags = tagnr;
+		this->MorphoDigCore->Getmui_ActiveTagMap()->tagNames = tagNames;
+	}
+	/*
+	
+	
+
+
 
 	
+	*/
 
 
 	
