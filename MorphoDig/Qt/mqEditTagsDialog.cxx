@@ -108,11 +108,11 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
-
+	this->Ui->reinitializeTagMap->setDisabled(false);
 	this->Ui->editTagMap->setDisabled(true);
 	this->Ui->deleteTagMap->setDisabled(true);
 	QAction* exportAction = new QAction(tr("&Export"), this);
-	exportAction->setToolTip(tr("Toggles recording."));
+	exportAction->setToolTip(tr("Export Tag Map"));
 	this->Ui->exportTagMap->addAction(exportAction);
 	this->Ui->exportTagMap->setDefaultAction(exportAction);
 	QIcon icon;
@@ -120,10 +120,12 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	exportAction->setIcon(icon);
 	//TOTO : create an export tag map...
 	//new mqSaveTagMAPDialogReaction(exportAction);
+	connect(this->Ui->reinitializeTagMap, SIGNAL(pressed()), this, SLOT(slotReinitializeTagMap()));
 	connect(this->Ui->editTagMap, SIGNAL(pressed()), this, SLOT(slotEditTagMapName()));
 	connect(this->Ui->deleteTagMap, SIGNAL(pressed()), this, SLOT(slotDeleteTagMap()));
 
 	connect(this->Ui->tableWidget, SIGNAL(cellChanged(int, int)), this, SLOT(slotCellChanged(int, int)));
+	QObject::connect(this->Ui->addTagMap, SIGNAL(clicked()), this, SLOT(slotSaveAsCustom()));
 	/*connect(this->Ui->tableWidget, SIGNAL(cellActivated(int, int)), this, SLOT(slotCellActivated(int, int)));
 	connect(this->Ui->tableWidget, SIGNAL(cellEntered(int, int)), this, SLOT(slotCellEntered(int, int)));
 	connect(this->Ui->tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(slotCellClicked(int, int)));
@@ -160,6 +162,40 @@ void mqEditTagsDialog::slotCellChanged(int row, int column)
 	this->updateLabel(row, mynewLabel);
 }
 
+void mqEditTagsDialog::slotSaveAsCustom()
+{
+	QInputDialog *giveNameDialog = new QInputDialog();
+	bool dialogResult;
+	QString newColormapName = giveNameDialog->getText(0, "Tag map name", "Name:", QLineEdit::Normal,
+		"Custom_TagMap", &dialogResult);
+	if (dialogResult)
+	{
+
+		cout << "tag map given:" << newColormapName.toStdString() << endl;
+		if (mqMorphoDigCore::instance()->tagMapNameAlreadyExists(newColormapName) == 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Can't save custom tag map : name already exists.");
+			msgBox.exec();
+			return;
+		}
+		if (newColormapName.length() == 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Can't save custom tag map: name length =0.");
+			msgBox.exec();
+			return;
+		}
+		mqMorphoDigCore::instance()->createCustomTagMap(newColormapName);
+		
+		
+	}
+	else
+	{
+		cout << "cancel " << endl;
+	}
+
+}
 void mqEditTagsDialog::slotColorChanged()
 {
 	//usually: works
@@ -431,6 +467,25 @@ void mqEditTagsDialog::slotRefreshTagMaps()
 	cout << "slotRefreshTagMaps" << endl;
 	this->RefreshComboTagMaps();
 }
+void mqEditTagsDialog::slotReinitializeTagMap()
+{
+	QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).isCustom;
+		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (ActiveTagMap == myExisingTagMapName && iscustom==0)
+		{
+
+			mqMorphoDigCore::instance()->reinitializeTagMap(i);
+			this->RefreshTagMapTable();
+			
+			mqMorphoDigCore::instance()->Render();		
+
+
+		}
+	}
+}
 void mqEditTagsDialog::slotEditTagMapName()
 {
 	QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
@@ -485,7 +540,7 @@ void mqEditTagsDialog::slotEditTagMapName()
 void mqEditTagsDialog::slotDeleteTagMap()
 {
 
-	/*QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
+	QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
 	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
 	{
 		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).isCustom;
@@ -497,8 +552,7 @@ void mqEditTagsDialog::slotDeleteTagMap()
 			//mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.erase(mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.begin() + i);
 			//mqMorphoDigCore::instance()->Setmui_ActiveTagMap(newTagMapName, mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap);
 
-			this->RefreshComboTagMaps();
-			this->mTagMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->TagMap);
+			this->RefreshComboTagMaps();			
 			mqMorphoDigCore::instance()->Render();
 				//mqMorphoDigCore::instance()->createCustomTagMap(newTagMapName, this->STC);				
 				//this->UpdateUI();
@@ -509,7 +563,7 @@ void mqEditTagsDialog::slotDeleteTagMap()
 
 
 		}
-	}*/
+	}
 }
 
 void mqEditTagsDialog::RefreshComboActiveTags()
@@ -648,11 +702,13 @@ void mqEditTagsDialog::slotActiveTagMapChanged(int idx)
 			
 			if (mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).isCustom==1)
 			{
+				this->Ui->reinitializeTagMap->setDisabled(true);
 				this->Ui->deleteTagMap->setDisabled(false);
 				this->Ui->editTagMap->setDisabled(false);
 			}
 			else
 			{
+				this->Ui->reinitializeTagMap->setDisabled(false);
 				this->Ui->deleteTagMap->setDisabled(true);
 				this->Ui->editTagMap->setDisabled(true);
 

@@ -47,6 +47,7 @@ public:
   public slots:
   virtual void slotEditColorMapName();
   virtual void slotDeleteColorMap();
+  virtual void slotReinitializeColorMap();
   virtual void slotActiveScalarChanged(int idx);
   virtual void slotActiveColorMapChanged(int idx);
   virtual void slotRefreshSuggestedRange();
@@ -60,6 +61,7 @@ public:
   virtual void slotCurrentMinMaxEdited();
   virtual void slotRemoveScalar();
   virtual void slotRefreshColorMaps();
+  
  /* virtual void slotSliderMinValueChanged(int value);
   virtual void slotSliderMaxValueChanged(int value);*/
   

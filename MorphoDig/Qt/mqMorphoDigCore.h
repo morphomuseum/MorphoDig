@@ -685,6 +685,8 @@ public:
 
   void UpdateLookupTablesToData();
   void createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC);
+  void createCustomTagMap(QString name);
+  
   void invertRGB(vtkDiscretizableColorTransferFunction *STC);
   void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin();
@@ -707,6 +709,9 @@ public:
   int colorMapNameAlreadyExists(QString proposed_name);
   int tagMapNameAlreadyExists(QString proposed_name);
   void deleteColorMap(int i);
+  void deleteTagMap(int i);
+  void reinitializeColorMap(int i);
+  void reinitializeTagMap(int i);
   double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);
   double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list);
 signals:

@@ -923,7 +923,27 @@ void mqMorphoDigCore::UpdateLookupTablesToData()
 	
 
 }
+void mqMorphoDigCore::createCustomTagMap(QString name)
+{
+	//copy Active Tag Maps inside a new tag map.
 
+	vtkSmartPointer<vtkLookupTable> newTagMap = vtkSmartPointer<vtkLookupTable>::New();
+	newTagMap->DeepCopy(this->Getmui_ActiveTagMap()->TagMap);
+
+	std::vector<std::string> tagNames = this->Getmui_ActiveTagMap()->tagNames;
+	int numTags = this->Getmui_ActiveTagMap()->numTags;
+
+
+	this->mui_ActiveTagMap->TagMap= newTagMap;
+	this->mui_ActiveTagMap->numTags= numTags;
+	this->mui_ActiveTagMap->tagNames = tagNames;
+	this->mui_ActiveTagMap->Name = name;	
+
+	cout << "Add this map to !!" << endl;
+	this->mui_ExistingTagMaps->Stack.push_back(ExistingTagMaps::Element(name, newTagMap, numTags, tagNames, 1));
+	emit this->tagMapsChanged();
+
+}
 void mqMorphoDigCore::createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC)
 {
 //@@ TO DO!
@@ -1173,6 +1193,129 @@ void mqMorphoDigCore::deleteColorMap(int i)
 	}
 }
 
+
+void mqMorphoDigCore::reinitializeTagMap(int i)
+{
+	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+	size_t size = tagMaps->Stack.size();
+	if (i < size && i >= 0 && tagMaps->Stack.at(i).isCustom==0)
+	{
+		//to change if mod than one "preset" tagmap
+		//only TagMap 1
+		int tagnr = 25;
+		vtkSmartPointer<vtkLookupTable> mTagLut = vtkSmartPointer<vtkLookupTable>::New();
+
+		mTagLut = this->GetTagLut();		
+		mTagLut->SetNumberOfTableValues(tagnr);
+		mTagLut->Build();
+		std::vector<std::string> tagNames;
+		for (int i = 0; i < tagnr; i++)
+		{
+			double rgba[4];
+			cout << "i=" << i << "try to get rgba" << endl;
+			this->GetDefaultTagColor(i, rgba);
+			mTagLut->SetTableValue(i, rgba[0], rgba[1], rgba[2], rgba[3]);
+			if (i == 0)
+			{
+				tagNames.push_back("Exterior");
+			}
+			else
+			{
+				QString TagName = "Tag" + QString::number(i);
+				tagNames.push_back(TagName.toStdString());
+			}
+		}
+		cout << "End i loop" << endl;
+		QString TagMap = QString("TagMap");
+		cout << "Try to set existing color maps!!" << endl;
+
+		this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = tagnr;
+		this->Getmui_ExistingTagMaps()->Stack.at(i).tagNames = tagNames;
+		this->Getmui_ExistingTagMaps()->Stack.at(i).TagMap = mTagLut;						
+		this->Setmui_ActiveTagMap(TagMap, tagnr, tagNames, mTagLut);
+	}	
+	emit this->tagMapsChanged();
+}
+
+void mqMorphoDigCore::reinitializeColorMap(int i)
+{
+	ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+	size_t size = colorMaps->Stack.size();
+	if (i < size && i >= 0 && colorMaps->Stack.at(i).isCustom == 0)
+	{
+		//to change if mod than one "preset" colorMap
+		vtkSmartPointer<vtkDiscretizableColorTransferFunction> STC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+		vtkSmartPointer<vtkPiecewiseFunction> opacityRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+		this->ScalarRainbowLut = STC;
+		STC->DiscretizeOff();
+		STC->SetColorSpaceToRGB();
+		//this->ScalarRainbowLut->EnableOpacityMappingOn();
+		QString Name;
+		if (i == 0)
+		{
+			Name = QString("Rainbow");
+			STC->AddRGBPoint(0.0, 1.0, 0.0, 1.0); //# purple
+			STC->AddRGBPoint(0.2, 0.0, 0.0, 1.0); //# blue
+			STC->AddRGBPoint(0.4, 0.0, 1.0, 1.0); //# purple
+			STC->AddRGBPoint(0.6, 0.0, 1.0, 0.0); //# green
+			STC->AddRGBPoint(0.8, 1.0, 1.0, 0.0); //# yellow
+			STC->AddRGBPoint(1.0, 1.0, 0.0, 0.0); //# red
+			opacityRfunction->AddPoint(0, 0.3);
+			opacityRfunction->AddPoint(0.2, 0.6);
+			opacityRfunction->AddPoint(0.8, 0.8);
+			opacityRfunction->AddPoint(1, 1);
+			STC->SetScalarOpacityFunction(opacityRfunction);
+			STC->EnableOpacityMappingOn();
+			STC->Build();
+		}
+		else 
+		{
+			Name = QString("Black-Red-White");
+			STC->SetColorSpaceToRGB();
+			STC->EnableOpacityMappingOn();
+			STC->AddRGBPoint(0.0, 0.0, 0.0, 0.0); //# black
+			STC->AddRGBPoint(0.4, 1.0, 0, 0.0); //# reddish
+			STC->AddRGBPoint(0.8, 1.0, 0.4900, 0.25);// # flesh
+			STC->AddRGBPoint(1.0, 1.0, 1.0, 1.0);// # white
+			
+
+			opacityRfunction->AddPoint(0, 0.3);
+			opacityRfunction->AddPoint(0.4, 0.4);
+			opacityRfunction->AddPoint(0.8, 0.6);
+			opacityRfunction->AddPoint(1, 1);
+			STC->SetScalarOpacityFunction(opacityRfunction);
+			STC->EnableOpacityMappingOn();
+			STC->Build();
+		}
+		
+
+		
+		this->mui_ActiveColorMap->ColorMap =STC;
+		this->mui_ActiveColorMap->Name = Name;
+
+		this->mui_ExistingColorMaps->Stack.at(i).ColorMap = STC;
+		this->mui_ExistingColorMaps->Stack.at(i).Name = Name;
+
+	
+		cout << "Try to set existing color maps 3!!" << endl;
+
+	}
+	emit this->colorMapsChanged();
+}
+void mqMorphoDigCore::deleteTagMap(int i)
+{
+	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+	size_t size = tagMaps->Stack.size();
+	if (i < size && i >= 0)
+	{
+		tagMaps->Stack.erase(tagMaps->Stack.begin() + i);
+		if (tagMaps->Stack.size() > 0)
+		{
+			this->Setmui_ActiveTagMap(tagMaps->Stack.at(0).Name, tagMaps->Stack.at(0).numTags, tagMaps->Stack.at(0).tagNames, tagMaps->Stack.at(0).TagMap);
+		}
+	}
+	emit this->colorMapsChanged();
+}
 
 int mqMorphoDigCore::tagMapNameAlreadyExists(QString proposed_name)
 {

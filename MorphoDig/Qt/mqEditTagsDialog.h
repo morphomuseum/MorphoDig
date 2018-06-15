@@ -61,6 +61,7 @@ public:
 
   public slots:
   virtual void slotEditTagMapName();
+  virtual void  slotReinitializeTagMap();
   virtual void slotDeleteTagMap();
   virtual void slotActiveTagsChanged(int idx);
   virtual void slotActiveTagMapChanged(int idx);
@@ -76,7 +77,8 @@ public:
   virtual void slotColorChanged();
   virtual void slotActiveTagChanged();
   virtual void slotAlphaChanged(int newalpha);
-  
+  virtual void slotSaveAsCustom();
+
 protected:
 	
 private:

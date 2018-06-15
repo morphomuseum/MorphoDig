@@ -181,11 +181,12 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 	connect(this->Ui->pushRemoveScalar, SIGNAL(pressed()), this, SLOT(slotRemoveScalar()));
 
+	this->Ui->reinitializeColorMap->setDisabled(false);
 	this->Ui->editColorMap->setDisabled(true);
 	this->Ui->deleteColorMap->setDisabled(true);
 
 	QAction* exportAction = new QAction(tr("&Export"), this);
-	exportAction->setToolTip(tr("Toggles recording."));
+	exportAction->setToolTip(tr("Export color map"));
 	this->Ui->exportColorMap->addAction(exportAction);
 	this->Ui->exportColorMap->setDefaultAction(exportAction);
 	QIcon icon;
@@ -310,6 +311,33 @@ void mqEditScalarsDialog::slotRefreshColorMaps()
 {
 	cout << "slotRefreshColorMaps" << endl;
 	this->RefreshComboColorMaps();
+}
+void mqEditScalarsDialog::slotReinitializeColorMap()
+{
+	QString ActiveColorMap = this->Ui->comboColorMap->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom;
+		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+		if (ActiveColorMap == myExisingColorMapName && iscustom==0)
+		{
+
+			mqMorphoDigCore::instance()->reinitializeColorMap(i);
+			
+			this->RefreshComboColorMaps();
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap);
+			mqMorphoDigCore::instance()->Render();
+			//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
+			//this->UpdateUI();
+
+
+			//this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+
+
+		}
+	}
+
 }
 void mqEditScalarsDialog::slotEditColorMapName()
 {
@@ -646,11 +674,13 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 			
 			if (mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom==1)
 			{
+				this->Ui->reinitializeColorMap->setDisabled(true);
 				this->Ui->deleteColorMap->setDisabled(false);
 				this->Ui->editColorMap->setDisabled(false);
 			}
 			else
 			{
+				this->Ui->reinitializeColorMap->setDisabled(false);
 				this->Ui->deleteColorMap->setDisabled(true);
 				this->Ui->editColorMap->setDisabled(true);
 
