@@ -710,6 +710,8 @@ public:
   int tagMapNameAlreadyExists(QString proposed_name);
   void deleteColorMap(int i);
   void deleteTagMap(int i);
+  void addTagToTagMap(int i);
+  void removeTagFromTagMap(int i);
   void reinitializeColorMap(int i);
   void reinitializeTagMap(int i);
   double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);

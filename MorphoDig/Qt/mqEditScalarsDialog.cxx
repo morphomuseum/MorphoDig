@@ -196,7 +196,8 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	new mqSaveMAPDialogReaction(exportAction);
 	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
-
+	connect(this->Ui->reinitializeColorMap, SIGNAL(pressed()), this, SLOT(slotReinitializeColorMap()));
+	
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 
 	this->RefreshSliders();
@@ -325,7 +326,11 @@ void mqEditScalarsDialog::slotReinitializeColorMap()
 			mqMorphoDigCore::instance()->reinitializeColorMap(i);
 			
 			this->RefreshComboColorMaps();
+
 			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap);
+			this->Ui->currentMin->setValue(0);
+			this->Ui->currentMax->setValue(1);
+			
 			mqMorphoDigCore::instance()->Render();
 			//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
 			//this->UpdateUI();

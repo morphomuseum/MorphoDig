@@ -823,7 +823,7 @@
   <customwidget>
    <class>mqColorChooserButton</class>
    <extends>QToolButton</extends>
-   <header location="global">mqcolorchooserbutton.h</header>
+   <header location="global">mqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

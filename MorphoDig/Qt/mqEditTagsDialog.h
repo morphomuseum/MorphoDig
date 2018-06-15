@@ -61,6 +61,8 @@ public:
 
   public slots:
   virtual void slotEditTagMapName();
+  virtual void slotAddTag();
+  virtual void slotRemoveTag();
   virtual void  slotReinitializeTagMap();
   virtual void slotDeleteTagMap();
   virtual void slotActiveTagsChanged(int idx);

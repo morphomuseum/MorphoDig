@@ -1192,6 +1192,42 @@ void mqMorphoDigCore::deleteColorMap(int i)
 		}
 	}
 }
+void mqMorphoDigCore::addTagToTagMap(int i) 
+{
+	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+	size_t size = tagMaps->Stack.size();
+	if (i < size && i >= 0)
+	{
+		//to change if mod than one "preset" tagmap
+		//only TagMap 1
+		
+		vtkSmartPointer<vtkLookupTable> mTagLut = vtkSmartPointer<vtkLookupTable>::New();
+
+		mTagLut = this->Getmui_ActiveTagMap()->TagMap;
+		int tagnr = mTagLut->GetNumberOfTableValues();
+		int newtag = tagnr;
+		tagnr++;
+		mTagLut->SetNumberOfTableValues(tagnr);
+		//mTagLut->Build();
+		double rgba[4];		
+		this->GetDefaultTagColor(newtag, rgba);
+		mTagLut->SetTableValue(tagnr, rgba);
+		QString TagName = "Tag" + QString::number(tagnr);								
+		this->Getmui_ActiveTagMap()->tagNames.push_back(TagName.toStdString());
+		this->Getmui_ActiveTagMap()->numTags = tagnr;
+		
+
+		this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = tagnr;
+		this->Getmui_ExistingTagMaps()->Stack.at(i).tagNames = this->Getmui_ActiveTagMap()->tagNames;
+		this->Getmui_ExistingTagMaps()->Stack.at(i).TagMap = mTagLut;
+		//this->Setmui_ActiveTagMap(TagMap, tagnr, tagNames, mTagLut);
+	}
+	emit this->tagMapsChanged();
+}
+void mqMorphoDigCore::removeTagFromTagMap(int i)
+{
+
+}
 
 
 void mqMorphoDigCore::reinitializeTagMap(int i)
@@ -1246,13 +1282,16 @@ void mqMorphoDigCore::reinitializeColorMap(int i)
 		//to change if mod than one "preset" colorMap
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> STC = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 		vtkSmartPointer<vtkPiecewiseFunction> opacityRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
-		this->ScalarRainbowLut = STC;
+		
+		
 		STC->DiscretizeOff();
 		STC->SetColorSpaceToRGB();
 		//this->ScalarRainbowLut->EnableOpacityMappingOn();
 		QString Name;
 		if (i == 0)
 		{
+			STC = this->ScalarRainbowLut;
+			STC->RemoveAllPoints();
 			Name = QString("Rainbow");
 			STC->AddRGBPoint(0.0, 1.0, 0.0, 1.0); //# purple
 			STC->AddRGBPoint(0.2, 0.0, 0.0, 1.0); //# blue
@@ -1271,14 +1310,14 @@ void mqMorphoDigCore::reinitializeColorMap(int i)
 		else 
 		{
 			Name = QString("Black-Red-White");
+			STC = this->ScalarRedLut;
+			STC->RemoveAllPoints();
 			STC->SetColorSpaceToRGB();
 			STC->EnableOpacityMappingOn();
 			STC->AddRGBPoint(0.0, 0.0, 0.0, 0.0); //# black
 			STC->AddRGBPoint(0.4, 1.0, 0, 0.0); //# reddish
 			STC->AddRGBPoint(0.8, 1.0, 0.4900, 0.25);// # flesh
-			STC->AddRGBPoint(1.0, 1.0, 1.0, 1.0);// # white
-			
-
+			STC->AddRGBPoint(1.0, 1.0, 1.0, 1.0);// # white			
 			opacityRfunction->AddPoint(0, 0.3);
 			opacityRfunction->AddPoint(0.4, 0.4);
 			opacityRfunction->AddPoint(0.8, 0.6);
@@ -1288,11 +1327,9 @@ void mqMorphoDigCore::reinitializeColorMap(int i)
 			STC->Build();
 		}
 		
-
 		
 		this->mui_ActiveColorMap->ColorMap =STC;
 		this->mui_ActiveColorMap->Name = Name;
-
 		this->mui_ExistingColorMaps->Stack.at(i).ColorMap = STC;
 		this->mui_ExistingColorMaps->Stack.at(i).Name = Name;
 

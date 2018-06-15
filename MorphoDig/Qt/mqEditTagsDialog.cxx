@@ -126,6 +126,8 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 
 	connect(this->Ui->tableWidget, SIGNAL(cellChanged(int, int)), this, SLOT(slotCellChanged(int, int)));
 	QObject::connect(this->Ui->addTagMap, SIGNAL(clicked()), this, SLOT(slotSaveAsCustom()));
+	QObject::connect(this->Ui->addTag, SIGNAL(clicked()), this, SLOT(slotAddTag()));
+	QObject::connect(this->Ui->removeTag, SIGNAL(clicked()), this, SLOT(slotRemoveTag()));
 	/*connect(this->Ui->tableWidget, SIGNAL(cellActivated(int, int)), this, SLOT(slotCellActivated(int, int)));
 	connect(this->Ui->tableWidget, SIGNAL(cellEntered(int, int)), this, SLOT(slotCellEntered(int, int)));
 	connect(this->Ui->tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(slotCellClicked(int, int)));
@@ -481,6 +483,44 @@ void mqEditTagsDialog::slotReinitializeTagMap()
 			this->RefreshTagMapTable();
 			
 			mqMorphoDigCore::instance()->Render();		
+
+
+		}
+	}
+}
+void mqEditTagsDialog::slotAddTag()
+{
+	QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).isCustom;
+		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (ActiveTagMap == myExisingTagMapName )
+		{
+
+			mqMorphoDigCore::instance()->addTagToTagMap(i);
+			this->RefreshTagMapTable();
+
+			mqMorphoDigCore::instance()->Render();
+
+
+		}
+	}
+}
+void mqEditTagsDialog::slotRemoveTag()
+{
+	QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).isCustom;
+		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (ActiveTagMap == myExisingTagMapName && iscustom == 0)
+		{
+
+			mqMorphoDigCore::instance()->removeTagFromTagMap(i);
+			this->RefreshTagMapTable();
+
+			mqMorphoDigCore::instance()->Render();
 
 
 		}
