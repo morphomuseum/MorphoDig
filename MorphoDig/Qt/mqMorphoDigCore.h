@@ -443,6 +443,8 @@ public:
 	int SaveSTVFile(QString fileName, int save_only_selected);
 	int SaveMAPFile(QString fileName, int save_only_active);
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
+	int SaveTAGMAPFile(QString fileName, int save_only_active);
+	void SaveTAGMAP(QString fileName, QString Name, vtkSmartPointer<vtkLookupTable> ColorMap);
 	void OpenMAP(QString fileName);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
@@ -708,7 +710,14 @@ public:
   void ComputeSelectedNamesLists();
   int colorMapNameAlreadyExists(QString proposed_name);
   int tagMapNameAlreadyExists(QString proposed_name);
+  int tagAlreadyExists(int tagnr);
+  void clearTag(int tagnr);
+  int highestTagInActorCollection();
+  void increaseTagNumberTo(int newtagnr);
+  int getActiveTagMapId();
   void deleteColorMap(int i);
+  void matchTagMapToActorCollection();
+  
   void deleteTagMap(int i);
   void addTagToTagMap(int i);
   void removeTagFromTagMap(int i);

@@ -1205,28 +1205,293 @@ void mqMorphoDigCore::addTagToTagMap(int i)
 
 		mTagLut = this->Getmui_ActiveTagMap()->TagMap;
 		int tagnr = mTagLut->GetNumberOfTableValues();
+		
 		int newtag = tagnr;
 		tagnr++;
+		mTagLut->Build();
 		mTagLut->SetNumberOfTableValues(tagnr);
 		//mTagLut->Build();
 		double rgba[4];		
 		this->GetDefaultTagColor(newtag, rgba);
-		mTagLut->SetTableValue(tagnr, rgba);
-		QString TagName = "Tag" + QString::number(tagnr);								
+		mTagLut->SetTableValue(newtag, rgba[0], rgba[1], rgba[2], rgba[3]);
+		/*for (int i = 0; i < tagnr; i++)
+		{
+			double rgba[4];
+			cout << "i=" << i << "try to get rgba" << endl;
+
+			if (i == newtag)
+			{
+				this->GetDefaultTagColor(i, rgba);
+			
+			}
+			
+		}*/
+		//mTagLut->SetTableValue(newtag, rgba);
+		QString TagName = "Tag" + QString::number(newtag);								
 		this->Getmui_ActiveTagMap()->tagNames.push_back(TagName.toStdString());
-		this->Getmui_ActiveTagMap()->numTags = tagnr;
+		//this->Getmui_ActiveTagMap()->numTags = tagnr;
 		
 
 		this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = tagnr;
 		this->Getmui_ExistingTagMaps()->Stack.at(i).tagNames = this->Getmui_ActiveTagMap()->tagNames;
 		this->Getmui_ExistingTagMaps()->Stack.at(i).TagMap = mTagLut;
-		//this->Setmui_ActiveTagMap(TagMap, tagnr, tagNames, mTagLut);
+
+		this->Setmui_ActiveTagMap(this->Getmui_ActiveTagMap()->Name, tagnr, this->Getmui_ActiveTagMap()->tagNames, mTagLut);
+		mTagLut->Build();
 	}
 	emit this->tagMapsChanged();
 }
+void mqMorphoDigCore::matchTagMapToActorCollection()
+{
+	int activeTagMapNr = this->Getmui_ActiveTagMap()->numTags;
+	int maxTagNr = this->highestTagInActorCollection();
+	cout << "activeTagMapNr =" << activeTagMapNr << endl;
+	cout << "maxTagNr =" << maxTagNr << endl;
+	
+	if (maxTagNr>activeTagMapNr)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Some tagged vertices (max tagged value found:" + QString::number(maxTagNr)+") are above active Tag Map highest value ("+ QString::number(activeTagMapNr)+"). Extend current tag map?");
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::No);
+		int ret = msgBox.exec();
+
+		if (ret == QMessageBox::Yes) { this->increaseTagNumberTo(maxTagNr);}
+		
+		
+	}
+
+}
+
+void mqMorphoDigCore::increaseTagNumberTo(int newtagnr)
+{	
+	int i = this->getActiveTagMapId();
+	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+	size_t size = tagMaps->Stack.size();
+	if (i < size && i >= 0)
+	{
+		vtkSmartPointer<vtkLookupTable> mTagLut = vtkSmartPointer<vtkLookupTable>::New();
+
+		mTagLut = this->Getmui_ActiveTagMap()->TagMap;
+		int tagnr = mTagLut->GetNumberOfTableValues();
+		if (newtagnr > tagnr)
+		{
+			mTagLut->SetNumberOfTableValues(newtagnr);
+
+			mTagLut->Build();
+			for (int j = tagnr; j < newtagnr; j++)
+			{
+				double rgba[4];
+				this->GetDefaultTagColor(j, rgba);
+				mTagLut->SetTableValue(j, rgba[0], rgba[1], rgba[2], rgba[3]);
+				QString TagName = "Tag" + QString::number(j);
+				this->Getmui_ActiveTagMap()->tagNames.push_back(TagName.toStdString());
+			}
+			this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = newtagnr;
+			this->Getmui_ExistingTagMaps()->Stack.at(i).tagNames = this->Getmui_ActiveTagMap()->tagNames;
+			this->Getmui_ExistingTagMaps()->Stack.at(i).TagMap = mTagLut;
+
+			this->Setmui_ActiveTagMap(this->Getmui_ActiveTagMap()->Name, newtagnr, this->Getmui_ActiveTagMap()->tagNames, mTagLut);
+			mTagLut->Build();
+
+			emit this->tagMapsChanged();
+		}
+
+
+	}
+
+
+	
+}
+int mqMorphoDigCore::getActiveTagMapId()
+{
+	int activeTagMapId = 0;
+	QString ActiveTagMap = this->Getmui_ActiveTagMap()->Name;
+	for (int i = 0; i <this->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		QString myExisingTagMapName = this->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (ActiveTagMap == myExisingTagMapName )
+		{
+
+			activeTagMapId = i;
+		}
+	}
+	return activeTagMapId;
+}
+int mqMorphoDigCore::tagAlreadyExists(int tagnr)
+{
+	int exists = 0;
+	int modified = 0;
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		//if (myActor->GetSelected() == 1)
+		//{
+
+		//	myActor->SetSelected(0);
+		vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+		{
+			vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+			mPD = mymapper->GetInput();
+			double numvert = mPD->GetNumberOfPoints();
+			vtkIntArray *currentTags = (vtkIntArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+			if (currentTags != NULL)
+			{
+				for (vtkIdType j = 0; j < mymapper->GetInput()->GetNumberOfPoints(); j++)
+				{
+					if (currentTags->GetTuple1(j) == tagnr)
+					{
+						exists = 1; return 1;
+					}
+				}
+				cout << "Finished loop and found no tag matching " << tagnr << endl;
+			}
+			else
+			{
+
+				cout << "current tags is null!" << endl;
+			}
+		}
+		//}
+	}
+	return exists;
+}
+void mqMorphoDigCore::clearTag(int tagnr)
+{
+		cout << "Clean tag " << tagnr << endl;
+		int modified = 0;
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			//if (myActor->GetSelected() == 1)
+			//{
+
+			//	myActor->SetSelected(0);
+				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+				{
+					vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+					mPD = mymapper->GetInput();
+					double numvert = mPD->GetNumberOfPoints();					
+					vtkIntArray *currentTags = (vtkIntArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+					if (currentTags != NULL)
+					{
+						for (vtkIdType j = 0; j < mymapper->GetInput()->GetNumberOfPoints(); j++)
+						{
+							if (currentTags->GetTuple1(j)==tagnr)
+							{
+								currentTags->SetTuple1(j, 0);
+							}							
+						}
+					}					
+				}
+			//}
+		}
+		
+
+	/*int exists = 0;
+
+	return exists;*/
+}
+int mqMorphoDigCore::highestTagInActorCollection()
+{
+	int max = 0;
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	cout << "Number of actors : " << num << endl;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		
+		vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+		{
+			vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+			mPD = mymapper->GetInput();
+			double numvert = mPD->GetNumberOfPoints();
+			vtkIntArray *currentTags = (vtkIntArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());			
+			if (currentTags != NULL)
+			{
+				for (vtkIdType j = 0; j < mymapper->GetInput()->GetNumberOfPoints(); j++)
+				{
+					if (currentTags->GetTuple1(j) >max)
+					{
+						max = currentTags->GetTuple1(j);
+					}
+				}
+			}
+			
+		}
+		//}
+	}
+	return max;
+}
 void mqMorphoDigCore::removeTagFromTagMap(int i)
 {
+	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+	size_t size = tagMaps->Stack.size();
+	if (i < size && i >= 0)
+	{
+		//to change if mod than one "preset" tagmap
+		//only TagMap 1
 
+		vtkSmartPointer<vtkLookupTable> mTagLut = vtkSmartPointer<vtkLookupTable>::New();
+
+		mTagLut = this->Getmui_ActiveTagMap()->TagMap;
+		int tagnr = mTagLut->GetNumberOfTableValues();
+		int tag_to_remove = tagnr - 1;
+		if (tagnr > 1)
+		{
+			int remove = 1;
+			int exists= this->tagAlreadyExists(tag_to_remove);
+			if (exists==1)
+			{
+				cout << "tag exists!"<< endl;
+				QMessageBox msgBox;
+				msgBox.setText("Some opened objets have vertices tagged with value " + QString::number(tag_to_remove) + ". Reset corresponding vertices to 0 ?");
+				msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+				msgBox.setDefaultButton(QMessageBox::No);
+				int ret = msgBox.exec();
+				
+				if (ret == QMessageBox::Yes) { this->clearTag(tag_to_remove); remove = 1; }
+				else
+				{
+					remove = 0;
+					QMessageBox msgBox2;
+					msgBox2.setText("Remove last line from tag map anyway?");
+					msgBox2.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+					msgBox2.setDefaultButton(QMessageBox::No);
+					int ret2 = msgBox2.exec();
+					if (ret2 == QMessageBox::Yes) { remove = 1; }
+				}
+
+			}
+			if (remove)			
+			{
+				int newtag = tagnr;
+				tagnr--;
+
+				mTagLut->SetNumberOfTableValues(tagnr);
+				//mTagLut->Build();
+
+
+				this->Getmui_ActiveTagMap()->tagNames.pop_back();
+				
+
+				this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = tagnr;
+				this->Getmui_ExistingTagMaps()->Stack.at(i).tagNames = this->Getmui_ActiveTagMap()->tagNames;
+				this->Getmui_ExistingTagMaps()->Stack.at(i).TagMap = mTagLut;
+				this->Setmui_ActiveTagMap(this->Getmui_ActiveTagMap()->Name, tagnr, this->Getmui_ActiveTagMap()->tagNames, mTagLut);
+			}
+		}
+		//this->Setmui_ActiveTagMap(TagMap, tagnr, tagNames, mTagLut);
+	}
+	emit this->tagMapsChanged();
 }
 
 
@@ -1512,6 +1777,7 @@ void mqMorphoDigCore::SaveORI(QString fileName)
 
 void mqMorphoDigCore::GetDefaultTagColor(int tagnr, double rgba[4])
 {
+	cout << "GetDefaultTagColor(" << tagnr <<")"<< endl;
 	std::vector<double> r;
 	
 	std::vector<double> g;
@@ -1569,6 +1835,7 @@ void mqMorphoDigCore::GetDefaultTagColor(int tagnr, double rgba[4])
 	
 	if (tagnr < r.size())
 	{
+		cout << "r.size()=" << r.size() << endl;
 		rgba[0] = r.at(tagnr);
 		rgba[1] = g.at(tagnr);
 		rgba[2] = b.at(tagnr);
@@ -2936,8 +3203,10 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 	actor->GetProperty()->SetColor(0.5, 1, 0.5);
 	actor->GetProperty()->SetOpacity(0.5);*/
 	//this->MainWindow->vtkWidgetUpdate();
+	//cout << "call matchTagMapToActorCollection" << endl;
+	
 	this->Render();
-
+	this->matchTagMapToActorCollection();
 
 }
 void mqMorphoDigCore::OpenNTW(QString fileName)
@@ -4239,6 +4508,161 @@ int mqMorphoDigCore::SaveFlagFile(QString fileName, int save_only_selected)
 	return 1;
 
 }
+
+int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
+{
+	//save_only_active 
+	// 1: save only active color map => then check if extension exists => if not add tgp
+	// 0: save ALL colormaps (custom + "hard coded native" ones)
+	// 2 : save ALL custom colormaps
+
+	std::string TAGext = ".tgp";
+	std::string TAGext2 = ".TGP";
+	std::string TAGext3 = ".tag";
+	std::string TAGext4 = ".TAG";
+	std::size_t found = fileName.toStdString().find(TAGext);
+	std::size_t found2 = fileName.toStdString().find(TAGext2);
+	if (found == std::string::npos && found2 == std::string::npos)
+	{
+		fileName.append(".map");
+	}
+
+
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+		if (save_only_active == 1)
+		{
+			stream << "nr: 1" << endl;
+			file.close();
+			this->SaveMAP(fileName, this->Getmui_ActiveColorMap()->Name, this->Getmui_ActiveColorMap()->ColorMap);
+		}
+		else if (save_only_active == 0)//save all
+		{
+			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+			size_t size = colorMaps->Stack.size();
+
+			stream << "nr: " << size << endl;
+			file.close();
+			for (int i = 0; i < size; i++)
+			{
+				this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+			}
+		}
+		else // save all customs
+		{
+			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
+			size_t size = colorMaps->Stack.size();
+			int sizec = 0;
+			for (int i = 0; i < size; i++)
+			{
+				if (colorMaps->Stack.at(i).isCustom == 1)
+				{
+					sizec++;
+				}
+			}
+
+			stream << "nr: " << sizec << endl;
+			file.close();
+			for (int i = 0; i < size; i++)
+			{
+				if (colorMaps->Stack.at(i).isCustom == 1)
+				{
+					this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+				}
+			}
+		}
+	}
+
+	return 1;
+
+}
+
+void mqMorphoDigCore::SaveTAGMAP(QString fileName, QString Name, vtkSmartPointer<vtkLookupTable> TagMap)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
+	{
+		/*QTextStream stream(&file);
+		stream << "name: " << Name << endl;
+
+		stream << "discretize: " << ColorMap->GetDiscretize() << endl;
+		stream << "discretizenr: " << ColorMap->GetNumberOfValues() << endl;
+		stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << endl;
+
+		//3 set numer of colors
+
+		int nc = ColorMap->GetSize();
+		stream << "nc: " << nc << endl;
+
+		//4 set number of opacity nodes
+		int no = ColorMap->GetScalarOpacityFunction()->GetSize();
+		stream << "no: " << no << endl;
+
+		double *pts = ColorMap->GetDataPointer();
+		//first : find max and min cx to reset cx range between 0 and 1
+		double cx_min = DBL_MAX;
+		double cx_max = -DBL_MAX;
+		for (int j = 0; j < nc; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < cx_min) { cx_min = curr; }
+			if (curr > cx_max) { cx_max = curr; }
+
+		}
+		double c = 0;
+		double mult = 1;
+		if (cx_max > cx_min)
+		{
+			double range = cx_max - cx_min;
+			mult = 1 / range;
+			c = -cx_min / range;
+		}
+
+		for (int j = 0; j < nc; j++)
+		{
+			double cx = mult*pts[4 * j] + c;
+			double r = pts[4 * j + 1];
+			double g = pts[4 * j + 2];
+			double b = pts[4 * j + 3];
+			stream << "c" << j << ": " << cx << " " << r << " " << g << " " << b << endl;
+		}
+		double *pts2 = ColorMap->GetScalarOpacityFunction()->GetDataPointer();
+
+		double ox_min = DBL_MAX;
+		double ox_max = -DBL_MAX;
+		for (int j = 0; j < no; j++)
+		{
+			double curr = pts2[2 * j];
+			if (curr < ox_min) { ox_min = curr; }
+			if (curr > ox_max) { ox_max = curr; }
+		}
+		c = 0;
+		mult = 1;
+		if (ox_max > ox_min)
+		{
+			double range = ox_max - ox_min;
+			mult = 1 / range;
+			c = -ox_min / range;
+		}
+
+		for (int j = 0; j < no; j++)
+		{
+			double ox = mult*pts2[2 * j] + c;
+			double ov = pts2[2 * j + 1];
+			stream << "op" << j << ": " << ox << " " << ov << endl;
+
+
+		}*/
+
+	}
+	file.close();
+
+}
+
+
 int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active)
 {
 	//save_only_active 
@@ -12689,7 +13113,10 @@ void mqMorphoDigCore::Setmui_ActiveScalars(QString Scalar, int dataType, int num
 	this->mui_ActiveScalars->NumComp = numComp;
 	cout << "Now active scalar is " << Scalar.toStdString() << endl;
 	
-		
+	if ((this->mui_ActiveScalars->DataType == VTK_INT) && this->mui_ActiveScalars->NumComp == 1)
+	{
+		this->matchTagMapToActorCollection();
+	}
 
 
 	this->RefreshColorMapsAndScalarVisibility();

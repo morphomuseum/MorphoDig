@@ -61,6 +61,7 @@
 #include "mqOrientationLabelsDialogReaction.h"
 #include "mqSaveSTVDialogReaction.h"
 #include "mqSaveMAPDialogReaction.h"
+#include "mqSaveTAGMAPDialogReaction.h"
 #include "mqSaveNTWDialogReaction.h"
 #include "mqSelectLandmarkRangeDialogReaction.h"
 #include "mqSmoothDialogReaction.h"
@@ -140,6 +141,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   QMenu* submenuOrientationLabels = menu.addMenu("Orientation helper labels");
   QMenu* submenuMeasurements = menu.addMenu("Measurements");
   QMenu* submenuColorMaps = menu.addMenu("Color maps");
+  QMenu* submenuTagMaps = menu.addMenu("Tag maps");
 
   new mqOpenDataReaction(submenuProject->addAction("Open Project") << mqSetName("actionOpenNTW"), 1);
   new mqSaveNTWDialogReaction(submenuProject->addAction("Save Project") << mqSetName("actionSaveNTW"));
@@ -155,6 +157,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (MAP)") << mqSetName("actionOpenMAP"), 17);
   new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (MAP)") << mqSetName("actionSaveMAP"));
   
+  new mqOpenDataReaction(submenuTagMaps->addAction("Import tag maps (.TGM, .TAG)") << mqSetName("actionOpenTAGMAP"), 18);
+  new mqSaveTAGMAPDialogReaction(submenuTagMaps->addAction("Export tag maps (MAP)") << mqSetName("actionSaveTAGMAP"));
 
   new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (STV)") << mqSetName("actionSaveSTV"));
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks") << mqSetName("actionSaveNormalLMK"), 0);

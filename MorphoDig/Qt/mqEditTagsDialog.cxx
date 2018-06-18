@@ -344,7 +344,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 {
 	SignalBlocker tagTableSignalBlocker(this->Ui->tableWidget); //blocks signals when populating the table! Blocking will stop 
 	this->Ui->tableWidget->clear();
-	this->Ui->tableWidget->setColumnCount(5);
+	this->Ui->tableWidget->setColumnCount(4);
 	QTableWidgetItem *header1 = new QTableWidgetItem();
 	header1->setText("Tag");
 	this->Ui->tableWidget->setHorizontalHeaderItem(0, header1);
@@ -357,9 +357,9 @@ void mqEditTagsDialog::RefreshTagMapTable()
 	QTableWidgetItem *header4 = new QTableWidgetItem();
 	header4->setText("Alpha");
 	this->Ui->tableWidget->setHorizontalHeaderItem(3, header4);
-	QTableWidgetItem *header5 = new QTableWidgetItem();
+	/*QTableWidgetItem *header5 = new QTableWidgetItem();
 	header5->setText("Clear");
-	this->Ui->tableWidget->setHorizontalHeaderItem(4, header5);
+	this->Ui->tableWidget->setHorizontalHeaderItem(4, header5);*/
 
 	// f(Active Tag Map)
 	QString currentTagMapName = this->Ui->comboTagMaps->currentText(); 
@@ -379,9 +379,10 @@ void mqEditTagsDialog::RefreshTagMapTable()
 	//QLabel *nom;
 	//QLabel *alphaL;
 	QRadioButton *radio;
-	QToolButton *clear;
+	//QToolButton *clear;
 	QSpinBox *alphaSB;
 	mqColorChooserButton *colorbutton;
+
 	if (numTags > 0)
 	{
 		this->Ui->tableWidget->setRowCount(numTags);
@@ -392,7 +393,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 		
 		radio = new QRadioButton();
 		if (i == 1) { radio->setChecked(true); }
-		clear = new QToolButton();
+		//clear = new QToolButton();
 		colorbutton = new mqColorChooserButton(this->Ui->tableWidget);
 		QColor myColor;
 		myColor.setRedF(TagMap->GetTableValue(i)[0]);
@@ -430,11 +431,11 @@ void mqEditTagsDialog::RefreshTagMapTable()
 
 		this->Ui->tableWidget->setCellWidget(i, 2, colorbutton); // TAG COLOR
 		this->Ui->tableWidget->setCellWidget(i, 3, alphaSB); //TAG ALPHA
-
-		if (i > 0)
+		/*this->Ui->tableWidget->setCellWidget(i, 4, clear);// TAG CLEAR
+		if (i == 0)
 		{
-			this->Ui->tableWidget->setCellWidget(i, 4, clear);// TAG CLEAR
-		}
+			clear->setDisabled(true);
+		}*/
 		
 		colorbutton->setObjectName(QString(i));
 		connect(colorbutton, SIGNAL(colorChosen()), this, SLOT(slotColorChanged()));
@@ -490,6 +491,7 @@ void mqEditTagsDialog::slotReinitializeTagMap()
 }
 void mqEditTagsDialog::slotAddTag()
 {
+	cout << "Add Tag!" << endl;
 	QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
 	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
 	{
@@ -497,7 +499,7 @@ void mqEditTagsDialog::slotAddTag()
 		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
 		if (ActiveTagMap == myExisingTagMapName )
 		{
-
+			cout << "Add Tag To Map(" <<i<<")"<< endl;
 			mqMorphoDigCore::instance()->addTagToTagMap(i);
 			this->RefreshTagMapTable();
 
@@ -509,12 +511,13 @@ void mqEditTagsDialog::slotAddTag()
 }
 void mqEditTagsDialog::slotRemoveTag()
 {
+
 	QString ActiveTagMap = this->Ui->comboTagMaps->currentText();
 	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.size(); i++)
 	{
 		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).isCustom;
 		QString myExisingTagMapName = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).Name;
-		if (ActiveTagMap == myExisingTagMapName && iscustom == 0)
+		if (ActiveTagMap == myExisingTagMapName)
 		{
 
 			mqMorphoDigCore::instance()->removeTagFromTagMap(i);
@@ -757,7 +760,7 @@ void mqEditTagsDialog::slotActiveTagMapChanged(int idx)
 				mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).tagNames,
 				mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap);
 
-			
+			mqMorphoDigCore::instance()->matchTagMapToActorCollection();
 			this->RefreshTagMapTable();
 			
 		

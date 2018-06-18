@@ -32,10 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef mqUndoStack_h
 #define mqUndoStack_h
 
-
+#include "mqMorphoDigCore.h"
 #include <QObject>
 
-class vtkUndoStack;
+//class vtkUndoStack;
+#include "vtkUndoStack.h"
 
 
 class mqUndoStack : public QObject
@@ -120,7 +121,7 @@ private:
   mqImplementation* Implementation;
 };
 
-#include "mqMorphoDigCore.h"
+
 
 inline int BEGIN_UNDO_SET(std::string & name)
 {
