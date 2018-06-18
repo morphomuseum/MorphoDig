@@ -40,6 +40,7 @@ public:
    void OpenSTV();
    void OpenMAP();
    void OpenTAG();
+   void OpenTAGMAP();
    void OpenORI();
    
   
@@ -121,6 +122,10 @@ protected:
 	else if (this->Mode == 17)
 	{
 		this->OpenMAP();
+	}
+	else if (this->Mode == 18)
+	{
+		this->OpenTAGMAP();
 	}
   }
 

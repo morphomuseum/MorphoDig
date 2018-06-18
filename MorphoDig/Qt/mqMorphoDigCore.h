@@ -444,7 +444,7 @@ public:
 	int SaveMAPFile(QString fileName, int save_only_active);
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
 	int SaveTAGMAPFile(QString fileName, int save_only_active);
-	void SaveTAGMAP(QString fileName, QString Name, vtkSmartPointer<vtkLookupTable> ColorMap);
+	void SaveTAGMAP(QString fileName, int mapId, int mode);
 	void OpenMAP(QString fileName);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
@@ -461,6 +461,7 @@ public:
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
 	void OpenTAG(QString fileName);
+	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);
 	void OpenNTW(QString fileName);
 	void OpenVER(QString fileName, int mode);

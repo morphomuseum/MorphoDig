@@ -1894,7 +1894,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 						double ve_final_pos[3];
 						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
 
-						vtkIdType id_min=NULL;
+						vtkIdType id_min=-1; 
 						for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++) 
 						{
 							// for every triangle 
@@ -1913,7 +1913,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 							}
 							
 						}
-						if (id_min != NULL) // means that mesh i could be the mesh that contains the closest vertex of flag k
+						if (id_min != -1) // means that mesh i could be the mesh that contains the closest vertex of flag k
 						{
 							//now get current color of point id_min of mesh i!
 							//@TODO! => On va faire 1 variable globale de type G_Current_Active_Scalar => Ce premier if sera changé par 
@@ -3505,7 +3505,6 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 	}
 }
 
-void mqMorphoDigCore::OpenTAG(QString fileName) {}
 void mqMorphoDigCore::OpenORI(QString fileName)
 {
 
@@ -4508,6 +4507,167 @@ int mqMorphoDigCore::SaveFlagFile(QString fileName, int save_only_selected)
 	return 1;
 
 }
+void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
+	
+
+	int ntagmap;
+	
+	cout << "start: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Tag maps inside the stack!" << endl;
+	size_t  length;
+
+	int type = 1;
+	length = fileName.toStdString().length();
+
+	int done = 0;
+	if (length>0)
+	{
+		int file_exists = 1;
+		ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			
+			file.close();
+		}
+		else
+		{
+
+			std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+
+		if (file_exists == 1)
+		{
+
+			std::string TAGext = ".tgp";
+			std::string TAGext2 = ".TGP";
+			std::string TAGext3 = ".tag";
+			std::string TAGext4 = ".TAG";
+			std::size_t found = fileName.toStdString().find(TAGext);
+			std::size_t found2 = fileName.toStdString().find(TAGext2);
+			std::size_t found3 = fileName.toStdString().find(TAGext3);
+			std::size_t found4 = fileName.toStdString().find(TAGext4);
+			int mode = 0; //tgp
+
+			if (found == std::string::npos && found2 == std::string::npos && found3 == std::string::npos && found4 == std::string::npos)
+			{
+				mode = 0;
+			}
+			else if (found3 != std::string::npos || found4 != std::string::npos)
+			{
+				mode = 1; //TAG! Old meshtools style
+			}
+								
+			if (mode == 0) // tgp extension
+			{
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				QFile inputFile(fileName);
+				int ok = 0;
+				if (inputFile.open(QIODevice::ReadOnly))
+				{
+					
+
+					QTextStream in(&inputFile);
+					int cpt_line = 0;
+					QString line = in.readLine();
+					QTextStream myteststream(&line);
+					QString SomeText;
+
+					myteststream >> SomeText >> ntagmap;
+
+					if (ntagmap > 0)
+					{
+						for (int i = 0; i < ntagmap; i++)
+						{
+							int tagnr;
+							vtkSmartPointer<vtkLookupTable> NewMap = vtkSmartPointer<vtkLookupTable>::New();
+							std::vector<std::string> tagNames;
+							double  r, g, b, a;
+							QString TagMapName;
+							QString Tag;
+						
+						
+							line = in.readLine();
+							myteststream.setString(&line);
+							myteststream >> SomeText >> TagMapName;
+							cout << "Found a name: " << TagMapName.toStdString() << endl;
+
+							line = in.readLine();
+							myteststream.setString(&line);
+							myteststream >> SomeText >> tagnr;
+							cout << "Tagnr: " << tagnr << endl;
+							NewMap->SetNumberOfTableValues(tagnr);
+							NewMap->Build();
+
+							for (int j = 0; j < tagnr; j++)
+							{
+								line = in.readLine();
+								myteststream.setString(&line);
+								myteststream >> SomeText >> Tag;
+								tagNames.push_back(Tag.toStdString().c_str());
+
+								line = in.readLine();
+								myteststream.setString(&line);
+								myteststream >> SomeText >> r >> g >> b >> a;
+
+								
+								NewMap->SetTableValue(j, r, g, b, a);
+
+							}
+
+							
+
+
+							cout << "Add this color map to !!" << endl;
+							int num = 2;
+							if (this->tagMapNameAlreadyExists(TagMapName) == 1)
+							{
+								int exists = 1;
+								while (exists == 1)
+								{
+									QString NewColorMapName = TagMapName + "_" + QString::number(num);
+									if (this->tagMapNameAlreadyExists(NewColorMapName) == 0)
+									{
+										exists = 0;
+										TagMapName = NewColorMapName;
+									}
+									else
+									{
+										num++;
+									}
+								}
+							}
+
+							cout << "here: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+
+							this->Getmui_ExistingTagMaps()->Stack.push_back(ExistingTagMaps::Element(TagMapName, NewMap, tagnr, tagNames, 1));
+							cout << "and now: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+
+
+						}
+
+						cout << "have Just Imported " << ntagmap << " Tag Maps" << endl;
+						cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Tag  maps inside the stack!" << endl;
+						this->signal_tagMapsChanged();// emit this->colorMapsChanged();
+					}
+
+				}
+				/**/
+
+				inputFile.close();
+
+
+			}
+			else
+			{
+				// mode TAG : todo!!!!
+
+			}
+		}
+
+	}
+
+}
+void mqMorphoDigCore::OpenTAG(QString fileName) {}
 
 int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 {
@@ -4516,17 +4676,24 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 	// 0: save ALL colormaps (custom + "hard coded native" ones)
 	// 2 : save ALL custom colormaps
 
+	int mode = 0; //tgp
+
 	std::string TAGext = ".tgp";
 	std::string TAGext2 = ".TGP";
 	std::string TAGext3 = ".tag";
 	std::string TAGext4 = ".TAG";
 	std::size_t found = fileName.toStdString().find(TAGext);
 	std::size_t found2 = fileName.toStdString().find(TAGext2);
-	if (found == std::string::npos && found2 == std::string::npos)
+	std::size_t found3 = fileName.toStdString().find(TAGext3);
+	std::size_t found4 = fileName.toStdString().find(TAGext4);
+	if (found == std::string::npos && found2 == std::string::npos && found3 == std::string::npos && found4 == std::string::npos)
 	{
-		fileName.append(".map");
+		fileName.append(".tgp");
 	}
-
+	else if (found3 != std::string::npos || found4 != std::string::npos)
+	{
+		mode = 1; //TAG! Old meshtools style
+	}
 
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -4534,42 +4701,51 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 		QTextStream stream(&file);
 		if (save_only_active == 1)
 		{
-			stream << "nr: 1" << endl;
+			if (mode == 0)
+			{
+				stream << "nr: 1" << endl;
+			}
 			file.close();
-			this->SaveMAP(fileName, this->Getmui_ActiveColorMap()->Name, this->Getmui_ActiveColorMap()->ColorMap);
+			int i = this->getActiveTagMapId();
+			this->SaveTAGMAP(fileName, i, mode);
 		}
 		else if (save_only_active == 0)//save all
 		{
-			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
-			size_t size = colorMaps->Stack.size();
-
-			stream << "nr: " << size << endl;
+			ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+			size_t size = tagMaps->Stack.size();
+			if (mode == 0)
+			{
+				stream << "nr: " << size << endl;
+			}
 			file.close();
 			for (int i = 0; i < size; i++)
 			{
-				this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+				this->SaveTAGMAP(fileName,i, mode);
 			}
 		}
 		else // save all customs
 		{
-			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
-			size_t size = colorMaps->Stack.size();
+			ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+			size_t size = tagMaps->Stack.size();
 			int sizec = 0;
 			for (int i = 0; i < size; i++)
 			{
-				if (colorMaps->Stack.at(i).isCustom == 1)
+				if (tagMaps->Stack.at(i).isCustom == 1)
 				{
 					sizec++;
 				}
 			}
 
-			stream << "nr: " << sizec << endl;
+			if (mode == 0)
+			{
+				stream << "nr: " << sizec << endl;
+			}
 			file.close();
 			for (int i = 0; i < size; i++)
 			{
-				if (colorMaps->Stack.at(i).isCustom == 1)
+				if (tagMaps->Stack.at(i).isCustom == 1)
 				{
-					this->SaveMAP(fileName, colorMaps->Stack.at(i).Name, colorMaps->Stack.at(i).ColorMap);
+					this->SaveTAGMAP(fileName, i, mode);
 				}
 			}
 		}
@@ -4579,83 +4755,42 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 
 }
 
-void mqMorphoDigCore::SaveTAGMAP(QString fileName, QString Name, vtkSmartPointer<vtkLookupTable> TagMap)
+void mqMorphoDigCore::SaveTAGMAP(QString fileName, int mapId, int mode)
 {
+	//mode 0: tgp
+	//mode 1: tag
+	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
+	QString Name = tagMaps->Stack.at(mapId).Name;
+	vtkSmartPointer<vtkLookupTable> TagMap = tagMaps->Stack.at(mapId).TagMap;
+	std::vector < std::string> tagNames = tagMaps->Stack.at(mapId).tagNames;
+	int tagnr = tagMaps->Stack.at(mapId).numTags;
+
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
 	{
-		/*QTextStream stream(&file);
-		stream << "name: " << Name << endl;
-
-		stream << "discretize: " << ColorMap->GetDiscretize() << endl;
-		stream << "discretizenr: " << ColorMap->GetNumberOfValues() << endl;
-		stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << endl;
-
-		//3 set numer of colors
-
-		int nc = ColorMap->GetSize();
-		stream << "nc: " << nc << endl;
-
-		//4 set number of opacity nodes
-		int no = ColorMap->GetScalarOpacityFunction()->GetSize();
-		stream << "no: " << no << endl;
-
-		double *pts = ColorMap->GetDataPointer();
-		//first : find max and min cx to reset cx range between 0 and 1
-		double cx_min = DBL_MAX;
-		double cx_max = -DBL_MAX;
-		for (int j = 0; j < nc; j++)
+		QTextStream stream(&file);
+		if (mode == 1)
 		{
-			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
-			if (curr < cx_min) { cx_min = curr; }
-			if (curr > cx_max) { cx_max = curr; }
+			for (int i = 0; i < tagnr; i++)
+			{
+				stream << QString::fromStdString(tagNames.at(i)) << endl;
+				double *rgba = TagMap->GetTableValue(i);
+				stream << rgba[0] << " " << rgba[1] << " " << rgba[2] << " " << rgba[3] << " " << endl;
+			}
 
 		}
-		double c = 0;
-		double mult = 1;
-		if (cx_max > cx_min)
+		else
 		{
-			double range = cx_max - cx_min;
-			mult = 1 / range;
-			c = -cx_min / range;
-		}
-
-		for (int j = 0; j < nc; j++)
-		{
-			double cx = mult*pts[4 * j] + c;
-			double r = pts[4 * j + 1];
-			double g = pts[4 * j + 2];
-			double b = pts[4 * j + 3];
-			stream << "c" << j << ": " << cx << " " << r << " " << g << " " << b << endl;
-		}
-		double *pts2 = ColorMap->GetScalarOpacityFunction()->GetDataPointer();
-
-		double ox_min = DBL_MAX;
-		double ox_max = -DBL_MAX;
-		for (int j = 0; j < no; j++)
-		{
-			double curr = pts2[2 * j];
-			if (curr < ox_min) { ox_min = curr; }
-			if (curr > ox_max) { ox_max = curr; }
-		}
-		c = 0;
-		mult = 1;
-		if (ox_max > ox_min)
-		{
-			double range = ox_max - ox_min;
-			mult = 1 / range;
-			c = -ox_min / range;
-		}
-
-		for (int j = 0; j < no; j++)
-		{
-			double ox = mult*pts2[2 * j] + c;
-			double ov = pts2[2 * j + 1];
-			stream << "op" << j << ": " << ox << " " << ov << endl;
-
-
-		}*/
+			stream <<"name: "<< Name << endl;
+			stream << "nt: " << tagnr << endl;
+			for (int i = 0; i < tagnr; i++)
+			{
+				stream << "t" << QString::number(i) << ": "<< QString::fromStdString(tagNames.at(i)) << endl;
+				double *rgba = TagMap->GetTableValue(i);
+				stream << "c" << QString::number(i) <<": " << rgba[0] << " " << rgba[1] << " " << rgba[2] << " " << rgba[3] << " " << endl;
+			}
+			
+		}		
 
 	}
 	file.close();
