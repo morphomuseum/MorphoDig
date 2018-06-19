@@ -210,6 +210,7 @@ mqEditACTORDialog::mqEditACTORDialog(QWidget* Parent)
  connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
 connect(this->Ui->deleteScalar, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()));
 connect(this->Ui->editScalar, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
+connect(this->Ui->duplicateScalar, SIGNAL(pressed()), this, SLOT(slotDuplicateScalar()));
 
 }
 
@@ -444,8 +445,11 @@ void mqEditACTORDialog::UpdateUI()
 		for (int i = 0; i < MyList->Stack.size(); i++)
 		{
 			if (
-				((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
-				|| (MyList->Stack.at(i).DataType == VTK_UNSIGNED_CHAR  && MyList->Stack.at(i).NumComp >= 3)
+				((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1) // conventional scalars
+				|| (MyList->Stack.at(i).DataType == VTK_UNSIGNED_CHAR  && MyList->Stack.at(i).NumComp >= 3 //RGB-like arrays
+					)
+				|| 
+				((MyList->Stack.at(i).DataType == VTK_INT || MyList->Stack.at(i).DataType == VTK_UNSIGNED_INT) && MyList->Stack.at(i).NumComp == 1) // conventional tag arrays
 				
 				
 				)
@@ -541,6 +545,31 @@ void mqEditACTORDialog::GetPrecedingActor()
 		}
 	}
 
+}
+
+void mqEditACTORDialog::slotDuplicateScalar()
+{
+	int row = this->Ui->scalarList->currentIndex().row();
+	if (this->ACTOR != NULL && row >= 0)
+	{
+		QString ScalarName = this->Ui->scalarList->item(row)->text();
+		cout << "try to duplicate scalar" << endl;
+		cout << "try to duplicate scalar " << row << ":" << this->Ui->scalarList->item(row)->text().toStdString() << endl;
+		QInputDialog *renameDialog = new QInputDialog();
+		bool dialogResult;
+		QString newScalarName = renameDialog->getText(0, "Duplicate array", "New name:", QLineEdit::Normal,
+			this->Ui->scalarList->item(row)->text(), &dialogResult);
+		if (dialogResult)
+		{
+			cout << "new scalar given:" << newScalarName.toStdString() << endl;
+			mqMorphoDigCore::instance()->DuplicateScalar(this->ACTOR, ScalarName, newScalarName);
+			this->UpdateUI();
+		}
+		else
+		{
+			cout << "cancel " << endl;
+		}
+	}
 }
 void mqEditACTORDialog::slotEditScalar()
 {

@@ -49,6 +49,7 @@ public:
   virtual void slotReinitMatrix();
   virtual void slotapplyMatrixToAllSelectedActors();
   virtual void slotEditScalar();
+  virtual void slotDuplicateScalar();
   virtual void slotDeleteScalar();
 
 protected:

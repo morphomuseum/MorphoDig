@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //#include "pqActiveObjects.h"
 //#include "pqChooseColorPresetReaction.h"
-#include "mqColorTableModel.h"
+
 //#include "pqDataRepresentation.h"
-#include "mqOpacityTableModel.h"
+
 #include "mqMorphoDigCore.h"
 //#include "pqPipelineRepresentation.h"
 //#include "pqPropertiesPanel.h"
@@ -81,8 +81,7 @@ class mqColorOpacityEditorWidget::mqInternals
 {
 public:
   Ui::ColorOpacityEditorWidget Ui;
-  mqColorTableModel ColorTableModel;
-  mqOpacityTableModel OpacityTableModel;
+    
   //QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
   //vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
   //vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
@@ -92,27 +91,18 @@ public:
   vtkNew<vtkEventQtSlotConnect> IndexedLookupConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
 
-  mqInternals(mqColorOpacityEditorWidget* self)
-    : ColorTableModel(self)
-    , OpacityTableModel(self)    
+  mqInternals(mqColorOpacityEditorWidget* self) 
   {
+	  cout << "mqInternals instantiation" << endl;
     this->Ui.setupUi(self);
+	cout << "mqInternals instantiation : set validator" << endl;
     this->Ui.CurrentDataValue->setValidator(new QDoubleValidator(self));
     //this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     // this->Ui.mainLayout->setSpacing(
     //  pqPropertiesPanel::suggestedVerticalSpacing());
 
    // this->Decorator = new pqColorOpacityEditorWidgetDecorator(NULL, self);
-
-    this->Ui.ColorTable->setModel(&this->ColorTableModel);
-    this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
-    this->Ui.ColorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    this->Ui.ColorTable->horizontalHeader()->setStretchLastSection(true);
-
-    this->Ui.OpacityTable->setModel(&this->OpacityTableModel);
-    this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
-    this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
+	
 	this->Ui.EnableOpacityMapping->setChecked(true);
 	this->Ui.Discretize->setChecked(false);
 	this->Ui.currentDiscretizeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -124,7 +114,7 @@ public:
 	this->Ui.discretizeSlider->setMaximum(1024);
 	this->Ui.discretizeSlider->setValue(256);
 	this->Ui.discretizeSlider->setEnabled(false);
-
+	cout << "mqInternals instantiation : done" << endl;
   }
 
   void render()
@@ -185,14 +175,10 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   this->STC = stc;
   if (stc!=NULL)
   {
-
+	  cout << "Initialize ColorEditor widget. " << endl;
     ui.ColorEditor->initialize(stc, true, NULL, false);
-    QObject::connect(&this->Internals->ColorTableModel,
-      SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
-      SIGNAL(xrgbPointsChanged()));
-    QObject::connect(&this->Internals->OpacityTableModel,
-      SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
-      SIGNAL(xvmsPointsChanged()));
+   
+	cout << "Initialize OpacityEditor widget " << endl;
 	this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
   }
   else
@@ -256,7 +242,7 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   //QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
   QObject::connect(ui.SaveAsCustom, SIGNAL(clicked()), this, SLOT(saveAsCustom()));
   
-  QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
+  
 
  // this->connect(
   //  ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
@@ -519,11 +505,11 @@ void mqColorOpacityEditorWidget::updatePanel()
 	cout << "mqColorOpacityEditorWidget updatePanel" << endl;
   if (this->Internals)
   {
-    bool advancedVisible = this->Internals->Ui.AdvancedButton->isChecked();
+    /*bool advancedVisible = this->Internals->Ui.AdvancedButton->isChecked();
     this->Internals->Ui.ColorLabel->setVisible(advancedVisible);
     this->Internals->Ui.ColorTable->setVisible(advancedVisible);
     this->Internals->Ui.OpacityLabel->setVisible(advancedVisible);
-    this->Internals->Ui.OpacityTable->setVisible(advancedVisible);
+    this->Internals->Ui.OpacityTable->setVisible(advancedVisible);*/
   }
 }
 
@@ -576,10 +562,7 @@ void mqColorOpacityEditorWidget::updateCurrentData()
 	  cout << "Case 3" << endl;
     ui.CurrentDataValue->setEnabled(false);
   }
-  cout << "Refresh color model... " << endl;
-  this->Internals->ColorTableModel.refresh();
-  cout << "Refresh opacity model... " << endl;
-  this->Internals->OpacityTableModel.refresh();
+  
 }
 
 //-----------------------------------------------------------------------------

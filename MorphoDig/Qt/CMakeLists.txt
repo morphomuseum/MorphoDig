@@ -231,14 +231,14 @@ mqExpandableTableView.cxx
 mqExpandableTableView.h
 mqTableView.cxx
 mqTableView.h
-mqColorTableModel.h
-mqColorTableModel.cxx
-mqOpacityTableModel.cxx
-mqOpacityTableModel.h
 mqLineEdit.h
 mqLineEdit.cxx
 mqColorOpacityEditorWidget.cxx
 mqColorOpacityEditorWidget.h
+mqSaveTAGMAPDialog.cxx
+mqSaveTAGMAPDialog.h
+mqSaveTAGMAPDialogReaction.cxx
+mqSaveTAGMAPDialogReaction.h
 mqSaveMAPDialog.cxx
 mqSaveMAPDialog.h
 mqSaveMAPDialogReaction.cxx
@@ -304,6 +304,7 @@ mqScalarsDistanceDialog.ui
 mqICPDialog.ui
 mqColorOpacityEditorWidget.ui
 mqSaveMAPDialog.ui
+mqSaveTAGMAPDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

@@ -786,6 +786,20 @@
       </spacer>
      </item>
      <item>
+      <widget class="QToolButton" name="reinitializeColorMap">
+       <property name="toolTip">
+        <string>Reinitialize Color Map</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/Initialize24.png</normaloff>:/Icons/Initialize24.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="exportColorMap">
        <property name="toolTip">
         <string>Export color map</string>

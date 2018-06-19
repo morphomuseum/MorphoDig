@@ -260,7 +260,7 @@ mqTransferFunctionWidget::~mqTransferFunctionWidget()
 void mqTransferFunctionWidget::initialize(
   vtkScalarsToColors* stc, bool stc_editable, vtkPiecewiseFunction* pwf, bool pwf_editable)
 {
-	//cout << "mqTransferFunctionWidget Initialize " << endl;
+	cout << "mqTransferFunctionWidget Initialize " << endl;
   this->Internals->cleanup();
 
   // TODO: If needed, we can support vtkLookupTable.
@@ -268,7 +268,7 @@ void mqTransferFunctionWidget::initialize(
 
   if (ctf != NULL && pwf == NULL)
   {
-	//  cout << "mqTransferFunctionWidget Initialize 1" << endl;
+	  cout << "mqTransferFunctionWidget Initialize 1" << endl;
     vtkNew<vtkColorTransferFunctionItem> item;
     item->SetColorTransferFunction(ctf);
 
@@ -291,7 +291,7 @@ void mqTransferFunctionWidget::initialize(
   }
   else if (ctf == NULL && pwf != NULL)
   {
-	//  cout << "mqTransferFunctionWidget Initialize 2" << endl;
+	  cout << "mqTransferFunctionWidget Initialize 2" << endl;
     vtkNew<vtkPiecewiseFunctionItem> item;
     item->SetPiecewiseFunction(pwf);
 
@@ -309,7 +309,7 @@ void mqTransferFunctionWidget::initialize(
   }
   else if (ctf != NULL && pwf != NULL)
   {
-	//  cout << "mqTransferFunctionWidget Initialize 3" << endl;
+	  cout << "mqTransferFunctionWidget Initialize 3" << endl;
     vtkNew<vtkCompositeTransferFunctionItem> item;
     item->SetOpacityFunction(pwf);
     item->SetColorTransferFunction(ctf);
@@ -346,12 +346,12 @@ void mqTransferFunctionWidget::initialize(
   {
     return;
   }
- // cout << "mqTransferFunctionWidget Initialize suite" << endl;
+  cout << "mqTransferFunctionWidget Initialize Add Plot" << endl;
   this->Internals->ChartXY->AddPlot(this->Internals->TransferFunctionItem);
 
   if (this->Internals->ControlPointsItem)
   {
-	 // cout << "mqTransferFunctionWidget we have control points item" << endl;
+	  cout << "mqTransferFunctionWidget we have control points item" << endl;
 
     this->Internals->ChartXY->ControlPointsItem = this->Internals->ControlPointsItem;
     this->Internals->ControlPointsItem->SetEndPointsRemovable(false);
@@ -370,13 +370,13 @@ void mqTransferFunctionWidget::initialize(
   // ensures that.
   if (ctf)
   {
-	 // cout << "mqTransferFunctionWidget conect ctf with slot render" << endl;
+	  cout << "mqTransferFunctionWidget conect ctf with slot render" << endl;
 
     this->Internals->VTKConnect->Connect(ctf, vtkCommand::ModifiedEvent, this, SLOT(render()));
   }
   if (pwf)
   {
-	 // cout << "mqTransferFunctionWidget conect pwf with slot render" << endl;
+	  cout << "mqTransferFunctionWidget conect pwf with slot render" << endl;
     this->Internals->VTKConnect->Connect(pwf, vtkCommand::ModifiedEvent, this, SLOT(render()));
   }
 }

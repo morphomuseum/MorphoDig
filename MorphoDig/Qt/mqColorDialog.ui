@@ -50,7 +50,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -84,7 +84,7 @@
   <customwidget>
    <class>mqColorChooserButton</class>
    <extends>QToolButton</extends>
-   <header location="global">mqcolorchooserbutton.h</header>
+   <header location="global">mqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

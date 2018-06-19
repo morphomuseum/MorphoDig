@@ -61,6 +61,7 @@
 #include "mqOrientationLabelsDialogReaction.h"
 #include "mqSaveSTVDialogReaction.h"
 #include "mqSaveMAPDialogReaction.h"
+#include "mqSaveTAGMAPDialogReaction.h"
 #include "mqSaveNTWDialogReaction.h"
 #include "mqSelectLandmarkRangeDialogReaction.h"
 #include "mqSmoothDialogReaction.h"
@@ -140,6 +141,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   QMenu* submenuOrientationLabels = menu.addMenu("Orientation helper labels");
   QMenu* submenuMeasurements = menu.addMenu("Measurements");
   QMenu* submenuColorMaps = menu.addMenu("Color maps");
+  QMenu* submenuTagMaps = menu.addMenu("Tag maps");
 
   new mqOpenDataReaction(submenuProject->addAction("Open Project") << mqSetName("actionOpenNTW"), 1);
   new mqSaveNTWDialogReaction(submenuProject->addAction("Save Project") << mqSetName("actionSaveNTW"));
@@ -155,6 +157,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (MAP)") << mqSetName("actionOpenMAP"), 17);
   new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (MAP)") << mqSetName("actionSaveMAP"));
   
+  new mqOpenDataReaction(submenuTagMaps->addAction("Import tag maps (.TGM, .TAG)") << mqSetName("actionOpenTAGMAP"), 18);
+  new mqSaveTAGMAPDialogReaction(submenuTagMaps->addAction("Export tag maps (MAP)") << mqSetName("actionSaveTAGMAP"));
 
   new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (STV)") << mqSetName("actionSaveSTV"));
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks") << mqSetName("actionSaveNormalLMK"), 0);
@@ -292,14 +296,14 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(Orange, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotOrange()));
 	QAction::connect(Brown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotBrown()));
 	
-	QMenu* submenuScalarModification = menu.addMenu("Scalars and colors");
+	QMenu* submenuScalarModification = menu.addMenu("Scalar arrays");
 	//new mqThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickness"));
 	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
 	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance map from camera");
 	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
 
-	QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
-	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
+	//QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
+	
 
 
 	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
@@ -309,6 +313,14 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	new mqScalarsComplexityDialogReaction(submenuScalarModification->addAction("Compute complexity") << mqSetName("actionComplexity"));
 	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars") << mqSetName("actionSmooth"));
 
+
+	QMenu* submenuRGBModification = menu.addMenu("RGB arrays");
+	QAction *RGBFromCurrentColor = submenuRGBModification->addAction("Create/replace RGB array from current display color");
+	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
+
+	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
+	QAction *CreateNewTagArray = submenuTagModification->addAction("Create new empty tag array");
+	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
 	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
 	*/

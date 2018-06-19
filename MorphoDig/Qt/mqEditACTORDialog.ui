@@ -755,7 +755,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Existing scalars</string>
+     <string>Existing arrays (scalars/RGB colors/tags)</string>
     </property>
     <widget class="QListWidget" name="scalarList">
      <property name="geometry">
@@ -780,14 +780,21 @@
       <item>
        <widget class="QPushButton" name="editScalar">
         <property name="text">
-         <string>Edit scalar name</string>
+         <string>Edit array name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="duplicateScalar">
+        <property name="text">
+         <string>Duplicate array</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="deleteScalar">
         <property name="text">
-         <string>Delete scalar</string>
+         <string>Delete array</string>
         </property>
        </widget>
       </item>
@@ -816,7 +823,7 @@
   <customwidget>
    <class>mqColorChooserButton</class>
    <extends>QToolButton</extends>
-   <header location="global">mqcolorchooserbutton.h</header>
+   <header location="global">mqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

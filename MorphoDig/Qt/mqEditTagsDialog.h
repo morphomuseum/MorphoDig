@@ -18,7 +18,23 @@ namespace Ui
 {
 class mqEditTagsDialog;
 }
+class SignalBlocker {
+public:
+	SignalBlocker(QObject *o) : object(o), alreadyBlocked(object->signalsBlocked()) {
+		if (!alreadyBlocked) {
+			object->blockSignals(true);
+		}
+	}
+	~SignalBlocker() {
+		if (!alreadyBlocked) {
+			object->blockSignals(false);
+		}
+	}
 
+private:
+	QObject *object;
+	bool alreadyBlocked;
+};
 
 
 
@@ -37,13 +53,17 @@ public:
   void UpdateUI();
   
  void RefreshDialog();
- void RefreshComboTags();
+ void RefreshComboActiveTags();
  void RefreshComboTagMaps();
+ void RefreshTagMapTable();
+ 
+ 
 
- 
- 
   public slots:
   virtual void slotEditTagMapName();
+  virtual void slotAddTag();
+  virtual void slotRemoveTag();
+  virtual void  slotReinitializeTagMap();
   virtual void slotDeleteTagMap();
   virtual void slotActiveTagsChanged(int idx);
   virtual void slotActiveTagMapChanged(int idx);
@@ -51,16 +71,27 @@ public:
   virtual void slotRefreshComboTags();
   virtual void slotRemoveTags();
   virtual void slotRefreshTagMaps();
- 
-  
+  virtual void slotCellChanged(int row, int column);
+/*  virtual void slotCellActivated(int row, int column);  
+  virtual void slotCellClicked(int row, int column);
+  virtual void slotCellEntered(int row, int column);
+  virtual void slotCellPressed(int row, int column);*/
+  virtual void slotColorChanged();
+  virtual void slotActiveTagChanged();
+  virtual void slotAlphaChanged(int newalpha);
+  virtual void slotSaveAsCustom();
+
 protected:
 	
 private:
-	
+	void updateLabel(int row, QString newLabel);	
+	void updateColor(int row, double r, double g, double b);
+	void updateAlpha(int row, int newalpha);
+
 
   Q_DISABLE_COPY(mqEditTagsDialog)
   Ui::mqEditTagsDialog* const Ui;
- 
+  double activeTag;
  
 
   // Here we should have the file name, no ?

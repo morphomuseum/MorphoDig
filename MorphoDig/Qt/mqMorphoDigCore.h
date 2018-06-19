@@ -62,6 +62,8 @@ public:
 	VectorOfElements Stack;
 };
 
+
+
 class ExistingColorMaps
 {
 public:
@@ -84,6 +86,34 @@ public:
 	
 };
 
+class ExistingTagMaps
+{
+public:
+	struct Element
+	{
+		QString Name;
+		vtkSmartPointer<vtkLookupTable> TagMap;
+		int numTags;
+		std::vector<std::string> tagNames;
+		int isCustom;
+
+		Element(QString name, vtkSmartPointer<vtkLookupTable> tagmap, int numtags, std::vector<std::string> tagnames, int custom = 0)
+		{
+			this->Name = name;
+			this->TagMap = tagmap;
+			this->isCustom = custom;
+			this->tagNames = tagnames;
+			this->numTags = numtags;
+
+		}
+	};
+	typedef std::vector<Element> VectorOfElements;
+	VectorOfElements Stack;
+
+};
+
+
+
 class ActiveScalars
 {
 public:
@@ -91,6 +121,17 @@ public:
 	int DataType;
 	int NumComp;
 	
+};
+
+
+class ActiveTagMap
+{
+public:
+	QString Name;
+	vtkSmartPointer<vtkLookupTable> TagMap;
+	int numTags;
+	std::vector<std::string> tagNames;
+
 };
 
 
@@ -320,6 +361,7 @@ public:
 	QProgressBar *myRAMProgressBar;
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
+	void createTags(QString newTags);
 	void RemoveScalar(QString scalarName, int onlySelectedObjects);
 	void GetDisplayToWorld(double x, double y, double z, double worldPt[4]);
 	void GetWorldToDisplay(double x, double y, double z, double displayPt[3]);
@@ -401,6 +443,8 @@ public:
 	int SaveSTVFile(QString fileName, int save_only_selected);
 	int SaveMAPFile(QString fileName, int save_only_active);
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
+	int SaveTAGMAPFile(QString fileName, int save_only_active);
+	void SaveTAGMAP(QString fileName, int mapId, int mode);
 	void OpenMAP(QString fileName);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
@@ -417,6 +461,7 @@ public:
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
 	void OpenTAG(QString fileName);
+	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);
 	void OpenNTW(QString fileName);
 	void OpenVER(QString fileName, int mode);
@@ -475,6 +520,7 @@ public:
 	void Setmui_BackGroundColor(double bg1, double bg2, double bg3);
 	void Setmui_BackGroundColor(double background[3]);
 	void EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString oldScalarName, QString newScalarName);
+	void DuplicateScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName, QString newScalarName);
 	void DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName);
 	ExistingScalars *Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDActor> actor);
 	ExistingScalars *Getmui_ScalarsOfSelectedObjects(int onlyfirst=0);
@@ -494,7 +540,15 @@ public:
 	void Setmui_ActiveColorMap(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colorMap);
 	void Setmui_ActiveColorMapAndRender(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colorMap);
 
-	
+
+
+	ExistingTagMaps* Getmui_ExistingTagMaps();
+	ActiveTagMap* Getmui_ActiveTagMap();
+
+	void Setmui_ActiveTagMap(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
+	void Setmui_ActiveTagMapAndRender(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
+
+
 
 	double* Getmui_BackGroundColor2();
 	void Getmui_BackGroundColor2(double bg[3]);
@@ -620,6 +674,7 @@ public:
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
   static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);
   
+  void signal_tagMapsChanged();
   void signal_colorMapsChanged();
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
@@ -633,6 +688,8 @@ public:
 
   void UpdateLookupTablesToData();
   void createCustomColorMap(QString name, vtkDiscretizableColorTransferFunction *STC);
+  void createCustomTagMap(QString name);
+  
   void invertRGB(vtkDiscretizableColorTransferFunction *STC);
   void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin();
@@ -641,6 +698,7 @@ public:
 	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
+  void GetDefaultTagColor(int tagnr, double rgba[4]);
   void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
   
   QVTKOpenGLWidget* getQVTKWidget();
@@ -652,12 +710,26 @@ public:
   void InitLuts();
   void ComputeSelectedNamesLists();
   int colorMapNameAlreadyExists(QString proposed_name);
+  int tagMapNameAlreadyExists(QString proposed_name);
+  int tagAlreadyExists(int tagnr);
+  void clearTag(int tagnr);
+  int highestTagInActorCollection();
+  void increaseTagNumberTo(int newtagnr);
+  int getActiveTagMapId();
   void deleteColorMap(int i);
+  void matchTagMapToActorCollection();
+  
+  void deleteTagMap(int i);
+  void addTagToTagMap(int i);
+  void removeTagFromTagMap(int i);
+  void reinitializeColorMap(int i);
+  void reinitializeTagMap(int i);
   double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);
   double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list);
 signals:
   
   void projectionModeChanged();
+  void tagMapsChanged();
   void colorMapsChanged();
   void zoomChanged();
   void lmSelectionChanged();
@@ -675,7 +747,7 @@ protected:
 	~mqMorphoDigCore();
 	//vtkUndoStack* mUndoStack;
 	vtkSmartPointer<vtkLookupTable> TagLut;
-	int TagTableSize;
+	//int TagTableSize;
 
 	vtkSmartPointer<vtkMDInteractorStyle> Style;
 	vtkSmartPointer<vtkInteractorStyleDrawPolygon> LassoStyle;
@@ -723,6 +795,12 @@ protected:
 
 	ActiveColorMap *mui_ActiveColorMap;
 	ExistingColorMaps *mui_ExistingColorMaps;
+
+
+	ActiveTagMap *mui_ActiveTagMap;
+	ExistingTagMaps *mui_ExistingTagMaps;
+
+
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;
@@ -813,6 +891,7 @@ public slots:
 	virtual void slotKeepLargest();
 	virtual void slotScalarsCameraDistance();
 	virtual void slotScalarsRGB();
+	virtual void slotCreateTagArray();
 	virtual void  slotGrey();
 	virtual void slotYellow();
 	virtual void slotRed();
