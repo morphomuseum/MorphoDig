@@ -143,8 +143,8 @@ void mqCameraControlsWidget::constructor()
   this->ui->CameraCentreOfMassToggle->addAction(actionCameraCentreOfMassToggle);
   this->ui->CameraCentreOfMassToggle->setDefaultAction(actionCameraCentreOfMassToggle);
   QIcon icon7;
-  icon7.addFile(QStringLiteral(":/Icons/move_cam.png"), QSize(), QIcon::Normal, QIcon::Off);
-  icon7.addFile(QStringLiteral(":/Icons/move_cam2.png"), QSize(), QIcon::Normal, QIcon::On);
+  icon7.addFile(QStringLiteral(":/Icons/Move_cam.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon7.addFile(QStringLiteral(":/Icons/Move_cam2.png"), QSize(), QIcon::Normal, QIcon::On);
   //  exportColorMap->setIcon(icon);
   actionCameraCentreOfMassToggle->setIcon(icon7);
 
