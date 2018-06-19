@@ -4660,6 +4660,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 			else
 			{
 				// mode TAG : todo!!!!
+				//
 
 			}
 		}
