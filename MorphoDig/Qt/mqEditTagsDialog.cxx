@@ -17,6 +17,7 @@
 #include "mqColorChooserButton.h"
 #include "mqColorOpacityEditorWidget.h"
 #include "mqTransferFunctionWidget.h"
+#include "mqSaveTAGMAPDialogReaction.h"
 #include "mqMinimalWidget.h"
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
@@ -119,7 +120,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	icon.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
 	exportAction->setIcon(icon);
 	//TOTO : create an export tag map...
-	//new mqSaveTagMAPDialogReaction(exportAction);
+	new mqSaveTAGMAPDialogReaction(exportAction);
 	connect(this->Ui->reinitializeTagMap, SIGNAL(pressed()), this, SLOT(slotReinitializeTagMap()));
 	connect(this->Ui->editTagMap, SIGNAL(pressed()), this, SLOT(slotEditTagMapName()));
 	connect(this->Ui->deleteTagMap, SIGNAL(pressed()), this, SLOT(slotDeleteTagMap()));
