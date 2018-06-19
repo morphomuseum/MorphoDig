@@ -79,8 +79,8 @@
  <file>move2.png</file>
  <file>move3.png</file>
  <file>move_mode2.png</file>
- <file>move_cam.png</file>
- <file>move_cam2.png</file>
+ <file>Move_cam.png</file>
+ <file>Move_cam2.png</file>
  <file>camera_ortho.png</file>
  <file>camera_persp.png</file>
  <file>renderer_anaglyph.png</file>
