@@ -42,6 +42,9 @@
 #include <QVBoxLayout>
 #include <algorithm>
 
+#include <vtkPen.h>
+#include <vtkRenderWindowInteractor.h>
+
 #if QT_VERSION >= 0x050000
 #include <QSurfaceFormat>
 #endif
