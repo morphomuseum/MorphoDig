@@ -469,6 +469,7 @@ void mqEditTagsDialog::slotRefreshTagMaps()
 {
 	cout << "slotRefreshTagMaps" << endl;
 	this->RefreshComboTagMaps();
+	this->RefreshTagMapTable();
 }
 void mqEditTagsDialog::slotReinitializeTagMap()
 {

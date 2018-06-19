@@ -1303,6 +1303,20 @@ void mqMorphoDigCore::increaseTagNumberTo(int newtagnr)
 
 	
 }
+int mqMorphoDigCore::getTagMapId(QString tagMapName)
+{
+	int tagMapId = -1;
+	for (int i = 0; i <this->Getmui_ExistingTagMaps()->Stack.size(); i++)
+	{
+		QString myExisingTagMapName = this->Getmui_ExistingTagMaps()->Stack.at(i).Name;
+		if (tagMapName == myExisingTagMapName)
+		{
+
+			tagMapId = i;
+		}
+	}
+	return tagMapId;
+}
 int mqMorphoDigCore::getActiveTagMapId()
 {
 	int activeTagMapId = 0;
@@ -3270,6 +3284,8 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 				std::string STVext2(".STV");
 				std::string TAGext(".tag");
 				std::string TAGext2(".TAG");
+				std::string TAGext3(".tgp");
+				std::string TAGext4(".TGP");
 				std::string ORIext(".ori");
 				std::string ORIext2(".ORI");
 				int lmk_file = 0;
@@ -3380,7 +3396,11 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 				found = myline.find(TAGext);
 				found2 = myline.find(TAGext2);
-				if (found != std::string::npos || found2 != std::string::npos)
+				std::size_t found3 = myline.find(TAGext3);
+				std::size_t found4 = myline.find(TAGext4);
+				 
+				if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos
+					)
 				{
 					lmk_file = 1;
 					// Now open TAG file!
@@ -3392,9 +3412,9 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						myline = path.c_str();
 						myline.append(tagfilename.c_str());
 					}
-					std::cout << "Try to load tag file :<<" << myline.c_str() << std::endl;
+					std::cout << "Try to load tag map file :<<" << myline.c_str() << std::endl;
 					QString tagfile(myline.c_str());
-					this->OpenTAG(tagfile);
+					this->OpenTAGMAP(tagfile);
 
 
 				}
@@ -4508,7 +4528,8 @@ int mqMorphoDigCore::SaveFlagFile(QString fileName, int save_only_selected)
 
 }
 void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
-	
+	// tgp files: when map name already exists : update existing map.
+	// tag files : always replace "this->TagMap" by .tag file content.
 
 	int ntagmap;
 	
@@ -4621,7 +4642,9 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 							int num = 2;
 							if (this->tagMapNameAlreadyExists(TagMapName) == 1)
 							{
-								int exists = 1;
+								int id = this->getTagMapId(TagMapName);
+
+								/*int exists = 1;
 								while (exists == 1)
 								{
 									QString NewColorMapName = TagMapName + "_" + QString::number(num);
@@ -4634,14 +4657,28 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 									{
 										num++;
 									}
+								}*/
+								QString mTagMap =  QString("TagMap");
+								if (TagMapName == mTagMap)
+								{
+									this->TagLut = NewMap;
 								}
+								this->Getmui_ExistingTagMaps()->Stack.at(id).numTags = tagnr;
+								this->Getmui_ExistingTagMaps()->Stack.at(id).TagMap= NewMap;
+								this->Getmui_ExistingTagMaps()->Stack.at(id).tagNames = tagNames;
+								if (id == this->getActiveTagMapId())
+								{
+									this->Setmui_ActiveTagMap(TagMapName, tagnr, tagNames, NewMap);
+								}
+								
 							}
+							else
+							{
 
-							cout << "here: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Color maps inside the stack!" << endl;
 
-							this->Getmui_ExistingTagMaps()->Stack.push_back(ExistingTagMaps::Element(TagMapName, NewMap, tagnr, tagNames, 1));
-							cout << "and now: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Color maps inside the stack!" << endl;
-
+								this->Getmui_ExistingTagMaps()->Stack.push_back(ExistingTagMaps::Element(TagMapName, NewMap, tagnr, tagNames, 1));
+								cout << "and now: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+							}
 
 						}
 
@@ -4660,6 +4697,88 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 			else
 			{
 				// mode TAG : todo!!!!
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				int tagnr = 0;
+				QFile inputFileTMP(fileName);
+				int ok = 0;
+				if (inputFileTMP.open(QIODevice::ReadOnly))
+				{
+					//@@@
+					QTextStream in1(&inputFileTMP);
+					int cpt = 0;
+					while (!in1.atEnd())
+					{
+
+						QString line1 = in1.readLine();
+						if (line1.length() > 1)
+						{
+							cpt++;
+						}
+
+					}
+					tagnr = (int)(cpt / 2);
+					cout << "found " << tagnr << " tags inside .TAG file" << endl;
+
+				}
+				inputFileTMP.close();
+
+				QFile inputFile(fileName);
+				
+				if (inputFile.open(QIODevice::ReadOnly))
+				{				
+
+					QTextStream in(&inputFile);
+					QString SomeText;
+					QString TagMapName = QString("TagMap");
+						
+					vtkSmartPointer<vtkLookupTable> NewMap = vtkSmartPointer<vtkLookupTable>::New();
+					std::vector<std::string> tagNames;
+					double  r, g, b, a;
+					QString Tag;
+
+					NewMap->SetNumberOfTableValues(tagnr);
+					NewMap->Build();
+					for (int j = 0; j < tagnr; j++)
+					{
+						QString line = in.readLine();
+						QTextStream myteststream(&line);					
+						myteststream >> Tag;
+						tagNames.push_back(Tag.toStdString().c_str());
+
+						line = in.readLine();
+						myteststream.setString(&line);
+						myteststream >> r >> g >> b >> a;
+
+
+						NewMap->SetTableValue(j, r, g, b, a);
+
+					}
+
+
+
+
+					cout << "Add this color map to TAGMAP default !!" << endl;
+					int num = 2;
+					
+					int id = 0; // default tag map									
+					this->TagLut = NewMap;					
+					this->Getmui_ExistingTagMaps()->Stack.at(id).numTags = tagnr;
+					this->Getmui_ExistingTagMaps()->Stack.at(id).TagMap = NewMap;
+					this->Getmui_ExistingTagMaps()->Stack.at(id).tagNames = tagNames;
+					if (id == this->getActiveTagMapId())
+					{
+						this->Setmui_ActiveTagMap(TagMapName, tagnr, tagNames, NewMap);
+					}										
+					this->signal_tagMapsChanged();// emit this->colorMapsChanged();
+					
+
+				}
+				/**/
+
+				inputFile.close();
+
+
+
 
 			}
 		}
@@ -4667,7 +4786,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 	}
 
 }
-void mqMorphoDigCore::OpenTAG(QString fileName) {}
+//void mqMorphoDigCore::OpenTAG(QString fileName) {}
 
 int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 {
