@@ -61,8 +61,8 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/move_cam.png</normaloff>
-           <normalon>:/Icons/move_cam2.png</normalon>:/Icons/move_cam.png</iconset>
+           <normaloff>:/Icons/Move_cam.png</normaloff>
+           <normalon>:/Icons/Move_cam2.png</normalon>:/Icons/Move_cam.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
