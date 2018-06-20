@@ -4,17 +4,17 @@
 Visit the official web page at http://morphomuseum.com/morphodig
 
 
-##Build/Install MorphoDig on Linux
+## Build/Install MorphoDig on Linux
 
 MorphoDig has not been compiled yet on Linux. Theoretically, MorphoDig should run on Linux without problem (very minor corrections may have to be applied to make it possible). Help would be appreciated to compile and distribute MorphoDig on Linux!
 
     
    
-##Install morphodig binaries for Windows 
+## Install morphodig binaries for Windows 
 
 Windows binaries are downloadable at the following address : http://morphomuseum.com/morphodig 
   
-##Build morphodig on Windows
+## Build morphodig on Windows
 1.  install visual studio 2015 express for desktop.
 2.  install Qt 5
 4.  download and install CMAKE (>=3.3.x) (http://cmake.org).
@@ -36,7 +36,7 @@ Load CMAKE after Path has been modified
 Then add the directory where your .dll files have been created in your path.
 6.  get MorphoDig and build it (http://github.com/morphomuseum/MorphoDig). 
 
-##Build morphodig on OS X
+## Build morphodig on OS X
 
 MorphoDig has not been compiled yet on Mac Os. Theoretically, MorphoDig should run on Mac without problem (very minor corrections may have to be applied though). Help would be appreciated to compile and distribute MorphoDig on Mac!
     
