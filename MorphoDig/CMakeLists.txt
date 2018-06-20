@@ -108,6 +108,8 @@ else()
 
 endif()
 
+
+IF (WIN32)
 install(TARGETS MorphoDig	
         RUNTIME
         DESTINATION bin
@@ -201,3 +203,7 @@ install(
 		"${qtico}"                
         DESTINATION bin/imageformats
         COMPONENT applications)
+
+ELSE()
+#TO DO FOR OTHER SYSTEMS
+ENDIF()
