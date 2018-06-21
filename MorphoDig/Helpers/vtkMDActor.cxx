@@ -46,6 +46,7 @@ vtkMDActor::vtkMDActor()
 
 	this->SetBackfaceProperty(backFaces);
 	this->UndoRedo = new vtkMDActorUndoRedo;
+	this->KdTree = nullptr;
 	this->Selected = 1;
 	this->Changed = 0;
 	this->Name = "New Mesh";
@@ -59,6 +60,30 @@ vtkMDActor::~vtkMDActor()
 	delete this->UndoRedo;
 	
 
+
+
+}
+
+void vtkMDActor::BuildKdTree()
+{
+	//do not care about position matrix as long as we can convert picked coordinate to vertex id thanks to picker->GetPointId();
+	vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+	{
+
+		vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+		mPD = mymapper->GetInput();
+		this->KdTree->SetDataSet(mPD);
+		this->KdTree->BuildLocator();
+	}
+}
+void vtkMDActor::FreeKdTree()
+{
+	this->KdTree = nullptr;
+}
+vtkSmartPointer<vtkKdTreePointLocator> vtkMDActor::GetKdTree()
+{
+	return this->KdTree;
 }
 int vtkMDActor::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {

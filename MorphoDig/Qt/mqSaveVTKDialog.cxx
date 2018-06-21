@@ -60,7 +60,7 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfSelectedObjects(0);
  for (int i = 0; i < MyList->Stack.size(); i++)
  {
-	 if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
+	 if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
 	 {
 		 QListWidgetItem* item = new QListWidgetItem(MyList->Stack.at(i).Name, this->Ui->scalarList);
 		 item->setFlags(item->flags() | Qt::ItemIsUserCheckable); // set checkable flag

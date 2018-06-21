@@ -376,7 +376,8 @@ public:
 	void Setmui_ScalarVisibility(int scalarvisibility);
 	int Getmui_DefaultScalarVisibility();
 	int Getmui_ScalarVisibility();
-
+	int Getmui_TagModeActivated();
+	void Setmui_TagModeActivated(int activated);
 	void Setmui_MoveMode(int movemode);
 	int Getmui_MoveMode();
 	int Getmui_DefaultMoveMode();
@@ -437,6 +438,8 @@ public:
 	void Setmui_Z2Label(QString label);
 	QString Getmui_DefaultZ2Label();
 	QString Getmui_Z2Label();
+	
+	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int override);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName);
 	void SaveORI(QString fileName);
 	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces =0);
@@ -753,6 +756,7 @@ protected:
 	vtkSmartPointer<vtkMDInteractorStyle> Style;
 	vtkSmartPointer<vtkInteractorStyleDrawPolygon> LassoStyle;
 	vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
+	vtkSmartPointer<vtkScalarBarActor> TagScalarBarActor;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRedLut;
 
@@ -821,6 +825,7 @@ protected:
 	int mui_ShowOrientationHelper;
 	int mui_CameraCentreOfMassAtOrigin;
 	int mui_CameraOrtho;
+	int mui_TagModeActivated;
 
 	QString mui_X1Label;
 	QString mui_X2Label;

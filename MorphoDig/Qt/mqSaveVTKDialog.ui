@@ -895,7 +895,7 @@
        <x>10</x>
        <y>20</y>
        <width>160</width>
-       <height>41</height>
+       <height>42</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout1">
@@ -934,7 +934,7 @@
        <x>10</x>
        <y>20</y>
        <width>231</width>
-       <height>41</height>
+       <height>42</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout1_4">
@@ -965,7 +965,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Scalars to be saved:</string>
+     <string>Scalars and tag arrays to be saved:</string>
     </property>
     <widget class="QListWidget" name="scalarList">
      <property name="geometry">
@@ -1028,9 +1028,6 @@
     </widget>
    </widget>
   </widget>
-  <zorder>layoutWidget</zorder>
-  <zorder>SaveVTKBox</zorder>
-  <zorder>buttonBox</zorder>
  </widget>
  <resources/>
  <connections>

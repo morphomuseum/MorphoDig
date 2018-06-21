@@ -107,6 +107,7 @@ protected:
   int CurrentMode;
   int Ctrl;
   int L;
+  int T;
   int Alt;
   int LM_Button;
   //vtkProp3D *InteractionProp;

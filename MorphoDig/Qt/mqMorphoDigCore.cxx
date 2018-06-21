@@ -13,6 +13,7 @@
 #include "vtkBezierCurveSource.h"
 #include <time.h>
 #include <vtkLandmarkTransform.h>
+#include <vtkTextProperty.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
@@ -109,7 +110,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 	mqMorphoDigCore::Instance = this;
 
-
+	this->mui_TagModeActivated = 0;
 	this->qvtkWidget = NULL;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
 	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
@@ -136,6 +137,13 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->ScalarBarActor->SetOrientationToHorizontal();
 	this->ScalarBarActor->SetHeight(0.1);
 
+	this->TagScalarBarActor = vtkSmartPointer<vtkScalarBarActor>::New();
+	this->TagScalarBarActor->SetOrientationToVertical();
+	this->TagScalarBarActor->SetHeight(0.8);
+	//this->TagScalarBarActor->GetLabelTextProperty()->set
+	//this->TagScalarBarActor->SetLabelFormat("%d");
+	//this->TagScalarBarActor->SetWidth(0.8);
+	//this->TagScalarBarActor->SetTitleRatio(10);
 
 	cout << "mui_ActiveScalars creaed" << endl;
 	QString none = QString("none");
@@ -429,6 +437,44 @@ void mqMorphoDigCore::ChangeBackfaceCulling() {
 int mqMorphoDigCore::Getmui_BackfaceCulling() { return this->mui_BackfaceCulling; }
 void mqMorphoDigCore::Setmui_BackfaceCulling(int on_off) {
 	if (on_off == 0 || on_off == 1) { this->mui_BackfaceCulling = on_off; }
+}
+
+void mqMorphoDigCore::Setmui_TagModeActivated(int activated) {
+	this->mui_TagModeActivated = activated;
+	/*	
+	If off : delete existing  KdTrees for all actors.
+	*/
+	if (activated == 0)
+	{
+		this->ActorCollection->InitTraversal();
+
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			myActor->FreeKdTree();
+		}
+	}
+}
+
+void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int override)
+{
+
+	cout << "Tag At " << pickid << endl;
+	//1 check if myActor is not null
+	//2 now check if tagModeActivated is on
+	//3 if on, check if actor has a scalar list
+	//4 if it has not do nothing, if it has, retrieve what tool is active
+	//5 retrieve list of point ids which are selected by the currently active tool
+	//6 update list depending on override on/off and of color of active tag.
+	//7 retrieve currently active tag number
+	//8 update activeTag array with active tag number for all selected point ids.
+
+
+}
+
+int mqMorphoDigCore::Getmui_TagModeActivated() {
+	return this->mui_TagModeActivated;
+
 }
 
 void mqMorphoDigCore::ChangeClippingPlane() 
@@ -4129,6 +4175,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		QString vtkExt = ".vtk";
 		QString plyExt = ".ply";
 		QString tagExt = ".tag";
+		QString tagExt2 = ".tgp";
 		QString oriExt = ".ori";
 		QString flgExt = ".flg";
 		QString verExt = ".ver";
@@ -4231,8 +4278,10 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		{
 			QString _tag_fullpath;
 			QString _tag_file;
-			int tag_exists = this->context_file_exists(onlypath, tagExt, projectname);
-			if (tag_exists == 1)
+			
+			int tag_exists2 = this->context_file_exists(onlypath, tagExt2, projectname);
+			
+			if (tag_exists2 ==1)
 			{
 				QMessageBox msgBox;
 				msgBox.setText("Tag file already exists: overwrite existing tag colours and labels file ?");
@@ -4244,7 +4293,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			}
 
 			_tag_file = projectname;
-			_tag_file.append(".tag");
+			
+			_tag_file.append(".tgp");
 			_tag_fullpath = onlypath;
 			_tag_fullpath += _tag_file;
 			int write = 1;
@@ -4253,7 +4303,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			{
 				//write or overwrite TAG file without further question (0)
 				//@@ TODO!
-				//this->SaveTAG(_tag_fullpath);
+				this->SaveTAGMAPFile(_tag_fullpath, 0);
 			}
 			stream << _tag_file.toLocal8Bit() << endl;
 			
@@ -12804,11 +12854,17 @@ void mqMorphoDigCore::Setmui_ScalarVisibility(int scalarvisibility)
 	{
 		//cout << "Scalar visibility has changed" << endl;
 		//1 refresh scalar bar actor !
-		int sba_refresh_needed = 0;
+		int sba_refresh_needed = 0; //conventional scalar bar actor
+		int tsba_refresh_needed = 0; //tag scalar bar actor (tag legent)
 		if ((this->mui_ActiveScalars->DataType==VTK_FLOAT|| this->mui_ActiveScalars->DataType == VTK_DOUBLE)&& this->mui_ActiveScalars->NumComp == 1)
 		{
 			//cout << "SBA refresh needed" << endl;
 			sba_refresh_needed = 1;
+		}
+		if (this->mui_ActiveScalars->DataType == VTK_INT  && this->mui_ActiveScalars->NumComp == 1)
+		{
+			//cout << "SBA refresh needed" << endl;
+			tsba_refresh_needed = 1;
 		}
 		if (scalarvisibility == 1)
 		{
@@ -12818,6 +12874,14 @@ void mqMorphoDigCore::Setmui_ScalarVisibility(int scalarvisibility)
 				this->ScalarBarActor->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
 				this->ScalarBarActor->SetTitle(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
 				this->Renderer->AddActor(ScalarBarActor);
+				//cout << "Add SBA" << endl;
+			}
+			if (tsba_refresh_needed == 1)
+			{
+				this->TagScalarBarActor->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+				this->TagScalarBarActor->SetNumberOfLabels(this->Getmui_ActiveTagMap()->numTags);
+				this->TagScalarBarActor->SetTitle(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+				//this->Renderer->AddActor(TagScalarBarActor);
 				//cout << "Add SBA" << endl;
 			}
 
@@ -12830,6 +12894,10 @@ void mqMorphoDigCore::Setmui_ScalarVisibility(int scalarvisibility)
 			//	cout << "Remove SBA" << endl;
 				this->Renderer->RemoveActor(ScalarBarActor);
 			}
+			
+				//	cout << "Remove SBA" << endl;
+				//this->Renderer->RemoveActor(TagScalarBarActor);
+			
 		}
 	
 
@@ -13224,7 +13292,20 @@ void mqMorphoDigCore::RefreshColorMapsAndScalarVisibility()
 			
 			
 	}
+	int tsba_refresh_needed = 0;
+	if ((this->mui_ActiveScalars->DataType == VTK_INT ) && this->mui_ActiveScalars->NumComp == 1)
+	{
+		tsba_refresh_needed = 1;
+	}
 
+	if (tsba_refresh_needed == 1)
+	{
+		this->TagScalarBarActor->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+		this->TagScalarBarActor->SetNumberOfLabels(this->Getmui_ActiveTagMap()->numTags);
+		this->TagScalarBarActor->SetTitle(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+
+
+	}
 	
 
 	//2 refresh all actors
@@ -13335,16 +13416,28 @@ void mqMorphoDigCore::Setmui_ActiveScalarsAndRender(QString Scalar, int dataType
 void mqMorphoDigCore::Setmui_ActiveScalars(QString Scalar, int dataType, int numComp)
 {
 	int sba_refresh_needed = 0;
+	int tsba_refresh_needed = 0;
 	int old_sba_on = 0;
+	int old_tsba_on = 0;
 	int new_sba_on = 0;
+	int new_tsba_on = 0;
 	if ((dataType == VTK_FLOAT || dataType == VTK_DOUBLE) && numComp == 1)
 	{
 		new_sba_on = 1;
 		
 	}
+	if ((dataType == VTK_INT ) && numComp == 1)
+	{
+		new_tsba_on = 1;
+
+	}
 	if ((this->mui_ActiveScalars->DataType == VTK_FLOAT || this->mui_ActiveScalars->DataType == VTK_DOUBLE) && this->mui_ActiveScalars->NumComp == 1)
 	{
 		old_sba_on = 1;
+	}
+	if ((this->mui_ActiveScalars->DataType == VTK_INT ) && this->mui_ActiveScalars->NumComp == 1)
+	{
+		old_tsba_on = 1;
 	}
 	if (old_sba_on != new_sba_on)
 	{
@@ -13361,7 +13454,23 @@ void mqMorphoDigCore::Setmui_ActiveScalars(QString Scalar, int dataType, int num
 			this->Renderer->RemoveActor(ScalarBarActor);
 		}
 	}
-
+	if (old_tsba_on != new_tsba_on)
+	{
+		tsba_refresh_needed = 1;
+		if (new_tsba_on == 1)
+		{
+			this->TagScalarBarActor->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+			this->TagScalarBarActor->SetNumberOfLabels(this->Getmui_ActiveTagMap()->numTags);
+			
+			this->TagScalarBarActor->SetTitle(Scalar.toStdString().c_str());
+			
+			//this->Renderer->AddActor(TagScalarBarActor);
+		}
+		else
+		{
+			//this->Renderer->RemoveActor(TagScalarBarActor);
+		}
+	}
 	this->mui_ActiveScalars->Name = Scalar;
 	this->mui_ActiveScalars->DataType = dataType;
 	this->mui_ActiveScalars->NumComp = numComp;

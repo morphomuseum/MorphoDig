@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   Visualization Toolkti
   Inspired from Module:    vtkInteractorStyleRubberBandPick.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
@@ -86,6 +86,9 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define ALT_RELEASED 5
 #define L_PRESSED 2
 #define L_RELEASED 3
+#define T_PRESSED 7
+#define T_RELEASED 8
+
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
@@ -97,6 +100,7 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	this->Alt = ALT_RELEASED;
 	//this->MoveMode = MOVECAM_MODE;
 	this->L = L_RELEASED;
+	this->T = T_RELEASED;
 	this->MoveWhat = CAM;
 	this->Ctrl = CTRL_RELEASED;
 	this->LM_Button = LBUTTON_UP;
@@ -280,6 +284,11 @@ void vtkMDInteractorStyle::StartSelect()
 	{
 		//cout << "l pressed" << endl;
 		this->L = L_PRESSED;
+	}
+	if (key.compare("t") == 0 || key.compare("T") == 0)
+	{
+		//cout << "l pressed" << endl;
+		this->T = T_PRESSED;
 	}
 	if (key.compare("Control_L") == 0)
 	{
@@ -782,7 +791,11 @@ void vtkMDInteractorStyle::StartSelect()
 		  this->L = L_RELEASED;
 		  // std::cout << key << "Released" << '\n';
 	  }
-
+	  if (key.compare("t") == 0 || key.compare("T") == 0)
+	  {
+		  this->T = T_RELEASED;
+		  // std::cout << key << "Released" << '\n';
+	  }
 	  // Forward events
 	  vtkInteractorStyleTrackballCamera::OnKeyRelease();
   }
@@ -891,6 +904,50 @@ void vtkMDInteractorStyle::RubberStart()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnRightButtonDown()
 {
+
+	if (this->T == T_PRESSED)
+	{
+		//int* clickPos = this->GetInteractor()->GetEventPosition();
+		int x = this->Interactor->GetEventPosition()[0];
+		int y = this->Interactor->GetEventPosition()[1];
+		//std::cout << "Clicked at "
+		//	<< x << " " << y << std::endl;
+		if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+		if (this->CurrentRenderer != NULL)
+		{
+			//std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+			// Pick from this location.
+			/* vtkSmartPointer<vtkPropPicker>  picker =
+			vtkSmartPointer<vtkPropPicker>::New();*/
+
+			vtkSmartPointer<vtkCellPicker> picker =
+				vtkSmartPointer<vtkCellPicker>::New();
+
+			picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+			vtkIdType pickid = picker->GetPointId();
+			
+			if (picker->GetActor() == NULL) {
+				cout << "Picked Null actor" << endl;
+			}
+			else
+			{
+				vtkMDActor * myActor = vtkMDActor::SafeDownCast(picker->GetActor());
+				if (myActor != NULL)
+				{
+					mqMorphoDigCore::instance()->TagAt(pickid, myActor, 0);
+				}
+
+				mqMorphoDigCore::instance()->Render();
+			}
+
+		}
+		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+		//this->T = T_RELEASED;
+
+	}
 	//Special case: move landmark
 	if (this->L == L_PRESSED)
 	{
@@ -1053,6 +1110,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 
 			  double* pos = picker->GetPickPosition();
+			  
 			  //  std::cout << "Pick position (world coordinates) is: "
 			  //	  << pos[0] << " " << pos[1]
 			  //	  << " " << pos[2] << std::endl;
@@ -1074,6 +1132,50 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 
 		  this->L = L_RELEASED;
+	  }//left button down, no landmark 
+	  else  if (this->T == T_PRESSED && this->Ctrl != CTRL_PRESSED)
+	  {
+
+		  //int* clickPos = this->GetInteractor()->GetEventPosition();
+		  int x = this->Interactor->GetEventPosition()[0];
+		  int y = this->Interactor->GetEventPosition()[1];
+		  //std::cout << "Clicked at "
+		  //	<< x << " " << y << std::endl;
+		  if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+		  if (this->CurrentRenderer != NULL)
+		  {
+			  //std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+			  // Pick from this location.
+			  /* vtkSmartPointer<vtkPropPicker>  picker =
+			  vtkSmartPointer<vtkPropPicker>::New();*/
+
+			  vtkSmartPointer<vtkCellPicker> picker =
+				  vtkSmartPointer<vtkCellPicker>::New();
+
+			  picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+			  vtkIdType pickid = picker->GetPointId();
+
+			  if (picker->GetActor() == NULL) {
+				  cout << "Picked Null actor" << endl;
+			  }
+			  else
+			  {
+				  vtkMDActor * myActor = vtkMDActor::SafeDownCast(picker->GetActor());
+				  if (myActor != NULL)
+				  {
+					  mqMorphoDigCore::instance()->TagAt(pickid, myActor, 1);
+				  }
+
+				  mqMorphoDigCore::instance()->Render();
+			  }
+
+		  }
+		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+
+		 // this->T = T_RELEASED;
 	  }//left button down, no landmark 
 	  else
 	  { // left mouse pressed, no 

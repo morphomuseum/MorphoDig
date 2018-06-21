@@ -17,6 +17,7 @@ Module:    vtkMDActor.h
 #include <vtkDataArray.h>
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
+#include <vtkKdTreePointLocator.h>
 #include <vector>
 #include <QString>
 class vtkMDActorUndoRedo
@@ -57,7 +58,9 @@ public:
 	
 	vtkTypeMacro(vtkMDActor, vtkOpenGLActor);
 	void PrintSelf(ostream& os, vtkIndent indent);
-
+	void BuildKdTree();
+	void FreeKdTree();
+	vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
 	
 	// Description:
 	void ShallowCopy(vtkProp *prop);
@@ -100,7 +103,7 @@ public:
 protected:
 	vtkMDActor();
 	~vtkMDActor();
-
+	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
 	int Selected;
 	int Changed; // used by MTActorCollection class to recompute global center of mass and center of mass
 	//of selected objects etc... 
