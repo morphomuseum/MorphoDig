@@ -439,7 +439,7 @@ public:
 	QString Getmui_DefaultZ2Label();
 	QString Getmui_Z2Label();
 	
-	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int override);
+	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName);
 	void SaveORI(QString fileName);
 	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces =0);

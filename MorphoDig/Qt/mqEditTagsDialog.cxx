@@ -109,6 +109,9 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
+
+	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
+
 	this->Ui->reinitializeTagMap->setDisabled(false);
 	this->Ui->editTagMap->setDisabled(true);
 	this->Ui->deleteTagMap->setDisabled(true);
@@ -733,6 +736,19 @@ void mqEditTagsDialog::slotActiveTagsChanged(int idx)
 
 }
 
+void mqEditTagsDialog::slotActivateTagMode()
+{
+	if (this->Ui->activateTagMode->isChecked())
+	{
+		cout << "Activate Tag Mode" << endl;
+		mqMorphoDigCore::instance()->Setmui_TagModeActivated(1);
+	}
+	else
+	{
+		cout << "Deactivate Tag Mode" << endl;
+		mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
+	}
+}
 
 void mqEditTagsDialog::slotActiveTagMapChanged(int idx)
 {

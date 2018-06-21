@@ -937,6 +937,7 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 				vtkMDActor * myActor = vtkMDActor::SafeDownCast(picker->GetActor());
 				if (myActor != NULL)
 				{
+					//right button down : no override
 					mqMorphoDigCore::instance()->TagAt(pickid, myActor, 0);
 				}
 

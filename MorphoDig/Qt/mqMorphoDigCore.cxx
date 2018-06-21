@@ -456,18 +456,95 @@ void mqMorphoDigCore::Setmui_TagModeActivated(int activated) {
 	}
 }
 
-void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int override)
+void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride)
 {
 
 	cout << "Tag At " << pickid << endl;
 	//1 check if myActor is not null
 	//2 now check if tagModeActivated is on
-	//3 if on, check if actor has a scalar list
-	//4 if it has not do nothing, if it has, retrieve what tool is active
-	//5 retrieve list of point ids which are selected by the currently active tool
-	//6 update list depending on override on/off and of color of active tag.
-	//7 retrieve currently active tag number
-	//8 update activeTag array with active tag number for all selected point ids.
+	if (this->Getmui_TagModeActivated() == 1 && myActor !=NULL)
+	{
+		//3 if on, check if actor has a scalar list
+		vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+		{
+			QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+			vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+			//4 if current tags exist, retrieve what tool is active
+			if (currentTags != NULL)
+			{
+				vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+				//todo : retrieve what tool is active
+				//5 retrieve list of point ids which are selected by the currently active tool
+				if (myActor->GetKdTree() == nullptr)
+				{
+					cout << "Try to build kdtree!" << endl;
+					myActor->BuildKdTree();
+					cout << "KdTree built" << endl;
+				}
+				double ve[3];
+				myPD->GetPoint(pickid, ve);
+				int curTag = currentTags->GetTuple1(pickid);
+				cout << "pickid :" << pickid << ", tagid:" << curTag << endl;
+				int do_override;
+				
+				if (toverride==1 || curTag==0) // if user explicitly asks to override OR current picked vertex is tagged with 0 (exterior), we do the override
+				{
+					do_override = 1;
+				}
+				else
+				{
+					do_override = 0;
+				}
+				vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+				double Radius = 2;
+				myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
+				for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+				{
+
+					
+					vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+					
+					int mTag = currentTags->GetTuple1(observedConnectedVertex);
+					if (j<10) {
+						std::cout << "neighbour id: " << observedConnectedVertex << ", tagid:" << mTag << endl;
+
+
+					}
+					if (do_override == 1 || (do_override == 0 && mTag == curTag))
+					{
+						if (j < 10)
+						{
+							cout << "change tag value" << endl;
+						}
+						currentTags->SetTuple1(observedConnectedVertex, 1);
+					}
+
+				}
+				//mymapper->GetLookupTable()->
+				currentTags->Modified();
+				//mymapper->Update();
+
+			}
+			else
+			{
+				cout << "Can not tag, could not find tags" << endl;
+			}
+			
+			
+			//6 update list depending on override on/off and of color of active tag.
+			//7 retrieve currently active tag number
+			//8 update activeTag array with active tag number for all selected point ids.
+		}
+		else
+		{
+			cout << "Can not tag, no mapper / polydata" << endl;
+		}
+	}
+	else
+	{
+		cout << "Can not tag : Tag Mode is deactivated" << endl;
+	}
 
 
 }

@@ -72,6 +72,7 @@ void vtkMDActor::BuildKdTree()
 	{
 
 		vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+		this->KdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
 		mPD = mymapper->GetInput();
 		this->KdTree->SetDataSet(mPD);
 		this->KdTree->BuildLocator();

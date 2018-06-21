@@ -71,6 +71,7 @@ public:
   virtual void slotRefreshComboTags();
   virtual void slotRemoveTags();
   virtual void slotRefreshTagMaps();
+  virtual void slotActivateTagMode();
   virtual void slotCellChanged(int row, int column);
 /*  virtual void slotCellActivated(int row, int column);  
   virtual void slotCellClicked(int row, int column);
