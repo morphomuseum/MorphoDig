@@ -68,7 +68,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
   : QDialog(Parent)
   , Ui(new Ui::mqEditTagsDialog())
 {
-
+	
 	
 	//1 populate active scalar combo box, and check which tags is the active one!
 	this->Ui->setupUi(this);
@@ -109,7 +109,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
-
+	
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
 
 	this->Ui->reinitializeTagMap->setDisabled(false);
@@ -155,6 +155,22 @@ mqEditTagsDialog::~mqEditTagsDialog()
  //depending on what is 
 	
   delete this->Ui;
+}
+
+/*void mqEditTagsDialog::hide()
+{
+	//cout << "Hide" << endl;
+	this->QDialog::hide();
+	
+}*/
+
+void mqEditTagsDialog::closeEvent(QCloseEvent *event)
+{
+	cout << "Deactivate Tag Mode" << endl;
+	mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
+	this->Ui->activateTagMode->setChecked(false);
+
+	event->accept();
 }
 
 //fonctionne sur la modification du nom. // problème : quand on remplit le tableau, ça appelle aussi la fonction
@@ -749,6 +765,13 @@ void mqEditTagsDialog::slotActivateTagMode()
 		mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
 	}
 }
+
+/*void mqEditTagsDialog::slotDeactivateTagMode()
+{
+		cout << "Deactivate Tag Mode" << endl;
+		mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
+	
+}*/
 
 void mqEditTagsDialog::slotActiveTagMapChanged(int idx)
 {

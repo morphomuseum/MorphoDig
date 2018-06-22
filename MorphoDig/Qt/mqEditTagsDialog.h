@@ -51,12 +51,13 @@ public:
   ~mqEditTagsDialog();
  
   void UpdateUI();
-  
+  //void hide();
  void RefreshDialog();
  void RefreshComboActiveTags();
  void RefreshComboTagMaps();
  void RefreshTagMapTable();
- 
+ void closeEvent(QCloseEvent *event);
+
  
 
   public slots:
@@ -72,6 +73,7 @@ public:
   virtual void slotRemoveTags();
   virtual void slotRefreshTagMaps();
   virtual void slotActivateTagMode();
+  //virtual void slotDeactivateTagMode();
   virtual void slotCellChanged(int row, int column);
 /*  virtual void slotCellActivated(int row, int column);  
   virtual void slotCellClicked(int row, int column);
