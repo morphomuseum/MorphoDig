@@ -779,6 +779,32 @@
      <string>Activate tag mode</string>
     </property>
    </widget>
+   <widget class="QDoubleSpinBox" name="pencilSearchSize">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>140</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <double>1.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>140</y>
+      <width>47</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pencil size</string>
+    </property>
+   </widget>
   </widget>
   <action name="actionExportColorMaps">
    <property name="icon">
