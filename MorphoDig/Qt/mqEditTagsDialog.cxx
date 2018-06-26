@@ -109,7 +109,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
-	
+	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(double)), this, SLOT(slotPencilSearchSizeChanged(double)));
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
 
 	this->Ui->reinitializeTagMap->setDisabled(false);
@@ -266,7 +266,7 @@ void mqEditTagsDialog::slotActiveTagChanged()
 		{
 			cout << "Active tag at row " << i << ", column" << j << endl;
 			this->activeTag = i;
-			
+			mqMorphoDigCore::instance()->Setmui_ActiveTag(i);
 		}
 	}
 }
@@ -725,6 +725,12 @@ void mqEditTagsDialog::RefreshDialog()
 {
 	this->UpdateUI();
 	mqMorphoDigCore::instance()->Render();
+}
+
+void mqEditTagsDialog::slotPencilSearchSizeChanged(double newSize)
+{
+	mqMorphoDigCore::instance()->Setmui_PencilSize(newSize);
+
 }
 
 

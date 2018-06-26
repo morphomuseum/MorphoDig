@@ -126,6 +126,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_ActiveColorMap = new ActiveColorMap;
 	this->mui_ExistingColorMaps = new ExistingColorMaps;
 	this->mui_ActiveTagMap = new ActiveTagMap;
+	this->mui_ActiveTag = 1;
+	this->mui_PencilSize = 1;
 	this->mui_ExistingTagMaps = new ExistingTagMaps;
 	this->InitLuts();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -497,8 +499,9 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					do_override = 0;
 				}
 				vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
-				double Radius = 2;
+				double Radius = this->Getmui_PencilSize();
 				myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
+				int activeTag = this->Getmui_ActiveTag();
 				for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 				{
 
@@ -517,7 +520,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						{
 							cout << "change tag value" << endl;
 						}
-						currentTags->SetTuple1(observedConnectedVertex, 1);
+						currentTags->SetTuple1(observedConnectedVertex, activeTag);
 					}
 
 				}
@@ -13450,6 +13453,22 @@ void mqMorphoDigCore::RefreshColorMapsAndScalarVisibility()
 	}
 }
 
+void mqMorphoDigCore::Setmui_PencilSize(double pencilSize)
+{
+	this->mui_PencilSize = pencilSize;
+}
+double mqMorphoDigCore::Getmui_PencilSize()
+{
+	return this->mui_PencilSize;
+}
+void mqMorphoDigCore::Setmui_ActiveTag(int activeTag)
+{
+	this->mui_ActiveTag = activeTag;
+}
+int mqMorphoDigCore::Getmui_ActiveTag()
+{
+	return this->mui_ActiveTag;
+}
 void  mqMorphoDigCore::Setmui_ActiveTagMap(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap)
 {
 	this->mui_ActiveTagMap->Name = name;

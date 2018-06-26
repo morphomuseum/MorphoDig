@@ -550,8 +550,10 @@ public:
 
 	void Setmui_ActiveTagMap(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
 	void Setmui_ActiveTagMapAndRender(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
-
-
+	void Setmui_ActiveTag(int activeTag);
+	int Getmui_ActiveTag();
+	double Getmui_PencilSize();
+	void Setmui_PencilSize(double pencilSize);
 
 	double* Getmui_BackGroundColor2();
 	void Getmui_BackGroundColor2(double bg[3]);
@@ -804,8 +806,8 @@ protected:
 
 	ActiveTagMap *mui_ActiveTagMap;
 	ExistingTagMaps *mui_ExistingTagMaps;
-
-
+	int mui_ActiveTag;
+	double mui_PencilSize;
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;
