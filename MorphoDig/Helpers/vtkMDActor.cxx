@@ -63,7 +63,56 @@ vtkMDActor::~vtkMDActor()
 
 
 }
+void vtkMDActor::BuildConnectivityFilter()
+{
+	vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+	{
 
+		this->cFilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+	
+		this->cFilter->SetInputData(mymapper->GetInput());
+		this->cFilter->SetExtractionModeToAllRegions();
+		this->cFilter->ColorRegionsOn();
+		this->cFilter->Update();
+		
+	}
+
+}
+vtkSmartPointer<vtkPolyDataConnectivityFilter> vtkMDActor::GetConnectivityFilter()
+{
+	return this->cFilter;
+}
+
+vtkSmartPointer<vtkIdTypeArray>  vtkMDActor::GetConnectivityRegions()
+{
+	if (this->cFilter == nullptr)
+	{
+		this->BuildConnectivityFilter();
+		
+	}
+	if (this->cFilter == nullptr)
+	{
+		return nullptr;
+	}
+	else
+	{
+		vtkSmartPointer<vtkIdTypeArray> currentRegions = vtkSmartPointer<vtkIdTypeArray>::New();
+
+		//my_data->GetNu
+		currentRegions = vtkIdTypeArray::SafeDownCast(this->cFilter->GetOutput()->GetPointData()->GetArray("RegionId"));
+	}
+}
+
+/*	vtkSmartPointer<vtkIdTypeArray> currentRegions = vtkSmartPointer<vtkIdTypeArray>::New();
+
+				//my_data->GetNu
+				currentRegions = vtkIdTypeArray::SafeDownCast(cfilter->GetOutput()->GetPointData()->GetArray("RegionId"));
+*/
+void vtkMDActor::FreeConnectivityFilter()
+{
+	this->cFilter = nullptr;
+}
 void vtkMDActor::BuildKdTree()
 {
 	//do not care about position matrix as long as we can convert picked coordinate to vertex id thanks to picker->GetPointId();

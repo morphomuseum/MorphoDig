@@ -18,6 +18,7 @@ Module:    vtkMDActor.h
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
 #include <vtkKdTreePointLocator.h>
+#include <vtkPolyDataConnectivityFilter.h>
 #include <vector>
 #include <QString>
 class vtkMDActorUndoRedo
@@ -62,6 +63,14 @@ public:
 	void FreeKdTree();
 	vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
 	
+	void BuildConnectivityFilter();
+	void FreeConnectivityFilter();
+	vtkSmartPointer<vtkPolyDataConnectivityFilter> GetConnectivityFilter();
+
+	vtkSmartPointer<vtkIdTypeArray> GetConnectivityRegions();
+	//vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
+
+
 	// Description:
 	void ShallowCopy(vtkProp *prop);
 
@@ -104,6 +113,9 @@ protected:
 	vtkMDActor();
 	~vtkMDActor();
 	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
+	vtkSmartPointer<vtkPolyDataConnectivityFilter> cFilter;
+	
+
 	int Selected;
 	int Changed; // used by MTActorCollection class to recompute global center of mass and center of mass
 	//of selected objects etc... 

@@ -454,6 +454,7 @@ void mqMorphoDigCore::Setmui_TagModeActivated(int activated) {
 		{
 			vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			myActor->FreeKdTree();
+			myActor->FreeConnectivityFilter();
 		}
 	}
 }
@@ -490,6 +491,12 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					cout << "Try to build kdtree!" << endl;
 					myActor->BuildKdTree();
 					cout << "KdTree built" << endl;
+				}
+				if (myActor->GetConnectivityFilter() == nullptr)
+				{
+					cout << "Try to build connectivity filter!" << endl;
+					myActor->BuildConnectivityFilter();
+					cout << "Connectivity filter built" << endl;
 				}
 				double ve[3];
 				myPD->GetPoint(pickid, ve);
