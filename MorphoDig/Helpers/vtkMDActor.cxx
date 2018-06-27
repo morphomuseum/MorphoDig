@@ -89,6 +89,7 @@ vtkSmartPointer<vtkIdTypeArray>  vtkMDActor::GetConnectivityRegions()
 {
 	if (this->cFilter == nullptr)
 	{
+		//cout << "Build connectivity filter" << endl;
 		this->BuildConnectivityFilter();
 		
 	}
@@ -102,6 +103,7 @@ vtkSmartPointer<vtkIdTypeArray>  vtkMDActor::GetConnectivityRegions()
 
 		//my_data->GetNu
 		currentRegions = vtkIdTypeArray::SafeDownCast(this->cFilter->GetOutput()->GetPointData()->GetArray("RegionId"));
+		return currentRegions;
 	}
 }
 

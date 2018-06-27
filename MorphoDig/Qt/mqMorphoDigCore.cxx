@@ -525,13 +525,15 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				}
 
 				int tool = this->Getmui_TagTool();
+				cout << "Tool=" << tool<<endl;
+				int activeTag = this->Getmui_ActiveTag();
 				if (tool == 0)
 				{
 
 					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 					double Radius = this->Getmui_PencilSize();
 					myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
-					int activeTag = this->Getmui_ActiveTag();
+					
 					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 					{
 
@@ -556,9 +558,27 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					}
 				}
 				else// paint bucket
-				{ 
-					int currRegion = myActor->GetConnectivityRegions()->GetTuple1(pickid);
-					cout << "current region:" << currRegion << endl;
+				{
+					cout << "Start non pencil Tool=" << tool << endl;
+
+					int pickedRegion = myActor->GetConnectivityRegions()->GetTuple1(pickid);
+					cout << "picked region:" << pickedRegion << endl;
+					for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
+					{
+
+						int jRegion = myActor->GetConnectivityRegions()->GetTuple1(j);
+			
+						if (jRegion == pickedRegion)
+						{
+							int mTag = currentTags->GetTuple1(j);
+
+							if (do_override == 1 || (do_override == 0 && mTag == curTag))
+							{
+
+								currentTags->SetTuple1(j, activeTag);
+							}
+						}
+					}
 				
 				}
 				//mymapper->GetLookupTable()->

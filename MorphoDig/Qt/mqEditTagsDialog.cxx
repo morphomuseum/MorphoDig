@@ -113,8 +113,8 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
 	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(double)), this, SLOT(slotPencilSearchSizeChanged(double)));
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
-	connect(this->Ui->bucketOn, SIGNAL(pressed()), this, SLOT(slotBucketOn()));
-	connect(this->Ui->pencilOn, SIGNAL(pressed()), this, SLOT(slotPencilOn()));
+	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
+	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
 
 	this->Ui->reinitializeTagMap->setDisabled(false);
 	this->Ui->editTagMap->setDisabled(true);
