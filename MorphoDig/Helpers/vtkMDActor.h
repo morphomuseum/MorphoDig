@@ -91,7 +91,7 @@ public:
 	vtkIdType GetNumberOfPoints();
 	void Render(vtkRenderer *ren, vtkMapper *mapper);
 	virtual void SetSelected(int selected);
-	virtual void SaveState(int mCount, QString arrayToSave = QString());
+	virtual void SaveState(int mCount, QString arrayToSave = QString(), int arrayType=0);
 	virtual void Redo(int mCount); // Try to redo (if exists) "mCount" event
 	virtual void Erase(int mCount); // Try to erase (if exists) "mCount" event
 	virtual void Undo(int mCount); // Try to undo (if exists) "mCount" event

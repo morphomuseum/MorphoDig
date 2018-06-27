@@ -481,7 +481,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 
 				std::string mScalarName = ActiveScalar.toStdString(); 
 
-				myActor->SaveState(Count, QString(mScalarName.c_str()));
+				myActor->SaveState(Count, QString(mScalarName.c_str()), 1);
 				vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
 				//todo : retrieve what tool is active
 				//5 retrieve list of point ids which are selected by the currently active tool

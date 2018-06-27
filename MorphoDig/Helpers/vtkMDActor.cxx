@@ -696,8 +696,10 @@ void vtkMDActor::PopRedoStack()
 	this->Modified();
 }
 
-void vtkMDActor::SaveState(int mCount, QString arrayToSave)
+void vtkMDActor::SaveState(int mCount, QString arrayToSave, int arrayType)
 {
+	//arrayType: 0 "scalar"
+	// 1 : "tag"
 	//cout << "myActor Save Position: redostack clear." << endl;
 	this->UndoRedo->RedoStack.clear();
 
@@ -731,10 +733,18 @@ void vtkMDActor::SaveState(int mCount, QString arrayToSave)
 		cout << "Try to get " << arrayToSave.toStdString() << "array" << endl;
 		if (myArray != NULL)
 		{
-			savedArray = vtkSmartPointer<vtkDoubleArray>::New();
-			savedArray->DeepCopy(myArray);
-			cout << "Have deep copied " << arrayToSave.toStdString() << "array" << endl;
-		
+			if (arrayType == 0)//scalar
+			{
+				savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				savedArray->DeepCopy(myArray);
+				cout << "Have deep copied " << arrayToSave.toStdString() << "array" << endl;
+			}
+			else // tag
+			{ 
+				savedArray = vtkSmartPointer<vtkIntArray>::New();
+				savedArray->DeepCopy(myArray);
+				cout << "Have deep copied tag " << arrayToSave.toStdString() << "array" << endl;
+			}
 		}
 		
 
