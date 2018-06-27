@@ -47,6 +47,7 @@ vtkMDActor::vtkMDActor()
 	this->SetBackfaceProperty(backFaces);
 	this->UndoRedo = new vtkMDActorUndoRedo;
 	this->KdTree = nullptr;
+	this->cFilter = nullptr;
 	this->Selected = 1;
 	this->Changed = 0;
 	this->Name = "New Mesh";

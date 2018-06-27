@@ -378,6 +378,8 @@ public:
 	int Getmui_ScalarVisibility();
 	int Getmui_TagModeActivated();
 	void Setmui_TagModeActivated(int activated);
+	int Getmui_TagTool();
+	void Setmui_TagTool(int tool);
 	void Setmui_MoveMode(int movemode);
 	int Getmui_MoveMode();
 	int Getmui_DefaultMoveMode();
@@ -828,7 +830,7 @@ protected:
 	int mui_CameraCentreOfMassAtOrigin;
 	int mui_CameraOrtho;
 	int mui_TagModeActivated;
-
+	int mui_TagTool;
 	QString mui_X1Label;
 	QString mui_X2Label;
 	QString mui_Y1Label;

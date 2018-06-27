@@ -751,6 +751,12 @@
         <iconset resource="../Icons/icons.qrc">
          <normaloff>:/Cursors/pencil.png</normaloff>:/Cursors/pencil.png</iconset>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -761,6 +767,9 @@
        <property name="icon">
         <iconset resource="../Icons/icons.qrc">
          <normaloff>:/Cursors/Flood_fill.png</normaloff>:/Cursors/Flood_fill.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

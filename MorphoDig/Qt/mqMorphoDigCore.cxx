@@ -111,6 +111,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	mqMorphoDigCore::Instance = this;
 
 	this->mui_TagModeActivated = 0;
+	this->mui_TagTool = 0; //pencil by defaults
 	this->qvtkWidget = NULL;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
 	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
@@ -441,6 +442,16 @@ void mqMorphoDigCore::Setmui_BackfaceCulling(int on_off) {
 	if (on_off == 0 || on_off == 1) { this->mui_BackfaceCulling = on_off; }
 }
 
+void mqMorphoDigCore::Setmui_TagTool(int tool)
+{
+	this->mui_TagTool = tool;
+	//0 : pencil, 1, paintbucket
+}
+int mqMorphoDigCore::Getmui_TagTool()
+{
+	return this->mui_TagTool;
+}
+
 void mqMorphoDigCore::Setmui_TagModeActivated(int activated) {
 	this->mui_TagModeActivated = activated;
 	/*	
@@ -512,31 +523,42 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				{
 					do_override = 0;
 				}
-				vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
-				double Radius = this->Getmui_PencilSize();
-				myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
-				int activeTag = this->Getmui_ActiveTag();
-				for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+
+				int tool = this->Getmui_TagTool();
+				if (tool == 0)
 				{
 
-					
-					vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
-					
-					int mTag = currentTags->GetTuple1(observedConnectedVertex);
-					if (j<10) {
-						std::cout << "neighbour id: " << observedConnectedVertex << ", tagid:" << mTag << endl;
-
-
-					}
-					if (do_override == 1 || (do_override == 0 && mTag == curTag))
+					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+					double Radius = this->Getmui_PencilSize();
+					myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
+					int activeTag = this->Getmui_ActiveTag();
+					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 					{
-						if (j < 10)
-						{
-							cout << "change tag value" << endl;
-						}
-						currentTags->SetTuple1(observedConnectedVertex, activeTag);
-					}
 
+
+						vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+
+						int mTag = currentTags->GetTuple1(observedConnectedVertex);
+						if (j < 10) {
+							std::cout << "neighbour id: " << observedConnectedVertex << ", tagid:" << mTag << endl;
+
+
+						}
+						if (do_override == 1 || (do_override == 0 && mTag == curTag))
+						{
+							if (j < 10)
+							{
+								cout << "change tag value" << endl;
+							}
+							currentTags->SetTuple1(observedConnectedVertex, activeTag);
+						}
+
+					}
+				}
+				else// paint bucket
+				{ 
+					//int currRegion = myActor->Get
+				
 				}
 				//mymapper->GetLookupTable()->
 				currentTags->Modified();

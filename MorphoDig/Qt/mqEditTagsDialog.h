@@ -74,6 +74,8 @@ public:
   virtual void slotRefreshTagMaps();
   virtual void slotActivateTagMode();
   virtual void slotPencilSearchSizeChanged(double newSize);
+  virtual void slotBucketOn();
+  virtual void slotPencilOn();
   //virtual void slotDeactivateTagMode();
   virtual void slotCellChanged(int row, int column);
 /*  virtual void slotCellActivated(int row, int column);  

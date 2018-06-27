@@ -102,6 +102,8 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	
 	this->Ui->comboActiveTags->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	this->Ui->comboTagMaps->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	this->Ui->pencilOn->setDisabled(true);
+	this->Ui->bucketOn->setDisabled(true);
 
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboTags()));
@@ -111,6 +113,8 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
 	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(double)), this, SLOT(slotPencilSearchSizeChanged(double)));
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
+	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
+	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
 
 	this->Ui->reinitializeTagMap->setDisabled(false);
 	this->Ui->editTagMap->setDisabled(true);
@@ -757,18 +761,34 @@ void mqEditTagsDialog::slotActiveTagsChanged(int idx)
 	
 
 }
+void mqEditTagsDialog::slotBucketOn()
+{
 
+	this->Ui->pencilOn->setChecked(false);
+	this->Ui->bucketOn->setChecked(true);
+	mqMorphoDigCore::instance()->Setmui_TagTool(1);
+}
+void mqEditTagsDialog::slotPencilOn()
+{
+	this->Ui->pencilOn->setChecked(true);
+	this->Ui->bucketOn->setChecked(false);
+	mqMorphoDigCore::instance()->Setmui_TagTool(0);
+}
 void mqEditTagsDialog::slotActivateTagMode()
 {
 	if (this->Ui->activateTagMode->isChecked())
 	{
 		cout << "Activate Tag Mode" << endl;
 		mqMorphoDigCore::instance()->Setmui_TagModeActivated(1);
+		this->Ui->pencilOn->setDisabled(false);
+		this->Ui->bucketOn->setDisabled(false);
 	}
 	else
 	{
 		cout << "Deactivate Tag Mode" << endl;
 		mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
+		this->Ui->pencilOn->setDisabled(true);
+		this->Ui->bucketOn->setDisabled(true);
 	}
 }
 
