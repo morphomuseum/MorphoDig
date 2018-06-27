@@ -557,7 +557,8 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				}
 				else// paint bucket
 				{ 
-					//int currRegion = myActor->Get
+					int currRegion = myActor->GetConnectivityRegions()->GetTuple1(pickid);
+					cout << "current region:" << currRegion << endl;
 				
 				}
 				//mymapper->GetLookupTable()->
