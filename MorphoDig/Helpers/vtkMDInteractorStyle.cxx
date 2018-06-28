@@ -289,6 +289,18 @@ void vtkMDInteractorStyle::StartSelect()
 	{
 		//cout << "l pressed" << endl;
 		this->T = T_PRESSED;
+		if (mqMorphoDigCore::instance()->Getmui_TagModeActivated())
+		{
+			int tool = mqMorphoDigCore::instance()->Getmui_TagTool();
+			if (tool ==0)// pencil
+			{
+				mqMorphoDigCore::instance()->setCurrentCursor(5);
+			}
+			else // paint buckett
+			{
+				mqMorphoDigCore::instance()->setCurrentCursor(6);
+			}
+		}
 	}
 	if (key.compare("Control_L") == 0)
 	{
@@ -794,6 +806,7 @@ void vtkMDInteractorStyle::StartSelect()
 	  if (key.compare("t") == 0 || key.compare("T") == 0)
 	  {
 		  this->T = T_RELEASED;
+		  mqMorphoDigCore::instance()->resetCursor();
 		  // std::cout << key << "Released" << '\n';
 	  }
 	  // Forward events

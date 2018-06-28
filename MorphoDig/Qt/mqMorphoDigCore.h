@@ -646,6 +646,7 @@ public:
   void groupSelectedActors();
   void startLasso(int lasso_mode);//change interaction style
   void setCurrentCursor(int cursor); //changes mouse cursor
+  void resetCursor(); // reset cursor when lasso stops, tag stop, landmark stop
   void stopLasso();//change interaction style back to normal
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
   void Redo(); // calls the undoStack Redo function

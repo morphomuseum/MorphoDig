@@ -6202,9 +6202,9 @@ void mqMorphoDigCore::SwitchMoveMode()
 	}
 	emit this->modeModeChanged();
 }
-void mqMorphoDigCore::stopLasso()
+void mqMorphoDigCore::resetCursor()
 {
-	if (this->Getmui_MoveMode()==0 || this->Getmui_MoveMode() == 1)
+	if (this->Getmui_MoveMode() == 0 || this->Getmui_MoveMode() == 1)
 	{
 		this->setCurrentCursor(0);
 	}
@@ -6212,6 +6212,10 @@ void mqMorphoDigCore::stopLasso()
 	{
 		this->setCurrentCursor(1);
 	}
+}
+void mqMorphoDigCore::stopLasso()
+{
+	this->resetCursor();
 	
 	//bacl to normal selection mode
 	if (this->currentLassoMode == 0|| this->currentLassoMode == 1)// lasso cut
