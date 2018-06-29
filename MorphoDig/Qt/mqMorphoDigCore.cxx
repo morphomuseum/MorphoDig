@@ -6598,96 +6598,96 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 		for (vtkIdType i = 0; i < num; i++)
 		{
 			cout << "try to get next actor:" << i << endl;
-			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());			
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			//myActor->SetSelected(0); we don't unselect after a cut
-				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
-				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+				vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				//4 if current tags exist, retrieve what tool is active
+				if (currentTags != NULL)
 				{
+					std::string action = "Lasso tag ";
+					action.append(myActor->GetName().c_str());
+					int Count = BEGIN_UNDO_SET(action);
 
-					QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
-					vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-					//4 if current tags exist, retrieve what tool is active
-					if (currentTags != NULL)
-					{
-						std::string action = "Lasso tag ";
-						action.append(myActor->GetName().c_str());
-						int Count = BEGIN_UNDO_SET(action);
+					std::string mScalarName = ActiveScalar.toStdString();
 
-						std::string mScalarName = ActiveScalar.toStdString();
-
-						myActor->SaveState(Count, QString(mScalarName.c_str()), 1);
+					myActor->SaveState(Count, QString(mScalarName.c_str()), 1);
 
 
-						vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+					vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
 
-						vtkSmartPointer<vtkIntArray> toTag =
-							vtkSmartPointer<vtkIntArray>::New();
+					vtkSmartPointer<vtkIntArray> toTag =
+						vtkSmartPointer<vtkIntArray>::New();
 
-						toTag->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-						toTag->SetNumberOfTuples(myPD->GetNumberOfPoints());
+					toTag->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					toTag->SetNumberOfTuples(myPD->GetNumberOfPoints());
 
-						double ve_init_pos[3];;
-						double ve_final_pos[3];
-						double ve_proj_screen[3];
-						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
-						POLYGON_VERTEX proj_screen;
-						int proj_is_inside;
-						for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++) {
-							// for every triangle 
-							myPD->GetPoint(i, ve_init_pos);
-							mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
-							this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
-							if (i < 10)
-							{
-								cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
-							}
-							proj_screen.x = ve_proj_screen[0];
-							proj_screen.y = ve_proj_screen[1];
-							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
-							if (i < 10)
-							{
-							}
-
-							if (tag_inside == 2)
-							{
-								if (proj_is_inside == 0) { proj_is_inside = 1; }
-								else
-								{
-									proj_is_inside = 0;
-								}
-							}
-							if ((ve_proj_screen[2] > -1.0) && ve_proj_screen[2] < 1.0 && (proj_is_inside == 1))
-							{
-								toTag->InsertTuple1(i, 1);
-							}
-
-						}
-
-						int activeTag = this->Getmui_ActiveTag();
-						for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
+					double ve_init_pos[3];;
+					double ve_final_pos[3];
+					double ve_proj_screen[3];
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+					POLYGON_VERTEX proj_screen;
+					int proj_is_inside;
+					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						myPD->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
+						if (i < 10)
 						{
-
-							int changeTag = toTag->GetTuple1(j);
-
-							if (changeTag == 1)
-							{								
-									currentTags->SetTuple1(j, activeTag);
-								
-							}
+							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+						}
+						proj_screen.x = ve_proj_screen[0];
+						proj_screen.y = ve_proj_screen[1];
+						proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+						if (i < 10)
+						{
 						}
 
-					
+						if (tag_inside == 2)
+						{
+							if (proj_is_inside == 0) { proj_is_inside = 1; }
+							else
+							{
+								proj_is_inside = 0;
+							}
+						}
+						if ((ve_proj_screen[2] > -1.0) && ve_proj_screen[2] < 1.0 && (proj_is_inside == 1))
+						{
+							toTag->InsertTuple1(i, 1);
+						}
+
+					}
+
+					int activeTag = this->Getmui_ActiveTag();
+					for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
+					{
+
+						int changeTag = toTag->GetTuple1(j);
+
+						if (changeTag == 1)
+						{
+							currentTags->SetTuple1(j, activeTag);
+
+						}
+					}
+
+
 					//mymapper->GetLookupTable()->
 					currentTags->Modified();
 					//mymapper->Update();
 					END_UNDO_SET();
-															
+
 				}
-			
-		}
-		
+
+			}
+
 			this->Render();
-		
+		}
 
 	}
 }
