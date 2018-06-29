@@ -103,6 +103,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	this->Ui->comboActiveTags->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	this->Ui->comboTagMaps->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	this->Ui->pencilOn->setDisabled(true);
+	this->Ui->lassoOn->setDisabled(true);
 	this->Ui->bucketOn->setDisabled(true);
 
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
@@ -115,6 +116,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
 	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
 	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
+	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoTagInside()));
 
 	this->Ui->reinitializeTagMap->setDisabled(false);
 	this->Ui->editTagMap->setDisabled(true);

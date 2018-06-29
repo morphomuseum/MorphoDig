@@ -643,6 +643,7 @@ public:
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
+  void lassoTagActors(int tag_inside);
   void groupSelectedActors();
   void startLasso(int lasso_mode);//change interaction style
   void setCurrentCursor(int cursor); //changes mouse cursor

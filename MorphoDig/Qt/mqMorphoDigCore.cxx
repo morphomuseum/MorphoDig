@@ -6184,6 +6184,8 @@ void mqMorphoDigCore::startLasso(int lasso_mode)
 	this->currentLassoMode = lasso_mode;
 	if (lasso_mode == 0) { this->setCurrentCursor(3); }
 	if (lasso_mode == 1) { this->setCurrentCursor(2); }
+	if (lasso_mode == 2) { this->setCurrentCursor(3); }
+	if (lasso_mode == 3) { this->setCurrentCursor(2); }
 // 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
 }
 void mqMorphoDigCore::SwitchMoveMode()
@@ -6222,6 +6224,12 @@ void mqMorphoDigCore::stopLasso()
 	{
 		int keep_inside = this->currentLassoMode;
 		this->lassoCutSelectedActors(keep_inside);
+	}
+	else
+	{
+		int tag_inside = this->currentLassoMode;// 2: tag insiden 3 tag outside
+		this->lassoTagActors(tag_inside);
+		
 	}
 	
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
@@ -6576,6 +6584,113 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 	}
 }
 
+void mqMorphoDigCore::lassoTagActors(int tag_inside)
+{
+	POLYGON_LIST poly;
+	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
+	cout << "Poly valide: " << poly.state << endl;
+	if (this->Getmui_TagModeActivated() == 1 && poly.state == 1)// only for valid lasso selections!
+	{
+		vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		int modified = 0;
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());			
+			//myActor->SetSelected(0); we don't unselect after a cut
+				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+				{
+
+					QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+					vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+					//4 if current tags exist, retrieve what tool is active
+					if (currentTags != NULL)
+					{
+						std::string action = "Lasso tag ";
+						action.append(myActor->GetName().c_str());
+						int Count = BEGIN_UNDO_SET(action);
+
+						std::string mScalarName = ActiveScalar.toStdString();
+
+						myActor->SaveState(Count, QString(mScalarName.c_str()), 1);
+
+
+						vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+
+						vtkSmartPointer<vtkIntArray> toTag =
+							vtkSmartPointer<vtkIntArray>::New();
+
+						toTag->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+						toTag->SetNumberOfTuples(myPD->GetNumberOfPoints());
+
+						double ve_init_pos[3];;
+						double ve_final_pos[3];
+						double ve_proj_screen[3];
+						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+						POLYGON_VERTEX proj_screen;
+						int proj_is_inside;
+						for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++) {
+							// for every triangle 
+							myPD->GetPoint(i, ve_init_pos);
+							mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+							this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
+							if (i < 10)
+							{
+								cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+							}
+							proj_screen.x = ve_proj_screen[0];
+							proj_screen.y = ve_proj_screen[1];
+							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+							if (i < 10)
+							{
+							}
+
+							if (tag_inside == 2)
+							{
+								if (proj_is_inside == 0) { proj_is_inside = 1; }
+								else
+								{
+									proj_is_inside = 0;
+								}
+							}
+							if ((ve_proj_screen[2] > -1.0) && ve_proj_screen[2] < 1.0 && (proj_is_inside == 1))
+							{
+								toTag->InsertTuple1(i, 1);
+							}
+
+						}
+
+						int activeTag = this->Getmui_ActiveTag();
+						for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
+						{
+
+							int changeTag = toTag->GetTuple1(j);
+
+							if (changeTag == 1)
+							{								
+									currentTags->SetTuple1(j, activeTag);
+								
+							}
+						}
+
+					
+					//mymapper->GetLookupTable()->
+					currentTags->Modified();
+					//mymapper->Update();
+					END_UNDO_SET();
+															
+				}
+			
+		}
+		
+			this->Render();
+		
+
+	}
+}
 void mqMorphoDigCore::addConvexHull()
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();

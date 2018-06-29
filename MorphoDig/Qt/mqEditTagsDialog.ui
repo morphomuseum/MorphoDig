@@ -734,7 +734,7 @@
      <rect>
       <x>190</x>
       <y>140</y>
-      <width>51</width>
+      <width>73</width>
       <height>24</height>
      </rect>
     </property>
@@ -770,6 +770,17 @@
        </property>
        <property name="checkable">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="lassoOn">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/Lasso_keepinside.png</normaloff>:/Icons/Lasso_keepinside.png</iconset>
        </property>
       </widget>
      </item>
