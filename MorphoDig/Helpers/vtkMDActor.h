@@ -69,8 +69,8 @@ public:
 
 	vtkSmartPointer<vtkIdTypeArray> GetConnectivityRegions();
 	//vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
-
-
+	vtkSmartPointer<vtkIdList> GetConnectivityRegionsCorrList();
+	vtkIdType GetCorrPickedId(vtkIdType picked);
 	// Description:
 	void ShallowCopy(vtkProp *prop);
 
@@ -114,7 +114,7 @@ protected:
 	~vtkMDActor();
 	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> cFilter;
-	
+	vtkSmartPointer<vtkIdList> cFilterCorrList;// for some reason vertice ids are not the same in cFilter input / output => so a corresponding list has to be built
 
 	int Selected;
 	int Changed; // used by MTActorCollection class to recompute global center of mass and center of mass

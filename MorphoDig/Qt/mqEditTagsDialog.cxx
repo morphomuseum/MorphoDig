@@ -784,6 +784,7 @@ void mqEditTagsDialog::slotActivateTagMode()
 		mqMorphoDigCore::instance()->Setmui_TagModeActivated(1);
 		this->Ui->pencilOn->setDisabled(false);
 		this->Ui->bucketOn->setDisabled(false);
+		this->Ui->lassoOn->setDisabled(false);
 	}
 	else
 	{
@@ -791,6 +792,7 @@ void mqEditTagsDialog::slotActivateTagMode()
 		mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
 		this->Ui->pencilOn->setDisabled(true);
 		this->Ui->bucketOn->setDisabled(true);
+		this->Ui->lassoOn->setDisabled(true);
 	}
 }
 

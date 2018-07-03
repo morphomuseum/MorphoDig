@@ -16,6 +16,7 @@ Module:    vtkMDActor.cxx
 #include <vtkTable.h>
 #include <vtkPCAStatistics.h>
 #include <vtkLine.h>
+#include <vtkIdList.h>
 #include <vtkTexture.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
@@ -48,6 +49,7 @@ vtkMDActor::vtkMDActor()
 	this->UndoRedo = new vtkMDActorUndoRedo;
 	this->KdTree = nullptr;
 	this->cFilter = nullptr;
+	this->cFilterCorrList = nullptr;
 	this->Selected = 1;
 	this->Changed = 0;
 	this->Name = "New Mesh";
@@ -69,22 +71,71 @@ void vtkMDActor::BuildConnectivityFilter()
 	vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
 	if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 	{
-
+		if (this->GetKdTree() == nullptr)
+		{
+			
+			this->BuildKdTree();
+			cout << "KdTree built" << endl;
+		}
 		this->cFilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
-	
+		vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+		
 		this->cFilter->SetInputData(mymapper->GetInput());
 		this->cFilter->SetExtractionModeToAllRegions();
 		this->cFilter->ColorRegionsOn();
+		//this->cFilter->set
 		this->cFilter->Update();
+		this->cFilterCorrList = vtkSmartPointer<vtkIdList>::New();
+		this->cFilterCorrList->SetNumberOfIds(this->cFilter->GetOutput()->GetNumberOfPoints());
+	/*	cout << "Build connectivity filter" << endl;
+		cout << "Orig ve number : " << mymapper->GetInput()->GetNumberOfPoints();
+		cout << "Conn filter ve number : " << this->cFilter->GetOutput()->GetNumberOfPoints();*/
+		for (vtkIdType i = 0; i < this->cFilter->GetOutput()->GetNumberOfPoints(); i++)
+		{
+			double vecf[3];
+			double veorig[3];
+			double vecorr[3];
+			this->cFilter->GetOutput()->GetPoint(i, vecf);
+			mymapper->GetInput()->GetPoint(i, veorig);
+			
+			vtkIdType corr = this->GetKdTree()->FindClosestPoint(vecf);
+			mymapper->GetInput()->GetPoint(corr, vecorr);
+		/*	if (i < 10) {
+				cout << "cFilter ve" << i << ":" << vecf[0] << "," << vecf[1] << "," << vecf[2] << endl;
+				cout << "orig ve" << i << ":" << veorig[0] << "," << veorig[1] << "," << veorig[2] << endl;
+				cout << "corr ve" << corr << ":" << vecorr[0] << "," << vecorr[1] << "," << vecorr[2] << endl;
+				
+			}*/
+			
+			//this->cFilterCorrList->InsertNextId(corr);
+			this->cFilterCorrList->SetId(i, corr);
+		}
+		
 		
 	}
 
 }
+
 vtkSmartPointer<vtkPolyDataConnectivityFilter> vtkMDActor::GetConnectivityFilter()
 {
 	return this->cFilter;
 }
-
+vtkSmartPointer<vtkIdList> vtkMDActor::GetConnectivityRegionsCorrList()
+{
+	return this->cFilterCorrList;
+}
+vtkIdType vtkMDActor::GetCorrPickedId(vtkIdType picked)
+{
+	if (this->cFilterCorrList == nullptr) { return 0; }
+	else
+	{
+		for (vtkIdType i = 0; i < this->cFilterCorrList->GetNumberOfIds(); i++)
+		{
+			if (this->cFilterCorrList->GetId(i) == picked) { return i; }
+		}
+	}
+	return 0;
+}
 vtkSmartPointer<vtkIdTypeArray>  vtkMDActor::GetConnectivityRegions()
 {
 	if (this->cFilter == nullptr)

@@ -560,22 +560,25 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				else// paint bucket
 				{
 					cout << "Start non pencil Tool=" << tool << endl;
-
-					int pickedRegion = myActor->GetConnectivityRegions()->GetTuple1(pickid);
+					vtkIdType corrpickedId = myActor->GetCorrPickedId(pickid);
+					int pickedRegion = myActor->GetConnectivityRegions()->GetTuple1(corrpickedId);
 					cout << "picked region:" << pickedRegion << endl;
+					cout << "small check: " << myPD->GetNumberOfPoints() << "=" << myActor->GetConnectivityRegions()->GetNumberOfTuples() << "?" << endl;
 					for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
 					{
-
-						int jRegion = myActor->GetConnectivityRegions()->GetTuple1(j);
-			
+						vtkIdType corrj = myActor->GetCorrPickedId(j);
+						int jRegion = myActor->GetConnectivityRegions()->GetTuple1(corrj);
+						
 						if (jRegion == pickedRegion)
 						{
 							int mTag = currentTags->GetTuple1(j);
 
 							if (do_override == 1 || (do_override == 0 && mTag == curTag))
 							{
-
 								currentTags->SetTuple1(j, activeTag);
+								
+
+								
 							}
 						}
 					}
@@ -8928,7 +8931,85 @@ void mqMorphoDigCore::EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString 
 	mScalars->SetName(newScalarName.toStdString().c_str());
 	this->Initmui_ExistingScalars();
 }
+void mqMorphoDigCore::createTagsConnectivity(QString newTags)
+{
+	if (newTags.length() == 0) { return; }
+	int modified = 0;
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			if (myActor->GetConnectivityFilter() == nullptr)
+			{
+				cout << "Try to build connectivity filter!" << endl;
+				myActor->BuildConnectivityFilter();
+				cout << "Connectivity filter built" << endl;
+			}
 
+			myActor->SetSelected(0);
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				double numvert = mPD->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkIntArray> newTagsArray =
+					vtkSmartPointer<vtkIntArray>::New();
+				newTagsArray->SetNumberOfComponents(1);
+				newTagsArray->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
+				//initialize array
+				for (vtkIdType j = 0; j < mymapper->GetInput()->GetNumberOfPoints(); j++)
+				{
+					newTagsArray->SetTuple1(j, 0);
+				}
+
+				//tag what's found in the cfilter output
+				//cout << "start new tags!" << endl;
+				vtkSmartPointer<vtkIdList> clist = myActor->GetConnectivityRegionsCorrList();
+				if (clist == nullptr) { cout << "clist is nullptr!" << endl; }
+				else
+				{
+					int numIDs = clist->GetNumberOfIds();
+					int numVeOrig = mymapper->GetInput()->GetNumberOfPoints();
+					//cout << "num VE in orig mesh:" << numVeOrig << endl;
+					//cout << "num corrlist ids:" << numIDs << endl;
+					int numTup = myActor->GetConnectivityRegions()->GetNumberOfTuples();
+					//cout << "num tups in connectivity regions:" << numTup << endl;
+					for (vtkIdType j = 0; j < myActor->GetConnectivityRegions()->GetNumberOfTuples(); j++)
+					{
+						vtkIdType k = myActor->GetConnectivityRegionsCorrList()->GetId(j);
+						if (k < mymapper->GetInput()->GetNumberOfPoints())
+						{
+							newTagsArray->SetTuple1(k, myActor->GetConnectivityRegions()->GetTuple1(j));
+						}
+						//newTagsArray->SetTuple1(j, myActor->GetConnectivityRegions()->GetTuple1(j));
+					}
+				}
+				//cout << "end new tags!" << endl;
+
+				newTagsArray->SetName(newTags.toStdString().c_str());
+				mymapper->GetInput()->GetPointData()->RemoveArray(newTags.toStdString().c_str());
+				mymapper->GetInput()->GetPointData()->AddArray(newTagsArray);
+				mymapper->GetInput()->GetPointData()->SetActiveScalars(newTags.toStdString().c_str());
+				modified = 1;
+			}
+		}
+	}
+	if (modified == 1)
+	{
+		this->Setmui_ActiveScalars(newTags, VTK_INT, 1);
+		this->Initmui_ExistingScalars();
+
+	}
+
+}
 void mqMorphoDigCore::createTags(QString newTags)
 {
 	if (newTags.length() == 0) { return; }
@@ -14651,6 +14732,23 @@ void mqMorphoDigCore::slotCreateTagArray()
 	{
 		cout << "Tag array chosen name:" << newTags.toStdString() << endl;
 		this->createTags(newTags);
+	}
+	else
+	{
+		cout << "cancel " << endl;
+	}
+}
+void mqMorphoDigCore::slotCreateTagArrayConnectivity()
+{
+	QString TagArrayName = QString("ConnectivityTags");
+	QInputDialog *newTagName = new QInputDialog();
+	bool dialogResult;
+	QString newTags = newTagName->getText(0, "Tag array name:", "name:", QLineEdit::Normal,
+		TagArrayName, &dialogResult);
+	if (dialogResult)
+	{
+		cout << "Tag array chosen name:" << newTags.toStdString() << endl;
+		this->createTagsConnectivity(newTags);
 	}
 	else
 	{
