@@ -50,6 +50,7 @@ vtkMDActor::vtkMDActor()
 	this->KdTree = nullptr;
 	this->cFilter = nullptr;
 	this->cFilterCorrList = nullptr;
+	this->cFilterCorrList2 = nullptr;
 	this->Selected = 1;
 	this->Changed = 0;
 	this->Name = "New Mesh";
@@ -87,6 +88,8 @@ void vtkMDActor::BuildConnectivityFilter()
 		this->cFilter->Update();
 		this->cFilterCorrList = vtkSmartPointer<vtkIdList>::New();
 		this->cFilterCorrList->SetNumberOfIds(this->cFilter->GetOutput()->GetNumberOfPoints());
+		this->cFilterCorrList2 = vtkSmartPointer<vtkIdList>::New();
+		this->cFilterCorrList2->SetNumberOfIds(mymapper->GetInput()->GetNumberOfPoints());
 	/*	cout << "Build connectivity filter" << endl;
 		cout << "Orig ve number : " << mymapper->GetInput()->GetNumberOfPoints();
 		cout << "Conn filter ve number : " << this->cFilter->GetOutput()->GetNumberOfPoints();*/
@@ -109,8 +112,22 @@ void vtkMDActor::BuildConnectivityFilter()
 			
 			//this->cFilterCorrList->InsertNextId(corr);
 			this->cFilterCorrList->SetId(i, corr);
+			//this->cFilterCorrList2->SetId(corr, i);
 		}
+
+		vtkSmartPointer<vtkKdTreePointLocator> KDTree2 = vtkSmartPointer<vtkKdTreePointLocator>::New();
 		
+		KDTree2->SetDataSet(this->cFilter->GetOutput());
+		KDTree2->BuildLocator();
+		for (vtkIdType i = 0; i < mymapper->GetInput()->GetNumberOfPoints(); i++)
+		{
+			
+			double veorig[3];			
+			mymapper->GetInput()->GetPoint(i, veorig);
+			vtkIdType corr2 = KDTree2->FindClosestPoint(veorig);	
+			this->cFilterCorrList2->SetId(i, corr2);
+			
+		}
 		
 	}
 
@@ -124,15 +141,20 @@ vtkSmartPointer<vtkIdList> vtkMDActor::GetConnectivityRegionsCorrList()
 {
 	return this->cFilterCorrList;
 }
+vtkSmartPointer<vtkIdList> vtkMDActor::GetConnectivityRegionsCorrList2()
+{
+	return this->cFilterCorrList2;
+}
 vtkIdType vtkMDActor::GetCorrPickedId(vtkIdType picked)
 {
-	if (this->cFilterCorrList == nullptr) { return 0; }
+	if (this->cFilterCorrList2 == nullptr) { return 0; }
 	else
 	{
-		for (vtkIdType i = 0; i < this->cFilterCorrList->GetNumberOfIds(); i++)
+		if (picked < this->cFilterCorrList2->GetNumberOfIds())
 		{
-			if (this->cFilterCorrList->GetId(i) == picked) { return i; }
+			return this->cFilterCorrList2->GetId(picked);
 		}
+		
 	}
 	return 0;
 }
