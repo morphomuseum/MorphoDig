@@ -12039,15 +12039,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	{
 		myLM->SetLMSize(this->Getmui_FlagRenderingSize());
 	}
-	/*
-		double green[4] = { 0.5, 1, 0, 1 }; // LMType=0
-	double yellow[4] = { 1, 1, 0,0.5 }; // LMType = 1 (target LM)
-	double darkred[4] = { 0.5, 0, 0, 1 }; // LMType = 2 (curve node: dark red)
-	double orange[4] = { 1, 0.5, 0, 1 }; // LMType = 3 (curve handle : orange)
-	double red[4] = { 1, 0.4, 0.4, 1 }; // LMType=4 (curve starting point)
-	double blue[4] = { 0, 0.5, 1, 1 }; // LMType = 5 (curve milestone)
-	double cyan[4] = { 0, 1, 1, 1 }; // LMType = 6 (curve ending point)
-	*/
+	
 	if (lmk_type == NORMAL_LMK)
 	{
 		myLM->SetLMType(NORMAL_LMK);

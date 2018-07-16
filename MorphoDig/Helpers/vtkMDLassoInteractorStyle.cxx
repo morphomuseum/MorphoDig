@@ -2461,7 +2461,7 @@ void vtkMDLassoInteractorStyle::ChangeAttachmentPoint(vtkMatrix4x4 *NewMat, vtkL
 	double mult = 1;
 	if (LMActor->GetLMType() == TARGET_LMK || LMActor->GetLMType() == HANDLE_LMK)
 	{
-		mult = 1.1;
+		mult = 1.4;
 	}
 	if (LMActor->GetLMBodyType() == SPHERE)
 	{
