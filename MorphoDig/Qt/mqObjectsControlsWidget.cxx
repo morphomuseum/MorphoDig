@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // For later!
 #include "QReleaseSlider.h"
-//#include "QReleaseSliderValue.h"
+#include "QDoubleReleaseSlider.h"
+#include "QReleaseSliderValue.h"
 
 #include "mqEditLMKDialogReaction.h"
 #include "mqCreateLMKDialogReaction.h"
@@ -56,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkMatrix4x4.h>
 #include <QToolButton>
 #include <QHBoxLayout>
+#include <QSizePolicy>
 #define NORMAL_LMK 0
 #define TARGET_LMK 1
 #define NODE_LMK 2
@@ -106,58 +108,66 @@ void mqObjectsControlsWidget::constructor()
 	  "QScrollBar::handle:vertical{background:yellow;max-height:10px;} "
 
   );
-  this->zTr = new QReleaseSlider;
+  //this->zTr = new QReleaseSlider;
+  this->zTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
   this->zTr->setMaximum(100);
   this->zTr->setMinimum(-100);
   this->zTr->setToolTip(QString("Translate along z viewing axis"));
 
 
-  //this->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
-  this->zRot = new QReleaseSlider;
-  this->zRot->setMaximum(90);
-  this->zRot->setMinimum(-90);
+  this->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->zRot = new QDoubleReleaseSlider;
+  //this->zRot = new QReleaseSlider;
+  this->zRot->setMaximum(45);
+  this->zRot->setMinimum(-45);
+  //this->zRot->setSingleStep(0.1);
+  //this->zRot->setSingleStep(0.1);
   this->zRot->setToolTip(QString("Rotation along z viewing axis"));
 
-
-  this->yTr = new QReleaseSlider;
+  this->yTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->yTr = new QReleaseSlider;
   this->yTr->setMaximum(100);
   this->yTr->setMinimum(-100);
   this->yTr->setToolTip(QString("Translate along y viewing axis"));
 
-  //this->yRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
-  this->yRot = new QReleaseSlider;
-  this->yRot->setMaximum(90);
-  this->yRot->setMinimum(-90);
+  this->yRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->yRot = new QReleaseSlider;
+  this->yRot->setMaximum(45);
+  this->yRot->setMinimum(-45);
   this->yRot->setToolTip(QString("Rotation along y viewing axis"));
 
   
-  this->xTr = new QReleaseSlider;
+  //this->xTr = new QReleaseSlider;
+  this->xTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
   this->xTr->setMaximum(100);
   this->xTr->setMinimum(-100);
   this->xTr->setToolTip(QString("Translate along x viewing axis"));
 
-  //this->xRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
-  this->xRot = new QReleaseSlider;
-  this->xRot->setMaximum(90);
-  this->xRot->setMinimum(-90);
+  this->xRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->xRot = new QReleaseSlider;
+  this->xRot->setMaximum(45);
+  this->xRot->setMinimum(-45);
   this->xRot->setToolTip(QString("Rotation along x viewing axis"));
 
   QHBoxLayout *zlayout = new QHBoxLayout;
   QWidget* zgrid = new QWidget();
   zlayout->setSpacing(1);
-  zlayout->setMargin(5);
+  zlayout->setMargin(1);
+  //zlayout->set
   zlayout->addWidget(this->zRot);
  // zlayout->addWidget(this->xTr);
   //zlayout->addWidget(this->yTr);
   zlayout->addWidget(this->zTr);
 
   zgrid->setLayout(zlayout);
+  //zgrid->setSizePolicy(QSizePolicy::Policy::Expanding);
+  
   this->ui->verticalLayout->addWidget(zgrid);
 
   QHBoxLayout *ylayout = new QHBoxLayout;
   QWidget* ygrid = new QWidget();
  ylayout->setSpacing(1);
-  ylayout->setMargin(5);
+  ylayout->setMargin(1);
   ylayout->addWidget(this->yRot);
   ylayout->addWidget(this->yTr);
 
@@ -167,12 +177,17 @@ void mqObjectsControlsWidget::constructor()
   QHBoxLayout *xlayout = new QHBoxLayout;
   QWidget* xgrid = new QWidget();
   xlayout->setSpacing(1);
-  xlayout->setMargin(5);
+  xlayout->setMargin(1);
  xlayout->addWidget(this->xRot);
  xlayout->addWidget(this->xTr);
 
   xgrid->setLayout(xlayout);
   this->ui->verticalLayout->addWidget(xgrid);
+  /*xgrid->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ygrid->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  zgrid->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);*/
+
+  
 
   connect(this->ui->Delete, SIGNAL(pressed()), this, SLOT(slotDeleteObjects()));
   connect(this->ui->Delete, SIGNAL(pressed()), this, SLOT(slotDeleteObjects()));

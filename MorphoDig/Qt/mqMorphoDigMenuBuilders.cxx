@@ -511,8 +511,8 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	dock5->setWidget(ObjectsWidget);
 	
 	//
-	/*
-	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
+	
+	/*QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
 		<< mqSetName("ObjectsControlsToolbar");
 	ObjectsToolBar->layout()->setSpacing(0);
 	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);*/

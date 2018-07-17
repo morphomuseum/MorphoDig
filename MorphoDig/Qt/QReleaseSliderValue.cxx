@@ -51,7 +51,12 @@ QReleaseSliderValue::QReleaseSliderValue(Qt::Orientation orientation, const QStr
 	layout2->setAlignment(Qt::AlignCenter);
 	layout2->addWidget(slider);
 	layout2->addWidget(spinbox);
+	
 	setLayout(layout2);
+	layout2->setSpacing(0);
+	layout2->setMargin(0);
+	this->setMaximumWidth(16);
+	//this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed)
 	//this->setContentsMargins(0, 0, 0, 0);
 	//this->setFixedWidth(30);
 }

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // For later!
 #include "QReleaseSlider.h"
-//#include "QReleaseSliderValue.h"
+#include "QReleaseSliderValue.h"
 
 #include "mqEditLMKDialogReaction.h"
 #include "mqCreateLMKDialogReaction.h"
@@ -114,6 +114,7 @@ void mqObjectsControlsToolbar::constructor()
 
   //this->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
   this->zRot = new QReleaseSlider;
+  //this->zRot = new QDoubleReleaseSlider;
   this->zRot->setMaximum(90);
   this->zRot->setMinimum(-90);
   this->zRot->setToolTip(QString("Rotation along z viewing axis"));
