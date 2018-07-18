@@ -23,6 +23,7 @@
 #include <QToolButton>
 #include <QComboBox>
 #include <QSlider>
+#include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
@@ -291,8 +292,9 @@ void mqCameraControlsWidget::constructor()
 
   
   this->ui->verticalLayout->addWidget(grid3);
- 
-
+  QLabel *label = new QLabel;
+  label->setText("Zoom");
+  this->ui->verticalLayout->addWidget(label);
   //this->setLayout(layout);
   //this->ui->actionTagEdit->setDisabled(true);
   //this->ui->actionClippingPlaneOnOff->setDisabled(true);

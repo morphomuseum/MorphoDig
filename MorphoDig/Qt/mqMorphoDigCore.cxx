@@ -149,7 +149,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	//this->TagScalarBarActor->SetTitleRatio(10);
 
 	cout << "mui_ActiveScalars creaed" << endl;
-	QString none = QString("none");
+	QString none = QString("Solid color");
 	this->Setmui_ActiveScalars(none, -1, 0);
 	cout << "mui_ActiveScalars instantiated" << endl;
 	this->Addmui_ExistingScalars(this->mui_ActiveScalars->Name, this->mui_ActiveScalars->DataType, this->mui_ActiveScalars->NumComp);
@@ -2118,7 +2118,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 							//now get current color of point id_min of mesh i!
 							//@TODO! => On va faire 1 variable globale de type G_Current_Active_Scalar => Ce premier if sera changé par 
 							// if (visibility ==0 OU GetScalar(G_Current_Active_Scalar)==NULL)
-							QString none = QString("none");
+							QString none = QString("Solid color");
 							if (this->Getmui_ScalarVisibility() == 0 || this->mui_ActiveScalars->Name== none||
 							myPD->GetPointData()->GetScalars(this->mui_ActiveScalars->Name.toStdString().c_str()) == NULL )
 								
@@ -8350,7 +8350,7 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 				int nr, ng, nb, na;
 				this->ActorCollection->InitTraversal();
 				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
-				QString none = QString("none");
+				QString none = QString("Solid color");
 				QString RGB = QString("RGB");
 				
 				// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
@@ -11285,7 +11285,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		int nr, ng, nb, na;
 		this->ActorCollection->InitTraversal();
 		QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
-		QString none = QString("none");
+		QString none = QString("Solid color");
 		QString RGB = QString("RGB");
 		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 		{
@@ -12805,46 +12805,37 @@ void mqMorphoDigCore::SetGridInfos()
 	myAnnotation = follows + valueAsString;
 	//myAnnotation = myAnnotation + this->Getmui_SizeUnit() + ", 100px="+hundredpx+ this->Getmui_SizeUnit();
 	myAnnotation = myAnnotation + this->Getmui_SizeUnit()+ onehundredpx;
-	cornerAnnotation->SetText(vtkCornerAnnotation::LowerRight, myAnnotation.toStdString().c_str());
+	this->cornerAnnotation->SetText(vtkCornerAnnotation::LowerRight, myAnnotation.toStdString().c_str());
 	//QString myTest("Loulou fait du ski\nEt voila\nToutou");
 	if (this->Getmui_ShowGrid() == 1)
 	{
-		cornerAnnotation->VisibilityOn();
+		this->cornerAnnotation->VisibilityOn();
 	}
 	else
 	{
-		cornerAnnotation->VisibilityOff();
+		this->cornerAnnotation->VisibilityOff();
 	}
-	cornerAnnotation->SetLinearFontScaleFactor(2);  
-	cornerAnnotation->SetNonlinearFontScaleFactor(1);  
-	cornerAnnotation->SetMaximumFontSize(12);
-	//this->Render();
-
-	//cornerAnnotation->SetText(vtkCornerAnnotation::RightEdge, valueAsString.toStdString().c_str());
-	//cornerAnnotation->SetText(vtkCornerAnnotation::RightEdge, myTest.toStdString().c_str());
-
-	//this->LandmarkCollection->SetChanged(1);
-	
-	/*vtkPropCollection* props = this->getRenderer()->GetViewProps(); //iterate through and set each visibility to 0
-	props->InitTraversal();
-	std::string str1("vtkGridActor");
-	for (int i = 0; i < props->GetNumberOfItems(); i++)
+	this->cornerAnnotation->SetLinearFontScaleFactor(2);
+	this->cornerAnnotation->SetNonlinearFontScaleFactor(1);
+	this->cornerAnnotation->SetMaximumFontSize(12);
+	double *bg = this->Getmui_BackGroundColor();
+	double r, g, b;
+	r = bg[0]; g = bg[1]; b = bg[2];
+	double sum = r + g + b;
+	if (
+		sum > 1.5 
+		)
 	{
-		vtkProp *myprop = props->GetNextProp();
-		if (str1.compare(myprop->GetClassName()) == 0)
-		{
-			if (this->Getmui_ShowGrid() == 1)
-			{
-				myprop->VisibilityOn();
-			}
-			else
-			{
-				myprop->VisibilityOff();
-			}
-		}
-
+		r = 0; g = 0; b = 0;
 	}
-	this->Render();*/
+	
+	else 
+	{
+		r = 1; g = 1; b = 1;
+		
+	}
+	
+	this->cornerAnnotation->GetTextProperty()->SetColor(r, g,b);
 	this->Render();
 }
 
@@ -13243,7 +13234,7 @@ void mqMorphoDigCore::Setmui_ScalarVisibility(int scalarvisibility)
 				if (scalarvisibility == 1 && myActor->GetSelected()==0)
 				{
 				
-					QString none = QString("none");
+					QString none = QString("Solid color");
 					if (this->mui_ActiveScalars->Name != none)
 					{
 						vtkPolyData *myPD = vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput());
@@ -13283,7 +13274,7 @@ ExistingScalars * mqMorphoDigCore::Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDAc
 	cout << "Init mui scalars of selected objects" << endl;
 	QStringList existing;
 	this->mui_ScalarsList->Stack.clear();
-	QString none = QString("none");
+	QString none = QString("Solid color");
 	this->mui_ScalarsList->Stack.push_back(ExistingScalars::Element(none, -1, 0));
 	
 	vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
@@ -13338,7 +13329,7 @@ ExistingScalars * mqMorphoDigCore::Getmui_ScalarsOfSelectedObjects(int onlyfirst
 	QStringList existing;
 	this->ActorCollection->InitTraversal();
 	this->mui_ScalarsList->Stack.clear();
-	QString none = QString("none");
+	QString none = QString("Solid color");
 	this->mui_ScalarsList->Stack.push_back(ExistingScalars::Element(none,-1,0));
 	int stop = 0;
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
@@ -13417,7 +13408,7 @@ void mqMorphoDigCore::Addmui_ExistingScalars(QString Scalar, int dataType, int n
 {
 	// if only_selected == 1 : populate the list of scalars of selected actors
 	int exists = 0;
-	QString none = QString("none");
+	QString none = QString("Solid color");
 	/*if (this->mui_ExistingScalars.size() == 1 && this->mui_ExistingScalars.at(0) == none)
 	{
 		cout << "1 scalar, and this is none! Confirmation:" << this->mui_ExistingScalars.at(0).toStdString() << endl;
@@ -13466,7 +13457,7 @@ void mqMorphoDigCore::Initmui_ExistingScalars()
 	QStringList existing;
 	this->ActorCollection->InitTraversal();
 	this->mui_ExistingScalars->Stack.clear();
-	QString none = QString("none");
+	QString none = QString("Solid color");
 	this->mui_ExistingScalars->Stack.push_back(ExistingScalars::Element(none,-1,0));
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
@@ -13649,7 +13640,7 @@ void mqMorphoDigCore::RefreshColorMapsAndScalarVisibility()
 		{
 			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
 			//vtkPolyDataMapper::SafeDownCast(myActor->GetMapper())->ScalarVisibilityOff();
-			QString none = QString("none");
+			QString none = QString("Solid color");
 
 			if (
 				(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)

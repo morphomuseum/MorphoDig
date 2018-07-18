@@ -54,7 +54,7 @@
        <item>
         <widget class="QToolButton" name="ScalarsVisibility">
          <property name="toolTip">
-          <string>Display scalars on/off toggle button</string>
+          <string>Display arrays on/off toggle button</string>
          </property>
          <property name="text">
           <string/>

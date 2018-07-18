@@ -511,7 +511,7 @@ void vtkMDActor::SetSelected(int selected)
 	{
 		if (this->GetMapper() != NULL && mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
 		{
-			QString none = QString("none");
+			QString none = QString("Solid color");
 			if (mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name != none)
 			{
 				vtkPolyDataMapper::SafeDownCast(this->GetMapper())->ScalarVisibilityOn();

@@ -30,7 +30,7 @@ void mqScalarsControlsWidget::constructor()
   //@@ to do : populate combo box according to found scalars
   // Create a list with all possible scalars.
   //this->comboActiveScalars->addItems({ "Initial RGB", "Tags", "Thickness", "Curvature"});
-  this->comboActiveScalars->addItems({ "none" });
+  this->comboActiveScalars->addItems({ "Solid color" });
   // Add values in the combo box
   this->ui->horizontalLayout->addWidget(this->comboActiveScalars);
   if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
