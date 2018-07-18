@@ -113,7 +113,9 @@ void mqObjectsControlsWidget::constructor()
   this->zTr->setMaximum(100);
   this->zTr->setMinimum(-100);
   this->zTr->setToolTip(QString("Translate along z viewing axis"));
-
+  QString tz =  QString("tz");
+  this->zTr->setLabelText(tz);
+  this->zTr->setLabelVisible(1);
 
   this->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
   //this->zRot = new QDoubleReleaseSlider;
@@ -123,31 +125,46 @@ void mqObjectsControlsWidget::constructor()
   //this->zRot->setSingleStep(0.1);
   //this->zRot->setSingleStep(0.1);
   this->zRot->setToolTip(QString("Rotation along z viewing axis"));
+  QString rz = QString("rz");
+  this->zRot->setLabelText(rz);
+  this->zRot->setLabelVisible(1);
+
 
   this->yTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
   //this->yTr = new QReleaseSlider;
   this->yTr->setMaximum(100);
   this->yTr->setMinimum(-100);
   this->yTr->setToolTip(QString("Translate along y viewing axis"));
+  QString ty = QString("ty");
+  this->yTr->setLabelText(ty);
+  this->yTr->setLabelVisible(1);
 
   this->yRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
   //this->yRot = new QReleaseSlider;
   this->yRot->setMaximum(45);
   this->yRot->setMinimum(-45);
   this->yRot->setToolTip(QString("Rotation along y viewing axis"));
-
+  QString ry = QString("ry");
+  this->yRot->setLabelText(ry);
+  this->yRot->setLabelVisible(1);
   
   //this->xTr = new QReleaseSlider;
   this->xTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
   this->xTr->setMaximum(100);
   this->xTr->setMinimum(-100);
   this->xTr->setToolTip(QString("Translate along x viewing axis"));
+  QString tx = QString("tx");
+  this->xTr->setLabelText(tx);
+  this->xTr->setLabelVisible(1);
 
   this->xRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
   //this->xRot = new QReleaseSlider;
   this->xRot->setMaximum(45);
   this->xRot->setMinimum(-45);
   this->xRot->setToolTip(QString("Rotation along x viewing axis"));
+  QString rx = QString("rx");
+  this->xRot->setLabelText(rx);
+  this->xRot->setLabelVisible(1);
 
   QHBoxLayout *zlayout = new QHBoxLayout;
   QWidget* zgrid = new QWidget();

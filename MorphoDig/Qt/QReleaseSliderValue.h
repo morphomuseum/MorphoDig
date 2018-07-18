@@ -8,6 +8,8 @@ class QScrollBar;
 class QReleaseSlider;
 //class QDoubleSlider;
 class QSpinBox;
+class QVBoxLayout;
+class QLabel;
 
 class QReleaseSliderValue : public QWidget
 {
@@ -26,12 +28,19 @@ signals:
 	void setMaximum(int value);
 	void invertAppearance(bool invert);
 	void invertKeyBindings(bool invert);
+	void setLabelVisible(int visible);
+	void setSpinboxVisible(int visible);
+	void setLabelText(QString text);
 
 private:
 	//QReleaseSlider *slider;
 	QReleaseSlider *slider;
 	QSpinBox *spinbox;
 	QDial *dial;
+	QLabel *label;
+	QVBoxLayout *layout;
+	int labelVisible;
+	int spinboxVisible;
 };
 
 #endif

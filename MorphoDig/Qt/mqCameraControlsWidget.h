@@ -53,8 +53,8 @@ private:
 	//QReleaseScrollBarValue * zRot;
 	//QDial * zRot;
 	//QDial * camzRot;
-	//QReleaseSliderValue *cP;
-	QReleaseSlider *cP;
+	QReleaseSliderValue *cP;
+	//QReleaseSlider *cP;
 	//QDoubleSlider * cP;
 	QDoubleReleaseSlider * zoom;
   Ui_mqCameraControlsWidget *ui;
