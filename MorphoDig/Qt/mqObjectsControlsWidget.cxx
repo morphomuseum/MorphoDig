@@ -537,7 +537,7 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 
 void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 {
-	//cout << "Rotate axis: " << axis << ", degrees:" << degrees << endl;
+//cout << "Rotate axis: " << axis << ", degrees:" << degrees << endl;
 //axis: 0=X, 1=Y, 2=z
 	
 	double rot_center[3] = { 0,0,0 };
@@ -580,42 +580,15 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 	// Convert them to display coord
 	double disp_obj_center[3];
 
-	/*this->ComputeWorldToDisplay(rot_center[0], rot_center[1], rot_center[2],
-		disp_obj_center);
-
-	this->ComputeWorldToDisplay(outsidept[0], outsidept[1], outsidept[2],
-		outsidept);
-		*/
+	
 	double radius = sqrt(vtkMath::Distance2BetweenPoints(disp_obj_center,
 		outsidept));
-	/*double nxf = (rwi->GetEventPosition()[0] - disp_obj_center[0]) / radius;
-
-	double nyf = (rwi->GetEventPosition()[1] - disp_obj_center[1]) / radius;
-
-	double oxf = (rwi->GetLastEventPosition()[0] - disp_obj_center[0]) / radius;
-
-	double oyf = (rwi->GetLastEventPosition()[1] - disp_obj_center[1]) / radius;*/
+	
 
 
 	if (degrees != 0)
 	{
-		double newXAngle = 0;
-		if (axis == 0)
-		{
-			newXAngle = degrees;
-		}
-
-		double newYAngle = 0; 
-		if (axis == 0)
-		{
-			newYAngle = degrees;
-		}
-
-		double newZAngle = 0;
-		if (axis == 0)
-		{
-			newZAngle = degrees;
-		}
+		
 		
 
 		double scale[3];
@@ -628,18 +601,20 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 		
 		if (axis == 0)
 		{
-			rotate[0][0] = degrees;
-			rotate[0][1] = view_up[0];
-			rotate[0][2] = view_up[1];
-			rotate[0][3] = view_up[2];
-		}
-		else if (axis == 1)
-		{
 
 			rotate[0][0] = degrees;
 			rotate[0][1] = view_right[0];
 			rotate[0][2] = view_right[1];
 			rotate[0][3] = view_right[2];
+
+		}
+		else if (axis == 1)
+		{
+			rotate[0][0] = degrees;
+			rotate[0][1] = view_up[0];
+			rotate[0][2] = view_up[1];
+			rotate[0][3] = view_up[2];
+
 		}
 		else
 		{
@@ -794,27 +769,27 @@ void mqObjectsControlsWidget::SavePositions(int val)
 	switch (val)
 	{
 	case 0:
-		action = "Rotate selected actors along X";
+		action = "Rotate selected actors along X viewing axis";
 		//cout << "VTK_IS_ROTATE: action=" << action.c_str() << endl;
 		break;
 	case 1:
-		action = "Rotate selected actors along Y";
+		action = "Rotate selected actors along Y viewing axis";
 		//cout << "VTK_IS_PAN: action=" << action.c_str() << endl;
 		break;
 	case 2:
-		action = "Rotate selected actors along Z";
+		action = "Rotate selected actors along Z viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	case 3:
-		action = "Translate selected actors along X";
+		action = "Translate selected actors along X viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	case 4:
-		action = "Translate selected actors along Y";
+		action = "Translate selected actors along Y viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	case 5:
-		action = "Translate selected actors along Z";
+		action = "Translate selected actors along Z viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	}
@@ -971,7 +946,7 @@ void mqObjectsControlsWidget::slotXrot(int val)
 		return;
 	}
 
-	this->RotateActors(0, val- this->oldrotval);
+	this->RotateActors(0, this->oldrotval-val);
 	this->oldrotval = val;
 
 }
@@ -983,7 +958,7 @@ void mqObjectsControlsWidget::slotYrot(int val)
 		return;
 	}
 
-	this->RotateActors(1, this->oldrotval-val);
+	this->RotateActors(1, val-this->oldrotval);
 	this->oldrotval = val;
 
 }
