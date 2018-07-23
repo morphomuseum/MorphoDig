@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Edit first selected actor</string>
+   <string>Edit first selected surface</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -449,7 +449,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Edit selected actor</string>
+    <string>Edit selected surface</string>
    </property>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -510,7 +510,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Object main color</string>
+     <string>Object solid color</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="ActorName">
@@ -543,7 +543,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Object transparency</string>
+     <string>Object translucency</string>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="M00">
@@ -742,7 +742,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Apply matrix to all selected actors</string>
+     <string>Apply matrix to all selected surfaces</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="ActorScalars">

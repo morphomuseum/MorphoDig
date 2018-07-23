@@ -127,12 +127,15 @@
         <widget class="Line" name="line_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
+           <horstretch>23</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
+         </property>
+         <property name="lineWidth">
+          <number>10</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -150,25 +153,8 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-        </widget>
-       </item>
-       <item alignment="Qt::AlignHCenter">
-        <widget class="QToolButton" name="LandmarkMoveUp">
-         <property name="toolTip">
-          <string>Decrease landmark number (move up in list)</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/move_up.png</normaloff>:/Icons/move_up.png</iconset>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
+        </widget>      
+	    </item>
        <item alignment="Qt::AlignHCenter">
         <widget class="QToolButton" name="LandmarkMoveDown">
          <property name="toolTip">
@@ -179,11 +165,22 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/move_up.png</normaloff>:/Icons/move_up.png</iconset>
+         </property>        
+        </widget>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QToolButton" name="LandmarkMoveUp">        
+         <property name="toolTip">
+          <string>Decrease landmark number (move up in list)</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/move_down.png</normaloff>:/Icons/move_down.png</iconset>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
+         </property>       
         </widget>
        </item>
        <item>
