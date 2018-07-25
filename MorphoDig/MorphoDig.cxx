@@ -13,11 +13,10 @@
 #include "vtkBezierCurveSource.h"
 #include "vtkMDActor.h"
 #include "vtkLMActor.h"
-#include "mqObjectsControlsToolbar.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
-#include "vtkMDLassoInteractorStyle.h"
+//#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
 #include <QVTKOpenGLWidget.h>
 //#include "vtkUndoStack.h"

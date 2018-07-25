@@ -22,7 +22,7 @@
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
 #include <vtkInteractorStyleDrawPolygon.h>
-#include "vtkMDLassoInteractorStyle.h"
+
 #include "vtkGridActor.h"
 #include "vtkLMActor.h"
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included

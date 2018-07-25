@@ -6533,8 +6533,9 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 						newactor->SetMapper(newmapper);
 						newactor->SetSelected(0);
 
-
-						newactor->SetName("LC" + myActor->GetName());
+						//@@@@@
+						std::string newname = this->CheckingName(myActor->GetName());
+						newactor->SetName(newname);
 						cout << "try to add new actor=" << endl;
 						newcoll->AddTmpItem(newactor);
 						modified = 1;
