@@ -44,6 +44,7 @@ public:
 	static vtkMDActorCollection *New();
 	vtkTypeMacro(vtkMDActorCollection, vtkActorCollection);
 
+	 void SetDisplayMode(int mode);
 
 	void AddItem(vtkActor *a);
 	void AddTmpItem(vtkActor *a);

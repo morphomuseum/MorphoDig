@@ -22,6 +22,10 @@
     <!-- Typical file operations. -->
 <file>ScalarBar24.png</file>
    <file>ResetRange32.png</file>
+   <file>points.png</file>
+   <file>point_normals.png</file>
+   <file>cell_normals.png</file>
+   <file>wireframe.png</file>
    <file>edit.png</file>
    <file>ResetRange24.png</file>
    <file>Initialize24.png</file>

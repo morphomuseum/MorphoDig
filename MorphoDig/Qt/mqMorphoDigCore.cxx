@@ -109,7 +109,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 {
 
 	mqMorphoDigCore::Instance = this;
-
+	this->mui_DisplayMode = 1; // point normales by defaults
 	this->mui_TagModeActivated = 0;
 	this->mui_TagTool = 0; //pencil by defaults
 	this->qvtkWidget = NULL;
@@ -3029,18 +3029,20 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		//std::cout << "\nNumber of points 1:" << MyPolyData->GetNumberOfPoints() << std::endl;
 		//std::cout << "\nNumber of cells 1:" << MyPolyData->GetNumberOfCells() << std::endl;
 
-
-		vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+		/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 		ObjNormals->SetInputData(MyPolyData);
 		ObjNormals->ComputePointNormalsOn();
 		ObjNormals->ComputeCellNormalsOn();
 		//ObjNormals->AutoOrientNormalsOff();
+		//ObjNormals->FlipNormalsOn();
 		ObjNormals->ConsistencyOff();
 
-		ObjNormals->Update();
+		ObjNormals->Update();*/
 
+		
 		vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-		cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+		//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+		cleanPolyDataFilter->SetInputData(MyPolyData);
 		cleanPolyDataFilter->PieceInvariantOff();
 		cleanPolyDataFilter->ConvertLinesToPointsOff();
 		cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -3049,7 +3051,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		cleanPolyDataFilter->Update();
 
 		MyPolyData = cleanPolyDataFilter->GetOutput();
-
+		//MyPolyData->SetActive
 		cout << "\nNumber of points:" << MyPolyData->GetNumberOfPoints() << std::endl;
 		cout << "\nNumber of cells:" << MyPolyData->GetNumberOfCells() << std::endl;
 
@@ -3210,6 +3212,9 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			actor->SetMapper(mapper);
 			actor->SetSelected(1);
 			actor->SetName(newname);
+			
+			actor->SetDisplayMode(this->mui_DisplayMode);
+			//actor->GetProperty()->SetRepresentationToPoints();
 			this->getActorCollection()->AddItem(actor);
 			emit this->actorsMightHaveChanged(); 
 			this->Initmui_ExistingScalars();
@@ -6559,7 +6564,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 				cout << "try to get next actor from newcoll:" << i << endl;
 				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+				myActor->SetDisplayMode(this->mui_DisplayMode);
 				this->getActorCollection()->AddItem(myActor);
 				emit this->actorsMightHaveChanged();
 				std::string action = "Convex Hull added: " + myActor->GetName();
@@ -6847,7 +6852,7 @@ void mqMorphoDigCore::addConvexHull()
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Convex Hull added: " + myActor->GetName();
@@ -6947,15 +6952,16 @@ void mqMorphoDigCore::addMirrorXZ()
 
 				//VTK_CREATE(vtkActor, actor);
 
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+			/*	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(myData);
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				ObjNormals->ConsistencyOff();
-				ObjNormals->Update();
+				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				cleanPolyDataFilter->SetInputData(myData);
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -7030,7 +7036,7 @@ void mqMorphoDigCore::addMirrorXZ()
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Mirror object added: " + myActor->GetName();
@@ -7305,17 +7311,19 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 				
 
 
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(My_Output);
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				//ObjNormals->AutoOrientNormalsOff();
 				ObjNormals->ConsistencyOff();
 
-				ObjNormals->Update();
+				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				cleanPolyDataFilter->SetInputData(My_Output);
+
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -7378,7 +7386,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "TPS object added: " + myActor->GetName();
@@ -7465,17 +7473,18 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 				fillholes->SetHoleSize(maxsize);
 				fillholes->Update();
 				
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(fillholes->GetOutput());
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				//ObjNormals->AutoOrientNormalsOff();
 				ObjNormals->ConsistencyOff();
 
-				ObjNormals->Update();
+				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				cleanPolyDataFilter->SetInputData(fillholes->GetOutput());
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -7539,7 +7548,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Hole filled object added: " + myActor->GetName();
@@ -7627,20 +7636,18 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 				
 				densify->Update();
 				
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-				//ObjNormals->SetInputData(Sfilter->GetOutput());
-				
+			/*	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(densify->GetOutput());
-				
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				//ObjNormals->AutoOrientNormalsOff();
 				ObjNormals->ConsistencyOff();
 
-				ObjNormals->Update();
+				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				cleanPolyDataFilter->SetInputData(densify->GetOutput());
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -7694,7 +7701,7 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Densified object added: " + myActor->GetName();
@@ -7792,11 +7799,8 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 				{
 					decimate2->Update();
 				}
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-				//ObjNormals->SetInputData(Sfilter->GetOutput());
-				//ObjNormals->SetComputeCellNormals(1);
-				//ObjNormals->SetComputePointNormals(0);
-				if (quadric == 0)
+				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+					if (quadric == 0)
 				{
 					ObjNormals->SetInputData(decimate->GetOutput());
 				}
@@ -7809,10 +7813,20 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 				//ObjNormals->AutoOrientNormalsOff();
 				ObjNormals->ConsistencyOff();
 
-				ObjNormals->Update();
+				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				if (quadric == 0)
+				{
+					cleanPolyDataFilter->SetInputData(decimate->GetOutput());
+					
+				}
+				else
+				{
+					cleanPolyDataFilter->SetInputData(decimate2->GetOutput());
+					
+				}
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -7876,7 +7890,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Decimated object added: " + myActor->GetName();
@@ -7963,17 +7977,17 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 				Sfilter->Update();
 			
 
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(Sfilter->GetOutput());
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
-				//ObjNormals->AutoOrientNormalsOff();
 				ObjNormals->ConsistencyOff();
 
-				ObjNormals->Update();
+				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				cleanPolyDataFilter->SetInputData(Sfilter->GetOutput());
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -8037,7 +8051,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Smoothed object added: " + myActor->GetName();
@@ -8280,7 +8294,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Largest region object added: " + myActor->GetName();
@@ -10601,15 +10615,16 @@ void mqMorphoDigCore::addKeepLargest()
 
 				
 
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(cfilter->GetOutput());
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				ObjNormals->ConsistencyOff();
-				ObjNormals->Update();
+				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				cleanPolyDataFilter->SetInputData(cfilter->GetOutput());
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -10664,7 +10679,7 @@ void mqMorphoDigCore::addKeepLargest()
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Largest region object added: " + myActor->GetName();
@@ -10834,7 +10849,7 @@ void mqMorphoDigCore::addInvert()
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
-
+			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
 			std::string action = "Inverted object added: " + myActor->GetName();
@@ -11045,14 +11060,14 @@ void mqMorphoDigCore::groupSelectedActors()
 		if (modified == 1)
 		{
 			mergedObjects->Update();
-			vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+			/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 			ObjNormals->SetInputData(mergedObjects->GetOutput());
 			ObjNormals->ComputePointNormalsOn();
 			ObjNormals->ComputeCellNormalsOn();
 			//ObjNormals->AutoOrientNormalsOff();
 			ObjNormals->ConsistencyOff();
 
-			ObjNormals->Update();
+			ObjNormals->Update();*/
 			VTK_CREATE(vtkMDActor, newactor);
 			if (this->mui_BackfaceCulling == 0)
 			{
@@ -11081,8 +11096,8 @@ void mqMorphoDigCore::groupSelectedActors()
 			newmapper->ScalarVisibilityOn();
 
 
-			newmapper->SetInputData(ObjNormals->GetOutput());
-
+			newmapper->SetInputData(mergedObjects->GetOutput());
+			//newmapper->SetInputData(ObjNormals->GetOutput());
 
 			int num = 2;
 
@@ -11100,6 +11115,7 @@ void mqMorphoDigCore::groupSelectedActors()
 			std::string actorName = this->CheckingName(newActorName.toStdString());
 			newactor->SetName(actorName);
 			cout << "try to add new actor=" << endl;
+			newactor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(newactor);
 			std::string action = "Grouped actor added: " + newactor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
@@ -11244,6 +11260,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 	Ok = 1;
 	mergedObjects->Update();
+	// here the only case where we need to compute normals (save merged surface)!
 	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 	ObjNormals->SetInputData(mergedObjects->GetOutput());
 	ObjNormals->ComputePointNormalsOn();
@@ -11255,6 +11272,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 	vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 	cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+	
 	cleanPolyDataFilter->PieceInvariantOff();
 	cleanPolyDataFilter->ConvertLinesToPointsOff();
 	cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -11771,6 +11789,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	
 	cout << "Update merged object" << endl;
 	mergedObjects->Update();
+	//Other case where we need to recompute normals outside "vtkMDActor"
 	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 	ObjNormals->SetInputData(mergedObjects->GetOutput());
 	ObjNormals->ComputePointNormalsOn();
@@ -12775,6 +12794,11 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	return name_obj;
 }
 
+void mqMorphoDigCore::SetDisplayMode(int mode)
+{
+	this->mui_DisplayMode = mode;
+	this->ActorCollection->SetDisplayMode(mode);
+}
 void mqMorphoDigCore::SetGridVisibility()
 {
 	vtkPropCollection* props = this->getRenderer()->GetViewProps(); //iterate through and set each visibility to 0

@@ -12,7 +12,7 @@ Module:    vtkMDActor.cxx
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkProperty.h>
-
+#include <vtkPolyDataNormals.h>
 #include <vtkTable.h>
 #include <vtkPCAStatistics.h>
 #include <vtkLine.h>
@@ -21,6 +21,7 @@ Module:    vtkMDActor.cxx
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 #include <vtkPointData.h>
+#include <vtkCellData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCenterOfMass.h>
 #include <vtkTransform.h>
@@ -44,7 +45,8 @@ vtkMDActor::vtkMDActor()
 	//backFaces->SetDiffuseColor(.8, .8, .8);
 	backFaces->SetColor(.7, .7, .7);
 	backFaces->SetOpacity(0.5);
-
+	this->pointNormals = nullptr;
+	this->cellNormals = nullptr;
 	this->SetBackfaceProperty(backFaces);
 	this->UndoRedo = new vtkMDActorUndoRedo;
 	this->KdTree = nullptr;
@@ -65,6 +67,120 @@ vtkMDActor::~vtkMDActor()
 	
 
 
+
+}
+void vtkMDActor::SetDisplayMode(int mode)
+{
+	vtkPolyData* mPD= vtkPolyData::SafeDownCast(this->GetMapper()->GetInput());
+	if (mPD!=NULL && (this->pointNormals == nullptr || this->cellNormals == nullptr))
+	{
+		//cout << "Compute Poly Data Normals on a PolyData of " <<mPD->GetNumberOfPoints()<<" points"<< endl;
+		
+		vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+		ObjNormals->SetInputData(mPD);
+		ObjNormals->ComputePointNormalsOn();
+		ObjNormals->ComputeCellNormalsOn();
+		//ObjNormals->AutoOrientNormalsOff();
+		//ObjNormals->FlipNormalsOn();
+		ObjNormals->ConsistencyOff();
+
+		ObjNormals->Update();
+
+		vtkSmartPointer<vtkFloatArray> mpointNormals = vtkSmartPointer<vtkFloatArray>::New();
+		mpointNormals = vtkFloatArray::SafeDownCast(ObjNormals->GetOutput()->GetPointData()->GetNormals());
+
+		vtkSmartPointer<vtkFloatArray> mcellNormals = vtkSmartPointer<vtkFloatArray>::New();
+		mcellNormals = vtkFloatArray::SafeDownCast(ObjNormals->GetOutput()->GetCellData()->GetNormals());
+		this->pointNormals = mpointNormals;
+		this->cellNormals = mcellNormals;
+		//mPD->GetPointData()->SetNormals(this->pointNormals);
+		//mPD->GetCellData()->SetNormals(this->cellNormals);
+
+	}
+	if (mode == 0 || mode == 1)
+	{
+		if (mPD != NULL)
+		{
+			if (mode == 0)
+			{
+				
+				//mPD->GetCellData()->RemoveArray("Normals");
+				//mPD->GetPointData()->SetNormals(this->pointNormals);
+				mPD->GetCellData()->SetNormals(this->cellNormals);
+				//cout << "Remove point normals" << endl;
+				mPD->GetPointData()->RemoveArray("Normals");
+				if (this->cellNormals!=nullptr)
+				{
+
+					//cout << "There are here " << this->cellNormals->GetNumberOfTuples()
+					//	<< "  Cells in cellNormals" << endl;
+				}
+				else
+				{
+					//cout << "this->cellNormals  is null " << endl;
+				}
+				
+			}
+			else
+			{
+				//cout <<"Try mode 1 point normals" << endl;
+				//cout << "Remove cell normals" << endl;
+				mPD->GetCellData()->RemoveArray("Normals");
+				mPD->GetPointData()->SetNormals(this->pointNormals);
+				if (this->pointNormals != nullptr)
+				{
+
+					//cout << "There are here " << this->pointNormals->GetNumberOfTuples()
+					//	<< " Float point normals inside pointNormals" << endl;
+				}
+				else
+				{
+					//cout << "this->pointNormals  is null " << endl;
+				}
+
+
+
+			}
+			//cout << "Now what we REALLY map:" << endl;
+			vtkFloatArray* norms = vtkFloatArray::SafeDownCast(mPD->GetCellData()->GetNormals());
+			if (norms)
+			{
+
+				//cout << "There are here " << norms->GetNumberOfTuples()
+				//	<< " Float Cell normals" << endl;
+			}
+			else
+			{
+			//	cout << "cell norms  is null " << endl;
+			}
+
+			norms = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetNormals());
+			if (norms)
+			{
+
+				//cout << "There are here " << norms->GetNumberOfTuples()
+				//	<< " Float point normals" << endl;
+			}
+			else
+			{
+				//cout << "point norms  is null " << endl;
+				
+			}
+
+		}
+		this->GetProperty()->SetRepresentationToSurface();
+
+	}
+	else if (mode == 2)
+	{
+		this->GetProperty()->SetRepresentationToWireframe();
+
+	}
+	else
+	{
+		this->GetProperty()->SetRepresentationToPoints();
+
+	}
 
 }
 void vtkMDActor::BuildConnectivityFilter()

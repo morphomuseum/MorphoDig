@@ -669,6 +669,7 @@ public:
   void DollyCameraForPerspectiveMode();
   void DollyCameraForParallelScale();
   void ResetCameraOrthoPerspective();
+  void SetDisplayMode(int mode);
   void SetGridVisibility();
   void SetGridInfos();
   void SetOrientationHelperVisibility();
@@ -886,7 +887,7 @@ protected:
 	double ScalarRangeMin;
 	double ScalarRangeMax;
 	void SetSelectedActorsColor(int r, int g, int b);
-	
+	int mui_DisplayMode; //0 cell 1 point 2 wireframe 3 points
 	vtkOrientationHelperWidget* OrientationHelperWidget;
 public slots:
 	virtual void slotLandmarkMoveUp();

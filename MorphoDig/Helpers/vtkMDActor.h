@@ -18,6 +18,8 @@ Module:    vtkMDActor.h
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
 #include <vtkKdTreePointLocator.h>
+#include <vtkSmartPointer.h>
+#include <vtkFloatArray.h>
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vector>
 #include <QString>
@@ -62,7 +64,7 @@ public:
 	void BuildKdTree();
 	void FreeKdTree();
 	vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
-	
+	void SetDisplayMode(int mode);
 	void BuildConnectivityFilter();
 	void FreeConnectivityFilter();
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> GetConnectivityFilter();
@@ -108,7 +110,8 @@ public:
 	virtual void PopUndoStack();
 	virtual void PopRedoStack();
 	virtual void ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat); // can be overriden in LMActor!
-	
+	vtkSmartPointer<vtkFloatArray> pointNormals;
+	vtkSmartPointer<vtkFloatArray> cellNormals;
 
 protected:
 	vtkMDActor();
@@ -128,6 +131,8 @@ protected:
 private:
 	vtkMDActor(const vtkMDActor&);  // Not implemented.
 	void operator=(const vtkMDActor&);  // Not implemented.
+
+
 	
 };
 
