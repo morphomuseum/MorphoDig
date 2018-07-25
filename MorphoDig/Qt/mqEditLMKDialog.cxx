@@ -61,7 +61,7 @@ mqEditLMKDialog::mqEditLMKDialog(QWidget* Parent)
 	connect(mqMorphoDigCore::instance(), SIGNAL(lmSelectionChanged()), this, SLOT(slotRefreshDialog()));
 	connect(this->Ui->next, SIGNAL(pressed()), this, SLOT(slotGetNextLandmark()));
 	connect(this->Ui->prec, SIGNAL(pressed()), this, SLOT(slotGetPrecedingLandmark()));
-	
+	connect(this->Ui->cam_center, SIGNAL(pressed()), this, SLOT(slotCamCenter()));
 	LMK_Coll = NULL;
 	LMK = NULL;
 	current_coll = -1;
@@ -392,6 +392,11 @@ void mqEditLMKDialog::GetPrecedingLandmark()
 
 
 	}
+
+}
+void mqEditLMKDialog::slotCamCenter()
+{
+	mqMorphoDigCore::instance()->ReplaceCameraAndGridAt(this->Ui->x->value(), this->Ui->y->value(), this->Ui->z->value());
 
 }
 

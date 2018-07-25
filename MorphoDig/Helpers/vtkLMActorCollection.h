@@ -39,7 +39,7 @@ public:
 	void ReorderLandmarks();
 	void LandmarksMoveUp();
 	void LandmarksMoveDown();
-protected:
+	protected:
 	
 	vtkLMActorCollection();
 	~vtkLMActorCollection();

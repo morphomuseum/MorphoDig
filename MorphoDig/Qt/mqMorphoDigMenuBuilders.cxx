@@ -249,7 +249,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	new mqEditAlphaDialogReaction(submenuRenderingModification->addAction("Change transparency") << mqSetName("actionEditAlpha"));
 
-	QMenu* submenuChangeObjectColor = submenuRenderingModification->addMenu("Change object color");
+	QMenu* submenuChangeObjectColor = submenuRenderingModification->addMenu("Change object solid color");
 
 	QAction *Grey = submenuChangeObjectColor->addAction("Grey");
 	

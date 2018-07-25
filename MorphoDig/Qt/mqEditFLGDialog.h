@@ -46,7 +46,7 @@ public:
   virtual void slotGetPrecedingFlag();
   virtual void slotGetNextFlag();
   virtual void slotsaveFLG();
-  
+  virtual void slotCamCenter();
 
 protected:
 	

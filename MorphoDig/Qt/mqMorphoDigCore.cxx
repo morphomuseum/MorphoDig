@@ -3708,6 +3708,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 			}
 			inputFile.close();
 		}
+		this->Render();
 	}
 }
 
@@ -6534,8 +6535,9 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 						newactor->SetSelected(0);
 
 						//@@@@@
-						std::string newname = this->CheckingName(myActor->GetName());
-						newactor->SetName(newname);
+						//std::string newname = this->CheckingName(myActor->GetName());
+						newactor->SetName(myActor->GetName() + "_lc");
+						//newactor->SetName(newname);
 						cout << "try to add new actor=" << endl;
 						newcoll->AddTmpItem(newactor);
 						modified = 1;
@@ -10812,6 +10814,8 @@ void mqMorphoDigCore::addInvert()
 				newactor->SetSelected(0);
 
 
+				//newactor->SetName(myActor->GetName() + "_inv");
+				//std::string newname = this->CheckingName(myActor->GetName());
 				newactor->SetName(myActor->GetName() + "_inv");
 				cout << "try to add new actor=" << endl;
 				newcoll->AddTmpItem(newactor);
@@ -11041,6 +11045,14 @@ void mqMorphoDigCore::groupSelectedActors()
 		if (modified == 1)
 		{
 			mergedObjects->Update();
+			vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+			ObjNormals->SetInputData(mergedObjects->GetOutput());
+			ObjNormals->ComputePointNormalsOn();
+			ObjNormals->ComputeCellNormalsOn();
+			//ObjNormals->AutoOrientNormalsOff();
+			ObjNormals->ConsistencyOff();
+
+			ObjNormals->Update();
 			VTK_CREATE(vtkMDActor, newactor);
 			if (this->mui_BackfaceCulling == 0)
 			{
@@ -11069,7 +11081,7 @@ void mqMorphoDigCore::groupSelectedActors()
 			newmapper->ScalarVisibilityOn();
 
 
-			newmapper->SetInputData(mergedObjects->GetOutput());
+			newmapper->SetInputData(ObjNormals->GetOutput());
 
 
 			int num = 2;
@@ -11906,14 +11918,16 @@ void mqMorphoDigCore::LandmarksMoveUp()
 	this->NodeLandmarkCollection->LandmarksMoveUp();
 	this->HandleLandmarkCollection->LandmarksMoveUp();
 	this->Render();
+	
 }
 void mqMorphoDigCore::LandmarksMoveDown()
 {
-	this->NormalLandmarkCollection->LandmarksMoveDown();
+		this->NormalLandmarkCollection->LandmarksMoveDown();
 	this->TargetLandmarkCollection->LandmarksMoveDown();
 	this->NodeLandmarkCollection->LandmarksMoveDown();
 	this->HandleLandmarkCollection->LandmarksMoveDown();
 	this->Render();
+	
 }
 
 void mqMorphoDigCore::SelectLandmarkRange(int start, int end, int lm_type)
@@ -12357,6 +12371,31 @@ void mqMorphoDigCore::ReplaceCameraAndGrid()
 
 	this->getGridActor()->SetGridOrigin(newcamerafocalpoint);
 	this->getGridActor()->SetOutlineMode(this->Getmui_CameraCentreOfMassAtOrigin());
+	//this->getGridActor()->SetGridType(gridtype);	
+	this->Render();
+
+
+}
+//Called to place camera and grid positions at some desired coordinate
+void mqMorphoDigCore::ReplaceCameraAndGridAt(double x, double y, double z)
+{
+	double newcamerafocalpoint[3] = { x,y, z };
+	
+
+	double oldcampos[3];
+	double newcampos[3];
+	this->getCamera()->GetPosition(oldcampos);
+	double oldcamerafocalpoint[3];
+	this->getCamera()->GetFocalPoint(oldcamerafocalpoint);
+
+	double dispvector[3];
+	vtkMath::Subtract(newcamerafocalpoint, oldcamerafocalpoint, dispvector);
+	vtkMath::Add(oldcampos, dispvector, newcampos);
+	this->getCamera()->SetPosition(newcampos);
+	this->getCamera()->SetFocalPoint(newcamerafocalpoint);
+
+	this->getGridActor()->SetGridOrigin(newcamerafocalpoint);
+	this->getGridActor()->SetOutlineMode(2);
 	//this->getGridActor()->SetGridType(gridtype);	
 	this->Render();
 

@@ -665,6 +665,7 @@ public:
   mqMorphoDigCore();
   void AdjustCameraAndGrid();
   void ReplaceCameraAndGrid();
+  void ReplaceCameraAndGridAt(double x, double y, double z);
   void DollyCameraForPerspectiveMode();
   void DollyCameraForParallelScale();
   void ResetCameraOrthoPerspective();

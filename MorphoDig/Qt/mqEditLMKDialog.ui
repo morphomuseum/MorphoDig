@@ -583,6 +583,26 @@
      <string>y:</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="cam_center">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>20</y>
+      <width>21</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Set camera center at x,y,z</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/move_cam3.png</normaloff>:/Icons/move_cam3.png</iconset>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
