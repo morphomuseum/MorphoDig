@@ -833,7 +833,7 @@ void vtkMDInteractorStyle::StartSelect()
 		  this->T = T_RELEASED;
 		  this->TagPencilStop();
 		  this->CurrentMode = VTKISMT_ORIENT;
-		  mqMorphoDigCore::instance()->resetCursor();
+		  //mqMorphoDigCore::instance()->resetCursor();
 		  this->Interactor->Render();
 		  // std::cout << key << "Released" << '\n';
 	  }
@@ -1085,8 +1085,10 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 	}
 	else
 	{
-
-		this->ResetMoveWhat();
+		if (this->T == T_RELEASED)
+		{
+			this->ResetMoveWhat();
+		}
 		//Right drag:
 		// CAM mode: draw rubber band
 		// OBJ mode: draw rubber band if alt is not pressed
@@ -1230,7 +1232,10 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 	  }//left button down, no landmark 
 	  else
 	  { // left mouse pressed, no 
-		  this->ResetMoveWhat();
+		  if (this->T == T_RELEASED)
+		  {
+			  this->ResetMoveWhat();
+		  }
 		  
 
 		  if (this->MoveWhat==CAM)
