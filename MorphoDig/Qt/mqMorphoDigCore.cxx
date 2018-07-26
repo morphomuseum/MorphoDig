@@ -110,7 +110,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 	mqMorphoDigCore::Instance = this;
 	this->mui_DisplayMode = 1; // point normales by defaults
-	this->mui_TagModeActivated = 0;
+	this->mui_TagModeActivated = 1;
 	this->mui_TagTool = 0; //pencil by defaults
 	this->qvtkWidget = NULL;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();

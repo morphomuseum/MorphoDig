@@ -102,9 +102,12 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	
 	this->Ui->comboActiveTags->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	this->Ui->comboTagMaps->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	this->Ui->pencilOn->setDisabled(true);
+	/*this->Ui->pencilOn->setDisabled(true);
 	this->Ui->lassoOn->setDisabled(true);
 	this->Ui->bucketOn->setDisabled(true);
+	
+	*/
+	this->Ui->activateTagMode->setVisible(false);
 	this->Ui->pencilSearchSize->setValue(mqMorphoDigCore::instance()->Getmui_PencilSize());
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboTags()));
@@ -172,9 +175,9 @@ mqEditTagsDialog::~mqEditTagsDialog()
 
 void mqEditTagsDialog::closeEvent(QCloseEvent *event)
 {
-	cout << "Deactivate Tag Mode" << endl;
+	/*cout << "Deactivate Tag Mode" << endl;
 	mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
-	this->Ui->activateTagMode->setChecked(false);
+	this->Ui->activateTagMode->setChecked(false);*/
 
 	event->accept();
 }

@@ -63,6 +63,8 @@ vtkMDActor::~vtkMDActor()
 {
 	this->UndoRedo->RedoStack.clear();
 	this->UndoRedo->UndoStack.clear();
+	this->FreeKdTree();
+	this->FreeConnectivityFilter();
 	delete this->UndoRedo;
 	
 
