@@ -33,7 +33,8 @@ public:
   vtkTypeMacro(vtkMDInteractorStyle, vtkInteractorStyleTrackballCamera);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void StartSelect();
+  /*void StartSelect();
+  void StartTagPencil();*/
 
   //@{
   /**
@@ -49,6 +50,9 @@ public:
   virtual void OnChar();
   virtual void RubberStart();
   virtual void RubberStop();
+  virtual void TagPencilStart();
+  virtual void TagPencilStop();
+  virtual void Tag(int mode);
   virtual void OnKeyPress();
   virtual void OnKeyRelease();
   virtual void EndRotate();
@@ -89,8 +93,10 @@ protected:
 	double newAttachmentPoint[3]);*/
   virtual void Pick();
   void RedrawRubberBand();
-
+  void RedrawTagPencilCircle();
   int StartPosition[2];
+  int TagPencilCenterPosition[2];
+  int TagPencilStarted;
   int EndPosition[2];
   int MoveWhat;
   int Moving;
@@ -102,6 +108,7 @@ protected:
   double GetBoundingBoxLengthOfSelectedActors();
   void GetCenterOfMassOfSelectedActors(double com[3]);
   vtkUnsignedCharArray *PixelArray;
+  vtkUnsignedCharArray *PixelArray2;
   void ChangeAttachmentPoint(vtkMatrix4x4 *NewMat, vtkLMActor *LMActor);
   void ResetMoveWhat();
   int CurrentMode;
@@ -110,6 +117,7 @@ protected:
   int T;
   int Alt;
   int LM_Button;
+  int RM_Button;
   //vtkProp3D *InteractionProp;
   vtkSmartPointer<vtkMDActorCollection> ActorCollection;
   vtkSmartPointer<vtkLMActorCollection> NormalLandmarkCollection;
