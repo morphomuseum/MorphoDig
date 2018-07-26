@@ -73,7 +73,7 @@ public:
   virtual void slotRemoveTags();
   virtual void slotRefreshTagMaps();
   virtual void slotActivateTagMode();
-  virtual void slotPencilSearchSizeChanged(double newSize);
+  virtual void slotPencilSearchSizeChanged(int newSize);
   virtual void slotBucketOn();
   virtual void slotPencilOn();
   //virtual void slotDeactivateTagMode();

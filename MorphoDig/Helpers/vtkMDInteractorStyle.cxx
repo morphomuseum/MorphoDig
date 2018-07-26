@@ -1611,7 +1611,7 @@ void vtkMDInteractorStyle::TagPencilStop()
 {
 	this->TagPencilStarted = 0;
 	
-	mqMorphoDigCore::instance()->setCurrentCursor(this->MoveWhat);
+	//mqMorphoDigCore::instance()->setCurrentCursor(this->MoveWhat);
 	if (!this->Interactor || !this->Moving)
 	{
 		return;

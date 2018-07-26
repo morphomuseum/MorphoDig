@@ -105,14 +105,14 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	this->Ui->pencilOn->setDisabled(true);
 	this->Ui->lassoOn->setDisabled(true);
 	this->Ui->bucketOn->setDisabled(true);
-
+	this->Ui->pencilSearchSize->setValue(mqMorphoDigCore::instance()->Getmui_PencilSize());
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
-	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(double)), this, SLOT(slotPencilSearchSizeChanged(double)));
+	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(int)), this, SLOT(slotPencilSearchSizeChanged(int)));
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
 	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
 	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
@@ -733,7 +733,7 @@ void mqEditTagsDialog::RefreshDialog()
 	mqMorphoDigCore::instance()->Render();
 }
 
-void mqEditTagsDialog::slotPencilSearchSizeChanged(double newSize)
+void mqEditTagsDialog::slotPencilSearchSizeChanged(int newSize)
 {
 	mqMorphoDigCore::instance()->Setmui_PencilSize(newSize);
 

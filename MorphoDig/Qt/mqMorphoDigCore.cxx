@@ -128,7 +128,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_ExistingColorMaps = new ExistingColorMaps;
 	this->mui_ActiveTagMap = new ActiveTagMap;
 	this->mui_ActiveTag = 1;
-	this->mui_PencilSize = 1;
+	this->mui_PencilSize = 15;
 	this->mui_ExistingTagMaps = new ExistingTagMaps;
 	this->InitLuts();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -531,7 +531,8 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				{
 
 					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
-					double Radius = this->Getmui_PencilSize();
+					double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize()/100;
+					cout <<"Radius = " << Radius << endl;
 					myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
 					
 					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
@@ -6261,7 +6262,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 1, 1);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6272,7 +6273,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/move_mode2.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 1, 1);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6283,7 +6284,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_keepinside.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 3, 18);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6294,7 +6295,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/Lasso_keepoutside.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 3, 18);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6305,7 +6306,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/select_mode2.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 18, 18);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6316,7 +6317,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/pencil.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 2, 18);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6327,7 +6328,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/Flood_fill.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 18, 18);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6338,7 +6339,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/magic_wand.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 2, 18);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6349,7 +6350,7 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 		{
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
-			QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+			QCursor projectCursor = QCursor(cursor_pixmap, 1, 1);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -13757,11 +13758,11 @@ void mqMorphoDigCore::RefreshColorMapsAndScalarVisibility()
 	}
 }
 
-void mqMorphoDigCore::Setmui_PencilSize(double pencilSize)
+void mqMorphoDigCore::Setmui_PencilSize(int pencilSize)
 {
 	this->mui_PencilSize = pencilSize;
 }
-double mqMorphoDigCore::Getmui_PencilSize()
+int mqMorphoDigCore::Getmui_PencilSize()
 {
 	return this->mui_PencilSize;
 }
