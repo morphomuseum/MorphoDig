@@ -314,7 +314,13 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
 	QAction *CreateNewTagArray = submenuTagModification->addAction("Create new empty tag array");
-	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
+	QAction *CreateNewTagArrayColor = submenuTagModification->addAction("Create new tag array based on currently displayed colors");
+	//là on va faire une fenêtre qui demande 2 choses : 
+	// 1) EXACT color match est-ce qu'on se base sur la tag map actuelle (exact color match) => ce qui implique qu'on puisse y acceder sans avoir d'array tags ouvertes.... ce qui n'est pas un drame, notamment pour éditer les tag maps quand on n'a pas de tags ouverts
+	// 2) si on 
+	//1) on s'arrête à combien de couleurs ?
+	// 
+	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayColor()));
 	QAction *CreateNewTagArrayConnectivity = submenuTagModification->addAction("Create new tag array based on connectivity");
 	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
 	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");

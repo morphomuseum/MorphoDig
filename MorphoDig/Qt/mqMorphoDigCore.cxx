@@ -8327,12 +8327,19 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 void mqMorphoDigCore::scalarsRGB(QString newRGB)
 {
+
 	std::string mScalarName = "RGB";
 	if (newRGB.length() > 0)
 	{
 		mScalarName = newRGB.toStdString();
 	}
-
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	vtkIdType num2 = this->ActorCollection->GetNumberOfSelectedActors();
 	
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -14839,6 +14846,13 @@ void mqMorphoDigCore::slotInvert() {
 
 void mqMorphoDigCore::slotCreateTagArray()
 {
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	QString TagArrayName = QString("Tags");
 	QInputDialog *newTagName = new QInputDialog();
 	bool dialogResult;
