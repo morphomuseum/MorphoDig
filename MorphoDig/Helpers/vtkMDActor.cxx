@@ -82,7 +82,7 @@ void vtkMDActor::SetDisplayMode(int mode)
 		ObjNormals->SetInputData(mPD);
 		ObjNormals->ComputePointNormalsOn();
 		ObjNormals->ComputeCellNormalsOn();
-		//ObjNormals->AutoOrientNormalsOff();
+		ObjNormals->AutoOrientNormalsOff();
 		//ObjNormals->FlipNormalsOn();
 		ObjNormals->ConsistencyOff();
 

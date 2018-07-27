@@ -219,13 +219,13 @@ void mqObjectsControlsWidget::constructor()
   connect(yTr, SIGNAL(valueChanged(int)), this, SLOT(slotYtr(int)));
   connect(xTr, SIGNAL(valueChanged(int)), this, SLOT(slotXtr(int)));
 
-  connect(zRot, SIGNAL(sliderPressed()), this, SLOT(slotZrotPressed()));
+  /*connect(zRot, SIGNAL(sliderPressed()), this, SLOT(slotZrotPressed()));
   connect(yRot, SIGNAL(sliderPressed()), this, SLOT(slotYrotPressed()));
   connect(xRot, SIGNAL(sliderPressed()), this, SLOT(slotXrotPressed()));
 
   connect(zTr, SIGNAL(sliderPressed()), this, SLOT(slotZtrPressed()));
   connect(yTr, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
-  connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));
+  connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));*/
   
   connect(this->ui->LassoCutKeepInside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
   connect(this->ui->LassoCutKeepOutside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
