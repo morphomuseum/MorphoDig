@@ -9264,7 +9264,6 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 									(col[0] == r.at(i))
 									&& (col[1] == g.at(i))
 									&& (col[2] == b.at(i))
-									&& (col[3] == a.at(i))
 									)
 								{
 									already = 1;
@@ -9278,7 +9277,7 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 								g.push_back(col[1]);
 								b.push_back(col[2]);
 								a.push_back(col[3]);
-								
+								std::cout << "push rgba:" << ve << "=" << ve << ", r:" << col[0] << ", g:" << col[1] << ", b:" << col[2] << ", a:" << col[3] << std::endl;
 								cdistinct++;
 							}
 						}
@@ -9291,6 +9290,7 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 						//newTagsArray->SetTuple1(j, 0);
 
 					}
+					cout << "We found " << cdistinct << " distinct colors" << endl;
 					// then edit current Tag Map according to the cdistinct color found 
 					ActiveTagMap *tagMap = this->Getmui_ActiveTagMap();
 					int currenttagMapId = this->getActiveTagMapId();
@@ -9313,10 +9313,10 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 					for (int i = 0; i < cdistinct; i++)
 					{
 						
-						rgba[0] = (double)r.at(i) / 255;
-						rgba[1] = (double)g.at(i) / 255;
-						rgba[2] = (double)b.at(i) / 255;
-						rgba[3] = (double)a.at(i) / 255;						
+						rgba[0] = (double)((double)r.at(i)/255);
+						rgba[1] = (double)((double)g.at(i) / 255);
+						rgba[2] = (double)((double)b.at(i) / 255);
+						rgba[3] = (double)((double)a.at(i) / 255);
 						
 						mTagLut->SetTableValue(i+1, rgba[0], rgba[1], rgba[2], rgba[3]);
 						
@@ -9344,9 +9344,9 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 					int tag_id = 0; //ext by default
 					for (int j = 0; j < tagMap->numTags; j++)
 					{
-						if ((col[0] == int(255 * tagMap->TagMap->GetTableValue(j)[0]))
-							&& (col[1] == int(255 * tagMap->TagMap->GetTableValue(j)[1]))
-							&& (col[2] == int(255 * tagMap->TagMap->GetTableValue(j)[2]))
+						if ((col[0] == (unsigned char)(255 * tagMap->TagMap->GetTableValue(j)[0]))
+							&& (col[1] == (unsigned char)(255 * tagMap->TagMap->GetTableValue(j)[1]))
+							&& (col[2] == (unsigned char)(255 * tagMap->TagMap->GetTableValue(j)[2]))
 							)
 						{
 							tag_id = j; break;
