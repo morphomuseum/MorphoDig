@@ -63,6 +63,7 @@
 #include "mqDensifyDialogReaction.h"
 #include "mqFillHolesDialogReaction.h"
 #include "mqTPSDialogReaction.h"
+#include "mqTagFromRGBDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
 #include "mqScalarsThicknessDialogReaction.h"
 #include "mqScalarsComplexityDialogReaction.h"
@@ -314,13 +315,15 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
 	QAction *CreateNewTagArray = submenuTagModification->addAction("Create new empty tag array");
-	QAction *CreateNewTagArrayColor = submenuTagModification->addAction("Create new tag array based on currently displayed colors");
+	new mqTagFromRGBDialogReaction(submenuTagModification->addAction("Create new tag array based on currently displayed colors") << mqSetName("ActrionTagFromRGB"));
+	
 	//là on va faire une fenêtre qui demande 2 choses : 
 	// 1) EXACT color match est-ce qu'on se base sur la tag map actuelle (exact color match) => ce qui implique qu'on puisse y acceder sans avoir d'array tags ouvertes.... ce qui n'est pas un drame, notamment pour éditer les tag maps quand on n'a pas de tags ouverts
 	// 2) si on 
 	//1) on s'arrête à combien de couleurs ?
 	// 
-	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayColor()));
+	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars") << mqSetName("actionSmooth"));
+	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayFromRGB()));
 	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
 	QAction *CreateNewTagArrayConnectivity = submenuTagModification->addAction("Create new tag array based on connectivity");
 	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
