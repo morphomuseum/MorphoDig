@@ -14830,16 +14830,68 @@ void mqMorphoDigCore::slotLandmarkMoveDown()
 
 	this->LandmarksMoveDown();
 }
-void mqMorphoDigCore::slotGroup() { this->groupSelectedActors(); }
+void mqMorphoDigCore::slotGroup() { 
+	
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes < 2) {
+		QMessageBox msgBox;
+		msgBox.setText("At least 2 surfaces must be selected to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->groupSelectedActors(); }
 
-void mqMorphoDigCore::slotLassoCutKeepInside() { this->startLasso(1); }
-void mqMorphoDigCore::slotLassoCutKeepOutside() { this->startLasso(0); }
-void mqMorphoDigCore::slotLassoTagInside() { this->startLasso(3); }
+void mqMorphoDigCore::slotLassoCutKeepInside() { 
+	
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->startLasso(1); }
+void mqMorphoDigCore::slotLassoCutKeepOutside() { 
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->startLasso(0); }
+void mqMorphoDigCore::slotLassoTagInside() { 
+	
+	
+	this->startLasso(3); }
 void mqMorphoDigCore::slotLassoTagOutside() { this->startLasso(2); }
 
-void mqMorphoDigCore::slotConvexHULL() { this->addConvexHull(); }
-void mqMorphoDigCore::slotMirror() { this->addMirrorXZ(); }
+void mqMorphoDigCore::slotConvexHULL() {
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->addConvexHull(); }
+void mqMorphoDigCore::slotMirror() { 
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->addMirrorXZ(); }
 void mqMorphoDigCore::slotInvert() { 
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 		this->addInvert(); 
 
 }
@@ -14914,6 +14966,13 @@ void mqMorphoDigCore::slotScalarsCameraDistance()
 
 
 void mqMorphoDigCore::slotKeepLargest() {
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	this->addKeepLargest();
 }
 
