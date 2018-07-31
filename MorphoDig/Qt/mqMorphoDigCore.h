@@ -362,6 +362,7 @@ public:
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
 	void createTags(QString newTags);
+	void createTagsFromRGB(QString newTags, int exact, int N);
 	void createTagsConnectivity(QString newTags);
 	void RemoveScalar(QString scalarName, int onlySelectedObjects);
 	void GetDisplayToWorld(double x, double y, double z, double worldPt[4]);
@@ -397,7 +398,7 @@ public:
 	QString Getmui_SizeUnit();
 	QString Getmui_DefaultSizeUnit();
 
-	
+
 
 	void Setmui_ShowOrientationHelper(int orientationHelper);
 	int Getmui_DefaultShowOrientationHelper();
@@ -441,11 +442,11 @@ public:
 	void Setmui_Z2Label(QString label);
 	QString Getmui_DefaultZ2Label();
 	QString Getmui_Z2Label();
-	
+
 	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName);
 	void SaveORI(QString fileName);
-	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces =0);
+	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces = 0);
 	int SaveSTVFile(QString fileName, int save_only_selected);
 	int SaveMAPFile(QString fileName, int save_only_active);
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
@@ -454,19 +455,19 @@ public:
 	void OpenMAP(QString fileName);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
-	
+
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
 	void SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName);
 	void SaveActiveScalarSummary(QString fileName);
-	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt=0, int save_norms = 0, vtkMDActor *myActor = NULL);
+	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
 	void DeleteSelectedActors();
 	void OpenFLG(QString fileName);
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
-	
+
 	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);
 	void OpenNTW(QString fileName);
@@ -475,7 +476,7 @@ public:
 	void OpenMesh(QString fileName);
 	void OpenPOS(QString fileName, int mode);
 	void OpenPOSTrans(QString fileName, int mode);
-
+	void GetVertexColor(vtkMDActor *myActor, vtkIdType ve, int color[4]);
 	double* Getmui_MeshColor();
 	void Getmui_MeshColor(double c[4]);
 	double* Getmui_DefaultMeshColor();

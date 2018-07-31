@@ -1379,6 +1379,8 @@ void mqMorphoDigCore::deleteColorMap(int i)
 		}
 	}
 }
+
+
 void mqMorphoDigCore::addTagToTagMap(int i) 
 {
 	ExistingTagMaps *tagMaps = this->Getmui_ExistingTagMaps();
@@ -8324,7 +8326,161 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 }
+void mqMorphoDigCore::GetVertexColor(vtkMDActor *myActor, vtkIdType ve, int color[4])
+{
+	
+	color[0] = 1;
+	color[1] = 0;
+	color[2] = 0;
+	color[3] = 1;
+	if (myActor != NULL)
+	{
+		vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+		{
 
+			vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+			mPD = mymapper->GetInput();
+
+			double numvert = mPD->GetNumberOfPoints();
+
+
+			vtkSmartPointer<vtkUnsignedCharArray> newcolors =
+				vtkSmartPointer<vtkUnsignedCharArray>::New();
+			newcolors->SetNumberOfComponents(4);
+			newcolors->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
+
+			vtkIdType iRGB = 0;
+			int nr, ng, nb, na;
+
+			QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+			QString none = QString("Solid color");
+			QString RGB = QString("RGB");
+
+			// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
+			int RGB_fromglobal = 1;
+			// if current active scalar is not the "none" one, and if the actor as current active scalar.
+			//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+			if (ActiveScalar != none && 	mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
+			{
+				RGB_fromglobal = 0;
+			}
+
+			vtkUnsignedCharArray *currentRGBcolors = vtkUnsignedCharArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
+			vtkFloatArray *currentFScalars = vtkFloatArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
+			vtkDoubleArray *currentDScalars = vtkDoubleArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
+			vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
+
+		
+
+	
+			nr = (unsigned char)(255 * myActor->GetmColor()[0]);
+			ng = (unsigned char)(255 * myActor->GetmColor()[1]);
+			nb = (unsigned char)(255 * myActor->GetmColor()[2]);
+			na = (unsigned char)(255 * myActor->GetmColor()[3]);
+
+			//1st case  : the current actor has not the currently active scalar.
+			if (RGB_fromglobal == 1)
+			{
+				//do nothing here as nr ng nb na have already been correctly instantiated just above
+
+			}
+			else
+			{
+				// 3 cases : 
+				//      A: active scalar = RGB => so we retake RGB... as we have started to do so earlier!
+				if (this->mui_ActiveScalars->DataType == VTK_UNSIGNED_CHAR
+					&&  this->mui_ActiveScalars->NumComp >= 3)
+				{
+					if (currentRGBcolors != NULL)
+					{
+						nr = (unsigned char)(currentRGBcolors->GetTuple(ve)[0]);
+						ng = (unsigned char)(currentRGBcolors->GetTuple(ve)[1]);
+						nb = (unsigned char)(currentRGBcolors->GetTuple(ve)[2]);
+						if (this->mui_ActiveScalars->NumComp == 4)
+						{
+							na = (unsigned char)(currentRGBcolors->GetTuple(ve)[3]);
+						}
+						else
+						{
+							na = 1;
+						}
+					}
+					// else we keep global RGB as instantiated above.
+
+				}
+				else
+				{
+					//      B: active scalar = 1 scalar or tag => we translate scalar or tag as RGB
+					if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
+						this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE ||
+						this->Getmui_ActiveScalars()->DataType == VTK_INT ||
+						this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
+
+
+						)
+						&& this->Getmui_ActiveScalars()->NumComp == 1)
+					{
+
+						double cscalar = 0;
+						if (this->Getmui_ActiveScalars()->DataType == VTK_INT ||
+							this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT)
+						{
+							if (currentTags != NULL)
+							{
+								cscalar = (double)currentTags->GetTuple(ve)[0];
+							}
+
+						}
+						else
+						{
+							if (currentFScalars != NULL)
+							{
+								cscalar = (double)currentFScalars->GetTuple(ve)[0];
+							}
+							if (currentDScalars != NULL)
+							{
+								cscalar = currentDScalars->GetTuple(ve)[0];
+							}
+						}
+
+						// retrieve scalar value
+
+						double cRGB[3];
+						double cOpac = 1;
+						mymapper->GetLookupTable()->GetColor(cscalar, cRGB);
+
+						nr = (unsigned char)(255 * cRGB[0]);
+						ng = (unsigned char)(255 * cRGB[1]);
+						nb = (unsigned char)(255 * cRGB[2]);
+						na = (unsigned char)(255 * mymapper->GetLookupTable()->GetOpacity(cscalar));
+						if (ve<10)
+						{
+							cout << "ve=" << ve << ", cRGB[0]=" << cRGB[0] << endl;
+						}
+
+						// translate it as RGB
+
+
+					}
+					// else we keep global RGB as instantiated above.
+
+				}
+
+
+
+			}
+
+
+			color[0] = nr;
+			color[1] = ng;
+			color[2] = nb;
+			color[3] = na;
+		}
+	}
+	
+
+}
 void mqMorphoDigCore::scalarsRGB(QString newRGB)
 {
 
@@ -8375,151 +8531,14 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 				newcolors->SetNumberOfComponents(4);
 				newcolors->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
 
-				vtkIdType iRGB = 0;
-				int nr, ng, nb, na;
-				
-				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
-				QString none = QString("Solid color");
-				QString RGB = QString("RGB");
-				
-				// we define wheter we have to create RGB from scalars/RGB/tags or from "global" color option.
-				int RGB_fromglobal = 1;
-				// if current active scalar is not the "none" one, and if the actor as current active scalar.
-				//if (ActiveScalar != none && 	mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
-				if (ActiveScalar != none && 	mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()) != NULL)
-				{
-					RGB_fromglobal = 0;
-				}
-
-				//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
-				//colors->SetNumberOfComponents(4);
-				//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars("RGB");
-				//vtkFloatArray *currentFScalars = (vtkFloatArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-				//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mergedObjects->GetOutput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-				/*vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-				vtkFloatArray *currentFScalars = (vtkFloatArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-				vtkDoubleArray *currentDScalars = (vtkDoubleArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
-				vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());*/
-				vtkUnsignedCharArray *currentRGBcolors = vtkUnsignedCharArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
-				vtkFloatArray *currentFScalars = vtkFloatArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
-				vtkDoubleArray *currentDScalars = vtkDoubleArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
-				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
-
-				//@@@
-
-
-					// on cherche la scalar active pour ce maillage
 					
 					for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
-					{
-						//Fill nr ng nb with at least something... 
-						nr = (unsigned char)(255 * myActor->GetmColor()[0]);
-						ng = (unsigned char)(255 * myActor->GetmColor()[1]);
-						nb = (unsigned char)(255 * myActor->GetmColor()[2]);
-						na = (unsigned char)(255 * myActor->GetmColor()[3]);
-
-						//1st case  : the current actor has not the currently active scalar.
-						if (RGB_fromglobal == 1)
-						{
-							//do nothing here as nr ng nb na have already been correctly instantiated just above
-
-						}
-						else
-						{
-							// 3 cases : 
-							//      A: active scalar = RGB => so we retake RGB... as we have started to do so earlier!
-							if(this->mui_ActiveScalars->DataType == VTK_UNSIGNED_CHAR
-								&&  this->mui_ActiveScalars->NumComp >= 3)
-							{
-								if (currentRGBcolors != NULL)
-								{
-									nr = (unsigned char)(currentRGBcolors->GetTuple(j)[0]);
-									ng = (unsigned char)(currentRGBcolors->GetTuple(j)[1]);
-									nb = (unsigned char)(currentRGBcolors->GetTuple(j)[2]);
-									if (this->mui_ActiveScalars->NumComp == 4)
-									{
-										na = (unsigned char)(currentRGBcolors->GetTuple(j)[3]);
-									}
-									else
-									{
-										na = 1;
-									}
-								}
-								// else we keep global RGB as instantiated above.
-
-							}
-							else
-							{
-								//      B: active scalar = 1 scalar or tag => we translate scalar or tag as RGB
-								if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
-									this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE ||
-									this->Getmui_ActiveScalars()->DataType == VTK_INT ||
-									this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
-
-
-									)
-									&& this->Getmui_ActiveScalars()->NumComp == 1)
-								{
-
-									double cscalar = 0;
-									if (this->Getmui_ActiveScalars()->DataType == VTK_INT ||
-										this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT)
-									{
-										if (currentTags != NULL)
-										{
-											cscalar = (double)currentTags->GetTuple(j)[0];
-										}
-										
-									}
-									else
-									{
-										if (currentFScalars != NULL)
-										{
-											cscalar = (double)currentFScalars->GetTuple(j)[0];
-										}
-										if (currentDScalars != NULL)
-										{
-											cscalar = currentDScalars->GetTuple(j)[0];
-										}
-									}
-									
-									// retrieve scalar value
-
-									double cRGB[3];
-									double cOpac = 1;
-									mymapper->GetLookupTable()->GetColor(cscalar, cRGB);
-
-									nr = (unsigned char)(255 * cRGB[0]);
-									ng = (unsigned char)(255 * cRGB[1]);
-									nb = (unsigned char)(255 * cRGB[2]);
-									na = (unsigned char)(255 * mymapper->GetLookupTable()->GetOpacity(cscalar));
-									if (j<10)
-									{
-										cout << "j=" << j << ", cRGB[0]=" << cRGB[0] << endl;
-									}
-
-									// translate it as RGB
-
-
-								}
-								// else we keep global RGB as instantiated above.
-
-							}
-
-
-
-						}
-
-
-
-						newcolors->InsertTuple4(iRGB, nr, ng, nb, na);
-						iRGB++;
-
+					{	
+						int col[4];
+						this->GetVertexColor(myActor, j, col);
+						newcolors->InsertTuple4(j, col[0], col[1], col[2], col[3]);						
 				}
-					
-
-				
-				
+													
 
 
 				newcolors->SetName(mScalarName.c_str());
@@ -9049,6 +9068,309 @@ void mqMorphoDigCore::createTagsConnectivity(QString newTags)
 
 	}
 
+}
+
+/*void CONTAINER_MESH::Convert_RGB_To_Tags(int exact)
+{
+
+		OBJECT_MESH *My_Obj;
+
+		if (this->OBJECTS_ROOT->OBJECTS != NULL)
+		{
+
+		My_Obj = this->OBJECTS_ROOT->OBJECTS;
+
+		while(My_Obj!=NULL)
+		{
+
+		if (My_Obj->selected ==1)
+		{
+		//std::cout<<"Found one object!"<<std::endl;
+		vtkUnsignedCharArray* test = (vtkUnsignedCharArray*)My_Obj->GetPointData()->GetScalars("RGB");
+		if (test !=NULL)
+		{
+		//std::cout<<"Test not null!"<<std::endl;
+		vtkSmartPointer<vtkUnsignedCharArray> colors =
+		vtkSmartPointer<vtkUnsignedCharArray>::New();
+		colors->SetNumberOfComponents(3);
+		colors=(vtkUnsignedCharArray*)My_Obj->GetPointData()->GetScalars("RGB");
+
+		vtkSmartPointer<vtkIntArray> newTags =
+		vtkSmartPointer<vtkIntArray>::New();
+
+		newTags->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+		newTags->SetNumberOfTuples(My_Obj->numvert);
+
+
+		if (exact ==0)
+		{
+		//std::cout<<"Non exact!"<<std::endl;
+
+		// first : build a table of 25 first distinct colours found in RGB scalars.
+		GLfloat rgb_distinct_colors[25][4];
+		for (int i =0;i<25;i++)
+		{
+		rgb_distinct_colors[i][0]=0;
+		rgb_distinct_colors[i][1]=0;
+		rgb_distinct_colors[i][2]=0;
+		rgb_distinct_colors[i][3]=1;
+		}
+		//std::cout<<"RGB list initiated!"<<std::endl;
+
+		int cdistinct=0; //current number of distinct colours found
+
+		for (int i=0;i<My_Obj->numvert;i++)	// for each vertex
+		{
+		if (cdistinct<25)
+		{
+		//std::cout<<"Try to get tuple"<< i<<"!"<<std::endl;
+		int cur_r =colors->GetTuple(i)[0];
+		int cur_g =colors->GetTuple(i)[1];
+		int cur_b =colors->GetTuple(i)[2];
+		//std::cout<<"RGB "<<i<<"="<<cur_r<<","<<cur_g<<","<<cur_b<<std::endl;
+		int already=0;
+		for (int j=0; j<cdistinct;j++)
+		{
+		if ( (cur_r == mround(255*rgb_distinct_colors[j][0]))
+		&&(cur_g == mround(255*rgb_distinct_colors[j][1]))
+		&&(cur_b == mround(255*rgb_distinct_colors[j][2]))
+		)
+		{
+		already=1;
+		}
+
+		}
+		if (already==0)
+		{
+		//std::cout<<"Found "<<i<<"="<<cur_r<<","<<cur_g<<","<<cur_b<<std::endl;
+
+		rgb_distinct_colors[cdistinct][0]= (float)cur_r/255;
+		rgb_distinct_colors[cdistinct][1]= (float)cur_g/255;
+		rgb_distinct_colors[cdistinct][2]= (float)cur_b/255;
+		cdistinct++;
+		}
+
+
+		}
+		else
+		{break;}
+
+
+		}
+		// then edit g_tag_colors[25][4] accordingly
+		for (int i=0;i<cdistinct;i++)
+		{
+		g_tag_colors[i][0]=rgb_distinct_colors[i][0];
+		g_tag_colors[i][1]=rgb_distinct_colors[i][1];
+		g_tag_colors[i][2]=rgb_distinct_colors[i][2];
+		}
+
+		}
+
+		// now we match RGB and Tags
+		for (int i=0;i<My_Obj->numvert;i++)	// for each vertex
+		{
+		int cur_r =colors->GetTuple(i)[0];
+		int cur_g =colors->GetTuple(i)[1];
+		int cur_b =colors->GetTuple(i)[2];
+		int tag_id=0;
+		//std::cout<<"Now match! RGB "<<i<<"="<<cur_r<<","<<cur_g<<","<<cur_b<<std::endl;
+
+		for (int j=0; j<25;j++)
+		{
+		if ( (cur_r == mround(255*g_tag_colors[j][0]))
+		&&(cur_g == mround(255*g_tag_colors[j][1]))
+		&&(cur_b == mround(255*g_tag_colors[j][2])))
+		{
+		tag_id=j;break;
+		}
+
+		}
+		//std::cout<<"vertex"<<i<<", current region:"<<currentRegions->GetTuple(i)[0]<<std::endl;
+		// get Tag id corresponding to actual RGB colour...
+		//newTags->InsertTuple1(i, (int)currentRegions->GetTuple(i)[0]);
+		newTags->InsertTuple1(i, tag_id);
+		}
+		newTags->SetName("Tags");
+		My_Obj->GetPointData()->RemoveArray("Tags");
+		My_Obj->GetPointData()->AddArray(newTags);
+		My_Obj->GetPointData()->SetActiveScalars("Tags");
+		My_Obj->selected=0;
+		My_Obj->view=1;
+		}//if RGB colour scalar exists
+		}//if selected
+
+		My_Obj = My_Obj->nextobj;
+		}//while
+
+
+}
+}*/
+void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
+{
+	if (newTags.length() == 0) { return; }
+	int modified = 0;
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+
+			myActor->SetSelected(0);
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+
+				double numvert = mPD->GetNumberOfPoints();
+
+
+				vtkSmartPointer<vtkIntArray> newTagsArray =
+					vtkSmartPointer<vtkIntArray>::New();
+				newTagsArray->SetNumberOfComponents(1);
+				newTagsArray->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
+
+				if (exact == 0)
+				{
+					std::cout << "Non exact!" << std::endl;
+					// first : build a vector of N first distinct colours found.
+					int cdistinct = 0; //current number of distinct colours found
+					/*GLfloat rgb_distinct_colors[25][4];
+					for (int i = 0; i<25; i++)
+					{
+						rgb_distinct_colors[i][0] = 0;
+						rgb_distinct_colors[i][1] = 0;
+						rgb_distinct_colors[i][2] = 0;
+						rgb_distinct_colors[i][3] = 1;
+					}*/
+					std::vector<int> r;
+					std::vector<int> g;
+					std::vector<int> b;
+					std::vector<int> a;
+					for (vtkIdType ve = 0; ve < mymapper->GetInput()->GetNumberOfPoints(); ve++)
+					{
+						if (cdistinct<N)
+						{
+							int col[4];
+							this->GetVertexColor(myActor, ve, col);
+							int already = 0;
+							for (int i = 0; i < cdistinct; i++)
+							{
+								if (
+									(col[0] == r.at(i))
+									&& (col[1] == g.at(i))
+									&& (col[2] == b.at(i))
+									&& (col[3] == a.at(i))
+									)
+								{
+									already = 1;
+								}
+							}
+							if (already == 0)
+							{
+								//std::cout<<"Found "<<i<<"="<<cur_r<<","<<cur_g<<","<<cur_b<<std::endl;
+
+								r.push_back(col[0]);
+								g.push_back(col[1]);
+								b.push_back(col[2]);
+								a.push_back(col[3]);
+								
+								cdistinct++;
+							}
+						}
+						else
+						{
+							break;
+						}
+						
+						// here we have the color.
+						//newTagsArray->SetTuple1(j, 0);
+
+					}
+					// then edit current Tag Map according to the cdistinct color found 
+					ActiveTagMap *tagMap = this->Getmui_ActiveTagMap();
+					int currenttagMapId = this->getActiveTagMapId();
+					int tagnr = cdistinct+1;
+					vtkSmartPointer<vtkLookupTable> mTagLut = vtkSmartPointer<vtkLookupTable>::New();
+					mTagLut = this->GetTagLut();
+					mTagLut->SetNumberOfTableValues(tagnr);
+					mTagLut->Build();
+					std::vector<std::string> tagNames;
+
+
+					double rgba[4];
+					
+					//0 is special (exterior)
+					this->GetDefaultTagColor(0, rgba);
+					mTagLut->SetTableValue(0, rgba[0], rgba[1], rgba[2], rgba[3]);
+					tagNames.push_back("Exterior");
+					
+					// the cdistinct other colors
+					for (int i = 0; i < cdistinct; i++)
+					{
+						
+						rgba[0] = (double)r.at(i) / 255;
+						rgba[1] = (double)g.at(i) / 255;
+						rgba[2] = (double)b.at(i) / 255;
+						rgba[3] = (double)a.at(i) / 255;						
+						
+						mTagLut->SetTableValue(i+1, rgba[0], rgba[1], rgba[2], rgba[3]);
+						
+						QString TagName = "TagFromRGB" + QString::number(i);
+						tagNames.push_back(TagName.toStdString());
+						
+					}
+					cout << "End i loop" << endl;
+					QString TagMap = QString("TagMap");
+					cout << "Try to set existing color maps!!" << endl;
+
+					this->Getmui_ExistingTagMaps()->Stack.at(currenttagMapId).numTags = tagnr;
+					this->Getmui_ExistingTagMaps()->Stack.at(currenttagMapId).tagNames = tagNames;
+					this->Getmui_ExistingTagMaps()->Stack.at(currenttagMapId).TagMap = mTagLut;
+					this->Setmui_ActiveTagMap(TagMap, tagnr, tagNames, mTagLut);
+					
+				}// end special case exact==0
+
+				 // now we match RGB and Tags of active tag map
+				ActiveTagMap *tagMap = this->Getmui_ActiveTagMap();
+				for (vtkIdType ve = 0; ve < mymapper->GetInput()->GetNumberOfPoints(); ve++)
+				{
+					int col[4];
+					this->GetVertexColor(myActor, ve, col);
+					int tag_id = 0; //ext by default
+					for (int j = 0; j < tagMap->numTags; j++)
+					{
+						if ((col[0] == int(255 * tagMap->TagMap->GetTableValue(j)[0]))
+							&& (col[1] == int(255 * tagMap->TagMap->GetTableValue(j)[1]))
+							&& (col[2] == int(255 * tagMap->TagMap->GetTableValue(j)[2]))
+							)
+						{
+							tag_id = j; break;
+						}
+					}
+					// here we have the color.
+					newTagsArray->SetTuple1(ve, tag_id);
+				}
+			
+				
+				newTagsArray->SetName(newTags.toStdString().c_str());
+				mymapper->GetInput()->GetPointData()->RemoveArray(newTags.toStdString().c_str());
+				mymapper->GetInput()->GetPointData()->AddArray(newTagsArray);
+				mymapper->GetInput()->GetPointData()->SetActiveScalars(newTags.toStdString().c_str());
+				modified = 1;
+			}
+		}
+	}
+	if (modified == 1)
+	{
+		this->Setmui_ActiveScalars(newTags, VTK_INT, 1);
+		this->Initmui_ExistingScalars();
+
+	}
 }
 void mqMorphoDigCore::createTags(QString newTags)
 {
