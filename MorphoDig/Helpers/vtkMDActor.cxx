@@ -756,6 +756,7 @@ void vtkMDActor::PopUndoStack()
 	toSaveArray = NULL;
 	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
 	//savedArray = NULL;
+	int arrayType = 0;
 
 	if (this->UndoRedo->UndoStack.back().arrayName.isEmpty() == false)
 	{ // potentially, we have to replace current scalar.
@@ -766,32 +767,43 @@ void vtkMDActor::PopUndoStack()
 			cout << "Here something we have scalars to save! deep copy array " << this->UndoRedo->UndoStack.back().arrayName.toStdString() << endl;
 			
 			int dataType = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->UndoStack.back().arrayName.toStdString().c_str())->GetDataType();
+			arrayType = this->UndoRedo->UndoStack.back().arrayType;
 
-			if (dataType == VTK_UNSIGNED_CHAR) {
-				savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+			if (arrayType == 2)
+			{
+				if (dataType == VTK_UNSIGNED_CHAR) {
+					savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+				}
 			}
-			else if (dataType == VTK_UNSIGNED_INT) {
-				savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
-			}
-			else if (dataType == VTK_INT) {
-				savedArray = vtkSmartPointer<vtkIntArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//cout << "Array" << i << " contains INTs" << endl; 
-			}
-			else if (dataType == VTK_FLOAT) {
-				savedArray = vtkSmartPointer<vtkFloatArray>::New();
-				savedArray->DeepCopy(toSaveArray);
+			else if (arrayType == 1)
+			{
 
-				//cout << "Array" << i << " contains FLOATs" << endl; 
+				if (dataType == VTK_UNSIGNED_INT) {
+					savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
+				}
+				else if (dataType == VTK_INT) {
+					savedArray = vtkSmartPointer<vtkIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains INTs" << endl; 
+				}
 			}
-			else if (dataType == VTK_DOUBLE) {
-				savedArray = vtkSmartPointer<vtkDoubleArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+			else if (arrayType == 0)
+				{
+				 if (dataType == VTK_FLOAT) {
+					savedArray = vtkSmartPointer<vtkFloatArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+
+					//cout << "Array" << i << " contains FLOATs" << endl; 
+				}
+				else if (dataType == VTK_DOUBLE) {
+					savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+				}
 			}
 			else
 			{
@@ -859,7 +871,8 @@ void vtkMDActor::PopUndoStack()
 	this->Name = this->UndoRedo->UndoStack.back().Name;
 	//cout << "Undo name: " << this->UndoRedo->UndoStack.back().Name;
 	cout << "PopUndoStack Set Selected: " << mCurrentSelected << endl;
-	this->UndoRedo->RedoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name, this->UndoRedo->UndoStack.back().arrayName, savedArray));
+	std::cout << "PopUndoStack: " << endl << arrayType << std::endl;
+	this->UndoRedo->RedoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name, this->UndoRedo->UndoStack.back().arrayName, savedArray, arrayType));
 	this->UndoRedo->UndoStack.pop_back();
 	this->Modified();
 }
@@ -879,17 +892,62 @@ void vtkMDActor::PopRedoStack()
 	vtkDataArray *toSaveArray;
 	toSaveArray = NULL;
 	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
-	
+	int arrayType = 0;
 
 	if (this->UndoRedo->RedoStack.back().arrayName.isEmpty() == false)
 	{ // potentially, we have to replace current scalar.
 		toSaveArray = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->RedoStack.back().arrayName.toStdString().c_str());;
-
+		
 		if (toSaveArray != NULL)
 		{
-			savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+			/*savedArray = vtkSmartPointer<vtkDoubleArray>::New();
 			savedArray->DeepCopy(toSaveArray);
-			cout << "POPREDO: deep copy array" << this->UndoRedo->RedoStack.back().arrayName.toStdString() << endl;
+			cout << "POPREDO: deep copy array" << this->UndoRedo->RedoStack.back().arrayName.toStdString() << endl;*/
+			arrayType = this->UndoRedo->RedoStack.back().arrayType;
+			int dataType = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->RedoStack.back().arrayName.toStdString().c_str())->GetDataType();
+
+			if (arrayType == 2)
+			{
+				if (dataType == VTK_UNSIGNED_CHAR) {
+					savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+				}
+			}
+			else if (arrayType == 1)
+			{
+
+				if (dataType == VTK_UNSIGNED_INT) {
+					savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
+				}
+				else if (dataType == VTK_INT) {
+					savedArray = vtkSmartPointer<vtkIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains INTs" << endl; 
+				}
+			}
+			else if (arrayType == 0)
+			{
+				if (dataType == VTK_FLOAT) {
+					savedArray = vtkSmartPointer<vtkFloatArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+
+					//cout << "Array" << i << " contains FLOATs" << endl; 
+				}
+				else if (dataType == VTK_DOUBLE) {
+					savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+				}
+			}
+			else
+			{
+				//savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				//savedArray->DeepCopy(toSaveArray);
+			}
+
 		}
 
 		toRestoreArray = this->UndoRedo->RedoStack.back().sauvArray;
@@ -931,10 +989,9 @@ void vtkMDActor::PopRedoStack()
 	this->mColor[3] = this->UndoRedo->RedoStack.back().Color[3];
 	this->SetSelected(this->UndoRedo->RedoStack.back().Selected);
 	cout << "PopRedoStack Set Selected: " << mCurrentSelected << endl;
-	this->Name = this->UndoRedo->RedoStack.back().Name;
-
-
-	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name, this->UndoRedo->RedoStack.back().arrayName, savedArray));
+	this->Name = this->UndoRedo->RedoStack.back().Name;	
+	std::cout << "PopRedoStack: " << endl << arrayType << std::endl;
+	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name, this->UndoRedo->RedoStack.back().arrayName, savedArray, arrayType));
 	this->UndoRedo->RedoStack.pop_back();
 	this->Modified();
 }
@@ -943,6 +1000,7 @@ void vtkMDActor::SaveState(int mCount, QString arrayToSave, int arrayType)
 {
 	//arrayType: 0 "scalar"
 	// 1 : "tag"
+	// 2 : "rgb"
 	//cout << "myActor Save Position: redostack clear." << endl;
 	this->UndoRedo->RedoStack.clear();
 
@@ -982,11 +1040,17 @@ void vtkMDActor::SaveState(int mCount, QString arrayToSave, int arrayType)
 				savedArray->DeepCopy(myArray);
 				cout << "Have deep copied " << arrayToSave.toStdString() << "array" << endl;
 			}
-			else // tag
+			else 	if (arrayType == 1)// tag
 			{ 
 				savedArray = vtkSmartPointer<vtkIntArray>::New();
 				savedArray->DeepCopy(myArray);
 				cout << "Have deep copied tag " << arrayToSave.toStdString() << "array" << endl;
+			}
+			else if (arrayType == 2) //RGB
+			{
+				savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+				savedArray->DeepCopy(myArray);
+				cout << "Have deep copied RGB " << arrayToSave.toStdString() << "array" << endl;
 			}
 		}
 		
@@ -996,8 +1060,9 @@ void vtkMDActor::SaveState(int mCount, QString arrayToSave, int arrayType)
 	}
 
 
-	//std::cout << "Saved Matrix Copy: " << endl << *SavedMat << std::endl;
-	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myColor, mSelected, mCount, name, arrayToSave, savedArray));
+	std::cout << "Save state: " << endl << arrayType << std::endl;
+	
+	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myColor, mSelected, mCount, name, arrayToSave, savedArray, arrayType));
 
 }
 //----------------------------------------------------------------------------

@@ -31,11 +31,12 @@ public:
 		vtkSmartPointer<vtkMatrix4x4> Matrix;
 		vtkSmartPointer<vtkDataArray> sauvArray;
 		QString arrayName;
+		int arrayType;// 0 double 1 int(tag) 2 char (RGB/RGBA)
 		double Color[4];
 		int Selected;
 		int UndoCount;
 		std::string Name;
-		Element(vtkSmartPointer<vtkMatrix4x4> m, double c[4], int selected, int Count, std::string name, QString marrayName, vtkSmartPointer<vtkDataArray> marray)
+		Element(vtkSmartPointer<vtkMatrix4x4> m, double c[4], int selected, int Count, std::string name, QString marrayName, vtkSmartPointer<vtkDataArray> marray, int mArrayType=0)
 		{
 			this->Matrix =m;
 			this->UndoCount = Count;
@@ -47,6 +48,7 @@ public:
 			this->Name = name;
 			this->sauvArray = marray;
 			this->arrayName = marrayName;
+			this->arrayType = mArrayType;
 		}
 	};
 	typedef std::vector<Element> VectorOfElements;

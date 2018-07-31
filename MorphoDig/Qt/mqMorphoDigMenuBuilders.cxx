@@ -321,6 +321,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	//1) on s'arrête à combien de couleurs ?
 	// 
 	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayColor()));
+	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
 	QAction *CreateNewTagArrayConnectivity = submenuTagModification->addAction("Create new tag array based on connectivity");
 	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
 	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");

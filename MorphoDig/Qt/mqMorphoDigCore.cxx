@@ -14862,6 +14862,7 @@ void mqMorphoDigCore::slotCreateTagArray()
 	{
 		cout << "Tag array chosen name:" << newTags.toStdString() << endl;
 		this->createTags(newTags);
+		this->Render();
 	}
 	else
 	{
