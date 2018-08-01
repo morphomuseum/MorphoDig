@@ -483,7 +483,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 		if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 		{
 			QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
-			vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+			vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
 			//4 if current tags exist, retrieve what tool is active
 			if (currentTags != NULL)
 			{
@@ -9370,6 +9370,54 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 		this->Setmui_ActiveScalars(newTags, VTK_INT, 1);
 		this->Initmui_ExistingScalars();
 
+	}
+}
+void mqMorphoDigCore::MergeTags(int tagSource, int tagTarget)
+{
+	if (tagSource != tagTarget)
+	{
+		int modified = 0;
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+				mPD = mymapper->GetInput();
+				double numvert = mPD->GetNumberOfPoints();
+				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
+				//4 if current tags exist, retrieve what tool is active
+				if (currentTags != NULL)
+				{
+					std::string action = "Merge tags";
+					action.append(myActor->GetName().c_str());
+					int Count = BEGIN_UNDO_SET(action);
+					std::string mScalarName = ActiveScalar.toStdString();
+					myActor->SaveState(Count, QString(mScalarName.c_str()), 1);
+					for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+					{
+						if (currentTags->GetTuple1(j) == tagSource)
+						{
+							currentTags->SetTuple1(j, tagTarget);
+							modified = 1;
+						}
+					}
+					currentTags->Modified();
+					END_UNDO_SET();
+				}
+			}
+		}
+		if (modified == 1)
+		{
+			
+			//this->Setmui_ActiveScalars(newTags, VTK_INT, 1);
+			//this->Initmui_ExistingScalars();
+			this->Render();
+		}
 	}
 }
 void mqMorphoDigCore::createTags(QString newTags)

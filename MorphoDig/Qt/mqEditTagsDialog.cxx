@@ -18,6 +18,7 @@
 #include "mqColorOpacityEditorWidget.h"
 #include "mqTransferFunctionWidget.h"
 #include "mqSaveTAGMAPDialogReaction.h"
+#include "mqMergeTagsDialogReaction.h"
 #include "mqMinimalWidget.h"
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
@@ -120,6 +121,19 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
 	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
 	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoTagInside()));
+	connect (this->Ui->erase, SIGNAL(pressed()), this, SLOT(slotEraseActiveTag()));
+	
+	QAction* mergeAction = new QAction(tr("&Merge"), this);
+	mergeAction->setToolTip(tr("Merge 2 tags"));
+	this->Ui->merge->addAction(mergeAction);
+	this->Ui->merge->setDefaultAction(mergeAction);
+	QIcon icon;
+	icon.addFile(QStringLiteral(":/Icons/merge.png"), QSize(), QIcon::Normal, QIcon::Off);
+	mergeAction->setIcon(icon);
+	//TOTO : create an export tag map...
+	new mqMergeTagsDialogReaction(mergeAction);
+
+
 
 	this->Ui->reinitializeTagMap->setDisabled(false);
 	this->Ui->editTagMap->setDisabled(true);
@@ -128,9 +142,9 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	exportAction->setToolTip(tr("Export Tag Map"));
 	this->Ui->exportTagMap->addAction(exportAction);
 	this->Ui->exportTagMap->setDefaultAction(exportAction);
-	QIcon icon;
-	icon.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
-	exportAction->setIcon(icon);
+	QIcon icon2;
+	icon2.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	exportAction->setIcon(icon2);
 	//TOTO : create an export tag map...
 	new mqSaveTAGMAPDialogReaction(exportAction);
 	connect(this->Ui->reinitializeTagMap, SIGNAL(pressed()), this, SLOT(slotReinitializeTagMap()));
@@ -182,7 +196,13 @@ void mqEditTagsDialog::closeEvent(QCloseEvent *event)
 	event->accept();
 }
 
-//fonctionne sur la modification du nom. // problème : quand on remplit le tableau, ça appelle aussi la fonction
+
+void mqEditTagsDialog::slotEraseActiveTag()
+{
+	
+	mqMorphoDigCore::instance()->MergeTags(this->activeTag, 0);
+}
+
 void mqEditTagsDialog::slotCellChanged(int row, int column)
 {
 	//usually: works

@@ -76,6 +76,7 @@ public:
   virtual void slotPencilSearchSizeChanged(int newSize);
   virtual void slotBucketOn();
   virtual void slotPencilOn();
+  virtual void slotEraseActiveTag();
   //virtual void slotDeactivateTagMode();
   virtual void slotCellChanged(int row, int column);
 /*  virtual void slotCellActivated(int row, int column);  

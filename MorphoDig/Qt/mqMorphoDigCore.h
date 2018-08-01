@@ -467,7 +467,7 @@ public:
 	void OpenFLG(QString fileName);
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
-
+	void MergeTags(int tagSource, int tagTarget);
 	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);
 	void OpenNTW(QString fileName);

@@ -716,7 +716,7 @@
    <widget class="QToolButton" name="removeTag">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>170</x>
       <y>670</y>
       <width>41</width>
       <height>21</height>
@@ -826,6 +826,46 @@
     </property>
     <property name="maximum">
      <number>500</number>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="erase">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>670</y>
+      <width>25</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>reset active tag (merge with tag 0)</string>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/erase.png</normaloff>:/Icons/erase.png</iconset>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="merge">
+    <property name="geometry">
+     <rect>
+      <x>234</x>
+      <y>670</y>
+      <width>25</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>merge 2 tags</string>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/merge.png</normaloff>:/Icons/merge.png</iconset>
     </property>
    </widget>
   </widget>

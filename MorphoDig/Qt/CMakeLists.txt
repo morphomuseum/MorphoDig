@@ -235,6 +235,10 @@ mqTagFromRGBDialog.cxx
 mqTagFromRGBDialog.h
 mqTagFromRGBDialogReaction.cxx
 mqTagFromRGBDialogReaction.h
+mqMergeTagsDialog.cxx
+mqMergeTagsDialog.h
+mqMergeTagsDialogReaction.cxx
+mqMergeTagsDialogReaction.h
 )
 
 set (Qt_MOC_HDRS
@@ -292,6 +296,7 @@ mqColorOpacityEditorWidget.ui
 mqSaveMAPDialog.ui
 mqSaveTAGMAPDialog.ui
 mqTagFromRGBDialog.ui
+mqMergeTagsDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

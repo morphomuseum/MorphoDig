@@ -23,6 +23,8 @@
 <file>ScalarBar24.png</file>
    <file>ResetRange32.png</file>
    <file>points.png</file>
+   <file>erase.png</file>
+   <file>merge.png</file>
    <file>point_normals.png</file>
    <file>cell_normals.png</file>
    <file>wireframe.png</file>
