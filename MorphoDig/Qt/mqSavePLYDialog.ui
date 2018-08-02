@@ -994,7 +994,7 @@
       <item>
        <widget class="QRadioButton" name="SaveNormalsOn">
         <property name="text">
-         <string>Save Normals</string>
+         <string>Save normals</string>
         </property>
        </widget>
       </item>

@@ -630,10 +630,10 @@ public:
   void addKeepLargest();// create for each selected surface an object which keeps only the largest "independent" region of the corresponding object.
   vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
-  void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit);
+  void scalarsThickness(double max_thickness, int smooth_normals, int avg, QString scalarName, double angularLimit);
   void scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode);
   void scalarsCurvature(int curvatureType, QString scalarName);
-  void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
+  void scalarsThicknessBetween(double max_thickness, int smooth_normals, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
   void scalarsDistance(double maxDist, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor);
   void ICP(int transformationMode, int iterationNumber, vtkMDActor *impactedActor, vtkMDActor* observedActor);
   vtkMDActor * getFirstActorFromName(QString actorName);

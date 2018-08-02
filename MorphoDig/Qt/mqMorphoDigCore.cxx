@@ -109,7 +109,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 {
 
 	mqMorphoDigCore::Instance = this;
-	this->mui_DisplayMode = 1; // point normales by defaults
+	this->mui_DisplayMode = 1; // point normals by defaults
 	this->mui_TagModeActivated = 1;
 	this->mui_TagTool = 0; //pencil by defaults
 	this->qvtkWidget = NULL;
@@ -9797,7 +9797,7 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 	}
 
 }
-void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
+void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normals, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
 {
 	cout << "Call scalarsThicknessBetween" << endl;
 	if (impactedActor != NULL && observedActor != NULL)
@@ -9943,7 +9943,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					}
 					vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
 					//ptn will be the average norm of all connected vertices.
-					if (smooth_normales)
+					if (smooth_normals)
 					{
 						connectedVertices = GetConnectedVertices(mImpactedPD, ptn, picked_value, ve, -1, 1); //	int tool_mode=-1; //no pencil! no magic wand!
 					}
@@ -10203,7 +10203,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 
 	return NULL;
 }
-void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit )
+void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normals, int avg, QString scalarName, double angularLimit )
 {
 	cout << "thickness scalars start " << endl;
 	std::string mScalarName = "Thickness";
@@ -10224,7 +10224,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normales
 			myActor->SetSelected(0);
 			// here we can call : 
 			cout << "thickness scalars between called " << endl;
-			this->scalarsThicknessBetween( max_thickness,  smooth_normales,  avg,  scalarName,  myActor, myActor, angularLimit);
+			this->scalarsThicknessBetween( max_thickness,  smooth_normals,  avg,  scalarName,  myActor, myActor, angularLimit);
 			modified = 1;
 
 		}
@@ -11172,7 +11172,7 @@ void mqMorphoDigCore::addInvert()
 				
 				myData = mfilter->GetOutput();
 				
-				// dirty hack because vtkReverseSense crashes when trying to reverse normales....
+				// dirty hack because vtkReverseSense crashes when trying to reverse normals....
 				vtkSmartPointer<vtkFloatArray> normalsArray =
 					vtkSmartPointer<vtkFloatArray>::New();
 
@@ -11626,7 +11626,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 						ObjNormals->ComputeCellNormalsOn();
 						ObjNormals->AutoOrientNormalsOff();
 						ObjNormals->ConsistencyOff();
-						cout << "update normales " << endl;
+						cout << "update normals " << endl;
 						ObjNormals->Update();
 						mergedObjects->AddInputData(ObjNormals->GetOutput());
 				}
@@ -12169,7 +12169,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	//mode 1: reorient
 
 	//strategy
-	//1) create a merged object of all opened objects... I guess normales should be reoriented!
+	//1) create a merged object of all opened objects... I guess normals should be reoriented!
 	//2) create a kdtree on the merged object
 	//3) call "loop" function foar each landmark list, passing the Kdtree as an argument: find closest vertex 
 
@@ -12282,7 +12282,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	}
 	else
 	{
-		action = "Reorient landmarks according to closest point's normale";
+		action = "Reorient landmarks according to closest point's normal";
 	}
 
 	cout << "Begin undo set" << endl;
