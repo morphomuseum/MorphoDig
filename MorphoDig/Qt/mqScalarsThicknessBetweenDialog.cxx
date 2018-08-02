@@ -62,7 +62,7 @@ mqScalarsThicknessBetweenDialog::mqScalarsThicknessBetweenDialog(QWidget* Parent
 	this->Ui->thickness->setSingleStep(1);
 	this->Ui->thickness->setValue(2);
 	this->Ui->progressBar->setVisible(false);
-	this->Ui->smoothNormales->setChecked(true);
+	this->Ui->smoothNormals->setChecked(true);
 	
 	this->Ui->avg->setMinimum(1);
 	this->Ui->avg->setValue(5);
@@ -139,7 +139,7 @@ void mqScalarsThicknessBetweenDialog::editThickness()
 		if (this->observedActor != NULL && this->impactedActor != NULL)
 		{
 		//	cout << "Call mphodigcore between function" << endl;
-			mqMorphoDigCore::instance()->scalarsThicknessBetween(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->impactedActor, this->observedActor, this->Ui->angularLimit->value(), this->Ui->invertObservedNormales->isChecked());// to update thickness
+			mqMorphoDigCore::instance()->scalarsThicknessBetween(this->Ui->thickness->value(), this->Ui->smoothNormals->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->impactedActor, this->observedActor, this->Ui->angularLimit->value(), this->Ui->invertObservedNormals->isChecked());// to update thickness
 		}
 		
 	}
