@@ -13477,11 +13477,13 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 			this->FlagLandmarkCollection->InitTraversal();
 			for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
 			{
+				//cout << "modify flag " << i << endl;
 				vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->FlagLandmarkCollection->GetNextActor());
 				if (myActor->GetSelected() == 1)
 				{
 					myActor->ApplyMatrix(Mat);;
 					myActor->SetSelected(0);
+					//cout << "modify flag " << i << "done"<< endl;
 				}
 			}
 		}

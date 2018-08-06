@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>318</width>
-    <height>502</height>
+    <height>393</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,7 +432,7 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>460</y>
+     <y>360</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -456,7 +456,7 @@
      <x>20</x>
      <y>20</y>
      <width>281</width>
-     <height>421</height>
+     <height>321</height>
     </rect>
    </property>
    <property name="palette">
@@ -959,13 +959,13 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>290</y>
+      <y>180</y>
       <width>251</width>
       <height>121</height>
      </rect>
     </property>
     <property name="title">
-     <string>Scalars and tag arrays to be saved:</string>
+     <string>Scalar, tag and RGB arrays to be saved:</string>
     </property>
     <widget class="QListWidget" name="scalarList">
      <property name="geometry">
@@ -976,55 +976,6 @@
        <height>81</height>
       </rect>
      </property>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="VTKColor">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>180</y>
-      <width>251</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Colors:</string>
-    </property>
-    <widget class="QWidget" name="verticalLayoutWidget_9">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>229</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout1_5">
-      <item>
-       <widget class="QRadioButton" name="RGBkeep">
-        <property name="text">
-         <string>Keep current RGB color (if exists)</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="RGBremove">
-        <property name="text">
-         <string>Remove RGB color (if exists)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="RGBreplace">
-        <property name="text">
-         <string>Save/Replace RGB as current display color</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </widget>
   </widget>

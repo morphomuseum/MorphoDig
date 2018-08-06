@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Export curves  as Landmark file</string>
+   <string>Export Curves as Landmark file</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -551,11 +551,6 @@
     </layout>
    </widget>
   </widget>
-  <zorder>layoutWidget</zorder>
-  <zorder>CURToBeSaved_2</zorder>
-  <zorder>buttonBox</zorder>
-  <zorder>groupBox</zorder>
-  <zorder>NORTARToBeSaved</zorder>
  </widget>
  <resources/>
  <connections>

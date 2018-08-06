@@ -39,7 +39,6 @@ public:
    void OpenCUR();
    void OpenSTV();
    void OpenMAP();
-   void OpenTAG();
    void OpenTAGMAP();
    void OpenORI();
    
@@ -85,7 +84,7 @@ protected:
 	}	
 	else if (this->Mode == 9)
 	{
-		this->OpenTAG();
+		this->OpenTAGMAP();
 	}
 	else if (this->Mode == 8)
 	{
@@ -123,10 +122,7 @@ protected:
 	{
 		this->OpenMAP();
 	}
-	else if (this->Mode == 18)
-	{
-		this->OpenTAGMAP();
-	}
+	
   }
 
 private:
