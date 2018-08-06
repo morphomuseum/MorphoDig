@@ -155,8 +155,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (MAP)") << mqSetName("actionOpenMAP"), 17);
   new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (MAP)") << mqSetName("actionSaveMAP"));
   
-  new mqOpenDataReaction(submenuTags->addAction("Import tag maps (.TGM, .TAG)") << mqSetName("actionOpenTAGMAP"), 9);
-  new mqSaveTAGMAPDialogReaction(submenuTags->addAction("Export tag maps (.TGM or .TAG)") << mqSetName("actionSaveTAGMAP"));
+  new mqOpenDataReaction(submenuTags->addAction("Import tag maps (.TGP, .TAG)") << mqSetName("actionOpenTAGMAP"), 9);
+  new mqSaveTAGMAPDialogReaction(submenuTags->addAction("Export tag maps (.TGP or .TAG)") << mqSetName("actionSaveTAGMAP"));
   
 
 
