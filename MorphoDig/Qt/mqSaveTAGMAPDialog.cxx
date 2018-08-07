@@ -79,19 +79,24 @@ void mqSaveTAGMAPDialog::slotSaveTAGMAPFile()
 	
 	QString fileName;
 	QString proposedName = "custom_tag_maps";
+	QString extensions = "TAG MAP file (*.tgp)";
+
 	if (this->Ui->SaveAll->isChecked())
 	{
 		proposedName = "all_tag_maps";
+		
 	}
 	if (this->Ui->SaveActive->isChecked())
 	{
 		proposedName = mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->Name;
+		extensions = "TAG MAP file (*.tag *.tgp)";
 	}
 	proposedName += QDir::separator();
-
+	
+	
 		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-			tr("Save TAG MAP files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
-			tr("TAG MAP file (*.tag, *.tgp)"), NULL
+			tr("Export TAG MAP(s)"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
+			tr(extensions.toStdString().c_str()), NULL
 			//, QFileDialog::DontConfirmOverwrite
 			);
 	

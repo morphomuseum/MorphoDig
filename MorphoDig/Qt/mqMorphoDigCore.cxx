@@ -5037,7 +5037,10 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 			file.close();
 			for (int i = 0; i < size; i++)
 			{
-				this->SaveTAGMAP(fileName,i, mode);
+				if (mode == 0 || i == 0) // just in case the user decided to save all with a .TAG extension, then just save the first one
+				{
+					this->SaveTAGMAP(fileName, i, mode);
+				}
 			}
 		}
 		else // save all customs
@@ -5058,11 +5061,17 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 				stream << "nr: " << sizec << endl;
 			}
 			file.close();
+			int ic = 0;
 			for (int i = 0; i < size; i++)
 			{
 				if (tagMaps->Stack.at(i).isCustom == 1)
 				{
-					this->SaveTAGMAP(fileName, i, mode);
+
+					if (mode == 0 || ic == 0) // just in case the user decided to save all custom tag maps with a .TAG extension, then just save the first custom one
+					{
+						this->SaveTAGMAP(fileName, i, mode);
+					}
+					ic++;
 				}
 			}
 		}
