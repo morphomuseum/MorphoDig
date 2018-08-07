@@ -6033,7 +6033,7 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 		
 		if (mode == 1)
 		{
-			stream << "Surface_name	Area Volume" << endl; 
+			stream << "Surface_name	Area	Volume	Triangle_nr	Vertex_nr" << endl; 
 		}
 		else
 		if (mode == 2)
@@ -6072,7 +6072,7 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 						{
 							
 							//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
-							stream << myActor->GetName().c_str() << "	"  << surface_area << "	" << volume << endl;
+							stream << myActor->GetName().c_str() << "	"  << surface_area << "	" << volume << "	" << mapper->GetInput()->GetNumberOfCells()<< "	"<< mapper->GetInput()->GetNumberOfPoints() << endl;
 						}
 						else if (mode == 2)
 						{
