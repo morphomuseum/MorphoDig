@@ -10228,7 +10228,7 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normals,
 	{
 		cout << "scalarsThickness:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		if (myActor->GetSelected() == 1)
+		if (myActor!=NULL && myActor->GetSelected() == 1)
 		{
 			myActor->SetSelected(0);
 			// here we can call : 
