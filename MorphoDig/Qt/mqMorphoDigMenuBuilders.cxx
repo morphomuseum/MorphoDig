@@ -134,11 +134,13 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   QMenu* submenuFlags = menu.addMenu("Flags");
   new mqOpenDataReaction(submenuFlags->addAction("Open Flag") << mqSetName("actionOpenFLG"), 6);
   new mqSaveFlagsDialogReaction(submenuFlags->addAction("SaveFlags") << mqSetName("actionSaveFLG"));
+  QMenu* submenuColorMaps = menu.addMenu("Color maps");
   QMenu* submenuTags = menu.addMenu("Tag maps");
+
   //QMenu* submenuFileInfos = menu.addMenu("Save infos (surface, area, volume)");
   QMenu* submenuOrientationLabels = menu.addMenu("Orientation helper labels");
   QMenu* submenuMeasurements = menu.addMenu("Measurements");
-  QMenu* submenuColorMaps = menu.addMenu("Color maps");
+  
   
 
   new mqOpenDataReaction(submenuProject->addAction("Open Project") << mqSetName("actionOpenNTW"), 1);
@@ -149,29 +151,29 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveVTKDialogReaction(submenuSurface->addAction("Save selected surfaces in one single VTK PolyData (.VTK or .VTP) file") << mqSetName("actionSaveVTP"));
   new mqSaveSTLDialogReaction(submenuSurface->addAction("Save selected surfaces in one single .STL file") << mqSetName("actionSaveSTL"));
     
-  new mqOpenDataReaction(submenuLandmark->addAction("Open MorphoDig Landmark/Curve file (STV)") << mqSetName("actionOpenSTV"), 16);
+  new mqOpenDataReaction(submenuLandmark->addAction("Open MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionOpenSTV"), 16);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Landmarks") << mqSetName("actionOpenNormalLMK"), 3);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Target Landmarks") << mqSetName("actionOpenNormalLMK"), 4);
-  new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (MAP)") << mqSetName("actionOpenMAP"), 17);
-  new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (MAP)") << mqSetName("actionSaveMAP"));
+  new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (.MAP)") << mqSetName("actionOpenMAP"), 17);
+  new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (.MAP)") << mqSetName("actionSaveMAP"));
   
   new mqOpenDataReaction(submenuTags->addAction("Import tag maps (.TGP or .TAG)") << mqSetName("actionOpenTAGMAP"), 9);
   new mqSaveTAGMAPDialogReaction(submenuTags->addAction("Export tag maps (.TGP or .TAG)") << mqSetName("actionSaveTAGMAP"));
   
 
 
-  new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (STV)") << mqSetName("actionSaveSTV"));
+  new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionSaveSTV"));
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks") << mqSetName("actionSaveNormalLMK"), 0);
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Target Landmarks") << mqSetName("actionSaveTargetLMK"), 1);
   
   
   
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve (.CUR)") << mqSetName("actionOpenCUR"), 5);
-  new mqOpenDataReaction(submenuCurves->addAction("Open MorphoDig Landmark/Curve file (STV)") << mqSetName("actionOpenSTV2"), 16);
+  new mqOpenDataReaction(submenuCurves->addAction("Open MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionOpenSTV2"), 16);
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve Node Landmarks") << mqSetName("actionOpenNodeLMK"), 14);
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve Handle Landmarks") << mqSetName("actionOpenHandleLMK"), 15);
   new mqSaveCURDialogReaction(submenuCurves->addAction("Save .CUR File ") << mqSetName("actionSaveCURLMK"));
-  new mqSaveSTVDialogReaction(submenuCurves->addAction("Save MorphoDig Landmark/Curve file (STV)") << mqSetName("actionSaveSTV2"));
+  new mqSaveSTVDialogReaction(submenuCurves->addAction("Save MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionSaveSTV2"));
   new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Node Landmarks") << mqSetName("actionSaveNodeLMK"), 2);
   new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Handle Landmarks") << mqSetName("actionSaveHandleLMK"), 3);
   new mqSaveCURasVERDialogReaction(submenuCurves->addAction("Export curve segments as landmark file") << mqSetName("actionExportCUR"));

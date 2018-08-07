@@ -202,6 +202,12 @@ void mqSaveDataReaction::SaveSelectedSurfaceScalars()
 void mqSaveDataReaction::SaveActiveScalarSummary()
 {
 	int numsel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (numsel == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	if (numsel>0&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1 &&
 
 		(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT
@@ -256,6 +262,15 @@ void mqSaveDataReaction::SaveShapeMeasures(int mode)
 	//mode: 1: area and volume 
 	//mode: 2: normalized shape index area and volume	
 	//mode: 3: convex hull area_ratio and ch_normalized_shape_index, area, volume, ch_area, ch_volume
+
+	vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+
 	QString myText;
 	if (mode == 1)
 	{
@@ -302,7 +317,13 @@ void mqSaveDataReaction::SaveShapeMeasures(int mode)
 }
 void mqSaveDataReaction::SaveMeshSize()
 {
-	
+	vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	QString myText;
 	
 		cout << "Save  mesh size " << endl;
