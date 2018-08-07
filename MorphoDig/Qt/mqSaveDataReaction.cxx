@@ -272,26 +272,30 @@ void mqSaveDataReaction::SaveShapeMeasures(int mode)
 	}
 
 	QString myText;
+	QString myFileProposition;
 	if (mode == 1)
 	{
-		cout << "Save normalized shape index" << endl;
-		myText = tr("Save normalized shape index");
+		cout << "Save area and volume" << endl;
+		myText = tr("Save area and volume");
+		myFileProposition = tr("Area_and_Volume.txt");
 	}
 	else if (mode == 2)
 	{
-		cout << "Save mean readius normalized shape index" << endl;
-		myText = tr("Save mean readius normalized shape index");
+		cout << "Save normalized shape index" << endl;
+		myText = tr("Save normalized shape index");
+		myFileProposition = tr("Normalized_shape_index.txt");
 	}
 	else 
 	{
-		cout << "Save convex hull normalized shape index" << endl;
-		myText = tr("Save convex hull normalized shape index ");
+		cout << "Save convex hull area ratio and convex hull normalized shape index" << endl;
+		myText = tr("Save convex hull area ratio and convex hull normalized shape index");
+		myFileProposition = tr("CH_are_ratio_CH_Normalized_shape_index.txt");
 	}
 
 
 
 	QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
-		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + myFileProposition,
 		tr("text file (*.txt)"));
 
 	cout << fileName.toStdString() << endl;;
@@ -326,14 +330,14 @@ void mqSaveDataReaction::SaveMeshSize()
 	}
 	QString myText;
 	
-		cout << "Save  mesh size " << endl;
-		myText = tr("Save mesh size");
+		cout << "Save  mesh size measurements" << endl;
+		myText = tr("Save mesh size measurements");
 	
 
-
+		QString myFileProposition = tr("Size_measurements.txt");
 
 	QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
-		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir()+ QDir::separator() + myFileProposition,
 		tr("text file (*.txt)"));
 
 	cout << fileName.toStdString() << endl;;

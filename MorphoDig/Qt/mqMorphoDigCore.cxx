@@ -6030,6 +6030,7 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
 		QTextStream stream(&file);
+		
 		if (mode == 1)
 		{
 			stream << "Surface_name	Area Volume" << endl; 
