@@ -10665,62 +10665,66 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 	//mode = 2: smooth within local sphere of radius defined by the user
 
 	// cut = 0 : cut ctuPercert% of Min and Max "abherent" values (for instance : vtkCurvatures yields extreme Min and Max values which make smoothing difficult)
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 
-
-	this->ActorCollection->InitTraversal();
-	vtkIdType num = this->ActorCollection->GetNumberOfItems();
-	int modified = 0;
-	for (vtkIdType i = 0; i < num; i++)
+	if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
 	{
-		cout << "Largest region of next actor:" << i << endl;
-		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		if (myActor->GetSelected() == 1)
-		{
-			
 
-			myActor->SetSelected(0);
-			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
-			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		int modified = 0;
+
+		std::string action = "Smooth active scalars";		
+		int Count = BEGIN_UNDO_SET(action);
+
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "Scalar smooth :" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			cout << "Got next actor:" << i << endl;
+			if (myActor!=NULL && myActor->GetSelected() == 1)
 			{
 
-				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
-				mPD = mymapper->GetInput();
-				
-				vtkDataArray *currentScalars = NULL;
-				if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
-				{
 
-					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+				myActor->SetSelected(0);
+				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+				{
+					cout << "found mapper for :" << i << endl;
+					vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+					mPD = mymapper->GetInput();
+
+					vtkDataArray *currentScalars = NULL;
+
+
+					currentScalars = vtkDoubleArray::SafeDownCast(mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
 					if (currentScalars == NULL)
 					{
-						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str());
+						currentScalars = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
 					}
-
-				}
-
-				double numvert = mymapper->GetInput()->GetNumberOfPoints();
-
-
-				vtkSmartPointer<vtkDoubleArray> newScalars =
-					vtkSmartPointer<vtkDoubleArray>::New();
-
-				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-				newScalars->SetNumberOfTuples(numvert);
-				newScalars->SetNumberOfTuples(numvert);
-
-
-				if (currentScalars != NULL)
-				{
-					std::string scname = currentScalars->GetName();
-					std::string sTags("Tags");
-					std::size_t found = scname.find(sTags);
-
-					if (found == std::string::npos)
+					if (currentScalars!=NULL)
 					{
+						cout << "found scalars for :" << i << endl;
 
-						std::string action = "Smooth active scalars";
-						action.append(myActor->GetName().c_str());
-						int Count = BEGIN_UNDO_SET(action);
+						double numvert = mymapper->GetInput()->GetNumberOfPoints();
+
+
+						vtkSmartPointer<vtkDoubleArray> newScalars =
+							vtkSmartPointer<vtkDoubleArray>::New();
+
+						newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+						newScalars->SetNumberOfTuples(numvert);
+						newScalars->SetNumberOfTuples(numvert);
+
+						std::string scname = currentScalars->GetName();						
+					
+
 						std::string mScalarName = "ActiveScalars";
 						if (scname.length() > 0)
 						{
@@ -10733,24 +10737,24 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 						{
 							std::vector<float> vals;
 							for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
-							{								
+							{
 								vals.push_back(currentScalars->GetTuple1(j));
 							}
 							std::sort(vals.begin(), vals.end());
-							int iMin = (int)(cutPercent*mPD->GetNumberOfPoints()/100);
-							int iMax = (int)((100-cutPercent)*mPD->GetNumberOfPoints() / 100);
+							int iMin = (int)(cutPercent*mPD->GetNumberOfPoints() / 100);
+							int iMax = (int)((100 - cutPercent)*mPD->GetNumberOfPoints() / 100);
 							if (iMax == mPD->GetNumberOfPoints()) {
 								iMax = mPD->GetNumberOfPoints() - 1;
 							}
 							cutMin = (double)vals.at(iMin);
 							cutMax = (double)vals.at(iMax);
 							cout << "Will cut between " << cutMin << ", and " << cutMax << endl;
-							
+
 						}
 
 						if (mode == 0)
 						{
-							
+
 
 							vtkSmartPointer<vtkFloatArray> newScalars =
 								vtkSmartPointer<vtkFloatArray>::New();
@@ -10826,13 +10830,13 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 						}
 						else
 						{
-							/*	
+							/*
 					if (this->Ui->localAuto->isChecked()) { mode = 1; }
 					if (this->Ui->localCustom->isChecked()) { mode = 2; }*/
 							double searchSize = localAreaLimit;
-							if (mode == 1 || localAreaLimit<=0) 
+							if (mode == 1 || localAreaLimit <= 0)
 							{
-								searchSize = myActor->GetXYZAvgPCLength()/40; // looks like a reasonable neighbourhood sphere radius size.
+								searchSize = myActor->GetXYZAvgPCLength() / 40; // looks like a reasonable neighbourhood sphere radius size.
 							}
 							cout << "mode=" << mode << ", searchSize=" << searchSize << endl;
 							double numvert = mPD->GetNumberOfPoints();
@@ -10930,31 +10934,27 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 
 
 
-						END_UNDO_SET();
-					}// not scalar "Tags
-					else
-					{
 					
-						std::cout << "Cannot smooth Tags" << std::endl;
-					}
-				}//scalars not null
+						
 
+						modified = 1;
+					}//scalars not null
 
-				modified = 1;
+				}
 
 			}
-
+			
 		}
+		if (modified == 1)
+		{
+
+			//cout << "camera and grid adjusted" << endl;
+			cout << "scalars updated " << endl;
+			this->Render();
+		}
+		END_UNDO_SET();
+
 	}
-	if (modified == 1)
-	{
-
-		//cout << "camera and grid adjusted" << endl;
-		cout << "scalars updated " << endl;		
-		this->Render();
-	}
-
-
 
 }
 
