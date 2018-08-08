@@ -65,7 +65,7 @@
    </widget>
    <widget class="QMenu" name="menuEditSelectedSurfaces">
     <property name="title">
-     <string>Edit selected surfaces</string>
+     <string>Surfaces</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuView">
