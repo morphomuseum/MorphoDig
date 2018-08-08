@@ -946,7 +946,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Landmark rendering size &lt;br/&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;(sphere diameter / arrow head length)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Landmark rendering size &lt;br/&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;(sphere diameter / 33% of arrow length)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="LandmarkRenderingSizeValue">
@@ -987,12 +987,12 @@
      <rect>
       <x>290</x>
       <y>190</y>
-      <width>31</width>
+      <width>51</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Unit</string>
+     <string>Size unit</string>
     </property>
    </widget>
   </widget>
@@ -1464,12 +1464,12 @@
      <rect>
       <x>250</x>
       <y>60</y>
-      <width>31</width>
+      <width>41</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Unit</string>
+     <string>Size unit</string>
     </property>
    </widget>
   </widget>

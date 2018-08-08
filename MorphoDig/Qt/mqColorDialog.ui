@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>355</width>
+    <width>544</width>
     <height>127</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>331</width>
+     <width>521</width>
      <height>51</height>
     </rect>
    </property>
@@ -28,21 +28,21 @@
       <item>
        <widget class="mqColorChooserButton" name="meshColorButton">
         <property name="text">
-         <string>Mesh color</string>
+         <string>Default solid solor of surfaces</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="mqColorChooserButton" name="backgroundColorButton">
         <property name="text">
-         <string>Background color</string>
+         <string>Lower background color</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="mqColorChooserButton" name="backgroundColorButton2">
         <property name="text">
-         <string>Background color 2</string>
+         <string>Upper background color</string>
         </property>
        </widget>
       </item>
@@ -53,7 +53,7 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>150</x>
      <y>80</y>
      <width>239</width>
      <height>25</height>

@@ -4403,7 +4403,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		if (mesh_exists == 1)
 		{
 			QMessageBox msgBox;
-			msgBox.setText("At least one mesh file already exists: update existing mesh files?");
+			msgBox.setText("At least one surface file already exists: update existing surface files?");
 			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
 			msgBox.setDefaultButton(QMessageBox::Yes);
 			int ret = msgBox.exec();

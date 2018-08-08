@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Edit transparency of all selected actors</string>
+   <string>Edit orientation labels</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">

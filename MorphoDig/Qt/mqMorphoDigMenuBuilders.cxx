@@ -215,7 +215,7 @@ void mqMorphoDigMenuBuilders::buildEditMenu(QMenu& menu)
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
   new mqColorDialogReaction(menu.addAction("Edit color options") << mqSetName("actionColor"));
-  new mqGridSizeDialogReaction(menu.addAction("Edit size unit and grid spacing") << mqSetName("actionGridSize"));
+  new mqGridSizeDialogReaction(menu.addAction("Edit size unit, grid spacing and scale") << mqSetName("actionGridSize"));
   new mqLandmarkDialogReaction(menu.addAction("Edit landmark and flag rendering options") << mqSetName("actionLandmark"));
   new mqOrientationLabelsDialogReaction(menu.addAction("Edit orientation labels") << mqSetName("actionOrientationLabels"));
   //new pqUndoRedoReaction(ui.actionEditUndo, true);
@@ -328,7 +328,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	// 2) si on 
 	//1) on s'arrête à combien de couleurs ?
 	// 
-	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars") << mqSetName("actionSmooth"));
+	
 	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayFromRGB()));
 	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
 	QAction *CreateNewTagArrayConnectivity = submenuTagModification->addAction("Create new tag array based on connectivity");

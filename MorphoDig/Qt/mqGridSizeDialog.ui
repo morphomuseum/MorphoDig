@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Set size unit and grid spacing</string>
+   <string>Size unit, grid spacing and scale</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">

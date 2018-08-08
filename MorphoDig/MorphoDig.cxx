@@ -236,7 +236,7 @@ void RubberBandSelect(vtkObject* caller,
 			std::string str2("vtkMDActor");
 			if (str2.compare(myprop3D->GetClassName()) == 0)
 			{
-				cout << "One mesh actor found!" << endl;
+				cout << "One surface actor found!" << endl;
 				vtkMDActor *myActor;
 				myActor = vtkMDActor::SafeDownCast(myprop3D);
 
