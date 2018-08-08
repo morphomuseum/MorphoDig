@@ -6611,8 +6611,12 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 	POLYGON_LIST poly;
 	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
 	cout << "Poly valide: " << poly.state << endl;
+
 	if (this->Getmui_TagModeActivated() == 1 && poly.state == 1)// only for valid lasso selections!
 	{
+		std::string action = "Lasso tag ";
+		
+		int Count = BEGIN_UNDO_SET(action);
 		vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 		this->ActorCollection->InitTraversal();
 		vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -6627,13 +6631,11 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 			{
 
 				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
-				vtkIntArray *currentTags = (vtkIntArray*)mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str());
+				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
 				//4 if current tags exist, retrieve what tool is active
 				if (currentTags != NULL)
 				{
-					std::string action = "Lasso tag ";
-					action.append(myActor->GetName().c_str());
-					int Count = BEGIN_UNDO_SET(action);
+				
 
 					std::string mScalarName = ActiveScalar.toStdString();
 
@@ -6702,7 +6704,7 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 					//mymapper->GetLookupTable()->
 					currentTags->Modified();
 					//mymapper->Update();
-					END_UNDO_SET();
+					
 
 				}
 
@@ -6710,7 +6712,8 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 
 			this->Render();
 		}
-
+		//
+		END_UNDO_SET();
 	}
 }
 void mqMorphoDigCore::addConvexHull()
