@@ -333,8 +333,8 @@ void mqOpenDataReaction::OpenTAG()
 	cout << "Open TAG" << endl;
 
 	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
-		tr("Load TAG file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("tag file (*.tag *.tgm)"));
+		tr("Load TAG MAP file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("tag file (*.tag *.tgp)"));
 
 	cout << fileName.toStdString()<<endl;
 	if (fileName.isEmpty()) return;
@@ -352,14 +352,14 @@ void mqOpenDataReaction::OpenTAGMAP()
 
 	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
 		tr("Load TAG MAP file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("tag file (*.tag)"));
+		tr("tag file (*.tag *.tgp)"));
 
 	cout << fileName.toStdString() << endl;
 	if (fileName.isEmpty()) return;
 	QFileInfo fileInfo(fileName);
 	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
 
-	mqMorphoDigCore::instance()->OpenTAG(fileName);
+	mqMorphoDigCore::instance()->OpenTAGMAP(fileName);
 
 }
 void mqOpenDataReaction::OpenData()
@@ -370,7 +370,7 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.vtp)"));
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.vtp)"));
 
 	if (!filenames.isEmpty())
 	{
@@ -402,6 +402,8 @@ void mqOpenDataReaction::OpenData()
 			std::string LMKext2(".LMK");
 			std::string TAGext(".tag");
 			std::string TAGext2(".TAG");
+			std::string TAGext3(".tgp");
+			std::string TAGext4(".TGP");
 			std::string STVext(".stv");
 			std::string STVext2(".STV");
 			std::string ORIext(".ori");
@@ -473,7 +475,9 @@ void mqOpenDataReaction::OpenData()
 			}
 			found = fileName.toStdString().find(TAGext);
 			found2 = fileName.toStdString().find(TAGext2);
-			if (found != std::string::npos || found2 != std::string::npos)
+			found3 = fileName.toStdString().find(TAGext3);
+			found4 = fileName.toStdString().find(TAGext4);
+			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)				
 			{
 				type = 8; //TAG
 			}
@@ -524,7 +528,7 @@ void mqOpenDataReaction::OpenData()
 			}
 			else if (type == 8)
 			{
-				mqMorphoDigCore::instance()->OpenTAG(fileName);
+				mqMorphoDigCore::instance()->OpenTAGMAP(fileName);
 			}
 			else if (type == 9)
 			{

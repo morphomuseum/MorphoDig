@@ -471,7 +471,7 @@ void vtkMDInteractorStyle::StartSelect()
 
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.vtp)"));
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.vtp)"));
 
 			if (!filenames.isEmpty())
 			{
@@ -503,6 +503,8 @@ void vtkMDInteractorStyle::StartSelect()
 					std::string LMKext2(".LMK");
 					std::string TAGext(".tag");
 					std::string TAGext2(".TAG");
+					std::string TAGext3(".tgp");
+					std::string TAGext4(".TGP");
 					std::string STVext(".stv");
 					std::string STVext2(".STV");
 					std::string ORIext(".ori");
@@ -574,7 +576,9 @@ void vtkMDInteractorStyle::StartSelect()
 					}
 					found = fileName.toStdString().find(TAGext);
 					found2 = fileName.toStdString().find(TAGext2);
-					if (found != std::string::npos || found2 != std::string::npos)
+					found3 = fileName.toStdString().find(TAGext3);
+					found4 = fileName.toStdString().find(TAGext4);
+					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
 					{
 						type = 8; //TAG
 					}
@@ -625,7 +629,7 @@ void vtkMDInteractorStyle::StartSelect()
 					}
 					else if (type == 8)
 					{
-						mqMorphoDigCore::instance()->OpenTAG(fileName);
+						mqMorphoDigCore::instance()->OpenTAGMAP(fileName);
 					}
 					else if (type == 9)
 					{

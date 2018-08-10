@@ -460,7 +460,7 @@ public:
 	void OpenFLG(QString fileName);
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
-	void OpenTAG(QString fileName);
+	
 	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);
 	void OpenNTW(QString fileName);
@@ -716,6 +716,7 @@ public:
   int highestTagInActorCollection();
   void increaseTagNumberTo(int newtagnr);
   int getActiveTagMapId();
+  int getTagMapId(QString tagMapName);
   void deleteColorMap(int i);
   void matchTagMapToActorCollection();
   
