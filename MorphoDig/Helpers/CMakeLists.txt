@@ -43,10 +43,10 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED QUIET)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
 
-ADD_LIBRARY (MorphoDigHelpers ${Helpers_SRCS} ${Helpers_HDRS})
+ADD_LIBRARY (MorphoDigHelpers ${Helpers_SRCS} ${Helpers_HDRS} ${Qt5_LIBRARIES})
 include_directories ("${PROJECT_SOURCE_DIR}/Qt")
 
-#TARGET_LINK_LIBRARIES(MorphoDigHelpers  vtkGraphics vtkIOCore vtkCommonCore)
+TARGET_LINK_LIBRARIES(MorphoDigHelpers  ${VTK_LIBRARIES} )
 
 
 
