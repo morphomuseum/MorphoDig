@@ -35,6 +35,48 @@ configure_file (
 include_directories("${PROJECT_BINARY_DIR}")
 
 find_package(VTK REQUIRED)
+## define required VTK modules this helps to figure out issues with missing components in VTK build
+set( required_vtk_modules
+  vtkChartsCore
+  vtkCommonComputationalGeometry 
+  vtkCommonCore
+  vtkCommonDataModel
+  vtkCommonExecutionModel
+  vtkCommonMath
+  vtkCommonMisc
+  vtkCommonSystem
+  vtkCommonTransforms
+  vtkFiltersCore
+  vtkFiltersGeneral
+  vtkFiltersHybrid
+  vtkFiltersModeling
+  vtkFiltersStatistics
+  vtkGUISupportQt
+  vtkIOCore
+  vtkIOGeometry
+  vtkIOImport
+  vtkIOLegacy
+  vtkIOPLY
+  vtkIOXML
+  vtkIOXMLParser
+  vtkImagingHybrid
+  vtkInteractionStyle
+  vtkRenderingAnnotation
+  vtkRenderingCore
+  vtkRenderingGL2PSOpenGL2
+  vtkViewsContext2D
+  vtkViewsCore
+  )
+if(VTK_RENDERING_BACKEND) #in vtk 7, the rendering backend is exported as a var.
+  LIST(APPEND required_vtk_modules vtkRendering${VTK_RENDERING_BACKEND})
+else(VTK_RENDERING_BACKEND)
+  LIST(APPEND required_vtk_modules vtkRenderingOpenGL2)
+endif(VTK_RENDERING_BACKEND)
+## check if all modules are contained in the VTK version
+find_package( VTK REQUIRED COMPONENTS ${required_vtk_modules} )
+#message(${required_vtk_modules} )
+
+#find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
 if("${VTK_QT_VERSION}" STREQUAL "")
@@ -87,46 +129,7 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
 
   include_directories ("${PROJECT_SOURCE_DIR}/Qt")
   add_subdirectory (Qt) 
-  set( required_vtk_modules
-    vtkCommonComputationalGeometry
-    vtkCommonCore
-    vtkCommonDataModel
-    vtkCommonExecutionModel
-    vtkCommonMath
-    vtkCommonMisc
-    vtkCommonSystem
-    vtkCommonTransforms
-    vtkFiltersCore
-    vtkFiltersGeneral
-    vtkIOCore
-    vtkIOGeometry
-    vtkIOLegacy
-    vtkIOXML
-    vtkIOXMLParser
-    vtkImagingHybrid
-    vtkImagingStencil
-    vtkFiltersModeling
-    vtkFiltersHybrid
-    vtkIOImport
-    vtkRenderingCore
-    vtkImagingMorphological
-    vtkIOPLY
-    vtkDomainsChemistryOpenGL2
-    vtkRenderingGL2PSOpenGL2
-    vtkInteractionStyle
-    vtkFiltersStatistics
-    # vtkRenderingOpenGL
-    )
-  if(VTK_RENDERING_BACKEND) #in vtk 7, the rendering backend is exported as a var.
-    LIST(APPEND required_vtk_modules vtkRendering${VTK_RENDERING_BACKEND})
-  else(VTK_RENDERING_BACKEND)
-    LIST(APPEND required_vtk_modules vtkRenderingOpenGL2)
-  endif(VTK_RENDERING_BACKEND)
-  find_package( VTK REQUIRED COMPONENTS ${required_vtk_modules} )
-  message(${required_vtk_modules} )
-
   
-  include(${VTK_USE_FILE})
   link_directories(${VTK_LIBRARY_DIR} Helpers)
   set (EXTRA_LIBRARIES ${EXTRA_LIBRARIES} 
     MorphoDigHelpers
