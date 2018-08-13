@@ -70,7 +70,7 @@ set( required_vtk_modules
 if(VTK_RENDERING_BACKEND) #in vtk 7, the rendering backend is exported as a var.
   LIST(APPEND required_vtk_modules vtkRendering${VTK_RENDERING_BACKEND})
 else(VTK_RENDERING_BACKEND)
-  LIST(APPEND required_vtk_modules vtkRenderingOpenGL2)
+  LIST(APPEND required_vtk_modules vtkRenderingOpenGL)
 endif(VTK_RENDERING_BACKEND)
 ## check if all modules are contained in the VTK version
 find_package( VTK REQUIRED COMPONENTS ${required_vtk_modules} )
