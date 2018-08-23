@@ -143,7 +143,7 @@ void mqSaveDataReaction::SaveCURInfos()
 		int num_seg = mqMorphoDigCore::instance()->getBezierCurveSource()->GetCurveSegmentNumber();
 		for (int i = 1; i <= num_seg; i++)
 		{
-			stream << "Curve_segment_" << i << "_length(mm):" << mqMorphoDigCore::instance()->getBezierCurveSource()->GetCurveSegmentLength(i)<<endl;
+			stream << "Curve_segment_" << i << "_length:	" << mqMorphoDigCore::instance()->getBezierCurveSource()->GetCurveSegmentLength(i)<<endl;
 		}
 
 	}
@@ -202,6 +202,12 @@ void mqSaveDataReaction::SaveSelectedSurfaceScalars()
 void mqSaveDataReaction::SaveActiveScalarSummary()
 {
 	int numsel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (numsel == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	if (numsel>0&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1 &&
 
 		(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT
@@ -256,27 +262,40 @@ void mqSaveDataReaction::SaveShapeMeasures(int mode)
 	//mode: 1: area and volume 
 	//mode: 2: normalized shape index area and volume	
 	//mode: 3: convex hull area_ratio and ch_normalized_shape_index, area, volume, ch_area, ch_volume
+
+	vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+
 	QString myText;
+	QString myFileProposition;
 	if (mode == 1)
 	{
-		cout << "Save normalized shape index" << endl;
-		myText = tr("Save normalized shape index");
+		cout << "Save area and volume" << endl;
+		myText = tr("Save area and volume");
+		myFileProposition = tr("Area_and_Volume.txt");
 	}
 	else if (mode == 2)
 	{
-		cout << "Save mean readius normalized shape index" << endl;
-		myText = tr("Save mean readius normalized shape index");
+		cout << "Save normalized shape index" << endl;
+		myText = tr("Save normalized shape index");
+		myFileProposition = tr("Normalized_shape_index.txt");
 	}
 	else 
 	{
-		cout << "Save convex hull normalized shape index" << endl;
-		myText = tr("Save convex hull normalized shape index ");
+		cout << "Save convex hull area ratio and convex hull normalized shape index" << endl;
+		myText = tr("Save convex hull area ratio and convex hull normalized shape index");
+		myFileProposition = tr("CH_are_ratio_CH_Normalized_shape_index.txt");
 	}
 
 
 
 	QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
-		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + myFileProposition,
 		tr("text file (*.txt)"));
 
 	cout << fileName.toStdString() << endl;;
@@ -302,17 +321,23 @@ void mqSaveDataReaction::SaveShapeMeasures(int mode)
 }
 void mqSaveDataReaction::SaveMeshSize()
 {
-	
+	vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	QString myText;
 	
-		cout << "Save  mesh size " << endl;
-		myText = tr("Save mesh size");
+		cout << "Save  mesh size measurements" << endl;
+		myText = tr("Save mesh size measurements");
 	
 
-
+		QString myFileProposition = tr("Size_measurements.txt");
 
 	QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
-		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir()+ QDir::separator() + myFileProposition,
 		tr("text file (*.txt)"));
 
 	cout << fileName.toStdString() << endl;;

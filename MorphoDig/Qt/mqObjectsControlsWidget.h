@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 class QReleaseSlider;
+class QDoubleReleaseSlider;
 class QReleaseSliderValue;
 class vtkProp3D;
 class vtkMatrix4x4;
@@ -86,15 +87,22 @@ private:
 		int oldtrval;
 	void SavePositions(int val);
 	
-	//QReleaseSliderValue * zRot;
-	QReleaseSlider * zRot;
-	QReleaseSlider *zTr;
-	//QReleaseSliderValue * yRot;
-	QReleaseSlider * yRot;
-	QReleaseSlider *yTr;
-	//QReleaseSliderValue * xRot;
-	QReleaseSlider * xRot;
-	QReleaseSlider *xTr;
+	QReleaseSliderValue * zRot;
+
+	//QDoubleReleaseSlider * zRot;
+	//QReleaseSlider * zRot;
+	
+	//QReleaseSlider *zTr;
+	QReleaseSliderValue *zTr;
+
+	QReleaseSliderValue * yRot;	
+	//QReleaseSlider * yRot;
+	QReleaseSliderValue *yTr;
+	//QReleaseSlider *yTr;
+	QReleaseSliderValue * xRot;
+	//QReleaseSlider * xRot;
+	QReleaseSliderValue *xTr;
+	//QReleaseSlider *xTr;
   Ui_mqObjectsControlsWidget *ui;
   void constructor();
   void RotateActors(int axis, int degrees);

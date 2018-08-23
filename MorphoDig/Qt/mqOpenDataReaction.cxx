@@ -327,24 +327,6 @@ void mqOpenDataReaction::OpenCUR()
 	mqMorphoDigCore::instance()->OpenCUR(fileName);
 
 }
-void mqOpenDataReaction::OpenTAG()
-{
-
-	cout << "Open TAG" << endl;
-
-	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
-		tr("Load TAG MAP file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("tag file (*.tag *.tgp)"));
-
-	cout << fileName.toStdString()<<endl;
-	if (fileName.isEmpty()) return;
-	QFileInfo fileInfo(fileName);
-	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
-
-	mqMorphoDigCore::instance()->OpenTAGMAP(fileName);
-
-}
-
 void mqOpenDataReaction::OpenTAGMAP()
 {
 

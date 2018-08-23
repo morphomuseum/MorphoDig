@@ -23,6 +23,7 @@
 #include <QToolButton>
 #include <QComboBox>
 #include <QSlider>
+#include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
@@ -185,13 +186,18 @@ void mqCameraControlsWidget::constructor()
 
  /* */
   // this->cP = new QDoubleSlider;
-  //this->cP = new QReleaseSliderValue(Qt::Vertical, tr("")); 
-  this->cP = new QReleaseSlider;
+  this->cP = new QReleaseSliderValue(Qt::Vertical, tr("")); 
+  //this->cP = new QReleaseSlider;
   //this->cP->set
    this->cP->setToolTip(QString("Clipping plane"));
    
    this->cP->setMaximum(100);
    this->cP->setMinimum(-100);
+   QString cp = QString("cp");
+   this->cP->setLabelText(cp);
+   this->cP->setLabelVisible(1);
+   this->cP->setSpinboxVisible(0);
+
 
   this->zoom = new QDoubleReleaseSlider;
   this->zoom->setToolTip(QString("Zoom"));
@@ -200,6 +206,7 @@ void mqCameraControlsWidget::constructor()
   this->zoom->setDoubleMaximum(100);
   this->zoom->setDoubleValue(0);
   //this->zRot = new QReleaseSlider;
+
   this->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
   //this->ui->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
   //this->zRot = new QReleaseDial;
@@ -243,7 +250,10 @@ void mqCameraControlsWidget::constructor()
   
 
   this->zRot->setToolTip(QString("Rotate camera along viewing axis"));
-  
+  QString rz = QString("rz");
+  this->zRot->setLabelText(rz);
+  this->zRot->setLabelVisible(1);
+
   QHBoxLayout *layout = new QHBoxLayout;
   
   
@@ -257,50 +267,34 @@ void mqCameraControlsWidget::constructor()
 
   grid->setLayout(layout);
   this->ui->verticalLayout->addWidget(grid);
-  //addWidget(cP, 0, Qt::AlignHCenter)
-  //this->ui->verticalLayout->addWidget(this->zRot, 0, Qt::AlignCenter);
-  //this->ui->verticalLayout->addWidget(this->zRot);
-  // Add values in the combo box
-  /*this->addWidget(this->zRot);
-  this->addWidget(this->cP);
-  this->addWidget(this->zoom);*/
+
+
   QHBoxLayout *layout2 = new QHBoxLayout;
   layout2->setSpacing(1);
   layout2->setMargin(1);
 
   QWidget* grid2 = new QWidget();
-  //layout2->addWidget(this->ui->cP);
+ layout2->addWidget(this->cP);
 
 
   grid2->setLayout(layout2);
-  //this->ui->verticalLayout->addWidget(grid2);
-  this->ui->verticalLayout->addWidget(this->cP, 0, Qt::AlignCenter);
+ this->ui->verticalLayout->addWidget(grid2);
  
 
-  /*QHBoxLayout *layout2 = new QHBoxLayout;
-  QWidget* grid2 = new QWidget();
-  layout2->addWidget(this->cP);
-  grid2->setLayout(layout2);
-  this->addWidget(grid2);*/
-  
-  //this->addWidget(this->cP);
-  
-
-  QWidget* spacer = new QWidget();
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  //this->ui->verticalLayout->addWidget(spacer);
+ 
 
   QHBoxLayout *layout3 = new QHBoxLayout;
   layout3->setSpacing(1);
   layout3->setMargin(1);
   QWidget* grid3 = new QWidget();
-  //layout3->addWidget(this->zoom);
+  layout3->addWidget(this->zoom);
   grid3->setLayout(layout3);
 
   
- // this->ui->verticalLayout->addWidget(grid3);
-  this->ui->verticalLayout->addWidget(this->zoom, 0, Qt::AlignCenter);
-
+  this->ui->verticalLayout->addWidget(grid3);
+  QLabel *label = new QLabel;
+  label->setText("Zoom");
+  this->ui->verticalLayout->addWidget(label);
   //this->setLayout(layout);
   //this->ui->actionTagEdit->setDisabled(true);
   //this->ui->actionClippingPlaneOnOff->setDisabled(true);

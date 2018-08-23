@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // For later!
 #include "QReleaseSlider.h"
-//#include "QReleaseSliderValue.h"
+#include "QDoubleReleaseSlider.h"
+#include "QReleaseSliderValue.h"
 
 #include "mqEditLMKDialogReaction.h"
 #include "mqCreateLMKDialogReaction.h"
@@ -56,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkMatrix4x4.h>
 #include <QToolButton>
 #include <QHBoxLayout>
+#include <QSizePolicy>
 #define NORMAL_LMK 0
 #define TARGET_LMK 1
 #define NODE_LMK 2
@@ -106,58 +108,83 @@ void mqObjectsControlsWidget::constructor()
 	  "QScrollBar::handle:vertical{background:yellow;max-height:10px;} "
 
   );
-  this->zTr = new QReleaseSlider;
+  //this->zTr = new QReleaseSlider;
+  this->zTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
   this->zTr->setMaximum(100);
   this->zTr->setMinimum(-100);
   this->zTr->setToolTip(QString("Translate along z viewing axis"));
+  QString tz =  QString("tz");
+  this->zTr->setLabelText(tz);
+  this->zTr->setLabelVisible(1);
 
-
-  //this->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
-  this->zRot = new QReleaseSlider;
-  this->zRot->setMaximum(90);
-  this->zRot->setMinimum(-90);
+  this->zRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->zRot = new QDoubleReleaseSlider;
+  //this->zRot = new QReleaseSlider;
+  this->zRot->setMaximum(45);
+  this->zRot->setMinimum(-45);
+  //this->zRot->setSingleStep(0.1);
+  //this->zRot->setSingleStep(0.1);
   this->zRot->setToolTip(QString("Rotation along z viewing axis"));
+  QString rz = QString("rz");
+  this->zRot->setLabelText(rz);
+  this->zRot->setLabelVisible(1);
 
 
-  this->yTr = new QReleaseSlider;
+  this->yTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->yTr = new QReleaseSlider;
   this->yTr->setMaximum(100);
   this->yTr->setMinimum(-100);
   this->yTr->setToolTip(QString("Translate along y viewing axis"));
+  QString ty = QString("ty");
+  this->yTr->setLabelText(ty);
+  this->yTr->setLabelVisible(1);
 
-  //this->yRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
-  this->yRot = new QReleaseSlider;
-  this->yRot->setMaximum(90);
-  this->yRot->setMinimum(-90);
+  this->yRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->yRot = new QReleaseSlider;
+  this->yRot->setMaximum(45);
+  this->yRot->setMinimum(-45);
   this->yRot->setToolTip(QString("Rotation along y viewing axis"));
-
+  QString ry = QString("ry");
+  this->yRot->setLabelText(ry);
+  this->yRot->setLabelVisible(1);
   
-  this->xTr = new QReleaseSlider;
+  //this->xTr = new QReleaseSlider;
+  this->xTr = new QReleaseSliderValue(Qt::Vertical, tr(""));
   this->xTr->setMaximum(100);
   this->xTr->setMinimum(-100);
   this->xTr->setToolTip(QString("Translate along x viewing axis"));
+  QString tx = QString("tx");
+  this->xTr->setLabelText(tx);
+  this->xTr->setLabelVisible(1);
 
-  //this->xRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
-  this->xRot = new QReleaseSlider;
-  this->xRot->setMaximum(90);
-  this->xRot->setMinimum(-90);
+  this->xRot = new QReleaseSliderValue(Qt::Vertical, tr(""));
+  //this->xRot = new QReleaseSlider;
+  this->xRot->setMaximum(45);
+  this->xRot->setMinimum(-45);
   this->xRot->setToolTip(QString("Rotation along x viewing axis"));
+  QString rx = QString("rx");
+  this->xRot->setLabelText(rx);
+  this->xRot->setLabelVisible(1);
 
   QHBoxLayout *zlayout = new QHBoxLayout;
   QWidget* zgrid = new QWidget();
   zlayout->setSpacing(1);
-  zlayout->setMargin(5);
+  zlayout->setMargin(1);
+  //zlayout->set
   zlayout->addWidget(this->zRot);
  // zlayout->addWidget(this->xTr);
   //zlayout->addWidget(this->yTr);
   zlayout->addWidget(this->zTr);
 
   zgrid->setLayout(zlayout);
+  //zgrid->setSizePolicy(QSizePolicy::Policy::Expanding);
+  
   this->ui->verticalLayout->addWidget(zgrid);
 
   QHBoxLayout *ylayout = new QHBoxLayout;
   QWidget* ygrid = new QWidget();
  ylayout->setSpacing(1);
-  ylayout->setMargin(5);
+  ylayout->setMargin(1);
   ylayout->addWidget(this->yRot);
   ylayout->addWidget(this->yTr);
 
@@ -167,12 +194,17 @@ void mqObjectsControlsWidget::constructor()
   QHBoxLayout *xlayout = new QHBoxLayout;
   QWidget* xgrid = new QWidget();
   xlayout->setSpacing(1);
-  xlayout->setMargin(5);
+  xlayout->setMargin(1);
  xlayout->addWidget(this->xRot);
  xlayout->addWidget(this->xTr);
 
   xgrid->setLayout(xlayout);
   this->ui->verticalLayout->addWidget(xgrid);
+  /*xgrid->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ygrid->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  zgrid->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);*/
+
+  
 
   connect(this->ui->Delete, SIGNAL(pressed()), this, SLOT(slotDeleteObjects()));
   connect(this->ui->Delete, SIGNAL(pressed()), this, SLOT(slotDeleteObjects()));
@@ -187,13 +219,13 @@ void mqObjectsControlsWidget::constructor()
   connect(yTr, SIGNAL(valueChanged(int)), this, SLOT(slotYtr(int)));
   connect(xTr, SIGNAL(valueChanged(int)), this, SLOT(slotXtr(int)));
 
-  connect(zRot, SIGNAL(sliderPressed()), this, SLOT(slotZrotPressed()));
+  /*connect(zRot, SIGNAL(sliderPressed()), this, SLOT(slotZrotPressed()));
   connect(yRot, SIGNAL(sliderPressed()), this, SLOT(slotYrotPressed()));
   connect(xRot, SIGNAL(sliderPressed()), this, SLOT(slotXrotPressed()));
 
   connect(zTr, SIGNAL(sliderPressed()), this, SLOT(slotZtrPressed()));
   connect(yTr, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
-  connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));
+  connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));*/
   
   connect(this->ui->LassoCutKeepInside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
   connect(this->ui->LassoCutKeepOutside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
@@ -505,7 +537,7 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 
 void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 {
-	//cout << "Rotate axis: " << axis << ", degrees:" << degrees << endl;
+//cout << "Rotate axis: " << axis << ", degrees:" << degrees << endl;
 //axis: 0=X, 1=Y, 2=z
 	
 	double rot_center[3] = { 0,0,0 };
@@ -548,42 +580,15 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 	// Convert them to display coord
 	double disp_obj_center[3];
 
-	/*this->ComputeWorldToDisplay(rot_center[0], rot_center[1], rot_center[2],
-		disp_obj_center);
-
-	this->ComputeWorldToDisplay(outsidept[0], outsidept[1], outsidept[2],
-		outsidept);
-		*/
+	
 	double radius = sqrt(vtkMath::Distance2BetweenPoints(disp_obj_center,
 		outsidept));
-	/*double nxf = (rwi->GetEventPosition()[0] - disp_obj_center[0]) / radius;
-
-	double nyf = (rwi->GetEventPosition()[1] - disp_obj_center[1]) / radius;
-
-	double oxf = (rwi->GetLastEventPosition()[0] - disp_obj_center[0]) / radius;
-
-	double oyf = (rwi->GetLastEventPosition()[1] - disp_obj_center[1]) / radius;*/
+	
 
 
 	if (degrees != 0)
 	{
-		double newXAngle = 0;
-		if (axis == 0)
-		{
-			newXAngle = degrees;
-		}
-
-		double newYAngle = 0; 
-		if (axis == 0)
-		{
-			newYAngle = degrees;
-		}
-
-		double newZAngle = 0;
-		if (axis == 0)
-		{
-			newZAngle = degrees;
-		}
+		
 		
 
 		double scale[3];
@@ -596,18 +601,20 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 		
 		if (axis == 0)
 		{
-			rotate[0][0] = degrees;
-			rotate[0][1] = view_up[0];
-			rotate[0][2] = view_up[1];
-			rotate[0][3] = view_up[2];
-		}
-		else if (axis == 1)
-		{
 
 			rotate[0][0] = degrees;
 			rotate[0][1] = view_right[0];
 			rotate[0][2] = view_right[1];
 			rotate[0][3] = view_right[2];
+
+		}
+		else if (axis == 1)
+		{
+			rotate[0][0] = degrees;
+			rotate[0][1] = view_up[0];
+			rotate[0][2] = view_up[1];
+			rotate[0][3] = view_up[2];
+
 		}
 		else
 		{
@@ -762,27 +769,27 @@ void mqObjectsControlsWidget::SavePositions(int val)
 	switch (val)
 	{
 	case 0:
-		action = "Rotate selected actors along X";
+		action = "Rotate selected actors along X viewing axis";
 		//cout << "VTK_IS_ROTATE: action=" << action.c_str() << endl;
 		break;
 	case 1:
-		action = "Rotate selected actors along Y";
+		action = "Rotate selected actors along Y viewing axis";
 		//cout << "VTK_IS_PAN: action=" << action.c_str() << endl;
 		break;
 	case 2:
-		action = "Rotate selected actors along Z";
+		action = "Rotate selected actors along Z viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	case 3:
-		action = "Translate selected actors along X";
+		action = "Translate selected actors along X viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	case 4:
-		action = "Translate selected actors along Y";
+		action = "Translate selected actors along Y viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	case 5:
-		action = "Translate selected actors along Z";
+		action = "Translate selected actors along Z viewing axis";
 		//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 		break;
 	}
@@ -939,7 +946,7 @@ void mqObjectsControlsWidget::slotXrot(int val)
 		return;
 	}
 
-	this->RotateActors(0, val- this->oldrotval);
+	this->RotateActors(0, this->oldrotval-val);
 	this->oldrotval = val;
 
 }
@@ -951,7 +958,7 @@ void mqObjectsControlsWidget::slotYrot(int val)
 		return;
 	}
 
-	this->RotateActors(1, this->oldrotval-val);
+	this->RotateActors(1, val-this->oldrotval);
 	this->oldrotval = val;
 
 }

@@ -62,7 +62,7 @@ mqEditFLGDialog::mqEditFLGDialog(QWidget* Parent)
 	connect(mqMorphoDigCore::instance(), SIGNAL(lmSelectionChanged()), this, SLOT(slotRefreshDialog()));
 	connect(this->Ui->next, SIGNAL(pressed()), this, SLOT(slotGetNextFlag()));
 	connect(this->Ui->prec, SIGNAL(pressed()), this, SLOT(slotGetPrecedingFlag()));
-	
+	connect(this->Ui->cam_center, SIGNAL(pressed()), this, SLOT(slotCamCenter()));
 	this->FLG_Coll = NULL;
 	this->FLG = NULL;
 	
@@ -361,7 +361,11 @@ void mqEditFLGDialog::GetPrecedingFlag()
 }
 
 
+void mqEditFLGDialog::slotCamCenter()
+{
+	mqMorphoDigCore::instance()->ReplaceCameraAndGridAt(this->Ui->x->value(), this->Ui->y->value(), this->Ui->z->value());
 
+}
 void mqEditFLGDialog::slotsaveFLG()
 {
 	this->saveFLG();

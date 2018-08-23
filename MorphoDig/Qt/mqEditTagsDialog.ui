@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>547</width>
-    <height>726</height>
+    <height>778</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,7 +432,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>680</y>
+     <y>730</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -456,7 +456,7 @@
      <x>10</x>
      <y>10</y>
      <width>511</width>
-     <height>661</height>
+     <height>701</height>
     </rect>
    </property>
    <property name="title">
@@ -531,7 +531,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>120</y>
+      <y>170</y>
       <width>451</width>
       <height>491</height>
      </rect>
@@ -587,7 +587,7 @@
            <x>0</x>
            <y>0</y>
            <width>451</width>
-           <height>491</height>
+           <height>511</height>
           </rect>
          </property>
         </widget>
@@ -701,7 +701,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>620</y>
+      <y>670</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -716,8 +716,8 @@
    <widget class="QToolButton" name="removeTag">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>620</y>
+      <x>170</x>
+      <y>670</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -727,6 +727,145 @@
     </property>
     <property name="text">
      <string>-</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>140</y>
+      <width>73</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="pencilOn">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Cursors/pencil.png</normaloff>:/Cursors/pencil.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="bucketOn">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Cursors/Flood_fill.png</normaloff>:/Cursors/Flood_fill.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="lassoOn">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/Lasso_keepinside.png</normaloff>:/Icons/Lasso_keepinside.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QCheckBox" name="activateTagMode">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>140</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Activate tag mode</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>140</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pencil radius (px):</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pencilSearchSize">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>140</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>500</number>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="erase">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>670</y>
+      <width>25</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>reset active tag (merge with tag 0)</string>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/erase.png</normaloff>:/Icons/erase.png</iconset>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="merge">
+    <property name="geometry">
+     <rect>
+      <x>234</x>
+      <y>670</y>
+      <width>25</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>merge 2 tags</string>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/merge.png</normaloff>:/Icons/merge.png</iconset>
     </property>
    </widget>
   </widget>

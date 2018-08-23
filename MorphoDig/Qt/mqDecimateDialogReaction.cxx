@@ -10,7 +10,6 @@
 #include "mqDecimateDialog.h"
 #include "mqReaction.h"
 
-
 //-----------------------------------------------------------------------------
 mqDecimateDialogReaction::mqDecimateDialogReaction(QAction* parentObject)
   : Superclass(parentObject)

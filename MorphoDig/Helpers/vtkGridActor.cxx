@@ -1100,7 +1100,7 @@ void vtkGridActor::CreateGridOutline()
 		outline_color[2] = 255;
 		
 	}
-	else
+	else if (this->OutlineMode == 1)
 	{
 		
 		outline_color[0] = 255;
@@ -1108,7 +1108,14 @@ void vtkGridActor::CreateGridOutline()
 		outline_color[2] = 0;
 
 	}
-	
+	else
+	{
+
+		outline_color[0] = 255;
+		outline_color[1] = 0;
+		outline_color[2] = 0;
+
+	}
 	
 
 	// Create a vtkUnsignedCharArray container and store the colors in it

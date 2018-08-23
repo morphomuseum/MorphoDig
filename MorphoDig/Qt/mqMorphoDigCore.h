@@ -22,7 +22,7 @@
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
 #include <vtkInteractorStyleDrawPolygon.h>
-#include "vtkMDLassoInteractorStyle.h"
+
 #include "vtkGridActor.h"
 #include "vtkLMActor.h"
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
@@ -362,6 +362,8 @@ public:
 	std::vector<std::string> g_selected_names;
 	std::vector<std::string> g_distinct_selected_names;
 	void createTags(QString newTags);
+	void createTagsFromRGB(QString newTags, int exact, int N);
+	void createTagsConnectivity(QString newTags);
 	void RemoveScalar(QString scalarName, int onlySelectedObjects);
 	void GetDisplayToWorld(double x, double y, double z, double worldPt[4]);
 	void GetWorldToDisplay(double x, double y, double z, double displayPt[3]);
@@ -376,7 +378,10 @@ public:
 	void Setmui_ScalarVisibility(int scalarvisibility);
 	int Getmui_DefaultScalarVisibility();
 	int Getmui_ScalarVisibility();
-
+	int Getmui_TagModeActivated();
+	void Setmui_TagModeActivated(int activated);
+	int Getmui_TagTool();
+	void Setmui_TagTool(int tool);
 	void Setmui_MoveMode(int movemode);
 	int Getmui_MoveMode();
 	int Getmui_DefaultMoveMode();
@@ -393,7 +398,7 @@ public:
 	QString Getmui_SizeUnit();
 	QString Getmui_DefaultSizeUnit();
 
-	
+
 
 	void Setmui_ShowOrientationHelper(int orientationHelper);
 	int Getmui_DefaultShowOrientationHelper();
@@ -437,9 +442,11 @@ public:
 	void Setmui_Z2Label(QString label);
 	QString Getmui_DefaultZ2Label();
 	QString Getmui_Z2Label();
+
+	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName);
 	void SaveORI(QString fileName);
-	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces =0);
+	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces = 0);
 	int SaveSTVFile(QString fileName, int save_only_selected);
 	int SaveMAPFile(QString fileName, int save_only_active);
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
@@ -448,19 +455,19 @@ public:
 	void OpenMAP(QString fileName);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
-	
+
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
 	void SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName);
 	void SaveActiveScalarSummary(QString fileName);
-	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt=0, int save_norms = 0, vtkMDActor *myActor = NULL);
+	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
 	void DeleteSelectedActors();
 	void OpenFLG(QString fileName);
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
-	
+	void MergeTags(int tagSource, int tagTarget);
 	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);
 	void OpenNTW(QString fileName);
@@ -469,7 +476,7 @@ public:
 	void OpenMesh(QString fileName);
 	void OpenPOS(QString fileName, int mode);
 	void OpenPOSTrans(QString fileName, int mode);
-
+	void GetVertexColor(vtkMDActor *myActor, vtkIdType ve, int color[4]);
 	double* Getmui_MeshColor();
 	void Getmui_MeshColor(double c[4]);
 	double* Getmui_DefaultMeshColor();
@@ -547,8 +554,10 @@ public:
 
 	void Setmui_ActiveTagMap(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
 	void Setmui_ActiveTagMapAndRender(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
-
-
+	void Setmui_ActiveTag(int activeTag);
+	int Getmui_ActiveTag();
+	int Getmui_PencilSize();
+	void Setmui_PencilSize(int pencilSize);
 
 	double* Getmui_BackGroundColor2();
 	void Getmui_BackGroundColor2(double bg[3]);
@@ -621,10 +630,10 @@ public:
   void addKeepLargest();// create for each selected surface an object which keeps only the largest "independent" region of the corresponding object.
   vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
-  void scalarsThickness(double max_thickness, int smooth_normales, int avg, QString scalarName, double angularLimit);
+  void scalarsThickness(double max_thickness, int smooth_normals, int avg, QString scalarName, double angularLimit);
   void scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode);
   void scalarsCurvature(int curvatureType, QString scalarName);
-  void scalarsThicknessBetween(double max_thickness, int smooth_normales, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
+  void scalarsThicknessBetween(double max_thickness, int smooth_normals, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales =0);
   void scalarsDistance(double maxDist, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor);
   void ICP(int transformationMode, int iterationNumber, vtkMDActor *impactedActor, vtkMDActor* observedActor);
   vtkMDActor * getFirstActorFromName(QString actorName);
@@ -636,9 +645,11 @@ public:
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
+  void lassoTagActors(int tag_inside);
   void groupSelectedActors();
   void startLasso(int lasso_mode);//change interaction style
   void setCurrentCursor(int cursor); //changes mouse cursor
+  void resetCursor(); // reset cursor when lasso stops, tag stop, landmark stop
   void stopLasso();//change interaction style back to normal
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
   void Redo(); // calls the undoStack Redo function
@@ -655,9 +666,11 @@ public:
   mqMorphoDigCore();
   void AdjustCameraAndGrid();
   void ReplaceCameraAndGrid();
+  void ReplaceCameraAndGridAt(double x, double y, double z);
   void DollyCameraForPerspectiveMode();
   void DollyCameraForParallelScale();
   void ResetCameraOrthoPerspective();
+  void SetDisplayMode(int mode);
   void SetGridVisibility();
   void SetGridInfos();
   void SetOrientationHelperVisibility();
@@ -753,6 +766,7 @@ protected:
 	vtkSmartPointer<vtkMDInteractorStyle> Style;
 	vtkSmartPointer<vtkInteractorStyleDrawPolygon> LassoStyle;
 	vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
+	vtkSmartPointer<vtkScalarBarActor> TagScalarBarActor;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRedLut;
 
@@ -800,8 +814,8 @@ protected:
 
 	ActiveTagMap *mui_ActiveTagMap;
 	ExistingTagMaps *mui_ExistingTagMaps;
-
-
+	int mui_ActiveTag;
+	int mui_PencilSize;
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;
@@ -821,7 +835,8 @@ protected:
 	int mui_ShowOrientationHelper;
 	int mui_CameraCentreOfMassAtOrigin;
 	int mui_CameraOrtho;
-
+	int mui_TagModeActivated;
+	int mui_TagTool;
 	QString mui_X1Label;
 	QString mui_X2Label;
 	QString mui_Y1Label;
@@ -873,7 +888,7 @@ protected:
 	double ScalarRangeMin;
 	double ScalarRangeMax;
 	void SetSelectedActorsColor(int r, int g, int b);
-	
+	int mui_DisplayMode; //0 cell 1 point 2 wireframe 3 points
 	vtkOrientationHelperWidget* OrientationHelperWidget;
 public slots:
 	virtual void slotLandmarkMoveUp();
@@ -893,6 +908,7 @@ public slots:
 	virtual void slotScalarsCameraDistance();
 	virtual void slotScalarsRGB();
 	virtual void slotCreateTagArray();
+	virtual void slotCreateTagArrayConnectivity();
 	virtual void  slotGrey();
 	virtual void slotYellow();
 	virtual void slotRed();

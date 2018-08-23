@@ -45,7 +45,7 @@ public:
   virtual void slotRefreshDialog();
   virtual void slotGetPrecedingLandmark();
   virtual void slotGetNextLandmark();
- 
+  virtual void slotCamCenter();
   
 
 protected:

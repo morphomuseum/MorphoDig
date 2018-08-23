@@ -79,7 +79,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string> MorphoDig provides a set of tools for editing, positioning, deforming, labeling, measuring and rendering sets of 3D meshes.
+      <string> MorphoDig provides a set of tools for editing, positioning, deforming, labeling, measuring and rendering sets of 3D surfaces (=meshes).
 
 Features include:
 

@@ -12,14 +12,16 @@ Module:    vtkMDActor.cxx
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkProperty.h>
-
+#include <vtkPolyDataNormals.h>
 #include <vtkTable.h>
 #include <vtkPCAStatistics.h>
 #include <vtkLine.h>
+#include <vtkIdList.h>
 #include <vtkTexture.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 #include <vtkPointData.h>
+#include <vtkCellData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCenterOfMass.h>
 #include <vtkTransform.h>
@@ -43,9 +45,14 @@ vtkMDActor::vtkMDActor()
 	//backFaces->SetDiffuseColor(.8, .8, .8);
 	backFaces->SetColor(.7, .7, .7);
 	backFaces->SetOpacity(0.5);
-
+	this->pointNormals = nullptr;
+	this->cellNormals = nullptr;
 	this->SetBackfaceProperty(backFaces);
 	this->UndoRedo = new vtkMDActorUndoRedo;
+	this->KdTree = nullptr;
+	this->cFilter = nullptr;
+	this->cFilterCorrList = nullptr;
+	this->cFilterCorrList2 = nullptr;
 	this->Selected = 1;
 	this->Changed = 0;
 	this->Name = "New Mesh";
@@ -56,9 +63,271 @@ vtkMDActor::~vtkMDActor()
 {
 	this->UndoRedo->RedoStack.clear();
 	this->UndoRedo->UndoStack.clear();
+	this->FreeKdTree();
+	this->FreeConnectivityFilter();
 	delete this->UndoRedo;
 	
 
+
+
+}
+void vtkMDActor::SetDisplayMode(int mode)
+{
+	vtkPolyData* mPD= vtkPolyData::SafeDownCast(this->GetMapper()->GetInput());
+	if (mPD!=NULL && (this->pointNormals == nullptr || this->cellNormals == nullptr))
+	{
+		//cout << "Compute Poly Data Normals on a PolyData of " <<mPD->GetNumberOfPoints()<<" points"<< endl;
+		
+		vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+		ObjNormals->SetInputData(mPD);
+		ObjNormals->ComputePointNormalsOn();
+		ObjNormals->ComputeCellNormalsOn();
+		ObjNormals->AutoOrientNormalsOff();
+		//ObjNormals->FlipNormalsOn();
+		ObjNormals->ConsistencyOff();
+
+		ObjNormals->Update();
+
+		vtkSmartPointer<vtkFloatArray> mpointNormals = vtkSmartPointer<vtkFloatArray>::New();
+		mpointNormals = vtkFloatArray::SafeDownCast(ObjNormals->GetOutput()->GetPointData()->GetNormals());
+
+		vtkSmartPointer<vtkFloatArray> mcellNormals = vtkSmartPointer<vtkFloatArray>::New();
+		mcellNormals = vtkFloatArray::SafeDownCast(ObjNormals->GetOutput()->GetCellData()->GetNormals());
+		this->pointNormals = mpointNormals;
+		this->cellNormals = mcellNormals;
+		//mPD->GetPointData()->SetNormals(this->pointNormals);
+		//mPD->GetCellData()->SetNormals(this->cellNormals);
+
+	}
+	if (mode == 0 || mode == 1)
+	{
+		if (mPD != NULL)
+		{
+			if (mode == 0)
+			{
+				
+				//mPD->GetCellData()->RemoveArray("Normals");
+				//mPD->GetPointData()->SetNormals(this->pointNormals);
+				mPD->GetCellData()->SetNormals(this->cellNormals);
+				//cout << "Remove point normals" << endl;
+				mPD->GetPointData()->RemoveArray("Normals");
+				if (this->cellNormals!=nullptr)
+				{
+
+					//cout << "There are here " << this->cellNormals->GetNumberOfTuples()
+					//	<< "  Cells in cellNormals" << endl;
+				}
+				else
+				{
+					//cout << "this->cellNormals  is null " << endl;
+				}
+				
+			}
+			else
+			{
+				//cout <<"Try mode 1 point normals" << endl;
+				//cout << "Remove cell normals" << endl;
+				mPD->GetCellData()->RemoveArray("Normals");
+				mPD->GetPointData()->SetNormals(this->pointNormals);
+				if (this->pointNormals != nullptr)
+				{
+
+					//cout << "There are here " << this->pointNormals->GetNumberOfTuples()
+					//	<< " Float point normals inside pointNormals" << endl;
+				}
+				else
+				{
+					//cout << "this->pointNormals  is null " << endl;
+				}
+
+
+
+			}
+			//cout << "Now what we REALLY map:" << endl;
+			vtkFloatArray* norms = vtkFloatArray::SafeDownCast(mPD->GetCellData()->GetNormals());
+			if (norms)
+			{
+
+				//cout << "There are here " << norms->GetNumberOfTuples()
+				//	<< " Float Cell normals" << endl;
+			}
+			else
+			{
+			//	cout << "cell norms  is null " << endl;
+			}
+
+			norms = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetNormals());
+			if (norms)
+			{
+
+				//cout << "There are here " << norms->GetNumberOfTuples()
+				//	<< " Float point normals" << endl;
+			}
+			else
+			{
+				//cout << "point norms  is null " << endl;
+				
+			}
+
+		}
+		this->GetProperty()->SetRepresentationToSurface();
+
+	}
+	else if (mode == 2)
+	{
+		this->GetProperty()->SetRepresentationToWireframe();
+
+	}
+	else
+	{
+		this->GetProperty()->SetRepresentationToPoints();
+
+	}
+
+}
+void vtkMDActor::BuildConnectivityFilter()
+{
+	vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+	{
+		if (this->GetKdTree() == nullptr)
+		{
+			
+			this->BuildKdTree();
+			cout << "KdTree built" << endl;
+		}
+		this->cFilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+		vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+		
+		this->cFilter->SetInputData(mymapper->GetInput());
+		this->cFilter->SetExtractionModeToAllRegions();
+		this->cFilter->ColorRegionsOn();
+		//this->cFilter->set
+		this->cFilter->Update();
+		this->cFilterCorrList = vtkSmartPointer<vtkIdList>::New();
+		this->cFilterCorrList->SetNumberOfIds(this->cFilter->GetOutput()->GetNumberOfPoints());
+		this->cFilterCorrList2 = vtkSmartPointer<vtkIdList>::New();
+		this->cFilterCorrList2->SetNumberOfIds(mymapper->GetInput()->GetNumberOfPoints());
+	/*	cout << "Build connectivity filter" << endl;
+		cout << "Orig ve number : " << mymapper->GetInput()->GetNumberOfPoints();
+		cout << "Conn filter ve number : " << this->cFilter->GetOutput()->GetNumberOfPoints();*/
+		for (vtkIdType i = 0; i < this->cFilter->GetOutput()->GetNumberOfPoints(); i++)
+		{
+			double vecf[3];
+			double veorig[3];
+			double vecorr[3];
+			this->cFilter->GetOutput()->GetPoint(i, vecf);
+			mymapper->GetInput()->GetPoint(i, veorig);
+			
+			vtkIdType corr = this->GetKdTree()->FindClosestPoint(vecf);
+			mymapper->GetInput()->GetPoint(corr, vecorr);
+		/*	if (i < 10) {
+				cout << "cFilter ve" << i << ":" << vecf[0] << "," << vecf[1] << "," << vecf[2] << endl;
+				cout << "orig ve" << i << ":" << veorig[0] << "," << veorig[1] << "," << veorig[2] << endl;
+				cout << "corr ve" << corr << ":" << vecorr[0] << "," << vecorr[1] << "," << vecorr[2] << endl;
+				
+			}*/
+			
+			//this->cFilterCorrList->InsertNextId(corr);
+			this->cFilterCorrList->SetId(i, corr);
+			//this->cFilterCorrList2->SetId(corr, i);
+		}
+
+		vtkSmartPointer<vtkKdTreePointLocator> KDTree2 = vtkSmartPointer<vtkKdTreePointLocator>::New();
+		
+		KDTree2->SetDataSet(this->cFilter->GetOutput());
+		KDTree2->BuildLocator();
+		for (vtkIdType i = 0; i < mymapper->GetInput()->GetNumberOfPoints(); i++)
+		{
+			
+			double veorig[3];			
+			mymapper->GetInput()->GetPoint(i, veorig);
+			vtkIdType corr2 = KDTree2->FindClosestPoint(veorig);	
+			this->cFilterCorrList2->SetId(i, corr2);
+			
+		}
+		
+	}
+
+}
+
+vtkSmartPointer<vtkPolyDataConnectivityFilter> vtkMDActor::GetConnectivityFilter()
+{
+	return this->cFilter;
+}
+vtkSmartPointer<vtkIdList> vtkMDActor::GetConnectivityRegionsCorrList()
+{
+	return this->cFilterCorrList;
+}
+vtkSmartPointer<vtkIdList> vtkMDActor::GetConnectivityRegionsCorrList2()
+{
+	return this->cFilterCorrList2;
+}
+vtkIdType vtkMDActor::GetCorrPickedId(vtkIdType picked)
+{
+	if (this->cFilterCorrList2 == nullptr) { return 0; }
+	else
+	{
+		if (picked < this->cFilterCorrList2->GetNumberOfIds())
+		{
+			return this->cFilterCorrList2->GetId(picked);
+		}
+		
+	}
+	return 0;
+}
+vtkSmartPointer<vtkIdTypeArray>  vtkMDActor::GetConnectivityRegions()
+{
+	if (this->cFilter == nullptr)
+	{
+		//cout << "Build connectivity filter" << endl;
+		this->BuildConnectivityFilter();
+		
+	}
+	if (this->cFilter == nullptr)
+	{
+		return nullptr;
+	}
+	else
+	{
+		vtkSmartPointer<vtkIdTypeArray> currentRegions = vtkSmartPointer<vtkIdTypeArray>::New();
+
+		//my_data->GetNu
+		currentRegions = vtkIdTypeArray::SafeDownCast(this->cFilter->GetOutput()->GetPointData()->GetArray("RegionId"));
+		return currentRegions;
+	}
+}
+
+/*	vtkSmartPointer<vtkIdTypeArray> currentRegions = vtkSmartPointer<vtkIdTypeArray>::New();
+
+				//my_data->GetNu
+				currentRegions = vtkIdTypeArray::SafeDownCast(cfilter->GetOutput()->GetPointData()->GetArray("RegionId"));
+*/
+void vtkMDActor::FreeConnectivityFilter()
+{
+	this->cFilter = nullptr;
+}
+void vtkMDActor::BuildKdTree()
+{
+	//do not care about position matrix as long as we can convert picked coordinate to vertex id thanks to picker->GetPointId();
+	vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+	{
+
+		vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+		this->KdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
+		mPD = mymapper->GetInput();
+		this->KdTree->SetDataSet(mPD);
+		this->KdTree->BuildLocator();
+	}
+}
+void vtkMDActor::FreeKdTree()
+{
+	this->KdTree = nullptr;
+}
+vtkSmartPointer<vtkKdTreePointLocator> vtkMDActor::GetKdTree()
+{
+	return this->KdTree;
 }
 int vtkMDActor::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {
@@ -360,7 +629,7 @@ void vtkMDActor::SetSelected(int selected)
 	{
 		if (this->GetMapper() != NULL && mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
 		{
-			QString none = QString("none");
+			QString none = QString("Solid color");
 			if (mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name != none)
 			{
 				vtkPolyDataMapper::SafeDownCast(this->GetMapper())->ScalarVisibilityOn();
@@ -487,6 +756,7 @@ void vtkMDActor::PopUndoStack()
 	toSaveArray = NULL;
 	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
 	//savedArray = NULL;
+	int arrayType = 0;
 
 	if (this->UndoRedo->UndoStack.back().arrayName.isEmpty() == false)
 	{ // potentially, we have to replace current scalar.
@@ -497,32 +767,43 @@ void vtkMDActor::PopUndoStack()
 			cout << "Here something we have scalars to save! deep copy array " << this->UndoRedo->UndoStack.back().arrayName.toStdString() << endl;
 			
 			int dataType = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->UndoStack.back().arrayName.toStdString().c_str())->GetDataType();
+			arrayType = this->UndoRedo->UndoStack.back().arrayType;
 
-			if (dataType == VTK_UNSIGNED_CHAR) {
-				savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+			if (arrayType == 2)
+			{
+				if (dataType == VTK_UNSIGNED_CHAR) {
+					savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+				}
 			}
-			else if (dataType == VTK_UNSIGNED_INT) {
-				savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
-			}
-			else if (dataType == VTK_INT) {
-				savedArray = vtkSmartPointer<vtkIntArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//cout << "Array" << i << " contains INTs" << endl; 
-			}
-			else if (dataType == VTK_FLOAT) {
-				savedArray = vtkSmartPointer<vtkFloatArray>::New();
-				savedArray->DeepCopy(toSaveArray);
+			else if (arrayType == 1)
+			{
 
-				//cout << "Array" << i << " contains FLOATs" << endl; 
+				if (dataType == VTK_UNSIGNED_INT) {
+					savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
+				}
+				else if (dataType == VTK_INT) {
+					savedArray = vtkSmartPointer<vtkIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains INTs" << endl; 
+				}
 			}
-			else if (dataType == VTK_DOUBLE) {
-				savedArray = vtkSmartPointer<vtkDoubleArray>::New();
-				savedArray->DeepCopy(toSaveArray);
-				//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+			else if (arrayType == 0)
+				{
+				 if (dataType == VTK_FLOAT) {
+					savedArray = vtkSmartPointer<vtkFloatArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+
+					//cout << "Array" << i << " contains FLOATs" << endl; 
+				}
+				else if (dataType == VTK_DOUBLE) {
+					savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+				}
 			}
 			else
 			{
@@ -590,7 +871,8 @@ void vtkMDActor::PopUndoStack()
 	this->Name = this->UndoRedo->UndoStack.back().Name;
 	//cout << "Undo name: " << this->UndoRedo->UndoStack.back().Name;
 	cout << "PopUndoStack Set Selected: " << mCurrentSelected << endl;
-	this->UndoRedo->RedoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name, this->UndoRedo->UndoStack.back().arrayName, savedArray));
+	std::cout << "PopUndoStack: " << endl << arrayType << std::endl;
+	this->UndoRedo->RedoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name, this->UndoRedo->UndoStack.back().arrayName, savedArray, arrayType));
 	this->UndoRedo->UndoStack.pop_back();
 	this->Modified();
 }
@@ -610,17 +892,62 @@ void vtkMDActor::PopRedoStack()
 	vtkDataArray *toSaveArray;
 	toSaveArray = NULL;
 	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
-	
+	int arrayType = 0;
 
 	if (this->UndoRedo->RedoStack.back().arrayName.isEmpty() == false)
 	{ // potentially, we have to replace current scalar.
 		toSaveArray = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->RedoStack.back().arrayName.toStdString().c_str());;
-
+		
 		if (toSaveArray != NULL)
 		{
-			savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+			/*savedArray = vtkSmartPointer<vtkDoubleArray>::New();
 			savedArray->DeepCopy(toSaveArray);
-			cout << "POPREDO: deep copy array" << this->UndoRedo->RedoStack.back().arrayName.toStdString() << endl;
+			cout << "POPREDO: deep copy array" << this->UndoRedo->RedoStack.back().arrayName.toStdString() << endl;*/
+			arrayType = this->UndoRedo->RedoStack.back().arrayType;
+			int dataType = this->GetMapper()->GetInput()->GetPointData()->GetScalars(this->UndoRedo->RedoStack.back().arrayName.toStdString().c_str())->GetDataType();
+
+			if (arrayType == 2)
+			{
+				if (dataType == VTK_UNSIGNED_CHAR) {
+					savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+				}
+			}
+			else if (arrayType == 1)
+			{
+
+				if (dataType == VTK_UNSIGNED_INT) {
+					savedArray = vtkSmartPointer<vtkUnsignedIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
+				}
+				else if (dataType == VTK_INT) {
+					savedArray = vtkSmartPointer<vtkIntArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//cout << "Array" << i << " contains INTs" << endl; 
+				}
+			}
+			else if (arrayType == 0)
+			{
+				if (dataType == VTK_FLOAT) {
+					savedArray = vtkSmartPointer<vtkFloatArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+
+					//cout << "Array" << i << " contains FLOATs" << endl; 
+				}
+				else if (dataType == VTK_DOUBLE) {
+					savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+					savedArray->DeepCopy(toSaveArray);
+					//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+				}
+			}
+			else
+			{
+				//savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				//savedArray->DeepCopy(toSaveArray);
+			}
+
 		}
 
 		toRestoreArray = this->UndoRedo->RedoStack.back().sauvArray;
@@ -662,16 +989,18 @@ void vtkMDActor::PopRedoStack()
 	this->mColor[3] = this->UndoRedo->RedoStack.back().Color[3];
 	this->SetSelected(this->UndoRedo->RedoStack.back().Selected);
 	cout << "PopRedoStack Set Selected: " << mCurrentSelected << endl;
-	this->Name = this->UndoRedo->RedoStack.back().Name;
-
-
-	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name, this->UndoRedo->RedoStack.back().arrayName, savedArray));
+	this->Name = this->UndoRedo->RedoStack.back().Name;	
+	std::cout << "PopRedoStack: " << endl << arrayType << std::endl;
+	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myCurrentColor, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name, this->UndoRedo->RedoStack.back().arrayName, savedArray, arrayType));
 	this->UndoRedo->RedoStack.pop_back();
 	this->Modified();
 }
 
-void vtkMDActor::SaveState(int mCount, QString arrayToSave)
+void vtkMDActor::SaveState(int mCount, QString arrayToSave, int arrayType)
 {
+	//arrayType: 0 "scalar"
+	// 1 : "tag"
+	// 2 : "rgb"
 	//cout << "myActor Save Position: redostack clear." << endl;
 	this->UndoRedo->RedoStack.clear();
 
@@ -705,10 +1034,24 @@ void vtkMDActor::SaveState(int mCount, QString arrayToSave)
 		cout << "Try to get " << arrayToSave.toStdString() << "array" << endl;
 		if (myArray != NULL)
 		{
-			savedArray = vtkSmartPointer<vtkDoubleArray>::New();
-			savedArray->DeepCopy(myArray);
-			cout << "Have deep copied " << arrayToSave.toStdString() << "array" << endl;
-		
+			if (arrayType == 0)//scalar
+			{
+				savedArray = vtkSmartPointer<vtkDoubleArray>::New();
+				savedArray->DeepCopy(myArray);
+				cout << "Have deep copied " << arrayToSave.toStdString() << "array" << endl;
+			}
+			else 	if (arrayType == 1)// tag
+			{ 
+				savedArray = vtkSmartPointer<vtkIntArray>::New();
+				savedArray->DeepCopy(myArray);
+				cout << "Have deep copied tag " << arrayToSave.toStdString() << "array" << endl;
+			}
+			else if (arrayType == 2) //RGB
+			{
+				savedArray = vtkSmartPointer<vtkUnsignedCharArray>::New();
+				savedArray->DeepCopy(myArray);
+				cout << "Have deep copied RGB " << arrayToSave.toStdString() << "array" << endl;
+			}
 		}
 		
 
@@ -717,8 +1060,9 @@ void vtkMDActor::SaveState(int mCount, QString arrayToSave)
 	}
 
 
-	//std::cout << "Saved Matrix Copy: " << endl << *SavedMat << std::endl;
-	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myColor, mSelected, mCount, name, arrayToSave, savedArray));
+	std::cout << "Save state: " << endl << arrayType << std::endl;
+	
+	this->UndoRedo->UndoStack.push_back(vtkMDActorUndoRedo::Element(SavedMat, myColor, mSelected, mCount, name, arrayToSave, savedArray, arrayType));
 
 }
 //----------------------------------------------------------------------------

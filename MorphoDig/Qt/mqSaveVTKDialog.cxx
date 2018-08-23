@@ -58,15 +58,21 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  this->Ui->PositionOriginal->setChecked(true);
  this->Ui->scalarList->clear();
  ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfSelectedObjects(0);
+ QString none = QString("Solid color");
  for (int i = 0; i < MyList->Stack.size(); i++)
  {
-	 if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
-	 {
-		 QListWidgetItem* item = new QListWidgetItem(MyList->Stack.at(i).Name, this->Ui->scalarList);
-		 item->setFlags(item->flags() | Qt::ItemIsUserCheckable); // set checkable flag
-		 item->setCheckState(Qt::Checked);
+	 //if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
+	// {
+
+
+	 	 if (MyList->Stack.at(i).Name != none)
+		 {
+			 QListWidgetItem* item = new QListWidgetItem(MyList->Stack.at(i).Name, this->Ui->scalarList);
+			 item->setFlags(item->flags() | Qt::ItemIsUserCheckable); // set checkable flag
+			 item->setCheckState(Qt::Checked);
+		 }
 		
-	 }
+	// }
 
  }
  /*
@@ -106,7 +112,7 @@ mqSaveVTKDialog::~mqSaveVTKDialog()
 }
 void mqSaveVTKDialog::slotSaveVTKFile()
 {
-	cout << "VTK File Saved!" << endl;
+	cout << "Save VTK File!" << endl;
 	int position_mode = 0; // 0 Original position , 1 Modified position
 	int file_type = 1; // 0 STL 1 VTK/VTP, 2 PLY
 	int save_norms = 0; //0 no, 1 yes
@@ -126,11 +132,9 @@ void mqSaveVTKDialog::slotSaveVTKFile()
 			mscalarsToBeRemoved.push_back(this->Ui->scalarList->item(i)->text().toStdString());
 		}
 	}
-	// RGB and Tags ? Not handled yet... 
-	int RGBopt = 0;
-	if (this->Ui->RGBkeep->isChecked()) { RGBopt = 0; }
-	if (this->Ui->RGBremove->isChecked()) { RGBopt = 1; }
-	if (this->Ui->RGBreplace->isChecked()) { RGBopt = 2; }
+	 
+	int RGBopt = 0; //Keep RGB if exists... as RGB scalars can be handled totally via windows menus etc... 
+	
 	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved,RGBopt, save_norms);
 
 }

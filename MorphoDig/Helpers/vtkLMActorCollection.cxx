@@ -39,7 +39,6 @@ vtkLMActorCollection::~vtkLMActorCollection()
 	
 
 }
-
 void vtkLMActorCollection::LandmarksMoveUp()
 {
 // mode = 0 : user landmark move up (more than one can be selected
@@ -47,7 +46,6 @@ void vtkLMActorCollection::LandmarksMoveUp()
 
 	// mode = 1 : called by "Reorder_Landmarks" (only one landmark is selected): 
 	// mode = 1 is not followed by a change of landmark indices...
-
 
 
 	
@@ -103,7 +101,6 @@ void vtkLMActorCollection::LandmarksMoveDown()
 
 	// mode = 1 : called by "Reorder_Landmarks" (only one landmark is selected): 
 	// mode = 1 is not followed by a change of landmark indices...
-
 
 
 	vtkLMActor *LastOBJ = NULL;

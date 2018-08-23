@@ -108,6 +108,8 @@ vtkMDActor* vtkMDActorCollection::GetActorBefore(vtkMDActor *Actor)
 	return Before;
 }
 
+
+
 vtkMDActor *vtkMDActorCollection::GetActorAfter(vtkMDActor *Actor)
 {
 	vtkMDActor *After = NULL;
@@ -150,6 +152,26 @@ vtkMDActor* vtkMDActorCollection::GetFirstSelectedActor()
 	return NULL;
 }
 //----------------------------------------------------------------------------
+void vtkMDActorCollection::SetDisplayMode(int mode)
+{
+	//mode 0 : cell normals
+	//mode 1 : point normals
+	//mode 2 : wireframe
+	//mode 3 : points
+	this->InitTraversal();
+	for (vtkIdType i = 0; i < this->GetNumberOfItems(); i++)
+	{
+
+		vtkMDActor *act = vtkMDActor::SafeDownCast(this->GetNextActor());
+		if (act != NULL) {
+			act->SetDisplayMode(mode);
+			
+		}
+
+	}
+
+}
+
 vtkMDActorCollection::~vtkMDActorCollection()
 {
 	

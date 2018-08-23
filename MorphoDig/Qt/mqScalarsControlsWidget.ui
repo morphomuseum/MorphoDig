@@ -54,7 +54,7 @@
        <item>
         <widget class="QToolButton" name="ScalarsVisibility">
          <property name="toolTip">
-          <string>Display scalars on/off toggle button</string>
+          <string>Display arrays on/off toggle button</string>
          </property>
          <property name="text">
           <string/>
@@ -73,6 +73,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="ColorScaleEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="toolTip">
           <string>Edit look up table</string>
          </property>
@@ -90,6 +93,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="TagEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="toolTip">
           <string>Edit tags</string>
          </property>

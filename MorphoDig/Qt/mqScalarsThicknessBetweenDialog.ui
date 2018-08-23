@@ -489,7 +489,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="smoothNormales">
+   <widget class="QCheckBox" name="smoothNormals">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -613,7 +613,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Observed object:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="invertObservedNormales">
+   <widget class="QCheckBox" name="invertObservedNormals">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -623,7 +623,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>invert normales of observed object</string>
+     <string>invert normals of observed object</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_11">

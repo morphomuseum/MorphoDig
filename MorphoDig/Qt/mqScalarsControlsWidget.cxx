@@ -30,21 +30,9 @@ void mqScalarsControlsWidget::constructor()
   //@@ to do : populate combo box according to found scalars
   // Create a list with all possible scalars.
   //this->comboActiveScalars->addItems({ "Initial RGB", "Tags", "Thickness", "Curvature"});
-  this->comboActiveScalars->addItems({ "none" });
+  this->comboActiveScalars->addItems({ "Solid color" });
   // Add values in the combo box
   this->ui->horizontalLayout->addWidget(this->comboActiveScalars);
-  if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
-  {
-	  this->comboActiveScalars->setDisabled(false);
-	  this->ui->ScalarsVisibility->setChecked(true);
-	 
-  }
-  else
-  {
-	  this->comboActiveScalars->setDisabled(true);
-	  this->ui->ScalarsVisibility->setChecked(false);
-	 
-  }
   
   
   
@@ -69,7 +57,7 @@ void mqScalarsControlsWidget::constructor()
   
 
   new mqEditScalarsDialogReaction(colorScaleAction);
-  this->ui->ColorScaleEdit->setDisabled(true);
+  
 
 
   //@@@
@@ -82,7 +70,24 @@ void mqScalarsControlsWidget::constructor()
   //  exportColorMap->setIcon(icon);
   TagEditAction->setIcon(icon2);
   new mqEditTagsDialogReaction(TagEditAction);
-  this->ui->TagEdit->setDisabled(true);
+  if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
+  {
+	  this->comboActiveScalars->setDisabled(false);
+	  this->ui->ColorScaleEdit->setDisabled(false);
+	  this->ui->TagEdit->setDisabled(false);
+	  this->ui->ScalarsVisibility->setChecked(true);
+
+  }
+  else
+  {
+	  this->comboActiveScalars->setDisabled(true);
+	  this->ui->ColorScaleEdit->setDisabled(true);
+	  this->ui->TagEdit->setDisabled(true);
+	  this->ui->ScalarsVisibility->setChecked(false);
+
+  }
+
+  
 }
 
 void mqScalarsControlsWidget::slotActiveScalarChanged(int idx)
@@ -99,7 +104,7 @@ void mqScalarsControlsWidget::slotActiveScalarChanged(int idx)
 				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).DataType, 
 				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).NumComp
 			);
-			this->RefreshEditButtons();
+			//this->RefreshEditButtons();
 
 		}
 	}
@@ -158,7 +163,7 @@ void mqScalarsControlsWidget::slotRefreshComboScalars()
 	if (exists > -1) { 
 		//cout << "Now current index of combo box is " << exists << endl;
 		this->comboActiveScalars->setCurrentIndex(exists); 
-		this->RefreshEditButtons();
+		//this->RefreshEditButtons();
 		
 	}
 	
@@ -171,12 +176,16 @@ void mqScalarsControlsWidget::slotScalarVisitiliby()
 		mqMorphoDigCore::instance()->Setmui_ScalarVisibility(1);
 		this->ui->ScalarsVisibility->setChecked(false);// this should be "true"... but the ui has decided otherwise... 
 		this->comboActiveScalars->setDisabled(false);
+		this->ui->ColorScaleEdit->setDisabled(false);
+		this->ui->TagEdit->setDisabled(false);
 	}
 	else
 	{
 		mqMorphoDigCore::instance()->Setmui_ScalarVisibility(0);
 		this->ui->ScalarsVisibility->setChecked(true);// this should be "false"... but the ui has decided otherwise... 
 		this->comboActiveScalars->setDisabled(true);
+		this->ui->ColorScaleEdit->setDisabled(true);
+		this->ui->TagEdit->setDisabled(true);
 	}
 	
 	mqMorphoDigCore::instance()->Render();

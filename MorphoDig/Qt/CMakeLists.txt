@@ -83,30 +83,18 @@ mqViewMenuManager.cxx
   mqUndoRedoReaction.cxx
   mqUndoStack.h
   mqUndoStack.cxx
-  mqObjectsControlsToolbar.h
-  mqObjectsControlsToolbar.cxx
   mqObjectsControlsWidget.h
   mqObjectsControlsWidget.cxx
-  mqCameraControlsToolbar.h
-  mqCameraControlsToolbar.cxx
   mqCameraControlsWidget.h
   mqCameraControlsWidget.cxx
-  mqMainControlsToolbar.h
-  mqMainControlsToolbar.cxx
   mqMainControlsWidget.h
   mqMainControlsWidget.cxx
-  mqDisplayControlsToolbar.h
-  mqDisplayControlsToolbar.cxx
   mqDisplayControlsWidget.h
   mqDisplayControlsWidget.cxx
   mqInteractionControlsWidget.h
   mqInteractionControlsWidget.cxx
-  mqLightControlsToolbar.h
-  mqLightControlsToolbar.cxx
   mqLightControlsWidget.h
   mqLightControlsWidget.cxx
-  mqScalarsControlsToolbar.h
-  mqScalarsControlsToolbar.cxx
   mqScalarsControlsWidget.h
   mqScalarsControlsWidget.cxx
   mqMorphoDigCore.h
@@ -243,6 +231,14 @@ mqSaveMAPDialog.cxx
 mqSaveMAPDialog.h
 mqSaveMAPDialogReaction.cxx
 mqSaveMAPDialogReaction.h
+mqTagFromRGBDialog.cxx
+mqTagFromRGBDialog.h
+mqTagFromRGBDialogReaction.cxx
+mqTagFromRGBDialogReaction.h
+mqMergeTagsDialog.cxx
+mqMergeTagsDialog.h
+mqMergeTagsDialogReaction.cxx
+mqMergeTagsDialogReaction.h
 )
 
 set (Qt_MOC_HDRS
@@ -253,11 +249,8 @@ set (Qt_MOC_HDRS
 set (Qt_UIs mqAboutDialog.ui 
 mqColorDialog.ui 
 mqLandmarkDialog.ui  
-mqCameraControlsToolbar.ui 
 mqCameraControlsWidget.ui 
-mqObjectsControlsToolbar.ui 
 mqObjectsControlsWidget.ui 
-mqMainControlsToolbar.ui 
 mqMainControlsWidget.ui 
 mqSavePLYDialog.ui 
 mqSaveVTKDialog.ui 
@@ -278,12 +271,9 @@ mqEditTagsDialog.ui
 mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
 mqSelectLandmarkRangeDialog.ui
-mqLightControlsToolbar.ui
 mqLightControlsWidget.ui
 mqInteractionControlsWidget.ui
 mqDisplayControlsWidget.ui
-mqDisplayControlsToolbar.ui
-mqScalarsControlsToolbar.ui
 mqScalarsControlsWidget.ui
 mqGridSizeDialog.ui
 mqOrientationLabelsDialog.ui
@@ -305,6 +295,8 @@ mqICPDialog.ui
 mqColorOpacityEditorWidget.ui
 mqSaveMAPDialog.ui
 mqSaveTAGMAPDialog.ui
+mqTagFromRGBDialog.ui
+mqMergeTagsDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

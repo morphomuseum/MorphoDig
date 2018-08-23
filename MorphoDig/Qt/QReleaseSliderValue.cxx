@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <QLabel>
 //#include "QDoubleSlider.h"
 #include "QReleaseSlider.h"
 #include "QReleaseSliderValue.h"
@@ -12,26 +13,17 @@ QReleaseSliderValue::QReleaseSliderValue(Qt::Orientation orientation, const QStr
 	this->spinbox = new QSpinBox;
 	this->spinbox->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->spinbox->setDisabled(true);
-	//this->spinbox->setMaximum(90);
-	//this->spinbox->setMinimum(-90);
-	//this->spinbox->setFixedWidth(20);
-	//this->spinbox->setFixedSize(15, 15);
-	this->spinbox->setFixedSize(16, 15);
+		this->spinbox->setFixedSize(16, 15);
 	QFont font(this->spinbox->font());
 	font.setPointSize(4);
 	this->spinbox->setFont(font);
 
-	this->slider = new QReleaseSlider;
-	//this->slider = new QSlider(orientation);
-	//this->slider = new QDoubleSlider;
-	//this->slider = new QDoubleSlider;
-	//this->slider->setFocusPolicy(Qt::StrongFocus);
-	//this->slider->setTickPosition(QSlider::TicksBothSides);
-	//this->slider->setTickInterval(10);
+	this->slider = new QReleaseSlider;	
 	this->slider->setSingleStep(0.2);
-
-	
-	
+	this->labelVisible = 0;
+	this->spinboxVisible = 0;
+	this->label = new QLabel;
+	this->label->setText("T");
 	connect(slider, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
 	connect(slider, SIGNAL(valueChanged(int)), this, SIGNAL(valueChanged(int)));
 
@@ -46,16 +38,32 @@ QReleaseSliderValue::QReleaseSliderValue(Qt::Orientation orientation, const QStr
 		direction = QBoxLayout::LeftToRight;
 	}
 
-	//QBoxLayout *slidersLayout = new QBoxLayout(direction);
-	QVBoxLayout *layout2 = new QVBoxLayout;
-	layout2->setAlignment(Qt::AlignCenter);
-	layout2->addWidget(slider);
-	layout2->addWidget(spinbox);
-	setLayout(layout2);
-	//this->setContentsMargins(0, 0, 0, 0);
-	//this->setFixedWidth(30);
+	this->layout = new QVBoxLayout;
+	this->layout->setAlignment(Qt::AlignCenter);
+	this->layout->addWidget(slider);
+	
+	setLayout(this->layout);
+	this->layout->setSpacing(0);
+	this->layout->setMargin(0);
+	this->setMaximumWidth(16);
+	
 }
-
+void QReleaseSliderValue::setLabelVisible(int visible)
+{
+	this->labelVisible = visible;
+	if (visible == 0) { this->layout->removeWidget(this->label); }
+	else{ this->layout->addWidget(this->label); }
+}
+void QReleaseSliderValue::setSpinboxVisible(int visible)
+{
+	this->spinboxVisible = visible;
+	if (visible == 0) { this->layout->removeWidget(this->spinbox); }
+	else { this->layout->addWidget(this->spinbox); }
+}
+void QReleaseSliderValue::setLabelText(QString text)
+{
+	this->label->setText(text.toStdString().c_str());
+}
 void QReleaseSliderValue::setValue(int value)
 {
 	slider->setValue(value);
@@ -77,13 +85,13 @@ void QReleaseSliderValue::setMaximum(int value)
 void QReleaseSliderValue::invertAppearance(bool invert)
 {
 	slider->setInvertedAppearance(invert);
-	//spinbox->setInvertedAppearance(invert);
+
 	
 }
 
 void QReleaseSliderValue::invertKeyBindings(bool invert)
 {
 	slider->setInvertedControls(invert);
-	//spinbox->setInvertedControls(invert);
+	
 	
 }

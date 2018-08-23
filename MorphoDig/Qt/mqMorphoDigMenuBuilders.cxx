@@ -35,19 +35,13 @@
 #include "mqColorDialogReaction.h"
 #include "mqLandmarkDialogReaction.h"
 #include "mqMorphoDigMenuBuilders.h"
-//#include "mqCameraControlsToolbar.h"
 #include "mqCameraControlsWidget.h"
-//#include "mqMainControlsToolbar.h"
 #include "mqMainControlsWidget.h"
 #include "mqInteractionControlsWidget.h"
 #include "mqDisplayControlsWidget.h"
-#include "mqDisplayControlsToolbar.h"
-//#include "mqLightControlsToolbar.h"
 #include "mqLightControlsWidget.h"
 #include "mqActorTreePanel.h"
-//#include "mqObjectsControlsToolbar.h"
 #include "mqObjectsControlsWidget.h"
-//#include "mqScalarsControlsToolbar.h"
 #include "mqScalarsControlsWidget.h"
 #include "mqDesktopServicesReaction.h"
 #include "mqOpenDataReaction.h"
@@ -69,6 +63,7 @@
 #include "mqDensifyDialogReaction.h"
 #include "mqFillHolesDialogReaction.h"
 #include "mqTPSDialogReaction.h"
+#include "mqTagFromRGBDialogReaction.h"
 #include "mqDecomposeDialogReaction.h"
 #include "mqScalarsThicknessDialogReaction.h"
 #include "mqScalarsComplexityDialogReaction.h"
@@ -136,12 +131,17 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   QMenu* submenuLandmark = menu.addMenu("Landmarks");
   QMenu* submenuCurves = menu.addMenu("Curves");
   
-  QMenu* submenuTagsAndFlags = menu.addMenu("Tags and Flags");
+  QMenu* submenuFlags = menu.addMenu("Flags");
+  new mqOpenDataReaction(submenuFlags->addAction("Open Flag") << mqSetName("actionOpenFLG"), 6);
+  new mqSaveFlagsDialogReaction(submenuFlags->addAction("SaveFlags") << mqSetName("actionSaveFLG"));
+  QMenu* submenuColorMaps = menu.addMenu("Color maps");
+  QMenu* submenuTags = menu.addMenu("Tag maps");
+
   //QMenu* submenuFileInfos = menu.addMenu("Save infos (surface, area, volume)");
   QMenu* submenuOrientationLabels = menu.addMenu("Orientation helper labels");
   QMenu* submenuMeasurements = menu.addMenu("Measurements");
-  QMenu* submenuColorMaps = menu.addMenu("Color maps");
-  QMenu* submenuTagMaps = menu.addMenu("Tag maps");
+  
+  
 
   new mqOpenDataReaction(submenuProject->addAction("Open Project") << mqSetName("actionOpenNTW"), 1);
   new mqSaveNTWDialogReaction(submenuProject->addAction("Save Project") << mqSetName("actionSaveNTW"));
@@ -151,28 +151,30 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveVTKDialogReaction(submenuSurface->addAction("Save selected surfaces in one single VTK PolyData (.VTK or .VTP) file") << mqSetName("actionSaveVTP"));
   new mqSaveSTLDialogReaction(submenuSurface->addAction("Save selected surfaces in one single .STL file") << mqSetName("actionSaveSTL"));
     
-  new mqOpenDataReaction(submenuLandmark->addAction("Open MorphoDig Landmark/Curve file (STV)") << mqSetName("actionOpenSTV"), 16);
+  new mqOpenDataReaction(submenuLandmark->addAction("Open MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionOpenSTV"), 16);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Landmarks") << mqSetName("actionOpenNormalLMK"), 3);
   new mqOpenDataReaction(submenuLandmark->addAction("Open Target Landmarks") << mqSetName("actionOpenNormalLMK"), 4);
-  new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (MAP)") << mqSetName("actionOpenMAP"), 17);
-  new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (MAP)") << mqSetName("actionSaveMAP"));
+  new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (.MAP)") << mqSetName("actionOpenMAP"), 17);
+  new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (.MAP)") << mqSetName("actionSaveMAP"));
   
-  new mqOpenDataReaction(submenuTagMaps->addAction("Import tag maps (.TGM, .TAG)") << mqSetName("actionOpenTAGMAP"), 18);
-  new mqSaveTAGMAPDialogReaction(submenuTagMaps->addAction("Export tag maps (MAP)") << mqSetName("actionSaveTAGMAP"));
+  new mqOpenDataReaction(submenuTags->addAction("Import tag maps (.TGP or .TAG)") << mqSetName("actionOpenTAGMAP"), 9);
+  new mqSaveTAGMAPDialogReaction(submenuTags->addAction("Export tag maps (.TGP or .TAG)") << mqSetName("actionSaveTAGMAP"));
+  
 
-  new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (STV)") << mqSetName("actionSaveSTV"));
+
+  new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionSaveSTV"));
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks") << mqSetName("actionSaveNormalLMK"), 0);
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Target Landmarks") << mqSetName("actionSaveTargetLMK"), 1);
   
   
   
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve (.CUR)") << mqSetName("actionOpenCUR"), 5);
-  new mqOpenDataReaction(submenuCurves->addAction("Open MorphoDig Landmark/Curve file (STV)") << mqSetName("actionOpenSTV2"), 16);
+  new mqOpenDataReaction(submenuCurves->addAction("Open MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionOpenSTV2"), 16);
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve Node Landmarks") << mqSetName("actionOpenNodeLMK"), 14);
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve Handle Landmarks") << mqSetName("actionOpenHandleLMK"), 15);
   new mqSaveCURDialogReaction(submenuCurves->addAction("Save .CUR File ") << mqSetName("actionSaveCURLMK"));
-  new mqSaveSTVDialogReaction(submenuCurves->addAction("Save MorphoDig Landmark/Curve file (STV)") << mqSetName("actionSaveSTV2"));
-  new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Nodes Landmarks") << mqSetName("actionSaveNodeLMK"), 2);
+  new mqSaveSTVDialogReaction(submenuCurves->addAction("Save MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionSaveSTV2"));
+  new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Node Landmarks") << mqSetName("actionSaveNodeLMK"), 2);
   new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Handle Landmarks") << mqSetName("actionSaveHandleLMK"), 3);
   new mqSaveCURasVERDialogReaction(submenuCurves->addAction("Export curve segments as landmark file") << mqSetName("actionExportCUR"));
   new mqSaveDataReaction(submenuCurves->addAction("Save curve infos (length per curve segment)") << mqSetName("actionSaveCURInfos"), 17);
@@ -180,23 +182,22 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
 
   new mqOpenDataReaction(submenuPosition->addAction("Open position for selected surfaces") << mqSetName("actionOpenPOS"), 8);
   new mqOpenDataReaction(submenuPosition->addAction("Open transposed position for selected surfaces") << mqSetName("actionOpenPOS2"), 10);
-  new mqOpenDataReaction(submenuPosition->addAction("Open position for selected landmarks") << mqSetName("actionOpenPOS3"), 11);
-  new mqOpenDataReaction(submenuPosition->addAction("Open transposed position for selected landmarks") << mqSetName("actionOpenPOS4"), 12);
+  new mqOpenDataReaction(submenuPosition->addAction("Open position for selected landmarks/flags") << mqSetName("actionOpenPOS3"), 11);
+  new mqOpenDataReaction(submenuPosition->addAction("Open transposed position for selected landmarks/flags") << mqSetName("actionOpenPOS4"), 12);
   new mqSaveDataReaction(submenuPosition->addAction("Save position for selected surface") << mqSetName("actionSavePOS"), 8);
 
-  new mqOpenDataReaction(submenuTagsAndFlags->addAction("Open Flag") << mqSetName("actionOpenFLG"), 6);
-  new mqSaveFlagsDialogReaction(submenuTagsAndFlags->addAction("SaveFlags") << mqSetName("actionSaveFLG"));
+  
   new mqOpenDataReaction(submenuOrientationLabels->addAction("Open Orientation Labels") << mqSetName("actionOpenORI"), 7);
   new mqSaveDataReaction(submenuOrientationLabels->addAction("Save Orientation Labels") << mqSetName("actionSaveORI"), 7);
   
-  new mqSaveDataReaction(submenuMeasurements->addAction("Save area and volume of selected surfaces") << mqSetName("actionSaveAV"), 18);
+  new mqSaveDataReaction(submenuMeasurements->addAction("Save area, volume, triangle number and vertex number of selected surfaces") << mqSetName("actionSaveAV"), 18);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save normalized shape index of selected surfaces") << mqSetName("actionSaveNSI"), 19);  
   new mqSaveDataReaction(submenuMeasurements->addAction("Save convex hull area ratio and normalized shape index of selected surfaces (warning: slow)") << mqSetName("actionSaveCHNSI"), 20);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save size measurements (max length in xyz direction etc.) of selected surfaces") << mqSetName("actionSaveSize"), 21);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"), 22);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save scalar values of first selected surface") << mqSetName("actionSaveSCInfos"), 23);
 
-  new mqOpenDataReaction(submenuTagsAndFlags->addAction("Open Tag") << mqSetName("actionOpenTAG"), 9);
+  
 
   
 }
@@ -214,7 +215,7 @@ void mqMorphoDigMenuBuilders::buildEditMenu(QMenu& menu)
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
   new mqColorDialogReaction(menu.addAction("Edit color options") << mqSetName("actionColor"));
-  new mqGridSizeDialogReaction(menu.addAction("Edit size unit and grid spacing") << mqSetName("actionGridSize"));
+  new mqGridSizeDialogReaction(menu.addAction("Edit size unit, grid spacing and scale") << mqSetName("actionGridSize"));
   new mqLandmarkDialogReaction(menu.addAction("Edit landmark and flag rendering options") << mqSetName("actionLandmark"));
   new mqOrientationLabelsDialogReaction(menu.addAction("Edit orientation labels") << mqSetName("actionOrientationLabels"));
   //new pqUndoRedoReaction(ui.actionEditUndo, true);
@@ -255,7 +256,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	new mqEditAlphaDialogReaction(submenuRenderingModification->addAction("Change transparency") << mqSetName("actionEditAlpha"));
 
-	QMenu* submenuChangeObjectColor = submenuRenderingModification->addMenu("Change object color");
+	QMenu* submenuChangeObjectColor = submenuRenderingModification->addMenu("Change object solid color");
 
 	QAction *Grey = submenuChangeObjectColor->addAction("Grey");
 	
@@ -320,7 +321,18 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
 	QAction *CreateNewTagArray = submenuTagModification->addAction("Create new empty tag array");
+	new mqTagFromRGBDialogReaction(submenuTagModification->addAction("Create new tag array based on currently displayed colors") << mqSetName("ActrionTagFromRGB"));
+	
+	//là on va faire une fenêtre qui demande 2 choses : 
+	// 1) EXACT color match est-ce qu'on se base sur la tag map actuelle (exact color match) => ce qui implique qu'on puisse y acceder sans avoir d'array tags ouvertes.... ce qui n'est pas un drame, notamment pour éditer les tag maps quand on n'a pas de tags ouverts
+	// 2) si on 
+	//1) on s'arrête à combien de couleurs ?
+	// 
+	
+	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayFromRGB()));
 	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
+	QAction *CreateNewTagArrayConnectivity = submenuTagModification->addAction("Create new tag array based on connectivity");
+	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
 	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
 	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
 	*/
@@ -359,7 +371,7 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	
 
 	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Move curve handles semi-automatically") << mqSetName("actionMoveHandles"), 4);
-	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Normal nodes (red): change as starting nodes (dark red)") << mqSetName("actionStartingNode"), 1);
+	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Normal nodes (red): change as starting nodes (dark green)") << mqSetName("actionStartingNode"), 1);
 	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Normal nodes (red): connect to preceding starting nodes (cyan)") << mqSetName("actionConnectNode"), 3);
 	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Normal nodes (red): define as milestone nodes (blue)") << mqSetName("actionMilestoneNode"), 2);
 	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Reset selected nodes to Normal nodes (red)") << mqSetName("actionNormalNode"), 0);
@@ -509,8 +521,8 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	dock5->setWidget(ObjectsWidget);
 	
 	//
-	/*
-	QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
+	
+	/*QToolBar* ObjectsToolBar = new mqObjectsControlsToolbar(&projectWindow)
 		<< mqSetName("ObjectsControlsToolbar");
 	ObjectsToolBar->layout()->setSpacing(0);
 	projectWindow.addToolBar(Qt::RightToolBarArea, ObjectsToolBar);*/

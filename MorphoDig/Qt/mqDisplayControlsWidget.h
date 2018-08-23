@@ -32,6 +32,10 @@ public:
   public slots :
   virtual void slotClippingPlaneOnOff();
   virtual void slotBackfaceCullingOnOff();
+  virtual void slotDisplayCellNormals();
+  virtual void slotDisplayPointNormals();
+  virtual void slotDisplayWireframe();
+  virtual void slotDisplayPoints();
 private:
 	Q_DISABLE_COPY(mqDisplayControlsWidget)
   

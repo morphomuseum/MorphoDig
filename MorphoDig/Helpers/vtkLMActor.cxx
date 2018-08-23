@@ -221,7 +221,7 @@ void vtkLMActor::CreateLMLabelText()
 	double mult = 1;
 	if (this->LMType == TARGET_LMK || this->LMType == HANDLE_LMK)
 	{
-		mult = 1.2;
+		mult = 1.4;
 	}
 	
 
@@ -346,7 +346,7 @@ void vtkLMActor::CreateLMBody()
 		sphereSource->SetRadius(0.5*this->LMSize);
 		if (this->LMType == TARGET_LMK || this->LMType == HANDLE_LMK)
 		{
-			sphereSource->SetRadius(0.5*1.2*this->LMSize);
+			sphereSource->SetRadius(0.5*1.4*this->LMSize);
 		}
 		sphereSource->Update();
 		this->LMBody = sphereSource->GetOutput();
@@ -360,7 +360,7 @@ void vtkLMActor::CreateLMBody()
 		probeSource->SetArrowLength(3*this->LMSize);
 		if (this->LMType == TARGET_LMK || this->LMType == HANDLE_LMK)
 		{
-			probeSource->SetArrowLength(3*1.2*this->LMSize);
+			probeSource->SetArrowLength(3*1.4*this->LMSize);
 		}
 		else if (this->LMType == FLAG_LMK)
 		{
@@ -387,14 +387,14 @@ void vtkLMActor::ResetLMColor()
 	// Create six colors - one for each line
 	double red[4] = { 1, 0.4, 0.4, 1 };// LMType=0 VERT
 
-	double yellow[4] = { 1, 1, 0,0.5 }; 
-	double darkred[4] = { 0.5, 0, 0, 1 }; 
-	double orange[4] = { 1, 0.5, 0, 0.5 }; 
+	double yellow[4] = { 1, 1, 0,0.3 }; 
+	double darkgreen[4] = { 0, 0.7, 0, 1 }; 
+	double orange[4] = { 1, 0.5, 0, 0.3 }; 
 	double green[4] = { 0.5, 1, 0, 1 };  
 	double blue[4] = { 0, 0.5, 1, 1 }; 
 	
 	double cyan[4] = { 0, 1, 1, 1 }; 
-	double violet[4] = { 0.7, 0, 1, 0.5 }; 
+	double violet[4] = { 0.7, 0, 1, 0.3 }; 
 	double *flgcolor = mqMorphoDigCore::instance()->Getmui_FlagColor();
 	double flagcolor[4] = { flgcolor[0], flgcolor[1], flgcolor[2], 0.5 };// LMType=0 VERT
 	if (this->LMType == NORMAL_LMK) { this->SetmColor(green); }// LMType = 0 (normal LM) vert
@@ -405,7 +405,7 @@ void vtkLMActor::ResetLMColor()
 			this->SetmColor(red);
 		}
 		if (this->LMNodeType == STARTING_NODE) {
-			this->SetmColor(darkred);
+			this->SetmColor(darkgreen);
 		}
 		if (this->LMNodeType == MILESTONE_NODE) {
 			this->SetmColor(blue);

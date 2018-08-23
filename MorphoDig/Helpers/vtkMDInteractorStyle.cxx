@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   Visualization Toolkti
   Inspired from Module:    vtkInteractorStyleRubberBandPick.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
@@ -78,14 +78,22 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define LBUTTON_DOWN 0
 #define LBUTTON_UP 1
 
+#define RBUTTON_DOWN 0
+#define RBUTTON_UP 1
+
+
 #define VTKISMT_ORIENT 0
 #define VTKISMD_SELECT 1
+#define VTKISMD_TAGPENCIL 2
 #define CTRL_RELEASED 0
 #define CTRL_PRESSED 1
 #define ALT_PRESSED 4
 #define ALT_RELEASED 5
 #define L_PRESSED 2
 #define L_RELEASED 3
+#define T_PRESSED 7
+#define T_RELEASED 8
+
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
@@ -97,13 +105,18 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	this->Alt = ALT_RELEASED;
 	//this->MoveMode = MOVECAM_MODE;
 	this->L = L_RELEASED;
+	this->T = T_RELEASED;
 	this->MoveWhat = CAM;
 	this->Ctrl = CTRL_RELEASED;
 	this->LM_Button = LBUTTON_UP;
+	this->RM_Button = RBUTTON_UP;
 	this->StartPosition[0] = this->StartPosition[1] = 0;
 	this->EndPosition[0] = this->EndPosition[1] = 0;
+	this->TagPencilCenterPosition[0] = this->TagPencilCenterPosition[1] = 0;
+	this->TagPencilStarted = 0;
 	this->Moving = 0;
 	this->PixelArray = vtkUnsignedCharArray::New();
+	this->PixelArray2 = vtkUnsignedCharArray::New();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
 	this->NormalLandmarkCollection = vtkSmartPointer<vtkLMActorCollection>::New();
 	this->TargetLandmarkCollection = vtkSmartPointer<vtkLMActorCollection>::New();
@@ -142,6 +155,7 @@ void vtkMDInteractorStyle::SetFlagLandmarkCollection(vtkSmartPointer<vtkLMActorC
 vtkMDInteractorStyle::~vtkMDInteractorStyle()
 {
   this->PixelArray->Delete();
+  this->PixelArray2->Delete();
 }
 
 void vtkMDInteractorStyle::EndRotate()
@@ -251,6 +265,12 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 }
 
 
+//--------------------------------------------------------------------------
+/*void vtkMDInteractorStyle::StartTagPencil()
+{
+	this->CurrentMode = VTKISMD_TAGPENCIL;
+	mqMorphoDigCore::instance()->setCurrentCursor(5);
+}
 
 
 //--------------------------------------------------------------------------
@@ -258,7 +278,7 @@ void vtkMDInteractorStyle::StartSelect()
 {
 	this->CurrentMode = VTKISMD_SELECT;
 	mqMorphoDigCore::instance()->setCurrentCursor(4);
-}
+}*/
 //--------------------------------------------------------------------------
   void vtkMDInteractorStyle::OnKeyPress()
   {
@@ -280,6 +300,32 @@ void vtkMDInteractorStyle::StartSelect()
 	{
 		//cout << "l pressed" << endl;
 		this->L = L_PRESSED;
+	}
+	if (key.compare("t") == 0 || key.compare("T") == 0)
+	{
+		//cout << "l pressed" << endl;
+		this->T = T_PRESSED;
+		
+		
+		if (mqMorphoDigCore::instance()->Getmui_TagModeActivated())
+		{
+			
+			int tool = mqMorphoDigCore::instance()->Getmui_TagTool();
+			if (tool ==0)// pencil
+			{
+				this->CurrentMode = VTKISMD_TAGPENCIL;
+				mqMorphoDigCore::instance()->setCurrentCursor(5);
+				//cout << "Tag Pencil start" << endl;
+				
+				this->TagPencilStart();
+				this->RedrawTagPencilCircle();
+				
+			}
+			else // paint buckett
+			{
+				mqMorphoDigCore::instance()->setCurrentCursor(6);
+			}
+		}
 	}
 	if (key.compare("Control_L") == 0)
 	{
@@ -782,7 +828,15 @@ void vtkMDInteractorStyle::StartSelect()
 		  this->L = L_RELEASED;
 		  // std::cout << key << "Released" << '\n';
 	  }
-
+	  if (key.compare("t") == 0 || key.compare("T") == 0)
+	  {
+		  this->T = T_RELEASED;
+		  this->TagPencilStop();
+		  this->CurrentMode = VTKISMT_ORIENT;
+		  //mqMorphoDigCore::instance()->resetCursor();
+		  this->Interactor->Render();
+		  // std::cout << key << "Released" << '\n';
+	  }
 	  // Forward events
 	  vtkInteractorStyleTrackballCamera::OnKeyRelease();
   }
@@ -862,6 +916,7 @@ void vtkMDInteractorStyle::Dolly(double factor)
 }
 void vtkMDInteractorStyle::RubberStart()
 {
+	//cout << "RubberStart()" << endl;
 	mqMorphoDigCore::instance()->setCurrentCursor(4);
 	if (!this->Interactor)
 	{
@@ -888,9 +943,98 @@ void vtkMDInteractorStyle::RubberStart()
 
 	this->FindPokedRenderer(this->StartPosition[0], this->StartPosition[1]);
 }
+void vtkMDInteractorStyle::TagPencilStart()
+{
+	if (this->TagPencilStarted == 0)
+	{
+		//cout << "PencilStart()" << endl;
+		//mqMorphoDigCore::instance()->setCurrentCursor(4);
+		//here we save 
+		if (!this->Interactor)
+		{
+			return;
+		}
+
+		//otherwise record the rubber band starting coordinate
+
+		this->Moving = 1;
+
+		vtkRenderWindow *renWin = this->Interactor->GetRenderWindow();
+
+		int x = this->Interactor->GetEventPosition()[0];
+		int y = this->Interactor->GetEventPosition()[1];
+		TagPencilCenterPosition[0] = x;
+		TagPencilCenterPosition[1] = y;
+
+
+		this->PixelArray2->Initialize();
+		this->PixelArray2->SetNumberOfComponents(4);
+		int *size = renWin->GetSize();
+		this->PixelArray2->SetNumberOfTuples(size[0] * size[1]);
+
+		renWin->GetRGBACharPixelData(0, 0, size[0] - 1, size[1] - 1, 1, this->PixelArray2);
+
+		this->FindPokedRenderer(this->TagPencilCenterPosition[0], this->TagPencilCenterPosition[1]);
+		this->TagPencilStarted = 1;
+	}
+	
+
+}
+void vtkMDInteractorStyle::Tag(int mode)
+{
+	//int* clickPos = this->GetInteractor()->GetEventPosition();
+	int x = this->Interactor->GetEventPosition()[0];
+	int y = this->Interactor->GetEventPosition()[1];
+	TagPencilCenterPosition[0] = x;
+	TagPencilCenterPosition[1] = y;
+	//std::cout << "Clicked at "
+	//	<< x << " " << y << std::endl;
+	if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+	if (this->CurrentRenderer != NULL)
+	{
+		//std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+		// Pick from this location.
+		/* vtkSmartPointer<vtkPropPicker>  picker =
+		vtkSmartPointer<vtkPropPicker>::New();*/
+
+		vtkSmartPointer<vtkCellPicker> picker =
+			vtkSmartPointer<vtkCellPicker>::New();
+
+		picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+		vtkIdType pickid = picker->GetPointId();
+
+		if (picker->GetActor() == NULL) {
+			cout << "Picked Null actor" << endl;
+		}
+		else
+		{
+			vtkMDActor * myActor = vtkMDActor::SafeDownCast(picker->GetActor());
+			if (myActor != NULL)
+			{
+				//right button down : no override
+				mqMorphoDigCore::instance()->TagAt(pickid, myActor, mode);
+			}
+
+			mqMorphoDigCore::instance()->Render();
+		}
+
+	}
+}
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnRightButtonDown()
 {
+	this->RM_Button = RBUTTON_DOWN;
+	if (this->T == T_PRESSED)
+	{
+		this->Tag(0);
+		
+		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+		//this->T = T_RELEASED;
+
+	}
 	//Special case: move landmark
 	if (this->L == L_PRESSED)
 	{
@@ -941,8 +1085,10 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 	}
 	else
 	{
-
-		this->ResetMoveWhat();
+		if (this->T == T_RELEASED)
+		{
+			this->ResetMoveWhat();
+		}
 		//Right drag:
 		// CAM mode: draw rubber band
 		// OBJ mode: draw rubber band if alt is not pressed
@@ -1053,6 +1199,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 
 			  double* pos = picker->GetPickPosition();
+			  
 			  //  std::cout << "Pick position (world coordinates) is: "
 			  //	  << pos[0] << " " << pos[1]
 			  //	  << " " << pos[2] << std::endl;
@@ -1075,9 +1222,20 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 		  this->L = L_RELEASED;
 	  }//left button down, no landmark 
+	  else  if (this->T == T_PRESSED && this->Ctrl != CTRL_PRESSED)
+	  {
+
+		  this->Tag(1);
+		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+
+		 // this->T = T_RELEASED;
+	  }//left button down, no landmark 
 	  else
 	  { // left mouse pressed, no 
-		  this->ResetMoveWhat();
+		  if (this->T == T_RELEASED)
+		  {
+			  this->ResetMoveWhat();
+		  }
 		  
 
 		  if (this->MoveWhat==CAM)
@@ -1315,7 +1473,8 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnMouseMove()
 {
-  if (this->CurrentMode != VTKISMD_SELECT )
+	
+  if (this->CurrentMode != VTKISMD_SELECT &&  this->CurrentMode != VTKISMD_TAGPENCIL)
   {
 	 // this->ResetMoveWhat();
 	  //if (this->Ctrl != CTRL_PRESSED)
@@ -1376,31 +1535,69 @@ void vtkMDInteractorStyle::OnMouseMove()
     return;
   }
 
-  this->EndPosition[0] = this->Interactor->GetEventPosition()[0];
-  this->EndPosition[1] = this->Interactor->GetEventPosition()[1];
-  int *size = this->Interactor->GetRenderWindow()->GetSize();
-  if (this->EndPosition[0] > (size[0]-1))
+  if (this->CurrentMode == VTKISMD_SELECT)
   {
-    this->EndPosition[0] = size[0]-1;
+
+	  this->EndPosition[0] = this->Interactor->GetEventPosition()[0];
+	  this->EndPosition[1] = this->Interactor->GetEventPosition()[1];
+	  int *size = this->Interactor->GetRenderWindow()->GetSize();
+	  if (this->EndPosition[0] > (size[0] - 1))
+	  {
+		  this->EndPosition[0] = size[0] - 1;
+	  }
+	  if (this->EndPosition[0] < 0)
+	  {
+		  this->EndPosition[0] = 0;
+	  }
+	  if (this->EndPosition[1] > (size[1] - 1))
+	  {
+		  this->EndPosition[1] = size[1] - 1;
+	  }
+	  if (this->EndPosition[1] < 0)
+	  {
+		  this->EndPosition[1] = 0;
+	  }
+	  this->RedrawRubberBand();
   }
-  if (this->EndPosition[0] < 0)
+  
+  if (this->CurrentMode == VTKISMD_TAGPENCIL)
   {
-    this->EndPosition[0] = 0;
+	
+	  this->TagPencilCenterPosition[0] = this->Interactor->GetEventPosition()[0];
+	  this->TagPencilCenterPosition[1] = this->Interactor->GetEventPosition()[1];
+	  int *size = this->Interactor->GetRenderWindow()->GetSize();
+	  if (this->TagPencilCenterPosition[0] > (size[0] - 1))
+	  {
+		  this->TagPencilCenterPosition[0] = size[0] - 1;
+	  }
+	  if (this->TagPencilCenterPosition[0] < 0)
+	  {
+		  this->TagPencilCenterPosition[0] = 0;
+	  }
+	  if (this->TagPencilCenterPosition[1] > (size[1] - 1))
+	  {
+		  this->TagPencilCenterPosition[1] = size[1] - 1;
+	  }
+	  if (this->TagPencilCenterPosition[1] < 0)
+	  {
+		  this->TagPencilCenterPosition[1] = 0;
+	  }
+	 // cout << "this->LM_Button=" << this->LM_Button << endl;
+	  if (this->LM_Button == LBUTTON_DOWN)
+	  {
+		  cout << "Tag inside moousmove" << endl;
+		  this->Tag(0);
+	  }
+	  if (this->RM_Button == RBUTTON_DOWN)
+	  {
+		  this->Tag(1);
+	  }
+	  this->RedrawTagPencilCircle();
   }
-  if (this->EndPosition[1] > (size[1]-1))
-  {
-    this->EndPosition[1] = size[1]-1;
-  }
-  if (this->EndPosition[1] < 0)
-  {
-    this->EndPosition[1] = 0;
-  }
-  this->RedrawRubberBand();
 }
 
 void vtkMDInteractorStyle::RubberStop()
 {
-	
 	mqMorphoDigCore::instance()->setCurrentCursor(this->MoveWhat);
 	if (!this->Interactor || !this->Moving)
 	{
@@ -1415,9 +1612,21 @@ if ((this->StartPosition[0] != this->EndPosition[0])
 }
 this->Moving = 0;
 }
+void vtkMDInteractorStyle::TagPencilStop()
+{
+	this->TagPencilStarted = 0;
+	
+	//mqMorphoDigCore::instance()->setCurrentCursor(this->MoveWhat);
+	if (!this->Interactor || !this->Moving)
+	{
+		return;
+	}
 
+	this->Moving = 0;
+}
 void vtkMDInteractorStyle::OnRightButtonUp()
-{	
+{
+	this->RM_Button = RBUTTON_UP;
 	if (this->CurrentMode != VTKISMD_SELECT)
 	{
 		
@@ -1591,6 +1800,7 @@ void vtkMDInteractorStyle::OnMiddleButtonUp()
 void vtkMDInteractorStyle::RedrawRubberBand()
 {
   //update the rubber band on the screen
+	
   int *size = this->Interactor->GetRenderWindow()->GetSize();
 
   vtkUnsignedCharArray *tmpPixelArray = vtkUnsignedCharArray::New();
@@ -1622,6 +1832,12 @@ void vtkMDInteractorStyle::RedrawRubberBand()
   int i;
   for (i = min[0]; i <= max[0]; i++)
   {
+	  // i = x1  [x1, y2]
+	  //     4(y1*taillex)+x1)
+	  //  4(y2*taillex)+x1)
+	  // i =x2    [x2, y2
+	  //      4(y2*taillex)+x2)
+
     pixels[4*(min[1]*size[0]+i)] = 255 ^ pixels[4*(min[1]*size[0]+i)];
     pixels[4*(min[1]*size[0]+i)+1] = 255 ^ pixels[4*(min[1]*size[0]+i)+1];
     pixels[4*(min[1]*size[0]+i)+2] = 0 ^ pixels[4*(min[1]*size[0]+i)+2];
@@ -1631,6 +1847,10 @@ void vtkMDInteractorStyle::RedrawRubberBand()
   }
   for (i = min[1]+1; i < max[1]; i++)
   {
+	  // i = y1+1 
+	  //     4(y1*taillex)+x1)
+	  // i =x2    [x2, y2
+	  //      4(y2*taillex)+x2)
     pixels[4*(i*size[0]+min[0])] = 255 ^ pixels[4*(i*size[0]+min[0])];
     pixels[4*(i*size[0]+min[0])+1] = 255 ^ pixels[4*(i*size[0]+min[0])+1];
     pixels[4*(i*size[0]+min[0])+2] = 0 ^ pixels[4*(i*size[0]+min[0])+2];
@@ -1644,7 +1864,112 @@ void vtkMDInteractorStyle::RedrawRubberBand()
 
   tmpPixelArray->Delete();
 }
+void vtkMDInteractorStyle::RedrawTagPencilCircle()
+{
+	// assume "R" is 
+	//update the rubber band on the screen
+	int *size = this->Interactor->GetRenderWindow()->GetSize();
 
+	vtkUnsignedCharArray *tmpPixelArray = vtkUnsignedCharArray::New();
+	tmpPixelArray->DeepCopy(this->PixelArray2);
+	unsigned char *pixels = tmpPixelArray->GetPointer(0);
+
+	// adaptation of the midpoint circle algorithm to know which pixels form the outline of a circle of center x0,Y0 and radius "radius"
+	int radius = (int) mqMorphoDigCore::instance()->Getmui_PencilSize();
+	if (radius < 10) { radius = 10; }
+	int x0 = this->TagPencilCenterPosition[0];
+	int y0 = this->TagPencilCenterPosition[1];
+	int x = radius - 1;
+	int y = 0;
+	int dx = 1;
+	int dy = 1;
+	int err = dx - (radius << 1);
+	while (x >= y)
+	{
+		if (((x0 + x)<=(size[0]-1)) && ((y0 + y)<=(size[1] - 1))) {
+			int cx = x0 + x;
+			int cy = y0 + y;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4*(size[0]*cy + cx) ];
+			pixels[4 * (size[0]*cy + cx) +1] = 255 ^ pixels[4*(size[0]*cy + cx) +1];
+			pixels[4 * (size[0]*cy + cx) +2] = 0 ^ pixels[4*(size[0]*cy + cx) +2];
+			
+		}
+		if ((((x0 + y)<=(size[0] - 1)) && ((y0 + x)<=(size[1] - 1)))) {
+			int cx = x0 + y;
+			int cy = y0 + x;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4 * (size[0]*cy + cx)];
+			pixels[4 * (size[0]*cy + cx) + 1] = 255 ^ pixels[4 * (size[0]*cy + cx) + 1];
+			pixels[4 * (size[0]*cy + cx) + 2] = 0 ^ pixels[4 * (size[0]*cy + cx) + 2];
+			//putpixel(x0 + y, y0 + x);
+		}
+		if (((x0 -y)>=0) && ((y0 + x)<=(size[1] - 1))) {
+			int cx = x0 - y;
+			int cy = y0 + x;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4 * (size[0]*cy + cx)];
+			pixels[4 * (size[0]*cy + cx) + 1] = 255 ^ pixels[4 * (size[0]*cy + cx) + 1];
+			pixels[4 * (size[0]*cy + cx) + 2] = 0 ^ pixels[4 * (size[0]*cy + cx) + 2];
+		}
+		if (((x0 - x) >= 0) && ((y0 + y) <= (size[1] - 1))) {
+			int cx = x0 - x;
+			int cy = y0 + y;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4 * (size[0]*cy + cx)];
+			pixels[4 * (size[0]*cy + cx) + 1] = 255 ^ pixels[4 * (size[0]*cy + cx) + 1];
+			pixels[4 * (size[0]*cy + cx) + 2] = 0 ^ pixels[4 * (size[0]*cy + cx) + 2];
+			//putpixel(x0 - x, y0 + y);
+		}
+		if (((x0 - x) >= 0) && ((y0 - y)>=0 )) {
+			int cx = x0 - x;
+			int cy = y0 - y;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4 * (size[0]*cy + cx)];
+			pixels[4 * (size[0]*cy + cx) + 1] = 255 ^ pixels[4 * (size[0]*cy + cx) + 1];
+			pixels[4 * (size[0]*cy + cx) + 2] = 0 ^ pixels[4 * (size[0]*cy + cx) + 2];
+			
+		}
+		if (((x0 - y) >= 0) && ((y0 - x) >=0)) {
+			int cx = x0 - y;
+			int cy = y0 - x;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4 * (size[0]*cy + cx)];
+			pixels[4 * (size[0]*cy + cx) + 1] = 255 ^ pixels[4 * (size[0]*cy + cx) + 1];
+			pixels[4 * (size[0]*cy + cx) + 2] = 0 ^ pixels[4 * (size[0]*cy + cx) + 2];
+		}
+		if (((x0 + y) <=(size[0] - 1)) && ((y0 -x ) >=0)) {
+			int cx = x0 + y;
+			int cy = y0 - x;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4 * (size[0]*cy + cx)];
+			pixels[4 * (size[0]*cy + cx) + 1] = 255 ^ pixels[4 * (size[0]*cy + cx) + 1];
+			pixels[4 * (size[0]*cy + cx) + 2] = 0 ^ pixels[4 * (size[0]*cy + cx) + 2];
+			
+		}
+		if (((x0 + x) <= (size[0] - 1)) && ((y0 - y) >= 0)) {
+			int cx = x0 + x;
+			int cy = y0 - y;
+			pixels[4 * (size[0]*cy + cx)] = 255 ^ pixels[4 * (size[0]*cy + cx)];
+			pixels[4 * (size[0]*cy + cx) + 1] = 255 ^ pixels[4 * (size[0]*cy + cx) + 1];
+			pixels[4 * (size[0]*cy + cx) + 2] = 0 ^ pixels[4 * (size[0]*cy + cx) + 2];
+			
+		}
+
+		if (err <= 0)
+		{
+			y++;
+			err += dy;
+			dy += 2;
+		}
+
+		if (err > 0)
+		{
+			x--;
+			dx += 2;
+			err += dx - (radius << 1);
+		}
+	}
+
+	
+	this->Interactor->GetRenderWindow()->SetRGBACharPixelData(0, 0, size[0] - 1, size[1] - 1, pixels, 0);
+	this->Interactor->GetRenderWindow()->Frame();
+
+	tmpPixelArray->Delete();
+}
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::Pick()
 {
@@ -2510,7 +2835,7 @@ void vtkMDInteractorStyle::ChangeAttachmentPoint(vtkMatrix4x4 *NewMat, vtkLMActo
 	double mult = 1;
 	if (LMActor->GetLMType() == TARGET_LMK || LMActor->GetLMType() == HANDLE_LMK)
 	{
-		mult = 1.1;
+		mult = 1.4;
 	}
 	if (LMActor->GetLMBodyType() == SPHERE)
 	{

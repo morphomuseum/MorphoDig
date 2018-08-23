@@ -94,10 +94,77 @@ void mqDisplayControlsWidget::constructor()
 
   connect(this->ui->BackFaceCullingOnOff, SIGNAL(pressed()), this, SLOT(slotBackfaceCullingOnOff()));
   connect(this->ui->ClippingPlaneOnOff, SIGNAL(pressed()), this, SLOT(slotClippingPlaneOnOff()));
-
+  connect(this->ui->cellNormals, SIGNAL(pressed()), this, SLOT(slotDisplayCellNormals()));
+  connect(this->ui->pointNormals, SIGNAL(pressed()), this, SLOT(slotDisplayPointNormals())); 
+  connect(this->ui->wireframe, SIGNAL(pressed()), this, SLOT(slotDisplayWireframe()));
+  connect(this->ui->points, SIGNAL(pressed()), this, SLOT(slotDisplayPoints()));
+  /*virtual void slotDisplayCellNormals();
+  virtual void slotDisplayPointNormals();
+  virtual void slotDisplayWireframe();
+  virtual void slotDisplayPoints();*/
   
   
 }
+
+
+void mqDisplayControlsWidget::slotDisplayCellNormals()
+{
+	if (this->ui->cellNormals->isChecked())
+	{
+		this->ui->cellNormals->setChecked(false);
+	}
+	this->ui->pointNormals->setChecked(false);
+	this->ui->wireframe->setChecked(false);
+	this->ui->points->setChecked(false);
+	mqMorphoDigCore::instance()->SetDisplayMode(0);
+	mqMorphoDigCore::instance()->Render();
+	
+}
+
+void mqDisplayControlsWidget::slotDisplayPointNormals()
+{
+	if (this->ui->pointNormals->isChecked())
+	{
+		this->ui->pointNormals->setChecked(false);
+	}
+	this->ui->cellNormals->setChecked(false);
+	this->ui->wireframe->setChecked(false);
+	this->ui->points->setChecked(false);
+	mqMorphoDigCore::instance()->SetDisplayMode(1);
+	mqMorphoDigCore::instance()->Render();
+
+}
+
+void mqDisplayControlsWidget::slotDisplayWireframe()
+{
+	if (this->ui->wireframe->isChecked())
+	{
+		this->ui->wireframe->setChecked(false);
+	}
+	this->ui->cellNormals->setChecked(false);
+	this->ui->pointNormals->setChecked(false);
+	this->ui->points->setChecked(false);
+	mqMorphoDigCore::instance()->SetDisplayMode(2);
+
+	mqMorphoDigCore::instance()->Render();
+
+}
+
+void mqDisplayControlsWidget::slotDisplayPoints()
+{
+	if (this->ui->points->isChecked())
+	{
+		this->ui->points->setChecked(false);
+	}
+	this->ui->cellNormals->setChecked(false);
+	this->ui->wireframe->setChecked(false);
+	this->ui->pointNormals->setChecked(false);
+	mqMorphoDigCore::instance()->SetDisplayMode(3);
+	mqMorphoDigCore::instance()->Render();
+
+}
+
+
 
 void mqDisplayControlsWidget::slotClippingPlaneOnOff()
 {

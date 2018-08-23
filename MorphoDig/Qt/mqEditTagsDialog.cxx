@@ -18,6 +18,7 @@
 #include "mqColorOpacityEditorWidget.h"
 #include "mqTransferFunctionWidget.h"
 #include "mqSaveTAGMAPDialogReaction.h"
+#include "mqMergeTagsDialogReaction.h"
 #include "mqMinimalWidget.h"
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
@@ -68,7 +69,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
   : QDialog(Parent)
   , Ui(new Ui::mqEditTagsDialog())
 {
-
+	
 	
 	//1 populate active scalar combo box, and check which tags is the active one!
 	this->Ui->setupUi(this);
@@ -102,13 +103,38 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	
 	this->Ui->comboActiveTags->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	this->Ui->comboTagMaps->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-
+	/*this->Ui->pencilOn->setDisabled(true);
+	this->Ui->lassoOn->setDisabled(true);
+	this->Ui->bucketOn->setDisabled(true);
+	
+	*/
+	this->Ui->activateTagMode->setVisible(false);
+	this->Ui->pencilSearchSize->setValue(mqMorphoDigCore::instance()->Getmui_PencilSize());
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
+	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(int)), this, SLOT(slotPencilSearchSizeChanged(int)));
+	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
+	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
+	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
+	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoTagInside()));
+	connect (this->Ui->erase, SIGNAL(pressed()), this, SLOT(slotEraseActiveTag()));
+	
+	QAction* mergeAction = new QAction(tr("&Merge"), this);
+	mergeAction->setToolTip(tr("Merge 2 tags"));
+	this->Ui->merge->addAction(mergeAction);
+	this->Ui->merge->setDefaultAction(mergeAction);
+	QIcon icon;
+	icon.addFile(QStringLiteral(":/Icons/merge.png"), QSize(), QIcon::Normal, QIcon::Off);
+	mergeAction->setIcon(icon);
+	//TOTO : create an export tag map...
+	new mqMergeTagsDialogReaction(mergeAction);
+
+
+
 	this->Ui->reinitializeTagMap->setDisabled(false);
 	this->Ui->editTagMap->setDisabled(true);
 	this->Ui->deleteTagMap->setDisabled(true);
@@ -116,9 +142,9 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	exportAction->setToolTip(tr("Export Tag Map"));
 	this->Ui->exportTagMap->addAction(exportAction);
 	this->Ui->exportTagMap->setDefaultAction(exportAction);
-	QIcon icon;
-	icon.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
-	exportAction->setIcon(icon);
+	QIcon icon2;
+	icon2.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	exportAction->setIcon(icon2);
 	//TOTO : create an export tag map...
 	new mqSaveTAGMAPDialogReaction(exportAction);
 	connect(this->Ui->reinitializeTagMap, SIGNAL(pressed()), this, SLOT(slotReinitializeTagMap()));
@@ -154,7 +180,29 @@ mqEditTagsDialog::~mqEditTagsDialog()
   delete this->Ui;
 }
 
-//fonctionne sur la modification du nom. // problème : quand on remplit le tableau, ça appelle aussi la fonction
+/*void mqEditTagsDialog::hide()
+{
+	//cout << "Hide" << endl;
+	this->QDialog::hide();
+	
+}*/
+
+void mqEditTagsDialog::closeEvent(QCloseEvent *event)
+{
+	/*cout << "Deactivate Tag Mode" << endl;
+	mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
+	this->Ui->activateTagMode->setChecked(false);*/
+
+	event->accept();
+}
+
+
+void mqEditTagsDialog::slotEraseActiveTag()
+{
+	
+	mqMorphoDigCore::instance()->MergeTags(this->activeTag, 0);
+}
+
 void mqEditTagsDialog::slotCellChanged(int row, int column)
 {
 	//usually: works
@@ -247,7 +295,7 @@ void mqEditTagsDialog::slotActiveTagChanged()
 		{
 			cout << "Active tag at row " << i << ", column" << j << endl;
 			this->activeTag = i;
-			
+			mqMorphoDigCore::instance()->Setmui_ActiveTag(i);
 		}
 	}
 }
@@ -708,6 +756,12 @@ void mqEditTagsDialog::RefreshDialog()
 	mqMorphoDigCore::instance()->Render();
 }
 
+void mqEditTagsDialog::slotPencilSearchSizeChanged(int newSize)
+{
+	mqMorphoDigCore::instance()->Setmui_PencilSize(newSize);
+
+}
+
 
 void mqEditTagsDialog::slotActiveTagsChanged(int idx)
 {
@@ -732,7 +786,45 @@ void mqEditTagsDialog::slotActiveTagsChanged(int idx)
 	
 
 }
+void mqEditTagsDialog::slotBucketOn()
+{
 
+	this->Ui->pencilOn->setChecked(false);
+	this->Ui->bucketOn->setChecked(true);
+	mqMorphoDigCore::instance()->Setmui_TagTool(1);
+}
+void mqEditTagsDialog::slotPencilOn()
+{
+	this->Ui->pencilOn->setChecked(true);
+	this->Ui->bucketOn->setChecked(false);
+	mqMorphoDigCore::instance()->Setmui_TagTool(0);
+}
+void mqEditTagsDialog::slotActivateTagMode()
+{
+	if (this->Ui->activateTagMode->isChecked())
+	{
+		cout << "Activate Tag Mode" << endl;
+		mqMorphoDigCore::instance()->Setmui_TagModeActivated(1);
+		this->Ui->pencilOn->setDisabled(false);
+		this->Ui->bucketOn->setDisabled(false);
+		this->Ui->lassoOn->setDisabled(false);
+	}
+	else
+	{
+		cout << "Deactivate Tag Mode" << endl;
+		mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
+		this->Ui->pencilOn->setDisabled(true);
+		this->Ui->bucketOn->setDisabled(true);
+		this->Ui->lassoOn->setDisabled(true);
+	}
+}
+
+/*void mqEditTagsDialog::slotDeactivateTagMode()
+{
+		cout << "Deactivate Tag Mode" << endl;
+		mqMorphoDigCore::instance()->Setmui_TagModeActivated(0);
+	
+}*/
 
 void mqEditTagsDialog::slotActiveTagMapChanged(int idx)
 {

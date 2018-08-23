@@ -17,6 +17,10 @@ Module:    vtkMDActor.h
 #include <vtkDataArray.h>
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
+#include <vtkKdTreePointLocator.h>
+#include <vtkSmartPointer.h>
+#include <vtkFloatArray.h>
+#include <vtkPolyDataConnectivityFilter.h>
 #include <vector>
 #include <QString>
 class vtkMDActorUndoRedo
@@ -27,11 +31,12 @@ public:
 		vtkSmartPointer<vtkMatrix4x4> Matrix;
 		vtkSmartPointer<vtkDataArray> sauvArray;
 		QString arrayName;
+		int arrayType;// 0 double 1 int(tag) 2 char (RGB/RGBA)
 		double Color[4];
 		int Selected;
 		int UndoCount;
 		std::string Name;
-		Element(vtkSmartPointer<vtkMatrix4x4> m, double c[4], int selected, int Count, std::string name, QString marrayName, vtkSmartPointer<vtkDataArray> marray)
+		Element(vtkSmartPointer<vtkMatrix4x4> m, double c[4], int selected, int Count, std::string name, QString marrayName, vtkSmartPointer<vtkDataArray> marray, int mArrayType=0)
 		{
 			this->Matrix =m;
 			this->UndoCount = Count;
@@ -43,6 +48,7 @@ public:
 			this->Name = name;
 			this->sauvArray = marray;
 			this->arrayName = marrayName;
+			this->arrayType = mArrayType;
 		}
 	};
 	typedef std::vector<Element> VectorOfElements;
@@ -57,8 +63,19 @@ public:
 	
 	vtkTypeMacro(vtkMDActor, vtkOpenGLActor);
 	void PrintSelf(ostream& os, vtkIndent indent);
+	void BuildKdTree();
+	void FreeKdTree();
+	vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
+	void SetDisplayMode(int mode);
+	void BuildConnectivityFilter();
+	void FreeConnectivityFilter();
+	vtkSmartPointer<vtkPolyDataConnectivityFilter> GetConnectivityFilter();
 
-	
+	vtkSmartPointer<vtkIdTypeArray> GetConnectivityRegions();
+	//vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
+	vtkSmartPointer<vtkIdList> GetConnectivityRegionsCorrList();
+	vtkSmartPointer<vtkIdList> GetConnectivityRegionsCorrList2();
+	vtkIdType GetCorrPickedId(vtkIdType picked);
 	// Description:
 	void ShallowCopy(vtkProp *prop);
 
@@ -88,18 +105,23 @@ public:
 	vtkIdType GetNumberOfPoints();
 	void Render(vtkRenderer *ren, vtkMapper *mapper);
 	virtual void SetSelected(int selected);
-	virtual void SaveState(int mCount, QString arrayToSave = QString());
+	virtual void SaveState(int mCount, QString arrayToSave = QString(), int arrayType=0);
 	virtual void Redo(int mCount); // Try to redo (if exists) "mCount" event
 	virtual void Erase(int mCount); // Try to erase (if exists) "mCount" event
 	virtual void Undo(int mCount); // Try to undo (if exists) "mCount" event
 	virtual void PopUndoStack();
 	virtual void PopRedoStack();
 	virtual void ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat); // can be overriden in LMActor!
-	
+	vtkSmartPointer<vtkFloatArray> pointNormals;
+	vtkSmartPointer<vtkFloatArray> cellNormals;
 
 protected:
 	vtkMDActor();
 	~vtkMDActor();
+	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
+	vtkSmartPointer<vtkPolyDataConnectivityFilter> cFilter;
+	vtkSmartPointer<vtkIdList> cFilterCorrList;// for some reason vertice ids are not the same in cFilter input / output => so a corresponding list has to be built . Here: 1,2,3,4 = cFilter ids. GetId(i) returns original list id
+	vtkSmartPointer<vtkIdList> cFilterCorrList2;// for some reason vertice ids are not the same in cFilter input / output => so a corresponding list has to be built. Here: 1,2,3,4 = original list ids. GetId(i) returns cfilter list id
 
 	int Selected;
 	int Changed; // used by MTActorCollection class to recompute global center of mass and center of mass
@@ -111,6 +133,8 @@ protected:
 private:
 	vtkMDActor(const vtkMDActor&);  // Not implemented.
 	void operator=(const vtkMDActor&);  // Not implemented.
+
+
 	
 };
 

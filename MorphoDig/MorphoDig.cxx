@@ -13,11 +13,10 @@
 #include "vtkBezierCurveSource.h"
 #include "vtkMDActor.h"
 #include "vtkLMActor.h"
-#include "mqObjectsControlsToolbar.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
-#include "vtkMDLassoInteractorStyle.h"
+//#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
 #include <QVTKOpenGLWidget.h>
 //#include "vtkUndoStack.h"
@@ -239,7 +238,7 @@ void RubberBandSelect(vtkObject* caller,
 			std::string str2("vtkMDActor");
 			if (str2.compare(myprop3D->GetClassName()) == 0)
 			{
-				cout << "One mesh actor found!" << endl;
+				cout << "One surface actor found!" << endl;
 				vtkMDActor *myActor;
 				myActor = vtkMDActor::SafeDownCast(myprop3D);
 
