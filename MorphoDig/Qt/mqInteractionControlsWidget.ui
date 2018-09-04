@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>194</width>
+    <width>200</width>
     <height>26</height>
    </rect>
   </property>
@@ -98,7 +98,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/landmarks2.png</normaloff>:/Icons/landmarks2.png</iconset>
+           <normaloff>:/Icons/Landmarks2.png</normaloff>:/Icons/Landmarks2.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -144,7 +144,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/landmarks9.png</normaloff>:/Icons/landmarks9.png</iconset>
+           <normaloff>:/Icons/Landmarks9.png</normaloff>:/Icons/Landmarks9.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -164,7 +164,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/landmarks6.png</normaloff>:/Icons/landmarks6.png</iconset>
+           <normaloff>:/Icons/Landmarks6.png</normaloff>:/Icons/Landmarks6.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -181,7 +181,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/landmarks7.png</normaloff>:/Icons/landmarks7.png</iconset>
+           <normaloff>:/Icons/Landmarks7.png</normaloff>:/Icons/Landmarks7.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -198,7 +198,7 @@
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/landmarks5.png</normaloff>:/Icons/landmarks5.png</iconset>
+           <normaloff>:/Icons/Landmarks5.png</normaloff>:/Icons/Landmarks5.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>

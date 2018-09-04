@@ -87,7 +87,6 @@
  <file>move_mode2.png</file>
  <file>move_cam.png</file>
  <file>move_cam2.png</file>
- <file>move_cam3.png</file>
  <file>camera_ortho.png</file>
  <file>camera_persp.png</file>
  <file>renderer_anaglyph.png</file>
@@ -97,13 +96,13 @@
 <file>Lmk_edit.png</file>
 <file>Lmk_xyz.png</file>
 <file>Flag02.png</file>
- <file>landmarks2.png</file>
- <file>landmarks4.png</file>
- <file>landmarks5.png</file>
- <file>landmarks6.png</file>
- <file>landmarks7.png</file>
- <file>landmarks8.png</file>
- <file>landmarks9.png</file>
+ <file>Landmarks2.png</file>
+ <file>Landmarks4.png</file>
+ <file>Landmarks5.png</file>
+ <file>Landmarks6.png</file>
+ <file>Landmarks7.png</file>
+ <file>Landmarks8.png</file>
+ <file>Landmarks9.png</file>
  <file>Flag01.png</file>
  <file>s_right.png</file>
  <file>s_left.png</file>

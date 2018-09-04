@@ -90,6 +90,8 @@
 //#include <QLabel>
 #include <QTreeView>
 
+#include <vtkRenderWindowInteractor.h>
+
 //-----------------------------------------------------------------------------
 //MorphoDig* MorphoDig::Instance = 0;
 
@@ -1709,8 +1711,8 @@ void MorphoDig::saveSettings()
 
 
 
-// problème
-// aujourd'hui, c'est cette seule fonction qui est appelée lorsqu'on ouvre un nouveau maillage
+// problÃ¨me
+// aujourd'hui, c'est cette seule fonction qui est appelÃ©e lorsqu'on ouvre un nouveau maillage
 // et lorsqu'on change entre "camera
 
 

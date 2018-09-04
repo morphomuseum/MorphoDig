@@ -1,4 +1,6 @@
+#test Leo!
 project(MorphoDig)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 cmake_minimum_required(VERSION 2.8)
 

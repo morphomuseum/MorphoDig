@@ -35,6 +35,48 @@ configure_file (
 include_directories("${PROJECT_BINARY_DIR}")
 
 find_package(VTK REQUIRED)
+## define required VTK modules this helps to figure out issues with missing components in VTK build
+set( required_vtk_modules
+  vtkChartsCore
+  vtkCommonComputationalGeometry 
+  vtkCommonCore
+  vtkCommonDataModel
+  vtkCommonExecutionModel
+  vtkCommonMath
+  vtkCommonMisc
+  vtkCommonSystem
+  vtkCommonTransforms
+  vtkFiltersCore
+  vtkFiltersGeneral
+  vtkFiltersHybrid
+  vtkFiltersModeling
+  vtkFiltersStatistics
+  vtkGUISupportQt
+  vtkIOCore
+  vtkIOGeometry
+  vtkIOImport
+  vtkIOLegacy
+  vtkIOPLY
+  vtkIOXML
+  vtkIOXMLParser
+  vtkImagingHybrid
+  vtkInteractionStyle
+  vtkRenderingAnnotation
+  vtkRenderingCore
+  vtkRenderingGL2PSOpenGL2
+  vtkViewsContext2D
+  vtkViewsCore
+  )
+if(VTK_RENDERING_BACKEND) #in vtk 7, the rendering backend is exported as a var.
+  LIST(APPEND required_vtk_modules vtkRendering${VTK_RENDERING_BACKEND})
+else(VTK_RENDERING_BACKEND)
+  LIST(APPEND required_vtk_modules vtkRenderingOpenGL)
+endif(VTK_RENDERING_BACKEND)
+## check if all modules are contained in the VTK version
+find_package( VTK REQUIRED COMPONENTS ${required_vtk_modules} )
+#message(${required_vtk_modules} )
+
+#find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
 if("${VTK_QT_VERSION}" STREQUAL "")
@@ -45,18 +87,15 @@ endif()
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
-)
+  
+  )
 
 # Set your files and resources here
 
 set( Srcs main.cxx MorphoDig.cxx)
-
 set( Hdrs MorphoDig.h )
-
 set( MOC_Hdrs MorphoDig.h )
-
 set( UIs MorphoDig.ui )
-
 set( QRCs Icons/icons.qrc )
 
 
@@ -76,128 +115,132 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
     ${UIs}
     ${QRCs}
     ${EXE_ICON} # Not present
-  )
+    )
 
   source_group("Generated" FILES
     ${UI_Srcs}
     ${MOC_Srcs}
     ${QRC_Srcs}
     ${QRC_Srcs}
-  )
+    )
 
-include_directories ("${PROJECT_SOURCE_DIR}/Helpers")
-add_subdirectory (Helpers) 
+  include_directories ("${PROJECT_SOURCE_DIR}/Helpers")
+  add_subdirectory (Helpers) 
 
-include_directories ("${PROJECT_SOURCE_DIR}/Qt")
-add_subdirectory (Qt) 
-
-
-
-set (EXTRA_LIBRARIES ${EXTRA_LIBRARIES} 
-MorphoDigHelpers
-MorphoDigQt
-)
-
+  include_directories ("${PROJECT_SOURCE_DIR}/Qt")
+  add_subdirectory (Qt) 
+  
+  link_directories(${VTK_LIBRARY_DIR} Helpers)
+  set (EXTRA_LIBRARIES ${EXTRA_LIBRARIES} 
+    MorphoDigHelpers
+    MorphoDigQt
+    )
+  
   add_executable(MorphoDig MACOSX_BUNDLE
     ${Srcs} ${Hdrs} ${UI_Srcs} ${MOC_Hdrs} ${QRC_Srcs})
   qt5_use_modules(MorphoDig Core Gui Widgets)
-  target_link_libraries(MorphoDig ${VTK_LIBRARIES} ${EXTRA_LIBRARIES} )
+  target_link_libraries(MorphoDig ${VTK_LIBRARIES} ${EXTRA_LIBRARIES} MorphoDigHelpers  MorphoDigQt )
 else()
-
+  
   message(FATAL_ERROR "Qt 5 required")
-
+  
 endif()
 
-install(TARGETS MorphoDig	
-        RUNTIME
-        DESTINATION bin
-        COMPONENT applications)
-#set (QT5_BINARIES "C:/Qt/5.8/msvc2015_64/bin") 
 
-file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Core.dll" qtcore)
-file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Widgets.dll" qtwidgets)
-file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5GUI.dll" qtgui)
-file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/platforms/qwindows.dll" qtwindows)
-file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/imageformats/qico.dll" qtico)
+IF (WIN32)
+  install(TARGETS MorphoDig	
+    RUNTIME
+    DESTINATION bin
+    COMPONENT applications)
+  #set (QT5_BINARIES "C:/Qt/5.8/msvc2015_64/bin") 
 
-install(
-	FILES
- "${VTK_DIR}/bin/Release/vtkGUISupportQt-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
- "${VTK_DIR}/bin/Release/vtkRenderingOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkInteractionStyle-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkRenderingFreeType-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkRenderingCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkFiltersSources-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkFiltersGeneral-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkFiltersCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkIOGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkIOCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonExecutionModel-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonDataModel-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonTransforms-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonMath-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonColor-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkInteractionWidgets-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkRenderingAnnotation-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkIOLegacy-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkIOPLY-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkRenderingContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkChartsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkInfovisCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkViewsContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkViewsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Core.dll" qtcore)
+  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Widgets.dll" qtwidgets)
+  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5GUI.dll" qtgui)
+  file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/platforms/qwindows.dll" qtwindows)
+  file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/imageformats/qico.dll" qtico)
 
-"${VTK_DIR}/bin/Release/vtkCommonComputationalGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonMisc-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkCommonSystem-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+  install(
+    FILES
+    "${VTK_DIR}/bin/Release/vtkGUISupportQt-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkInteractionStyle-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingFreeType-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersSources-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersGeneral-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkIOGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkIOCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonExecutionModel-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonDataModel-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonTransforms-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonMath-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonColor-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkInteractionWidgets-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingAnnotation-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkIOLegacy-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkIOPLY-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkChartsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkInfovisCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkViewsContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkViewsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
-"${VTK_DIR}/bin/Release/vtkFiltersGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkFiltersExtraction-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkFiltersStatistics-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkImagingFourier-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkImagingCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkalglib-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkImagingHybrid-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkglew-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkIOImage-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkpng-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkzlib-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtktiff-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkjpeg-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkmetaio-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkDICOMParser-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkfreetype-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkFiltersHybrid-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkImagingSources-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkFiltersModeling-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkImagingGeneral-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkImagingColor-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkRenderingVolume-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtksys-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtklz4-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkRenderingContextOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkRenderingGL2PSOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-"${VTK_DIR}/bin/Release/vtkgl2ps-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonComputationalGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonMisc-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkCommonSystem-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
-
-
-
-		"${qtcore}"
-		"${qtwidgets}"
-		"${qtgui}"
-	                
-        DESTINATION bin
-        COMPONENT applications)
-install(
-	FILES
-		"${qtwindows}"                
-        DESTINATION bin/platforms
-        COMPONENT applications)
+    "${VTK_DIR}/bin/Release/vtkFiltersGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersExtraction-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersStatistics-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkImagingFourier-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkImagingCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkalglib-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkImagingHybrid-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkglew-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkIOImage-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkpng-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkzlib-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtktiff-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkjpeg-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkmetaio-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkDICOMParser-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkfreetype-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersHybrid-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkImagingSources-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersModeling-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkImagingGeneral-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkImagingColor-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingVolume-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtksys-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtklz4-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingContextOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingGL2PSOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkgl2ps-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
 
-install(
-	FILES
-		"${qtico}"                
-        DESTINATION bin/imageformats
-        COMPONENT applications)
+
+
+    "${qtcore}"
+    "${qtwidgets}"
+    "${qtgui}"
+    
+    DESTINATION bin
+    COMPONENT applications)
+  install(
+    FILES
+    "${qtwindows}"                
+    DESTINATION bin/platforms
+    COMPONENT applications)
+
+
+  install(
+    FILES
+    "${qtico}"                
+    DESTINATION bin/imageformats
+    COMPONENT applications)
+ELSE()
+  #TO DO FOR OTHER SYSTEMS
+ENDIF()
