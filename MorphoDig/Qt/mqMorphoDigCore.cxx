@@ -7485,20 +7485,21 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 					vtkSmartPointer<vtkFillHolesFilter>::New();
 				fillholes->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
 				fillholes->SetHoleSize(maxsize);
+				
 				fillholes->Update();
 				
-				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+				vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(fillholes->GetOutput());
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				//ObjNormals->AutoOrientNormalsOff();
-				ObjNormals->ConsistencyOff();
+				//ObjNormals->ConsistencyOff();
 
-				ObjNormals->Update();*/
+				ObjNormals->Update();
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
-				cleanPolyDataFilter->SetInputData(fillholes->GetOutput());
+				cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+				//cleanPolyDataFilter->SetInputData(fillholes->GetOutput());
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -7508,10 +7509,10 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 				VTK_CREATE(vtkPolyData, myData);
 
 				myData = cleanPolyDataFilter->GetOutput();
-
+				//myData = fillholes->GetOutput();
+				cout << "original mesh holes: nv=" << mymapper->GetInput()->GetNumberOfPoints() << endl;
 				cout << "fill holes: nv=" << myData->GetNumberOfPoints() << endl;
-				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
-
+			
 
 
 
