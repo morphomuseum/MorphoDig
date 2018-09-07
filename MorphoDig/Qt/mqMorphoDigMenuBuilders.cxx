@@ -244,10 +244,10 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	QAction *Invert = submenuStructureModification->addAction("Invert each selected surface");
 	QAction *Mirror = submenuStructureModification->addAction("Mirror each selected surface along Y plane");
-	QAction *ConvexHULL = submenuStructureModification->addAction("Create convex hull for each selected surface");
+	QAction *ConvexHULL = submenuStructureModification->addAction("Create a convex hull for each selected surface");
 	/*QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
 	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");*/
-	QAction *Group = submenuStructureModification->addAction("Group selected meshes as one single mesh");
+	QAction *Group = submenuStructureModification->addAction("Group selected surfaces");
 	
 	QMenu* submenuAlignment = menu.addMenu("Surface alignment");
 	new mqICPDialogReaction(submenuAlignment->addAction("Align 2 surfaces (iterative closest point algorithm)") << mqSetName("actionICP"));
