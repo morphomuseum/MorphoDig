@@ -94,11 +94,11 @@ void mqDecomposeDialog::Decompose()
 			mode = 1;
 
 		}
-		else if (this->Ui->tag->isChecked())
+		/*else if (this->Ui->tag->isChecked())
 		{
 			mode = 2;
 
-		}
+		}*/
 
 		mqMorphoDigCore::instance()->addDecompose(mode, this->Ui->minsize->value());
 		

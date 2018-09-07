@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Decompose dialog</string>
+   <string>Surface decomposition dialog</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -449,7 +449,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Decompose object</string>
+    <string>Surface decomposition in non connex elements</string>
    </property>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
@@ -487,17 +487,7 @@
      <item>
       <widget class="QRadioButton" name="random">
        <property name="text">
-        <string>Random colors (different each time)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="tag">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Use tag colors</string>
+        <string>Random colors</string>
        </property>
       </widget>
      </item>
