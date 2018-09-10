@@ -28,7 +28,7 @@
       <item>
        <widget class="mqColorChooserButton" name="meshColorButton">
         <property name="text">
-         <string>Default solid solor of surfaces</string>
+         <string>Default solid color of surfaces</string>
         </property>
        </widget>
       </item>
