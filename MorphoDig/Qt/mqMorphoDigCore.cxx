@@ -9561,6 +9561,7 @@ void mqMorphoDigCore::ICP(int transformationMode, int iterationNumber, vtkMDActo
 		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
 		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
 		{
+			
 
 			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
 			mImpactedPD = myImpactedMapper->GetInput();
@@ -9613,6 +9614,12 @@ void mqMorphoDigCore::ICP(int transformationMode, int iterationNumber, vtkMDActo
 			vtkSmartPointer<vtkMatrix4x4> finalMat = vtkSmartPointer<vtkMatrix4x4>::New();
 			vtkMatrix4x4::Multiply4x4(m, impMat, finalMat);
 			impactedActor->ApplyMatrix(finalMat);
+			//64, 123, 126
+			double r = (double)64/((double)255);
+			double g = (double)123/255;
+			double b = (double)126/255;
+			//impactedActor->SetmColor((double)(64/255), (double)(123 / 255), (double)(126/255), 0.5);
+			impactedActor->SetmColor(r, g, b, 0.5);
 		}
 
 		END_UNDO_SET();

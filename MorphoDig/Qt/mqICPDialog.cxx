@@ -104,9 +104,8 @@ void mqICPDialog::launchICP()
 	cout << "Launch ICP " << endl;
 	this->Ui->cancel->setDisabled(true);
 	
-	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
-	{
-		std::string action = "Update ThicknessBetween";
+	//if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
+	//{
 		if (!this->Ui->observedObject->currentText().isEmpty())
 		{
 			this->observedActor = mqMorphoDigCore::instance()->getFirstActorFromName(this->Ui->observedObject->currentText());
@@ -139,7 +138,7 @@ void mqICPDialog::launchICP()
 			mqMorphoDigCore::instance()->ICP(tMode, this->Ui->iter->value(), this->impactedActor, this->observedActor);// to launch ICP
 		}
 		
-	}
+	//}
 
 }
 
