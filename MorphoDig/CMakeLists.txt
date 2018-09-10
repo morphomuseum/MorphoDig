@@ -34,6 +34,9 @@ configure_file (
 # so that we will find TutorialConfig.h
 include_directories("${PROJECT_BINARY_DIR}")
 
+
+
+
 find_package(VTK REQUIRED)
 ## define required VTK modules this helps to figure out issues with missing components in VTK build
 set( required_vtk_modules
@@ -52,6 +55,8 @@ set( required_vtk_modules
   vtkFiltersModeling
   vtkFiltersStatistics
   vtkGUISupportQt
+  vtkImagingHybrid
+  vtkInteractionStyle
   vtkIOCore
   vtkIOGeometry
   vtkIOImport
@@ -59,9 +64,8 @@ set( required_vtk_modules
   vtkIOPLY
   vtkIOXML
   vtkIOXMLParser
-  vtkImagingHybrid
-  vtkInteractionStyle
   vtkRenderingAnnotation
+  vtkRenderingContextOpenGL2
   vtkRenderingCore
   vtkRenderingGL2PSOpenGL2
   vtkViewsContext2D

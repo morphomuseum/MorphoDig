@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Tags</string>
+   <string>Tag options</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">

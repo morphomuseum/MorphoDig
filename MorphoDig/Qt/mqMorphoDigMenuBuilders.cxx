@@ -53,6 +53,7 @@
 #include "mqEditAlphaDialogReaction.h"
 #include "mqSaveCURasVERDialogReaction.h"
 #include "mqOrientationLabelsDialogReaction.h"
+#include "mqEditScalarsDialogReaction.h"
 #include "mqSaveSTVDialogReaction.h"
 #include "mqSaveMAPDialogReaction.h"
 #include "mqSaveTAGMAPDialogReaction.h"
@@ -300,23 +301,25 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QMenu* submenuScalarModification = menu.addMenu("Scalar arrays");
 	//new mqThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickness"));
 	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
-	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance map from camera");
+	new mqEditScalarsDialogReaction(submenuScalarModification->addAction("Open scalar rendering options window") << mqSetName("editScalarRenderingWindow"));
+
+	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance from camera for each selected surface");
 	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
 
 	//QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
 	
 
 
-	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickess"));
-	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness map between two objects") << mqSetName("actionThickessBetween"));
-	new mqScalarsDistanceDialogReaction(submenuScalarModification->addAction("Compute distance map between two objects") << mqSetName("actionDistanceBetween"));
-	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature map") << mqSetName("actionCurvature"));
-	new mqScalarsComplexityDialogReaction(submenuScalarModification->addAction("Compute complexity") << mqSetName("actionComplexity"));
-	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars") << mqSetName("actionSmooth"));
+	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness within each selected surface ") << mqSetName("actionThickess"));
+	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness between two surfaces") << mqSetName("actionThickessBetween"));
+	new mqScalarsDistanceDialogReaction(submenuScalarModification->addAction("Compute distance between two surfaces") << mqSetName("actionDistanceBetween"));
+	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature for each selected surface") << mqSetName("actionCurvature"));
+	new mqScalarsComplexityDialogReaction(submenuScalarModification->addAction("Compute complexity for each selected surface") << mqSetName("actionComplexity"));
+	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars for each selected surface") << mqSetName("actionSmooth"));
 
 
 	QMenu* submenuRGBModification = menu.addMenu("RGB arrays");
-	QAction *RGBFromCurrentColor = submenuRGBModification->addAction("Create/replace RGB array from current display color");
+	QAction *RGBFromCurrentColor = submenuRGBModification->addAction("Create or replace an RGB array with current display color");
 	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
 
 	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
