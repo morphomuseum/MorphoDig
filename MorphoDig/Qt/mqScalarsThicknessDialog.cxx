@@ -61,6 +61,8 @@ mqScalarsThicknessDialog::mqScalarsThicknessDialog(QWidget* Parent)
 	this->Ui->thickness->setMaximum(DBL_MAX);
 	this->Ui->thickness->setSingleStep(1);
 	this->Ui->thickness->setValue(2);
+	double proposed_value = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLengthOfSelectedActors() / 20;
+	this->Ui->thickness->setValue(proposed_value);
 	this->Ui->progressBar->setVisible(false);
 	this->Ui->smoothNormales->setChecked(true);
 	
@@ -95,7 +97,7 @@ void mqScalarsThicknessDialog::editThickness()
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
 	{
 		std::string action = "Update thickness";
-		
+		cout << action << endl;
 		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->Ui->angularLimit->value());// to update thickness
 		
 	}

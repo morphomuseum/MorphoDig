@@ -460,7 +460,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Scalar arrays and color maps</string>
+    <string>Scalar arrays and color maps:</string>
    </property>
    <widget class="QLabel" name="label_2">
     <property name="geometry">

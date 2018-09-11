@@ -360,10 +360,10 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 
 	//new mqOpenDataReaction(openNtw, 1);//1= open NTW 
 	new mqSelectLandmarkRangeDialogReaction(menu.addAction("Select landmark range") << mqSetName("actionSelectLandmarkRange"));
-	QAction *MoveUp = menu.addAction("Selected landmarks : move up (decrease landmark number)");
-	QAction *MoveDown = menu.addAction("Selected landmarks : move down (increase landmark number)");
-	QAction *PushBack = menu.addAction("Selected landmarks : push back on object surface");
-	QAction *ReOrient = menu.addAction("Selected landmarks : change orientation according to surface normal");
+		QAction *MoveDown = menu.addAction("Selected landmarks:  increase landmark number (move down in list)");
+		QAction *MoveUp = menu.addAction("Selected landmarks: decrease landmark number(move up in list)");
+	QAction *PushBack = menu.addAction("Selected landmarks: push back on object surface");
+	QAction *ReOrient = menu.addAction("Selected landmarks: change orientation according to surface's normals");
 	QAction::connect(MoveUp, SIGNAL(triggered()), mqMorphoDigCore::instance() , SLOT(slotLandmarkMoveUp()));
 	QAction::connect(MoveDown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMoveDown()));
 
@@ -374,10 +374,10 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	//actionLandmarskMoveUp
 
 
-	QMenu* submenuLandmarksInvolved = menu.addMenu("Selected node and handle landmarks");
-	new mqEditAllFLGColorDialogReaction(menu.addAction("Edit color of all selected flags") << mqSetName("actionEditAllSelectedFlagsColors"));
-	new mqEditAllFLGLengthDialogReaction(menu.addAction("Edit length all selected flags") << mqSetName("actionEditAllSelectedFlagsLength"));
-	QAction *UpdateAllSelectedFlagsColors = menu.addAction("Update all selected flags colours automatically");
+	QMenu* submenuLandmarksInvolved = menu.addMenu("Selected curve node and curve handle landmarks");
+	new mqEditAllFLGColorDialogReaction(menu.addAction("Edit color of all selected flag landmarks") << mqSetName("actionEditAllSelectedFlagsColors"));
+	new mqEditAllFLGLengthDialogReaction(menu.addAction("Edit length all selected flag landmarks") << mqSetName("actionEditAllSelectedFlagsLength"));
+	QAction *UpdateAllSelectedFlagsColors = menu.addAction("Update all selected flag landmarks' color to that of the closest vertex");
 	QAction::connect(UpdateAllSelectedFlagsColors, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotUpdateAllSelectedFlagsColors()));
 	
 
