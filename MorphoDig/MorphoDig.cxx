@@ -980,6 +980,9 @@ cm2ov2=1
 
 	mqMorphoDigMenuBuilders::buildFileMenu(*this->menuFile);
 	mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(*this->menuEditSelectedSurfaces);
+	mqMorphoDigMenuBuilders::buildTagsMenu(*this->menuTags);
+	mqMorphoDigMenuBuilders::buildScalarsMenu(*this->menuScalars);
+	mqMorphoDigMenuBuilders::buildRGBMenu(*this->menuRGB);
 	mqMorphoDigMenuBuilders::buildEditMenu(*this->menuEdit);
 	mqMorphoDigMenuBuilders::buildLandmarksMenu(*this->menuLandmarks);
 	mqMorphoDigMenuBuilders::buildHelpMenu(*this->menuHelp);

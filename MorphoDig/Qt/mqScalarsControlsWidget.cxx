@@ -44,7 +44,7 @@ void mqScalarsControlsWidget::constructor()
 
   //@@@
   QAction* colorScaleAction = new QAction(tr("&ColorScale"), this);
-  colorScaleAction->setToolTip(tr("Edit lookup table."));
+  colorScaleAction->setToolTip(tr("Edit scalar rendering options"));
   this->ui->ColorScaleEdit->addAction(colorScaleAction);
   this->ui->ColorScaleEdit->setDefaultAction(colorScaleAction);
   QIcon icon;
@@ -62,7 +62,7 @@ void mqScalarsControlsWidget::constructor()
 
   //@@@
   QAction* TagEditAction = new QAction(tr("&TagEdit"), this);
-  TagEditAction->setToolTip(tr("Edit tags."));
+  TagEditAction->setToolTip(tr("Edit tags and tag rendering options"));
   this->ui->TagEdit->addAction(TagEditAction);
   this->ui->TagEdit->setDefaultAction(TagEditAction);
   QIcon icon2;

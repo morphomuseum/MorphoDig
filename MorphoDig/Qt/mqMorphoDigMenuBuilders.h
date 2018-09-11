@@ -29,7 +29,9 @@ public:
   static void buildFileMenu(QMenu& menu);
 
   static void buildLandmarksMenu(QMenu& menu);
-
+  static void buildScalarsMenu(QMenu& menu);
+  static void buildTagsMenu(QMenu& menu);
+  static void buildRGBMenu(QMenu& menu);
   static void buildEditSelectedSurfacesMenu(QMenu& menu);
   /**
   * Builds the standard Edit menu.

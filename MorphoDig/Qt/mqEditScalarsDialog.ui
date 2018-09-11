@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalar rendering options</string>
+   <string>Scalars</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -460,7 +460,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Edit scalar</string>
+    <string>Scalar arrays and color maps</string>
    </property>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
@@ -478,21 +478,21 @@
    <widget class="QPushButton" name="pushRemoveScalar">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>40</x>
       <y>50</y>
-      <width>141</width>
+      <width>161</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Remove selected scalar</string>
+     <string>Remove selected scalar array</string>
     </property>
    </widget>
    <widget class="QComboBox" name="comboActiveScalar">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>20</y>
+      <x>120</x>
+      <y>17</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -501,27 +501,27 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>20</y>
-      <width>101</width>
+      <width>131</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose active scalar&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active scalar array&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>90</y>
+      <y>95</y>
       <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose color map&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active color map&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="suggestedMin">
@@ -691,7 +691,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>only for selected objects</string>
+     <string>only for selected surfaces</string>
     </property>
     <property name="checked">
      <bool>true</bool>

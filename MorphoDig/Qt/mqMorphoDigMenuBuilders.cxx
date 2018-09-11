@@ -27,6 +27,7 @@
 #include "mqAboutDialogReaction.h"
 #include "mqChangeNodeReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
+#include "mqEditTagsDialogReaction.h"
 #include "mqICPDialogReaction.h"
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqSavePLYDialogReaction.h"
@@ -226,6 +227,53 @@ void mqMorphoDigMenuBuilders::buildEditMenu(QMenu& menu)
   
 }
 
+void mqMorphoDigMenuBuilders::buildScalarsMenu(QMenu& menu)
+{
+
+		new mqEditScalarsDialogReaction(menu.addAction("Open scalars window") << mqSetName("editScalarRenderingWindow"));
+
+	QAction *CameraDistance = menu.addAction("Compute distance from camera for each selected surface");
+	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
+
+
+
+	new mqScalarsThicknessDialogReaction(menu.addAction("Compute thickness within each selected surface ") << mqSetName("actionThickess"));
+	new mqScalarsThicknessBetweenDialogReaction(menu.addAction("Compute thickness between two surfaces") << mqSetName("actionThickessBetween"));
+	new mqScalarsDistanceDialogReaction(menu.addAction("Compute distance between two surfaces") << mqSetName("actionDistanceBetween"));
+	new mqScalarsCurvatureDialogReaction(menu.addAction("Compute curvature for each selected surface") << mqSetName("actionCurvature"));
+	new mqScalarsComplexityDialogReaction(menu.addAction("Compute complexity for each selected surface") << mqSetName("actionComplexity"));
+	new mqScalarsSmoothDialogReaction(menu.addAction("Smooth active scalars for each selected surface") << mqSetName("actionSmooth"));
+
+}
+void mqMorphoDigMenuBuilders::buildTagsMenu(QMenu& menu)
+{
+
+	new mqEditTagsDialogReaction(menu.addAction("Open tags window") << mqSetName("editScalarRenderingWindow"));
+
+	QAction *CreateNewTagArray = menu.addAction("Create new empty tag array for each selected surface");
+	new mqTagFromRGBDialogReaction(menu.addAction("Create new tag array based on currently displayed colors for each selected surface") << mqSetName("ActrionTagFromRGB"));
+
+	//là on va faire une fenêtre qui demande 2 choses : 
+	// 1) EXACT color match est-ce qu'on se base sur la tag map actuelle (exact color match) => ce qui implique qu'on puisse y acceder sans avoir d'array tags ouvertes.... ce qui n'est pas un drame, notamment pour éditer les tag maps quand on n'a pas de tags ouverts
+	// 2) si on 
+	//1) on s'arrête à combien de couleurs ?
+	// 
+
+	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayFromRGB()));
+	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
+	QAction *CreateNewTagArrayConnectivity = menu.addAction("Create new tag array based on connectivity for each selected surface");
+	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
+	
+}
+void mqMorphoDigMenuBuilders::buildRGBMenu(QMenu& menu)
+{
+
+	QAction *RGBFromCurrentColor = menu.addAction("Create or replace an RGB array with current display color for each selected surface");
+	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
+
+}
+
+
 void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 {
 	QString objectName = menu.objectName();
@@ -245,11 +293,13 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	QAction *Invert = submenuStructureModification->addAction("Invert each selected surface");
 	QAction *Mirror = submenuStructureModification->addAction("Mirror each selected surface along Y plane");
-	QAction *ConvexHULL = submenuStructureModification->addAction("Create a convex hull for each selected surface");
+	
 	/*QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
 	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");*/
 	QAction *Group = submenuStructureModification->addAction("Merge selected surfaces into one single surface");
-	
+	QMenu* submenuConvexHulls = menu.addMenu("Convex hulls");
+	QAction *ConvexHULL = submenuConvexHulls->addAction("Create a convex hull for each selected surface");
+
 	QMenu* submenuAlignment = menu.addMenu("Surface alignment");
 	new mqICPDialogReaction(submenuAlignment->addAction("Align 2 surfaces (iterative closest point algorithm)") << mqSetName("actionICP"));
 	QMenu* submenuRenderingModification = menu.addMenu("Rendering modification");
@@ -297,48 +347,6 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction::connect(Darkgreen, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotDarkgreen()));
 	QAction::connect(Orange, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotOrange()));
 	QAction::connect(Brown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotBrown()));
-	
-	QMenu* submenuScalarModification = menu.addMenu("Scalar arrays");
-	//new mqThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness") << mqSetName("actionThickness"));
-	//new mqCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature") << mqSetName("actionCurvature"));
-	new mqEditScalarsDialogReaction(submenuScalarModification->addAction("Open scalar rendering options window") << mqSetName("editScalarRenderingWindow"));
-
-	QAction *CameraDistance = submenuScalarModification->addAction("Compute distance from camera for each selected surface");
-	QAction::connect(CameraDistance, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsCameraDistance()));
-
-	//QAction *RGBFromCurrentColor = submenuScalarModification->addAction("Create/replace RGB scalar from current color");
-	
-
-
-	new mqScalarsThicknessDialogReaction(submenuScalarModification->addAction("Compute thickness within each selected surface ") << mqSetName("actionThickess"));
-	new mqScalarsThicknessBetweenDialogReaction(submenuScalarModification->addAction("Compute thickness between two surfaces") << mqSetName("actionThickessBetween"));
-	new mqScalarsDistanceDialogReaction(submenuScalarModification->addAction("Compute distance between two surfaces") << mqSetName("actionDistanceBetween"));
-	new mqScalarsCurvatureDialogReaction(submenuScalarModification->addAction("Compute curvature for each selected surface") << mqSetName("actionCurvature"));
-	new mqScalarsComplexityDialogReaction(submenuScalarModification->addAction("Compute complexity for each selected surface") << mqSetName("actionComplexity"));
-	new mqScalarsSmoothDialogReaction(submenuScalarModification->addAction("Smooth active scalars for each selected surface") << mqSetName("actionSmooth"));
-
-
-	QMenu* submenuRGBModification = menu.addMenu("RGB arrays");
-	QAction *RGBFromCurrentColor = submenuRGBModification->addAction("Create or replace an RGB array with current display color");
-	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
-
-	QMenu* submenuTagModification = menu.addMenu("Tag arrays");
-	QAction *CreateNewTagArray = submenuTagModification->addAction("Create new empty tag array");
-	new mqTagFromRGBDialogReaction(submenuTagModification->addAction("Create new tag array based on currently displayed colors") << mqSetName("ActrionTagFromRGB"));
-	
-	//là on va faire une fenêtre qui demande 2 choses : 
-	// 1) EXACT color match est-ce qu'on se base sur la tag map actuelle (exact color match) => ce qui implique qu'on puisse y acceder sans avoir d'array tags ouvertes.... ce qui n'est pas un drame, notamment pour éditer les tag maps quand on n'a pas de tags ouverts
-	// 2) si on 
-	//1) on s'arrête à combien de couleurs ?
-	// 
-	
-	//QAction::connect(CreateNewTagArrayColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayFromRGB()));
-	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
-	QAction *CreateNewTagArrayConnectivity = submenuTagModification->addAction("Create new tag array based on connectivity");
-	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
-	/*QAction *GaussianBlur = submenuScalarModification->addAction("Smooth active scalars (gaussian blur)");
-	QAction::connect(GaussianBlur, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsGaussianBlur()));
-	*/
 }
 void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 {

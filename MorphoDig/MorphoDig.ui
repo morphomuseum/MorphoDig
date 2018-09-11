@@ -73,10 +73,28 @@
      <string>View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuScalars">
+    <property name="title">
+     <string>Scalars</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTags">
+    <property name="title">
+     <string>Tags</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuRGB">
+    <property name="title">
+     <string>RGB</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuEditSelectedSurfaces"/>
    <addaction name="menuLandmarks"/>
+   <addaction name="menuScalars"/>
+   <addaction name="menuTags"/>
+   <addaction name="menuRGB"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
