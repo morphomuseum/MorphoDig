@@ -362,7 +362,7 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	new mqSelectLandmarkRangeDialogReaction(menu.addAction("Select landmark range") << mqSetName("actionSelectLandmarkRange"));
 		QAction *MoveDown = menu.addAction("Selected landmarks:  increase landmark number (move down in list)");
 		QAction *MoveUp = menu.addAction("Selected landmarks: decrease landmark number(move up in list)");
-	QAction *PushBack = menu.addAction("Selected landmarks: push back on object surface");
+	QAction *PushBack = menu.addAction("Selected landmarks: push back on closest surface's vertex");
 	QAction *ReOrient = menu.addAction("Selected landmarks: change orientation according to surface's normals");
 	QAction::connect(MoveUp, SIGNAL(triggered()), mqMorphoDigCore::instance() , SLOT(slotLandmarkMoveUp()));
 	QAction::connect(MoveDown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMoveDown()));

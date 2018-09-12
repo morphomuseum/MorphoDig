@@ -465,8 +465,8 @@
    <widget class="QDoubleSpinBox" name="FlagRenderingSizeValue">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>30</y>
+      <x>180</x>
+      <y>28</y>
       <width>71</width>
       <height>22</height>
      </rect>
@@ -476,13 +476,13 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>20</y>
+      <y>23</y>
       <width>151</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flag rendering size (mm)&lt;br/&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;(total arrow length)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flag rendering size (size unit)&lt;br/&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;(total arrow length)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>

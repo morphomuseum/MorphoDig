@@ -77,6 +77,7 @@ void mqChangeNodeReaction::ChangeSelectedNodes(int new_node_type)
 	if (coll_modified == 1)
 	{
 		myColl->Modified();
+		mqMorphoDigCore::instance()->Render();
 	}
 
 }
