@@ -492,8 +492,8 @@
    <widget class="QCheckBox" name="smoothNormals">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>210</y>
+      <x>39</x>
+      <y>165</y>
       <width>331</width>
       <height>17</height>
      </rect>
@@ -506,7 +506,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>160</y>
+      <y>190</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -516,10 +516,13 @@
     </property>
    </widget>
    <widget class="QSpinBox" name="avg">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>160</y>
+      <y>190</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -532,7 +535,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>160</y>
+      <y>190</y>
       <width>111</width>
       <height>21</height>
      </rect>

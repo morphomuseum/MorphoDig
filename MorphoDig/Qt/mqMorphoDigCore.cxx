@@ -2056,6 +2056,14 @@ void mqMorphoDigCore::GetDefaultTagColor(int tagnr, double rgba[4])
 }
 void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 {
+	vtkIdType num_flg = 0;
+	num_flg = mqMorphoDigCore::instance()->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_flg == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No flag landmark selected. Please select at least one flag to use this option.");
+		msgBox.exec();
+		return;
+	}
 	double r1, g1, b1;
 	vtkIdType selectedflags = this->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
 	if (selectedflags>0)
@@ -8525,7 +8533,7 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
-			cout << "Set slected 0 for actor  " << i << endl;
+			cout << "Set selected 0 for actor  " << i << endl;
 
 			myActor->SetSelected(0);
 			myActor->SaveState(Count, QString(mScalarName.c_str()));
@@ -8682,6 +8690,14 @@ void mqMorphoDigCore::scalarsCurvature(int curvatureType, QString scalarName)
 void mqMorphoDigCore::scalarsCameraDistance()
 {
 		
+	vtkIdType num_surf = 0;
+	num_surf = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_surf == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
 	int modified = 0;
@@ -9818,7 +9834,7 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 	}
 
 }
-void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normals, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormales)
+void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normals, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormals)
 {
 	cout << "Call scalarsThicknessBetween" << endl;
 	if (impactedActor != NULL && observedActor != NULL)
@@ -10047,7 +10063,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 							ptn2obs[1] = ptn2[1];
 							ptn2obs[2] = ptn2[2];*/
 
-							if (observedActor != impactedActor && invertObservedNormales==1)
+							if (observedActor != impactedActor && invertObservedNormals==1)
 							{
 								ptn2obs[0] = -ptn2obs[0];
 								ptn2obs[1] = -ptn2obs[1];
@@ -12285,7 +12301,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	ven_init_pos[0] = mImpactedptn[0];
 	ven_init_pos[1] = mImpactedptn[1];
 	ven_init_pos[2] = mImpactedptn[2];
-	cout << "Normale 14044 of merged object:" << endl;
+	cout << "Normal 14044 of merged object:" << endl;
 	cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
 
 	// 2 : build kdtree on merged object
@@ -12327,6 +12343,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 }
 void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree, vtkSmartPointer<vtkPolyData> PD, int mcount)
 {
+
 	//mode0: pushback
 	//mode 1: reorient
 	LmkCollection->InitTraversal();
@@ -12387,18 +12404,50 @@ void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLM
 void mqMorphoDigCore::LandmarksReorient()
 {
 //mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
-	
+	vtkIdType num_lmk = 0;
+	num_lmk = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No landmark selected. Please select at least one landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
 	this->LandmarksPushBackOrReorient(1);
 	this->Render();
 }
 
 void mqMorphoDigCore::LandmarksPushBack()
 {
+	vtkIdType num_lmk = 0;
+	num_lmk = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No landmark selected. Please select at least one landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
 	this->LandmarksPushBackOrReorient(0);
 	this->Render();
 }
 void mqMorphoDigCore::LandmarksMoveUp()
 {
+	vtkIdType num_lmk = 0;
+	num_lmk = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No landmark selected. Please select at least one landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
 	this->NormalLandmarkCollection->LandmarksMoveUp();
 	this->TargetLandmarkCollection->LandmarksMoveUp();
 	this->NodeLandmarkCollection->LandmarksMoveUp();
@@ -12408,7 +12457,18 @@ void mqMorphoDigCore::LandmarksMoveUp()
 }
 void mqMorphoDigCore::LandmarksMoveDown()
 {
-		this->NormalLandmarkCollection->LandmarksMoveDown();
+	vtkIdType num_lmk = 0;
+	num_lmk = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No landmark selected. Please select at least one landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->NormalLandmarkCollection->LandmarksMoveDown();
 	this->TargetLandmarkCollection->LandmarksMoveDown();
 	this->NodeLandmarkCollection->LandmarksMoveDown();
 	this->HandleLandmarkCollection->LandmarksMoveDown();

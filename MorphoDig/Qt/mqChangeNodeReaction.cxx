@@ -51,11 +51,27 @@ mqChangeNodeReaction::mqChangeNodeReaction(QAction* parentObject,  int _mode)
 
 void mqChangeNodeReaction::MoveCurveHandles()
 {
+	vtkIdType num_lmk = 0;
+	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No curve handle selected. Please select at least one curve handle landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
 	mqChangeNodeReaction::showMoveCurveHandlesDialog();
 }
 
 void mqChangeNodeReaction::ChangeSelectedNodes(int new_node_type)
 {
+	vtkIdType num_lmk = 0;
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No curve node landmark selected. Please select at least one curve node landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
 	vtkSmartPointer<vtkLMActorCollection> myColl = vtkSmartPointer<vtkLMActorCollection>::New();
 	myColl = mqMorphoDigCore::instance()->getNodeLandmarkCollection();
 

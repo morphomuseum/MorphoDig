@@ -64,7 +64,7 @@ mqScalarsThicknessDialog::mqScalarsThicknessDialog(QWidget* Parent)
 	double proposed_value = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLengthOfSelectedActors() / 20;
 	this->Ui->thickness->setValue(proposed_value);
 	this->Ui->progressBar->setVisible(false);
-	this->Ui->smoothNormales->setChecked(true);
+	//this->Ui->smoothNormales->setChecked(true);
 	
 	this->Ui->avg->setMinimum(1);
 	this->Ui->avg->setValue(5);
@@ -73,6 +73,7 @@ mqScalarsThicknessDialog::mqScalarsThicknessDialog(QWidget* Parent)
 	
   
 	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditThickness()));
+	connect(this->Ui->smoothNormals, SIGNAL(pressed()), this, SLOT(slotsmoothNormals()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditThickness()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(thicknessProgression(int)), this, SLOT(slotProgressBar(int)));
@@ -98,12 +99,17 @@ void mqScalarsThicknessDialog::editThickness()
 	{
 		std::string action = "Update thickness";
 		cout << action << endl;
-		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormales->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->Ui->angularLimit->value());// to update thickness
+		mqMorphoDigCore::instance()->scalarsThickness(this->Ui->thickness->value(), this->Ui->smoothNormals->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->Ui->angularLimit->value());// to update thickness
 		
 	}
 
 }
+void mqScalarsThicknessDialog::slotsmoothNormals()
+{
+	if (this->Ui->smoothNormals->isChecked()) { this->Ui->avg->setEnabled(false); }
+	else{ this->Ui->avg->setEnabled(true); }
 
+}
 void mqScalarsThicknessDialog::slotProgressBar(int val)
 {
 	this->Ui->progressBar->setValue(val);

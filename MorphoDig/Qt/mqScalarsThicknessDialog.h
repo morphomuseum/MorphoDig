@@ -34,7 +34,7 @@ public:
   public slots:
   
   
-  
+  virtual void slotsmoothNormals();
   virtual void sloteditThickness();
   virtual void slotClose();
   virtual void slotProgressBar(int val);

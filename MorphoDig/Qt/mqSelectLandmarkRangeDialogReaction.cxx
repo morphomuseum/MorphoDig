@@ -25,7 +25,17 @@ void mqSelectLandmarkRangeDialogReaction::onTriggered()
 {
 	
 	
-
+	vtkIdType num_lmk = 0;
+	num_lmk = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfItems();
+	num_lmk+= mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfItems();
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfItems();
+	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfItems();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("Please create or load landmarks in order to be able to use this option.");
+		msgBox.exec();
+		return;
+	}
 		mqSelectLandmarkRangeDialogReaction::showSelectLandmarkRangeDialog();
 		
 		

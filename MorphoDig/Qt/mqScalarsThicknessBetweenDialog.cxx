@@ -62,7 +62,7 @@ mqScalarsThicknessBetweenDialog::mqScalarsThicknessBetweenDialog(QWidget* Parent
 	this->Ui->thickness->setSingleStep(1);
 	this->Ui->thickness->setValue(2);
 	this->Ui->progressBar->setVisible(false);
-	this->Ui->smoothNormals->setChecked(true);
+	//this->Ui->smoothNormals->setChecked(true);
 	
 	this->Ui->avg->setMinimum(1);
 	this->Ui->avg->setValue(5);
@@ -92,6 +92,7 @@ mqScalarsThicknessBetweenDialog::mqScalarsThicknessBetweenDialog(QWidget* Parent
 
 	}
 	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditThickness()));
+	connect(this->Ui->smoothNormals, SIGNAL(pressed()), this, SLOT(slotsmoothNormals()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditThickness()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(thicknessProgression(int)), this, SLOT(slotProgressBar(int)));
@@ -146,6 +147,13 @@ void mqScalarsThicknessBetweenDialog::editThickness()
 
 }
 
+
+void mqScalarsThicknessBetweenDialog::slotsmoothNormals()
+{
+	if (this->Ui->smoothNormals->isChecked()) { this->Ui->avg->setEnabled(false); }
+	else { this->Ui->avg->setEnabled(true); }
+
+}
 void mqScalarsThicknessBetweenDialog::slotProgressBar(int val)
 {
 	this->Ui->progressBar->setValue(val);
