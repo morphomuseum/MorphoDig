@@ -134,7 +134,7 @@ void mqScalarsDistanceDialog::launchDistance()
 
 		if (this->observedActor != NULL && this->impactedActor != NULL && this->observedActor!= this->impactedActor)
 		{
-		//	cout << "Call mphodigcore between function" << endl;
+			cout << "Call mqmorphodigcore scalarsDistance" << endl;
 		
 			mqMorphoDigCore::instance()->scalarsDistance(this->Ui->maxDist->value(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->impactedActor, this->observedActor);// to launch scalarDistance computation
 		}

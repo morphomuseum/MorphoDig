@@ -9711,9 +9711,9 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 
 
 			kDTree->SetDataSet(observedMoved);
-
+			cout << "Start build kdtree"  << endl;
 			kDTree->BuildLocator();
-
+			cout << "KdTree built" << endl;
 			for (ve = 0; ve < numvert; ve++)
 			{
 				min_dist = maxDist;
@@ -9806,7 +9806,7 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 
 
 			}
-			//std::cout<<"New Scalar computation done "<<std::endl;
+			std::cout<<"New Distance Scalar computation done "<<std::endl;
 
 			newScalars->SetName(mScalarName.c_str());
 			// test if exists...
@@ -15393,6 +15393,13 @@ void mqMorphoDigCore::slotCreateTagArrayConnectivity()
 }
 void mqMorphoDigCore::slotScalarsRGB()
 {
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	QString RGB = QString("RGB");
 	QInputDialog *newRGBName= new QInputDialog();
 	bool dialogResult;

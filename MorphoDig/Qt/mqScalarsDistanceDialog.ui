@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Compute distance between 2 meshes</string>
+   <string>Compute distance between 2 surfaces</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -503,7 +503,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>60</y>
+      <y>64</y>
       <width>101</width>
       <height>16</height>
      </rect>

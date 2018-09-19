@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalars: compute thickness within selected objects</string>
+   <string>Scalars: compute thickness between 2 objects</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
