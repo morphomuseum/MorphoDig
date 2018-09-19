@@ -108,8 +108,7 @@ void mqScalarsDistanceDialog::launchDistance()
 	cout << "Launch scalar distance computation " << endl;
 	this->Ui->cancel->setDisabled(true);
 	
-	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
-	{
+	
 		if (!this->Ui->observedObject->currentText().isEmpty())
 		{
 			this->observedActor = mqMorphoDigCore::instance()->getFirstActorFromName(this->Ui->observedObject->currentText());
@@ -127,7 +126,7 @@ void mqScalarsDistanceDialog::launchDistance()
 		}
 		else
 		{
-			//cout << "impacted actor is null" << endl;
+			cout << "impacted actor is null" << endl;
 			this->impactedActor = NULL;
 		}
 
@@ -139,7 +138,7 @@ void mqScalarsDistanceDialog::launchDistance()
 			mqMorphoDigCore::instance()->scalarsDistance(this->Ui->maxDist->value(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->impactedActor, this->observedActor);// to launch scalarDistance computation
 		}
 		
-	}
+	
 
 }
 
