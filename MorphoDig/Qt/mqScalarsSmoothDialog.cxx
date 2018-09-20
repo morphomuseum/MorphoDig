@@ -70,8 +70,8 @@ mqScalarsSmoothDialog::mqScalarsSmoothDialog(QWidget* Parent)
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditSmooth()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 connect(this->Ui->localCustom, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
-	 connect(this->Ui->localAuto, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
-	 connect(this->Ui->localNeighbours, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
+	 connect(this->Ui->localAuto, SIGNAL(pressed()), this, SLOT(slotEnableDisableAutoArea()));
+	  connect(this->Ui->localNeighbours, SIGNAL(pressed()), this, SLOT(slotEnableDisableLocalNeighboursArea()));
 
 	 connect(this->Ui->cutMinMax, SIGNAL(pressed()), this, SLOT(slotEnableDisableCutPercent()));
 
@@ -97,17 +97,21 @@ void mqScalarsSmoothDialog::editSmooth()
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
 	{
 		std::string action = "Smooth scalars";
+		int smoothing_method = 0;
+		//smoothing_method = 0 => average
+		//smoothing_method = 1 => median
 		int mode = 3;
-		//mode = 0: raw smoothing (average of direct neighbours)
+		//mode = 0: raw smoothing (average/median of direct neighbours)
 		//mode = 1: smooth within local sphere of radius ~ mesh avg size / 40
 		//mode = 2: smooth within local sphere of radius defined by the user
-		
+		if (this->Ui->median->isChecked()) { smoothing_method = 1; }
+
 		if (this->Ui->localNeighbours->isChecked()) { mode = 0; }
 		if (this->Ui->localAuto->isChecked()) { mode = 1; }
 		if (this->Ui->localCustom->isChecked()) { mode = 2; }
 		int cut = 0;
 		if (this->Ui->cutMinMax->isChecked()) { cut = 1; }
-		mqMorphoDigCore::instance()->scalarsSmooth(this->Ui->localAreaLimit->value(), cut, this->Ui->cutPercent->value(),mode);// to update Smooth
+		mqMorphoDigCore::instance()->scalarsSmooth(this->Ui->localAreaLimit->value(), cut, this->Ui->cutPercent->value(),mode, smoothing_method);// to update Smooth
 		
 	}
 
@@ -127,6 +131,22 @@ void mqScalarsSmoothDialog::slotEnableDisableCutPercent()
 	}
 
 }
+
+void mqScalarsSmoothDialog::slotEnableDisableLocalNeighboursArea()
+{
+	
+		this->Ui->localAreaLimit->setDisabled(true);
+	
+	
+}
+void mqScalarsSmoothDialog::slotEnableDisableAutoArea()
+{
+	
+		this->Ui->localAreaLimit->setDisabled(true);
+	
+	
+}
+
 void mqScalarsSmoothDialog::slotEnableDisableCustomArea()
 {
 	if (this->Ui->localCustom->isChecked())

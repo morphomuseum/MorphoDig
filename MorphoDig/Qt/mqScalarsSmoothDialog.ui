@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>526</width>
-    <height>289</height>
+    <height>339</height>
    </rect>
   </property>
   <property name="palette">
@@ -426,13 +426,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalars: compute complexity of selected objects</string>
+   <string>Active scalars smoothing options</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>240</y>
+     <y>300</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -460,7 +460,7 @@
      <x>10</x>
      <y>10</y>
      <width>461</width>
-     <height>161</height>
+     <height>241</height>
     </rect>
    </property>
    <property name="title">
@@ -479,7 +479,7 @@
      <item>
       <widget class="QRadioButton" name="localNeighbours">
        <property name="text">
-        <string>Smoothing based on direct neighbouring vertices (fast, but extremely local)</string>
+        <string>Smoothing based on direct neighboring vertices (fast, but extremely local)</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -489,7 +489,7 @@
      <item>
       <widget class="QRadioButton" name="localAuto">
        <property name="text">
-        <string>Smoothing based on vertices closer than mesh average &quot;size&quot;/40</string>
+        <string>Smoothing based on vertices closer than surface average &quot;size&quot;/40</string>
        </property>
       </widget>
      </item>
@@ -518,7 +518,7 @@
        <item>
         <widget class="QCheckBox" name="cutMinMax">
          <property name="text">
-          <string>Remove x% min and max values</string>
+          <string>Remove x% extreme min and max values from computation:</string>
          </property>
         </widget>
        </item>
@@ -545,12 +545,54 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>180</y>
+      <width>441</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="average">
+       <property name="text">
+        <string>Compute average of found neighboring vertices</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="median">
+       <property name="text">
+        <string>Compute median of  found neighboring vertices</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>160</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Smoothing &quot;method&quot;</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QProgressBar" name="progressBar">
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>200</y>
+     <y>270</y>
      <width>321</width>
      <height>23</height>
     </rect>
