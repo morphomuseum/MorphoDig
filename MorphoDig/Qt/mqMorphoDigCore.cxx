@@ -8699,106 +8699,142 @@ void mqMorphoDigCore::scalarsNormalization(QString scalarName, double oldMin, do
 		msgBox.exec();
 		return;
 	}
-	if (oldMax<=oldMin || newMax<=newMin) {
+	if (oldMax==oldMin || newMax==newMin) {
 		QMessageBox msgBox;
-		msgBox.setText("min and max values should not be equal, and min values should be smaller than max values.");
+		msgBox.setText("min and max values should not be equal.");
 		msgBox.exec();
 		return;
 	}
-
-	this->ActorCollection->InitTraversal();
-	vtkIdType num = this->ActorCollection->GetNumberOfItems();
-	int modified = 0;
-	std::string action = "Rescale or Normalize scalar";
-	int Count = BEGIN_UNDO_SET(action);
-	for (vtkIdType i = 0; i < num; i++)
+	if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
 	{
-		cout << "Camera distance" << i << endl;
-		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		if (myActor->GetSelected() == 1)
+		std::string mScalarName = "NormalizedScalar";
+
+
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		int modified = 0;
+		std::string action = "Rescale or Normalize scalar";
+		int Count = BEGIN_UNDO_SET(action);
+		for (vtkIdType i = 0; i < num; i++)
 		{
-
-			myActor->SetSelected(0);
-			myActor->SaveState(Count, QString("Depth"));
-			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
-			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			cout << "Scalar smooth :" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			cout << "Got next actor:" << i << endl;
+			if (myActor != NULL && myActor->GetSelected() == 1)
 			{
-
-
-				double numvert = mymapper->GetInput()->GetNumberOfPoints();
-
-
-				vtkSmartPointer<vtkDoubleArray> newScalars =
-					vtkSmartPointer<vtkDoubleArray>::New();
-
-				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-				newScalars->SetNumberOfTuples(numvert);
-
-				newScalars->SetNumberOfTuples(numvert);
-
-
-
-
-				vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
-				mPD = mymapper->GetInput();
-				double ve_init_pos[3];;
-				double ve_final_pos[3];
-				double distance_from_camera;
-				vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
-				distance_from_camera = 3;
-				double campos[3];
-				this->getCamera()->GetPosition(campos);
-
-				for (vtkIdType i = 0; i < numvert; i++)	// for each vertex of this
-
+				myActor->SetSelected(0);
+				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 				{
-					mPD->GetPoint(i, ve_init_pos);
-					mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+					cout << "found mapper for :" << i << endl;
+					vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+					mPD = mymapper->GetInput();
 
-					distance_from_camera = sqrt(vtkMath::Distance2BetweenPoints(campos, ve_final_pos));
+					vtkDataArray *currentScalars = NULL;
 
-					newScalars->InsertTuple1(i, distance_from_camera);
 
+					currentScalars = vtkDoubleArray::SafeDownCast(mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
+					if (currentScalars == NULL)
+					{
+						currentScalars = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
+					}
+					if (currentScalars != NULL)
+					{
+						cout << "found scalars for :" << i << endl;
+
+						double numvert = mymapper->GetInput()->GetNumberOfPoints();
+
+
+						vtkSmartPointer<vtkDoubleArray> newScalars =
+							vtkSmartPointer<vtkDoubleArray>::New();
+
+						newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+						newScalars->SetNumberOfTuples(numvert);
+				
+						std::string scname = scalarName.toStdString();
+
+
+						if (scname.length() > 0)
+						{
+							mScalarName = scname;
+						}
+						myActor->SaveState(Count, QString(mScalarName.c_str()));
+						
+						/*for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						{
+							vals.push_back(currentScalars->GetTuple1(j));
+						}*/
+
+
+
+
+						
+							vtkIdType ve;
+
+
+							double vn[3];
+							vn[0] = 0;
+							vn[1] = 0;
+							vn[2] = 1;
+							double picked_value = 0;
+							for (ve = 0; ve < numvert; ve++)
+							{
+							
+								double newscalar = 0;													
+								double curr_scalar = (double)(currentScalars->GetTuple(ve))[0];
+								newscalar = curr_scalar*(newMax -newMin )/(oldMax - oldMin);
+
+								if (flipOutput == 1)
+								{
+									newscalar = -1*newscalar + newMin + newMax;
+								}
+								//std::cout<<curr_scalar<<std::endl;
+								if (allowLowerThanNewMin ==0 && newscalar < newMin)
+								{
+									newscalar = newMin;
+								}
+								if (allowHigherThanNewMax == 0 && newscalar > newMax)
+								{
+									newscalar = newMax;
+								}
+
+									
+																
+
+								newScalars->InsertTuple1(ve, newscalar);
+
+
+							}
+							//std::cout<<"New Scalar computation done "<<std::endl;
+							newScalars->SetName(mScalarName.c_str());
+							mPD->GetPointData()->RemoveArray(mScalarName.c_str());				
+							mPD->GetPointData()->AddArray(newScalars);				
+							mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
+
+						modified = 1;
+					}//scalars not null
 
 				}
-				newScalars->SetName("Camera_distance");
-				// test if exists...
-				//
-				int exists = 0;
-
-				// remove this scalar
-				//this->GetPointData()->SetScalars(newScalars);
-				mPD->GetPointData()->RemoveArray("Depth");
-				mPD->GetPointData()->AddArray(newScalars);
-				mPD->GetPointData()->SetActiveScalars("Depth");
-				//g_active_scalar = 0;
-				// 0 => depth
-				// 1 =>	"Maximum_Curvature"
-				// 2 => "Minimum_Curvature"
-				// 3 => "Gauss_Curvature"
-				// 4 => "Mean_Curvature"
-
-				modified = 1;
 
 			}
 
 		}
+		if (modified == 1)
+		{
+			this->Initmui_ExistingScalars();
+			this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
+			cout << "scalars updated " << endl;
+			this->Render();
+		}
+
+		END_UNDO_SET();
+
 	}
-	if (modified == 1)
-	{
-
-		//cout << "camera and grid adjusted" << endl;
-		cout << "scalars updated " << endl;
-
-		this->Initmui_ExistingScalars();
-		this->Setmui_ActiveScalarsAndRender("Depth", VTK_DOUBLE, 1);
-
-
-	}
-	END_UNDO_SET();
-
-
-
+	QMessageBox msgBox;
+	msgBox.setText("Active array must be an existing scalar...");
+	msgBox.exec();
+	return;
 }
 void mqMorphoDigCore::scalarsCameraDistance()
 {
