@@ -71,6 +71,7 @@
 #include "mqScalarsComplexityDialogReaction.h"
 #include "mqScalarsSmoothDialogReaction.h"
 #include "mqScalarsCurvatureDialogReaction.h"
+#include "mqScalarsNormalizationDialogReaction.h"
 #include "mqScalarsDistanceDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
 
@@ -193,8 +194,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveDataReaction(submenuOrientationLabels->addAction("Save Orientation Labels") << mqSetName("actionSaveORI"), 7);
   
   new mqSaveDataReaction(submenuMeasurements->addAction("Save area, volume, triangle number and vertex number of selected surfaces") << mqSetName("actionSaveAV"), 18);
-  new mqSaveDataReaction(submenuMeasurements->addAction("Save normalized shape index of selected surfaces") << mqSetName("actionSaveNSI"), 19);  
-  new mqSaveDataReaction(submenuMeasurements->addAction("Save convex hull area ratio and normalized shape index of selected surfaces (warning: slow)") << mqSetName("actionSaveCHNSI"), 20);
+  new mqSaveDataReaction(submenuMeasurements->addAction("Surface global complexity: save normalized shape index of selected surfaces") << mqSetName("actionSaveNSI"), 19);  
+  new mqSaveDataReaction(submenuMeasurements->addAction("Surface global complexity: save convex hull area ratio and normalized shape index of selected surfaces (warning: slow)") << mqSetName("actionSaveCHNSI"), 20);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save size measurements (max length in xyz direction etc.) of selected surfaces") << mqSetName("actionSaveSize"), 21);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"), 22);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save scalar values of first selected surface") << mqSetName("actionSaveSCInfos"), 23);
@@ -243,6 +244,7 @@ void mqMorphoDigMenuBuilders::buildScalarsMenu(QMenu& menu)
 	new mqScalarsCurvatureDialogReaction(menu.addAction("Compute curvature for each selected surface") << mqSetName("actionCurvature"));
 	new mqScalarsComplexityDialogReaction(menu.addAction("Compute complexity for each selected surface") << mqSetName("actionComplexity"));
 	new mqScalarsSmoothDialogReaction(menu.addAction("Smooth active scalars for each selected surface") << mqSetName("actionSmooth"));
+	new mqScalarsNormalizationDialogReaction(menu.addAction("Normalize or rescale active scalars for each selected surface") << mqSetName("actionNormalize"));
 
 }
 void mqMorphoDigMenuBuilders::buildTagsMenu(QMenu& menu)

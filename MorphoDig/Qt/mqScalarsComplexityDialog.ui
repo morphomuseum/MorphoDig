@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
-    <height>307</height>
+    <width>605</width>
+    <height>326</height>
    </rect>
   </property>
   <property name="palette">
@@ -426,13 +426,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalars: compute complexity of selected objects</string>
+   <string>Scalars: compute complexity of selected surfaces</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>270</y>
+     <x>180</x>
+     <y>290</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -459,12 +459,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>411</width>
-     <height>241</height>
+     <width>571</width>
+     <height>261</height>
     </rect>
    </property>
    <property name="title">
-    <string>Local convex hull area ratio (advice: surfaces &lt; 100 000 vertices)</string>
+    <string>Complexity computation options (advice: surfaces &lt; 100 000 vertices)</string>
    </property>
    <widget class="QDoubleSpinBox" name="localAreaLimit">
     <property name="enabled">
@@ -472,7 +472,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>450</x>
       <y>40</y>
       <width>62</width>
       <height>22</height>
@@ -486,21 +486,21 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>170</y>
-      <width>113</width>
+      <y>200</y>
+      <width>321</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Local_area_complexity</string>
+     <string>Complexity_LCh-AR</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>170</y>
-      <width>111</width>
+      <x>60</x>
+      <y>200</y>
+      <width>71</width>
       <height>21</height>
      </rect>
     </property>
@@ -511,17 +511,17 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>70</y>
-      <width>260</width>
+      <x>140</x>
+      <y>90</y>
+      <width>401</width>
       <height>88</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="sphereShapeIndex">
+      <widget class="QRadioButton" name="convexHullArea">
        <property name="text">
-        <string>local sphere shape index (slow)</string>
+        <string>complexity= local convex hull area ratio (LCh-AR) | very slow</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -531,7 +531,7 @@
      <item>
       <widget class="QRadioButton" name="sphereArea">
        <property name="text">
-        <string>local area / local sphere area (slow)</string>
+        <string>complexity = Local Sphere Area Ratio (LS-AR) | slow</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -541,7 +541,7 @@
      <item>
       <widget class="QRadioButton" name="convexHullShapeIndex">
        <property name="text">
-        <string> local convex hull  shape index (slower)</string>
+        <string>complexity=  local convex hull  normalized shape index (LCh-NSI) | very slow</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -549,9 +549,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="convexHullArea">
+      <widget class="QRadioButton" name="sphereShapeIndex">
        <property name="text">
-        <string>local convex hull area ratio (slower)</string>
+        <string>complexity = Local Sphere Normalized Shape Index  (LS-NSI) | slow</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -563,14 +563,14 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>60</y>
-      <width>201</width>
+      <x>25</x>
+      <y>89</y>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Compute:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For each vertex:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="customLocalAreaLimit">
@@ -578,20 +578,33 @@
      <rect>
       <x>20</x>
       <y>40</y>
-      <width>271</width>
+      <width>421</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Local sphere radius (=local area limit in size units)</string>
+     <string>Custom local vertex search distance limit ( = invesitgation sphere radius size units)</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>461</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>If unchecked: a search distance limit will be automatically computed for each selected surface.</string>
     </property>
    </widget>
   </widget>
   <widget class="QProgressBar" name="progressBar">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>210</y>
+     <x>160</x>
+     <y>240</y>
      <width>321</width>
      <height>23</height>
     </rect>

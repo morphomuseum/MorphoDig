@@ -203,6 +203,10 @@ mqScalarsCurvatureDialog.h
 mqScalarsCurvatureDialog.cxx
 mqScalarsCurvatureDialogReaction.h
 mqScalarsCurvatureDialogReaction.cxx
+mqScalarsNormalizationDialog.h
+mqScalarsNormalizationDialog.cxx
+mqScalarsNormalizationDialogReaction.h
+mqScalarsNormalizationDialogReaction.cxx
 mqICPDialog.h
 mqICPDialog.cxx
 mqICPDialogReaction.h
@@ -297,6 +301,7 @@ mqSaveMAPDialog.ui
 mqSaveTAGMAPDialog.ui
 mqTagFromRGBDialog.ui
 mqMergeTagsDialog.ui
+mqScalarsNormalizationDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

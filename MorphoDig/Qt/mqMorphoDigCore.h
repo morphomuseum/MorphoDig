@@ -640,6 +640,7 @@ public:
   std::vector<std::string> getActorNames();
   
   void scalarsCameraDistance(); //compute camera distance for each selected scalar.
+  void scalarsNormalization(QString scalarName, double oldMin, double oldMax, double newMin, double newMax, int allowLowerThanNewMin, int allowHigherThanNewMax, int flipOutput);
   void scalarsSmooth(double localAreaLimit, int cutMinMax, double cutPercent, int mode, int smoothing_method); //compute gaussian blur of current scalars
   void scalarsRGB(QString newRGB);
   void addDecompose(int color_mode, int min_region_size);// create for each selected surface as many object as extisting independent subregions in terms of connectivity.

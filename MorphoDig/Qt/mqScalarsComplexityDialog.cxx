@@ -71,6 +71,12 @@ mqScalarsComplexityDialog::mqScalarsComplexityDialog(QWidget* Parent)
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 connect(this->Ui->customLocalAreaLimit, SIGNAL(pressed()), this, SLOT(slotEnableDisableCustomArea()));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(complexityProgression(int)), this, SLOT(slotProgressBar(int)));
+	 connect(this->Ui->sphereShapeIndex, SIGNAL(pressed()), this, SLOT(slotsphereShapeIndex()));
+	 connect(this->Ui->sphereArea, SIGNAL(pressed()), this, SLOT(slotsphereArea()));
+	 connect(this->Ui->convexHullShapeIndex, SIGNAL(pressed()), this, SLOT(slotconvexHullShapeIndex()));
+	 connect(this->Ui->convexHullArea, SIGNAL(pressed()), this, SLOT(slotconvexHullArea()));
+	 
+
 }
 
 
@@ -107,6 +113,25 @@ void mqScalarsComplexityDialog::editComplexity()
 
 }
 
+void mqScalarsComplexityDialog::slotsphereShapeIndex()
+{
+	this->Ui->scalarName->setText("Complexity_LS-NSI");
+}
+
+void mqScalarsComplexityDialog::slotsphereArea() 
+{
+	this->Ui->scalarName->setText("Complexity_LS-AR");
+}
+void mqScalarsComplexityDialog::slotconvexHullShapeIndex()
+{
+	this->Ui->scalarName->setText("Complexity_LCh-NSI");
+}
+
+void mqScalarsComplexityDialog::slotconvexHullArea()
+{
+	this->Ui->scalarName->setText("Complexity_LCh-AR");
+
+}
 void mqScalarsComplexityDialog::slotEnableDisableCustomArea()
 {
 	if (this->Ui->customLocalAreaLimit->isChecked())

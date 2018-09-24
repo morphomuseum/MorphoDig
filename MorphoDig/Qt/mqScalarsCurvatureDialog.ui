@@ -519,7 +519,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Curvature</string>
+     <string>Curvature_mean</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_8">
@@ -527,7 +527,7 @@
      <rect>
       <x>30</x>
       <y>150</y>
-      <width>111</width>
+      <width>71</width>
       <height>21</height>
      </rect>
     </property>

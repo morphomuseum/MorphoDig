@@ -64,6 +64,10 @@ mqScalarsCurvatureDialog::mqScalarsCurvatureDialog(QWidget* Parent)
 	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditCurvature()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditCurvature()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
+	 connect(this->Ui->gaussianCurvature, SIGNAL(pressed()), this, SLOT(slotgaussianCurvature()));
+	 connect(this->Ui->minimalCurvature, SIGNAL(pressed()), this, SLOT(slotminimalCurvature()));
+	 connect(this->Ui->maximalCurvature, SIGNAL(pressed()), this, SLOT(slotmaximalCurvature()));
+	 connect(this->Ui->meanCurvature, SIGNAL(pressed()), this, SLOT(slotmeanCurvature()));
 	
 }
 
@@ -107,6 +111,26 @@ void mqScalarsCurvatureDialog::editCurvature()
 		
 	}
 
+}
+
+void mqScalarsCurvatureDialog::slotminimalCurvature()
+{
+	this->Ui->scalarName->setText("Curvature_min");
+}
+void mqScalarsCurvatureDialog::slotmeanCurvature()
+{
+	this->Ui->scalarName->setText("Curvature_mean");
+}
+
+
+
+void mqScalarsCurvatureDialog::slotgaussianCurvature()
+{
+	this->Ui->scalarName->setText("Curvature_gaussian");
+}
+void mqScalarsCurvatureDialog::slotmaximalCurvature()
+{
+	this->Ui->scalarName->setText("Curvature_max");
 }
 
 

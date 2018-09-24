@@ -33,8 +33,12 @@ public:
   
   public slots:
   
-  
-  
+  virtual void slotmeanCurvature();
+  virtual void slotminimalCurvature();
+  virtual void slotgaussianCurvature();
+  virtual void slotmaximalCurvature();
+    
+
   virtual void sloteditCurvature();
   virtual void slotClose();
   

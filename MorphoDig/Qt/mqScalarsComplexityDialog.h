@@ -33,8 +33,10 @@ public:
   
   public slots:
   
-  
-  
+  virtual void slotsphereShapeIndex();
+  virtual void slotsphereArea();
+  virtual void slotconvexHullShapeIndex();
+  virtual void slotconvexHullArea();
   virtual void sloteditComplexity();
   virtual void slotClose();
   virtual void slotProgressBar(int val);
