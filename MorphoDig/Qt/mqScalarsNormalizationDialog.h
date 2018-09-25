@@ -31,12 +31,17 @@ public:
   ~mqScalarsNormalizationDialog();
   void editNormalization();
   
+  void RefreshSuggestedOldMinMax();
+  void RefreshScalarName();
+
   public slots:
   
+  virtual void slotRefreshActiveScalars();
+  virtual void slotRefreshSuggestedOldMinMax();
   virtual void slotremovePercent();
-  virtual void slotcustomMinMax();
-  virtual void slotReinitializeMinMax();
+  virtual void slotcustomMinMax();  
   virtual void sloteditNormalization();
+
   virtual void slotClose();
   
 

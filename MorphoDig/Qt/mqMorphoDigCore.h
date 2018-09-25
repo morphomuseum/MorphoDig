@@ -706,8 +706,8 @@ public:
   
   void invertRGB(vtkDiscretizableColorTransferFunction *STC);
   void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
-	double GetSuggestedScalarRangeMin();
-	double GetSuggestedScalarRangeMax();
+	double GetSuggestedScalarRangeMin(int cutMin= 5, int onlyselected=0);
+	double GetSuggestedScalarRangeMax(int cutMax=5, int onlyselected=0);
 	double GetScalarRangeMin();
 	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);

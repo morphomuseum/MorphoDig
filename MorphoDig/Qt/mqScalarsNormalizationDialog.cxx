@@ -59,16 +59,28 @@ mqScalarsNormalizationDialog::mqScalarsNormalizationDialog(QWidget* Parent)
 	this->Ui->setupUi(this);
 	this->setObjectName("mqScalarsNormalizationDialog");	
 	
-	
-  
-	 connect(this->Ui->reinitialize_minmax, SIGNAL(pressed()), this, SLOT(slotReinitializeMinMax()));
-	 connect(this->Ui->customMinMax, SIGNAL(pressed()), this, SLOT(slotcustomMinMax()));
-	 connect(this->Ui->removePercent, SIGNAL(pressed()), this, SLOT(slotremovePercent()));
+	this->RefreshScalarName();
+	this->Ui->oldMin->setMinimum(-DBL_MAX);
+	this->Ui->oldMax->setMinimum(-DBL_MAX);	
+	this->Ui->newMin->setMinimum(-DBL_MAX);
+	this->Ui->newMax->setMinimum(-DBL_MAX);
 
+	this->Ui->oldMin->setMaximum(DBL_MAX);
+	this->Ui->oldMax->setMaximum(DBL_MAX);
+	this->Ui->newMin->setMaximum(DBL_MAX);
+	this->Ui->newMax->setMaximum(DBL_MAX);
+
+	this->RefreshSuggestedOldMinMax();
+	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshActiveScalars()));
+	 connect(this->Ui->reinitialize_minmax, SIGNAL(pressed()), this, SLOT(slotRefreshSuggestedOldMinMax()));
+	 connect(this->Ui->customMinMax, SIGNAL(pressed()), this, SLOT(slotcustomMinMax()));
+	 connect(this->Ui->removePercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedOldMinMax()));
+
+	 connect(this->Ui->customMinMax, SIGNAL(pressed()), this, SLOT(slotcustomMinMax()));
 	 
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditNormalization()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
-	
+	 this->Ui->reinitialize_minmax->setVisible(false); // as this dialog is modal, no need to show this control for the moment!
 	
 }
 
@@ -97,13 +109,57 @@ void mqScalarsNormalizationDialog::editNormalization()
 	}
 
 }
+void mqScalarsNormalizationDialog::RefreshScalarName()
+{
+	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	this->Ui->activeScalarName->setText(ActiveScalar.toStdString().c_str());
+	QString SuggestedActiveScalarName = "Norm_" + ActiveScalar;
+	this->Ui->scalarName->setText(SuggestedActiveScalarName.toStdString().c_str());
+}
+void mqScalarsNormalizationDialog::RefreshSuggestedOldMinMax()
+{
+	int removePercent = this->Ui->removePercent->value();
+	this->Ui->oldMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax(removePercent));
+	this->Ui->oldMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin(removePercent));
 
-void mqScalarsNormalizationDialog::slotReinitializeMinMax()
-{}
+}
+
 void mqScalarsNormalizationDialog::slotcustomMinMax()
-{}
+{
+	if (this->Ui->customMinMax->isChecked())
+	{
+		this->Ui->removePercent->setEnabled(true);
+		this->Ui->oldMin->setEnabled(false);
+		this->Ui->oldMax->setEnabled(false);
+	}
+	else
+	{
+		this->Ui->removePercent->setEnabled(false);
+		this->Ui->oldMin->setEnabled(true);
+		this->Ui->oldMax->setEnabled(true);
+
+	}
+}
+
+void mqScalarsNormalizationDialog::slotRefreshSuggestedOldMinMax()
+{
+	this->RefreshSuggestedOldMinMax();
+cout << "DIAL refreshsuggestedRange" << endl;
+
+}
+
+void mqScalarsNormalizationDialog::slotRefreshActiveScalars()
+{
+	this->RefreshScalarName();
+	this->RefreshSuggestedOldMinMax();
+}
+
+
+
 void mqScalarsNormalizationDialog::slotremovePercent()
-{}
+{
+	this->RefreshSuggestedOldMinMax();
+}
 
 void mqScalarsNormalizationDialog::slotClose()
 {

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>476</width>
-    <height>661</height>
+    <height>704</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,7 +432,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>630</y>
+     <y>670</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -456,7 +456,7 @@
      <x>10</x>
      <y>10</y>
      <width>441</width>
-     <height>611</height>
+     <height>651</height>
     </rect>
    </property>
    <property name="title">
@@ -466,7 +466,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>550</y>
+      <y>590</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -528,8 +528,8 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>550</y>
-      <width>61</width>
+      <y>590</y>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
@@ -541,8 +541,8 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>580</y>
-      <width>61</width>
+      <y>620</y>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
@@ -554,7 +554,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>580</y>
+      <y>620</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -566,8 +566,8 @@
    <widget class="QPushButton" name="pushScalarSuggestedMin">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>550</y>
+      <x>210</x>
+      <y>590</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -579,8 +579,8 @@
    <widget class="QPushButton" name="pushScalarSuggestedMax">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>580</y>
+      <x>210</x>
+      <y>620</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -592,8 +592,8 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>580</y>
+      <x>250</x>
+      <y>620</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -605,8 +605,8 @@
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>550</y>
+      <x>250</x>
+      <y>590</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -618,9 +618,9 @@
    <widget class="QDoubleSpinBox" name="currentMin">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>550</y>
-      <width>61</width>
+      <x>300</x>
+      <y>590</y>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
@@ -631,9 +631,9 @@
    <widget class="QDoubleSpinBox" name="currentMax">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>580</y>
-      <width>61</width>
+      <x>300</x>
+      <y>620</y>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
@@ -854,6 +854,35 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QSpinBox" name="removePercent">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>560</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>49</number>
+    </property>
+    <property name="value">
+     <number>5</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>560</y>
+      <width>321</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>% of extreme values removed to compute suggested Min and Max</string>
+    </property>
    </widget>
   </widget>
   <action name="actionExportColorMaps">

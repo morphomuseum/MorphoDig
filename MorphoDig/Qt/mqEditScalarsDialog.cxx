@@ -197,9 +197,9 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
 	connect(this->Ui->reinitializeColorMap, SIGNAL(pressed()), this, SLOT(slotReinitializeColorMap()));
-	
+	connect(this->Ui->removePercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
-
+	
 	this->RefreshSliders();
 	/*
 	sc_show:
@@ -432,8 +432,9 @@ void mqEditScalarsDialog::slotRefreshSuggestedRange()
 void mqEditScalarsDialog::RefreshSuggestedRange() 
 {
 	cout << "DIAL refreshsuggestedRange" << endl;
-	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax());
-	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin());
+	int removePercent = this->Ui->removePercent->value();
+	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax(removePercent));
+	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin(removePercent));
 }
 void mqEditScalarsDialog::RefreshSliders() 
 {

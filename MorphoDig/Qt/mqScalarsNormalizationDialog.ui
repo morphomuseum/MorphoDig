@@ -666,6 +666,9 @@
     <property name="text">
      <string>output: allow &lt;new min</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="allowMax">
     <property name="geometry">
@@ -679,6 +682,9 @@
     <property name="text">
      <string>output: allow &gt;new max</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QSpinBox" name="removePercent">
     <property name="geometry">
@@ -688,6 +694,9 @@
       <width>42</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <number>49</number>
     </property>
    </widget>
    <widget class="QLabel" name="label_6">
