@@ -1473,7 +1473,7 @@ void mqMorphoDigCore::increaseTagNumberTo(int newtagnr)
 				double rgba[4];
 				this->GetDefaultTagColor(j, rgba);
 				mTagLut->SetTableValue(j, rgba[0], rgba[1], rgba[2], rgba[3]);
-				QString TagName = "Tag" + QString::number(j+1);
+				QString TagName = "Tag" + QString::number(j);
 				this->Getmui_ActiveTagMap()->tagNames.push_back(TagName.toStdString());
 			}
 			this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = newtagnr;
