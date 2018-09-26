@@ -1432,20 +1432,20 @@ void mqMorphoDigCore::addTagToTagMap(int i)
 }
 void mqMorphoDigCore::matchTagMapToActorCollection()
 {
-	int activeTagMapNr = this->Getmui_ActiveTagMap()->numTags;
-	int maxTagNr = this->highestTagInActorCollection();
+	int activeTagMapNr = this->Getmui_ActiveTagMap()->numTags; 
+	int maxTagNr = this->highestTagInActorCollection();// 0 1 2 3 ... maxTagNr
 	cout << "activeTagMapNr =" << activeTagMapNr << endl;
 	cout << "maxTagNr =" << maxTagNr << endl;
 	
-	if (maxTagNr>activeTagMapNr)
+	if (maxTagNr>=activeTagMapNr)
 	{
 		QMessageBox msgBox;
-		msgBox.setText("Some tagged vertices (max tagged value found:" + QString::number(maxTagNr)+") are above active Tag Map highest value ("+ QString::number(activeTagMapNr)+"). Extend current tag map?");
+		msgBox.setText("Some tagged vertices (max tagged value found:" + QString::number(maxTagNr)+") are above active Tag Map highest value ("+ QString::number(activeTagMapNr-1)+"). Extend current tag map?");
 		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		msgBox.setDefaultButton(QMessageBox::No);
 		int ret = msgBox.exec();
 
-		if (ret == QMessageBox::Yes) { this->increaseTagNumberTo(maxTagNr);}
+		if (ret == QMessageBox::Yes) { this->increaseTagNumberTo(maxTagNr+1);}
 		
 		
 	}
@@ -1473,7 +1473,7 @@ void mqMorphoDigCore::increaseTagNumberTo(int newtagnr)
 				double rgba[4];
 				this->GetDefaultTagColor(j, rgba);
 				mTagLut->SetTableValue(j, rgba[0], rgba[1], rgba[2], rgba[3]);
-				QString TagName = "Tag" + QString::number(j);
+				QString TagName = "Tag" + QString::number(j+1);
 				this->Getmui_ActiveTagMap()->tagNames.push_back(TagName.toStdString());
 			}
 			this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = newtagnr;

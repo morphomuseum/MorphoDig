@@ -432,7 +432,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 	//QToolButton *clear;
 	QSpinBox *opacitySB;
 	mqColorChooserButton *colorbutton;
-
+	cout << "Refresh tag map with numTags=" << numTags<<endl;
 	if (numTags > 0)
 	{
 		this->Ui->tableWidget->setRowCount(numTags);
@@ -494,6 +494,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 		
 		
 	}
+	cout << "Done..." << endl;
 
 }
 void mqEditTagsDialog::UpdateUI()
@@ -856,8 +857,9 @@ void mqEditTagsDialog::slotActiveTagMapChanged(int idx)
 				mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap);
 
 			mqMorphoDigCore::instance()->matchTagMapToActorCollection();
+			cout << "Call refresh tag map table" << endl;
 			this->RefreshTagMapTable();
-			
+			cout << "Tag map tabe refreshed" << endl;
 		
 
 
