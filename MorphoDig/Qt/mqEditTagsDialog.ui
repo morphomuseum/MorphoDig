@@ -478,7 +478,7 @@
    <widget class="QComboBox" name="comboActiveTags">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>130</x>
       <y>20</y>
       <width>69</width>
       <height>22</height>
@@ -490,25 +490,25 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>101</width>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose active tags&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose active tag array:&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>90</y>
+      <x>21</x>
+      <y>91</y>
       <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose tag map&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose tag map:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="selectedObjects">
@@ -642,7 +642,7 @@
      <item>
       <widget class="QToolButton" name="addTagMap">
        <property name="toolTip">
-        <string>Add Tag Map to presets</string>
+        <string>Add active tag map to presets (duplicate tag map and create a new custom tag map)</string>
        </property>
        <property name="text">
         <string>...</string>
@@ -670,7 +670,7 @@
      <item>
       <widget class="QToolButton" name="editTagMap">
        <property name="toolTip">
-        <string>Edit color map name</string>
+        <string>Edit tag map name</string>
        </property>
        <property name="text">
         <string/>

@@ -502,26 +502,26 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
+      <y>17</y>
       <width>131</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active scalar array&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active scalar array:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>95</y>
+      <y>91</y>
       <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active color map&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active color map:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="suggestedMin">
@@ -876,12 +876,12 @@
      <rect>
       <x>20</x>
       <y>560</y>
-      <width>321</width>
+      <width>331</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>% of extreme values removed to compute suggested Min and Max</string>
+     <string>% of extreme values removed to compute suggested Min and Max:</string>
     </property>
    </widget>
   </widget>

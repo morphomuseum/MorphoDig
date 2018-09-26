@@ -85,7 +85,7 @@ public:
   virtual void slotCellPressed(int row, int column);*/
   virtual void slotColorChanged();
   virtual void slotActiveTagChanged();
-  virtual void slotAlphaChanged(int newalpha);
+  virtual void slotOpacityChanged(int newopacity);
   virtual void slotSaveAsCustom();
 
 protected:
@@ -93,7 +93,7 @@ protected:
 private:
 	void updateLabel(int row, QString newLabel);	
 	void updateColor(int row, double r, double g, double b);
-	void updateAlpha(int row, int newalpha);
+	void updateOpacity(int row, int newopacity);
 
 
   Q_DISABLE_COPY(mqEditTagsDialog)

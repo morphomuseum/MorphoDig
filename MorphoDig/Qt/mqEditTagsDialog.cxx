@@ -130,6 +130,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	QIcon icon;
 	icon.addFile(QStringLiteral(":/Icons/merge.png"), QSize(), QIcon::Normal, QIcon::Off);
 	mergeAction->setIcon(icon);
+	mergeAction->setToolTip(tr("Merge two tags"));
 	//TOTO : create an export tag map...
 	new mqMergeTagsDialogReaction(mergeAction);
 
@@ -143,7 +144,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	this->Ui->exportTagMap->addAction(exportAction);
 	this->Ui->exportTagMap->setDefaultAction(exportAction);
 	QIcon icon2;
-	icon2.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	icon2.addFile(QStringLiteral(":/Icons/ExportTagMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
 	exportAction->setIcon(icon2);
 	//TOTO : create an export tag map...
 	new mqSaveTAGMAPDialogReaction(exportAction);
@@ -341,14 +342,14 @@ void mqEditTagsDialog::updateColor(int row, double r, double g, double b)
 			TagMap = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap;
 		}
 	}
-	double alpha = TagMap->GetTableValue(row)[3];
+	double opacity = TagMap->GetTableValue(row)[3];
 	
-	cout << "r" << r << "g" << g << "b" << b << "alpha" << alpha << endl;
-	TagMap->SetTableValue(row, r, g, b, alpha);
+	cout << "r" << r << "g" << g << "b" << b << "opacity" << opacity << endl;
+	TagMap->SetTableValue(row, r, g, b, opacity);
 	//mqMorphoDigCore::instance()->Setmui_ActiveTagMap(TagMapName, numTags, tagNames, TagMap);
 	mqMorphoDigCore::instance()->Render();
 }
-void mqEditTagsDialog::updateAlpha(int row, int newalpha)
+void mqEditTagsDialog::updateOpacity(int row, int newopacity)
 {
 	QString currentTagMapName = this->Ui->comboTagMaps->currentText();
 	int numTags = 0;
@@ -364,27 +365,27 @@ void mqEditTagsDialog::updateAlpha(int row, int newalpha)
 			TagMap = mqMorphoDigCore::instance()->Getmui_ExistingTagMaps()->Stack.at(i).TagMap;
 		}
 	}
-	double alpha = (double)((double)newalpha/100);
+	double opacity = (double)((double)newopacity/100);
 	double r = TagMap->GetTableValue(row)[0];
 	double g = TagMap->GetTableValue(row)[1];
 	double b = TagMap->GetTableValue(row)[2];
-	cout << "r" << r << "g" << g << "b" << b << "alpha" << alpha << endl;
-	TagMap->SetTableValue(row, r, g, b, alpha);
+	cout << "r" << r << "g" << g << "b" << b << "opacity" << opacity << endl;
+	TagMap->SetTableValue(row, r, g, b, opacity);
 	mqMorphoDigCore::instance()->Render();
 }
 
-void mqEditTagsDialog::slotAlphaChanged(int newalpha)
+void mqEditTagsDialog::slotOpacityChanged(int newopacity)
 {
 
 	QSpinBox *sb = (QSpinBox*)sender();
 	for (int i = 0; i < this->Ui->tableWidget->rowCount(); i++)
 	{
 
-		int j = 3; // column 4 = alpha
+		int j = 3; // column 4 = opacity
 		if (this->Ui->tableWidget->cellWidget(i, j) ==sb )
 		{
-			cout << "New alpha at row " << i << ", value=" << newalpha << endl;
-			this->updateAlpha(i, newalpha);
+			cout << "New opacity at row " << i << ", value=" << newopacity << endl;
+			this->updateOpacity(i, newopacity);
 		}
 	}
 }
@@ -404,7 +405,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 	header3->setText("Color");
 	this->Ui->tableWidget->setHorizontalHeaderItem(2, header3);
 	QTableWidgetItem *header4 = new QTableWidgetItem();
-	header4->setText("Alpha");
+	header4->setText("Opacity");
 	this->Ui->tableWidget->setHorizontalHeaderItem(3, header4);
 	/*QTableWidgetItem *header5 = new QTableWidgetItem();
 	header5->setText("Clear");
@@ -426,10 +427,10 @@ void mqEditTagsDialog::RefreshTagMapTable()
 		}
 	}
 	//QLabel *nom;
-	//QLabel *alphaL;
+	//QLabel *opacityL;
 	QRadioButton *radio;
 	//QToolButton *clear;
-	QSpinBox *alphaSB;
+	QSpinBox *opacitySB;
 	mqColorChooserButton *colorbutton;
 
 	if (numTags > 0)
@@ -448,13 +449,13 @@ void mqEditTagsDialog::RefreshTagMapTable()
 		myColor.setRedF(TagMap->GetTableValue(i)[0]);
 		myColor.setGreenF(TagMap->GetTableValue(i)[1]);
 		myColor.setBlueF(TagMap->GetTableValue(i)[2]);
-		int alpha = (int)(100 * TagMap->GetTableValue(i)[3]);
-		alphaSB = new QSpinBox();
-		alphaSB->setMinimum(0);
-		alphaSB->setMaximum(100);
-		alphaSB->setValue(alpha);
-		//alphaL = new QLabel();
-		//alphaL->setText(QString::number(alpha).toStdString().c_str());
+		int opacity = (int)(100 * TagMap->GetTableValue(i)[3]);
+		opacitySB = new QSpinBox();
+		opacitySB->setMinimum(0);
+		opacitySB->setMaximum(100);
+		opacitySB->setValue(opacity);
+		//opacityL = new QLabel();
+		//opacityL->setText(QString::number(opacity).toStdString().c_str());
 	
 
 
@@ -464,7 +465,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 
 		/*QTableWidgetItem *item = new QTableWidgetItem;
 		item->setFlags(item->flags() | Qt::ItemIsEditable);
-		item->setText(QString::number(alpha).toStdString().c_str());*/
+		item->setText(QString::number(opacity).toStdString().c_str());*/
 
 		//this->Ui->tableWidget->setItem(i, 1, item); //TAG ALPHA
 		
@@ -479,7 +480,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 		this->Ui->tableWidget->setCellWidget(i, 1, radio); // TAG ACTIVE
 
 		this->Ui->tableWidget->setCellWidget(i, 2, colorbutton); // TAG COLOR
-		this->Ui->tableWidget->setCellWidget(i, 3, alphaSB); //TAG ALPHA
+		this->Ui->tableWidget->setCellWidget(i, 3, opacitySB); //TAG OPACITY
 		/*this->Ui->tableWidget->setCellWidget(i, 4, clear);// TAG CLEAR
 		if (i == 0)
 		{
@@ -489,7 +490,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 		colorbutton->setObjectName(QString(i));
 		connect(colorbutton, SIGNAL(colorChosen()), this, SLOT(slotColorChanged()));
 		connect(radio, SIGNAL(clicked()), this, SLOT(slotActiveTagChanged()));
-		connect(alphaSB, SIGNAL(valueChanged(int)), this, SLOT(slotAlphaChanged(int)));
+		connect(opacitySB, SIGNAL(valueChanged(int)), this, SLOT(slotOpacityChanged(int)));
 		
 		
 	}

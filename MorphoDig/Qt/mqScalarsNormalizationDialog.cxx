@@ -119,8 +119,8 @@ void mqScalarsNormalizationDialog::RefreshScalarName()
 void mqScalarsNormalizationDialog::RefreshSuggestedOldMinMax()
 {
 	int removePercent = this->Ui->removePercent->value();
-	this->Ui->oldMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax(removePercent));
-	this->Ui->oldMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin(removePercent));
+	this->Ui->oldMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax(removePercent, 1));
+	this->Ui->oldMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin(removePercent, 1));
 
 }
 
