@@ -1627,6 +1627,7 @@ void vtkMDInteractorStyle::TagPencilStop()
 void vtkMDInteractorStyle::OnRightButtonUp()
 {
 	this->RM_Button = RBUTTON_UP;
+	this->Alt = ALT_RELEASED;
 	if (this->CurrentMode != VTKISMD_SELECT)
 	{
 		
@@ -1670,12 +1671,12 @@ void vtkMDInteractorStyle::OnRightButtonUp()
 	}
 	this->RubberStop();	
 	this->CurrentMode = VTKISMT_ORIENT;
-	this->Alt = ALT_RELEASED;
 }
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnLeftButtonUp()
 {
 	this->LM_Button = LBUTTON_UP;
+	this->Alt = ALT_RELEASED;
   if (this->CurrentMode != VTKISMD_SELECT)
   {
 	 // this->ResetMoveWhat();
@@ -1713,7 +1714,7 @@ void vtkMDInteractorStyle::OnLeftButtonUp()
     return;
   }
   this->RubberStop();
-  this->Alt = ALT_RELEASED;
+  
 
 }
 
