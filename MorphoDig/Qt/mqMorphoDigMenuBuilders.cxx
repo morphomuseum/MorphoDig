@@ -135,8 +135,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   QMenu* submenuCurves = menu.addMenu("Curves");
   
   QMenu* submenuFlags = menu.addMenu("Flags");
-  new mqOpenDataReaction(submenuFlags->addAction("Open Flag") << mqSetName("actionOpenFLG"), 6);
-  new mqSaveFlagsDialogReaction(submenuFlags->addAction("SaveFlags") << mqSetName("actionSaveFLG"));
+  new mqOpenDataReaction(submenuFlags->addAction("Open Flags") << mqSetName("actionOpenFLG"), 6);
+  new mqSaveFlagsDialogReaction(submenuFlags->addAction("Save Flags") << mqSetName("actionSaveFLG"));
   QMenu* submenuColorMaps = menu.addMenu("Color maps");
   QMenu* submenuTags = menu.addMenu("Tag maps");
 

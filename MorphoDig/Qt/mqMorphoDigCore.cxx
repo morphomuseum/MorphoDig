@@ -2420,6 +2420,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 					this->UpdateLandmarkSettings();
 
 				}
+				this->Render();
 			}//fin if																		
 
 		}//file exists...
@@ -2941,7 +2942,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 
 		}//file exists...
 	}	//length
-
+	this->Render();
 
 }
 
@@ -3910,6 +3911,7 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 
 
 				}
+				this->Render();
 			}//fin if																		
 
 		}//file exists...
@@ -4033,6 +4035,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 
 
 				}
+				this->Render();
 			}//fin if																		
 
 		}//file exists...
