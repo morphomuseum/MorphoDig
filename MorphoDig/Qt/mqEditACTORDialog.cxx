@@ -346,6 +346,7 @@ void mqEditACTORDialog::saveActor()
 			this->ACTOR->ApplyMatrix(Mat);
 			this->ACTOR->Modified();
 			END_UNDO_SET();
+			mqMorphoDigCore::instance()->Render();
 		}
 		
 	}

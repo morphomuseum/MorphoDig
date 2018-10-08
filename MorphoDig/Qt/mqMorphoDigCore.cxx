@@ -4836,7 +4836,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 								line = in.readLine();
 								myteststream.setString(&line);
 								myteststream >> SomeText >> Tag;
-								tagNames.push_back(Tag.toStdString().c_str());
+								tagNames.push_back(line.toStdString().c_str());
 
 								line = in.readLine();
 								myteststream.setString(&line);
@@ -4954,7 +4954,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 						QString line = in.readLine();
 						QTextStream myteststream(&line);					
 						myteststream >> Tag;
-						tagNames.push_back(Tag.toStdString().c_str());
+						tagNames.push_back(line.toStdString().c_str());
 
 						line = in.readLine();
 						myteststream.setString(&line);
@@ -4995,6 +4995,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 		}
 
 	}
+	this->Render();
 
 }
 //void mqMorphoDigCore::OpenTAG(QString fileName) {}
@@ -5089,7 +5090,7 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 			}
 		}
 	}
-
+	this->Render();
 	return 1;
 
 }

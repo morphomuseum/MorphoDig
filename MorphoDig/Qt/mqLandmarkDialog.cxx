@@ -114,7 +114,7 @@ mqLandmarkDialog::mqLandmarkDialog(QWidget* Parent)
   connect(this->Ui->LandmarkRenderingSizeValue, SIGNAL(valueChanged(double)), this, SLOT(slotLandmarkRenderingSizeChanged()));
   connect(this->Ui->FlagRenderingSizeValue, SIGNAL(valueChanged(double)), this, SLOT(slotFlagRenderingSizeChanged()));
   connect(this->Ui->AdjustScaleFactor, SIGNAL(valueChanged(double)), this, SLOT(slotAdjustScaleFactorChanged()));
-
+  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotRender()));
 }
 
 
@@ -161,6 +161,7 @@ void mqLandmarkDialog::slotAdjustLandmarkRenderingSizeChanged()
 
 	cout << "new adjust lmk rdr size:" << adj_lmk_size << endl;
 	mqMorphoDigCore::instance()->Setmui_AdjustLandmarkRenderingSize(adj_lmk_size);
+	mqMorphoDigCore::instance()->Render();
 }
 
 void mqLandmarkDialog::slotLandmarkRenderingSizeChanged()
@@ -168,13 +169,14 @@ void mqLandmarkDialog::slotLandmarkRenderingSizeChanged()
 	double lmk_rendering_size= this->Ui->LandmarkRenderingSizeValue->value();
 	cout << "new lmk rdr size:" << lmk_rendering_size << endl;
 	mqMorphoDigCore::instance()->Setmui_LandmarkRenderingSize(lmk_rendering_size);
-
+	mqMorphoDigCore::instance()->Render();
 }
 void mqLandmarkDialog::slotFlagRenderingSizeChanged()
 {
 	double flg_rendering_size = this->Ui->FlagRenderingSizeValue->value();
 	cout << "new flg rdr size:" << flg_rendering_size << endl;
 	mqMorphoDigCore::instance()->Setmui_FlagRenderingSize(flg_rendering_size);
+	mqMorphoDigCore::instance()->Render();
 }
 void mqLandmarkDialog::slotLandmarkBodyTypeChanged()
 {
@@ -185,8 +187,13 @@ void mqLandmarkDialog::slotLandmarkBodyTypeChanged()
 	}
 	cout << "new lmk body type:" << lmk_body_type << endl;
 	mqMorphoDigCore::instance()->Setmui_LandmarkBodyType(lmk_body_type);
+	mqMorphoDigCore::instance()->Render();
 }
+void mqLandmarkDialog::slotRender()
+{
+	mqMorphoDigCore::instance()->Render();
 
+}
 void mqLandmarkDialog::slotFlagColorChanged()
 {
 	QColor myFlagColor = this->Ui->FlagColorButton->chosenColor();

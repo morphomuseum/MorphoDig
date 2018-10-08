@@ -38,7 +38,7 @@ public:
   virtual void slotFlagRenderingSizeChanged();
   virtual void slotLandmarkBodyTypeChanged();
   virtual void slotReinitializeColors();
-
+  virtual void slotRender();
 protected:
 	
 private:
