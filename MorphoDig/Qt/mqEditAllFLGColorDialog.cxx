@@ -105,6 +105,7 @@ void mqEditAllFLGColorDialog::saveAllFLG()
 
 		mqMorphoDigCore::instance()->UpdateAllSelectedFlagsColors(flagcolor);// to update body size!
 		END_UNDO_SET();
+		mqMorphoDigCore::instance()->Render();
 	}
 }
 

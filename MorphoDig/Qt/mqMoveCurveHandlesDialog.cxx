@@ -281,7 +281,7 @@ void mqMoveCurveHandlesDialog::slotMoveCurveHandles()
 	
 	
 
-	
+	mqMorphoDigCore::instance()->Render();
 
 	
 

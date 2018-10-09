@@ -94,6 +94,7 @@ void mqEditAllFLGLengthDialog::saveAllFLG()
 
 		mqMorphoDigCore::instance()->UpdateAllSelectedFlagsLengths(flg_rendering_size);// to update body size!
 		END_UNDO_SET();
+		mqMorphoDigCore::instance()->Render();
 	}
 }
 

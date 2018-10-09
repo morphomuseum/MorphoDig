@@ -515,7 +515,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				cout << "pickid :" << pickid << ", tagid:" << curTag << endl;
 				int do_override;
 				
-				if (toverride==1 || curTag==0) // if user explicitly asks to override OR current picked vertex is tagged with 0 (exterior), we do the override
+				if (toverride==1) // if user explicitly asks to override OR current picked vertex is tagged with 0 (exterior), we do the override
 				{
 					do_override = 1;
 				}
@@ -3823,6 +3823,7 @@ void mqMorphoDigCore::OpenORI(QString fileName)
 
 		}//file exists...
 	}	//length*/
+	this->Render();
 }
 
 void mqMorphoDigCore::OpenCUR(QString fileName)
