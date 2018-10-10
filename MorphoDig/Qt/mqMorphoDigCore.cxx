@@ -4837,7 +4837,9 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 								line = in.readLine();
 								myteststream.setString(&line);
 								myteststream >> SomeText >> Tag;
-								tagNames.push_back(line.toStdString().c_str());
+								//tagNames.push_back(line.toStdString().c_str());
+								QString AllTag = line.remove(0, SomeText.length()+1);
+								tagNames.push_back(AllTag.toStdString().c_str());
 
 								line = in.readLine();
 								myteststream.setString(&line);
