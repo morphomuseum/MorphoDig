@@ -345,8 +345,7 @@ void mqEditACTORDialog::saveActor()
 			Mat->SetElement(3, 3, this->Ui->M33->value());
 			this->ACTOR->ApplyMatrix(Mat);
 			this->ACTOR->Modified();
-			END_UNDO_SET();
-			mqMorphoDigCore::instance()->Render();
+			END_UNDO_SET();			
 		}
 		
 	}
@@ -663,6 +662,7 @@ void mqEditACTORDialog::slotsaveActor()
 	{
 		this->ACTOR->SetSelected(0);
 		this->ACTOR->Modified();
+		mqMorphoDigCore::instance()->Render();
 	}
 }
 void mqEditACTORDialog::slotGetPrecedingActor()
