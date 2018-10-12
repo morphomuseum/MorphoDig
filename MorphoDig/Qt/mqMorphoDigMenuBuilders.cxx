@@ -74,6 +74,7 @@
 #include "mqScalarsNormalizationDialogReaction.h"
 #include "mqScalarsDistanceDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
+#include "mqScalarsInfosDialogReaction.h"
 
 #include "mqSetName.h"
 #include "mqViewMenuManager.h"
@@ -197,7 +198,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveDataReaction(submenuMeasurements->addAction("Surface global complexity: save normalized shape index of selected surfaces") << mqSetName("actionSaveNSI"), 19);  
   new mqSaveDataReaction(submenuMeasurements->addAction("Surface global complexity: save convex hull area ratio and normalized shape index of selected surfaces (warning: slow)") << mqSetName("actionSaveCHNSI"), 20);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save size measurements (max length in xyz direction etc.) of selected surfaces") << mqSetName("actionSaveSize"), 21);
-  new mqSaveDataReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"), 22);
+  //new mqSaveDataReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"), 22);
+  new mqScalarsInfosDialogReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"));
   new mqSaveDataReaction(submenuMeasurements->addAction("Save scalar values of first selected surface") << mqSetName("actionSaveSCInfos"), 23);
 
   

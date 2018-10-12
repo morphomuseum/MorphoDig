@@ -5870,15 +5870,25 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 	file.close();
 
 }
-void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
+
+void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId)
 {
 	QFile file(fileName);
-	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
 	{
 		QTextStream stream(&file);
 
-		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q15	Q90	Q95" << endl;
-
+		std::string TagName = "";
+		if (TagId < mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->numTags)
+		{
+			TagName = mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->tagNames.at(TagId);
+		}
+		else
+		{
+			TagName = "Tag" + TagId;
+		}
+		
+		
 
 		//this->ComputeSelectedNamesLists();
 
@@ -5894,9 +5904,9 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
 
 				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 				vtkPolyData *mPD = mapper->GetInput();
-				
-					
-				vtkDataArray *currentScalars=NULL;
+
+
+				vtkDataArray *currentScalars = NULL;
 				if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
 				{
 
@@ -5908,7 +5918,15 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
 
 				}
 
-				if (currentScalars != NULL)				
+				vtkIntArray *currentTags = NULL; //
+				
+				//4 if current tags exist, retrieve what tool is active
+				if (useTags == 1)
+				{
+					currentTags = vtkIntArray::SafeDownCast(mPD->GetPointData()->GetScalars(TagArray.toStdString().c_str()));
+				}
+
+				if (currentScalars != NULL)
 				{
 
 
@@ -5922,55 +5940,144 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
 					double Q10 = 0;
 					double Q90 = 0;
 					double Q95 = 0;
-
+					vtkIdType cpt = 0;
+					int ok = 0;
 					if (mPD->GetNumberOfPoints() > 10)
 					{
 
 						std::vector<float> vals;
+						
+						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						{
+							if (useTags == 0)
+							{
+								Mean += currentScalars->GetTuple1(j);
+								vals.push_back(currentScalars->GetTuple1(j));
+							}
+							else
+							{
+								//1: check if currentTags is null.
+								//2: check if vertex j is tagged like TagId
+								if (currentTags != NULL && currentTags->GetTuple1(j) == TagId)
+								{
+									cpt++;
+									Mean += currentScalars->GetTuple1(j);
+									vals.push_back(currentScalars->GetTuple1(j));
+
+								}
+							}
+						}
+						if (useTags == 0)
+						{
+							Mean /= mPD->GetNumberOfPoints();
+							ok = 1;
+						}
+						else
+						{
+							if (cpt > 0)
+							{
+								Mean /= cpt;
+								ok = 1;
+							}
+						}
+
 
 						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
 						{
-							Mean += currentScalars->GetTuple1(j);
-							vals.push_back(currentScalars->GetTuple1(j));
+							if (useTags == 0)
+							{
+								Variance += (currentScalars->GetTuple1(j) - Mean)*(currentScalars->GetTuple1(j) - Mean);
+							}
+							else
+							{
+								//1: check if currentTags is null.
+								//2: check if vertex j is tagged like TagId
+								if (currentTags != NULL && currentTags->GetTuple1(j) == TagId)
+								{
+									
+									Variance += (currentScalars->GetTuple1(j) - Mean)*(currentScalars->GetTuple1(j) - Mean);									
+
+								}
+							}
 						}
-						Mean /= mPD->GetNumberOfPoints();
-
-
-						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						
+						if (useTags == 0)
 						{
-							Variance += (currentScalars->GetTuple1(j)-Mean)*(currentScalars->GetTuple1(j) - Mean);							
+							Variance /= mPD->GetNumberOfPoints();
+							
 						}
-						Variance/= mPD->GetNumberOfPoints();
-						StdDev = sqrt(Variance);
-						std::sort(vals.begin(), vals.end());
+						else
+						{
+							if (cpt > 0)
+							{
+								Variance /= cpt;
+								
+							}
+						}
+						if (ok==1)
+						{
+							StdDev = sqrt(Variance);
+							std::sort(vals.begin(), vals.end());
 
-						int iMin = 0;
-						int iMax = mPD->GetNumberOfPoints() - 1;
-						int iQ5 = (int)(0.05*mPD->GetNumberOfPoints());
-						int iQ10 = (int)(0.1*mPD->GetNumberOfPoints());
-						int iQ50 = (int)(0.5*mPD->GetNumberOfPoints());
-						int iQ90 = (int)(0.9*mPD->GetNumberOfPoints());
-						int iQ95 = (int)(0.95*mPD->GetNumberOfPoints());
-						Median = (double)vals.at(iQ50);
-						Min = (double)vals.at(iMin);
-						Max = (double)vals.at(iMax);
-						Q5 = (double)vals.at(iQ5);
-						Q10 = (double)vals.at(iQ10);
-						Q90 = (double)vals.at(iQ90);
-						Q95 = (double)vals.at(iQ95);
+							int iMin = 0;
+							int iMax = 0;
+							int iQ5 = 0;
+							int iQ10 = 0;
+							int iQ50 = 0;
+							int iQ90 = 0;
+							int iQ95 = 0;
+							if (useTags == 0)
+							{
+								iMax = mPD->GetNumberOfPoints() - 1;
+								iQ5 = (int)(0.05*mPD->GetNumberOfPoints());
+								iQ10 = (int)(0.1*mPD->GetNumberOfPoints());
+								iQ50 = (int)(0.5*mPD->GetNumberOfPoints());
+								iQ90 = (int)(0.9*mPD->GetNumberOfPoints());
+								iQ95 = (int)(0.95*mPD->GetNumberOfPoints());
+							}
+							else
+							{
+								iMax = cpt - 1; if (iMax < 0) { iMax = 0; }
+								iQ5 = (int)(0.05*cpt);
+								iQ10 = (int)(0.1*cpt);
+								iQ50 = (int)(0.5*cpt);
+								iQ90 = (int)(0.9*cpt);
+								iQ95 = (int)(0.95*cpt);
+							}
+
+							Median = (double)vals.at(iQ50);
+							Min = (double)vals.at(iMin);
+							Max = (double)vals.at(iMax);
+							Q5 = (double)vals.at(iQ5);
+							Q10 = (double)vals.at(iQ10);
+							Q90 = (double)vals.at(iQ90);
+							Q95 = (double)vals.at(iQ95);
+						}
+						
+
 
 					}
-					
+
 
 
 					//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
-					stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << endl;
+					if (useTags == 0)
+					{
+						stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << "	" << "whole_surface" << endl;
+					}
+					else
+					{
+						if (cpt > 10)
+						{
+							stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << "	" << TagName.c_str() << endl;
+						}
+					}
 
 
 				}
 				else
 				{
-					stream << myActor->GetName().c_str() << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << endl;
+					stream << myActor->GetName().c_str() << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << endl;
 				}
 
 
@@ -5978,6 +6085,63 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName)
 		}
 	}
 	file.close();
+
+}
+
+void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+
+		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q15	Q90	Q95	Tagged_Region" << endl;
+		cout << "First Summary Done" << endl;
+		file.close();
+		this->SaveActiveScalarSummary(fileName, 0, TagArray, 0);
+		//if useTags =1, search Max tagged value in all opened objects
+		if (useTags == 1 && TagArray.length() > 0)
+		{
+			cout << "useTags==1 and TagArray.length()>0" << endl;
+			this->ActorCollection->InitTraversal();
+
+			vtkIdType maxTagId = 0;
+
+			for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+			{
+				vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+				if (myActor->GetSelected() == 1)
+				{
+					vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+					vtkPolyData *mPD = mapper->GetInput();
+					vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mPD->GetPointData()->GetScalars(TagArray.toStdString().c_str()));
+					if (currentTags != NULL)
+					{
+						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+						{
+							if (currentTags->GetTuple1(j) > maxTagId)
+							{
+								maxTagId = currentTags->GetTuple1(j);
+							}
+
+						}
+					}
+				}
+				
+				
+			}// end search for max TagId
+			cout << "maxTagId=" << maxTagId << endl;
+			if (maxTagId > 0)
+			{
+				for (vtkIdType i = 0; i <= maxTagId; i++)
+				{
+					cout << "SaveActiveScalarSummary(" << i<<")"<< endl;
+					this->SaveActiveScalarSummary(fileName, 1, TagArray, i);
+				}
+			}
+
+		}//usetags=1
+	}//file open
 
 }
 

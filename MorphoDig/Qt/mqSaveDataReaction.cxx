@@ -244,7 +244,7 @@ void mqSaveDataReaction::SaveActiveScalarSummary()
 			fileName.append(".txt");
 		}
 
-		mqMorphoDigCore::instance()->SaveActiveScalarSummary(fileName);
+		mqMorphoDigCore::instance()->SaveActiveScalarSummary(fileName, 0, "");
 	}
 	else
 	{
