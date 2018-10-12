@@ -34,8 +34,20 @@ void mqScalarsNormalizationDialogReaction::showScalarsNormalizationDialog()
 		msgBox.exec();
 		return;
 	}
-	mqScalarsNormalizationDialog mqNormalization(mqCoreUtilities::mainWidget());
-	mqNormalization.exec();
+	if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT || mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1)
+	{
+		mqScalarsNormalizationDialog mqNormalization(mqCoreUtilities::mainWidget());
+		mqNormalization.exec();
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Active array must be a scalar array.");
+		msgBox.exec();
+		return;
+	}
+
+	
   
   //Normalization_dialog->show();
 }

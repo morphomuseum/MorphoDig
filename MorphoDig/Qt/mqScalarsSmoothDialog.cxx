@@ -57,6 +57,7 @@ mqScalarsSmoothDialog::mqScalarsSmoothDialog(QWidget* Parent)
 {
 	this->Ui->setupUi(this);
 	this->setObjectName("mqScalarsSmoothDialog");	
+	this->RefreshScalarName();
 	this->Ui->localAreaLimit->setMinimum(0);
 	this->Ui->localAreaLimit->setMaximum(DBL_MAX);
 	this->Ui->localAreaLimit->setSingleStep(0.1);
@@ -74,7 +75,7 @@ mqScalarsSmoothDialog::mqScalarsSmoothDialog(QWidget* Parent)
 	  connect(this->Ui->localNeighbours, SIGNAL(pressed()), this, SLOT(slotEnableDisableLocalNeighboursArea()));
 
 	 connect(this->Ui->cutMinMax, SIGNAL(pressed()), this, SLOT(slotEnableDisableCutPercent()));
-
+	 connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshActiveScalars()));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(smoothingProgression(int)), this, SLOT(slotProgressBar(int)));
 }
 
@@ -111,13 +112,24 @@ void mqScalarsSmoothDialog::editSmooth()
 		if (this->Ui->localCustom->isChecked()) { mode = 2; }
 		int cut = 0;
 		if (this->Ui->cutMinMax->isChecked()) { cut = 1; }
-		mqMorphoDigCore::instance()->scalarsSmooth(this->Ui->localAreaLimit->value(), cut, this->Ui->cutPercent->value(),mode, smoothing_method);// to update Smooth
+		mqMorphoDigCore::instance()->scalarsSmooth(this->Ui->scalarName->text(), this->Ui->localAreaLimit->value(), cut, this->Ui->cutPercent->value(),mode, smoothing_method);// to update Smooth
 		
 	}
 
 }
+void mqScalarsSmoothDialog::slotRefreshActiveScalars()
+{
+	this->RefreshScalarName();
+	
+}
 
-
+void mqScalarsSmoothDialog::RefreshScalarName()
+{
+	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	this->Ui->activeScalarName->setText(ActiveScalar.toStdString().c_str());
+	QString SuggestedActiveScalarName = "Smooth_" + ActiveScalar;
+	this->Ui->scalarName->setText(SuggestedActiveScalarName.toStdString().c_str());
+}
 
 void mqScalarsSmoothDialog::slotEnableDisableCutPercent()
 {

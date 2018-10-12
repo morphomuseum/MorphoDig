@@ -10894,7 +10894,7 @@ double mqMorphoDigCore::ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mP
 	//Complexity process is computed on MyObj
 
 }
-void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double cutPercent, int mode, int smoothing_method)
+void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, int cutMinMax, double cutPercent, int mode, int smoothing_method)
 {
 	//mode = 0: raw smoothing (average of direct neighbours)
 	//mode = 1: smooth within local sphere of radius ~ mesh avg size / 40
@@ -10914,7 +10914,7 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 
 	if ((this->Getmui_ActiveScalars()->DataType == VTK_FLOAT || this->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && this->Getmui_ActiveScalars()->NumComp == 1)
 	{
-
+		std::string mScalarName = "SmoothedScalar";
 		this->ActorCollection->InitTraversal();
 		vtkIdType num = this->ActorCollection->GetNumberOfItems();
 		int modified = 0;
@@ -10961,15 +10961,17 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 						newScalars->SetNumberOfTuples(numvert);
 						newScalars->SetNumberOfTuples(numvert);
 
-						std::string scname = currentScalars->GetName();						
 					
 
-						std::string mScalarName = "ActiveScalars";
+						std::string scname = scalarName.toStdString();
+
+
 						if (scname.length() > 0)
 						{
 							mScalarName = scname;
 						}
 						myActor->SaveState(Count, QString(mScalarName.c_str()));
+
 						double cutMin = DBL_MAX;
 						double cutMax = -DBL_MAX;
 						if (cutMinMax == 1)
@@ -11082,14 +11084,19 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 
 
 							}
-							//std::cout<<"New Scalar computation done "<<std::endl;
-							std::string sc_name = this->Getmui_ActiveScalars()->Name.toStdString();
-							newScalars->SetName(sc_name.c_str());
-							mPD->GetPointData()->RemoveArray(sc_name.c_str());
-							//std::cout<<"Add array "<<std::endl;
+					
+
+							newScalars->SetName(mScalarName.c_str());
+
+							// test if exists...
+
+							// remove this scalar
+							//this->GetPointData()->SetScalars(newScalars);
+							mPD->GetPointData()->RemoveArray(mScalarName.c_str());
 							mPD->GetPointData()->AddArray(newScalars);
-							//std::cout<<"Set Active scalar"<<std::endl;
-							mPD->GetPointData()->SetActiveScalars(sc_name.c_str());
+							mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
+
 
 						}
 						else
@@ -11191,6 +11198,7 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 							}
 
 							newScalars->SetName(mScalarName.c_str());
+							
 							// test if exists...
 
 							// remove this scalar
@@ -11217,9 +11225,11 @@ void mqMorphoDigCore::scalarsSmooth(double localAreaLimit, int cutMinMax, double
 			
 		}
 		if (modified == 1)
-		{
+		{		
 
-			//cout << "camera and grid adjusted" << endl;
+
+			this->Initmui_ExistingScalars();
+			this->Setmui_ActiveScalarsAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 			cout << "scalars updated " << endl;
 			this->Render();
 		}

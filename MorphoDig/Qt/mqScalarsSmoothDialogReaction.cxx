@@ -34,8 +34,18 @@ void mqScalarsSmoothDialogReaction::showScalarsSmoothDialog()
 		msgBox.exec();
 		return;
 	}
-	mqScalarsSmoothDialog mqSmooth(mqCoreUtilities::mainWidget());
-	mqSmooth.exec();
-  
+	if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT || mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1)
+	{
+		mqScalarsSmoothDialog mqSmooth(mqCoreUtilities::mainWidget());
+		mqSmooth.exec();
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Active array must be a scalar array.");
+		msgBox.exec();
+		return;
+	}
+	
   //Smooth_dialog->show();
 }

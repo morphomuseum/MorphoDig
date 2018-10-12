@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>526</width>
-    <height>339</height>
+    <height>396</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,7 +432,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>300</y>
+     <y>360</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -460,7 +460,7 @@
      <x>10</x>
      <y>10</y>
      <width>461</width>
-     <height>241</height>
+     <height>271</height>
     </rect>
    </property>
    <property name="title">
@@ -472,10 +472,31 @@
       <x>10</x>
       <y>20</y>
       <width>434</width>
-      <height>131</height>
+      <height>172</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Active scalar name:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="activeScalarName">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
      <item>
       <widget class="QRadioButton" name="localNeighbours">
        <property name="text">
@@ -549,16 +570,16 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
+      <y>220</y>
       <width>441</width>
       <height>42</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QRadioButton" name="average">
+      <widget class="QRadioButton" name="median">
        <property name="text">
-        <string>Compute average of found neighboring vertices</string>
+        <string>Compute median of  found neighboring vertices</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -566,9 +587,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="median">
+      <widget class="QRadioButton" name="average">
        <property name="text">
-        <string>Compute median of  found neighboring vertices</string>
+        <string>Compute average of found neighboring vertices</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -578,13 +602,13 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>160</y>
+      <y>200</y>
       <width>131</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Smoothing &quot;method&quot;</string>
+     <string>Smoothing &quot;method&quot;:</string>
     </property>
    </widget>
   </widget>
@@ -592,13 +616,39 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>270</y>
+     <y>320</y>
      <width>321</width>
      <height>23</height>
     </rect>
    </property>
    <property name="value">
     <number>0</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>290</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;new scalar name:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="scalarName">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>290</y>
+     <width>211</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Smooth_</string>
    </property>
   </widget>
  </widget>

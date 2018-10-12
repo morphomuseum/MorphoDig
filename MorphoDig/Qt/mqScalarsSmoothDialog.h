@@ -30,7 +30,7 @@ public:
   
   ~mqScalarsSmoothDialog();
   void editSmooth();
-  
+  void RefreshScalarName();
   public slots:
   
   
@@ -42,6 +42,7 @@ public:
   virtual void slotEnableDisableLocalNeighboursArea();
   virtual void slotEnableDisableAutoArea();
   virtual void slotEnableDisableCutPercent();
+  virtual void slotRefreshActiveScalars();
   
 protected:
 	
