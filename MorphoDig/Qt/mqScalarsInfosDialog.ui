@@ -493,7 +493,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Include calar infos for each Tagged region</string>
+    <string>Include scalar infos for each Tagged region</string>
    </property>
   </widget>
   <widget class="QComboBox" name="comboTags">
