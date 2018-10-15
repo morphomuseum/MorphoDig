@@ -95,7 +95,7 @@ void mqCylinderDialog::editCylinder()
 	
 		
 		
-		mqMorphoDigCore::instance()->Cylinder(this->Ui->cylinderNumber->value(), this->Ui->cylinderHeight->value(), this->Ui->cylinderRadius->value(), this->Ui->cylinderResolution->value());
+		mqMorphoDigCore::instance()->Cylinder(this->Ui->cylinderNumber->value(), this->Ui->cylinderHeight->value(), this->Ui->cylinderRadius->value(), this->Ui->cylinderResolution->value(), this->Ui->cone->isChecked());
 		
 	
 }

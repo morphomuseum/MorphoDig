@@ -18,6 +18,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
 #include < vtkCylinderSource.h>
+#include < vtkConeSource.h>
 #include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
 #include <vtkMaskFields.h>
@@ -6089,8 +6090,10 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 
 }
 
-void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution)
+void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution, int mode)
 {
+	//mode: 0= cylinder
+	//mode: 1= cone
 
 	double mcylHeight = cylHeight;
 	double mcylRadius = cylRadius;
@@ -6112,12 +6115,22 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 
 		//@@TODO! 
 		newname = this->CheckingName(newname);
+
 		vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
+		vtkSmartPointer<vtkConeSource> cone = vtkSmartPointer<vtkConeSource>::New();
+		
 		  cylinder->SetResolution(cylResolution);
 		  cylinder->SetHeight(mcylHeight);
 		  cylinder->SetRadius(mcylRadius);
 		  //cylinder->SetCenter(0, i*mcylHeight*1.1, 0);
 		  cylinder->Update();
+
+		  cone->SetResolution(cylResolution);
+		  cone->SetHeight(mcylHeight);
+		  cone->SetRadius(mcylRadius);
+		  //cylinder->SetCenter(0, i*mcylHeight*1.1, 0);
+		  cone->Update();
+
 		  cout << "More than 10 points!" << endl;
 		  VTK_CREATE(vtkMDActor, actor);
 		  if (this->mui_BackfaceCulling == 0)
@@ -6131,8 +6144,14 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 		  VTK_CREATE(vtkPolyDataMapper, mapper);
 		 
 		  mapper->SetColorModeToDefault();
-
-		  mapper->SetInputData(cylinder->GetOutput());
+		  if (mode == 0)
+		  {
+			  mapper->SetInputData(cylinder->GetOutput());
+		  }
+		  else
+		  {
+			  mapper->SetInputData(cone->GetOutput());
+		  }
 
 		  actor->SetmColor(1,0,0,1);
 
@@ -6145,8 +6164,15 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 		  vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 		  Mat->DeepCopy(actor->GetMatrix());		 
 
+		  if (mode == 0)
+		  {
 
-		  Mat->SetElement(1, 3, i*mcylHeight*1.1);
+			  Mat->SetElement(1, 3, i*mcylHeight*1.1);
+		  }
+		  else
+		  { 
+			  Mat->SetElement(1, 3, i*mcylRadius*2.2);
+		  }
 		
 		  vtkTransform *newTransform = vtkTransform::New();
 		  newTransform->PostMultiply();

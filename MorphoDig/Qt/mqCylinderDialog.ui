@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Create 3D printing support material (cylinders)</string>
+   <string>Create 3D printing support material (cylinders or cones)</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -464,7 +464,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Create cylinders (support material for 3D printing)</string>
+    <string>Create cylinders or cones (support material for 3D printing)</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
@@ -477,11 +477,32 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QRadioButton" name="cylinder">
+         <property name="text">
+          <string>Cylinder</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="cone">
+         <property name="text">
+          <string>Cone</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
        <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Number of cylinders</string>
+          <string>Number of cylinders/cones</string>
          </property>
         </widget>
        </item>
@@ -499,7 +520,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Cylinder height (size unit)</string>
+          <string>Height (size unit)</string>
          </property>
         </widget>
        </item>
@@ -523,7 +544,7 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Cylinder radius (size unit)</string>
+          <string>Radius (size unit)</string>
          </property>
         </widget>
        </item>
@@ -574,8 +595,6 @@
      </item>
     </layout>
    </widget>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>horizontalLayoutWidget_2</zorder>
   </widget>
  </widget>
  <resources>
