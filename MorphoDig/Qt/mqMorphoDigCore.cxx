@@ -17,6 +17,7 @@
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
+#include < vtkCylinderSource.h>
 #include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
 #include <vtkMaskFields.h>
@@ -6088,6 +6089,96 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 
 }
 
+void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution)
+{
+
+	double mcylHeight = cylHeight;
+	double mcylRadius = cylRadius;
+	if (cylHeight <= 0)
+	{
+		mcylHeight = this->getActorCollection()->GetBoundingBoxLength() / 20;
+		if (mcylHeight == 0) { mcylHeight = 10; }
+	
+	}
+	if (cylRadius <= 0)
+	{
+		mcylRadius = mcylHeight / 5;
+
+	}
+	for (int i = 0; i < numCyl; i++)
+	{
+		std::string newname = "Cylinder";
+		
+
+		//@@TODO! 
+		newname = this->CheckingName(newname);
+		vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
+		  cylinder->SetResolution(cylResolution);
+		  cylinder->SetHeight(mcylHeight);
+		  cylinder->SetRadius(mcylRadius);
+		  //cylinder->SetCenter(0, i*mcylHeight*1.1, 0);
+		  cylinder->Update();
+		  cout << "More than 10 points!" << endl;
+		  VTK_CREATE(vtkMDActor, actor);
+		  if (this->mui_BackfaceCulling == 0)
+		  {
+			  actor->GetProperty()->BackfaceCullingOff();
+		  }
+		  else
+		  {
+			  actor->GetProperty()->BackfaceCullingOn();
+		  }
+		  VTK_CREATE(vtkPolyDataMapper, mapper);
+		 
+		  mapper->SetColorModeToDefault();
+
+		  mapper->SetInputData(cylinder->GetOutput());
+
+		  actor->SetmColor(1,0,0,1);
+
+		  actor->SetMapper(mapper);
+		  actor->SetSelected(0);
+		  actor->SetName(newname);
+
+		  actor->SetDisplayMode(this->mui_DisplayMode);
+		 
+		  vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+		  Mat->DeepCopy(actor->GetMatrix());		 
+
+
+		  Mat->SetElement(1, 3, i*mcylHeight*1.1);
+		
+		  vtkTransform *newTransform = vtkTransform::New();
+		  newTransform->PostMultiply();
+
+		  newTransform->SetMatrix(Mat);
+		  actor->SetPosition(newTransform->GetPosition());
+		  actor->SetScale(newTransform->GetScale());
+		  actor->SetOrientation(newTransform->GetOrientation());
+		  newTransform->Delete();
+
+		  this->getActorCollection()->AddItem(actor);
+		  emit this->actorsMightHaveChanged();
+		
+		  std::string action = "Create cylinder";
+		  int mCount = BEGIN_UNDO_SET(action);
+		  this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+		  END_UNDO_SET();
+
+		  this->getActorCollection()->SetChanged(1);
+
+		   
+	}
+	
+	this->AdjustCameraAndGrid();
+	if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+	{
+		this->UpdateLandmarkSettings();
+	}
+	
+
+
+}
 void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray)
 {
 	QFile file(fileName);

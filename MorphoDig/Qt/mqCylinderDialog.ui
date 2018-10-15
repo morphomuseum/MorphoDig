@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqScalarsCurvatureDialog</class>
- <widget class="QDialog" name="mqScalarsCurvatureDialog">
+ <class>mqCylinderDialog</class>
+ <widget class="QDialog" name="mqCylinderDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
-    <height>241</height>
+    <width>526</width>
+    <height>272</height>
    </rect>
   </property>
   <property name="palette">
@@ -426,13 +426,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalars: compute curvature</string>
+   <string>Create 3D printing support material (cylinders)</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>200</y>
+     <x>160</x>
+     <y>230</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -459,82 +459,123 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>411</width>
-     <height>181</height>
+     <width>461</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="title">
-    <string>Compute</string>
+    <string>Create cylinders (support material for 3D printing)</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>59</x>
-      <y>30</y>
-      <width>291</width>
-      <height>91</height>
+      <x>10</x>
+      <y>20</y>
+      <width>434</width>
+      <height>172</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="meanCurvature">
-       <property name="text">
-        <string>Mean curvature</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Number of cylinders</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="cylinderNumber">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QRadioButton" name="maximalCurvature">
-       <property name="text">
-        <string>Principal maximal curvature</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Cylinder height (size unit)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="cylinderHeight">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>This value defines, for each point of the surface, the size of the sphere centered on that point which will be used to estimate local complexity</string>
+         </property>
+         <property name="decimals">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QRadioButton" name="minimalCurvature">
-       <property name="text">
-        <string>Principal minimal curvature</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Cylinder radius (size unit)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="cylinderRadius">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.500000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QRadioButton" name="gaussianCurvature">
-       <property name="text">
-        <string>Gaussian curvature</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Resolution</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="cylinderResolution">
+         <property name="minimum">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+         <property name="value">
+          <number>8</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>
-   <widget class="QLineEdit" name="scalarName">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>150</y>
-      <width>113</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Curvature_mean</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>150</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scalar name:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
+   <zorder>verticalLayoutWidget</zorder>
+   <zorder>horizontalLayoutWidget_2</zorder>
   </widget>
  </widget>
  <resources>

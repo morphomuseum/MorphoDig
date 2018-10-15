@@ -32,6 +32,7 @@
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqSavePLYDialogReaction.h"
 #include "mqSaveVTKDialogReaction.h"
+#include "mqCylinderDialogReaction.h"
 #include "mqSaveSTLDialogReaction.h"
 #include "mqColorDialogReaction.h"
 #include "mqLandmarkDialogReaction.h"
@@ -328,6 +329,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Orange = submenuChangeObjectColor->addAction("Orange");
 	QAction *Brown = submenuChangeObjectColor->addAction("Brown");
 	
+	QMenu* submenuSupportMaterial = menu.addMenu("Create 3D printing support surfaces");
+	new mqCylinderDialogReaction(submenuSupportMaterial->addAction("Create cylinders") << mqSetName("actionCylinders"));
 	
 
 	QAction::connect(KeepLargest, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotKeepLargest()));

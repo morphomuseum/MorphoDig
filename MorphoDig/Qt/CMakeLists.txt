@@ -9,6 +9,10 @@ mqViewMenuManager.cxx
   mqAboutDialogReaction.h
   mqCoreUtilities.cxx
   mqCoreUtilities.h
+  mqCylinderDialog.h
+  mqCylinderDialog.cxx
+  mqCylinderDialogReaction.h
+  mqCylinderDialogReaction.cxx
   mqDesktopServicesReaction.cxx
   mqDesktopServicesReaction.h
   mqReaction.cxx
@@ -256,6 +260,7 @@ set (Qt_MOC_HDRS
 
 set (Qt_UIs mqAboutDialog.ui 
 mqColorDialog.ui 
+mqCylinderDialog.ui 
 mqLandmarkDialog.ui  
 mqCameraControlsWidget.ui 
 mqObjectsControlsWidget.ui 
