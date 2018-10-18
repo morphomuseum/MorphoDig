@@ -3126,6 +3126,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			}
 
 			//@@TODO! 
+			
 			newname = this->CheckingName(newname);
 			cout << "Object Name= " << newname << endl;
 			
@@ -4324,6 +4325,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 	cout << "QString projectname: " << projectname.toStdString() << endl;;
 	QFile file(fileName);
 	QTextStream stream(&file);
+	this->ComputeSelectedNamesLists();
+	
 	//stream.setCodec("UTF-8");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
@@ -4355,7 +4358,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		int overwrite_cur = 1;
 		int overwrite_stv = 1;
 
-		this->ComputeSelectedNamesLists();
+		
+
 		QString postfix = "_";
 		postfix.append(projectname.toStdString().c_str());
 		QString no_postfix = "";
@@ -13814,6 +13818,29 @@ void mqMorphoDigCore::DollyCameraForPerspectiveMode()
 //fonction recurente pour savoir quel indice lui donner.
 std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	//cout << "check: " << name_obj << endl;
+
+	//1st: check if does not exist AT ALL (before searching for "(")
+	this->ActorCollection->InitTraversal();
+	int exists = 0;
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		std::string a_name = myActor->GetName();
+
+		if (a_name.compare(name_obj) == 0) {// if such an object exists... we  increase cpt_name
+
+			exists = 1;
+
+		}
+
+	}
+	if (exists==0)
+	{
+		return name_obj;
+	}
+
+	//2nd: suffix = base(newnum) is needed
+
 	int cpt_name = 1;
 	std::string s_cpt_name = std::to_string(cpt_name);
 	std::string name_base = name_obj;
@@ -13832,9 +13859,11 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	{
 		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		std::string a_name_base = myActor->GetName();
+		
 		//cout << "actor name: " << a_name_base << endl;
-		std::string apostfix = "";
+		
 		size_t anPos = a_name_base.find_first_of("(");
+		size_t anPos2 = a_name_base.find_first_of(")");
 		//cout << "AnPos:" << anPos << endl;
 		if (anPos > 0 && anPos <= a_name_base.length())
 		{
@@ -13842,15 +13871,48 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 			
 		}
 		//cout << "a_name_base: " << a_name_base<<endl;
-		if (a_name_base.compare(name_base) ==0) {// si il existe déjà, on augmente l'indice
+		if (a_name_base.compare(name_base) ==0) {// if such an object exists... we  increase cpt_name
 			
 			cpt_name++;			
-			s_cpt_name = std::to_string(cpt_name);
-			name_obj = name_base + "(" + s_cpt_name+")";
+			
 		}
 
 	}
 
+	// 3rd: now find a correct "num" in base(num) name
+	if (cpt_name > 1)
+	{
+		// we now that in all, there are "cpt_name" objects having the same name basis
+		// we search for the first "basis(cpt)" that does not exist and we give that name...
+		
+		for (int j = 2; j <= cpt_name; j++)
+		{
+			exists = 0;
+			this->ActorCollection->InitTraversal();
+			std::string j_name = name_base + "(" + std::to_string(j) + ")";
+			for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+			{
+				vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+				
+				std::string a_name = myActor->GetName();
+				if (a_name.compare(j_name) == 0) 
+				{
+					exists = 1;
+				}
+				
+			}
+			if (exists==0)
+			{
+				//does not exist => we give this name.
+				name_obj = j_name;
+				return name_obj;
+			}
+			
+		}
+		// here: all items were found in the series : basis basis(2) basis(3) etc. => we name it basis(4)
+		s_cpt_name = std::to_string(cpt_name+1);
+		name_obj = name_base + "(" + s_cpt_name + ")";
+	}
 	
 	
 	return name_obj;

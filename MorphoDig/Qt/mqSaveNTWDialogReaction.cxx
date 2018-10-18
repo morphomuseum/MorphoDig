@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
    Program: MorphoDig
@@ -66,6 +67,15 @@ void mqSaveNTWDialogReaction::onTriggered()
 			msgBox.exec();
 			return;
 		}
+		mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+		if (mqMorphoDigCore::instance()->g_distinct_selected_names.size() != mqMorphoDigCore::instance()->g_selected_names.size())
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Several selected surface objects have the same name. Impossible to save the project");
+			msgBox.exec();
+			return;
+
+		}
 		
 		if (num_sel_Actors != num_Actors
 			|| num_sel_Fags != num_Fags 
@@ -85,6 +95,7 @@ void mqSaveNTWDialogReaction::onTriggered()
 
 			
 		}
+	
 
 		cout << "Save NTW Dialog Triggered!" << endl;
 

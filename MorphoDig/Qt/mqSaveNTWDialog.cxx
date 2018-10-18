@@ -19,7 +19,7 @@
 #include <QFileDialog>
 #include <QCheckBox>
 #include <QHeaderView>
-
+#include <QMessageBox>
 
 #include <sstream>
 
@@ -91,9 +91,10 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 		filename.append(g_distinct_selected_names.at(i).c_str());*/
 
 	cout << "SAVE NTW: number of distinct selected surfaces:" << mqMorphoDigCore::instance()->g_distinct_selected_names.size() << endl;
+	
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() == 1)
 	{
-		mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+		
 		//cout << "preferred name:" << mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str();
 		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
 			tr("Save NTW files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir()+ QDir::separator()+ mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
@@ -104,6 +105,8 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 
 	else
 	{
+		
+		
 		
 		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
 			tr("Save NTW files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
