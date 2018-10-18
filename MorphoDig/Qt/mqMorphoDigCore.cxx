@@ -3100,9 +3100,9 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			cout << "FloatNorms POINTS is null " << endl;
 		}
 
-		if (MyPolyData->GetNumberOfPoints() > 10)
+		if (MyPolyData->GetNumberOfPoints() > 3)
 		{
-			cout << "More than 10 points!" << endl;
+			cout << "More than 3 points!" << endl;
 			VTK_CREATE(vtkMDActor, actor);
 			if (this->mui_BackfaceCulling == 0)
 			{
@@ -4304,8 +4304,12 @@ void mqMorphoDigCore::OpenMAP(QString fileName)
 }	
 
 
-int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_as_ply, int apply_position_to_surfaces)
+int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int apply_position_to_surfaces)
 {
+	//save_surfaces_format: 0:VTK 1:PLY 2:STL
+	// save_surfaces_format 0 : stl
+	// save_surfaces_format 1 : vtk-vtp
+	// save_surfaces_format 2 : ply
 	cout << "apply_position_to_surfaces=" << apply_position_to_surfaces << endl;
 	std::string NTWext = ".ntw";
 	std::string NTWext2 = ".NTW";
@@ -4342,6 +4346,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		//std::string vtpExt = ".vtp";
 		QString vtkExt = ".vtk";
 		QString plyExt = ".ply";
+		QString stlExt = ".stl";
 		QString tagExt = ".tag";
 		QString tagExt2 = ".tgp";
 		QString oriExt = ".ori";
@@ -4377,13 +4382,17 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			
 
 		int mesh_exists = 0;
-		if (save_surfaces_as_ply == 0)
+		if (save_surfaces_format == 1)//VTK
 		{
 			mesh_exists = this->selected_file_exists(onlypath, vtkExt, no_postfix);
 		}
-		else
+		else if (save_surfaces_format == 2)//PLY
 		{
 			mesh_exists = this->selected_file_exists(onlypath, plyExt, no_postfix);
+		}
+		else //0 STL
+		{
+			mesh_exists = this->selected_file_exists(onlypath, stlExt, no_postfix);
 		}
 
 		if (save_ori == 1)
@@ -4558,13 +4567,17 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				QString _pos_file;
 				_mesh_file.append(myActor->GetName().c_str());
 				_pos_file.append(myActor->GetName().c_str());
-				if (save_surfaces_as_ply == 0)
+				if (save_surfaces_format == 1)
 				{
 					_mesh_file.append(".vtk");
 				}
-				else
+				else if (save_surfaces_format == 2)
 				{
 					_mesh_file.append(".ply");
+				}
+				else
+				{
+					_mesh_file.append(".stl");
 				}
 				if (pos_special==0)
 				{
@@ -4592,9 +4605,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (write == 1)
 				{
 					//int write_type = 0 : binary or binary LE;
-					int File_type = 1; //: vtk-vtp
+					int File_type = save_surfaces_format; 
 
-					if (save_surfaces_as_ply == 1) { File_type = 2; }//2 = PLY
 					std::vector<std::string> mscalarsToBeRemoved; // no scalar to be removed here for the moment...
 					int RGBopt = 0; //now: keep current RGB color
 					this->SaveSurfaceFile(_mesh_fullpath ,0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, RGBopt, 0, myActor);

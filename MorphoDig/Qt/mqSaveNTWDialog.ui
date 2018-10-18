@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>385</width>
-    <height>469</height>
+    <height>466</height>
    </rect>
   </property>
   <property name="palette">
@@ -551,7 +551,7 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout1_7">
      <item>
-      <widget class="QRadioButton" name="VTP">
+      <widget class="QRadioButton" name="VTK">
        <property name="text">
         <string> VTK Polydata files  (.vtk)</string>
        </property>
@@ -561,6 +561,13 @@
       <widget class="QRadioButton" name="PLY">
        <property name="text">
         <string> PLY  (.ply)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="STL">
+       <property name="text">
+        <string>STL (.stl)</string>
        </property>
       </widget>
      </item>

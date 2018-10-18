@@ -56,7 +56,7 @@ mqSaveNTWDialog::mqSaveNTWDialog(QWidget* Parent)
  
  this->Ui->DoNotSaveORI->setChecked(true);
  this->Ui->DoNotSaveTAG->setChecked(true);
- this->Ui->VTP->setChecked(true);
+ this->Ui->VTK->setChecked(true);
  this->Ui->PositionInPosFile->setChecked(true);
   // Should connect...
   
@@ -123,18 +123,23 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 
 	int save_ori = 0; //0 no= save all landmark, 1 yes, save only selected landmarks
 	int save_tag = 0;
-	int save_surfaces_as_ply = 0;
+	int save_surfaces_format = 1;  // default, vtk
+								  // File_type 0 : stl
+								  // File_type 1 : vtk-vtp
+								  // File_type 2 : ply
 	int apply_position_to_surfaces = 0;
+
 
 
 	if (this->Ui->SaveORI->isChecked()) { save_ori = 1; }
 	if (this->Ui->SaveTAG->isChecked()) { save_tag = 1; }
-	if (this->Ui->PLY->isChecked()) { save_surfaces_as_ply = 1; }
+	if (this->Ui->PLY->isChecked()) { save_surfaces_format = 2; }
+	if (this->Ui->STL->isChecked()) { save_surfaces_format = 0; }
 	if (this->Ui->ApplyPositionToSurfaces->isChecked()) { apply_position_to_surfaces = 1; }
 
 	
 
-	mqMorphoDigCore::instance()->SaveNTWFile(fileName, save_ori, save_tag, save_surfaces_as_ply, apply_position_to_surfaces);
+	mqMorphoDigCore::instance()->SaveNTWFile(fileName, save_ori, save_tag, save_surfaces_format, apply_position_to_surfaces);
 
 }
 
