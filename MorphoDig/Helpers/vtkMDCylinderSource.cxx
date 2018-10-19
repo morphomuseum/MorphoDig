@@ -59,7 +59,7 @@ int vtkMDCylinderSource::RequestData(
   int i, idx;
   vtkIdType pts[VTK_CELL_SIZE];
   vtkPoints *newPoints;
-  vtkFloatArray *newNormals;
+  //vtkFloatArray *newNormals;
   //vtkFloatArray *newTCoords;
   vtkCellArray *newPolys;
 
@@ -68,7 +68,7 @@ int vtkMDCylinderSource::RequestData(
 //
 
   
-    numPts = 4*this->Resolution +2; // Top and bottom points are duplicated + 2 at the center of the top and the bottom ... normal issues? 
+    numPts = 2*this->Resolution +2; // Top and bottom points are not duplicated any longer + 2 at the center of the top and the bottom ... normal issues? 
     //numPolys = 2*this->Resolution+2;
 	numPolys = 4 * this->Resolution;
   
@@ -86,10 +86,10 @@ int vtkMDCylinderSource::RequestData(
   }
 
   newPoints->Allocate(numPts);
-  newNormals = vtkFloatArray::New();
-  newNormals->SetNumberOfComponents(3);
-  newNormals->Allocate(numPts);
-  newNormals->SetName("Normals");
+  //newNormals = vtkFloatArray::New();
+  //newNormals->SetNumberOfComponents(3);
+  //newNormals->Allocate(numPts);
+  //newNormals->SetName("Normals");
  
   newPolys = vtkCellArray::New();
   newPolys->Allocate(newPolys->EstimateSize(numPolys,this->Resolution));
@@ -116,65 +116,38 @@ int vtkMDCylinderSource::RequestData(
     idx = 2*i;
     newPoints->InsertPoint(idx,xbot);
     newPoints->InsertPoint(idx+1,xtop);
-    newNormals->InsertTuple(idx,nbot);
-    newNormals->InsertTuple(idx+1,ntop);
+    //newNormals->InsertTuple(idx,nbot);
+   // newNormals->InsertTuple(idx+1,ntop);
   }
 //
 // Generate polygons for sides
 //
   for (i=0; i<this->Resolution; i++)
   {
-    pts[0] = 2*i;
-    pts[1] = pts[0] + 1;
-    pts[2] = (pts[1] + 2) % (2*this->Resolution);
+    pts[0] = 2*i; //0
+    pts[1] = pts[0] + 1; //1
+    pts[2] = (pts[1] + 2) % (2*this->Resolution);//3
   
     newPolys->InsertNextCell(3,pts);
-	pts[0] = 2 * i;	
-	pts[1] = (pts[0]+1 + 2) % (2 * this->Resolution);
-	pts[2] = pts[1] - 1;
+	pts[0] = 2 * i;	//0
+	pts[1] = (pts[0]+1 + 2) % (2 * this->Resolution);//3
+	pts[2] = pts[1] - 1;//2
 	newPolys->InsertNextCell(3, pts);
   }
 //
 // Generate points and point data for top/bottom polygons
 //
   
-    for (i=0; i<this->Resolution; i++)
-    {
-      // x coordinate
-      xbot[0] = xtop[0] = this->Radius * cos(i*angle);
-      nbot[0] = ntop[0] = 0.0;
-      xbot[0] += center[0]; xtop[0] += center[0];
-
-      // y coordinate
-      xbot[1] = 0.5 * this->Height;
-      xtop[1] = -0.5 * this->Height;
-      nbot[1] = 1.0;
-      ntop[1] = -1.0;
-      xbot[1] += center[1]; xtop[1] += center[1];
-
-      // z coordinate
-      xbot[2] = xtop[2] = -this->Radius * sin(i*angle);
-	  xbot[2] += center[2]; xtop[2] += center[2];
-      nbot[2] = 0.0;
-      ntop[2] = 0.0;
-
-      idx = 2*this->Resolution;
-      newPoints->InsertPoint(idx+i,xbot);
-      newNormals->InsertTuple(idx+i,nbot);
-
-      idx = 3*this->Resolution;
-      newPoints->InsertPoint(idx+this->Resolution-i-1,xtop);
-      newNormals->InsertTuple(idx+this->Resolution-i-1,ntop);
-    }
+   
 	xbot[0] = xtop[0] = 0;
 	xbot[1] = 0.5 * this->Height;
 	xtop[1] = -0.5 * this->Height;
 	xbot[2] = xtop[2] = 0;
 
-	// top center
-	newPoints->InsertPoint(4* this->Resolution, xbot);
-	// bottom center 
-	newPoints->InsertPoint(4 * this->Resolution+1, xtop);
+	// bottom center
+	newPoints->InsertPoint(2* this->Resolution, xbot);
+	// top center 
+	newPoints->InsertPoint(2 * this->Resolution+1, xtop);
 //
 // Generate polygons for top/bottom polygons
 //
@@ -192,38 +165,21 @@ int vtkMDCylinderSource::RequestData(
 	// Y minus
 	for (i = 0; i<this->Resolution; i++)
 	{
-		idx = 2 * this->Resolution;
-		pts[0] = 4 * this->Resolution;
-		pts[1] = idx +i;
-		if (i < (this->Resolution - 1))
-		{
-			pts[2] = idx + i + 1;
-		}
-		else
-		{
-			pts[2] = idx;
-		}
-
+		//bottom
+		pts[0] =2 * this->Resolution; //bottom center
+		pts[1] = 2* i; // 0
+		pts[2] = (pts[1]+2) % (2 * this->Resolution); //2		
+		newPolys->InsertNextCell(3, pts);
+		
+		//top
+		pts[0] = 2 * this->Resolution +1; //top center		
+		pts[1] = (2 * i + 1 + 2) % (2 * this->Resolution); //3
+		pts[2] = 2 * i + 1; // 1
 		newPolys->InsertNextCell(3, pts);
 		
 	}
 
-	for (i = 0; i<this->Resolution; i++)
-	{
-		
-		idx = 3 * this->Resolution;
-		pts[0] = 4 * this->Resolution + 1;
-		pts[1] = idx + this->Resolution - i - 1;
-		if (i < (this->Resolution - 1))
-		{
-			pts[2] = idx + this->Resolution - i;
-		}
-		else
-		{
-			pts[2] = idx;
-		}
-		newPolys->InsertNextCell(3, pts);
-	}
+	
 
  
 //
@@ -232,8 +188,8 @@ int vtkMDCylinderSource::RequestData(
   output->SetPoints(newPoints);
   newPoints->Delete();
 
-  output->GetPointData()->SetNormals(newNormals);
-  newNormals->Delete();
+ // output->GetPointData()->SetNormals(newNormals);
+  //newNormals->Delete();
 
  
 
