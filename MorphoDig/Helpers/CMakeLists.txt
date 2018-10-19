@@ -14,6 +14,7 @@ vtkProbeSource.cxx
 vtkBezierSurfaceSource.cxx
 vtkBezierSurfaceWidget.cxx
 vtkBezierCurveSource.cxx
+vtkMDCylinderSource.cxx
 )
 
 set( Helpers_HDRS 
@@ -32,6 +33,7 @@ vtkProbeSource.h
 vtkBezierSurfaceSource.h
 vtkBezierSurfaceWidget.h
 vtkBezierCurveSource.h
+vtkMDCylinderSource.h
 )
 
 #Sorry but we need QT for the undo stack stuff... 

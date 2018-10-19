@@ -17,7 +17,7 @@
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
-#include < vtkCylinderSource.h>
+
 #include < vtkConeSource.h>
 #include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
@@ -83,6 +83,7 @@
 #include <QStatusBar>
 #include <QLabel>
 #include "mqUndoStack.h"
+#include "vtkMDCylinderSource.h"
 
 #define NORMAL_LMK 0
 #define TARGET_LMK 1
@@ -6132,7 +6133,7 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 		//@@TODO! 
 		newname = this->CheckingName(newname);
 
-		vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
+		vtkSmartPointer<vtkMDCylinderSource> cylinder = vtkSmartPointer<vtkMDCylinderSource>::New();
 		vtkSmartPointer<vtkConeSource> cone = vtkSmartPointer<vtkConeSource>::New();
 		
 		  cylinder->SetResolution(cylResolution);
