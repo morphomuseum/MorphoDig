@@ -70,8 +70,10 @@ public:
    */
   vtkSetClampMacro(Resolution,int,2,VTK_CELL_SIZE)
   vtkGetMacro(Resolution,int);
-  //@}
 
+  //@}
+  vtkSetClampMacro(ConeHeight, int, 0, 100)
+	  vtkGetMacro(ConeHeight, int);
   
 
   //@{
@@ -93,7 +95,7 @@ protected:
   double Radius;
   double Center[3];
   int Resolution;
- 
+  int ConeHeight;//in % of shaft length
   int OutputPointsPrecision;
 
 private:

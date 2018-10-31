@@ -37,7 +37,8 @@ public:
   
   virtual void sloteditCylinder();
   virtual void slotClose();
-  
+  virtual void slotConePressed();
+  virtual void slotCylinderPressed();
   
   
   

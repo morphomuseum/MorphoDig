@@ -18,7 +18,6 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
 
-#include < vtkConeSource.h>
 #include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
 #include <vtkMaskFields.h>
@@ -6107,20 +6106,22 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 
 }
 
-void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution, int mode)
+void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution, int coneHeight, int mode)
 {
-	//mode: 0= cylinder
-	//mode: 1= cone
+	//mode: 0= cylinder with flat top and bottom
+	//mode: 1= cylinder with conic extremities
 
 	double mcylHeight = cylHeight;
 	double mcylRadius = cylRadius;
-	if (cylHeight <= 0)
+	
+	if (cylHeight <= 0 || cylHeight==DBL_MAX)
 	{
 		mcylHeight = this->getActorCollection()->GetBoundingBoxLength() / 20;
-		if (mcylHeight == 0) { mcylHeight = 10; }
+		if (mcylHeight == 0 || mcylHeight == DBL_MAX) { mcylHeight = 10; }
 	
 	}
-	if (cylRadius <= 0)
+	if (mcylHeight == DBL_MAX) { mcylHeight = 10; }
+	if (cylRadius <= 0 || cylRadius == DBL_MAX)
 	{
 		mcylRadius = mcylHeight / 5;
 
@@ -6134,19 +6135,24 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 		newname = this->CheckingName(newname);
 
 		vtkSmartPointer<vtkMDCylinderSource> cylinder = vtkSmartPointer<vtkMDCylinderSource>::New();
-		vtkSmartPointer<vtkConeSource> cone = vtkSmartPointer<vtkConeSource>::New();
+	
 		
 		  cylinder->SetResolution(cylResolution);
 		  cylinder->SetHeight(mcylHeight);
 		  cylinder->SetRadius(mcylRadius);
+		  if (mode ==1)
+		  {
+			  cylinder->SetConeHeight(coneHeight);
+		  }
+		  else
+		  {
+			  cylinder->SetConeHeight(0);
+		  }
+
 		  //cylinder->SetCenter(0, i*mcylHeight*1.1, 0);
 		  cylinder->Update();
 
-		  cone->SetResolution(cylResolution);
-		  cone->SetHeight(mcylHeight);
-		  cone->SetRadius(mcylRadius);
-		  //cylinder->SetCenter(0, i*mcylHeight*1.1, 0);
-		  cone->Update();
+		  
 
 		  cout << "More than 10 points!" << endl;
 		  VTK_CREATE(vtkMDActor, actor);
@@ -6161,16 +6167,11 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 		  VTK_CREATE(vtkPolyDataMapper, mapper);
 		 
 		  mapper->SetColorModeToDefault();
-		  if (mode == 0)
-		  {
-			  mapper->SetInputData(cylinder->GetOutput());
-		  }
-		  else
-		  {
-			  mapper->SetInputData(cone->GetOutput());
-		  }
+		 
+		 mapper->SetInputData(cylinder->GetOutput());
+		 
 
-		  actor->SetmColor(1,0,0,1);
+		  actor->SetmColor(0.68,0.47,0.37,1);//pink
 
 		  actor->SetMapper(mapper);
 		  actor->SetSelected(0);
@@ -6184,11 +6185,12 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 		  if (mode == 0)
 		  {
 
-			  Mat->SetElement(1, 3, i*mcylHeight*1.1);
+			  Mat->SetElement(1, 3, i*(mcylHeight)*1.1);
 		  }
 		  else
 		  { 
-			  Mat->SetElement(1, 3, i*mcylRadius*2.2);
+			  //Mat->SetElement(1, 3, i*mcylRadius*2.2);
+			  Mat->SetElement(1, 3, i*(mcylHeight + 2 * coneHeight*mcylHeight / 100)*1.1);
 		  }
 		
 		  vtkTransform *newTransform = vtkTransform::New();

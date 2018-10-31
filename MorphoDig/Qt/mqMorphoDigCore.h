@@ -468,7 +468,7 @@ public:
 	void OpenFLG(QString fileName);
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
-	void Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution, int mode=0);
+	void Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution, int ConeHeight, int mode=0);
 	void MergeTags(int tagSource, int tagTarget);
 	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);

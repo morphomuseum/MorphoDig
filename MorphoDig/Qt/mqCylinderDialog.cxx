@@ -63,7 +63,13 @@ mqCylinderDialog::mqCylinderDialog(QWidget* Parent)
 	this->Ui->cylinderHeight->setMaximum(DBL_MAX);
 	this->Ui->cylinderHeight->setMinimum(0);
 	
-	double cylinderHeight = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLength()/20;
+
+	double cylinderHeight = 10; 
+	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems() > 0)
+	{
+		 cylinderHeight = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLength() / 20;
+
+	}
 	double cylinderRadius = cylinderHeight/5;
 
 	this->Ui->cylinderRadius->setValue(cylinderRadius);
@@ -72,6 +78,8 @@ mqCylinderDialog::mqCylinderDialog(QWidget* Parent)
 		
   
 	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditCylinder()));
+	connect(this->Ui->cone, SIGNAL(pressed()), this, SLOT(slotConePressed()));
+	connect(this->Ui->cylinder, SIGNAL(pressed()), this, SLOT(slotCylinderPressed()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditCylinder()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 
@@ -95,7 +103,7 @@ void mqCylinderDialog::editCylinder()
 	
 		
 		
-		mqMorphoDigCore::instance()->Cylinder(this->Ui->cylinderNumber->value(), this->Ui->cylinderHeight->value(), this->Ui->cylinderRadius->value(), this->Ui->cylinderResolution->value(), this->Ui->cone->isChecked());
+		mqMorphoDigCore::instance()->Cylinder(this->Ui->cylinderNumber->value(), this->Ui->cylinderHeight->value(), this->Ui->cylinderRadius->value(), this->Ui->cylinderResolution->value(), this->Ui->coneHeight->value(), this->Ui->cone->isChecked());
 		
 	
 }
@@ -108,6 +116,20 @@ void mqCylinderDialog::slotClose()
 	this->close();
 }
 
+void mqCylinderDialog::slotConePressed()
+{
+	if (this->Ui->cylinder->isChecked())
+	{
+		this->Ui->coneHeight->setDisabled(false);
+	}
+}
+void mqCylinderDialog::slotCylinderPressed()
+{
+	if (this->Ui->cone->isChecked())
+	{
+		this->Ui->coneHeight->setDisabled(true);
+	}
+}
 
 void mqCylinderDialog::sloteditCylinder()
 {

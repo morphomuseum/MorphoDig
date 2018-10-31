@@ -33,6 +33,7 @@ vtkMDCylinderSource::vtkMDCylinderSource (int res)
   this->Resolution = res;
   this->Height = 1.0;
   this->Radius = 0.5;
+  this->ConeHeight = 0;
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
   this->OutputPointsPrecision = SINGLE_PRECISION;
 
@@ -140,8 +141,8 @@ int vtkMDCylinderSource::RequestData(
   
    
 	xbot[0] = xtop[0] = 0;
-	xbot[1] = 0.5 * this->Height;
-	xtop[1] = -0.5 * this->Height;
+	xbot[1] = 0.5 * this->Height + this->ConeHeight*this->Height/100;
+	xtop[1] = -0.5 * this->Height- this->ConeHeight*this->Height/100;
 	xbot[2] = xtop[2] = 0;
 
 	// bottom center
@@ -178,9 +179,6 @@ int vtkMDCylinderSource::RequestData(
 		newPolys->InsertNextCell(3, pts);
 		
 	}
-
-	
-
  
 //
 // Update ourselves and release memory

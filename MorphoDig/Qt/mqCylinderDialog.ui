@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>526</width>
-    <height>272</height>
+    <height>332</height>
    </rect>
   </property>
   <property name="palette">
@@ -426,13 +426,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Create 3D printing support material (cylinders or cones)</string>
+   <string>Create 3D printing support material (cylinders)</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>230</y>
+     <x>150</x>
+     <y>300</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -460,49 +460,28 @@
      <x>10</x>
      <y>10</y>
      <width>461</width>
-     <height>201</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="title">
-    <string>Create cylinders or cones (support material for 3D printing)</string>
+    <string>Create cylinders (support material for 3D printing)</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>20</y>
-      <width>434</width>
-      <height>172</height>
+      <width>431</width>
+      <height>251</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QRadioButton" name="cylinder">
-         <property name="text">
-          <string>Cylinder</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="cone">
-         <property name="text">
-          <string>Cone</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
        <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Number of cylinders/cones</string>
+          <string>Number of cylinders</string>
          </property>
         </widget>
        </item>
@@ -520,7 +499,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Height (size unit)</string>
+          <string>Shaft length (size unit)</string>
          </property>
         </widget>
        </item>
@@ -587,7 +566,55 @@
           <number>1000</number>
          </property>
          <property name="value">
-          <number>8</number>
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QRadioButton" name="cone">
+         <property name="text">
+          <string>Conic top and bottom</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="cylinder">
+         <property name="text">
+          <string>Flat top and bottom</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Cone height: % of shaft length</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="coneHeight">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="singleStep">
+          <number>1</number>
+         </property>
+         <property name="value">
+          <number>20</number>
          </property>
         </widget>
        </item>
@@ -595,6 +622,8 @@
      </item>
     </layout>
    </widget>
+   <zorder>verticalLayoutWidget</zorder>
+   <zorder></zorder>
   </widget>
  </widget>
  <resources>
