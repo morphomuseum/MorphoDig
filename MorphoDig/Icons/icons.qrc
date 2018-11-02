@@ -9,6 +9,9 @@
    <file>Lasso_keepoutside.png</file>
    <file>pencil.png</file>
    <file>Flood_fill.png</file>
+   <file>rubber_mode.png</file>
+<file>rubber_mode_keepinside.png</file>
+   <file>rubber_mode_keepoutside.png</file>
    <file>magic_wand.png</file>
 
 
@@ -20,6 +23,9 @@
   <!-- Application Icon. -->
  <file>MorphoDig.ico</file>
     <!-- Typical file operations. -->
+   <file>rubber_mode.png</file>
+   <file>rubber_mode_keepinside.png</file>
+   <file>rubber_mode_keepoutside.png</file>
 <file>ScalarBar24.png</file>
    <file>ResetRange32.png</file>
    <file>points.png</file>

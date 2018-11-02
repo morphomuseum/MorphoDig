@@ -117,7 +117,9 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->qvtkWidget = NULL;
 	this->Style = vtkSmartPointer<vtkMDInteractorStyle>::New();
 	this->LassoStyle = vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
+	this->RubberStyle = vtkSmartPointer<vtkInteractorStyleRubberBand3D>::New();
 	this->currentLassoMode = 0; // 
+	this->currentRubberMode = 0; // 
 	this->ScalarRangeMin = 0;
 	this->ScalarRangeMax = 1;
 	this->mui_ClippingPlane = 0; // no x=0 clipping plane by default
@@ -394,6 +396,11 @@ void mqMorphoDigCore::SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyle
 {
 	this->LassoStyle = mLassoStyle;
 }
+void mqMorphoDigCore::SetRubberInteractorStyle(vtkSmartPointer<vtkInteractorStyleRubberBand3D> mRubbertyle)
+{
+	this->RubberStyle = mRubbertyle;
+}
+
 void mqMorphoDigCore::ActivateClippingPlane()
 {
 	if (this->Getmui_ClippinPlane() == 1)
@@ -6509,6 +6516,24 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 	return 1;
 }
 
+void mqMorphoDigCore::startRubber(int rubber_mode)
+{
+	// rubber_mode 0: = rubber cut (for selected surfaces), and we will only keep the outside of the selection
+	//lasso_mode 1: = rubber cut (for selected surfaces), and we will only keep the inside of the selection
+	//lasso_mode 2: = rubber tag and we will only tag the outside of the selection
+	//lasso_mode 3: = rubber tag and we will only tag the inside of the selection
+
+	//cout << "Set Lasso style as current interaction style!" << endl;
+	//1 change interaction mode
+	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->RubberStyle);
+	this->currentRubberMode = rubber_mode;
+	if (rubber_mode == 0) { this->setCurrentCursor(9); }
+	if (rubber_mode == 1) { this->setCurrentCursor(8); }
+	if (rubber_mode == 2) { this->setCurrentCursor(9); }
+	if (rubber_mode == 3) { this->setCurrentCursor(8); }
+	// 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
+}
+
 void mqMorphoDigCore::startLasso(int lasso_mode)
 {
 	// lasso_mode 0: = lasso cut (for selected surfaces), and we will only keep the outside of the selection
@@ -6573,6 +6598,30 @@ void mqMorphoDigCore::stopLasso()
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
 
 }
+void mqMorphoDigCore::stopRubber()
+{
+	this->resetCursor();
+
+	//bacl to normal selection mode
+	if (this->currentRubberMode == 0 || this->currentRubberMode == 1)// rubber cut
+	{
+		int keep_inside = this->currentRubberMode;
+		//@@@ to do
+		cout << "Stop rubber cut!" << endl;
+		this->rubberCutSelectedActors(keep_inside);
+	}
+	else
+	{
+		int tag_inside = this->currentRubberMode;// 2: tag insiden 3 tag outside
+		//@@@ to do
+		cout << "Stop rubber tag!" << endl;
+		this->rubberTagActors(tag_inside);
+
+	}
+
+	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
+
+}
 void mqMorphoDigCore::setCurrentCursor(int cursor)
 
 {
@@ -6584,6 +6633,8 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 //5 = pencil
 //6 = paint bucket
 //7 = set landmark
+//8 = rubber keep inside
+//9 = rubber keep outside
 	if (this->getQVTKWidget() != NULL)
 	{
 		if (cursor == 0)
@@ -6668,6 +6719,28 @@ void mqMorphoDigCore::setCurrentCursor(int cursor)
 
 			QPixmap cursor_pixmap = QPixmap(":/Cursors/magic_wand.png");
 			QCursor projectCursor = QCursor(cursor_pixmap, 2, 18);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 8)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/rubber_mode_keepinside.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 18, 18);
+
+
+			this->getQVTKWidget()->setCursor(projectCursor);
+
+
+		}
+		else if (cursor == 9)
+		{
+
+			QPixmap cursor_pixmap = QPixmap(":/Cursors/rubber_mode_keepoutside.png");
+			QCursor projectCursor = QCursor(cursor_pixmap, 18, 18);
 
 
 			this->getQVTKWidget()->setCursor(projectCursor);
@@ -6923,6 +6996,270 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 	}
 }
 
+void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
+{
+	POLYGON_LIST poly;
+	/*@@@ to do:*/
+
+	int mstart[2];
+	int mend[2];
+
+	this->RubberStyle->GetStartPosition(mstart);
+	this->RubberStyle->GetEndPosition(mend);
+	//std::vector<vtkVector2i>
+	vtkVector2i a,b,c,d;
+	a[0] = mstart[0];
+	a[1] = mstart[1];
+
+
+	b[0] = mstart[0];
+	b[1] = mend[1];
+
+	c[0] = mend[0];
+	c[1] = mend[1];
+
+	d[0] = mend[0];
+	d[1] = mstart[1];
+	cout << a[0] << "," << a[1] << endl;
+	cout << b[0] << "," << b[1] << endl;
+	cout << c[0] << "," << c[1] << endl;
+	cout << d[0] << "," << d[1] << endl;
+
+	std::vector<vtkVector2i> point_list;
+	point_list.push_back(a);
+	point_list.push_back(b);
+	point_list.push_back(c);
+	point_list.push_back(d);
+	poly.SetPointList(point_list);
+	cout << "Poly valide: " << poly.state << endl;
+	if (poly.state == 1)// only for valid lasso and rubber band selections!
+	{
+
+
+		vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		int modified = 0;
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				//myActor->SetSelected(0); we don't unselect after a cut
+
+
+				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+				{
+					vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+
+					vtkSmartPointer<vtkIntArray> newCuts =
+						vtkSmartPointer<vtkIntArray>::New();
+
+					newCuts->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					newCuts->SetNumberOfTuples(myPD->GetNumberOfPoints());
+
+					double ve_init_pos[3];;
+					double ve_final_pos[3];
+					double ve_proj_screen[3];
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+					POLYGON_VERTEX proj_screen;
+					int proj_is_inside;
+					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						myPD->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
+						if (i < 10)
+						{
+							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+						}
+						proj_screen.x = ve_proj_screen[0];
+						proj_screen.y = ve_proj_screen[1];
+						proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+						if (i < 10)
+						{
+						}
+
+						if (keep_inside == 0)
+						{
+							if (proj_is_inside == 0) { proj_is_inside = 1; }
+							else
+							{
+								proj_is_inside = 0;
+							}
+						}
+						if ((ve_proj_screen[2] > -1.0) && ve_proj_screen[2] < 1.0 && (proj_is_inside == 1))
+						{
+							newCuts->InsertTuple1(i, 1);
+						}
+
+					}
+					newCuts->SetName("Cuts");
+					myPD->GetPointData()->AddArray(newCuts);
+					myPD->GetPointData()->SetActiveScalars("Cuts");
+
+					vtkSmartPointer<vtkThreshold> selector =
+						vtkSmartPointer<vtkThreshold>::New();
+					vtkSmartPointer<vtkMaskFields> scalarsOff =
+						vtkSmartPointer<vtkMaskFields>::New();
+					vtkSmartPointer<vtkGeometryFilter> geometry =
+						vtkSmartPointer<vtkGeometryFilter>::New();
+					selector->SetInputData((vtkPolyData*)myPD);
+					selector->SetInputArrayToProcess(0, 0, 0,
+						vtkDataObject::FIELD_ASSOCIATION_CELLS,
+						vtkDataSetAttributes::SCALARS);
+					selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
+					selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
+					selector->ThresholdBetween(0.9, 1.1);
+					selector->Update();
+					std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
+					std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
+
+					scalarsOff->SetInputData(selector->GetOutput());
+					scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->Update();
+					geometry->SetInputData(scalarsOff->GetOutput());
+					geometry->Update();
+
+
+
+					vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+
+
+					MyObj = geometry->GetOutput();
+					myPD->GetPointData()->RemoveArray("Cuts");
+
+					std::cout << "\nLasso new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
+					std::cout << "\nLasso  new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
+
+					if (MyObj->GetNumberOfPoints() > 10)
+					{
+						VTK_CREATE(vtkMDActor, newactor);
+						if (this->mui_BackfaceCulling == 0)
+						{
+							newactor->GetProperty()->BackfaceCullingOff();
+						}
+						else
+						{
+							newactor->GetProperty()->BackfaceCullingOn();
+						}
+
+
+						//VTK_CREATE(vtkDataSetMapper, newmapper);
+						VTK_CREATE(vtkPolyDataMapper, newmapper);
+						//VTK_CREATE(vtkSmartPointer<vtkDataSetMapper>
+						//newmapper->ImmediateModeRenderingOn();
+						newmapper->SetColorModeToDefault();
+
+						if (
+							(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+							&& this->mui_ActiveScalars->NumComp == 1
+							)
+						{
+							newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+							newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+
+						}
+						else
+						{
+							newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+						}
+
+
+						newmapper->ScalarVisibilityOn();
+
+						cout << "cut object" << MyObj->GetNumberOfPoints() << endl;
+						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+						newmapper->SetInputData(MyObj);
+
+						//VTK_CREATE(vtkActor, actor);
+
+						int num = 2;
+
+						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+						vtkTransform *newTransform = vtkTransform::New();
+						newTransform->PostMultiply();
+
+						newTransform->SetMatrix(Mat);
+						newactor->SetPosition(newTransform->GetPosition());
+						newactor->SetScale(newTransform->GetScale());
+						newactor->SetOrientation(newTransform->GetOrientation());
+						newTransform->Delete();
+
+
+						double color[4] = { 0.5, 0.5, 0.5, 1 };
+						myActor->GetmColor(color);
+						/*double trans = 100* color[3];
+						if (trans >= 0 && trans <= 100)
+						{
+						color[3] = (double)((double)trans / 100);
+
+
+						}*/
+
+						newactor->SetmColor(color);
+
+						newactor->SetMapper(newmapper);
+						newactor->SetSelected(0);
+
+						//std::string newname = this->CheckingName(myActor->GetName());
+						newactor->SetName(myActor->GetName() + "_lc");
+						//newactor->SetName(newname);
+						cout << "try to add new actor=" << endl;
+						newcoll->AddTmpItem(newactor);
+						modified = 1;
+					}
+
+
+
+
+
+				}
+			}
+		}
+		if (modified == 1)
+		{
+			newcoll->InitTraversal();
+			vtkIdType num = newcoll->GetNumberOfItems();
+			for (vtkIdType i = 0; i < num; i++)
+			{
+				cout << "try to get next actor from newcoll:" << i << endl;
+				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+
+				myActor->SetDisplayMode(this->mui_DisplayMode);
+				this->getActorCollection()->AddItem(myActor);
+				emit this->actorsMightHaveChanged();
+				std::string action = "Convex Hull added: " + myActor->GetName();
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+
+			}
+			//cout << "camera and grid adjusted" << endl;
+			cout << "new actor(s) added" << endl;
+			this->Initmui_ExistingScalars();
+
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			this->Render();
+		}
+
+	}
+}
+
 void mqMorphoDigCore::lassoTagActors(int tag_inside)
 {
 	POLYGON_LIST poly;
@@ -7022,6 +7359,143 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 					currentTags->Modified();
 					//mymapper->Update();
 					
+
+				}
+
+			}
+
+			this->Render();
+		}
+		//
+		END_UNDO_SET();
+	}
+}
+void mqMorphoDigCore::rubberTagActors(int tag_inside)
+{
+	POLYGON_LIST poly;
+
+	int mstart[2];
+	int mend[2];
+
+	this->RubberStyle->GetStartPosition(mstart);
+	this->RubberStyle->GetEndPosition(mend);
+	//std::vector<vtkVector2i>
+	vtkVector2i a, b, c, d;
+	a[0] = mstart[0];
+	a[1] = mstart[1];
+
+	b[0] = mstart[0];
+	b[1] = mend[1];
+
+	c[0] = mend[0];
+	c[1] = mend[1];
+
+	d[0] = mend[0];
+	d[1] = mstart[1];
+
+	std::vector<vtkVector2i> point_list;
+	point_list.push_back(a);
+	point_list.push_back(b);
+	point_list.push_back(c);
+	point_list.push_back(d);
+	poly.SetPointList(point_list);
+
+
+	cout << "Poly valide: " << poly.state << endl;
+
+	if (this->Getmui_TagModeActivated() == 1 && poly.state == 1)// only for valid lasso selections!
+	{
+		std::string action = "Lasso tag ";
+
+		int Count = BEGIN_UNDO_SET(action);
+		vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+		this->ActorCollection->InitTraversal();
+		vtkIdType num = this->ActorCollection->GetNumberOfItems();
+		int modified = 0;
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			//myActor->SetSelected(0); we don't unselect after a cut
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+
+				QString ActiveScalar = this->Getmui_ActiveScalars()->Name;
+				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(ActiveScalar.toStdString().c_str()));
+				//4 if current tags exist, retrieve what tool is active
+				if (currentTags != NULL)
+				{
+
+
+					std::string mScalarName = ActiveScalar.toStdString();
+
+					myActor->SaveState(Count, QString(mScalarName.c_str()), 1);
+
+
+					vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+
+					vtkSmartPointer<vtkIntArray> toTag =
+						vtkSmartPointer<vtkIntArray>::New();
+
+					toTag->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					toTag->SetNumberOfTuples(myPD->GetNumberOfPoints());
+
+					double ve_init_pos[3];;
+					double ve_final_pos[3];
+					double ve_proj_screen[3];
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+					POLYGON_VERTEX proj_screen;
+					int proj_is_inside;
+					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						myPD->GetPoint(i, ve_init_pos);
+						mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
+						if (i < 10)
+						{
+							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+						}
+						proj_screen.x = ve_proj_screen[0];
+						proj_screen.y = ve_proj_screen[1];
+						proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+						if (i < 10)
+						{
+						}
+
+						if (tag_inside == 2)
+						{
+							if (proj_is_inside == 0) { proj_is_inside = 1; }
+							else
+							{
+								proj_is_inside = 0;
+							}
+						}
+						if ((ve_proj_screen[2] > -1.0) && ve_proj_screen[2] < 1.0 && (proj_is_inside == 1))
+						{
+							toTag->InsertTuple1(i, 1);
+						}
+
+					}
+
+					int activeTag = this->Getmui_ActiveTag();
+					for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
+					{
+
+						int changeTag = toTag->GetTuple1(j);
+
+						if (changeTag == 1)
+						{
+							currentTags->SetTuple1(j, activeTag);
+
+						}
+					}
+
+
+					//mymapper->GetLookupTable()->
+					currentTags->Modified();
+					//mymapper->Update();
+
 
 				}
 
@@ -15930,6 +16404,31 @@ void mqMorphoDigCore::slotLassoTagInside() {
 	
 	this->startLasso(3); }
 void mqMorphoDigCore::slotLassoTagOutside() { this->startLasso(2); }
+
+void mqMorphoDigCore::slotRubberCutKeepInside() {
+	
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->startRubber(1); }
+void mqMorphoDigCore::slotRubberCutKeepOutside() { 
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->startRubber(0); }
+void mqMorphoDigCore::slotRubberTagInside() { 
+	
+	
+	this->startRubber(3); }
+void mqMorphoDigCore::slotRubberTagOutside() { this->startRubber(2); }
 
 void mqMorphoDigCore::slotConvexHULL() {
 	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();

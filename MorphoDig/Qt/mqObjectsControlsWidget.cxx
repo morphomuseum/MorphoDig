@@ -227,8 +227,51 @@ void mqObjectsControlsWidget::constructor()
   connect(yTr, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
   connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));*/
   
-  connect(this->ui->LassoCutKeepInside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
-  connect(this->ui->LassoCutKeepOutside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
+  //connect(this->ui->LassoCut, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
+  //connect(this->ui->LassoCutKeepOutside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
+  //connect(this->ui->RubberCut, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberCutKeepOutside()));
+
+  QAction* lassoInside = new QAction(tr("&lasso cut: keep inside selected area"), this);
+  lassoInside->setToolTip(tr("Lasso cut: keep inside selected surface"));
+  this->ui->LassoCut->addAction(lassoInside);
+  this->ui->LassoCut->setDefaultAction(lassoInside);
+  QIcon icon9;
+  icon9.addFile(QStringLiteral(":/Icons/Lasso_keepinside.png"), QSize(), QIcon::Normal, QIcon::Off);
+  lassoInside->setIcon(icon9);
+  connect(lassoInside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
+
+  
+  QAction* lassoOutside = new QAction(tr("&lasso cut: keep outside selected area"), this);
+  lassoOutside->setToolTip(tr("Lasso cut: keep outside selected surface"));
+  this->ui->LassoCut->addAction(lassoOutside);
+   QIcon icon8;
+  icon8.addFile(QStringLiteral(":/Icons/Lasso_keepoutside.png"), QSize(), QIcon::Normal, QIcon::Off);
+  lassoOutside->setIcon(icon8);  
+  connect(lassoOutside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
+  
+ 
+  QAction* rubberInside = new QAction(tr("&rubber cut: keep inside selected area"), this);
+  rubberInside->setToolTip(tr("Rubber cut: keep inside selected surface"));
+  this->ui->RubberCut->addAction(rubberInside);
+  this->ui->RubberCut->setDefaultAction(rubberInside);
+  QIcon icon10;
+  icon10.addFile(QStringLiteral(":/Icons/rubber_mode_keepinside.png"), QSize(), QIcon::Normal, QIcon::Off);
+  rubberInside->setIcon(icon10);
+  connect(rubberInside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotRubberCutKeepInside()));
+
+
+  QAction* rubberOutside = new QAction(tr("&rubber cut: keep outside selected area"), this);
+  rubberOutside->setToolTip(tr("Rubber cut: keep outside selected surface"));
+  this->ui->RubberCut->addAction(rubberOutside);
+  QIcon icon11;
+  icon11.addFile(QStringLiteral(":/Icons/rubber_mode_keepoutside.png"), QSize(), QIcon::Normal, QIcon::Off);
+  rubberOutside->setIcon(icon11);
+  connect(rubberOutside, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotRubberCutKeepOutside()));
+
+
+  //TOTO : create an export tag map...
+  
+
 
   //@@TODO
 

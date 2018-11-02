@@ -153,8 +153,8 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-        </widget>      
-	    </item>
+        </widget>
+       </item>
        <item alignment="Qt::AlignHCenter">
         <widget class="QToolButton" name="LandmarkMoveDown">
          <property name="toolTip">
@@ -166,11 +166,11 @@
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/move_up.png</normaloff>:/Icons/move_up.png</iconset>
-         </property>        
+         </property>
         </widget>
        </item>
        <item alignment="Qt::AlignHCenter">
-        <widget class="QToolButton" name="LandmarkMoveUp">        
+        <widget class="QToolButton" name="LandmarkMoveUp">
          <property name="toolTip">
           <string>Decrease landmark number (move up in list)</string>
          </property>
@@ -180,7 +180,7 @@
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/move_down.png</normaloff>:/Icons/move_down.png</iconset>
-         </property>       
+         </property>
         </widget>
        </item>
        <item>
@@ -284,7 +284,7 @@
         </widget>
        </item>
        <item alignment="Qt::AlignHCenter">
-        <widget class="QToolButton" name="LassoCutKeepInside">
+        <widget class="QToolButton" name="LassoCut">
          <property name="toolTip">
           <string>Lasso cut: keep inside selected area</string>
          </property>
@@ -298,16 +298,16 @@
         </widget>
        </item>
        <item alignment="Qt::AlignHCenter">
-        <widget class="QToolButton" name="LassoCutKeepOutside">
+        <widget class="QToolButton" name="RubberCut">
          <property name="toolTip">
-          <string>Lasso cut: keep outside selected area</string>
+          <string>Rubber cut: keep inside selected area</string>
          </property>
          <property name="text">
           <string>...</string>
          </property>
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/Lasso_keepoutside.png</normaloff>:/Icons/Lasso_keepoutside.png</iconset>
+           <normaloff>:/Icons/rubber_mode_keepinside.png</normaloff>:/Icons/rubber_mode_keepinside.png</iconset>
          </property>
         </widget>
        </item>

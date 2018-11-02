@@ -22,7 +22,7 @@
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
 #include <vtkInteractorStyleDrawPolygon.h>
-
+#include <vtkInteractorStyleRubberBand3D.h>
 #include "vtkGridActor.h"
 #include "vtkLMActor.h"
 //#include "vtkUndoStack.h" => for some reason the ompilation fails if this header is included
@@ -649,10 +649,14 @@ public:
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
   void lassoTagActors(int tag_inside);
+  void rubberCutSelectedActors(int keep_inside);
+  void rubberTagActors(int tag_inside);
   void groupSelectedActors();
-  void startLasso(int lasso_mode);//change interaction style
+  void startRubber(int rubber_mode);//change interaction style
+  void stopRubber();//change interaction style back to normal
   void setCurrentCursor(int cursor); //changes mouse cursor
   void resetCursor(); // reset cursor when lasso stops, tag stop, landmark stop
+  void startLasso(int lasso_mode);//change interaction style
   void stopLasso();//change interaction style back to normal
   void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
   void Redo(); // calls the undoStack Redo function
@@ -722,6 +726,7 @@ public:
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
   void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyleDrawPolygon> mLassoStyle);
+  void SetRubberInteractorStyle(vtkSmartPointer<vtkInteractorStyleRubberBand3D> mRubbertyle);
   //void SetCurrentInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
@@ -769,6 +774,8 @@ protected:
 
 	vtkSmartPointer<vtkMDInteractorStyle> Style;
 	vtkSmartPointer<vtkInteractorStyleDrawPolygon> LassoStyle;
+	vtkSmartPointer<vtkInteractorStyleRubberBand3D> RubberStyle;
+
 	vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
 	vtkSmartPointer<vtkScalarBarActor> TagScalarBarActor;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
@@ -906,6 +913,10 @@ public slots:
 	virtual void slotLassoCutKeepOutside();
 	virtual void slotLassoTagInside();
 	virtual void slotLassoTagOutside();
+	virtual void slotRubberCutKeepInside();
+	virtual void slotRubberCutKeepOutside();
+	virtual void slotRubberTagInside();
+	virtual void slotRubberTagOutside();
 	virtual void slotMirror();
 	virtual void slotInvert();
 	virtual void slotKeepLargest();
@@ -932,6 +943,7 @@ private:
 	static mqMorphoDigCore* Instance;
 	QVTKOpenGLWidget *qvtkWidget;
 	int currentLassoMode;
+	int currentRubberMode;
 	int selected_file_exists(QString path, QString ext, QString postfix);
 	int context_file_exists(QString path, QString ext, QString postfix);
 

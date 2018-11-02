@@ -28,6 +28,7 @@
 #include <iostream>
 #include <vtkPiecewiseFunction.h>
 #include <vtkInteractorStyleDrawPolygon.h>
+#include <vtkInteractorStyleRubberBand3D.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkPoints.h>
 #include <vtkCylinderSource.h> 
@@ -146,6 +147,16 @@ void lassoselect(vtkObject* caller,
 {
 	cout << "Lasso selection changed!" << endl;
 	mqMorphoDigCore::instance()->stopLasso();
+
+}
+
+void rubberselect(vtkObject* caller,
+	long unsigned int vtkNotUsed(eventId),
+	void* vtkNotUsed(clientData),
+	void* vtkNotUsed(callData))
+{
+	cout << "Rubber selection changed!" << endl;
+	mqMorphoDigCore::instance()->stopRubber();
 
 }
 
@@ -1013,6 +1024,9 @@ cm2ov2=1
 	 vtkSmartPointer<vtkInteractorStyleDrawPolygon> lassostyle =
 		 vtkSmartPointer<vtkInteractorStyleDrawPolygon>::New();
 
+	 vtkSmartPointer<vtkInteractorStyleRubberBand3D> rubberstyle =
+		 vtkSmartPointer<vtkInteractorStyleRubberBand3D>::New();
+
 	 style->SetActorCollection(this->MorphoDigCore->getActorCollection());
 	 style->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
 	 style->SetTargetLandmarkCollection(this->MorphoDigCore->getTargetLandmarkCollection());
@@ -1038,6 +1052,11 @@ cm2ov2=1
 	 lassoselectionCallback->SetCallback(lassoselect);
 	 lassostyle->AddObserver(vtkCommand::SelectionChangedEvent, lassoselectionCallback);
 
+	 vtkSmartPointer<vtkCallbackCommand> rubberselectionCallback =
+		 vtkSmartPointer<vtkCallbackCommand>::New();
+	 rubberselectionCallback->SetCallback(rubberselect);
+	 rubberstyle->AddObserver(vtkCommand::SelectionChangedEvent, rubberselectionCallback);
+
 	 vtkSmartPointer<vtkCallbackCommand> pickCallback =
 		 vtkSmartPointer<vtkCallbackCommand>::New();
 
@@ -1060,6 +1079,7 @@ cm2ov2=1
   // mqMorphoDigCore should be aware of the 2 coexisting interactor styles (so that we can switch between them
   mqMorphoDigCore::instance()->SetNormalInteractorStyle(style);
   mqMorphoDigCore::instance()->SetLassoInteractorStyle(lassostyle);
+  mqMorphoDigCore::instance()->SetRubberInteractorStyle(rubberstyle);
 
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetHandles(mqMorphoDigCore::instance()->getHandleLandmarkCollection());
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetNodes(mqMorphoDigCore::instance()->getNodeLandmarkCollection());
