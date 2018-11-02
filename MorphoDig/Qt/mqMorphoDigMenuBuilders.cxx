@@ -330,8 +330,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Brown = submenuChangeObjectColor->addAction("Brown");
 	
 	QMenu* submenuSupportMaterial = menu.addMenu("Create 3D printing support surfaces");
-	new mqCylinderDialogReaction(submenuSupportMaterial->addAction("Create cylinders or cones") << mqSetName("actionCylinders"));
-	
+	new mqCylinderDialogReaction(submenuSupportMaterial->addAction("Create cylinders") << mqSetName("actionCylinders"));	
 
 	QAction::connect(KeepLargest, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotKeepLargest()));
 	QAction::connect(Invert, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotInvert()));
