@@ -5884,7 +5884,7 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 
 
 		}
-		//stream << "Name	Mean Median	Variance Min Max Q5 Q15 Q90 Q95" << endl;
+		//stream << "Name	Mean Median	Variance Min Max Q5 Q10 Q90 Q95" << endl;
 
 
 		//this->ComputeSelectedNamesLists();
@@ -6238,7 +6238,7 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 	{
 		QTextStream stream(&file);
 
-		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q15	Q90	Q95	Tagged_Region" << endl;
+		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q10	Q90	Q95	Tagged_Region" << endl;
 		cout << "First Summary Done" << endl;
 		file.close();
 		this->SaveActiveScalarSummary(fileName, 0, TagArray, 0);
