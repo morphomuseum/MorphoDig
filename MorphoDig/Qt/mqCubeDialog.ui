@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqCylinderDialog</class>
- <widget class="QDialog" name="mqCylinderDialog">
+ <class>mqCubeDialog</class>
+ <widget class="QDialog" name="mqCubeDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>498</width>
-    <height>431</height>
+    <height>251</height>
    </rect>
   </property>
   <property name="palette">
@@ -431,8 +431,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>400</y>
+     <x>160</x>
+     <y>210</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -460,11 +460,11 @@
      <x>20</x>
      <y>10</y>
      <width>461</width>
-     <height>381</height>
+     <height>181</height>
     </rect>
    </property>
    <property name="title">
-    <string>Create cylindric connective struts (connective material for 3D printing)</string>
+    <string>Create cubic / box-shaped connective struts (connective material for 3D printing)</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
@@ -472,7 +472,7 @@
       <x>20</x>
       <y>20</y>
       <width>431</width>
-      <height>108</height>
+      <height>136</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -481,12 +481,12 @@
        <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Number of cylinders</string>
+          <string>Number of cubes</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="cylinderNumber">
+        <widget class="QSpinBox" name="cubeNumber">
          <property name="minimum">
           <number>1</number>
          </property>
@@ -499,12 +499,12 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Shaft length (size unit)</string>
+          <string>X length (size unit)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="cylinderHeight">
+        <widget class="QDoubleSpinBox" name="sizeX">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -523,12 +523,12 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Radius (size unit)</string>
+          <string>Y length (size unit)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="cylinderRadius">
+        <widget class="QDoubleSpinBox" name="sizeY">
          <property name="decimals">
           <number>6</number>
          </property>
@@ -549,185 +549,36 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Resolution</string>
+          <string>Z length (size unit)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="cylinderResolution">
+        <widget class="QDoubleSpinBox" name="sizeZ">
+         <property name="decimals">
+          <number>6</number>
+         </property>
          <property name="minimum">
-          <number>3</number>
+          <double>0.000000000000000</double>
          </property>
          <property name="maximum">
-          <number>1000</number>
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.500000000000000</double>
          </property>
          <property name="value">
-          <number>6</number>
+          <double>1.000000000000000</double>
          </property>
         </widget>
        </item>
       </layout>
      </item>
     </layout>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>240</y>
-      <width>431</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Top an bottom shape</string>
-    </property>
-    <widget class="QWidget" name="verticalLayoutWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>401</width>
-       <height>91</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-       <widget class="QRadioButton" name="cylinder">
-        <property name="text">
-         <string>Flat top and bottom</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QRadioButton" name="cone">
-          <property name="text">
-           <string>Conic top and bottom</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Cone height: % of shaft length</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="coneHeight">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="singleStep">
-             <number>1</number>
-            </property>
-            <property name="value">
-             <number>20</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>130</y>
-      <width>431</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Shaft section shape</string>
-    </property>
-    <widget class="QWidget" name="verticalLayoutWidget_3">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>401</width>
-       <height>72</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QRadioButton" name="circular_shaft">
-          <property name="text">
-           <string>circular</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="elliptical_shaft">
-          <property name="text">
-           <string>elliptical</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <item>
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Radius 2 (size unit)</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDoubleSpinBox" name="cylinderRadius2">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="decimals">
-             <number>6</number>
-            </property>
-            <property name="minimum">
-             <double>0.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.500000000000000</double>
-            </property>
-            <property name="value">
-             <double>1.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
    </widget>
   </widget>
  </widget>

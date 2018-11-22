@@ -33,6 +33,7 @@ vtkMDCylinderSource::vtkMDCylinderSource (int res)
   this->Resolution = res;
   this->Height = 1.0;
   this->Radius = 0.5;
+  this->Radius2 = 0.5;
   this->ConeHeight = 0;
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
   this->OutputPointsPrecision = SINGLE_PRECISION;
@@ -111,8 +112,8 @@ int vtkMDCylinderSource::RequestData(
  
     // z coordinate
     nbot[2] = ntop[2] = -sin(i*angle);
-    xbot[2] = (nbot[2] * this->Radius) + center[2];
-    xtop[2] = (ntop[2] * this->Radius) + center[2];
+    xbot[2] = (nbot[2] * this->Radius2) + center[2];
+    xtop[2] = (ntop[2] * this->Radius2) + center[2];
 
     idx = 2*i;
     newPoints->InsertPoint(idx,xbot);
@@ -205,6 +206,7 @@ void vtkMDCylinderSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resolution: " << this->Resolution << "\n";
   os << indent << "Height: " << this->Height << "\n";
   os << indent << "Radius: " << this->Radius << "\n";
+  os << indent << "Radius2: " << this->Radius2 << "\n";
   os << indent << "Center: (" << this->Center[0] << ", "
      << this->Center[1] << ", " << this->Center[2] << " )\n";  
   os << indent << "Output Points Precision: " << this->OutputPointsPrecision << "\n";

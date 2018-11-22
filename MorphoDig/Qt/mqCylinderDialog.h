@@ -39,7 +39,8 @@ public:
   virtual void slotClose();
   virtual void slotConePressed();
   virtual void slotCylinderPressed();
-  
+  virtual void slotCircularShaftPressed();
+  virtual void slotEllipticalShaftPressed();
   
   
 protected:

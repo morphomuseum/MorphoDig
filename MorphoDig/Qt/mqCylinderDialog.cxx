@@ -73,13 +73,16 @@ mqCylinderDialog::mqCylinderDialog(QWidget* Parent)
 	double cylinderRadius = cylinderHeight/5;
 
 	this->Ui->cylinderRadius->setValue(cylinderRadius);
+	this->Ui->cylinderRadius2->setValue(cylinderRadius);
 	this->Ui->cylinderHeight->setValue(cylinderHeight);
-	
-		
+	this->Ui->cylinderRadius2->setDisabled(true);
+	this->Ui->circular_shaft->setChecked(true);
   
 	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditCylinder()));
 	connect(this->Ui->cone, SIGNAL(pressed()), this, SLOT(slotConePressed()));
 	connect(this->Ui->cylinder, SIGNAL(pressed()), this, SLOT(slotCylinderPressed()));
+	connect(this->Ui->circular_shaft, SIGNAL(pressed()), this, SLOT(slotCircularShaftPressed()));
+	connect(this->Ui->elliptical_shaft, SIGNAL(pressed()), this, SLOT(slotEllipticalShaftPressed()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditCylinder()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 
@@ -103,7 +106,7 @@ void mqCylinderDialog::editCylinder()
 	
 		
 		
-		mqMorphoDigCore::instance()->Cylinder(this->Ui->cylinderNumber->value(), this->Ui->cylinderHeight->value(), this->Ui->cylinderRadius->value(), this->Ui->cylinderResolution->value(), this->Ui->coneHeight->value(), this->Ui->cone->isChecked());
+		mqMorphoDigCore::instance()->Cylinder(this->Ui->cylinderNumber->value(), this->Ui->cylinderHeight->value(), this->Ui->cylinderRadius->value(), this->Ui->cylinderRadius2->value(), this->Ui->cylinderResolution->value(), this->Ui->coneHeight->value(), this->Ui->cone->isChecked(), this->Ui->circular_shaft->isChecked());
 		
 	
 }
@@ -128,6 +131,21 @@ void mqCylinderDialog::slotCylinderPressed()
 	if (this->Ui->cone->isChecked())
 	{
 		this->Ui->coneHeight->setDisabled(true);
+	}
+}
+
+void mqCylinderDialog::slotCircularShaftPressed()
+{
+	if (this->Ui->elliptical_shaft->isChecked())
+	{
+		this->Ui->cylinderRadius2->setDisabled(true);
+	}
+}
+void mqCylinderDialog::slotEllipticalShaftPressed()
+{
+	if (this->Ui->circular_shaft->isChecked())
+	{
+		this->Ui->cylinderRadius2->setDisabled(false);
 	}
 }
 

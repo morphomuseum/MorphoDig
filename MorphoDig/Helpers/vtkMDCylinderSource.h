@@ -56,6 +56,13 @@ public:
   vtkGetMacro(Radius,double);
   //@}
 
+  /**
+  * Set the radius of the ellipse. Initial value is 0.5
+  */
+  vtkSetClampMacro(Radius2, double, 0.0, VTK_DOUBLE_MAX)
+	  vtkGetMacro(Radius2, double);
+  //@}
+
   //@{
   /**
    * Set/Get cylinder center. Initial value is (0.0,0.0,0.0)
@@ -93,6 +100,7 @@ protected:
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
   double Height;
   double Radius;
+  double Radius2;
   double Center[3];
   int Resolution;
   int ConeHeight;//in % of shaft length

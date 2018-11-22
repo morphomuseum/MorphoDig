@@ -83,6 +83,7 @@
 #include <QLabel>
 #include "mqUndoStack.h"
 #include "vtkMDCylinderSource.h"
+#include "vtkMDCubeSource.h"
 
 #define NORMAL_LMK 0
 #define TARGET_LMK 1
@@ -6112,14 +6113,119 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 	file.close();
 
 }
+void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double sizeZ)
+{
+	double msizeX = sizeX;
+	double msizeY = sizeY;
+	double msizeZ = sizeZ;
+	
+	if (msizeY <= 0 || msizeX == DBL_MAX)
+	{
+		
+		msizeY = this->getActorCollection()->GetBoundingBoxLength() / 20;
+		if (msizeY == 0 || msizeX == DBL_MAX) { msizeY = 10; }
+	}
 
-void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, int cylResolution, int coneHeight, int mode)
+	if (msizeY <= 0 || msizeY == DBL_MAX)
+	{
+		msizeX = msizeY/5;
+	}
+	if (msizeZ <= 0 || msizeZ == DBL_MAX)
+	{
+		msizeZ = msizeY / 5;
+	}
+
+	for (int i = 0; i < numCubes; i++)
+	{
+		std::string newname = "Cube";
+
+
+		//@@TODO! 
+		newname = this->CheckingName(newname);
+
+		vtkSmartPointer<vtkMDCubeSource> cube = vtkSmartPointer<vtkMDCubeSource>::New();
+
+		cube->SetXLength(msizeX);
+		cube->SetYLength(msizeY);
+		cube->SetZLength(msizeZ);
+		
+
+		//cylinder->SetCenter(0, i*mcylHeight*1.1, 0);
+		cube->Update();
+
+
+
+		cout << "More than 10 points!" << endl;
+		VTK_CREATE(vtkMDActor, actor);
+		if (this->mui_BackfaceCulling == 0)
+		{
+			actor->GetProperty()->BackfaceCullingOff();
+		}
+		else
+		{
+			actor->GetProperty()->BackfaceCullingOn();
+		}
+		VTK_CREATE(vtkPolyDataMapper, mapper);
+
+		mapper->SetColorModeToDefault();
+
+		mapper->SetInputData(cube->GetOutput());
+
+
+		actor->SetmColor(0.68, 0.47, 0.37, 1);//pink
+
+		actor->SetMapper(mapper);
+		actor->SetSelected(0);
+		actor->SetName(newname);
+
+		actor->SetDisplayMode(this->mui_DisplayMode);
+
+		vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+		Mat->DeepCopy(actor->GetMatrix());
+
+
+		Mat->SetElement(1, 3, i*(msizeY)*1.1);
+		
+
+		vtkTransform *newTransform = vtkTransform::New();
+		newTransform->PostMultiply();
+
+		newTransform->SetMatrix(Mat);
+		actor->SetPosition(newTransform->GetPosition());
+		actor->SetScale(newTransform->GetScale());
+		actor->SetOrientation(newTransform->GetOrientation());
+		newTransform->Delete();
+
+		this->getActorCollection()->AddItem(actor);
+		emit this->actorsMightHaveChanged();
+
+		std::string action = "Create cube";
+		int mCount = BEGIN_UNDO_SET(action);
+		this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+		END_UNDO_SET();
+
+		this->getActorCollection()->SetChanged(1);
+	}
+
+	this->AdjustCameraAndGrid();
+	if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+	{
+		this->UpdateLandmarkSettings();
+	}
+
+}
+void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, double cylRadius2, int cylResolution, int coneHeight, int mode, int circular_shaft)
 {
 	//mode: 0= cylinder with flat top and bottom
 	//mode: 1= cylinder with conic extremities
 
 	double mcylHeight = cylHeight;
 	double mcylRadius = cylRadius;
+	double mcylRadius2 = cylRadius;
+	if (circular_shaft ==0 && cylRadius2>0)
+	{
+		mcylRadius2 = cylRadius2;
+	}
 	
 	if (cylHeight <= 0 || cylHeight==DBL_MAX)
 	{
@@ -6147,6 +6253,7 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, i
 		  cylinder->SetResolution(cylResolution);
 		  cylinder->SetHeight(mcylHeight);
 		  cylinder->SetRadius(mcylRadius);
+		  cylinder->SetRadius2(mcylRadius2);
 		  if (mode ==1)
 		  {
 			  cylinder->SetConeHeight(coneHeight);
