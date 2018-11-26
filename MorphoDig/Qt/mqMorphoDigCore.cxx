@@ -6118,11 +6118,15 @@ void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double size
 	double msizeX = sizeX;
 	double msizeY = sizeY;
 	double msizeZ = sizeZ;
+	double bbz = this->getActorCollection()->GetBoundingBox()[5];
+	double bbx = this->getActorCollection()->GetBoundingBox()[3];
+	double bby = this->getActorCollection()->GetBoundingBox()[4];
 	
 	if (msizeY <= 0 || msizeX == DBL_MAX)
 	{
 		
 		msizeY = this->getActorCollection()->GetBoundingBoxLength() / 20;
+		
 		if (msizeY == 0 || msizeX == DBL_MAX) { msizeY = 10; }
 	}
 
@@ -6172,8 +6176,8 @@ void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double size
 		mapper->SetInputData(cube->GetOutput());
 
 
-		actor->SetmColor(0.68, 0.47, 0.37, 1);//pink
-
+		//actor->SetmColor(0.68, 0.47, 0.37, 1);//pink
+		actor->SetmColor(0.666667, 0.666667, 1, 1);//kind of violet
 		actor->SetMapper(mapper);
 		actor->SetSelected(0);
 		actor->SetName(newname);
@@ -6184,8 +6188,11 @@ void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double size
 		Mat->DeepCopy(actor->GetMatrix());
 
 
-		Mat->SetElement(1, 3, i*(msizeY)*1.1);
-		
+
+		Mat->SetElement(0, 3, bbx*0.9);
+		Mat->SetElement(2, 3, bbz*1.1);		
+		Mat->SetElement(1, 3, i*(msizeY)*1.1 + bby*0.9);
+	
 
 		vtkTransform *newTransform = vtkTransform::New();
 		newTransform->PostMultiply();
@@ -6222,6 +6229,9 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, d
 	double mcylHeight = cylHeight;
 	double mcylRadius = cylRadius;
 	double mcylRadius2 = cylRadius;
+	double bbz = this->getActorCollection()->GetBoundingBox()[5];
+	double bbx = this->getActorCollection()->GetBoundingBox()[3];
+	double bby = this->getActorCollection()->GetBoundingBox()[4];
 	if (circular_shaft ==0 && cylRadius2>0)
 	{
 		mcylRadius2 = cylRadius2;
@@ -6285,8 +6295,8 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, d
 		 mapper->SetInputData(cylinder->GetOutput());
 		 
 
-		  actor->SetmColor(0.68,0.47,0.37,1);//pink
-
+		 // actor->SetmColor(0.68,0.47,0.37,1);//pink
+		 actor->SetmColor(0.666667, 0.666667, 1, 1);//kind of violet
 		  actor->SetMapper(mapper);
 		  actor->SetSelected(0);
 		  actor->SetName(newname);
@@ -6296,15 +6306,18 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, d
 		  vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 		  Mat->DeepCopy(actor->GetMatrix());		 
 
+		  Mat->SetElement(0, 3, bbx*0.9);
+		  Mat->SetElement(2, 3, bbz*1.1);
+
 		  if (mode == 0)
 		  {
 
-			  Mat->SetElement(1, 3, i*(mcylHeight)*1.1);
+			  Mat->SetElement(1, 3, i*(mcylHeight)*1.1+ bby*0.9);
 		  }
 		  else
 		  { 
 			  //Mat->SetElement(1, 3, i*mcylRadius*2.2);
-			  Mat->SetElement(1, 3, i*(mcylHeight + 2 * coneHeight*mcylHeight / 100)*1.1);
+			  Mat->SetElement(1, 3, i*(mcylHeight + 2 * coneHeight*mcylHeight / 100)*1.1 +bby*0.9);
 		  }
 		
 		  vtkTransform *newTransform = vtkTransform::New();
