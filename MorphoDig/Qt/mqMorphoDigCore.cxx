@@ -9955,7 +9955,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 
 
 }
-vtkSmartPointer<vtkIdList> GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn, vtkIdType id)
+vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn, vtkIdType id)
 {
 	//get propagated vertices in a restricted list of vertices (only in neighborList)
 	vtkSmartPointer<vtkIdList> connectedVertices =
