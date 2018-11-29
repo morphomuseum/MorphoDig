@@ -502,11 +502,14 @@ void mqMorphoDigCore::PropagateVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSm
 
 	vtkSmartPointer<vtkIdList> nnptList = vtkSmartPointer<vtkIdList>::New();
 	int bchanged = 0;
+	cout << "PropagateVertices 0" << endl;
+	cout << "nptList->GetNumberOfIds()" << nptList->GetNumberOfIds() <<endl;
 	for (vtkIdType i = 0; i<nptList->GetNumberOfIds(); i++)
 	{
 		vtkSmartPointer<vtkIdList> connected =
 			vtkSmartPointer<vtkIdList>::New();
 		//connected = GetConnectedVertices(mesh, vn, sc, nptList->GetId(i), g_tag_tool);
+		cout << "PropagateVertices 0" << i<< endl;
 		connected = GetPropagatedVertices(mesh, norms, neighborList, vn, nptList->GetId(i));
 		for (vtkIdType j = 0; j<connected->GetNumberOfIds(); j++)
 		{
@@ -645,8 +648,9 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						int list_changed = 1;
 						while (list_changed == 1)
 						{
-
-							this->PropagateVertices(vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput()), norms, vn, observedNeighbours,ids, newids, exnids, oldids, veryoldids, &list_changed);
+							cout << "cpt=" << cpt << endl;
+							vtkSmartPointer<vtkPolyData> mesh = vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput());
+							this->PropagateVertices(mesh, norms, vn, observedNeighbours,ids, newids, exnids, oldids, veryoldids, &list_changed);
 							
 							//std::cout<<"Tag magic wand level "<<cpt<<": list_changed="<<list_changed<<std::endl;
 							cpt++;
@@ -9957,6 +9961,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 }
 vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn, vtkIdType id)
 {
+	cout << "GetPropagatedVertices 0" << endl;
 	//get propagated vertices in a restricted list of vertices (only in neighborList)
 	double min_cos = cos((double)(this->mui_PencilLimitAngle)*vtkMath::Pi() / 180);
 	vtkSmartPointer<vtkIdList> connectedVertices =
@@ -9968,6 +9973,8 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointe
 	vtkSmartPointer<vtkIdList> cellIdList =
 		vtkSmartPointer<vtkIdList>::New();
 	mesh->GetPointCells(id, fullcellIdList);
+	cout << "GetPropagatedVertices fullcellIdList->GetNumberOfIds()=" << fullcellIdList->GetNumberOfIds()<< endl;
+	cout << "GetPropagatedVertices neighborList->GetNumberOfIds()=" << fullcellIdList->GetNumberOfIds() << endl;
 	// here we have to remove all the points which do not belong to neighborList
 	for (vtkIdType i = 0; i < fullcellIdList->GetNumberOfIds(); i++)
 	{
@@ -9976,16 +9983,18 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointe
 		{
 			if (fullcellIdList->GetId(i)== neighborList->GetId(j))
 			{
-				found = 1; break;
+				found = 1; 
 			}
 
 		}
+		cout << "GetPropagatedVertices 0.5" << endl;
 		if (found==1)
 		{
-			cellIdList->InsertNextId(i);
+			cellIdList->InsertNextId(fullcellIdList->GetId(i));
 		}
 	}
-
+	cout << "GetPropagatedVertices  cellIdList->GetNumberOfIds()=" << cellIdList->GetNumberOfIds()<< endl;
+	
 	for (vtkIdType i = 0; i < cellIdList->GetNumberOfIds(); i++)
 	{
 		vtkSmartPointer<vtkIdList> pointIdList =
@@ -10029,6 +10038,7 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointe
 		
 
 	}
+	cout << "GetPropagatedVertices 1" << endl;
 
 	return connectedVertices;
 }
