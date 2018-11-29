@@ -639,7 +639,8 @@ public:
 	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
   vtkSmartPointer<vtkIdList> GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn,  vtkIdType id);
   int mqMorphoDigCore::Already_Listed(vtkIdType ve, vtkSmartPointer<vtkIdList> ptList);
-  void PropagateVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, double *vn, vtkSmartPointer<vtkIdList> neighborList, vtkSmartPointer<vtkIdList> ptList, vtkSmartPointer<vtkIdList> nptList, vtkSmartPointer<vtkIdList> exnList, vtkSmartPointer<vtkIdList> oldList,
+  void PropagateVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, double *vn, vtkSmartPointer<vtkIdList> neighborList, vtkSmartPointer<vtkIdList> ptList, vtkSmartPointer<vtkIdList> nptList, 
+	  vtkSmartPointer<vtkIdList> exnList, vtkSmartPointer<vtkIdList> oldList,
 	  vtkSmartPointer<vtkIdList> veryoldList, int *list_changed);
   void scalarsThickness(double max_thickness, int smooth_normals, int avg, QString scalarName, double angularLimit);
   void scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode);

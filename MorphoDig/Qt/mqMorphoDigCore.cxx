@@ -646,7 +646,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						while (list_changed == 1)
 						{
 
-							this->PropagateVertices(mesh, norms, vn,  ids, newids, exnids, oldids, veryoldids, &list_changed);
+							this->PropagateVertices(vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput()), norms, vn, observedNeighbours,ids, newids, exnids, oldids, veryoldids, &list_changed);
 							
 							//std::cout<<"Tag magic wand level "<<cpt<<": list_changed="<<list_changed<<std::endl;
 							cpt++;
