@@ -134,6 +134,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_ActiveTagMap = new ActiveTagMap;
 	this->mui_ActiveTag = 1;
 	this->mui_PencilSize = 15;
+	this->mui_PencilLimitAngle = 180;
 	this->mui_ExistingTagMaps = new ExistingTagMaps;
 	this->InitLuts();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -481,6 +482,67 @@ void mqMorphoDigCore::Setmui_TagModeActivated(int activated) {
 	}
 }
 
+int mqMorphoDigCore::Already_Listed(vtkIdType ve, vtkSmartPointer<vtkIdList> ptList)
+{
+	int already = 0;
+	for (vtkIdType i = 0; i<ptList->GetNumberOfIds(); i++)
+	{
+
+		if (ve == ptList->GetId(i))
+		{
+			already = 1;
+		}
+	}
+	return already;
+}
+
+void mqMorphoDigCore::PropagateVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, double *vn, vtkSmartPointer<vtkIdList> neighborList, vtkSmartPointer<vtkIdList> ptList, vtkSmartPointer<vtkIdList> nptList, vtkSmartPointer<vtkIdList> exnList, vtkSmartPointer<vtkIdList> oldList,
+	vtkSmartPointer<vtkIdList> veryoldList, int *list_changed)
+{
+
+	vtkSmartPointer<vtkIdList> nnptList = vtkSmartPointer<vtkIdList>::New();
+	int bchanged = 0;
+	for (vtkIdType i = 0; i<nptList->GetNumberOfIds(); i++)
+	{
+		vtkSmartPointer<vtkIdList> connected =
+			vtkSmartPointer<vtkIdList>::New();
+		//connected = GetConnectedVertices(mesh, vn, sc, nptList->GetId(i), g_tag_tool);
+		connected = GetPropagatedVertices(mesh, norms, neighborList, vn, nptList->GetId(i));
+		for (vtkIdType j = 0; j<connected->GetNumberOfIds(); j++)
+		{
+			int already = 0;
+			int already2 = 0;
+			int already3 = 0;
+			int already4 = 0;
+			int already5 = 0;
+			already = this->Already_Listed(connected->GetId(j), exnList);
+			already2 = this->Already_Listed(connected->GetId(j), nptList);
+			already3 = this->Already_Listed(connected->GetId(j), oldList);
+			already4 = this->Already_Listed(connected->GetId(j), veryoldList);
+			already5 = this->Already_Listed(connected->GetId(j), nnptList);
+
+
+			//if (already2 ==1) {std::cout<<"already2!"<<std::endl;}
+			if (already == 0 && already2 == 0 && already3 == 0 && already4 == 0 && already5 == 0) {
+				ptList->InsertNextId(connected->GetId(j));
+				nnptList->InsertNextId(connected->GetId(j));
+				bchanged = 1;
+			}
+		}
+	}
+
+	veryoldList->Initialize();
+	veryoldList->DeepCopy(oldList);
+	oldList->Initialize();
+	oldList->DeepCopy(exnList);
+	exnList->Initialize();
+	exnList->DeepCopy(nptList);
+	nptList->Initialize();
+	nptList->DeepCopy(nnptList);
+	*list_changed = bchanged;
+
+}
+
 void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride)
 {
 
@@ -521,7 +583,13 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					cout << "Connectivity filter built" << endl;
 				}
 				double ve[3];
+
+				//double vn[3];
 				myPD->GetPoint(pickid, ve);
+				double *vn;
+				//vn = norms->GetTuple((vtkIdType)i);
+				vtkSmartPointer<vtkFloatArray> norms = myActor->GetPointNormals();
+				vn= norms->GetTuple(pickid);
 				int curTag = currentTags->GetTuple1(pickid);
 				cout << "pickid :" << pickid << ", tagid:" << curTag << endl;
 				int do_override;
@@ -538,19 +606,60 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				int tool = this->Getmui_TagTool();
 				cout << "Tool=" << tool<<endl;
 				int activeTag = this->Getmui_ActiveTag();
-				if (tool == 0)
+				if (tool == 0) // pencil
 				{
+					
 
 					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 					double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize()/100;
 					cout <<"Radius = " << Radius << endl;
 					myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
 					
-					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+					// two cases:
+					// 1 angle limit = 180°
+					// in that cases the observed Neighbours I am intersted in is the WHOLE list
+					// 1 angle limit < 180°
+					// in that case propagate from picked_id through observedneighbours to construct a new vtkIdList
+					vtkSmartPointer<vtkIdList> ids =
+						vtkSmartPointer<vtkIdList>::New();
+					vtkSmartPointer<vtkIdList> newids =
+						vtkSmartPointer<vtkIdList>::New();
+					vtkSmartPointer<vtkIdList> exnids =
+						vtkSmartPointer<vtkIdList>::New();
+
+					vtkSmartPointer<vtkIdList> oldids =
+						vtkSmartPointer<vtkIdList>::New();
+					vtkSmartPointer<vtkIdList> veryoldids =
+						vtkSmartPointer<vtkIdList>::New();
+					if (this->Getmui_PencilLimitAngle()==180)
+					{
+						ids = observedNeighbours;
+					}
+					else
+					{
+						ids->InsertNextId(pickid);
+						newids->InsertNextId(pickid);
+						oldids->InsertNextId(pickid);
+						veryoldids->InsertNextId(pickid);
+						int cpt = 0;
+						int list_changed = 1;
+						while (list_changed == 1)
+						{
+
+							this->PropagateVertices(mesh, norms, vn,  ids, newids, exnids, oldids, veryoldids, &list_changed);
+							
+							//std::cout<<"Tag magic wand level "<<cpt<<": list_changed="<<list_changed<<std::endl;
+							cpt++;
+						}
+
+					}
+
+
+					for (vtkIdType j = 0; j < ids->GetNumberOfIds(); j++)
 					{
 
-
-						vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+						
+						vtkIdType observedConnectedVertex = ids->GetId(j);
 
 						int mTag = currentTags->GetTuple1(observedConnectedVertex);
 						if (j < 10) {
@@ -9846,7 +9955,83 @@ void mqMorphoDigCore::scalarsCameraDistance()
 
 
 }
+vtkSmartPointer<vtkIdList> GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn, vtkIdType id)
+{
+	//get propagated vertices in a restricted list of vertices (only in neighborList)
+	vtkSmartPointer<vtkIdList> connectedVertices =
+		vtkSmartPointer<vtkIdList>::New();
+	connectedVertices->InsertNextId(id);
+	/*
+	vtkSmartPointer<vtkIdList> fullcellIdList =
+		vtkSmartPointer<vtkIdList>::New();
+	vtkSmartPointer<vtkIdList> cellIdList =
+		vtkSmartPointer<vtkIdList>::New();
+	mesh->GetPointCells(id, fullcellIdList);
+	// here we have to remove all the points which do not belong to neighborList
+	for (vtkIdType i = 0; i < fullcellIdList->GetNumberOfIds(); i++)
+	{
+		int found = 0;
+		for (vtkIdType j = 0; i < neighborList->GetNumberOfIds(); j++)
+		{
+			if (fullcellIdList->GetId(i)== neighborList->GetId(j))
+			{
+				found = 1; break;
+			}
 
+		}
+		if (found==1)
+		{
+			cellIdList->InsertNextId(i);
+		}
+	}
+
+	for (vtkIdType i = 0; i < cellIdList->GetNumberOfIds(); i++)
+	{
+		vtkSmartPointer<vtkIdList> pointIdList =
+			vtkSmartPointer<vtkIdList>::New();
+		mesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
+
+		vtkIdType newid;
+
+		if (pointIdList->GetId(0) != id)
+		{
+			newid = pointIdList->GetId(0);
+		}
+		else
+		{
+			newid = pointIdList->GetId(1);
+
+		}
+	
+		
+		
+		// now check normal
+		double *vn2;
+		float vvn1[3];
+		float vvn[3];
+						
+		if (norms != NULL)
+		{
+		vn2 = norms->GetTuple(newid);
+	
+		double curr_cos = vn[0] * vn2[0] + vn[1] * vn2[1] + vn[2] * vn2[2];
+		if (curr_cos>g_magic_wand_extension_min_cos)
+		{
+		connectedVertices->InsertNextId(newid);
+		}
+
+		}
+		else
+		{
+		std::cout << "Norm NULL..." << std::endl;
+		}
+
+		
+
+	}*/
+
+	return connectedVertices;
+}
 vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	double sc, vtkIdType id, int tool_mode, int compute_avg_norm)
 {
@@ -15514,6 +15699,14 @@ void mqMorphoDigCore::Setmui_PencilSize(int pencilSize)
 int mqMorphoDigCore::Getmui_PencilSize()
 {
 	return this->mui_PencilSize;
+}
+void mqMorphoDigCore::Setmui_PencilLimitAngle(int pencilLimitAngle)
+{
+	this->mui_PencilLimitAngle = pencilLimitAngle;
+}
+int mqMorphoDigCore::Getmui_PencilLimitAngle()
+{
+	return this->mui_PencilLimitAngle;
 }
 void mqMorphoDigCore::Setmui_ActiveTag(int activeTag)
 {

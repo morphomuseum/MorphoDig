@@ -74,6 +74,7 @@ public:
   virtual void slotRefreshTagMaps();
   virtual void slotActivateTagMode();
   virtual void slotPencilSearchSizeChanged(int newSize);
+  virtual void slotPencilLimitAngleChanged(int newLimitAngle);
   virtual void slotBucketOn();
   virtual void slotPencilOn();
   virtual void slotEraseActiveTag();
