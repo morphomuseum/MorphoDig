@@ -9958,10 +9958,11 @@ void mqMorphoDigCore::scalarsCameraDistance()
 vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn, vtkIdType id)
 {
 	//get propagated vertices in a restricted list of vertices (only in neighborList)
+	double min_cos = cos((double)(this->mui_PencilLimitAngle)*vtkMath::Pi() / 180);
 	vtkSmartPointer<vtkIdList> connectedVertices =
 		vtkSmartPointer<vtkIdList>::New();
 	connectedVertices->InsertNextId(id);
-	/*
+	
 	vtkSmartPointer<vtkIdList> fullcellIdList =
 		vtkSmartPointer<vtkIdList>::New();
 	vtkSmartPointer<vtkIdList> cellIdList =
@@ -10007,17 +10008,16 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointe
 		
 		// now check normal
 		double *vn2;
-		float vvn1[3];
-		float vvn[3];
+		
 						
 		if (norms != NULL)
 		{
 		vn2 = norms->GetTuple(newid);
 	
 		double curr_cos = vn[0] * vn2[0] + vn[1] * vn2[1] + vn[2] * vn2[2];
-		if (curr_cos>g_magic_wand_extension_min_cos)
+		if (curr_cos>min_cos)
 		{
-		connectedVertices->InsertNextId(newid);
+			connectedVertices->InsertNextId(newid);
 		}
 
 		}
@@ -10028,7 +10028,7 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointe
 
 		
 
-	}*/
+	}
 
 	return connectedVertices;
 }
