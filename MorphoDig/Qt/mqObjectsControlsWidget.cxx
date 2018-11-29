@@ -350,21 +350,8 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 
 		double motion_vector[3] = { 0,0,0 };
 		double dPanCenter[3] = { 0,0,0 };
+		double dPanAway[3] = { 0,0,0 };
 
-
-		double origin[4] = { 0, 0, 1,1 };
-		double away[4] = { 0, 0, 2,1 };
-
-	//	cout << "try  DTW" << endl;
-		
-		//cout << "try  DTW2" << endl;
-		int move = 10;
-		mqMorphoDigCore::instance()->GetWorldToDisplay(pan_center[0], pan_center[1], pan_center[2], dPanCenter);
-		mqMorphoDigCore::instance()->GetDisplayToWorld(dPanCenter[0], dPanCenter[1], dPanCenter[2], origin);
-		mqMorphoDigCore::instance()->GetDisplayToWorld(dPanCenter[0], dPanCenter[1]+30, dPanCenter[2], away); //example : 10px away from origin!
-		
-		// origin[2] -away[2] will give the amplitude of the movement. Now, let us compute the direction!
-		double ampli = value*(origin[2] - away[2]) / 12;
 		double view_up[3], view_look[3], view_right[3];
 
 		mqMorphoDigCore::instance()->getCamera()->OrthogonalizeViewUp();
@@ -375,6 +362,29 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 		vtkMath::Cross(view_up, view_look, view_right);
 		vtkMath::Normalize(view_right);
 		vtkMath::Normalize(view_look);
+		//cout << "View look:" << view_look[0] << "," << view_look[1] << "," << view_look[2] << endl;
+		//cout << "View up:" << view_up[0] << "," << view_up[1] << "," << view_up[2] << endl;
+		//cout << "View right:" << view_right[0] << "," << view_right[1] << "," << view_right[2] << endl;
+		//wrong away!
+		double origin[4] = { 0, 0, 1,1 };
+		double away[4] = { 0, 0, 2,1 };
+
+	//	cout << "try  DTW" << endl;
+		
+		//cout << "try  DTW2" << endl;
+		int move = 10;
+		mqMorphoDigCore::instance()->GetWorldToDisplay(pan_center[0], pan_center[1], pan_center[2], dPanCenter);
+		//cout << "dPanCenter:" << dPanCenter[0] << "," << dPanCenter[1] << "," << dPanCenter[2] << endl;
+		//cout << "dPanAway:" << dPanAway[0] << "," << dPanAway[1] << "," << dPanAway[2] << endl;
+		mqMorphoDigCore::instance()->GetDisplayToWorld(dPanCenter[0], dPanCenter[1], dPanCenter[2], origin);
+		mqMorphoDigCore::instance()->GetDisplayToWorld(dPanCenter[0], dPanCenter[1] + 30, dPanCenter[2], away);//example : 30px away from origin!
+	
+		//cout << "origin:" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
+		//cout << "away:" << away[0] << "," << away[1] << "," << away[2] << endl;
+
+		// origin[2] -away[2] will give the amplitude of the movement. Now, let us compute the direction!
+		double ampli = -value*(sqrt((origin[0] - away[0])*(origin[0] - away[0])+ (origin[1] - away[1])*(origin[1] - away[1])+ (origin[2] - away[2])*(origin[2] - away[2]))) / 20;
+		//cout << "ampli = " << ampli<< endl;
 		vtkMath::MultiplyScalar(view_right, ampli);
 		vtkMath::MultiplyScalar(view_up, ampli);
 		vtkMath::MultiplyScalar(view_look, ampli);
@@ -969,7 +979,7 @@ void mqObjectsControlsWidget::slotXtr(int val)
 	}
 	this->PanActors(0, this->oldtrval-val);
 	this->oldtrval = val;
-	cout << "hereX!" << endl;
+	//cout << "hereX!" << endl;
 }
 
 void mqObjectsControlsWidget::slotZrot(int val)

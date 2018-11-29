@@ -174,6 +174,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 
 	this->mui_Anaglyph = this->mui_DefaultAnaglyph = 0;
+	this->mui_DisplayMode = this->mui_DefaultDisplayMode = 0;
 	this->mui_ShowGrid = this->mui_DefaultShowGrid = 1;
 	this->mui_GridSpacing = this->mui_DefaultGridSpacing = 10;
 	this->mui_SizeUnit = this->mui_DefaultSizeUnit = "mm";
@@ -10973,11 +10974,14 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 			double picked_value = 0;
 			double min_dist = max_thickness;
 			double tmp_dist = 0;
-			auto impactedNorms = vtkFloatArray::SafeDownCast(mImpactedPD->GetPointData()->GetNormals());
-			auto observedNorms = vtkFloatArray::SafeDownCast(mObservedPD->GetPointData()->GetNormals());
-
+			auto impactedNorms = impactedActor->GetPointNormals();
+			//  auto impactedNorms =vtkFloatArray::SafeDownCast(mImpactedPD->GetPointData()->GetNormals()); .
+			auto observedNorms = observedActor->GetPointNormals(); 
+			//auto observedNorms = vtkFloatArray::SafeDownCast(mObservedPD->GetPointData()->GetNormals());
+			
 			//	cout << "Have tried to get norms" << endl;
 			//cout << "Safe point downcast done ! " << endl;
+			//if (impactedNorms && observedNorms)
 			if (impactedNorms && observedNorms)
 			{
 				//	cout << "We have found some norms" << endl;
@@ -14527,11 +14531,22 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	return name_obj;
 }
 
-void mqMorphoDigCore::SetDisplayMode(int mode)
+void mqMorphoDigCore::Setmui_DisplayMode(int mode)
 {
 	this->mui_DisplayMode = mode;
 	this->ActorCollection->SetDisplayMode(mode);
 }
+int mqMorphoDigCore::Getmui_DisplayMode()
+{
+	return this->mui_DisplayMode;
+	
+}
+int mqMorphoDigCore::Getmui_DefaultDisplayMode()
+{
+	return this->mui_DefaultDisplayMode;
+
+}
+
 void mqMorphoDigCore::SetGridVisibility()
 {
 	vtkPropCollection* props = this->getRenderer()->GetViewProps(); //iterate through and set each visibility to 0

@@ -531,87 +531,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//	this->MorphoDigCore->Getmui_DefaultAdjustScaleFactor()
 	//	).toDouble() << endl;
 	settings.endGroup();
-	/*[colormaps]
-nr=3
-cm0=CustomColorMap1
-cm0nc=4
-cm0no=3
-cm0discretize=1
-cm0discretizenr=10
-cm0enableopacity=1
-cm0cx0=0
-cm0r0=0.1
-cm0g0=0.5
-cm0b0=0.8
-cm0cx1=0.2
-cm0r1=1
-cm0g1=0.5
-cm0b1=0
-cm0cx2=0.6
-cm0r2=0
-cm0g2=1
-cm0b2=1
-cm0cx3=1
-cm0r3=0.3
-cm0g3=0.2
-cm0b3=0.1
-cm0ox0=0
-cm0ov0=0.2
-cm0ox1=0.5
-cm0ov1=0.9
-cm0ox2=1
-cm0ov2=0.9
-cm1=CustomColorMap2
-cm1nc=4
-cm1no=3
-cm1cx0=0
-cm1r0=0.1
-cm1g0=0.1
-cm1b0=0.1
-cm1cx1=0.2
-cm1r1=0.3
-cm1g1=0.3
-cm1b1=0.3
-cm1cx2=0.6
-cm1r2=0.6
-cm1g2=0.6
-cm1b2=0.6
-cm1cx3=1
-cm1r3=1
-cm1g3=1
-cm1b3=1
-cm1ox0=0
-cm1ov0=0.5
-cm1ox1=0.5
-cm1ov1=0.5
-cm1ox2=1
-cm1ov2=1
-cm2=CustomColorMap3
-cm2nc=4
-cm2no=3
-cm2cx0=0
-cm2r0=0.1
-cm2g0=0.1
-cm2b0=0.7
-cm2cx1=0.2
-cm2r1=0.3
-cm2g1=0.3
-cm2b1=0.7
-cm2cx2=0.6
-cm2r2=0.6
-cm2g2=0.6
-cm2b2=0.7
-cm2cx3=1
-cm2r3=1
-cm2g3=1
-cm2b3=0.7
-cm2ox0=0
-cm2ov0=0.1
-cm2ox1=0.5
-cm2ov1=0.5
-cm2ox2=1
-cm2ov2=1
-*/
+	
 	settings.beginGroup("colormaps");
 	cout<<"Number of custom colormaps:"<<settings.value("nr", 0).toInt()<<endl;
 	int nr = settings.value("nr", 0).toInt();
@@ -694,88 +614,7 @@ cm2ov2=1
 	}
 	
 	settings.endGroup();
-	/*[tagmaps]
-	nr=2
-	tm0=TagMap
-	tm0nt=10
-	tm0t0=Exterior
-	tm0t0r=1
-	tm0t0g=1
-	tm0t0b=0
-	tm0t0a=0.5
-	tm0t1=Tag1
-	tm0t1r=0
-	tm0t1g=1
-	tm0t1b=1
-	tm0t1a=1
-	tm0t2=Tag2
-	tm0t2r=1
-	tm0t2g=0
-	tm0t2b=1
-	tm0t2a=0.2
-	tm0t3=Tag3
-	tm0t3r=1
-	tm0t3g=0
-	tm0t3b=0
-	tm0t3a=0.2
-	tm0t4=Tag4
-	tm0t4r=0
-	tm0t4g=0
-	tm0t4b=1
-	tm0t4a=0.2
-	tm0t5=Tag5
-	tm0t5r=0
-	tm0t5g=1
-	tm0t5b=0
-	tm0t5a=0.2
-	tm0t6=Tag6
-	tm0t6r=0.5
-	tm0t6g=0
-	tm0t6b=0
-	tm0t6a=0.2
-	tm0t7=Tag7
-	tm0t7r=0
-	tm0t7g=0.5
-	tm0t7b=0
-	tm0t7a=0.2
-	tm0t8=Tag8
-	tm0t8r=0
-	tm0t8g=0
-	tm0t8b=0.5
-	tm0t8a=0.2
-	tm0t9=Tag9
-	tm0t9r=0.5
-	tm0t9g=0.5
-	tm0t9b=0
-	tm0t9a=0.2
-	tm1=CustomTagMap
-	tm1nt=5
-	tm1t0=NewStruct
-	tm1t0r=0.8
-	tm1t0g=0.8
-	tm1t0b=0
-	tm1t0a=0.4
-	tm1t1=MyStruct1
-	tm1t1r=0
-	tm1t1g=0.8
-	tm1t1b=0.8
-	tm1t1a=0.5
-	tm1t2=MyStruct2
-	tm1t2r=0.8
-	tm1t2g=0.1
-	tm1t2b=0.2
-	tm1t2a=0.6
-	tm1t3=MyStruct3
-	tm1t3r=0.1
-	tm1t3g=0.2
-	tm1t3b=0.3
-	tm1t3a=0.4
-	tm1t4=MyStruct4
-	tm1t4r=0
-	tm1t4g=0
-	tm1t4b=0.6
-	tm1t4a=0.3
-	*/
+	
 
 	settings.beginGroup("tagmaps");
 	cout << "Number of tagmaps:" << settings.value("nr", 0).toInt() << endl;
@@ -925,8 +764,13 @@ cm2ov2=1
 	window->SetStereoTypeToAnaglyph();
 	//this->ui->qvtkWidget->GetRenderWindow()->StereoCapableWindowOn();
 	window->StereoCapableWindowOn();
+	settings.endGroup();
 	settings.beginGroup("renderer_settings");
 	this->MorphoDigCore->Setmui_Anaglyph(settings.value("Anaglyph", "0").toInt());
+	//cout read ini file!
+	this->MorphoDigCore->Setmui_DisplayMode(settings.value("DisplayMode", "0").toInt());
+	cout << "In .ini file: Anaglyph = " << settings.value("Anaglyph", "0").toInt() << endl;
+	cout << "In .ini file: DisplayMode = " << settings.value("DisplayMode", "0").toInt() << endl;
 	settings.endGroup();
 
 	
@@ -1466,6 +1310,7 @@ void MorphoDig::saveSettings()
 	settings.endGroup();
 	settings.beginGroup("renderer_settings");
 	settings.setValue("Anaglyph", this->MorphoDigCore->Getmui_Anaglyph());	
+	settings.setValue("DisplayMode", this->MorphoDigCore->Getmui_DisplayMode());
 	settings.endGroup();
 	settings.beginGroup("colormaps");
 

@@ -94,6 +94,32 @@ void mqDisplayControlsWidget::constructor()
 
   connect(this->ui->BackFaceCullingOnOff, SIGNAL(pressed()), this, SLOT(slotBackfaceCullingOnOff()));
   connect(this->ui->ClippingPlaneOnOff, SIGNAL(pressed()), this, SLOT(slotClippingPlaneOnOff()));
+
+  if (mqMorphoDigCore::instance()->Getmui_DisplayMode() == 1)
+  {
+
+	  this->ui->pointNormals->setChecked(true);
+  }
+  if (mqMorphoDigCore::instance()->Getmui_DisplayMode() == 0)
+  {
+
+	  this->ui->cellNormals->setChecked(true);
+  }
+  if (mqMorphoDigCore::instance()->Getmui_DisplayMode() == 1)
+  {
+
+	  this->ui->pointNormals->setChecked(true);
+  }
+  if (mqMorphoDigCore::instance()->Getmui_DisplayMode() == 2)
+  {
+
+	  this->ui->wireframe->setChecked(true);
+  }
+  if (mqMorphoDigCore::instance()->Getmui_DisplayMode() == 3)
+  {
+
+	  this->ui->points->setChecked(true);
+  }
   connect(this->ui->cellNormals, SIGNAL(pressed()), this, SLOT(slotDisplayCellNormals()));
   connect(this->ui->pointNormals, SIGNAL(pressed()), this, SLOT(slotDisplayPointNormals())); 
   connect(this->ui->wireframe, SIGNAL(pressed()), this, SLOT(slotDisplayWireframe()));
@@ -116,7 +142,7 @@ void mqDisplayControlsWidget::slotDisplayCellNormals()
 	this->ui->pointNormals->setChecked(false);
 	this->ui->wireframe->setChecked(false);
 	this->ui->points->setChecked(false);
-	mqMorphoDigCore::instance()->SetDisplayMode(0);
+	mqMorphoDigCore::instance()->Setmui_DisplayMode(0);
 	mqMorphoDigCore::instance()->Render();
 	
 }
@@ -130,7 +156,7 @@ void mqDisplayControlsWidget::slotDisplayPointNormals()
 	this->ui->cellNormals->setChecked(false);
 	this->ui->wireframe->setChecked(false);
 	this->ui->points->setChecked(false);
-	mqMorphoDigCore::instance()->SetDisplayMode(1);
+	mqMorphoDigCore::instance()->Setmui_DisplayMode(1);
 	mqMorphoDigCore::instance()->Render();
 
 }
@@ -144,7 +170,7 @@ void mqDisplayControlsWidget::slotDisplayWireframe()
 	this->ui->cellNormals->setChecked(false);
 	this->ui->pointNormals->setChecked(false);
 	this->ui->points->setChecked(false);
-	mqMorphoDigCore::instance()->SetDisplayMode(2);
+	mqMorphoDigCore::instance()->Setmui_DisplayMode(2);
 
 	mqMorphoDigCore::instance()->Render();
 
@@ -159,7 +185,7 @@ void mqDisplayControlsWidget::slotDisplayPoints()
 	this->ui->cellNormals->setChecked(false);
 	this->ui->wireframe->setChecked(false);
 	this->ui->pointNormals->setChecked(false);
-	mqMorphoDigCore::instance()->SetDisplayMode(3);
+	mqMorphoDigCore::instance()->Setmui_DisplayMode(3);
 	mqMorphoDigCore::instance()->Render();
 
 }

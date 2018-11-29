@@ -370,6 +370,9 @@ public:
 	double GetHundredPxSU();
 	void UnselectAll(int Count);
 	void SelectAll(int Count);
+	void Setmui_DisplayMode(int mode);
+	int Getmui_DisplayMode();
+	int Getmui_DefaultDisplayMode();
 	void Setmui_Anaglyph(int anaglyph);
 	int Getmui_DefaultAnaglyph();
 	int Getmui_Anaglyph();
@@ -678,7 +681,7 @@ public:
   void DollyCameraForPerspectiveMode();
   void DollyCameraForParallelScale();
   void ResetCameraOrthoPerspective();
-  void SetDisplayMode(int mode);
+  
   void SetGridVisibility();
   void SetGridInfos();
   void SetOrientationHelperVisibility();
@@ -844,6 +847,7 @@ protected:
 	int mui_DefaultScalarVisibility;
 
 	int mui_Anaglyph;
+	int mui_DisplayMode;//0 cell 1 point 2 wireframe 3 points
 	int mui_ShowOrientationHelper;
 	int mui_CameraCentreOfMassAtOrigin;
 	int mui_CameraOrtho;
@@ -866,6 +870,7 @@ protected:
 	int mui_DefaultShowGrid;
 	int mui_DefaultMoveMode;
 	int mui_DefaultAnaglyph;
+	int mui_DefaultDisplayMode;
 	int mui_DefaultShowOrientationHelper;
 	int mui_DefaultCameraCentreOfMassAtOrigin;
 	int mui_DefaultCameraOrtho;
@@ -900,7 +905,7 @@ protected:
 	double ScalarRangeMin;
 	double ScalarRangeMax;
 	void SetSelectedActorsColor(int r, int g, int b);
-	int mui_DisplayMode; //0 cell 1 point 2 wireframe 3 points
+	//
 	vtkOrientationHelperWidget* OrientationHelperWidget;
 public slots:
 	virtual void slotLandmarkMoveUp();

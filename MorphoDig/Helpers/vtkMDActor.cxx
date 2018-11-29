@@ -71,6 +71,10 @@ vtkMDActor::~vtkMDActor()
 
 
 }
+vtkSmartPointer<vtkFloatArray> vtkMDActor::GetPointNormals()
+{
+	return this->pointNormals;
+}
 void vtkMDActor::SetDisplayMode(int mode)
 {
 	vtkPolyData* mPD= vtkPolyData::SafeDownCast(this->GetMapper()->GetInput());
