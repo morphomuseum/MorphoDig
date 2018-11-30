@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>547</width>
-    <height>821</height>
+    <width>788</width>
+    <height>443</height>
    </rect>
   </property>
   <property name="palette">
@@ -431,8 +431,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>770</y>
+     <x>280</x>
+     <y>400</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -454,9 +454,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
-     <width>511</width>
-     <height>751</height>
+     <y>0</y>
+     <width>771</width>
+     <height>391</height>
     </rect>
    </property>
    <property name="title">
@@ -465,8 +465,8 @@
    <widget class="QPushButton" name="pushRemoveTags">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>50</y>
+      <x>10</x>
+      <y>60</y>
       <width>141</width>
       <height>23</height>
      </rect>
@@ -478,7 +478,7 @@
    <widget class="QComboBox" name="comboActiveTags">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>100</x>
       <y>20</y>
       <width>69</width>
       <height>22</height>
@@ -495,27 +495,27 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose active tag array:&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active tag array:&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>21</x>
-      <y>91</y>
-      <width>101</width>
+      <x>10</x>
+      <y>100</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chose tag map:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tag map:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="selectedObjects">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>50</y>
+      <x>160</x>
+      <y>60</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -530,10 +530,10 @@
    <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>200</y>
+      <x>310</x>
+      <y>10</y>
       <width>451</width>
-      <height>511</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -551,7 +551,7 @@
        <x>0</x>
        <y>0</y>
        <width>451</width>
-       <height>511</height>
+       <height>351</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
@@ -587,7 +587,7 @@
            <x>0</x>
            <y>0</y>
            <width>451</width>
-           <height>511</height>
+           <height>351</height>
           </rect>
          </property>
         </widget>
@@ -599,9 +599,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>90</y>
-      <width>291</width>
+      <x>60</x>
+      <y>100</y>
+      <width>241</width>
       <height>24</height>
      </rect>
     </property>
@@ -700,8 +700,8 @@
    <widget class="QToolButton" name="addTag">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>720</y>
+      <x>450</x>
+      <y>360</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -716,8 +716,8 @@
    <widget class="QToolButton" name="removeTag">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>720</y>
+      <x>490</x>
+      <y>360</y>
       <width>41</width>
       <height>21</height>
      </rect>
@@ -729,121 +729,11 @@
      <string>-</string>
     </property>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>140</y>
-      <width>96</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QToolButton" name="pencilOn">
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../Icons/icons.qrc">
-         <normaloff>:/Cursors/pencil.png</normaloff>:/Cursors/pencil.png</iconset>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="bucketOn">
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../Icons/icons.qrc">
-         <normaloff>:/Cursors/Flood_fill.png</normaloff>:/Cursors/Flood_fill.png</iconset>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="lassoOn">
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../Icons/icons.qrc">
-         <normaloff>:/Icons/Lasso_keepinside.png</normaloff>:/Icons/Lasso_keepinside.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="rubberOn">
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../Icons/icons.qrc">
-         <normaloff>:/Icons/rubber_mode_keepinside.png</normaloff>:/Icons/rubber_mode_keepinside.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QCheckBox" name="activateTagMode">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>140</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Activate tag mode</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>170</y>
-      <width>111</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Pencil angle limit (°):</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="pencilSearchSize">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>170</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="maximum">
-     <number>500</number>
-    </property>
-   </widget>
    <widget class="QToolButton" name="erase">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>720</y>
+      <x>530</x>
+      <y>360</y>
       <width>25</width>
       <height>21</height>
      </rect>
@@ -862,8 +752,8 @@
    <widget class="QToolButton" name="merge">
     <property name="geometry">
      <rect>
-      <x>234</x>
-      <y>720</y>
+      <x>560</x>
+      <y>360</y>
       <width>25</width>
       <height>21</height>
      </rect>
@@ -879,37 +769,189 @@
       <normaloff>:/Icons/merge.png</normaloff>:/Icons/merge.png</iconset>
     </property>
    </widget>
-   <widget class="QSpinBox" name="pencilLimitAngle">
+   <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>170</y>
-      <width>42</width>
-      <height>22</height>
+      <x>10</x>
+      <y>150</y>
+      <width>281</width>
+      <height>201</height>
      </rect>
     </property>
-    <property name="minimum">
-     <number>1</number>
+    <property name="title">
+     <string>Tag tools</string>
     </property>
-    <property name="maximum">
-     <number>180</number>
-    </property>
-    <property name="value">
-     <number>180</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>170</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Pencil radius (px):</string>
-    </property>
+    <widget class="QWidget" name="horizontalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>96</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QToolButton" name="pencilOn">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Cursors/pencil.png</normaloff>:/Cursors/pencil.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="bucketOn">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Cursors/Flood_fill.png</normaloff>:/Cursors/Flood_fill.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="lassoOn">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/Lasso_keepinside.png</normaloff>:/Icons/Lasso_keepinside.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="rubberOn">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/rubber_mode_keepinside.png</normaloff>:/Icons/rubber_mode_keepinside.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QSpinBox" name="pencilLimitAngle">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>80</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>180</number>
+     </property>
+     <property name="value">
+      <number>180</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="pencilSearchSize">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>50</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>500</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pencil limit angle (°):</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pencil radius (px):</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="activateTagMode">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>20</y>
+       <width>111</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Activate tag mode</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="pencilAll">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>191</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string> tag all vertices </string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="pencilContinuous">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>130</y>
+       <width>241</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string> tag contiguous vertices (propagation, slower)</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <action name="actionExportColorMaps">
