@@ -496,52 +496,141 @@ int mqMorphoDigCore::Already_Listed(vtkIdType ve, vtkSmartPointer<vtkIdList> ptL
 	return already;
 }
 
-void mqMorphoDigCore::PropagateVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, double *vn, vtkSmartPointer<vtkIdList> neighborList, vtkSmartPointer<vtkIdList> ptList, vtkSmartPointer<vtkIdList> nptList, vtkSmartPointer<vtkIdList> exnList, vtkSmartPointer<vtkIdList> oldList,
-	vtkSmartPointer<vtkIdList> veryoldList, int *list_changed)
+void mqMorphoDigCore::PropagateVertices(
+	vtkSmartPointer<vtkPolyData> mesh, 
+	vtkSmartPointer<vtkFloatArray> norms, 
+	double vn[3], 
+	double min_cos,
+	vtkSmartPointer<vtkIdList> propagationPointsList, 
+	vtkSmartPointer<vtkIdList> outputPtsList, 
+	vtkSmartPointer<vtkIdList> ptsToInvestigate, 
+	vtkSmartPointer<vtkIdList> alreadyInvestigatedPtsList,
+	
+	int *list_changed
+)
 {
+	// this function updates an outputPtsList (list of vertices Id).
+	// it looks for the input mesh all the vertices within a list (ptsToInvestigate) and includes them in outputPtsList if 
+	// it their normal meet some criterion defined by vn[3] min_cos (angle between vn and that of investigated points should be smaller than a limit angle defined by min_cos)
 
-	vtkSmartPointer<vtkIdList> nnptList = vtkSmartPointer<vtkIdList>::New();
+	// for each vertex of ptsToInvestigate.
+	//		if point meets requirements:		
+	//			a- normal*vn > min_cos
+	//          b- not already in outputPtsList
+	//			c- within propagationPointsList
+	//		then: 
+	//			a: include it in outputPtsList
+	//          b: construct neighbors point list of this newly inserted point	
+	//          c: for all neigbor points	
+	//				if neighbor point meets requirements:	
+	//					1- not already in futureptsToInvestigate
+	//					2- not already in outputPtsList
+	//					3- not already in alreadyInvestigatedPtsList
+	//					4- within propagationPointsList
+	//			    then include neihbor point in futureptsToInvestigate
+	
+	vtkSmartPointer<vtkIdList> futureptsToInvestigate = vtkSmartPointer<vtkIdList>::New();
 	int bchanged = 0;
-	cout << "PropagateVertices 0" << endl;
-	cout << "nptList->GetNumberOfIds()" << nptList->GetNumberOfIds() <<endl;
-	for (vtkIdType i = 0; i<nptList->GetNumberOfIds(); i++)
-	{
-		vtkSmartPointer<vtkIdList> connected =
-			vtkSmartPointer<vtkIdList>::New();
-		//connected = GetConnectedVertices(mesh, vn, sc, nptList->GetId(i), g_tag_tool);
-		cout << "PropagateVertices 0" << i<< endl;
-		connected = GetPropagatedVertices(mesh, norms, neighborList, vn, nptList->GetId(i));
-		for (vtkIdType j = 0; j<connected->GetNumberOfIds(); j++)
+	// for each vertex of ptsToInvestigate.
+	for (vtkIdType i = 0; i<ptsToInvestigate->GetNumberOfIds(); i++)
+	{		
+		vtkIdType investigatedPt = ptsToInvestigate->GetId(i);
+		alreadyInvestigatedPtsList->InsertNextId(investigatedPt);
+
+		//		if point meets requirements:		
+		//          a- normal*vn > min_cos
+		double *vn2;
+		int ok = 1;
+		vn2 = norms->GetTuple(investigatedPt);
+		double curr_cos = vn[0] * vn2[0] + vn[1] * vn2[1] + vn[2] * vn2[2];
+		if (curr_cos<min_cos)
 		{
-			int already = 0;
-			int already2 = 0;
-			int already3 = 0;
-			int already4 = 0;
-			int already5 = 0;
-			already = this->Already_Listed(connected->GetId(j), exnList);
-			already2 = this->Already_Listed(connected->GetId(j), nptList);
-			already3 = this->Already_Listed(connected->GetId(j), oldList);
-			already4 = this->Already_Listed(connected->GetId(j), veryoldList);
-			already5 = this->Already_Listed(connected->GetId(j), nnptList);
-
-
-			//if (already2 ==1) {std::cout<<"already2!"<<std::endl;}
-			if (already == 0 && already2 == 0 && already3 == 0 && already4 == 0 && already5 == 0) {
-				ptList->InsertNextId(connected->GetId(j));
-				nnptList->InsertNextId(connected->GetId(j));
-				bchanged = 1;
-			}
+			ok = 0;
 		}
-	}
+		//          b- not already in outpuPtsList
+		if (ok == 1 && this->Already_Listed(investigatedPt, outputPtsList) == 1)
+		{
+			ok = 0;
+		}
+		//			c- within propagationPointsList
+		if (ok == 1 && this->Already_Listed(investigatedPt, propagationPointsList) == 0)
+		{
+			ok = 0;
+		}
 
-	veryoldList->Initialize();
-	veryoldList->DeepCopy(oldList);
-	oldList->Initialize();
-	oldList->DeepCopy(exnList);
-	exnList->Initialize();
-	exnList->DeepCopy(nptList);
-	nptList->Initialize();
-	nptList->DeepCopy(nnptList);
+		//        then:
+		if (ok == 1)
+		{
+			//			a- include it in outputPtsList
+			outputPtsList->InsertNextId(investigatedPt);
+			//          b: construct neighbors point list of this newly inserted point	
+			vtkSmartPointer<vtkIdList> neighborPts = vtkSmartPointer<vtkIdList>::New();
+			vtkSmartPointer<vtkIdList> cellPts = vtkSmartPointer<vtkIdList>::New();
+			vtkSmartPointer<vtkIdList> ptCells = vtkSmartPointer<vtkIdList>::New();
+			mesh->GetPointCells(investigatedPt, ptCells);
+			for (vtkIdType j = 0; j<ptCells->GetNumberOfIds(); j++)
+			{
+				mesh->GetCellPoints(ptCells->GetId(j), cellPts);
+				for (vtkIdType k = 0; k < cellPts->GetNumberOfIds(); k++)
+				{
+					if (this->Already_Listed(cellPts->GetId(k), neighborPts) == 0)
+					{
+						neighborPts->InsertNextId(cellPts->GetId(k));
+					}
+
+				}
+			}
+			//          c: for all neigbor points	
+			for (vtkIdType j = 0; j < neighborPts->GetNumberOfIds(); j++)
+			{
+				ok = 1;
+				vtkIdType neighborPt = neighborPts->GetId(j);
+				//				if neighbor point meets requirements:	
+
+				//					1- not already in futureptsToInvestigate				
+				if (this->Already_Listed(neighborPt, futureptsToInvestigate) == 1)
+				{
+					ok = 0;
+				}
+				//					2- not already in outputPtsList
+				if (ok == 1 && this->Already_Listed(neighborPt, outputPtsList) == 1)
+				{
+					ok = 0;
+				}
+				//					3- not already in alreadyInvestigatedPtsList
+				if (ok == 1 && this->Already_Listed(neighborPt, alreadyInvestigatedPtsList) == 1)
+				{
+					ok = 0;
+				}
+				//					4- within propagationPointsList						
+				if (ok == 1 && this->Already_Listed(neighborPt, propagationPointsList) == 0)
+				{
+					ok = 0;
+				}
+
+				//				then include it in futurepts to investigate
+				if (ok == 1)
+				{
+					futureptsToInvestigate->InsertNextId(neighborPt);
+				}
+				
+			}
+			
+		}
+
+
+
+		if (futureptsToInvestigate->GetNumberOfIds() > 0)
+		{
+			bchanged = 1;
+		}
+		
+	}
+	
+
+	
+	ptsToInvestigate->Initialize();
+	ptsToInvestigate->DeepCopy(futureptsToInvestigate);
 	*list_changed = bchanged;
 
 }
@@ -593,8 +682,13 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				//vn = norms->GetTuple((vtkIdType)i);
 				vtkSmartPointer<vtkFloatArray> norms = myActor->GetPointNormals();
 				vn= norms->GetTuple(pickid);
+				double mvn[3];
+				mvn[0] = vn[0];
+				mvn[1] = vn[1];
+				mvn[2] = vn[2];
 				int curTag = currentTags->GetTuple1(pickid);
 				cout << "pickid :" << pickid << ", tagid:" << curTag << endl;
+				cout << "vn[0] :" << vn[0] << ", vn[1]:" << vn[1] << ", vn[2]:" << vn[2] << endl;
 				int do_override;
 				
 				if (toverride==1) // if user explicitly asks to override OR current picked vertex is tagged with 0 (exterior), we do the override
@@ -620,45 +714,60 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					
 					// two cases:
 					// 1 angle limit = 180°
-					// in that cases the observed Neighbours I am intersted in is the WHOLE list
+					// in that cases the observed Neighbours I am interested in is the WHOLE list
 					// 1 angle limit < 180°
 					// in that case propagate from picked_id through observedneighbours to construct a new vtkIdList
+					vtkSmartPointer<vtkPolyData> mesh = vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput());
+					
 					vtkSmartPointer<vtkIdList> ids =
 						vtkSmartPointer<vtkIdList>::New();
-					vtkSmartPointer<vtkIdList> newids =
-						vtkSmartPointer<vtkIdList>::New();
-					vtkSmartPointer<vtkIdList> exnids =
-						vtkSmartPointer<vtkIdList>::New();
+					
+					
 
-					vtkSmartPointer<vtkIdList> oldids =
-						vtkSmartPointer<vtkIdList>::New();
-					vtkSmartPointer<vtkIdList> veryoldids =
-						vtkSmartPointer<vtkIdList>::New();
+					
 					if (this->Getmui_PencilLimitAngle()==180)
 					{
 						ids = observedNeighbours;
 					}
 					else
 					{
-						ids->InsertNextId(pickid);
-						newids->InsertNextId(pickid);
-						oldids->InsertNextId(pickid);
-						veryoldids->InsertNextId(pickid);
+						vtkSmartPointer<vtkIdList> toInvestigatePtsList =
+							vtkSmartPointer<vtkIdList>::New();
+						vtkSmartPointer<vtkIdList> alreadyinvestigatedPtsList =
+							vtkSmartPointer<vtkIdList>::New();
+						double min_cos=((double)(this->Getmui_PencilLimitAngle())*vtkMath::Pi() / 180);						
+						toInvestigatePtsList->InsertNextId(pickid);
 						int cpt = 0;
 						int list_changed = 1;
 						while (list_changed == 1)
 						{
 							cout << "cpt=" << cpt << endl;
-							vtkSmartPointer<vtkPolyData> mesh = vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput());
-							this->PropagateVertices(mesh, norms, vn, observedNeighbours,ids, newids, exnids, oldids, veryoldids, &list_changed);
-							
+							cout << "observedNeighbours->GetNumberOfIds()=" << observedNeighbours->GetNumberOfIds() << endl;
+							cout << "ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
+							cout << "toInvestigatePtsList->GetNumberOfIds()=" << toInvestigatePtsList->GetNumberOfIds() << endl;
+								
+
+							this->PropagateVertices(
+								mesh,
+								norms,
+								mvn,
+								min_cos,
+								observedNeighbours,
+								ids,
+								toInvestigatePtsList,
+								alreadyinvestigatedPtsList,
+								&list_changed
+							);
 							//std::cout<<"Tag magic wand level "<<cpt<<": list_changed="<<list_changed<<std::endl;
 							cpt++;
 						}
 
+						
+						cout << " AFTER TREATMENT ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
+
 					}
 
-
+					// mismatch observedneighbours
 					for (vtkIdType j = 0; j < ids->GetNumberOfIds(); j++)
 					{
 
@@ -9958,89 +10067,6 @@ void mqMorphoDigCore::scalarsCameraDistance()
 
 
 
-}
-vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn, vtkIdType id)
-{
-	cout << "GetPropagatedVertices 0" << endl;
-	//get propagated vertices in a restricted list of vertices (only in neighborList)
-	double min_cos = cos((double)(this->mui_PencilLimitAngle)*vtkMath::Pi() / 180);
-	vtkSmartPointer<vtkIdList> connectedVertices =
-		vtkSmartPointer<vtkIdList>::New();
-	connectedVertices->InsertNextId(id);
-	
-	vtkSmartPointer<vtkIdList> fullcellIdList =
-		vtkSmartPointer<vtkIdList>::New();
-	vtkSmartPointer<vtkIdList> cellIdList =
-		vtkSmartPointer<vtkIdList>::New();
-	mesh->GetPointCells(id, fullcellIdList);
-	cout << "GetPropagatedVertices fullcellIdList->GetNumberOfIds()=" << fullcellIdList->GetNumberOfIds()<< endl;
-	cout << "GetPropagatedVertices neighborList->GetNumberOfIds()=" << fullcellIdList->GetNumberOfIds() << endl;
-	// here we have to remove all the points which do not belong to neighborList
-	for (vtkIdType i = 0; i < fullcellIdList->GetNumberOfIds(); i++)
-	{
-		int found = 0;
-		for (vtkIdType j = 0; i < neighborList->GetNumberOfIds(); j++)
-		{
-			if (fullcellIdList->GetId(i)== neighborList->GetId(j))
-			{
-				found = 1; 
-			}
-
-		}
-		cout << "GetPropagatedVertices 0.5" << endl;
-		if (found==1)
-		{
-			cellIdList->InsertNextId(fullcellIdList->GetId(i));
-		}
-	}
-	cout << "GetPropagatedVertices  cellIdList->GetNumberOfIds()=" << cellIdList->GetNumberOfIds()<< endl;
-	
-	for (vtkIdType i = 0; i < cellIdList->GetNumberOfIds(); i++)
-	{
-		vtkSmartPointer<vtkIdList> pointIdList =
-			vtkSmartPointer<vtkIdList>::New();
-		mesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
-
-		vtkIdType newid;
-
-		if (pointIdList->GetId(0) != id)
-		{
-			newid = pointIdList->GetId(0);
-		}
-		else
-		{
-			newid = pointIdList->GetId(1);
-
-		}
-	
-		
-		
-		// now check normal
-		double *vn2;
-		
-						
-		if (norms != NULL)
-		{
-		vn2 = norms->GetTuple(newid);
-	
-		double curr_cos = vn[0] * vn2[0] + vn[1] * vn2[1] + vn[2] * vn2[2];
-		if (curr_cos>min_cos)
-		{
-			connectedVertices->InsertNextId(newid);
-		}
-
-		}
-		else
-		{
-		std::cout << "Norm NULL..." << std::endl;
-		}
-
-		
-
-	}
-	cout << "GetPropagatedVertices 1" << endl;
-
-	return connectedVertices;
 }
 vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
 	double sc, vtkIdType id, int tool_mode, int compute_avg_norm)

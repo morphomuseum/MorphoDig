@@ -471,7 +471,7 @@ public:
 	void OpenFLG(QString fileName);
 	void OpenCUR(QString fileName);
 	void OpenSTV(QString fileName);
-	void Cylinder(int numCyl, double cylHeight, double cylRadius, double cylRadius2, int cylResolution, int ConeHeight, int mode=0, int circular_shaft=1);
+	void Cylinder(int numCyl, double cylHeight, double cylRadius, double cylRadius2, int cylResolution, int ConeHeight, int mode = 0, int circular_shaft = 1);
 	void Cube(int numCubes, double sizeX, double sizeY, double sizeZ);
 	void MergeTags(int tagSource, int tagTarget);
 	void OpenTAGMAP(QString fileName);
@@ -536,10 +536,10 @@ public:
 	void DuplicateScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName, QString newScalarName);
 	void DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName);
 	ExistingScalars *Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDActor> actor);
-	ExistingScalars *Getmui_ScalarsOfSelectedObjects(int onlyfirst=0);
+	ExistingScalars *Getmui_ScalarsOfSelectedObjects(int onlyfirst = 0);
 	ExistingScalars* Getmui_ExistingScalars();
-	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int toglobalList =1);
-	
+	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int toglobalList = 1);
+
 	void Initmui_ExistingScalars();
 	void Setmui_ActiveScalars(QString Scalar, int dataType, int numComp);
 
@@ -586,9 +586,9 @@ public:
 	void LandmarksPushBack();
 	void LandmarksReorient();
 	void LandmarksPushBackOrReorient(int mode);
-	void LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree,  vtkSmartPointer<vtkPolyData> PD, int mcount);
-	
-	
+	void LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree, vtkSmartPointer<vtkPolyData> PD, int mcount);
+
+
 	void ChangeClippingPlane();
 	int Getmui_ClippinPlane();
 	void Setmui_ClippinPlane(int on_off);
@@ -605,43 +605,50 @@ public:
 	void UpdateAllSelectedFlagsColors();
 	void UpdateAllSelectedFlagsColors(double flagcolor[4]);
 	void UpdateAllSelectedFlagsLengths(double flag_rendering_size);
-  //void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renwin)
-  void SetRenderWindow(vtkRenderWindow *renwin)
-  {
-	  this->RenderWindow = renwin;
-  }
-  
-  vtkSmartPointer<vtkActor> getBezierActor();
-  vtkSmartPointer<vtkActor> getBezierNHActor();
-  vtkSmartPointer<vtkActor> getBezierSelectedActor();
-  vtkSmartPointer<vtkBezierCurveSource> getBezierCurveSource();
-  vtkSmartPointer<vtkLMActorCollection> getNormalLandmarkCollection();
-  vtkSmartPointer<vtkLMActorCollection> getTargetLandmarkCollection();
-  vtkSmartPointer<vtkLMActorCollection> getNodeLandmarkCollection();
-  vtkSmartPointer<vtkLMActorCollection> getHandleLandmarkCollection();
-  vtkSmartPointer<vtkLMActorCollection> getFlagLandmarkCollection();
+	//void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renwin)
+	void SetRenderWindow(vtkRenderWindow *renwin)
+	{
+		this->RenderWindow = renwin;
+	}
 
-  vtkSmartPointer<vtkMDActorCollection> getActorCollection();
-  //vtkMDActorCollection* getActorCollection();
-  vtkSmartPointer<vtkRenderer> getRenderer();
-  vtkSmartPointer<vtkCamera> getCamera();
-  vtkSmartPointer<vtkGridActor> getGridActor();
-  //void Invert();// Invert each selected surface
-  bool RecoverLandmarks(vtkSmartPointer< vtkPoints > landmarks_list_source, vtkSmartPointer< vtkPoints > landmarks_list_target, int all);
-  void addFillHoles(int maxsize);
-  void addDensify(int subdivisions);
-  void addTPS(int r, double factor, int all);
-  void addSmooth(int iteration, double relaxation);
-  void addDecimate(int quadric, double factor);
-  void addInvert();// create an inverted surface for each selected surface
-  void addKeepLargest();// create for each selected surface an object which keeps only the largest "independent" region of the corresponding object.
-  vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
-	  double sc, vtkIdType id, int tool_mode, int compute_avg_norm=0);
-  vtkSmartPointer<vtkIdList> GetPropagatedVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, vtkSmartPointer<vtkIdList>neighborList, double *vn,  vtkIdType id);
-  int mqMorphoDigCore::Already_Listed(vtkIdType ve, vtkSmartPointer<vtkIdList> ptList);
-  void PropagateVertices(vtkSmartPointer<vtkPolyData> mesh, vtkSmartPointer<vtkFloatArray> norms, double *vn, vtkSmartPointer<vtkIdList> neighborList, vtkSmartPointer<vtkIdList> ptList, vtkSmartPointer<vtkIdList> nptList, 
-	  vtkSmartPointer<vtkIdList> exnList, vtkSmartPointer<vtkIdList> oldList,
-	  vtkSmartPointer<vtkIdList> veryoldList, int *list_changed);
+	vtkSmartPointer<vtkActor> getBezierActor();
+	vtkSmartPointer<vtkActor> getBezierNHActor();
+	vtkSmartPointer<vtkActor> getBezierSelectedActor();
+	vtkSmartPointer<vtkBezierCurveSource> getBezierCurveSource();
+	vtkSmartPointer<vtkLMActorCollection> getNormalLandmarkCollection();
+	vtkSmartPointer<vtkLMActorCollection> getTargetLandmarkCollection();
+	vtkSmartPointer<vtkLMActorCollection> getNodeLandmarkCollection();
+	vtkSmartPointer<vtkLMActorCollection> getHandleLandmarkCollection();
+	vtkSmartPointer<vtkLMActorCollection> getFlagLandmarkCollection();
+
+	vtkSmartPointer<vtkMDActorCollection> getActorCollection();
+	//vtkMDActorCollection* getActorCollection();
+	vtkSmartPointer<vtkRenderer> getRenderer();
+	vtkSmartPointer<vtkCamera> getCamera();
+	vtkSmartPointer<vtkGridActor> getGridActor();
+	//void Invert();// Invert each selected surface
+	bool RecoverLandmarks(vtkSmartPointer< vtkPoints > landmarks_list_source, vtkSmartPointer< vtkPoints > landmarks_list_target, int all);
+	void addFillHoles(int maxsize);
+	void addDensify(int subdivisions);
+	void addTPS(int r, double factor, int all);
+	void addSmooth(int iteration, double relaxation);
+	void addDecimate(int quadric, double factor);
+	void addInvert();// create an inverted surface for each selected surface
+	void addKeepLargest();// create for each selected surface an object which keeps only the largest "independent" region of the corresponding object.
+	vtkSmartPointer<vtkIdList> GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, double *vn,
+		double sc, vtkIdType id, int tool_mode, int compute_avg_norm = 0);	
+	int mqMorphoDigCore::Already_Listed(vtkIdType ve, vtkSmartPointer<vtkIdList> ptList);
+	void PropagateVertices(
+		vtkSmartPointer<vtkPolyData> mesh,
+		vtkSmartPointer<vtkFloatArray> norms,
+		double vn[3],
+		double min_cos,		
+		vtkSmartPointer<vtkIdList> propagationPointsList,
+		vtkSmartPointer<vtkIdList> outputPtsList,
+		vtkSmartPointer<vtkIdList> ptsToInvestigate,
+		vtkSmartPointer<vtkIdList> alreadyInvestigatedPtsList,
+		int *list_changed
+	);
   void scalarsThickness(double max_thickness, int smooth_normals, int avg, QString scalarName, double angularLimit);
   void scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode);
   void scalarsCurvature(int curvatureType, QString scalarName);
