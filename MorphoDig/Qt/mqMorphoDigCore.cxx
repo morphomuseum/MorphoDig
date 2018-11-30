@@ -735,17 +735,17 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 							vtkSmartPointer<vtkIdList>::New();
 						vtkSmartPointer<vtkIdList> alreadyinvestigatedPtsList =
 							vtkSmartPointer<vtkIdList>::New();
-						double min_cos=((double)(this->Getmui_PencilLimitAngle())*vtkMath::Pi() / 180);						
+						double min_cos= cos((double)(this->Getmui_PencilLimitAngle())*vtkMath::Pi()/180);						
 						toInvestigatePtsList->InsertNextId(pickid);
 						int cpt = 0;
 						int list_changed = 1;
 						while (list_changed == 1)
 						{
-							cout << "cpt=" << cpt << endl;
-							cout << "observedNeighbours->GetNumberOfIds()=" << observedNeighbours->GetNumberOfIds() << endl;
-							cout << "ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
-							cout << "toInvestigatePtsList->GetNumberOfIds()=" << toInvestigatePtsList->GetNumberOfIds() << endl;
-								
+						//	cout << "cpt=" << cpt << endl;
+						//	cout << "observedNeighbours->GetNumberOfIds()=" << observedNeighbours->GetNumberOfIds() << endl;
+						//	cout << "ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
+						//	cout << "toInvestigatePtsList->GetNumberOfIds()=" << toInvestigatePtsList->GetNumberOfIds() << endl;
+						//	cout << "min_cos=" << min_cos << endl;
 
 							this->PropagateVertices(
 								mesh,
@@ -758,12 +758,13 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 								alreadyinvestigatedPtsList,
 								&list_changed
 							);
-							//std::cout<<"Tag magic wand level "<<cpt<<": list_changed="<<list_changed<<std::endl;
+							
 							cpt++;
+							std::cout << "Tag magic wand level " << cpt << ": ids=" << ids->GetNumberOfIds() << std::endl;
 						}
 
 						
-						cout << " AFTER TREATMENT ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
+						//cout << " ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
 
 					}
 
