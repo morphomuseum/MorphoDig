@@ -56,6 +56,7 @@
 #include "mqEditAlphaDialogReaction.h"
 #include "mqSaveCURasVERDialogReaction.h"
 #include "mqOrientationLabelsDialogReaction.h"
+#include "mqExtractScalarRangeDialogReaction.h"
 #include "mqEditScalarsDialogReaction.h"
 #include "mqSaveSTVDialogReaction.h"
 #include "mqSaveMAPDialogReaction.h"
@@ -77,7 +78,7 @@
 #include "mqScalarsDistanceDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
 #include "mqScalarsInfosDialogReaction.h"
-
+#include "mqExtractTagRangeDialogReaction.h"
 #include "mqSetName.h"
 #include "mqViewMenuManager.h"
 #include "QRAMThread.h"
@@ -249,7 +250,7 @@ void mqMorphoDigMenuBuilders::buildScalarsMenu(QMenu& menu)
 	new mqScalarsComplexityDialogReaction(menu.addAction("Compute complexity for each selected surface") << mqSetName("actionComplexity"));
 	new mqScalarsSmoothDialogReaction(menu.addAction("Smooth active scalars for each selected surface") << mqSetName("actionSmooth"));
 	new mqScalarsNormalizationDialogReaction(menu.addAction("Normalize or rescale active scalars for each selected surface") << mqSetName("actionNormalize"));
-
+	new mqExtractScalarRangeDialogReaction(menu.addAction("Extract scalar range for each selected surface") << mqSetName("actionExtractScalarRange"));
 }
 void mqMorphoDigMenuBuilders::buildTagsMenu(QMenu& menu)
 {
@@ -269,6 +270,13 @@ void mqMorphoDigMenuBuilders::buildTagsMenu(QMenu& menu)
 	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
 	QAction *CreateNewTagArrayConnectivity = menu.addAction("Create new tag array based on connectivity for each selected surface");
 	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
+	QAction *extractActiveTag = menu.addAction("Extract active tag corresponding region");
+	QAction::connect(extractActiveTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotExtractActiveTag()));
+	
+	new mqExtractTagRangeDialogReaction(menu.addAction("Extract tag range for each selected surface") << mqSetName("actionExtractTagRange"));
+	//QAction::connect(extractActiveTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotExtractActiveTag()));
+	QAction *decomposeTag = menu.addAction("Extract all taged regions as different objects");
+	QAction::connect(decomposeTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotDecomposeTag()));
 	
 }
 void mqMorphoDigMenuBuilders::buildRGBMenu(QMenu& menu)

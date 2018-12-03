@@ -566,6 +566,13 @@ public:
 	void Setmui_PencilSize(int pencilSize);
 	int Getmui_PencilLimitAngle();
 	void Setmui_PencilLimitAngle(int pencilLimitAngle);
+	int Getmui_PencilContiguous();
+	void Setmui_PencilContiguous(int pencilContiguous);
+	vtkSmartPointer<vtkIdTypeArray> Get_Tag_Region_Sizes(vtkIntArray *Tags);
+	void Extract_Tag_Range(int tag_min, int tag_max);
+	void Decompose_Tag(int tag_min, int tag_max);
+	void Extract_Scalar_Range(double scalar_min, double scalar_max);
+	void Extract_Array_Range(double array_min, int array_max);
 	double* Getmui_BackGroundColor2();
 	void Getmui_BackGroundColor2(double bg[3]);
 	double* Getmui_DefaultBackGroundColor2();
@@ -731,6 +738,8 @@ public:
   void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin(int cutMin= 5, int onlyselected=0);
 	double GetSuggestedScalarRangeMax(int cutMax=5, int onlyselected=0);
+	int GetTagRangeMin();
+	int GetTagRangeMax();
 	double GetScalarRangeMin();
 	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);
@@ -845,6 +854,7 @@ protected:
 	int mui_ActiveTag;
 	int mui_PencilSize;
 	int mui_PencilLimitAngle;
+	int mui_PencilContiguous;
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;
@@ -959,6 +969,9 @@ public slots:
 	virtual void slotBrown();
 	virtual void slotEditGridInfos();
 	virtual void slotRAMProgressBar(int percent);
+	virtual void slotExtractActiveTag();
+	virtual void slotDecomposeTag();
+	
 private:
 	static mqMorphoDigCore* Instance;
 	QVTKOpenGLWidget *qvtkWidget;

@@ -939,7 +939,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QRadioButton" name="pencilContinuous">
+    <widget class="QRadioButton" name="pencilContiguous">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -949,7 +949,7 @@
       </rect>
      </property>
      <property name="text">
-      <string> tag contiguous vertices (propagation, slower)</string>
+      <string> tag propagation from picked location ( slower)</string>
      </property>
     </widget>
    </widget>

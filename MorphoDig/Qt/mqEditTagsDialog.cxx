@@ -119,6 +119,8 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
 	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(int)), this, SLOT(slotPencilSearchSizeChanged(int)));
 	connect(this->Ui->pencilLimitAngle, SIGNAL(valueChanged(int)), this, SLOT(slotPencilLimitAngleChanged(int)));
+	connect(this->Ui->pencilAll, SIGNAL(clicked()), this, SLOT(slotPencilAll()));
+	connect(this->Ui->pencilContiguous, SIGNAL(clicked()), this, SLOT(slotPencilContiguous()));
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
 	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
 	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
@@ -771,7 +773,16 @@ void mqEditTagsDialog::slotPencilLimitAngleChanged(int newLimitAngle)
 	mqMorphoDigCore::instance()->Setmui_PencilLimitAngle(newLimitAngle);
 
 }
+void mqEditTagsDialog::slotPencilContiguous()
+{
+	mqMorphoDigCore::instance()->Setmui_PencilContiguous(1);
 
+}
+void mqEditTagsDialog::slotPencilAll()
+{
+	mqMorphoDigCore::instance()->Setmui_PencilContiguous(0);
+
+}
 
 void mqEditTagsDialog::slotActiveTagsChanged(int idx)
 {

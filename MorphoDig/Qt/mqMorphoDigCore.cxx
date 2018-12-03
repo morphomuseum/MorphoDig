@@ -135,6 +135,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_ActiveTag = 1;
 	this->mui_PencilSize = 15;
 	this->mui_PencilLimitAngle = 180;
+	this->mui_PencilContiguous = 0;
 	this->mui_ExistingTagMaps = new ExistingTagMaps;
 	this->InitLuts();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -634,7 +635,517 @@ void mqMorphoDigCore::PropagateVertices(
 	*list_changed = bchanged;
 
 }
+vtkSmartPointer<vtkIdTypeArray> mqMorphoDigCore::Get_Tag_Region_Sizes(vtkIntArray *Tags)
+{
+	// Constructs an array containing number of vertices held by each tag.
+	vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
+	// get min and max ranges.
+	vtkIdType Tag_Min = VTK_INT_MAX;
+	vtkIdType Tag_Max = 0;
+	//double current_tag;
+	vtkIdType current_tag;
+	vtkIdType act_ve_nr;
+	vtkFloatArray *currentTags;
+	
+	if (Tags != NULL)
+	{
+		for (vtkIdType i = 0; i<Tags->GetNumberOfTuples(); i++)	// for each vertex 
+		{
+			current_tag = (vtkIdType)Tags->GetTuple(i)[0];
+			if (current_tag > Tag_Max) { Tag_Max = current_tag; }
+			if (current_tag < Tag_Min) { Tag_Min = current_tag; }
+		}
+		region_sizes->SetNumberOfComponents(1);
+		region_sizes->SetNumberOfValues(Tag_Max + 1);
+		region_sizes->SetNumberOfTuples(Tag_Max + 1);
+		for (vtkIdType i = 0; i<region_sizes->GetNumberOfTuples(); i++)	// for each vertex 
+		{
+			region_sizes->SetValue(i, 0);
+		}
 
+		for (vtkIdType i = 0; i<Tags->GetNumberOfTuples(); i++)	// for each vertex 
+		{
+			current_tag = (vtkIdType)currentTags->GetTuple(i)[0];
+			if (current_tag >= 0)
+			{
+				act_ve_nr = region_sizes->GetValue(current_tag);
+				act_ve_nr++;
+				region_sizes->SetValue(current_tag, act_ve_nr);
+			}
+
+		}
+	}
+	return region_sizes;
+}
+
+void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
+{
+	// dirty hack:
+	//ActiveScalars *myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars();
+
+	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "try to get next actor:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			//myActor->SetSelected(0); we don't unselect after a cut
+
+
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+				vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+
+
+
+				vtkSmartPointer<vtkIntArray> newScalars =
+					vtkSmartPointer<vtkFloatArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(myPD->GetNumberOfPoints());
+
+				vtkIntArray *currentTag;
+				currentTag = (vtkIntArray*)myPD->GetPointData()->GetScalars();
+
+				if (currentTag != NULL)
+				{
+					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++)	// for each vertex 
+					{
+						//std::cout<<"vertex"<<i<<", current region:"<<currentRegions->GetTuple(i)[0]<<std::endl;
+						newScalars->InsertTuple1(i, (float)currentTag->GetTuple(i)[0]);
+					}
+					newScalars->SetName("TMP");
+
+					myPD->GetPointData()->RemoveArray("TMP");
+					myPD->GetPointData()->AddArray(newScalars);
+					myPD->GetPointData()->SetActiveScalars("TMP");
+					vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
+					region_sizes = this->Get_Tag_Region_Sizes(currentTag);
+					for (vtkIdType i = 0; i < region_sizes->GetNumberOfTuples(); i++)
+					{
+						if (region_sizes->GetTuple((vtkIdType)i)[0] >= (vtkIdType)50) // no region smaller than 50... could be parameterized somewhere though
+						{
+
+							vtkSmartPointer<vtkThreshold> selector =
+								vtkSmartPointer<vtkThreshold>::New();
+							vtkSmartPointer<vtkMaskFields> scalarsOff =
+								vtkSmartPointer<vtkMaskFields>::New();
+							vtkSmartPointer<vtkGeometryFilter> geometry =
+								vtkSmartPointer<vtkGeometryFilter>::New();
+							selector->SetInputData((vtkPolyData*)myPD);
+							selector->SetInputArrayToProcess(0, 0, 0,
+								vtkDataObject::FIELD_ASSOCIATION_CELLS,
+								vtkDataSetAttributes::SCALARS);
+							selector->SetAllScalars(1);
+							selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "TMP");
+							selector->ThresholdBetween((double)(i), (double)(i));
+
+							selector->Update();
+							std::cout << "\n Extract_Scalar_Range new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
+							std::cout << "\nExtract_Scalar_Range new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
+
+							scalarsOff->SetInputData(selector->GetOutput());
+							scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+							scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+							scalarsOff->Update();
+							geometry->SetInputData(scalarsOff->GetOutput());
+							geometry->Update();
+
+
+
+
+							vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+
+
+							MyObj = geometry->GetOutput();
+							myPD->GetPointData()->RemoveArray("TMP");
+
+							std::cout << "\nExtract array new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
+							std::cout << "\nExtract array new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
+
+							if (MyObj->GetNumberOfPoints() > 10)
+							{
+								VTK_CREATE(vtkMDActor, newactor);
+								if (this->mui_BackfaceCulling == 0)
+								{
+									newactor->GetProperty()->BackfaceCullingOff();
+								}
+								else
+								{
+									newactor->GetProperty()->BackfaceCullingOn();
+								}
+
+
+								//VTK_CREATE(vtkDataSetMapper, newmapper);
+								VTK_CREATE(vtkPolyDataMapper, newmapper);
+								//VTK_CREATE(vtkSmartPointer<vtkDataSetMapper>
+								//newmapper->ImmediateModeRenderingOn();
+								newmapper->SetColorModeToDefault();
+
+								if (
+									(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+									&& this->mui_ActiveScalars->NumComp == 1
+									)
+								{
+									newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+									newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+
+								}
+								else
+								{
+									newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+								}
+
+
+								newmapper->ScalarVisibilityOn();
+
+								cout << "extract object" << MyObj->GetNumberOfPoints() << endl;
+								//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+								newmapper->SetInputData(MyObj);
+
+								//VTK_CREATE(vtkActor, actor);
+
+								int num = 2;
+
+								vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+								vtkTransform *newTransform = vtkTransform::New();
+								newTransform->PostMultiply();
+
+								newTransform->SetMatrix(Mat);
+								newactor->SetPosition(newTransform->GetPosition());
+								newactor->SetScale(newTransform->GetScale());
+								newactor->SetOrientation(newTransform->GetOrientation());
+								newTransform->Delete();
+
+
+								double color[4] = { 0.5, 0.5, 0.5, 1 };
+								myActor->GetmColor(color);
+								/*double trans = 100* color[3];
+								if (trans >= 0 && trans <= 100)
+								{
+								color[3] = (double)((double)trans / 100);
+
+
+								}*/
+
+								newactor->SetmColor(color);
+
+								newactor->SetMapper(newmapper);
+								newactor->SetSelected(0);
+
+								//std::string newname = this->CheckingName(myActor->GetName());
+								newactor->SetName(myActor->GetName() + "_lc");
+								//newactor->SetName(newname);
+								cout << "try to add new actor=" << endl;
+								newcoll->AddTmpItem(newactor);
+								modified = 1;
+							}
+						}
+
+					}
+				}
+			}
+		}
+	}
+	if (modified == 1)
+	{
+		newcoll->InitTraversal();
+		vtkIdType num = newcoll->GetNumberOfItems();
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor from newcoll:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+
+			myActor->SetDisplayMode(this->mui_DisplayMode);
+			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
+			std::string action = "Object extracted from array: " + myActor->GetName();
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+
+
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "new actor(s) added" << endl;
+		this->Initmui_ExistingScalars();
+
+		cout << "Set actor collection changed" << endl;
+		this->getActorCollection()->SetChanged(1);
+		cout << "Actor collection changed" << endl;
+
+		this->AdjustCameraAndGrid();
+		cout << "Camera and grid adjusted" << endl;
+
+		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+		{
+			this->UpdateLandmarkSettings();
+		}
+		//this->Setmui_ActiveScalars(myActiveScalars->Name, myActiveScalars->DataType, myActiveScalars->NumComp);
+		this->Render();
+	}
+
+
+}
+
+void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
+{
+	// dirty hack:
+	//ActiveScalars *myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars();
+	
+	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	for (vtkIdType i = 0; i < num; i++)
+	{
+		cout << "try to get next actor:" << i << endl;
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			//myActor->SetSelected(0); we don't unselect after a cut
+
+
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+				vtkPolyData *myPD = vtkPolyData::SafeDownCast(mymapper->GetInput());
+
+				vtkSmartPointer<vtkFloatArray> newScalars =
+					vtkSmartPointer<vtkFloatArray>::New();
+
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(myPD->GetNumberOfPoints());
+
+				vtkFloatArray *currentScalar;
+				currentScalar = (vtkFloatArray*)myPD->GetPointData()->GetScalars();
+
+				if (currentScalar != NULL)
+				{
+					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++)	// for each vertex 
+					{
+						//std::cout<<"vertex"<<i<<", current region:"<<currentRegions->GetTuple(i)[0]<<std::endl;
+						newScalars->InsertTuple1(i, currentScalar->GetTuple(i)[0]);
+					}
+					newScalars->SetName("TMP");
+
+					myPD->GetPointData()->RemoveArray("TMP");
+					myPD->GetPointData()->AddArray(newScalars);
+					myPD->GetPointData()->SetActiveScalars("TMP");
+
+
+					vtkSmartPointer<vtkThreshold> selector =
+						vtkSmartPointer<vtkThreshold>::New();
+					vtkSmartPointer<vtkMaskFields> scalarsOff =
+						vtkSmartPointer<vtkMaskFields>::New();
+					vtkSmartPointer<vtkGeometryFilter> geometry =
+						vtkSmartPointer<vtkGeometryFilter>::New();
+					selector->SetInputData((vtkPolyData*)myPD);
+					selector->SetInputArrayToProcess(0, 0, 0,
+						vtkDataObject::FIELD_ASSOCIATION_CELLS,
+						vtkDataSetAttributes::SCALARS);
+					selector->SetAllScalars(1);
+					selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "TMP");
+					selector->ThresholdBetween(array_min, array_max);
+					selector->Update();
+					std::cout << "\n Extract_Scalar_Range new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
+					std::cout << "\nExtract_Scalar_Range new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
+
+					scalarsOff->SetInputData(selector->GetOutput());
+					scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+					scalarsOff->Update();
+					geometry->SetInputData(scalarsOff->GetOutput());
+					geometry->Update();
+
+
+
+
+					vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+
+
+					MyObj = geometry->GetOutput();
+					myPD->GetPointData()->RemoveArray("TMP");
+
+					std::cout << "\nExtract array new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
+					std::cout << "\nExtract array new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
+
+					if (MyObj->GetNumberOfPoints() > 10)
+					{
+						VTK_CREATE(vtkMDActor, newactor);
+						if (this->mui_BackfaceCulling == 0)
+						{
+							newactor->GetProperty()->BackfaceCullingOff();
+						}
+						else
+						{
+							newactor->GetProperty()->BackfaceCullingOn();
+						}
+
+
+						//VTK_CREATE(vtkDataSetMapper, newmapper);
+						VTK_CREATE(vtkPolyDataMapper, newmapper);
+						//VTK_CREATE(vtkSmartPointer<vtkDataSetMapper>
+						//newmapper->ImmediateModeRenderingOn();
+						newmapper->SetColorModeToDefault();
+
+						if (
+							(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+							&& this->mui_ActiveScalars->NumComp == 1
+							)
+						{
+							newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+							newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+
+						}
+						else
+						{
+							newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+						}
+
+
+						newmapper->ScalarVisibilityOn();
+
+						cout << "extract object" << MyObj->GetNumberOfPoints() << endl;
+						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+						newmapper->SetInputData(MyObj);
+
+						//VTK_CREATE(vtkActor, actor);
+
+						int num = 2;
+
+						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+						vtkTransform *newTransform = vtkTransform::New();
+						newTransform->PostMultiply();
+
+						newTransform->SetMatrix(Mat);
+						newactor->SetPosition(newTransform->GetPosition());
+						newactor->SetScale(newTransform->GetScale());
+						newactor->SetOrientation(newTransform->GetOrientation());
+						newTransform->Delete();
+
+
+						double color[4] = { 0.5, 0.5, 0.5, 1 };
+						myActor->GetmColor(color);
+						/*double trans = 100* color[3];
+						if (trans >= 0 && trans <= 100)
+						{
+						color[3] = (double)((double)trans / 100);
+
+
+						}*/
+
+						newactor->SetmColor(color);
+
+						newactor->SetMapper(newmapper);
+						newactor->SetSelected(0);
+
+						//std::string newname = this->CheckingName(myActor->GetName());
+						newactor->SetName(myActor->GetName() + "_lc");
+						//newactor->SetName(newname);
+						cout << "try to add new actor=" << endl;
+						newcoll->AddTmpItem(newactor);
+						modified = 1;
+					}
+
+				}
+			}
+		}
+		if (modified == 1)
+		{
+			newcoll->InitTraversal();
+			vtkIdType num = newcoll->GetNumberOfItems();
+			for (vtkIdType i = 0; i < num; i++)
+			{
+				cout << "try to get next actor from newcoll:" << i << endl;
+				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+
+				myActor->SetDisplayMode(this->mui_DisplayMode);
+				this->getActorCollection()->AddItem(myActor);
+				emit this->actorsMightHaveChanged();
+				std::string action = "Object extracted from array: " + myActor->GetName();
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+
+			}
+			//cout << "camera and grid adjusted" << endl;
+			cout << "new actor(s) added" << endl;
+			this->Initmui_ExistingScalars();
+			
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			//this->Setmui_ActiveScalars(myActiveScalars->Name, myActiveScalars->DataType, myActiveScalars->NumComp);
+			this->Render();
+		}
+	}
+
+}
+void mqMorphoDigCore::Extract_Tag_Range(int tag_min, int tag_max)
+{
+	// checks wether active array is tag array... 	
+	ActiveScalars *myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars();
+	int ok = 0;
+	if ((myActiveScalars->DataType == VTK_INT || myActiveScalars->DataType == VTK_UNSIGNED_INT) && myActiveScalars->NumComp == 1)
+	{
+		ok = 1;
+	}
+	if (ok == 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("A Tag array must be active to use this option.");
+		msgBox.exec();
+		return;
+	}
+	
+
+	std::cout << "tag_min=" << tag_min << ", tag_max=" << tag_max << std::endl;
+	
+	this->Extract_Array_Range((double)tag_min, (double)tag_max);
+	
+
+}
+void mqMorphoDigCore::Extract_Scalar_Range(double scalar_min, double scalar_max)
+{
+	// checks wether active array is scalar array... 	
+	ActiveScalars *myActiveScalars = this->Getmui_ActiveScalars();
+	int ok = 0;
+	if ((myActiveScalars->DataType == VTK_FLOAT || myActiveScalars->DataType == VTK_DOUBLE) && myActiveScalars->NumComp == 1)
+	{
+		ok = 1;
+	}
+	if (ok == 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("A Scalar array must be active to use this option.");
+		msgBox.exec();
+		return;
+	}
+
+
+	std::cout << "scalar_min=" << scalar_min << ", scalar_max=" << scalar_max << std::endl;
+
+	this->Extract_Array_Range(scalar_min, scalar_max);
+
+
+}
 void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride)
 {
 
@@ -723,11 +1234,35 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						vtkSmartPointer<vtkIdList>::New();
 					
 					
-
+					double min_cos = cos((double)(this->Getmui_PencilLimitAngle())*vtkMath::Pi() / 180);
 					
-					if (this->Getmui_PencilLimitAngle()==180)
+					
+					if (this->Getmui_PencilContiguous() == 0) // no propagation: tag all vertices matching angle condition within radius
 					{
-						ids = observedNeighbours;
+						if (this->Getmui_PencilLimitAngle() < 180)
+						{
+							cout << "Min cos = " << min_cos << endl;
+							for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+							{
+								vtkIdType investigatedPt = observedNeighbours->GetId(j);								
+								double *vn2;
+								vn2 = norms->GetTuple(investigatedPt);
+								double curr_cos = mvn[0] * vn2[0] + mvn[1] * vn2[1] + mvn[2] * vn2[2];
+								if (curr_cos > min_cos)
+								{
+
+									ids->InsertNextId(investigatedPt);
+								}
+
+							}
+						}
+						else
+						{
+							cout << "Ids = observedNeighbours" << endl;
+							ids = observedNeighbours;
+						}
+
+						
 					}
 					else
 					{
@@ -735,7 +1270,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 							vtkSmartPointer<vtkIdList>::New();
 						vtkSmartPointer<vtkIdList> alreadyinvestigatedPtsList =
 							vtkSmartPointer<vtkIdList>::New();
-						double min_cos= cos((double)(this->Getmui_PencilLimitAngle())*vtkMath::Pi()/180);						
+						
 						toInvestigatePtsList->InsertNextId(pickid);
 						int cpt = 0;
 						int list_changed = 1;
@@ -968,6 +1503,136 @@ double mqMorphoDigCore::GetScalarRangeMin()
 	}
 }
 
+int mqMorphoDigCore::GetTagRangeMin()
+{
+
+	//return this->ScalarRangeMin;
+	int my_min;
+	int my_currmin;
+
+	my_min = INT_MAX;
+	my_currmin = INT_MAX;
+
+	this->ActorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+		{
+			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+				&& (
+					this->Getmui_ActiveScalars()->DataType == VTK_INT ||
+					this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
+
+					)
+				&& this->Getmui_ActiveScalars()->NumComp == 1
+				)
+			{
+				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
+					if (currentTags != NULL)
+					{
+						my_currmin = INT_MAX;
+						my_currmin = currentTags->GetTuple(0)[0];
+
+
+						std::vector<int> vals;
+						for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+						{
+							vals.push_back(currentTags->GetTuple(i)[0]);
+						}
+
+						std::sort(vals.begin(), vals.end());
+
+						//int iQ = (int)(0.05*myPD->GetNumberOfPoints());
+						my_currmin = (int)vals.at(0);
+
+						if (my_currmin < my_min) { my_min = my_currmin; }
+					}
+				}
+				
+
+		}
+		
+	}
+	if (my_min == VTK_INT_MAX)
+	{
+		cout << "Strange!!!" << endl;
+		return 0;
+	}
+	else
+	{
+		return my_min;
+	}
+}
+int mqMorphoDigCore::GetTagRangeMax()
+{
+
+	//return this->ScalarRangeMin;
+	int my_max;
+	int my_currmax;
+
+	my_max = 0;
+	my_currmax = 0;
+
+	this->ActorCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+
+		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+		{
+			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+				&& (
+					this->Getmui_ActiveScalars()->DataType == VTK_INT ||
+					this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
+
+					)
+				&& this->Getmui_ActiveScalars()->NumComp == 1
+				)
+			{
+				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
+				if (currentTags != NULL)
+				{
+					my_currmax = 0;
+					my_currmax = currentTags->GetTuple(0)[0];
+
+
+					std::vector<int> vals;
+					for (int i = 0; i < myPD->GetNumberOfPoints(); i++)
+					{
+						vals.push_back(currentTags->GetTuple(i)[0]);
+					}
+
+					std::sort(vals.begin(), vals.end());
+
+					//int iQ = (int)(0.05*myPD->GetNumberOfPoints());
+					my_currmax= (int)vals.at(myPD->GetNumberOfPoints()-1);
+
+					if (my_currmax > my_max) { my_max = my_currmax; }
+				}
+			}
+
+
+		}
+
+	}
+	if (my_max == 0)
+	{
+		cout << "Odd... Tag max =0" << endl;
+		return 0;
+	}
+	else
+	{
+		return my_max;
+	}
+}
 double mqMorphoDigCore::GetScalarRangeMax()
 {
 
@@ -15737,6 +16402,15 @@ int mqMorphoDigCore::Getmui_PencilSize()
 {
 	return this->mui_PencilSize;
 }
+
+void mqMorphoDigCore::Setmui_PencilContiguous(int pencilContiguous)
+{
+	this->mui_PencilContiguous = pencilContiguous;
+}
+int mqMorphoDigCore::Getmui_PencilContiguous()
+{
+	return this->mui_PencilContiguous;
+}
 void mqMorphoDigCore::Setmui_PencilLimitAngle(int pencilLimitAngle)
 {
 	this->mui_PencilLimitAngle = pencilLimitAngle;
@@ -16710,6 +17384,38 @@ void mqMorphoDigCore::slotEditGridInfos()
 	this->SetGridInfos();
 
 }
+void mqMorphoDigCore::slotExtractActiveTag()
+{
+	this->Extract_Tag_Range(this->Getmui_ActiveTag(), this->Getmui_ActiveTag());
+}
+void mqMorphoDigCore::slotDecomposeTag()
+{
+	// checks wether active array is tag array... 	
+	ActiveScalars *myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars();
+	int ok = 0;
+	if ((myActiveScalars->DataType == VTK_INT || myActiveScalars->DataType == VTK_UNSIGNED_INT) && myActiveScalars->NumComp == 1)
+	{
+		ok = 1;
+	}
+	if (ok == 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("A Tag array must be active to use this option.");
+		msgBox.exec();
+		return;
+	}
+	//
+	//this->Decompose_Tag();
+	vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
+	// get min and max ranges.
+	int Tag_Min = this->GetTagRangeMin();
+	int Tag_Max = this->GetTagRangeMax();
+
+	this->Decompose_Tag(Tag_Min, Tag_Max);
+	
+
+}
+
 void mqMorphoDigCore::slotLandmarkMoveUp()
 {
 

@@ -256,6 +256,14 @@ mqMergeTagsDialog.cxx
 mqMergeTagsDialog.h
 mqMergeTagsDialogReaction.cxx
 mqMergeTagsDialogReaction.h
+ mqExtractScalarRangeDialog.cxx
+  mqExtractScalarRangeDialog.h
+  mqExtractScalarRangeDialogReaction.cxx
+  mqExtractScalarRangeDialogReaction.h
+ mqExtractTagRangeDialog.cxx
+  mqExtractTagRangeDialog.h
+  mqExtractTagRangeDialogReaction.cxx
+  mqExtractTagRangeDialogReaction.h
 )
 
 set (Qt_MOC_HDRS
@@ -318,6 +326,8 @@ mqSaveTAGMAPDialog.ui
 mqTagFromRGBDialog.ui
 mqMergeTagsDialog.ui
 mqScalarsNormalizationDialog.ui
+mqExtractScalarRangeDialog.ui 
+mqExtractTagRangeDialog.ui 
 )
 
 set( Qt_RCs ../Icons/icons.qrc )
