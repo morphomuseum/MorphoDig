@@ -645,7 +645,7 @@ vtkSmartPointer<vtkIdTypeArray> mqMorphoDigCore::Get_Tag_Region_Sizes(vtkIntArra
 	//double current_tag;
 	vtkIdType current_tag;
 	vtkIdType act_ve_nr;
-	vtkFloatArray *currentTags;
+
 	
 	if (Tags != NULL)
 	{
@@ -665,7 +665,7 @@ vtkSmartPointer<vtkIdTypeArray> mqMorphoDigCore::Get_Tag_Region_Sizes(vtkIntArra
 
 		for (vtkIdType i = 0; i<Tags->GetNumberOfTuples(); i++)	// for each vertex 
 		{
-			current_tag = (vtkIdType)currentTags->GetTuple(i)[0];
+			current_tag = (vtkIdType)Tags->GetTuple(i)[0];
 			if (current_tag >= 0)
 			{
 				act_ve_nr = region_sizes->GetValue(current_tag);
@@ -682,15 +682,18 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 {
 	// dirty hack:
 	//ActiveScalars *myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars();
-
+	cout << "Call Decompose Tag" << endl;
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+	
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	cout << "Here are num" << num << "Actors" << endl;
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
 		cout << "try to get next actor:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		cout << "ok?" << i << endl;
 		if (myActor->GetSelected() == 1)
 		{
 			//myActor->SetSelected(0); we don't unselect after a cut
@@ -704,15 +707,15 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 
 
 
-				vtkSmartPointer<vtkIntArray> newScalars =
+				vtkSmartPointer<vtkFloatArray> newScalars =
 					vtkSmartPointer<vtkFloatArray>::New();
 
 				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
 				newScalars->SetNumberOfTuples(myPD->GetNumberOfPoints());
 
 				vtkIntArray *currentTag;
-				currentTag = (vtkIntArray*)myPD->GetPointData()->GetScalars();
-
+				currentTag = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars());
+				cout << "Got current Tag array... " << endl;
 				if (currentTag != NULL)
 				{
 					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++)	// for each vertex 
@@ -726,7 +729,9 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 					myPD->GetPointData()->AddArray(newScalars);
 					myPD->GetPointData()->SetActiveScalars("TMP");
 					vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
+					cout << "Try to call Get_Tag_Region_Sizes"<<endl;
 					region_sizes = this->Get_Tag_Region_Sizes(currentTag);
+					cout << "Successful call" << endl;
 					for (vtkIdType i = 0; i < region_sizes->GetNumberOfTuples(); i++)
 					{
 						if (region_sizes->GetTuple((vtkIdType)i)[0] >= (vtkIdType)50) // no region smaller than 50... could be parameterized somewhere though
@@ -1058,44 +1063,49 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 				}
 			}
 		}
-		if (modified == 1)
-		{
-			newcoll->InitTraversal();
-			vtkIdType num = newcoll->GetNumberOfItems();
-			for (vtkIdType i = 0; i < num; i++)
-			{
-				cout << "try to get next actor from newcoll:" << i << endl;
-				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
-				myActor->SetDisplayMode(this->mui_DisplayMode);
-				this->getActorCollection()->AddItem(myActor);
-				emit this->actorsMightHaveChanged();
-				std::string action = "Object extracted from array: " + myActor->GetName();
-				int mCount = BEGIN_UNDO_SET(action);
-				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
-				END_UNDO_SET();
-
-
-			}
-			//cout << "camera and grid adjusted" << endl;
-			cout << "new actor(s) added" << endl;
-			this->Initmui_ExistingScalars();
-			
-			cout << "Set actor collection changed" << endl;
-			this->getActorCollection()->SetChanged(1);
-			cout << "Actor collection changed" << endl;
-
-			this->AdjustCameraAndGrid();
-			cout << "Camera and grid adjusted" << endl;
-
-			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
-			{
-				this->UpdateLandmarkSettings();
-			}
-			//this->Setmui_ActiveScalars(myActiveScalars->Name, myActiveScalars->DataType, myActiveScalars->NumComp);
-			this->Render();
-		}
 	}
+	
+	if (modified == 1)
+	{
+		newcoll->InitTraversal();
+		vtkIdType num = newcoll->GetNumberOfItems();
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor from newcoll:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+
+			myActor->SetDisplayMode(this->mui_DisplayMode);
+			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
+			std::string action = "Object extracted from array: " + myActor->GetName();
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+
+
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "new actor(s) added" << endl;
+		this->Initmui_ExistingScalars();
+			
+		cout << "Set actor collection changed" << endl;
+		this->getActorCollection()->SetChanged(1);
+		cout << "Actor collection changed" << endl;
+
+		this
+				
+				
+			->AdjustCameraAndGrid();
+		cout << "Camera and grid adjusted" << endl;
+
+		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+		{
+			this->UpdateLandmarkSettings();
+		}
+		//this->Setmui_ActiveScalars(myActiveScalars->Name, myActiveScalars->DataType, myActiveScalars->NumComp);
+		this->Render();
+	}
+	
 
 }
 void mqMorphoDigCore::Extract_Tag_Range(int tag_min, int tag_max)
@@ -17408,8 +17418,11 @@ void mqMorphoDigCore::slotDecomposeTag()
 	//this->Decompose_Tag();
 	vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
 	// get min and max ranges.
+	cout << "Try to Get min and max" << endl;
 	int Tag_Min = this->GetTagRangeMin();
+	cout << "Tag_min" << Tag_Min<< endl;
 	int Tag_Max = this->GetTagRangeMax();
+	cout << "Tag_max" << Tag_Max << endl;
 
 	this->Decompose_Tag(Tag_Min, Tag_Max);
 	
