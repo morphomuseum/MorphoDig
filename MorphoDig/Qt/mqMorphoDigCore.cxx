@@ -721,7 +721,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++)	// for each vertex 
 					{
 						//std::cout<<"vertex"<<i<<", current region:"<<currentRegions->GetTuple(i)[0]<<std::endl;
-						newScalars->InsertTuple1(i, (float)currentTag->GetTuple(i)[0]);
+						newScalars->InsertTuple1(i, currentTag->GetTuple(i)[0]);
 					}
 					newScalars->SetName("TMP");
 
@@ -731,9 +731,10 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 					vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
 					cout << "Try to call Get_Tag_Region_Sizes"<<endl;
 					region_sizes = this->Get_Tag_Region_Sizes(currentTag);
-					cout << "Successful call" << endl;
+					cout << "Number of regions: " << region_sizes->GetNumberOfTuples()<< endl;
 					for (vtkIdType i = 0; i < region_sizes->GetNumberOfTuples(); i++)
 					{
+						cout << "region_sizes->GetTuple((vtkIdType)"<<i<<")[0]" << region_sizes->GetTuple((vtkIdType)i)[0] << endl;
 						if (region_sizes->GetTuple((vtkIdType)i)[0] >= (vtkIdType)50) // no region smaller than 50... could be parameterized somewhere though
 						{
 
@@ -769,7 +770,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 
 
 							MyObj = geometry->GetOutput();
-							myPD->GetPointData()->RemoveArray("TMP");
+							
 
 							std::cout << "\nExtract array new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
 							std::cout << "\nExtract array new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
@@ -845,7 +846,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 								newactor->SetSelected(0);
 
 								//std::string newname = this->CheckingName(myActor->GetName());
-								newactor->SetName(myActor->GetName() + "_lc");
+								newactor->SetName(myActor->GetName() + "_tag_"+std::to_string((int)i));
 								//newactor->SetName(newname);
 								cout << "try to add new actor=" << endl;
 								newcoll->AddTmpItem(newactor);
@@ -854,6 +855,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 						}
 
 					}
+					myPD->GetPointData()->RemoveArray("TMP");
 				}
 			}
 		}
