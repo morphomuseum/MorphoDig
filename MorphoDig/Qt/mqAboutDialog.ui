@@ -86,8 +86,8 @@ Features include:
     Retro-deformation for un-deforming fossils/deformed specimens
     Point and curve primitives for placing the exact type of landmark points you're interested in
     Easy to use 3D interface for positioning and manipulating sets of surfaces and landmark primitives
-    Mesh tagging, labeling and coloring (to allow for the creation of anatomy atlases)
-    Mesh scalar computation and coloring (based upon curvature/thickness etc...) </string>
+    Surface tagging, labeling and coloring (to allow for the creation of anatomy atlases)
+    Surface scalar computation and coloring (based upon curvature/thickness etc...) </string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

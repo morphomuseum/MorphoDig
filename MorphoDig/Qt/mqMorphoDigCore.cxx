@@ -511,7 +511,7 @@ void mqMorphoDigCore::PropagateVertices(
 )
 {
 	// this function updates an outputPtsList (list of vertices Id).
-	// it looks for the input mesh all the vertices within a list (ptsToInvestigate) and includes them in outputPtsList if 
+	// it looks for the input surface all the vertices within a list (ptsToInvestigate) and includes them in outputPtsList if 
 	// it their normal meet some criterion defined by vn[3] min_cos (angle between vn and that of investigated points should be smaller than a limit angle defined by min_cos)
 
 	// for each vertex of ptsToInvestigate.
@@ -727,7 +727,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 
 					myPD->GetPointData()->RemoveArray("TMP");
 					myPD->GetPointData()->AddArray(newScalars);
-					myPD->GetPointData()->SetActiveScalars("TMP");
+					//myPD->GetPointData()->SetActiveScalars("TMP");
 					vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
 					cout << "Try to call Get_Tag_Region_Sizes"<<endl;
 					region_sizes = this->Get_Tag_Region_Sizes(currentTag);
@@ -770,8 +770,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 
 
 							MyObj = geometry->GetOutput();
-							
-
+							MyObj->GetPointData()->RemoveArray("TMP");
 							std::cout << "\nExtract array new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
 							std::cout << "\nExtract array new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
 
@@ -910,6 +909,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
 	int modified = 0;
+	QString Sauv_Active_Array_Name = this->Getmui_ActiveScalars()->Name;
 	for (vtkIdType i = 0; i < num; i++)
 	{
 		cout << "try to get next actor:" << i << endl;
@@ -945,7 +945,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 
 					myPD->GetPointData()->RemoveArray("TMP");
 					myPD->GetPointData()->AddArray(newScalars);
-					myPD->GetPointData()->SetActiveScalars("TMP");
+					//myPD->GetPointData()->SetActiveScalars("TMP");
 
 
 					vtkSmartPointer<vtkThreshold> selector =
@@ -980,7 +980,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 
 					MyObj = geometry->GetOutput();
 					myPD->GetPointData()->RemoveArray("TMP");
-
+					MyObj->GetPointData()->RemoveArray("TMP");
 					std::cout << "\nExtract array new Number of points:" << MyObj->GetNumberOfPoints() << std::endl;
 					std::cout << "\nExtract array new Number of cells:" << MyObj->GetNumberOfCells() << std::endl;
 
@@ -1019,6 +1019,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 
 
 						newmapper->ScalarVisibilityOn();
+						MyObj->GetPointData()->SetActiveScalars(Sauv_Active_Array_Name.toStdString().c_str());
 
 						cout << "extract object" << MyObj->GetNumberOfPoints() << endl;
 						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
@@ -4152,7 +4153,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			this->getActorCollection()->AddItem(actor);
 			emit this->actorsMightHaveChanged(); 
 			this->Initmui_ExistingScalars();
-			std::string action = "Load mesh file";
+			std::string action = "Load surface file";
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
 			END_UNDO_SET();
@@ -4218,7 +4219,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			{
 			double globalcenterofmass[3];
 			this->GetGlobalCenterOfMass(globalcenterofmass);
-			cout << "Center of mass of all opened mesh is " << globalcenterofmass[0] << " " << globalcenterofmass[1] << " " << globalcenterofmass[2] << endl;
+			cout << "Center of mass of all opened surfaces is " << globalcenterofmass[0] << " " << globalcenterofmass[1] << " " << globalcenterofmass[2] << endl;
 
 			double GlobalBoundingBoxLength = this->GetGlobalBoundingBoxLength();
 			cout << "Global Bounding Box length is " << GlobalBoundingBoxLength << " mm" << endl;
@@ -9480,7 +9481,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 
 				myData = cleanPolyDataFilter->GetOutput();
 				//myData = fillholes->GetOutput();
-				cout << "original mesh holes: nv=" << mymapper->GetInput()->GetNumberOfPoints() << endl;
+				cout << "original surface holes: nv=" << mymapper->GetInput()->GetNumberOfPoints() << endl;
 				cout << "fill holes: nv=" << myData->GetNumberOfPoints() << endl;
 			
 
@@ -10134,7 +10135,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 				MyObj->GetPointData()->RemoveArray("RegionId");
 				MyObj->GetPointData()->RemoveArray("TMP");
 				MyObj->GetPointData()->AddArray(newScalars);
-				MyObj->GetPointData()->SetActiveScalars("TMP");
+				//MyObj->GetPointData()->SetActiveScalars("TMP");
 
 
 				int cpt = 0;
@@ -12852,7 +12853,7 @@ double mqMorphoDigCore::ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mP
 void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, int cutMinMax, double cutPercent, int mode, int smoothing_method)
 {
 	//mode = 0: raw smoothing (average of direct neighbours)
-	//mode = 1: smooth within local sphere of radius ~ mesh avg size / 40
+	//mode = 1: smooth within local sphere of radius ~ surface avg size / 40
 	//mode = 2: smooth within local sphere of radius defined by the user
 
 	//smoothing_method = 0 => average
@@ -13576,7 +13577,7 @@ to achieve desired the correct rendering. Do not understand why yet.
 				vtkSmartPointer<vtkIdList> oldpoints = vtkSmartPointer<vtkIdList>::New();
 				vtkSmartPointer<vtkIdList> newpoints = vtkSmartPointer<vtkIdList>::New();
 
-				//std::cout << "\n Mesh invert";
+				//std::cout << "\n Surface invert";
 				//for every triangle
 				for (vtkIdType i = 0; i < myData->GetNumberOfCells(); i++)
 				{

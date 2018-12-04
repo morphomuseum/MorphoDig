@@ -159,7 +159,7 @@ void mqSaveDataReaction::SaveSelectedSurfaceScalars()
 	if (numsel == 0)
 	{
 		QMessageBox msgBox;
-		msgBox.setText("Select at least one mesh ");
+		msgBox.setText("Select at least one surface ");
 		msgBox.exec();
 		return;
 
@@ -249,7 +249,7 @@ void mqSaveDataReaction::SaveActiveScalarSummary()
 	else
 	{
 		QMessageBox msgBox;
-		msgBox.setText("Select at least one mesh and activate existing scalars to use this option");
+		msgBox.setText("Select at least one surface and activate existing scalars to use this option");
 		msgBox.exec();
 		return;
 
@@ -330,8 +330,8 @@ void mqSaveDataReaction::SaveMeshSize()
 	}
 	QString myText;
 	
-		cout << "Save  mesh size measurements" << endl;
-		myText = tr("Save mesh size measurements");
+		cout << "Save  surface size measurements" << endl;
+		myText = tr("Save surface size measurements");
 	
 
 		QString myFileProposition = tr("Size_measurements.txt");

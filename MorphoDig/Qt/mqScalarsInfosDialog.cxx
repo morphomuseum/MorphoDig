@@ -173,7 +173,7 @@ void mqScalarsInfosDialog::editInfos()
 	else
 	{
 		QMessageBox msgBox;
-		msgBox.setText("Select at least one mesh and activate existing scalars to use this option");
+		msgBox.setText("Select at least one surface and activate existing scalars to use this option");
 		msgBox.exec();
 		return;
 

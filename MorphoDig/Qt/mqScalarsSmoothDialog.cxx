@@ -103,7 +103,7 @@ void mqScalarsSmoothDialog::editSmooth()
 		//smoothing_method = 1 => median
 		int mode = 3;
 		//mode = 0: raw smoothing (average/median of direct neighbours)
-		//mode = 1: smooth within local sphere of radius ~ mesh avg size / 40
+		//mode = 1: smooth within local sphere of radius ~ surface avg size / 40
 		//mode = 2: smooth within local sphere of radius defined by the user
 		if (this->Ui->median->isChecked()) { smoothing_method = 1; }
 

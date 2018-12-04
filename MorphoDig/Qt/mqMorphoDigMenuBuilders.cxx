@@ -278,7 +278,7 @@ void mqMorphoDigMenuBuilders::buildTagsMenu(QMenu& menu)
 	
 	new mqExtractTagRangeDialogReaction(menu.addAction("Extract tag range for each selected surface") << mqSetName("actionExtractTagRange"));
 	//QAction::connect(extractActiveTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotExtractActiveTag()));
-	QAction *decomposeTag = menu.addAction("Extract all taged regions as different objects");
+	QAction *decomposeTag = menu.addAction("Extract each tagged region as a new object, for all regions of all selected surfaces");
 	QAction::connect(decomposeTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotDecomposeTag()));
 	
 }
