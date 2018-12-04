@@ -18,7 +18,7 @@
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
-
+#include <vtkFeatureEdges.h>
 #include <vtkExtractEdges.h>
 #include <vtkThreshold.h>
 #include <vtkMaskFields.h>
@@ -3987,7 +3987,9 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		cleanPolyDataFilter->ConvertLinesToPointsOff();
 		cleanPolyDataFilter->ConvertPolysToLinesOff();
 		cleanPolyDataFilter->ConvertStripsToPolysOff();
+		cleanPolyDataFilter->SetAbsoluteTolerance(0);
 		cleanPolyDataFilter->PointMergingOn();
+		
 		cleanPolyDataFilter->Update();
 
 		MyPolyData = cleanPolyDataFilter->GetOutput();
@@ -9627,7 +9629,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 					densify->SetNumberOfSubdivisions(subdivisions);
 					densify->Update();
 					cleanPolyDataFilter->SetInputData(densify->GetOutput());
-
+					
 					
 				}
 				else if (method == 1)// linear subdivision filter
@@ -9636,6 +9638,15 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 						vtkSmartPointer<vtkTriangleFilter>::New();
 					triangles->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
 					triangles->Update();
+					vtkSmartPointer<vtkFeatureEdges> featureEdges = vtkSmartPointer<vtkFeatureEdges>::New();
+					featureEdges->SetInputData(triangles->GetOutput());
+					featureEdges->BoundaryEdgesOff();
+					featureEdges->FeatureEdgesOff();
+					featureEdges->ManifoldEdgesOff();
+					featureEdges->NonManifoldEdgesOn();
+					featureEdges->Update();
+					cout << "Feature edges: nr of points in non manyfold edges" << featureEdges->GetOutput()->GetNumberOfPoints() << endl;
+
 					cout << "Triangles numpoints" << triangles->GetOutput()->GetNumberOfPoints() << endl;
 					cout << "Triangles numcells" << triangles->GetOutput()->GetNumberOfCells() << endl;
 					vtkSmartPointer<vtkSphereSource> sphereSource =
@@ -9651,7 +9662,14 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 					linear->Update();
 					cout << "Linear numpoints" << linear->GetOutput()->GetNumberOfPoints() << endl;
 					cout << "Linear numcells" << linear->GetOutput()->GetNumberOfCells() << endl;
-					cleanPolyDataFilter->SetInputData(linear->GetOutput());
+					if (linear->GetOutput()->GetNumberOfPoints() > 0)
+					{
+						cleanPolyDataFilter->SetInputData(linear->GetOutput());
+					}
+					else
+					{
+						cleanPolyDataFilter->SetInputData(featureEdges->GetOutput());
+					}
 
 
 				}
@@ -9665,8 +9683,8 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 					
 					vtkSmartPointer<vtkLoopSubdivisionFilter> loop =
 						vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
-					//loop->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-					loop->SetInputData(sphereSource->GetOutput()); 
+					loop->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+					//loop->SetInputData(sphereSource->GetOutput()); 
 					loop->SetNumberOfSubdivisions(subdivisions);
 					loop->Update();
 					cout << "Loop numpoints" << loop->GetOutput()->GetNumberOfPoints() << endl;
@@ -9683,8 +9701,8 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 
 					vtkSmartPointer<vtkButterflySubdivisionFilter> butterfly =
 						vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
-					//butterfly->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-					butterfly->SetInputData(sphereSource->GetOutput());
+					butterfly->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+					//butterfly->SetInputData(sphereSource->GetOutput());
 
 					butterfly->SetNumberOfSubdivisions(subdivisions);
 					butterfly->Update();
