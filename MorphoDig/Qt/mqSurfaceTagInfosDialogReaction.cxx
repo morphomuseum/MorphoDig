@@ -34,8 +34,10 @@ void mqSurfaceTagInfosDialogReaction::showSurfaceTagInfosDialog()
 		msgBox.exec();
 		return;
 	}
-	
+	mqSurfaceTagInfosDialog mqInfos(mqCoreUtilities::mainWidget());
+
+	mqInfos.exec();
 	
   
-  //Infos_dialog->show();
+		//Infos_dialog->show();
 }

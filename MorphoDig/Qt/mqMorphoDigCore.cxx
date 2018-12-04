@@ -1547,15 +1547,7 @@ int mqMorphoDigCore::GetTagRangeMin(QString TagArray)
 		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 		{
 			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
-			if (myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()) != NULL
-				&& (
-					this->Getmui_ActiveScalars()->DataType == VTK_INT ||
-					this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
-
-					)
-				&& this->Getmui_ActiveScalars()->NumComp == 1
-				)
-			{
+			
 				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()));
 					if (currentTags != NULL)
 					{
@@ -1576,7 +1568,7 @@ int mqMorphoDigCore::GetTagRangeMin(QString TagArray)
 
 						if (my_currmin < my_min) { my_min = my_currmin; }
 					}
-				}
+				
 				
 
 		}
@@ -1597,15 +1589,16 @@ int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
 	// A GLOBAL range max (for all actors)
 	//warning: calls a Ini Traversal...
 	QString mTagArray;
-	if (TagArray.length() == 0)
+	if (TagArray == "")
 	{
 		mTagArray = this->Getmui_ActiveScalars()->Name; // we hope this active scalar is a Tag one...
-			
+		
 	}
 	else
 	{
 		mTagArray = TagArray;
 	}
+	cout << "mTagArray=" << mTagArray.toStdString() << endl;
 	//return this->ScalarRangeMin;
 	int my_max;
 	int my_currmax;
@@ -1623,15 +1616,7 @@ int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
 		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 		{
 			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
-			if (myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()) != NULL
-				&& (
-					this->Getmui_ActiveScalars()->DataType == VTK_INT ||
-					this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
-
-					)
-				&& this->Getmui_ActiveScalars()->NumComp == 1
-				)
-			{
+			
 				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()));
 				if (currentTags != NULL)
 				{
@@ -1652,7 +1637,7 @@ int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
 
 					if (my_currmax > my_max) { my_max = my_currmax; }
 				}
-			}
+			
 
 
 		}
@@ -6932,7 +6917,7 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 						double surf = 0.5*sqrt((x2*y3 - x3*y2)*(x2*y3 - x3*y2)
 										+ (x3*y1 - x1*y3)*(x3*y1 - x1*y3) + 
 										  (x1*y2 - x2*y1)*(x1*y2 - x2*y1));
-						Volume += surf;
+						Area += surf;
 
 						double *ven;
 						double vn[3];
@@ -6970,10 +6955,10 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
 		QTextStream stream(&file);
-		stream << "Name	Area	Volume	Vertex_nr Triangle_nr" << endl;
+		stream << "Name	Area	Volume	Vertex_nr	Triangle_nr	Structure" << endl;
 		cout << "First Summary Done" << endl;
 		file.close();
-		this->SaveActiveScalarSummary(fileName, 0, TagArray, 0);
+		this->SaveSurfaceTagSummary(fileName, 0, TagArray, 0);
 		//if useTags =1, search Max tagged value in all opened objects
 		if (useTags == 1 && TagArray.length() > 0)
 		{
