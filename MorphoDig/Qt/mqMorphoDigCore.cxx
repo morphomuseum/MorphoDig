@@ -14,6 +14,7 @@
 #include <time.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkTextProperty.h>
+#include <vtkSphereSource.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkKdTreePointLocator.h>
@@ -25,6 +26,11 @@
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vtkFillHolesFilter.h>
 #include <vtkDensifyPolyData.h>
+#include <vtkLinearSubdivisionFilter.h>
+#include <vtkLoopSubdivisionFilter.h>
+#include <vtkTriangleFilter.h>
+#include <vtkButterflySubdivisionFilter.h>
+
 #include <vtkDecimatePro.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkSmoothPolyDataFilter.h>
@@ -9563,7 +9569,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 	}
 
 }
-void mqMorphoDigCore::addDensify(int subdivisions) 
+void mqMorphoDigCore::addDensify(int subdivisions, int method) 
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	this->ActorCollection->InitTraversal();
@@ -9612,16 +9618,81 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 				newmapper->ScalarVisibilityOn();
 				
 				cout << "densification subdivisions=" << subdivisions << endl;
+				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+				if (method == 0) // classic densify polydata
+				{
+					vtkSmartPointer<vtkDensifyPolyData> densify =
+						vtkSmartPointer<vtkDensifyPolyData>::New();
+					densify->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+					densify->SetNumberOfSubdivisions(subdivisions);
+					densify->Update();
+					cleanPolyDataFilter->SetInputData(densify->GetOutput());
 
-				vtkSmartPointer<vtkDensifyPolyData> densify =
-					vtkSmartPointer<vtkDensifyPolyData>::New();
-				densify->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-				densify->SetNumberOfSubdivisions(subdivisions);
+					
+				}
+				else if (method == 1)// linear subdivision filter
+				{
+					vtkSmartPointer<vtkTriangleFilter> triangles =
+						vtkSmartPointer<vtkTriangleFilter>::New();
+					triangles->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+					triangles->Update();
+					cout << "Triangles numpoints" << triangles->GetOutput()->GetNumberOfPoints() << endl;
+					cout << "Triangles numcells" << triangles->GetOutput()->GetNumberOfCells() << endl;
+					vtkSmartPointer<vtkSphereSource> sphereSource =
+						vtkSmartPointer<vtkSphereSource>::New();
+					sphereSource->Update();
+					
+					vtkSmartPointer<vtkLinearSubdivisionFilter> linear =
+						vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
+					linear->SetInputData(triangles->GetOutput());
+					//linear->SetInputData(sphereSource->GetOutput());
+					linear->SetNumberOfSubdivisions(subdivisions);
+					linear->SetCheckForTriangles(false);
+					linear->Update();
+					cout << "Linear numpoints" << linear->GetOutput()->GetNumberOfPoints() << endl;
+					cout << "Linear numcells" << linear->GetOutput()->GetNumberOfCells() << endl;
+					cleanPolyDataFilter->SetInputData(linear->GetOutput());
 
-				
-				
-				densify->Update();
-				
+
+				}
+				else if (method ==2)
+				{
+					vtkSmartPointer<vtkSphereSource> sphereSource =
+						vtkSmartPointer<vtkSphereSource>::New();
+					sphereSource->Update();
+
+					
+					
+					vtkSmartPointer<vtkLoopSubdivisionFilter> loop =
+						vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
+					//loop->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+					loop->SetInputData(sphereSource->GetOutput()); 
+					loop->SetNumberOfSubdivisions(subdivisions);
+					loop->Update();
+					cout << "Loop numpoints" << loop->GetOutput()->GetNumberOfPoints() << endl;
+					cout << "Loop numcells" << loop->GetOutput()->GetNumberOfCells() << endl;
+
+					cleanPolyDataFilter->SetInputData(loop->GetOutput());
+				}
+				else 
+				{
+					vtkSmartPointer<vtkSphereSource> sphereSource =
+						vtkSmartPointer<vtkSphereSource>::New();
+					sphereSource->Update();
+
+
+					vtkSmartPointer<vtkButterflySubdivisionFilter> butterfly =
+						vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
+					//butterfly->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+					butterfly->SetInputData(sphereSource->GetOutput());
+
+					butterfly->SetNumberOfSubdivisions(subdivisions);
+					butterfly->Update();
+					cout << "butterfly numpoints" << butterfly->GetOutput()->GetNumberOfPoints() << endl;
+					cout << "butterfly numcells" << butterfly->GetOutput()->GetNumberOfCells() << endl;
+					cleanPolyDataFilter->SetInputData(butterfly->GetOutput());
+				}
+
 			/*	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 				ObjNormals->SetInputData(densify->GetOutput());
 				ObjNormals->ComputePointNormalsOn();
@@ -9631,9 +9702,9 @@ void mqMorphoDigCore::addDensify(int subdivisions)
 
 				ObjNormals->Update();*/
 
-				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+				
 				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
-				cleanPolyDataFilter->SetInputData(densify->GetOutput());
+				
 				cleanPolyDataFilter->PieceInvariantOff();
 				cleanPolyDataFilter->ConvertLinesToPointsOff();
 				cleanPolyDataFilter->ConvertPolysToLinesOff();

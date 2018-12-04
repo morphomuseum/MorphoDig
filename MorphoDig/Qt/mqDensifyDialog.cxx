@@ -82,8 +82,24 @@ void mqDensifyDialog::Densify()
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
 	{
 		std::string action = "Densify selected actors";
-		
-		mqMorphoDigCore::instance()->addDensify(this->Ui->subdivisions->value());
+		int method = 1; //linear interpolation
+		if (this->Ui->mloop->isChecked())
+		{
+			method = 2;
+		}
+		if (this->Ui->densification->isChecked())
+		{
+			method = 0;
+		}
+		if (this->Ui->linear->isChecked())
+		{
+			method = 1;
+		}
+		if (this->Ui->butterfly->isChecked())
+		{
+			method = 3;
+		}
+		mqMorphoDigCore::instance()->addDensify(this->Ui->subdivisions->value(), method);
 		
 	}
 }

@@ -638,7 +638,7 @@ public:
 	//void Invert();// Invert each selected surface
 	bool RecoverLandmarks(vtkSmartPointer< vtkPoints > landmarks_list_source, vtkSmartPointer< vtkPoints > landmarks_list_target, int all);
 	void addFillHoles(int maxsize);
-	void addDensify(int subdivisions);
+	void addDensify(int subdivisions, int method);
 	void addTPS(int r, double factor, int all);
 	void addSmooth(int iteration, double relaxation);
 	void addDecimate(int quadric, double factor);
