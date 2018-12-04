@@ -113,6 +113,7 @@ public:
 	virtual void PopRedoStack();
 	virtual void ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat); // can be overriden in LMActor!
 	vtkSmartPointer<vtkFloatArray> GetPointNormals();
+	vtkSmartPointer<vtkFloatArray> GetCellNormals();
 	vtkSmartPointer<vtkFloatArray> pointNormals;
 	vtkSmartPointer<vtkFloatArray> cellNormals;
 

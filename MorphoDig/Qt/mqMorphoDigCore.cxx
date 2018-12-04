@@ -1515,8 +1515,20 @@ double mqMorphoDigCore::GetScalarRangeMin()
 	}
 }
 
-int mqMorphoDigCore::GetTagRangeMin()
+int mqMorphoDigCore::GetTagRangeMin(QString TagArray)
 {
+	// A GLOBAL range min (for all actors)
+	// warning: calls a Ini Traversal...
+		QString mTagArray;
+	if (TagArray.length() == 0)
+	{
+		mTagArray = this->Getmui_ActiveScalars()->Name; // we hope this active scalar is a Tag one...
+
+	}
+	else
+	{
+		mTagArray = TagArray;
+	}
 
 	//return this->ScalarRangeMin;
 	int my_min;
@@ -1535,7 +1547,7 @@ int mqMorphoDigCore::GetTagRangeMin()
 		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 		{
 			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
-			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+			if (myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()) != NULL
 				&& (
 					this->Getmui_ActiveScalars()->DataType == VTK_INT ||
 					this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
@@ -1544,7 +1556,7 @@ int mqMorphoDigCore::GetTagRangeMin()
 				&& this->Getmui_ActiveScalars()->NumComp == 1
 				)
 			{
-				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
+				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()));
 					if (currentTags != NULL)
 					{
 						my_currmin = INT_MAX;
@@ -1580,9 +1592,20 @@ int mqMorphoDigCore::GetTagRangeMin()
 		return my_min;
 	}
 }
-int mqMorphoDigCore::GetTagRangeMax()
-{
-
+int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
+{ 
+	// A GLOBAL range max (for all actors)
+	//warning: calls a Ini Traversal...
+	QString mTagArray;
+	if (TagArray.length() == 0)
+	{
+		mTagArray = this->Getmui_ActiveScalars()->Name; // we hope this active scalar is a Tag one...
+			
+	}
+	else
+	{
+		mTagArray = TagArray;
+	}
 	//return this->ScalarRangeMin;
 	int my_max;
 	int my_currmax;
@@ -1600,7 +1623,7 @@ int mqMorphoDigCore::GetTagRangeMax()
 		if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 		{
 			vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
-			if (myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()) != NULL
+			if (myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()) != NULL
 				&& (
 					this->Getmui_ActiveScalars()->DataType == VTK_INT ||
 					this->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT
@@ -1609,7 +1632,7 @@ int mqMorphoDigCore::GetTagRangeMax()
 				&& this->Getmui_ActiveScalars()->NumComp == 1
 				)
 			{
-				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(this->Getmui_ActiveScalars()->Name.toStdString().c_str()));
+				vtkIntArray *currentTags = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars(mTagArray.toStdString().c_str()));
 				if (currentTags != NULL)
 				{
 					my_currmax = 0;
@@ -6797,7 +6820,183 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 	file.close();
 
 }
+//SaveSurfaceTagSummary
+void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
+	{
+		QTextStream stream(&file);
 
+		std::string TagName = "";
+		if (TagId < mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->numTags)
+		{
+			TagName = mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->tagNames.at(TagId);
+		}
+		else
+		{
+			TagName = "Tag" + TagId;
+		}
+
+
+
+		//this->ComputeSelectedNamesLists();
+
+		this->ActorCollection->InitTraversal();
+
+
+
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				
+				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				vtkPolyData *mPD = mapper->GetInput();
+				double Area = 0;
+				double Volume = 0;
+				vtkIdType NumVert = 0;
+				vtkIdType NumCells = 0;
+				vtkIdType cpt = 0;
+				if (useTags == 0)
+				{
+					vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+					cpt = mapper->GetInput()->GetNumberOfPoints();
+					massProp->SetInputData(mapper->GetInput());
+					massProp->Update();
+					Area = massProp->GetSurfaceArea();
+					Volume = massProp->GetVolume();
+					NumVert = mapper->GetInput()->GetNumberOfPoints();
+					NumCells = mapper->GetInput()->GetNumberOfCells();
+					stream << myActor->GetName().c_str() << "	" << Area << "	" << Volume << "	" << NumVert << "	" << NumCells << "	" << "whole_surface" << endl;
+				}
+				else
+				{// if useTags=1: construct cell list for TagId
+					//most complex stuff: compute by tag.
+					vtkIntArray *currentTags = NULL; //
+					currentTags = vtkIntArray::SafeDownCast(mPD->GetPointData()->GetScalars(TagArray.toStdString().c_str()));
+				
+					vtkSmartPointer<vtkIdList> pointIdList =
+						vtkSmartPointer<vtkIdList>::New();
+					vtkSmartPointer<vtkIdList> cellIdList =
+						vtkSmartPointer<vtkIdList>::New();
+					for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+					{
+						if (currentTags != NULL && currentTags->GetTuple1(j) == TagId)
+						{
+							NumVert++;
+						}
+					}
+					for (vtkIdType j = 0; j < mPD->GetNumberOfCells(); j++)
+					{ 
+						mPD->GetCellPoints(j, pointIdList);
+						int ok = 1;
+						if (pointIdList->GetNumberOfIds() == 3)//only triangles are investigated here
+						{
+							if (currentTags != NULL && currentTags->GetTuple1(pointIdList->GetId(0)) == TagId								
+								&& currentTags->GetTuple1(pointIdList->GetId(1)) == TagId
+								&& currentTags->GetTuple1(pointIdList->GetId(2)) == TagId
+								)
+							{
+								// the 3 points of this cell are tagged the same way!
+								cellIdList->InsertNextId(j);
+							}
+						}
+
+
+					}
+					NumCells = cellIdList->GetNumberOfIds();
+					for (vtkIdType j = 0; j < cellIdList->GetNumberOfIds(); j++)
+					{
+						mPD->GetCellPoints(cellIdList->GetId(j), pointIdList);
+						double A[3], B[3], C[3];
+						double *ve = mPD->GetPoint(pointIdList->GetId(0));
+						A[0] = ve[0];
+						A[1] = ve[1];
+						A[2] = ve[2];
+						ve = mPD->GetPoint(pointIdList->GetId(1));
+						B[0] = ve[0];
+						B[1] = ve[1];
+						B[2] = ve[2];
+						ve = mPD->GetPoint(pointIdList->GetId(2));
+						C[0] = ve[0];
+						C[1] = ve[1];
+						C[2] = ve[2];
+						double x1 = B[0] - A[0];
+						double x2 = B[1] - A[1];
+						double x3 = B[2] - A[2];
+						double y1 = C[0] - A[0];
+						double y2 = C[1] - A[1];
+						double y3 = C[2] - A[2];
+						double surf = 0.5*sqrt((x2*y3 - x3*y2)*(x2*y3 - x3*y2)
+										+ (x3*y1 - x1*y3)*(x3*y1 - x1*y3) + 
+										  (x1*y2 - x2*y1)*(x1*y2 - x2*y1));
+						Volume += surf;
+
+						double *ven;
+						double vn[3];
+						ven = myActor->GetCellNormals()->GetTuple(cellIdList->GetId(j));
+						vn[0] = ven[0];
+						vn[1] = ven[1];
+						vn[2] = ven[2];
+						double center[3];
+						center[0] = (A[0] + B[0] + C[0]) / 3;
+						center[1] = (A[1] + B[1] + C[1]) / 3;
+						center[2] = (A[2] + B[2] + C[2]) / 3;
+						double vol = surf * (center[0] * vn[0] + center[1] * vn[1]+ center[2] * vn[2]) / 3;
+						Volume += vol;
+					}
+					
+					if (NumVert > 10)
+					{
+						stream << myActor->GetName().c_str() << "	" << Area << "	" << Volume << "	" << NumVert << "	" << NumCells << "	" << TagName.c_str() << endl;
+
+					}
+				}
+
+
+
+			}
+		}
+	}
+	file.close();
+
+
+}
+void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray)
+{
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+		stream << "Name	Area	Volume	Vertex_nr Triangle_nr" << endl;
+		cout << "First Summary Done" << endl;
+		file.close();
+		this->SaveActiveScalarSummary(fileName, 0, TagArray, 0);
+		//if useTags =1, search Max tagged value in all opened objects
+		if (useTags == 1 && TagArray.length() > 0)
+		{
+			cout << "useTags==1 and TagArray.length()>0" << endl;
+			
+			vtkIdType maxTagId = this->GetTagRangeMax(TagArray);
+			this->ActorCollection->InitTraversal();
+			
+			cout << "maxTagId=" << maxTagId << endl;
+			if (maxTagId > 0)
+			{
+				for (vtkIdType i = 0; i <= maxTagId; i++)
+				{
+					cout << "SaveActiveScalarSummary(" << i << ")" << endl;
+					this->SaveSurfaceTagSummary(fileName, 1, TagArray, i);
+				}
+			}
+
+		}//usetags=1
+	}//file open
+
+
+}
 void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId)
 {
 	QFile file(fileName);
@@ -7267,33 +7466,9 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 		if (useTags == 1 && TagArray.length() > 0)
 		{
 			cout << "useTags==1 and TagArray.length()>0" << endl;
+			vtkIdType maxTagId = this->GetTagRangeMax(TagArray);
 			this->ActorCollection->InitTraversal();
 
-			vtkIdType maxTagId = 0;
-
-			for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
-			{
-				vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-				if (myActor->GetSelected() == 1)
-				{
-					vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
-					vtkPolyData *mPD = mapper->GetInput();
-					vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mPD->GetPointData()->GetScalars(TagArray.toStdString().c_str()));
-					if (currentTags != NULL)
-					{
-						for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
-						{
-							if (currentTags->GetTuple1(j) > maxTagId)
-							{
-								maxTagId = currentTags->GetTuple1(j);
-							}
-
-						}
-					}
-				}
-				
-				
-			}// end search for max TagId
 			cout << "maxTagId=" << maxTagId << endl;
 			if (maxTagId > 0)
 			{
@@ -7342,7 +7517,6 @@ void mqMorphoDigCore::SaveMeshSize(QString fileName)
 					double pc2 = myActor->GetXYZPCLength(1);
 					double pc3 = myActor->GetXYZPCLength(2);
 					double avgpc = (pc1 + pc2 + pc3) / 3;
-					//vtkSmartPointer<vtkPolyData> toMeasure = vtkSmartPointer<vtkPolyData>::New();
 					vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
 
 					massProp->SetInputData(mapper->GetInput());
@@ -7406,7 +7580,6 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 					if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 					{
 					
-						//vtkSmartPointer<vtkPolyData> toMeasure = vtkSmartPointer<vtkPolyData>::New();
 						vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
 						
 						massProp->SetInputData(mapper->GetInput());

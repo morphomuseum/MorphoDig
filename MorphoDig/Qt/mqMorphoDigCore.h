@@ -462,6 +462,8 @@ public:
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
 	void SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName);
+	void SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId);
+	void SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray);
 	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);
@@ -738,8 +740,8 @@ public:
   void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin(int cutMin= 5, int onlyselected=0);
 	double GetSuggestedScalarRangeMax(int cutMax=5, int onlyselected=0);
-	int GetTagRangeMin();
-	int GetTagRangeMax();
+	int GetTagRangeMin(QString TagArray = "");
+	int GetTagRangeMax(QString TagArray="");
 	double GetScalarRangeMin();
 	double GetScalarRangeMax();
   void SetSelectedActorsTransparency(int trans);

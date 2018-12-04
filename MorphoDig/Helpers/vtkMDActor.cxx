@@ -71,6 +71,10 @@ vtkMDActor::~vtkMDActor()
 
 
 }
+vtkSmartPointer<vtkFloatArray> vtkMDActor::GetCellNormals()
+{
+	return this->cellNormals;
+}
 vtkSmartPointer<vtkFloatArray> vtkMDActor::GetPointNormals()
 {
 	return this->pointNormals;

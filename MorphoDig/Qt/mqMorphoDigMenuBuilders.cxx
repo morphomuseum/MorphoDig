@@ -78,6 +78,7 @@
 #include "mqScalarsDistanceDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
 #include "mqScalarsInfosDialogReaction.h"
+#include "mqSurfaceTagInfosDialogReaction.h"
 #include "mqExtractTagRangeDialogReaction.h"
 #include "mqSetName.h"
 #include "mqViewMenuManager.h"
@@ -197,7 +198,9 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqOpenDataReaction(submenuOrientationLabels->addAction("Open Orientation Labels") << mqSetName("actionOpenORI"), 7);
   new mqSaveDataReaction(submenuOrientationLabels->addAction("Save Orientation Labels") << mqSetName("actionSaveORI"), 7);
   
-  new mqSaveDataReaction(submenuMeasurements->addAction("Save area, volume, triangle number and vertex number of selected surfaces") << mqSetName("actionSaveAV"), 18);
+  //new mqSaveDataReaction(submenuMeasurements->addAction("Save area, volume, triangle number and vertex number of selected surfaces") << mqSetName("actionSaveAV"), 18);
+  new mqSurfaceTagInfosDialogReaction(submenuMeasurements->addAction("Save area, volume triangle number of selected surfaces") << mqSetName("actionSaveSurfaceTagInfos"));
+
   new mqSaveDataReaction(submenuMeasurements->addAction("Surface global complexity: save normalized shape index of selected surfaces") << mqSetName("actionSaveNSI"), 19);  
   new mqSaveDataReaction(submenuMeasurements->addAction("Surface global complexity: save convex hull area ratio and normalized shape index of selected surfaces (warning: slow)") << mqSetName("actionSaveCHNSI"), 20);
   new mqSaveDataReaction(submenuMeasurements->addAction("Save size measurements (max length in xyz direction etc.) of selected surfaces") << mqSetName("actionSaveSize"), 21);
