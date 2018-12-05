@@ -17,7 +17,10 @@ mqViewMenuManager.cxx
   mqCubeDialog.cxx
   mqCubeDialogReaction.h
   mqCubeDialogReaction.cxx
-
+  mqIcosahedronDialog.h
+  mqIcosahedronDialog.cxx
+  mqIcosahedronDialogReaction.h
+  mqIcosahedronDialogReaction.cxx
   mqDesktopServicesReaction.cxx
   mqDesktopServicesReaction.h
   mqReaction.cxx
@@ -279,6 +282,7 @@ set (Qt_UIs mqAboutDialog.ui
 mqColorDialog.ui 
 mqCylinderDialog.ui 
 mqCubeDialog.ui 
+mqIcosahedronDialog.ui
 mqLandmarkDialog.ui  
 mqCameraControlsWidget.ui 
 mqObjectsControlsWidget.ui 

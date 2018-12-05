@@ -4,38 +4,38 @@
    
 
 =========================================================================*/
-#ifndef _mqCubeDialog_h
-#define _mqCubeDialog_h
+#ifndef _mqIcosahedronDialog_h
+#define _mqIcosahedronDialog_h
 
 
 #include <QDialog>
 
 namespace Ui
 {
-class mqCubeDialog;
+class mqIcosahedronDialog;
 }
 
 
 
 
 /**
-* mqCubeDialog is the dialog used by MorphoDig to create cubic/box-shaped 3D printing connective material .
+* mqIcosahedronDialog is the dialog used by MorphoDig to create cubic/box-shaped 3D printing connective material .
 */
-class  mqCubeDialog : public QDialog
+class  mqIcosahedronDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  mqCubeDialog(QWidget* Parent);
+  mqIcosahedronDialog(QWidget* Parent);
   
-  ~mqCubeDialog();
-  void editCube();
+  ~mqIcosahedronDialog();
+  void editIcosahedron();
   
   public slots:
   
   
   
-  virtual void sloteditCube();
+  virtual void sloteditIcosahedron();
   virtual void slotClose();
   
   
@@ -44,8 +44,8 @@ protected:
 private:
 	
 
-  Q_DISABLE_COPY(mqCubeDialog)
-  Ui::mqCubeDialog* const Ui;
+  Q_DISABLE_COPY(mqIcosahedronDialog)
+  Ui::mqIcosahedronDialog* const Ui;
  
   // Here we should have the file name, no ?
 };

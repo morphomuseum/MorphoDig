@@ -7289,6 +7289,119 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 	file.close();
 
 }
+void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdivisions)
+{
+	double mRadius = radius;
+	double bbz = this->getActorCollection()->GetBoundingBox()[5];
+	double bbx = this->getActorCollection()->GetBoundingBox()[3];
+	double bby = this->getActorCollection()->GetBoundingBox()[4];
+	int msubdivisions = subdivisions;
+	if (msubdivisions < 0 || msubdivisions == INT_MAX)
+	{
+
+		msubdivisions = 0;
+		
+
+	}
+	if (mRadius <= 0 || mRadius == DBL_MAX)
+	{
+
+		mRadius = 1*this->getActorCollection()->GetBoundingBoxLength() / 20;
+		if (mRadius == 0 || mRadius == DBL_MAX) { mRadius = 10; }
+		
+	}
+
+	
+
+	for (int i = 0; i < numIcosahedrons; i++)
+	{
+		std::string newname = "Icosahedron";
+
+
+		//@@TODO! 
+		newname = this->CheckingName(newname);
+
+		vtkSmartPointer<vtkSphereSource> sphereSource =
+			vtkSmartPointer<vtkSphereSource>::New();
+		sphereSource->SetRadius(mRadius);
+		sphereSource->Update();
+
+		vtkSmartPointer<vtkLoopSubdivisionFilter> loop =
+			vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
+		if (msubdivisions > 0)
+		{
+			loop->SetInputData(sphereSource->GetOutput());
+			loop->SetNumberOfSubdivisions(msubdivisions);
+			loop->Update();
+		}
+
+		VTK_CREATE(vtkMDActor, actor);
+		if (this->mui_BackfaceCulling == 0)
+		{
+			actor->GetProperty()->BackfaceCullingOff();
+		}
+		else
+		{
+			actor->GetProperty()->BackfaceCullingOn();
+		}
+		VTK_CREATE(vtkPolyDataMapper, mapper);
+
+		mapper->SetColorModeToDefault();
+		if (msubdivisions > 0)
+		{
+			mapper->SetInputData(loop->GetOutput());
+		}
+		else
+		{
+			mapper->SetInputData(sphereSource->GetOutput());
+		}
+
+
+		//actor->SetmColor(0.68, 0.47, 0.37, 1);//pink
+		actor->SetmColor(0.666667, 0.666667, 1, 0.5);//kind of violet
+		actor->SetMapper(mapper);
+		actor->SetSelected(0);
+		actor->SetName(newname);
+
+		actor->SetDisplayMode(this->mui_DisplayMode);
+
+		vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+		Mat->DeepCopy(actor->GetMatrix());
+
+
+
+		Mat->SetElement(0, 3, bbx*0.9);
+		Mat->SetElement(2, 3, bbz*1.1);
+		Mat->SetElement(1, 3, i*(mRadius)*2.1 + bby*0.9);
+
+
+		vtkTransform *newTransform = vtkTransform::New();
+		newTransform->PostMultiply();
+
+		newTransform->SetMatrix(Mat);
+		actor->SetPosition(newTransform->GetPosition());
+		actor->SetScale(newTransform->GetScale());
+		actor->SetOrientation(newTransform->GetOrientation());
+		newTransform->Delete();
+
+		this->getActorCollection()->AddItem(actor);
+		emit this->actorsMightHaveChanged();
+
+		std::string action = "Create icosahedron";
+		int mCount = BEGIN_UNDO_SET(action);
+		this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+		END_UNDO_SET();
+
+		this->getActorCollection()->SetChanged(1);
+	}
+
+	this->AdjustCameraAndGrid();
+	if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+	{
+		this->UpdateLandmarkSettings();
+	}
+
+}
 void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double sizeZ)
 {
 	double msizeX = sizeX;

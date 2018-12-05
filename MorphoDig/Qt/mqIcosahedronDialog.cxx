@@ -6,8 +6,8 @@
  
 =========================================================================*/
 
-#include "mqCubeDialog.h"
-#include "ui_mqCubeDialog.h"
+#include "mqIcosahedronDialog.h"
+#include "ui_mqIcosahedronDialog.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
@@ -51,36 +51,28 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqCubeDialog::mqCubeDialog(QWidget* Parent)
+mqIcosahedronDialog::mqIcosahedronDialog(QWidget* Parent)
   : QDialog(Parent)
-  , Ui(new Ui::mqCubeDialog())
+  , Ui(new Ui::mqIcosahedronDialog())
 {
 	this->Ui->setupUi(this);
-	this->setObjectName("mqCubeDialog");	
-	this->Ui->sizeX->setMinimum(0);
-	this->Ui->sizeX->setMaximum(DBL_MAX);
-	this->Ui->sizeY->setMinimum(0);
-	this->Ui->sizeY->setMaximum(DBL_MAX);
-	this->Ui->sizeZ->setMinimum(0);
-	this->Ui->sizeZ->setMaximum(DBL_MAX);
+	this->setObjectName("mqIcosahedronDialog");	
+	this->Ui->radius->setMinimum(0);
+	this->Ui->radius->setMaximum(DBL_MAX);
 	
 	
 
-	double msizeY = 10; 
+	double mRadius = 10; 
 	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems() > 0)
 	{
-		msizeY = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLength() / 20;
+		mRadius = 1*mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLength() / 20;
 				
 
 	}
-	double msizeX = msizeY /5;
-	double msizeZ = msizeY / 5;
 
-	this->Ui->sizeX->setValue(msizeX);
-	this->Ui->sizeY->setValue(msizeY);
-	this->Ui->sizeZ->setValue(msizeZ);
+	this->Ui->radius->setValue(mRadius);
 	
-	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditCube()));
+	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditIcosahedron()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 
 	 
@@ -89,28 +81,28 @@ mqCubeDialog::mqCubeDialog(QWidget* Parent)
 
 
 //-----------------------------------------------------------------------------
-mqCubeDialog::~mqCubeDialog()
+mqIcosahedronDialog::~mqIcosahedronDialog()
 {
 
  //depending on what is 
 	
   delete this->Ui;
 }
-void mqCubeDialog::editCube()
+void mqIcosahedronDialog::editIcosahedron()
 {
-	cout << "Create Cube" << endl;
+	cout << "Create Icosahedron" << endl;
 	this->Ui->cancel->setDisabled(true);
 	
 		
 		
-		mqMorphoDigCore::instance()->Cube(this->Ui->cubeNumber->value(), this->Ui->sizeX->value(), this->Ui->sizeY->value(), this->Ui->sizeZ->value());
+		mqMorphoDigCore::instance()->Icosahedron(this->Ui->iscosahedronNumber->value(), this->Ui->radius->value(), this->Ui->subdivisions->value());
 		
 	
 }
 
 
 
-void mqCubeDialog::slotClose()
+void mqIcosahedronDialog::slotClose()
 {
 	
 	this->close();
@@ -118,11 +110,11 @@ void mqCubeDialog::slotClose()
 
 
 
-void mqCubeDialog::sloteditCube()
+void mqIcosahedronDialog::sloteditIcosahedron()
 {
 	//cout << "Set visible true!!!" << endl;
 
-	this->editCube();
+	this->editIcosahedron();
 	this->close();
 }
 

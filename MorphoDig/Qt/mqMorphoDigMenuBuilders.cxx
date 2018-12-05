@@ -34,6 +34,7 @@
 #include "mqSaveVTKDialogReaction.h"
 #include "mqCylinderDialogReaction.h"
 #include "mqCubeDialogReaction.h"
+#include "mqIcosahedronDialogReaction.h"
 #include "mqSaveSTLDialogReaction.h"
 #include "mqColorDialogReaction.h"
 #include "mqLandmarkDialogReaction.h"
@@ -344,7 +345,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QMenu* submenuSupportMaterial = menu.addMenu("Create 3D printing connective material");
 	new mqCylinderDialogReaction(submenuSupportMaterial->addAction("Create cylindric connective struts") << mqSetName("actionCylinders"));
 	new mqCubeDialogReaction(submenuSupportMaterial->addAction("Create cubic/box-shaped connective struts") << mqSetName("actionCubes"));	
-
+	new mqIcosahedronDialogReaction(submenuSupportMaterial->addAction("Create icosahedrons/spheres") << mqSetName("actionIcos"));
+	
 	QAction::connect(KeepLargest, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotKeepLargest()));
 	QAction::connect(Invert, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotInvert()));
 	QAction::connect(Mirror, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirror()));

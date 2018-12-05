@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqCubeDialog</class>
- <widget class="QDialog" name="mqCubeDialog">
+ <class>mqIcosahedronDialog</class>
+ <widget class="QDialog" name="mqIcosahedronDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -464,7 +464,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Create cubic / box-shaped connective struts (connective material for 3D printing)</string>
+    <string>Create icosahedons or spheres (connective material for 3D printing)</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
@@ -481,12 +481,12 @@
        <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Number of cubes</string>
+          <string>Number of icosahedrons / spheres:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="cubeNumber">
+        <widget class="QSpinBox" name="iscosahedronNumber">
          <property name="minimum">
           <number>1</number>
          </property>
@@ -499,20 +499,17 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>X length (size unit)</string>
+          <string>Number of subdivisions:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="sizeX">
-         <property name="enabled">
-          <bool>true</bool>
+        <widget class="QSpinBox" name="subdivisions">
+         <property name="minimum">
+          <number>0</number>
          </property>
-         <property name="toolTip">
-          <string>This value defines, for each point of the surface, the size of the sphere centered on that point which will be used to estimate local complexity</string>
-         </property>
-         <property name="decimals">
-          <number>6</number>
+         <property name="value">
+          <number>0</number>
          </property>
         </widget>
        </item>
@@ -523,42 +520,12 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Y length (size unit)</string>
+          <string>Radius (size unit)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="sizeY">
-         <property name="decimals">
-          <number>6</number>
-         </property>
-         <property name="minimum">
-          <double>0.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>100.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.500000000000000</double>
-         </property>
-         <property name="value">
-          <double>1.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Z length (size unit)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="sizeZ">
+        <widget class="QDoubleSpinBox" name="radius">
          <property name="decimals">
           <number>6</number>
          </property>

@@ -1,35 +1,35 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqCubeDialogReaction.cxx
+   Module:    mqIcosahedronDialogReaction.cxx
 
 
 ========================================================================*/
-#include "mqCubeDialogReaction.h"
+#include "mqIcosahedronDialogReaction.h"
 #include "mqCoreUtilities.h"
 #include "mqMorphoDigCore.h"
-#include "mqCubeDialog.h"
+#include "mqIcosahedronDialog.h"
 #include "mqReaction.h"
 
 
 //-----------------------------------------------------------------------------
-mqCubeDialogReaction::mqCubeDialogReaction(QAction* parentObject)
+mqIcosahedronDialogReaction::mqIcosahedronDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-	//this->Cube_dialog = new mqCubeDialog(mqCoreUtilities::mainWidget());
+	//this->Icosahedron_dialog = new mqIcosahedronDialog(mqCoreUtilities::mainWidget());
 
 	
 }
 
 
 //-----------------------------------------------------------------------------
-//void mqCubeDialogReaction::showCubeDialog(mqCubeDialog *Cube_dialog)
-void mqCubeDialogReaction::showCubeDialog()
+//void mqIcosahedronDialogReaction::showIcosahedronDialog(mqIcosahedronDialog *Icosahedron_dialog)
+void mqIcosahedronDialogReaction::showIcosahedronDialog()
 {
 	
-		mqCubeDialog mqCube(mqCoreUtilities::mainWidget());
-		mqCube.exec();
+		mqIcosahedronDialog mqIcosahedron(mqCoreUtilities::mainWidget());
+		mqIcosahedron.exec();
 	
 	
-  //Cube_dialog->show();
+  //Icosahedron_dialog->show();
 }
