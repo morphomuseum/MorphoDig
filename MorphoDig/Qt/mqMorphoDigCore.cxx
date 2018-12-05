@@ -4007,7 +4007,8 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		cout << "NON MANIFOLD pts:" << num_nonmanifold_pts << " , cells:" << num_nonmanifold_cells << endl;
 
 		MyPolyData = cleanPolyDataFilter->GetOutput();
-		if (num_nonmanifold_pts > 0)
+		//Too long for he moment! 
+		/*if (num_nonmanifold_pts > 0)
 		{
 			//UGLY STUFF TO REMOVE NON MANIFOLD PTS STARTS (I am so sorry...)
 			// try to build a list of pts 
@@ -4017,6 +4018,8 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 				vtkSmartPointer<vtkIdTypeArray>::New();
 			ids->SetNumberOfComponents(1);
 			Features = featureEdges->GetOutput();
+			//featureEdges->Get
+			//this thing is too long!
 			for (vtkIdType i = 0; i < num_nonmanifold_pts; i++)
 			{
 				double fpt[3];
@@ -4032,7 +4035,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 					pt[0] = mpt[0]; pt[1] = mpt[1]; pt[2] = mpt[2];
 					if (pt[0] == fpt[0] && pt[1] == fpt[1] && pt[2] == fpt[2])
 					{
-						cout << "Id=" << j << endl;
+						//cout << "Id=" << j << endl;
 						ids->InsertNextValue(j);
 					}
 				}
@@ -4069,23 +4072,9 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 
 			
 			MyPolyData = surfaceFilter->GetOutput(); 
-			/*for (vtkIdType i = 0; i < ptList->GetNumberOfIds(); i++)
-			{
-				cout << "Try to delete point "<< ptList->GetId(i) << endl;
-				MyPolyData->DeletePoint(ptList->GetId(i));
-			}
-			cout << "Try to re-clean" << endl;
-			cleanPolyDataFilter->SetInputData(MyPolyData);
-			cleanPolyDataFilter->PieceInvariantOff();
-			cleanPolyDataFilter->ConvertLinesToPointsOff();
-			cleanPolyDataFilter->ConvertPolysToLinesOff();
-			cleanPolyDataFilter->ConvertStripsToPolysOff();
-			cleanPolyDataFilter->PointMergingOn();
-			cleanPolyDataFilter->Update();
-			cout << "re-clean done" << endl;
-			MyPolyData = cleanPolyDataFilter->GetOutput();*/
+		
 		}
-
+		*/
 		//MyPolyData->SetActive
 		cout << "\nNumber of points:" << MyPolyData->GetNumberOfPoints() << std::endl;
 		cout << "\nNumber of cells:" << MyPolyData->GetNumberOfCells() << std::endl;
@@ -9670,8 +9659,10 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
 	int modified = 0;
+	int msg_nonmanifold = 0; // at the end of the loop, if msg_nonmanifold = 1 => send message that some filters failed
 	for (vtkIdType i = 0; i < num; i++)
 	{
+		int ok_to_add = 1;
 		cout << "Densify try to get next actor:" << i << endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
@@ -9680,185 +9671,207 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 			{
 				double numvert = mymapper->GetInput()->GetNumberOfPoints();
-
-				
-
-				VTK_CREATE(vtkMDActor, newactor);
-				if (this->mui_BackfaceCulling == 0)
+				if (method > 0)
 				{
-					newactor->GetProperty()->BackfaceCullingOff();
-				}
-				else
-				{
-					newactor->GetProperty()->BackfaceCullingOn();
-				}
-
-				VTK_CREATE(vtkPolyDataMapper, newmapper);
-				//newmapper->ImmediateModeRenderingOn();
-				newmapper->SetColorModeToDefault();
-
-				if (
-					(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
-					&& this->mui_ActiveScalars->NumComp == 1
-					)
-				{
-					newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
-					newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
-				}
-				else
-				{
-					newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
-				}
-
-				newmapper->ScalarVisibilityOn();
-				
-				cout << "densification subdivisions=" << subdivisions << endl;
-				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-				if (method == 0) // classic densify polydata
-				{
-					vtkSmartPointer<vtkDensifyPolyData> densify =
-						vtkSmartPointer<vtkDensifyPolyData>::New();
-					densify->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-					densify->SetNumberOfSubdivisions(subdivisions);
-					densify->Update();
-					cleanPolyDataFilter->SetInputData(densify->GetOutput());
-					
-					
-				}
-				else if (method == 1)// linear subdivision filter
-				{
-					vtkSmartPointer<vtkTriangleFilter> triangles =
-						vtkSmartPointer<vtkTriangleFilter>::New();
-					triangles->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-					triangles->Update();
 					vtkSmartPointer<vtkFeatureEdges> featureEdges = vtkSmartPointer<vtkFeatureEdges>::New();
-					featureEdges->SetInputData(triangles->GetOutput());
+					featureEdges->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
 					featureEdges->BoundaryEdgesOff();
 					featureEdges->FeatureEdgesOff();
 					featureEdges->ManifoldEdgesOff();
 					featureEdges->NonManifoldEdgesOn();
 					featureEdges->Update();
 					cout << "Feature edges: nr of points in non manyfold edges" << featureEdges->GetOutput()->GetNumberOfPoints() << endl;
-
-					cout << "Triangles numpoints" << triangles->GetOutput()->GetNumberOfPoints() << endl;
-					cout << "Triangles numcells" << triangles->GetOutput()->GetNumberOfCells() << endl;
-					vtkSmartPointer<vtkSphereSource> sphereSource =
-						vtkSmartPointer<vtkSphereSource>::New();
-					sphereSource->Update();
-					
-					vtkSmartPointer<vtkLinearSubdivisionFilter> linear =
-						vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
-					linear->SetInputData(triangles->GetOutput());
-					//linear->SetInputData(sphereSource->GetOutput());
-					linear->SetNumberOfSubdivisions(subdivisions);
-					linear->SetCheckForTriangles(false);
-					linear->Update();
-					cout << "Linear numpoints" << linear->GetOutput()->GetNumberOfPoints() << endl;
-					cout << "Linear numcells" << linear->GetOutput()->GetNumberOfCells() << endl;
-					if (linear->GetOutput()->GetNumberOfPoints() > 0)
+					if (featureEdges->GetOutput()->GetNumberOfPoints()>0)
 					{
-						cleanPolyDataFilter->SetInputData(linear->GetOutput());
+						msg_nonmanifold = 1;
+						ok_to_add = 0;
+					}
+				}
+				if (ok_to_add == 1)
+				{
+					VTK_CREATE(vtkMDActor, newactor);
+
+					if (this->mui_BackfaceCulling == 0)
+					{
+						newactor->GetProperty()->BackfaceCullingOff();
 					}
 					else
 					{
-						cleanPolyDataFilter->SetInputData(featureEdges->GetOutput());
+						newactor->GetProperty()->BackfaceCullingOn();
 					}
 
+					VTK_CREATE(vtkPolyDataMapper, newmapper);
+					//newmapper->ImmediateModeRenderingOn();
+					newmapper->SetColorModeToDefault();
 
-				}
-				else if (method ==2)
-				{
-					vtkSmartPointer<vtkSphereSource> sphereSource =
-						vtkSmartPointer<vtkSphereSource>::New();
-					sphereSource->Update();
+					if (
+						(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+						&& this->mui_ActiveScalars->NumComp == 1
+						)
+					{
+						newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+						newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+					}
+					else
+					{
+						newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+					}
 
-					
-					
-					vtkSmartPointer<vtkLoopSubdivisionFilter> loop =
-						vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
-					loop->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-					//loop->SetInputData(sphereSource->GetOutput()); 
-					loop->SetNumberOfSubdivisions(subdivisions);
-					loop->Update();
-					cout << "Loop numpoints" << loop->GetOutput()->GetNumberOfPoints() << endl;
-					cout << "Loop numcells" << loop->GetOutput()->GetNumberOfCells() << endl;
+					newmapper->ScalarVisibilityOn();
 
-					cleanPolyDataFilter->SetInputData(loop->GetOutput());
-				}
-				else 
-				{
-					vtkSmartPointer<vtkSphereSource> sphereSource =
-						vtkSmartPointer<vtkSphereSource>::New();
-					sphereSource->Update();
-
-
-					vtkSmartPointer<vtkButterflySubdivisionFilter> butterfly =
-						vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
-					butterfly->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-					//butterfly->SetInputData(sphereSource->GetOutput());
-
-					butterfly->SetNumberOfSubdivisions(subdivisions);
-					butterfly->Update();
-					cout << "butterfly numpoints" << butterfly->GetOutput()->GetNumberOfPoints() << endl;
-					cout << "butterfly numcells" << butterfly->GetOutput()->GetNumberOfCells() << endl;
-					cleanPolyDataFilter->SetInputData(butterfly->GetOutput());
-				}
-
-			/*	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-				ObjNormals->SetInputData(densify->GetOutput());
-				ObjNormals->ComputePointNormalsOn();
-				ObjNormals->ComputeCellNormalsOn();
-				//ObjNormals->AutoOrientNormalsOff();
-				ObjNormals->ConsistencyOff();
-
-				ObjNormals->Update();*/
-
-				
-				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
-				
-				cleanPolyDataFilter->PieceInvariantOff();
-				cleanPolyDataFilter->ConvertLinesToPointsOff();
-				cleanPolyDataFilter->ConvertPolysToLinesOff();
-				cleanPolyDataFilter->ConvertStripsToPolysOff();
-				cleanPolyDataFilter->PointMergingOn();
-				cleanPolyDataFilter->Update();
-				VTK_CREATE(vtkPolyData, myData);
-
-				myData = cleanPolyDataFilter->GetOutput();
-
-				cout << "densify: nv=" << myData->GetNumberOfPoints() << endl;
-				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
-				newmapper->SetInputData(myData);
-
-				vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
-				Mat = myActor->GetMatrix();
-
-				vtkTransform *newTransform = vtkTransform::New();
-				newTransform->PostMultiply();
-
-				newTransform->SetMatrix(Mat);
-				newactor->SetPosition(newTransform->GetPosition());
-				newactor->SetScale(newTransform->GetScale());
-				newactor->SetOrientation(newTransform->GetOrientation());
-				newTransform->Delete();
+					cout << "densification subdivisions=" << subdivisions << endl;
+					vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+					if (method == 0) // classic densify polydata
+					{
+						vtkSmartPointer<vtkDensifyPolyData> densify =
+							vtkSmartPointer<vtkDensifyPolyData>::New();
+						densify->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+						densify->SetNumberOfSubdivisions(subdivisions);
+						densify->Update();
+						cleanPolyDataFilter->SetInputData(densify->GetOutput());
 
 
-				double color[4] = { 0.5, 0.5, 0.5, 1 };
-				myActor->GetmColor(color);
-				newactor->SetmColor(color);
+					}
+					else if (method == 1)// linear subdivision filter
+					{
+						vtkSmartPointer<vtkTriangleFilter> triangles =
+							vtkSmartPointer<vtkTriangleFilter>::New();
+						triangles->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+						triangles->Update();
+						vtkSmartPointer<vtkFeatureEdges> featureEdges = vtkSmartPointer<vtkFeatureEdges>::New();
+						featureEdges->SetInputData(triangles->GetOutput());
+						featureEdges->BoundaryEdgesOff();
+						featureEdges->FeatureEdgesOff();
+						featureEdges->ManifoldEdgesOff();
+						featureEdges->NonManifoldEdgesOn();
+						featureEdges->Update();
+						cout << "Feature edges: nr of points in non manyfold edges" << featureEdges->GetOutput()->GetNumberOfPoints() << endl;
 
-				newactor->SetMapper(newmapper);
-				newactor->SetSelected(0);
+						cout << "Triangles numpoints" << triangles->GetOutput()->GetNumberOfPoints() << endl;
+						cout << "Triangles numcells" << triangles->GetOutput()->GetNumberOfCells() << endl;
+						vtkSmartPointer<vtkSphereSource> sphereSource =
+							vtkSmartPointer<vtkSphereSource>::New();
+						sphereSource->Update();
+
+						vtkSmartPointer<vtkLinearSubdivisionFilter> linear =
+							vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
+						linear->SetInputData(triangles->GetOutput());
+						//linear->SetInputData(sphereSource->GetOutput());
+						linear->SetNumberOfSubdivisions(subdivisions);
+						linear->SetCheckForTriangles(false);
+						linear->Update();
+						cout << "Linear numpoints" << linear->GetOutput()->GetNumberOfPoints() << endl;
+						cout << "Linear numcells" << linear->GetOutput()->GetNumberOfCells() << endl;
+						if (linear->GetOutput()->GetNumberOfPoints() > 0)
+						{
+							cleanPolyDataFilter->SetInputData(linear->GetOutput());
+						}
+						else
+						{
+							cleanPolyDataFilter->SetInputData(featureEdges->GetOutput());
+						}
 
 
-				newactor->SetName(myActor->GetName() + "_densify");
-				cout << "try to add new actor=" << endl;
-				newcoll->AddTmpItem(newactor);
-				modified = 1;
+					}
+					else if (method == 2)
+					{
+						vtkSmartPointer<vtkSphereSource> sphereSource =
+							vtkSmartPointer<vtkSphereSource>::New();
+						sphereSource->Update();
 
+
+
+						vtkSmartPointer<vtkLoopSubdivisionFilter> loop =
+							vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
+						loop->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+						//loop->SetInputData(sphereSource->GetOutput()); 
+						loop->SetNumberOfSubdivisions(subdivisions);
+						loop->Update();
+						cout << "Loop numpoints" << loop->GetOutput()->GetNumberOfPoints() << endl;
+						cout << "Loop numcells" << loop->GetOutput()->GetNumberOfCells() << endl;
+
+						cleanPolyDataFilter->SetInputData(loop->GetOutput());
+					}
+					else
+					{
+						vtkSmartPointer<vtkSphereSource> sphereSource =
+							vtkSmartPointer<vtkSphereSource>::New();
+						sphereSource->Update();
+
+
+						vtkSmartPointer<vtkButterflySubdivisionFilter> butterfly =
+							vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
+						butterfly->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+						//butterfly->SetInputData(sphereSource->GetOutput());
+
+						butterfly->SetNumberOfSubdivisions(subdivisions);
+						butterfly->Update();
+						cout << "butterfly numpoints" << butterfly->GetOutput()->GetNumberOfPoints() << endl;
+						cout << "butterfly numcells" << butterfly->GetOutput()->GetNumberOfCells() << endl;
+						cleanPolyDataFilter->SetInputData(butterfly->GetOutput());
+					}
+
+					/*	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+						ObjNormals->SetInputData(densify->GetOutput());
+						ObjNormals->ComputePointNormalsOn();
+						ObjNormals->ComputeCellNormalsOn();
+						//ObjNormals->AutoOrientNormalsOff();
+						ObjNormals->ConsistencyOff();
+
+						ObjNormals->Update();*/
+
+
+						//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+
+					cleanPolyDataFilter->PieceInvariantOff();
+					cleanPolyDataFilter->ConvertLinesToPointsOff();
+					cleanPolyDataFilter->ConvertPolysToLinesOff();
+					cleanPolyDataFilter->ConvertStripsToPolysOff();
+					cleanPolyDataFilter->PointMergingOn();
+					cleanPolyDataFilter->Update();
+					VTK_CREATE(vtkPolyData, myData);
+
+					myData = cleanPolyDataFilter->GetOutput();
+
+					cout << "densify: nv=" << myData->GetNumberOfPoints() << endl;
+					//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+					newmapper->SetInputData(myData);
+
+					vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+					Mat = myActor->GetMatrix();
+
+					vtkTransform *newTransform = vtkTransform::New();
+					newTransform->PostMultiply();
+
+					newTransform->SetMatrix(Mat);
+					newactor->SetPosition(newTransform->GetPosition());
+					newactor->SetScale(newTransform->GetScale());
+					newactor->SetOrientation(newTransform->GetOrientation());
+					newTransform->Delete();
+
+
+					double color[4] = { 0.5, 0.5, 0.5, 1 };
+					myActor->GetmColor(color);
+					newactor->SetmColor(color);
+
+					newactor->SetMapper(newmapper);
+					newactor->SetSelected(0);
+
+
+					newactor->SetName(myActor->GetName() + "_densify");
+					cout << "try to add new actor=" << endl;
+					newcoll->AddTmpItem(newactor);
+					modified = 1;
+				}//ok to add
 
 			}
 		}
+	}
+	if (msg_nonmanifold==1)
+	{ 
+		QMessageBox msgBox;
+		msgBox.setText("At least one surface contains non-manifold edges and could not be densified using the chosen method.");
+		msgBox.exec();
 	}
 	if (modified == 1)
 	{

@@ -431,8 +431,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>190</y>
+     <x>90</x>
+     <y>210</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -494,8 +494,8 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>60</y>
+      <x>10</x>
+      <y>40</y>
       <width>51</width>
       <height>31</height>
      </rect>
@@ -507,17 +507,17 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>60</y>
-      <width>249</width>
-      <height>111</height>
+      <x>50</x>
+      <y>50</y>
+      <width>301</width>
+      <height>127</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="linear">
+      <widget class="QRadioButton" name="densification">
        <property name="text">
-        <string>&quot;Linear&quot; interpolation method</string>
+        <string>1 new vertex at the center of each triangle</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -525,24 +525,29 @@
       </widget>
      </item>
      <item>
+      <widget class="QRadioButton" name="linear">
+       <property name="text">
+        <string>&quot;Linear&quot; interpolation method
+(surfaces should not contain non-manifold edges)</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QRadioButton" name="mloop">
        <property name="text">
-        <string>&quot;Loop&quot; method</string>
+        <string>&quot;Loop&quot; method
+(surfaces should not contain non-manifold edges)</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QRadioButton" name="butterfly">
        <property name="text">
-        <string>&quot;Butterfly&quot; scheme</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="densification">
-       <property name="text">
-        <string>1 new vertex at the center of each triangle 
- (classic and &quot;ugly&quot; densification)</string>
+        <string>&quot;Butterfly&quot; scheme
+(surfaces should not contain non-manifold edges)</string>
        </property>
       </widget>
      </item>
