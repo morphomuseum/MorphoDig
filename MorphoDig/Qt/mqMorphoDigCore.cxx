@@ -30,7 +30,7 @@
 #include <vtkLoopSubdivisionFilter.h>
 #include <vtkTriangleFilter.h>
 #include <vtkButterflySubdivisionFilter.h>
-
+#include <vtkInformation.h>
 #include <vtkDecimatePro.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkSmoothPolyDataFilter.h>
@@ -50,7 +50,9 @@
 #include <vtkPolyDataWriter.h>
 #include <vtkThinPlateSplineTransform.h>
 #include <vtkTransformPolyDataFilter.h>
-
+#include <vtkSelectionNode.h>
+#include <vtkSelection.h>
+#include <vtkExtractSelection.h>
 #include <vtkSmartPointer.h>
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataReader.h>
@@ -3991,8 +3993,99 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		cleanPolyDataFilter->PointMergingOn();
 		
 		cleanPolyDataFilter->Update();
+		//Surface can contain a few "non-manifold" edges
+		vtkSmartPointer<vtkFeatureEdges> featureEdges = vtkSmartPointer<vtkFeatureEdges>::New();
+		featureEdges->SetInputData(cleanPolyDataFilter->GetOutput());
+		featureEdges->BoundaryEdgesOff();
+		featureEdges->FeatureEdgesOff();
+		featureEdges->ManifoldEdgesOff();
+		featureEdges->NonManifoldEdgesOn();
+		
+		featureEdges->Update();
+		vtkIdType num_nonmanifold_pts = featureEdges->GetOutput()->GetNumberOfPoints();
+		vtkIdType num_nonmanifold_cells = featureEdges->GetOutput()->GetNumberOfCells();
+		cout << "NON MANIFOLD pts:" << num_nonmanifold_pts << " , cells:" << num_nonmanifold_cells << endl;
 
 		MyPolyData = cleanPolyDataFilter->GetOutput();
+		if (num_nonmanifold_pts > 0)
+		{
+			//UGLY STUFF TO REMOVE NON MANIFOLD PTS STARTS (I am so sorry...)
+			// try to build a list of pts 
+			vtkSmartPointer<vtkPolyData> Features = vtkSmartPointer<vtkPolyData>::New();
+			
+			vtkSmartPointer<vtkIdTypeArray> ids =
+				vtkSmartPointer<vtkIdTypeArray>::New();
+			ids->SetNumberOfComponents(1);
+			Features = featureEdges->GetOutput();
+			for (vtkIdType i = 0; i < num_nonmanifold_pts; i++)
+			{
+				double fpt[3];
+				double *mfpt;
+				mfpt = Features->GetPoint(i);
+				fpt[0] = mfpt[0]; fpt[1] = mfpt[1]; fpt[2] = mfpt[2];
+				int found = 0;
+				for (vtkIdType j = 0; j < MyPolyData->GetNumberOfPoints(); j++)
+				{
+					double pt[3];
+					double *mpt;
+					mpt = MyPolyData->GetPoint(j);
+					pt[0] = mpt[0]; pt[1] = mpt[1]; pt[2] = mpt[2];
+					if (pt[0] == fpt[0] && pt[1] == fpt[1] && pt[2] == fpt[2])
+					{
+						cout << "Id=" << j << endl;
+						ids->InsertNextValue(j);
+					}
+				}
+			}
+
+			//ids are in "selection nodes"
+			vtkSmartPointer<vtkSelectionNode> selectionNode =
+				vtkSmartPointer<vtkSelectionNode>::New();
+			selectionNode->SetFieldType(vtkSelectionNode::POINT);
+			selectionNode->SetContentType(vtkSelectionNode::INDICES);
+			selectionNode->SetSelectionList(ids);
+			selectionNode->GetProperties()->Set(vtkSelectionNode::CONTAINING_CELLS(), 1);
+			selectionNode->GetProperties()->Set(vtkSelectionNode::INVERSE(), 1); // to select all but these points
+
+			vtkSmartPointer<vtkSelection> selection =
+				vtkSmartPointer<vtkSelection>::New();
+			selection->AddNode(selectionNode);
+
+			vtkSmartPointer<vtkExtractSelection> extractSelection =
+				vtkSmartPointer<vtkExtractSelection>::New();
+
+			extractSelection->SetInputData(0, MyPolyData);
+			extractSelection->SetInputData(1, selection);
+
+			extractSelection->Update();
+			vtkSmartPointer<vtkUnstructuredGrid> notSelected =
+				vtkSmartPointer<vtkUnstructuredGrid>::New();
+			notSelected->ShallowCopy(extractSelection->GetOutput());
+			vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter =
+				vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+#
+			surfaceFilter->SetInputData(notSelected);
+			surfaceFilter->Update();
+
+			
+			MyPolyData = surfaceFilter->GetOutput(); 
+			/*for (vtkIdType i = 0; i < ptList->GetNumberOfIds(); i++)
+			{
+				cout << "Try to delete point "<< ptList->GetId(i) << endl;
+				MyPolyData->DeletePoint(ptList->GetId(i));
+			}
+			cout << "Try to re-clean" << endl;
+			cleanPolyDataFilter->SetInputData(MyPolyData);
+			cleanPolyDataFilter->PieceInvariantOff();
+			cleanPolyDataFilter->ConvertLinesToPointsOff();
+			cleanPolyDataFilter->ConvertPolysToLinesOff();
+			cleanPolyDataFilter->ConvertStripsToPolysOff();
+			cleanPolyDataFilter->PointMergingOn();
+			cleanPolyDataFilter->Update();
+			cout << "re-clean done" << endl;
+			MyPolyData = cleanPolyDataFilter->GetOutput();*/
+		}
+
 		//MyPolyData->SetActive
 		cout << "\nNumber of points:" << MyPolyData->GetNumberOfPoints() << std::endl;
 		cout << "\nNumber of cells:" << MyPolyData->GetNumberOfCells() << std::endl;
