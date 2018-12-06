@@ -95,7 +95,7 @@ void mqIcosahedronDialog::editIcosahedron()
 	
 		
 		
-		mqMorphoDigCore::instance()->Icosahedron(this->Ui->iscosahedronNumber->value(), this->Ui->radius->value(), this->Ui->subdivisions->value());
+		mqMorphoDigCore::instance()->Icosahedron(this->Ui->iscosahedronNumber->value(), this->Ui->radius->value(), this->Ui->subdivisions->value(), this->Ui->spheres->isChecked());
 		
 	
 }

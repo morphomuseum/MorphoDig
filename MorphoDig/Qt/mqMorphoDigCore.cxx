@@ -15,6 +15,7 @@
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkTextProperty.h>
+#include <vtkPlatonicSolidSource.h>
 #include <vtkSphereSource.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
@@ -7316,8 +7317,10 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 	file.close();
 
 }
-void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdivisions)
+void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdivisions, int mode)
 {
+	// mode=0: icosahedron
+	// mode =1: sphere
 	double mRadius = radius;
 	double bbz = this->getActorCollection()->GetBoundingBox()[5];
 	double bbx = this->getActorCollection()->GetBoundingBox()[3];
@@ -7347,7 +7350,9 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 		//GL_VERSION = 1;
 		//@@TODO! 
 		newname = this->CheckingName(newname);
-
+		vtkNew<vtkPlatonicSolidSource> icosahedron;
+		icosahedron->SetSolidTypeToIcosahedron();
+		icosahedron->Update();
 		vtkSmartPointer<vtkSphereSource> sphereSource =
 			vtkSmartPointer<vtkSphereSource>::New();
 		sphereSource->SetRadius(mRadius);
@@ -7357,7 +7362,15 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 			vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
 		if (msubdivisions > 0)
 		{
-			loop->SetInputData(sphereSource->GetOutput());
+			if (mode ==1)
+			{
+				loop->SetInputData(sphereSource->GetOutput());
+			}
+			else
+			{
+				loop->SetInputData(icosahedron->GetOutput());
+			}
+			
 			loop->SetNumberOfSubdivisions(msubdivisions);
 			loop->Update();
 		}
@@ -7380,7 +7393,17 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 		}
 		else
 		{
-			mapper->SetInputData(sphereSource->GetOutput());
+			if (mode == 1)
+			{
+				mapper->SetInputData(sphereSource->GetOutput());
+				
+			}
+			else
+			{
+				mapper->SetInputData(icosahedron->GetOutput());
+
+			}
+			
 		}
 
 
