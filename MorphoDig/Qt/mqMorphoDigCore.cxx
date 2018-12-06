@@ -12,6 +12,7 @@
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
 #include <time.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkTextProperty.h>
 #include <vtkSphereSource.h>
@@ -89,6 +90,7 @@
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QLabel>
+
 #include "mqUndoStack.h"
 #include "vtkMDCylinderSource.h"
 #include "vtkMDCubeSource.h"
@@ -119,7 +121,10 @@ mqMorphoDigCore* mqMorphoDigCore::instance()
 mqMorphoDigCore::mqMorphoDigCore()
 {
 
+
 	mqMorphoDigCore::Instance = this;
+	this->mui_OpenGL_minor_version = 0;
+	this->mui_OpenGL_major_version = 0;
 	this->mui_DisplayMode = 1; // point normals by defaults
 	this->mui_TagModeActivated = 1;
 	this->mui_TagTool = 0; //pencil by defaults
@@ -412,7 +417,29 @@ void mqMorphoDigCore::SetRubberInteractorStyle(vtkSmartPointer<vtkInteractorStyl
 {
 	this->RubberStyle = mRubbertyle;
 }
+QString mqMorphoDigCore::GetVTKVersion() 
+{
+	QString myVersion = QString::number(VTK_MAJOR_VERSION) + "." + QString::number(VTK_MINOR_VERSION);
+	return myVersion;
+}
 
+QString mqMorphoDigCore::GetOpenGLVersion()
+{
+	vtkSmartPointer<vtkGenericOpenGLRenderWindow> openGL = vtkGenericOpenGLRenderWindow::SafeDownCast(this->RenderWindow);
+	int min, maj;
+	openGL->GetOpenGLVersion(maj, min);
+	this->SetOpenGLVersion(maj, min);
+	QString myVersion = QString::number(this->mui_OpenGL_major_version) + "." + QString::number(this->mui_OpenGL_minor_version);
+	//QString myVersion = QString::number(maj) + "." + QString::number(min);
+	return myVersion;
+}
+
+void mqMorphoDigCore::SetOpenGLVersion(int major, int minor)
+{
+	this->mui_OpenGL_major_version = major;
+	this->mui_OpenGL_minor_version = minor;
+	
+}
 void mqMorphoDigCore::ActivateClippingPlane()
 {
 	if (this->Getmui_ClippinPlane() == 1)
@@ -7317,7 +7344,7 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 	{
 		std::string newname = "Icosahedron";
 
-
+		//GL_VERSION = 1;
 		//@@TODO! 
 		newname = this->CheckingName(newname);
 

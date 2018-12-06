@@ -7,6 +7,7 @@
 =========================================================================*/
 
 #include "mqAboutDialog.h"
+#include "mqMorphoDigCore.h"
 #include "ui_mqAboutDialog.h"
 #include "MorphoDigVersion.h"
 
@@ -86,12 +87,12 @@ void mqAboutDialog::AddClientInformation()
 	//pqOptions* opts = pqOptions::SafeDownCast(pm->GetOptions());
 
 	QTreeWidget* tree = this->Ui->ClientInformation;
-
-	::addItem(tree, "Version",
+	
+	::addItem(tree, "MorphoDig Version",
 		QString(MORPHODIG_VERSION) + " " + QString(ENVIRONMENT) + "-bit");
 	::addItem(tree, "Qt Version", QT_VERSION_STR);
-
-
+	::addItem(tree, "VTK Version", mqMorphoDigCore::instance()->GetVTKVersion());
+	::addItem(tree, "OpenGL Version", mqMorphoDigCore::instance()->GetOpenGLVersion());
 
 	
 

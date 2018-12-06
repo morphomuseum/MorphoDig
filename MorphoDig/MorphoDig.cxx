@@ -372,7 +372,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
 	cout << "Try to set render window" << endl;
   auto window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-  
+
   cout << "Set render window done" << endl;
   
 
@@ -1050,6 +1050,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   //@@ end rubber band selection!
 
   setAcceptDrops(true);
+  
 };
 
 

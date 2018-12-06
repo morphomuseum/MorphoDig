@@ -480,6 +480,9 @@ public:
 	void OpenTAGMAP(QString fileName);
 	void OpenORI(QString fileName);
 	void OpenNTW(QString fileName);
+	QString GetVTKVersion();
+	QString GetOpenGLVersion();
+	void SetOpenGLVersion(int major, int minor);
 	void OpenVER(QString fileName, int mode);
 	void OpenLMK(QString fileName, int mode);
 	void OpenMesh(QString fileName);
@@ -867,6 +870,8 @@ protected:
 	double mui_DefaultGridSpacing;
 	QString mui_DefaultSizeUnit;
 
+	int mui_OpenGL_minor_version;
+	int mui_OpenGL_major_version;
 	int mui_ClippingPlane;
 	int mui_BackfaceCulling;
 
