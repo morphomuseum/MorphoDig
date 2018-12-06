@@ -884,32 +884,58 @@ void vtkMDInteractorStyle::Dolly(double factor)
 	{
 		return;
 	}
-
-	vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
-	//if (camera->GetParallelProjection())
-	//{
+	if (this->T == T_PRESSED)
+	{
+		//cout << "T Dolly" << factor << endl;
+		int tool = mqMorphoDigCore::instance()->Getmui_TagTool();
+		if (mqMorphoDigCore::instance()->Getmui_TagModeActivated()&&tool == 0)// pencil
+		{
+			int pencil_size = mqMorphoDigCore::instance()->Getmui_PencilSize();
+			if (factor < 1)
+			{
+				if (pencil_size > 1)
+				{
+					pencil_size-=5;
+					if (pencil_size <= 0) { pencil_size = 1; }
+				}
+			}
+			else
+			{
+				pencil_size+=5;
+			}
+				mqMorphoDigCore::instance()->Setmui_PencilSize(pencil_size,1);
+				this->RedrawTagPencilCircle();					
+			
+		}
+	}
+	else
+	{
+		vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
+		//if (camera->GetParallelProjection())
+		//{
 		camera->SetParallelScale(camera->GetParallelScale() / factor);
 		//important because this is used sometimes in perspective mode to check the distance between camera and grid center.
 		//cout << "Dolly camera parallell" << endl;
 		camera->Dolly(factor);
-	//}
-	//else
-	//{
-	//	camera->Dolly(factor);
-		
-	//}
-	if (this->AutoAdjustCameraClippingRange)
-	{
-		this->CurrentRenderer->ResetCameraClippingRange();
-		mqMorphoDigCore::instance()->ActivateClippingPlane();
-	}
+		//}
+		//else
+		//{
+		//	camera->Dolly(factor);
 
-	if (this->Interactor->GetLightFollowCamera())
-	{
-		this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
-	}
+		//}
+		if (this->AutoAdjustCameraClippingRange)
+		{
+			this->CurrentRenderer->ResetCameraClippingRange();
+			mqMorphoDigCore::instance()->ActivateClippingPlane();
+		}
 
-	mqMorphoDigCore::instance()->signal_zoomChanged();
+		if (this->Interactor->GetLightFollowCamera())
+		{
+			this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
+		}
+
+		mqMorphoDigCore::instance()->signal_zoomChanged();
+	}
 	this->Interactor->Render();
 
 

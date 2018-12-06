@@ -16900,9 +16900,13 @@ void mqMorphoDigCore::RefreshColorMapsAndScalarVisibility()
 	}
 }
 
-void mqMorphoDigCore::Setmui_PencilSize(int pencilSize)
+void mqMorphoDigCore::Setmui_PencilSize(int pencilSize, int emit_signal)
 {
 	this->mui_PencilSize = pencilSize;
+	if (emit_signal == 1)
+	{
+		emit this->pencilSizeChanged(pencilSize);
+	}
 }
 int mqMorphoDigCore::Getmui_PencilSize()
 {

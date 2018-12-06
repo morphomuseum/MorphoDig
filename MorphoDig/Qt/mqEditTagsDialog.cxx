@@ -110,7 +110,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	*/
 	this->Ui->activateTagMode->setVisible(false);
 	this->Ui->pencilSearchSize->setValue(mqMorphoDigCore::instance()->Getmui_PencilSize());
-	
+	connect(mqMorphoDigCore::instance(), SIGNAL(pencilSizeChanged(int)), this, SLOT(slotRefreshPencilSearchSize(int)));
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboTags()));
@@ -762,7 +762,10 @@ void mqEditTagsDialog::RefreshDialog()
 	this->UpdateUI();
 	mqMorphoDigCore::instance()->Render();
 }
-
+void mqEditTagsDialog::slotRefreshPencilSearchSize(int newsize)
+{
+	this->Ui->pencilSearchSize->setValue(newsize);
+}
 void mqEditTagsDialog::slotPencilSearchSizeChanged(int newSize)
 {
 	mqMorphoDigCore::instance()->Setmui_PencilSize(newSize);

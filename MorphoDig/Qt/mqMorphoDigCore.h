@@ -569,7 +569,7 @@ public:
 	void Setmui_ActiveTag(int activeTag);
 	int Getmui_ActiveTag();
 	int Getmui_PencilSize();
-	void Setmui_PencilSize(int pencilSize);
+	void Setmui_PencilSize(int pencilSize, int emit_signal=0);
 	int Getmui_PencilLimitAngle();
 	void Setmui_PencilLimitAngle(int pencilLimitAngle);
 	int Getmui_PencilContiguous();
@@ -782,7 +782,7 @@ public:
   double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int cutMinMax, double cutMin, double cutMax);
   double ComputeActiveScalarsMedian(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int cutMinMax, double cutMin, double cutMax);
 signals:
-  
+  void pencilSizeChanged(int pencilSize);
   void projectionModeChanged();
   void tagMapsChanged();
   void colorMapsChanged();

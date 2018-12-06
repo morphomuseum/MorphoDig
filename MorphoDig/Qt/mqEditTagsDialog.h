@@ -66,6 +66,7 @@ public:
   virtual void slotRemoveTag();
   virtual void  slotReinitializeTagMap();
   virtual void slotDeleteTagMap();
+  virtual void slotRefreshPencilSearchSize(int newsize);
   virtual void slotActiveTagsChanged(int idx);
   virtual void slotActiveTagMapChanged(int idx);
   virtual void slotRefreshDialog();
