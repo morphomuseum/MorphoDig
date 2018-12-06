@@ -7360,6 +7360,7 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 
 		vtkSmartPointer<vtkLoopSubdivisionFilter> loop =
 			vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
+		vtkSmartPointer<vtkPolyData>MyObj = vtkSmartPointer<vtkPolyData>::New();
 		if (msubdivisions > 0)
 		{
 			if (mode ==1)
@@ -7373,8 +7374,41 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 			
 			loop->SetNumberOfSubdivisions(msubdivisions);
 			loop->Update();
+			MyObj = loop->GetOutput();
+		}
+		else
+		{
+			if (mode == 1)
+			{
+				MyObj  = sphereSource->GetOutput();
+
+			}
+			else
+			{
+				MyObj = icosahedron->GetOutput();
+
+			}
+		}
+		// now project back  MyObj points to radius mRadius Sphere
+		vtkSmartPointer<vtkPoints> points =
+			vtkSmartPointer<vtkPoints>::New();
+
+		int nrPoints = MyObj->GetNumberOfPoints();
+		points->SetNumberOfPoints(nrPoints);
+		for (vtkIdType i = 0; i < nrPoints; i++)
+		{
+			double pt[3];
+			double *mpt;
+			mpt = MyObj->GetPoint(i);
+			pt[0] = mpt[0]; pt[1] = mpt[1]; pt[2] = mpt[2];
+			vtkMath::Normalize(pt);
+			vtkMath::MultiplyScalar(pt, radius);
+			points->SetPoint(i, pt[0], pt[1], pt[2]);
 		}
 
+		//cout << "nr of nodes:" << nrPoints << endl;
+		
+		MyObj->SetPoints(points);
 		VTK_CREATE(vtkMDActor, actor);
 		if (this->mui_BackfaceCulling == 0)
 		{
