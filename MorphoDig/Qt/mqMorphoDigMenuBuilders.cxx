@@ -317,15 +317,16 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	/*QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
 	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");*/
 	QAction *Group = submenuStructureModification->addAction("Merge selected surfaces into one single surface");
-	QMenu* submenuConvexHulls = menu.addMenu("Convex hulls");
-	QAction *ConvexHULL = submenuConvexHulls->addAction("Create a convex hull for each selected surface");
+	QMenu* submenuWrapping = menu.addMenu("Wrapping methods");
+	QAction *ConvexHULL = submenuWrapping->addAction("Create a convex hull for each selected surface");
+
+	new mqShrinkWrapDialogReaction(submenuWrapping->addAction("Shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionShrinkWrap"));
+
 
 	QMenu* submenuAlignment = menu.addMenu("Surface alignment");
 	new mqICPDialogReaction(submenuAlignment->addAction("Align 2 surfaces (iterative closest point algorithm)") << mqSetName("actionICP"));
 
-	QMenu* submenuShwrinkWrap = menu.addMenu("Shrink and wrap");
-	new mqShrinkWrapDialogReaction(submenuShwrinkWrap->addAction("Shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionShrinkWrap"));
-
+	
 	QMenu* submenuRenderingModification = menu.addMenu("Rendering modification");
 	
 

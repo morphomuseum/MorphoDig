@@ -104,7 +104,7 @@ void mqShrinkWrapDialog::editShrinkWrap()
 	cout << "Edit ShrinkWrap" << endl;
 	this->Ui->cancel->setDisabled(true);
 	
-	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
+	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems() > 0)
 	{
 		std::string action = "Update ThicknessBetween";
 		if (!this->Ui->observedObject->currentText().isEmpty())

@@ -12752,7 +12752,7 @@ void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *i
 			for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
 				// for every triangle 
 				impactedMoved->GetPoint(i, ve_imp_init_pos);
-				mqMorphoDigCore::TransformPoint(obsMat, ve_imp_init_pos, ve_imp_final_pos);
+				mqMorphoDigCore::TransformPoint(impMat, ve_imp_init_pos, ve_imp_final_pos);
 
 				impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
 			}
