@@ -12,6 +12,7 @@
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
 #include <time.h>
+#include <vtkBooleanOperationPolyDataFilter.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkTextProperty.h>
@@ -12712,6 +12713,176 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 		
 	
+}
+void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, int mode = 0)
+{
+	cout << "Call Boolean operation" << endl;
+	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+	int modified = 0;
+	if (actorA != NULL && actorB != NULL && actorA != actorB)
+	{
+		std::string action = "boolean operation";
+		action.append(actorA->GetName().c_str());
+
+
+
+		vtkPolyDataMapper *myMapperA = vtkPolyDataMapper::SafeDownCast(actorA->GetMapper());
+		vtkPolyDataMapper *myMapperB = vtkPolyDataMapper::SafeDownCast(actorB->GetMapper());
+		if (myMapperA != NULL && vtkPolyData::SafeDownCast(myMapperA->GetInput()) != NULL)
+		{
+
+			vtkSmartPointer<vtkPolyData> mPD_A = vtkSmartPointer<vtkPolyData>::New();
+			mPD_A = myMapperA->GetInput();
+
+			vtkSmartPointer<vtkPolyData> mPD_B = vtkSmartPointer<vtkPolyData>::New();
+			mPD_B = myMapperB->GetInput();
+
+			double ve_B_init_pos[3];;
+			double ve_B_final_pos[3];
+
+			double ve_A_init_pos[3];;
+			double ve_A_final_pos[3];
+
+			vtkSmartPointer<vtkMatrix4x4> Mat_A = actorA->GetMatrix();
+			vtkSmartPointer<vtkMatrix4x4> Mat_B = actorB->GetMatrix();
+
+			vtkSmartPointer<vtkPolyData> mPD_A_Moved = vtkSmartPointer<vtkPolyData>::New();
+			mPD_A_Moved->DeepCopy(vtkPolyData::SafeDownCast(mPD_A));
+
+
+			for (vtkIdType i = 0; i < mPD_A_Moved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				mPD_A_Moved->GetPoint(i, ve_A_init_pos);
+				mqMorphoDigCore::TransformPoint(Mat_A, ve_A_init_pos, ve_A_final_pos);
+
+				mPD_A_Moved->GetPoints()->SetPoint((vtkIdType)i, ve_A_final_pos);
+			}
+
+			vtkSmartPointer<vtkPolyData> mPD_B_Moved = vtkSmartPointer<vtkPolyData>::New();
+			mPD_B_Moved->DeepCopy(vtkPolyData::SafeDownCast(mPD_B));
+			for (vtkIdType i = 0; i < mPD_B_Moved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				mPD_B_Moved->GetPoint(i, ve_B_init_pos);
+				mqMorphoDigCore::TransformPoint(Mat_B, ve_B_init_pos, ve_B_final_pos);
+
+				mPD_B_Moved->GetPoints()->SetPoint((vtkIdType)i, ve_B_final_pos);
+			}
+			VTK_CREATE(vtkMDActor, newactor);
+			if (this->mui_BackfaceCulling == 0)
+			{
+				newactor->GetProperty()->BackfaceCullingOff();
+			}
+			else
+			{
+				newactor->GetProperty()->BackfaceCullingOn();
+			}
+
+			VTK_CREATE(vtkPolyDataMapper, newmapper);
+			//newmapper->ImmediateModeRenderingOn();
+			newmapper->SetColorModeToDefault();
+
+			if (
+				(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+				&& this->mui_ActiveScalars->NumComp == 1
+				)
+			{
+				newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+				newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+			}
+			else
+			{
+				newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+			}
+
+			newmapper->ScalarVisibilityOn();
+
+			vtkSmartPointer<vtkBooleanOperationPolyDataFilter> Bfilter = vtkSmartPointer<vtkBooleanOperationPolyDataFilter>::New();
+			//Sfilter->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+			Bfilter->SetInputData(0, mPD_A_Moved);
+			Bfilter->SetInputData(1, mPD_B_Moved);
+			if (mode ==0)
+			{
+				Bfilter->SetOperationToDifference();
+			}else if (mode == 1)
+			{
+				Bfilter->SetOperationToUnion();
+			}
+			else 
+			{
+				Bfilter->SetOperationToIntersection();
+			}
+			Bfilter->Update();
+
+			vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+			cleanPolyDataFilter->SetInputData(Bfilter->GetOutput());
+			cleanPolyDataFilter->PieceInvariantOff();
+			cleanPolyDataFilter->ConvertLinesToPointsOff();
+			cleanPolyDataFilter->ConvertPolysToLinesOff();
+			cleanPolyDataFilter->ConvertStripsToPolysOff();
+			cleanPolyDataFilter->PointMergingOn();
+			cleanPolyDataFilter->Update();
+			VTK_CREATE(vtkPolyData, myData);
+
+			myData = cleanPolyDataFilter->GetOutput();
+
+			cout << "Boolean output: nv=" << myData->GetNumberOfPoints() << endl;
+			//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+
+			newmapper->SetInputData(myData);
+
+
+
+			double color[4] = { 0.5, 0.5, 0.5, 1 };
+			actorA->GetmColor(color);
+			newactor->SetmColor(color);
+
+			newactor->SetMapper(newmapper);
+			newactor->SetSelected(0);
+
+			newactor->SetName(actorA->GetName() + "_boolean");
+			cout << "try to add new actor=" << endl;
+			newcoll->AddTmpItem(newactor);
+			modified = 1;
+		}
+
+
+	}
+
+	if (modified == 1)
+	{
+		newcoll->InitTraversal();
+		vtkIdType num = newcoll->GetNumberOfItems();
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor from newcoll:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+			myActor->SetDisplayMode(this->mui_DisplayMode);
+			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
+			std::string action = "Boolean resulting object added: " + myActor->GetName();
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "new actor(s) added" << endl;
+		this->Initmui_ExistingScalars();
+
+		cout << "Set actor collection changed" << endl;
+		this->getActorCollection()->SetChanged(1);
+		cout << "Actor collection changed" << endl;
+
+		this->AdjustCameraAndGrid();
+		cout << "Camera and grid adjusted" << endl;
+
+		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+		{
+			this->UpdateLandmarkSettings();
+		}
+		this->Render();
+	}
+
+
 }
 void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *impactedActor, vtkMDActor* observedActor)
 {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqShrinkWrapDialog</class>
- <widget class="QDialog" name="mqShrinkWrapDialog">
+ <class>mqBooleanOperationDialog</class>
+ <widget class="QDialog" name="mqBooleanOperationDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Shrink Wrap</string>
+   <string>Boolean operation</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -464,22 +464,9 @@
     </rect>
    </property>
    <property name="title">
-    <string>Shrink Wrap impacted object over observed object</string>
+    <string>Boolean operation on 2 surfaces</string>
    </property>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>100</y>
-      <width>201</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Iteration_number&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="impactedObject">
+   <widget class="QComboBox" name="surfaceA">
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -499,10 +486,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Impacted object:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surface A:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="observedObject">
+   <widget class="QComboBox" name="surfaceB">
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -522,65 +509,41 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Observed object:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surface B:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="iteration">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>50</x>
       <y>100</y>
-      <width>71</width>
-      <height>21</height>
+      <width>281</width>
+      <height>71</height>
      </rect>
     </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>20</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>130</y>
-      <width>121</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relaxation (0.001-0.1):&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="relaxation">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>140</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>3</number>
-    </property>
-    <property name="minimum">
-     <double>0.001000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>0.100000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.001000000000000</double>
-    </property>
-    <property name="value">
-     <double>0.010000000000000</double>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QRadioButton" name="difference_2">
+       <property name="text">
+        <string>Difference (A - B)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="union_2">
+       <property name="text">
+        <string>Union (A u B)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="intersection_2">
+       <property name="text">
+        <string>Intersection (A ∩ B)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>

@@ -3,6 +3,10 @@ mqViewMenuManager.h
 mqViewMenuManager.cxx
   mqActorTreePanel.cxx
   mqActorTreePanel.h
+  mqBooleanOperationDialog.cxx
+  mqBooleanOperationDialog.h
+  mqBooleanOperationDialogReaction.cxx
+  mqBooleanOperationDialogReaction.h
   mqAboutDialog.cxx
   mqAboutDialog.h
   mqAboutDialogReaction.cxx
@@ -284,6 +288,7 @@ set (Qt_MOC_HDRS
 
 set (Qt_UIs mqAboutDialog.ui 
 mqColorDialog.ui 
+mqBooleanOperationDialog.ui
 mqCylinderDialog.ui 
 mqShrinkWrapDialog.ui 
 mqCubeDialog.ui 

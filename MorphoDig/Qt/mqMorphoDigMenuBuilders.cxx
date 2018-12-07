@@ -31,7 +31,7 @@
 #include "mqICPDialogReaction.h"
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqShrinkWrapDialogReaction.h"
-
+#include "mqBooleanOperationDialogReaction.h"
 #include "mqSavePLYDialogReaction.h"
 #include "mqSaveVTKDialogReaction.h"
 #include "mqCylinderDialogReaction.h"
@@ -322,6 +322,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	new mqShrinkWrapDialogReaction(submenuWrapping->addAction("Shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionShrinkWrap"));
 
+	QMenu* submenuBoolean = menu.addMenu("Boolean operations");
+	new mqBooleanOperationDialogReaction(submenuWrapping->addAction("Boolean operations involving two surfaces") << mqSetName("actionBoolean"));
 
 	QMenu* submenuAlignment = menu.addMenu("Surface alignment");
 	new mqICPDialogReaction(submenuAlignment->addAction("Align 2 surfaces (iterative closest point algorithm)") << mqSetName("actionICP"));
