@@ -155,6 +155,10 @@ mqSelectLandmarkRangeDialogReaction.cxx
   mqOrientationLabelsDialog.h
   mqOrientationLabelsDialogReaction.cxx
   mqOrientationLabelsDialogReaction.h
+mqShrinkWrapDialog.cxx
+mqShrinkWrapDialog.h
+mqShrinkWrapDialogReaction.cxx
+mqShrinkWrapDialogReaction.h
 QDoubleSlider.cxx
 QDoubleSlider.h
 QRAMThread.cxx
@@ -281,6 +285,7 @@ set (Qt_MOC_HDRS
 set (Qt_UIs mqAboutDialog.ui 
 mqColorDialog.ui 
 mqCylinderDialog.ui 
+mqShrinkWrapDialog.ui 
 mqCubeDialog.ui 
 mqIcosahedronDialog.ui
 mqLandmarkDialog.ui  

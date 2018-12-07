@@ -12713,7 +12713,167 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 		
 	
 }
+void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *impactedActor, vtkMDActor* observedActor)
+{
+	cout << "Call ShrinkWrap" << endl;
+	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+	int modified = 0;
+	if (impactedActor != NULL && observedActor != NULL && impactedActor != observedActor)
+	{
+		std::string action = "shrink wrap";
+		action.append(impactedActor->GetName().c_str());
+	
 
+		
+		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
+		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
+		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
+		{
+
+			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPD = myImpactedMapper->GetInput();
+
+			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPD = myObservedMapper->GetInput();
+	
+			double ve_obs_init_pos[3];;
+			double ve_obs_final_pos[3];
+			
+			double ve_imp_init_pos[3];;
+			double ve_imp_final_pos[3];
+			
+			vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
+			vtkSmartPointer<vtkMatrix4x4> obsMat = observedActor->GetMatrix();
+
+			vtkSmartPointer<vtkPolyData> impactedMoved = vtkSmartPointer<vtkPolyData>::New();
+			impactedMoved->DeepCopy(vtkPolyData::SafeDownCast(mImpactedPD));
+
+
+			for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				impactedMoved->GetPoint(i, ve_imp_init_pos);
+				mqMorphoDigCore::TransformPoint(obsMat, ve_imp_init_pos, ve_imp_final_pos);
+
+				impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
+			}
+
+			vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
+			observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
+			for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				observedMoved->GetPoint(i, ve_obs_init_pos);
+				mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
+
+				observedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_obs_final_pos);
+			}
+				VTK_CREATE(vtkMDActor, newactor);
+				if (this->mui_BackfaceCulling == 0)
+				{
+					newactor->GetProperty()->BackfaceCullingOff();
+				}
+				else
+				{
+					newactor->GetProperty()->BackfaceCullingOn();
+				}
+
+				VTK_CREATE(vtkPolyDataMapper, newmapper);
+				//newmapper->ImmediateModeRenderingOn();
+				newmapper->SetColorModeToDefault();
+
+				if (
+					(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+					&& this->mui_ActiveScalars->NumComp == 1
+					)
+				{
+					newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+					newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+				}
+				else
+				{
+					newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+				}
+
+				newmapper->ScalarVisibilityOn();
+
+				vtkSmartPointer<vtkSmoothPolyDataFilter> Sfilter = vtkSmartPointer<vtkSmoothPolyDataFilter>::New();
+				//Sfilter->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
+				Sfilter->SetInputData(0, impactedMoved);
+				Sfilter->SetInputData(1, observedMoved);
+				Sfilter->SetNumberOfIterations(iteration);
+				Sfilter->SetRelaxationFactor(relaxation);
+				Sfilter->Update();
+
+				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+				cleanPolyDataFilter->SetInputData(Sfilter->GetOutput());
+				cleanPolyDataFilter->PieceInvariantOff();
+				cleanPolyDataFilter->ConvertLinesToPointsOff();
+				cleanPolyDataFilter->ConvertPolysToLinesOff();
+				cleanPolyDataFilter->ConvertStripsToPolysOff();
+				cleanPolyDataFilter->PointMergingOn();
+				cleanPolyDataFilter->Update();
+				VTK_CREATE(vtkPolyData, myData);
+
+				myData = cleanPolyDataFilter->GetOutput();
+
+				cout << "shrink wrap output: nv=" << myData->GetNumberOfPoints() << endl;
+				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+
+				newmapper->SetInputData(myData);
+
+				
+
+				double color[4] = { 0.5, 0.5, 0.5, 1 };
+				impactedActor->GetmColor(color);
+				newactor->SetmColor(color);
+
+				newactor->SetMapper(newmapper);
+				newactor->SetSelected(0);
+
+				newactor->SetName(impactedActor->GetName() + "_shrinkwrap");
+				cout << "try to add new actor=" << endl;
+				newcoll->AddTmpItem(newactor);
+				modified = 1; 
+		}
+
+		
+	}
+
+	if (modified == 1)
+	{
+		newcoll->InitTraversal();
+		vtkIdType num = newcoll->GetNumberOfItems();
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor from newcoll:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+			myActor->SetDisplayMode(this->mui_DisplayMode);
+			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
+			std::string action = "Shrinked wrapped object added: " + myActor->GetName();
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "new actor(s) added" << endl;
+		this->Initmui_ExistingScalars();
+
+		cout << "Set actor collection changed" << endl;
+		this->getActorCollection()->SetChanged(1);
+		cout << "Actor collection changed" << endl;
+
+		this->AdjustCameraAndGrid();
+		cout << "Camera and grid adjusted" << endl;
+
+		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+		{
+			this->UpdateLandmarkSettings();
+		}
+		this->Render();
+	}
+
+
+}
 std::vector<std::string> mqMorphoDigCore::getActorNames()
 {
 	std::vector<std::string> myList;
