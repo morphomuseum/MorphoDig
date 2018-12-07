@@ -349,7 +349,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Orange = submenuChangeObjectColor->addAction("Orange");
 	QAction *Brown = submenuChangeObjectColor->addAction("Brown");
 	
-	QMenu* submenuSupportMaterial = menu.addMenu("Create 3D printing connective material");
+	QMenu* submenuSupportMaterial = menu.addMenu("Create 3D primitives");
 	new mqCylinderDialogReaction(submenuSupportMaterial->addAction("Create cylindric connective struts") << mqSetName("actionCylinders"));
 	new mqCubeDialogReaction(submenuSupportMaterial->addAction("Create cubic/box-shaped connective struts") << mqSetName("actionCubes"));	
 	new mqIcosahedronDialogReaction(submenuSupportMaterial->addAction("Create icosahedrons/spheres") << mqSetName("actionIcos"));
