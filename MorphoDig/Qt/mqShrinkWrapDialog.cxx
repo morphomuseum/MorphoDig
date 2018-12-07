@@ -82,7 +82,8 @@ mqShrinkWrapDialog::mqShrinkWrapDialog(QWidget* Parent)
 		
 
 	}
-	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditThickness()));
+	connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditShrinkWrap()));
+	 
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 
 }
