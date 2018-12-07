@@ -527,6 +527,9 @@
        <property name="text">
         <string>Difference (A - B)</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>

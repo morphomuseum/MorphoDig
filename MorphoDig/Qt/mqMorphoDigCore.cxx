@@ -12714,7 +12714,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 		
 	
 }
-void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, int mode = 0)
+void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, int mode)
 {
 	cout << "Call Boolean operation" << endl;
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
@@ -12812,7 +12812,7 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 				Bfilter->SetOperationToIntersection();
 			}
 			Bfilter->Update();
-
+		
 			vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 			cleanPolyDataFilter->SetInputData(Bfilter->GetOutput());
 			cleanPolyDataFilter->PieceInvariantOff();
@@ -12841,8 +12841,18 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 
 			newactor->SetName(actorA->GetName() + "_boolean");
 			cout << "try to add new actor=" << endl;
-			newcoll->AddTmpItem(newactor);
-			modified = 1;
+			if (myData->GetNumberOfPoints() > 10)
+			{
+				newcoll->AddTmpItem(newactor);
+				modified = 1;
+			}
+			else
+			{
+				QMessageBox msgBox;
+				msgBox.setText("No boolean object created. Output contained "+ QString::number(myData->GetNumberOfPoints())+" points");
+				msgBox.exec();
+				return;
+			}
 		}
 
 

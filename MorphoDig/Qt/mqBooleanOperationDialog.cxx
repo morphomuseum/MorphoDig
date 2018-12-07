@@ -132,9 +132,9 @@ void mqBooleanOperationDialog::editBooleanOperation()
 		//	cout << "Call mphodigcore between function" << endl;
 			int mode = 0; //0 difference // 1 union // 2 intersection
 
-			if (this->difference_2->isChecked()) { mode = 0; }
-			if (this->union_2->isChecked()) { mode = 1; }
-			if (this->intersection_2->isChecked()) { mode = 2; }
+			if (this->Ui->difference_2->isChecked()) { mode = 0; }
+			if (this->Ui->union_2->isChecked()) { mode = 1; }
+			if (this->Ui->intersection_2->isChecked()) { mode = 2; }
 			mqMorphoDigCore::instance()->BooleanOperation(this->actorA, this->actorB, mode);// to launch the process
 		}
 		
