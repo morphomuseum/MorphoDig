@@ -163,6 +163,10 @@ mqShrinkWrapDialog.cxx
 mqShrinkWrapDialog.h
 mqShrinkWrapDialogReaction.cxx
 mqShrinkWrapDialogReaction.h
+mqShrinkWrapIterativeDialog.cxx
+mqShrinkWrapIterativeDialog.h
+mqShrinkWrapIterativeDialogReaction.cxx
+mqShrinkWrapIterativeDialogReaction.h
 QDoubleSlider.cxx
 QDoubleSlider.h
 QRAMThread.cxx
@@ -291,6 +295,7 @@ mqColorDialog.ui
 mqBooleanOperationDialog.ui
 mqCylinderDialog.ui 
 mqShrinkWrapDialog.ui 
+mqShrinkWrapIterativeDialog.ui 
 mqCubeDialog.ui 
 mqIcosahedronDialog.ui
 mqLandmarkDialog.ui  

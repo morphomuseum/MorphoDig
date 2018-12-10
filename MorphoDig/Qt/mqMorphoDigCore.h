@@ -796,6 +796,7 @@ signals:
   void actorsMightHaveChanged();
   void modeModeChanged();
   void thicknessProgression(int percent);
+  void iterativeShrinkWrapProgression(int percent);
   void complexityProgression(int percent);
   void smoothingProgression(int percent);
   void distanceProgression(int percent);

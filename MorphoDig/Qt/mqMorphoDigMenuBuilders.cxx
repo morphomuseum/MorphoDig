@@ -31,6 +31,7 @@
 #include "mqICPDialogReaction.h"
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqShrinkWrapDialogReaction.h"
+#include "mqShrinkWrapIterativeDialogReaction.h"
 #include "mqBooleanOperationDialogReaction.h"
 #include "mqSavePLYDialogReaction.h"
 #include "mqSaveVTKDialogReaction.h"
@@ -321,6 +322,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *ConvexHULL = submenuWrapping->addAction("Create a convex hull for each selected surface");
 
 	new mqShrinkWrapDialogReaction(submenuWrapping->addAction("Shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionShrinkWrap"));
+	new mqShrinkWrapIterativeDialogReaction(submenuWrapping->addAction("Iterative shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionIterativeShrinkWrap"));
+
 
 	QMenu* submenuBoolean = menu.addMenu("Boolean operations");
 	new mqBooleanOperationDialogReaction(submenuBoolean->addAction("Boolean operations involving two surfaces") << mqSetName("actionBoolean"));
