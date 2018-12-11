@@ -12894,6 +12894,378 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 
 
 }
+void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iteration, double stopCriterion, double radius, double angularLimit, double maxStepAmplitude, vtkMDActor *impactedActor, vtkMDActor* observedActor, int smoothWrapping)
+{
+	cout << "Call ShrinkWrap" << endl;
+	if (radius <= 0) { radius = 1; }
+	if (maxStepAmplitude <= 0) { maxStepAmplitude = radius; }
+	if (maxStepAmplitude > radius) { maxStepAmplitude = radius; }
+
+	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+	int modified = 0;
+	if (impactedActor != NULL && observedActor != NULL && impactedActor != observedActor)
+	{
+		std::string action = "shrink wrap iterative";
+		action.append(impactedActor->GetName().c_str());
+
+		
+		int Count = BEGIN_UNDO_SET(action);
+
+		std::string mScalarName = "ShrinkWrap_Last_Displacement";
+		if (scalarName.length() > 0)
+		{
+			mScalarName = scalarName.toStdString();
+		}
+		impactedActor->SaveState(Count, QString(mScalarName.c_str()));
+
+		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
+		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
+		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
+		{
+
+			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPD = myImpactedMapper->GetInput();
+
+			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPD = myObservedMapper->GetInput();
+
+			double ve_obs_init_pos[3];;
+			double ve_obs_final_pos[3];
+			double ven_obs_final_pos[3];;
+
+			double ve_imp_init_pos[3];;
+			double ve_imp_final_pos[3];
+			double ven_imp_final_pos[3];;
+
+
+			vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
+			vtkSmartPointer<vtkMatrix4x4> obsMat = observedActor->GetMatrix();
+
+			vtkSmartPointer<vtkPolyData> impactedMoved = vtkSmartPointer<vtkPolyData>::New();
+			impactedMoved->DeepCopy(vtkPolyData::SafeDownCast(mImpactedPD));
+
+
+			for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				impactedMoved->GetPoint(i, ve_imp_init_pos);
+				mqMorphoDigCore::TransformPoint(impMat, ve_imp_init_pos, ve_imp_final_pos);
+
+				impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
+			}
+			// now compute the norms!
+			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP = vtkSmartPointer<vtkPolyDataNormals>::New();
+			ObjNormalsIMP->SetInputData(impactedMoved);
+			ObjNormalsIMP->ComputePointNormalsOn();
+			ObjNormalsIMP->ComputeCellNormalsOn();
+			ObjNormalsIMP->AutoOrientNormalsOff();
+			ObjNormalsIMP->ConsistencyOff();
+			ObjNormalsIMP->Update();
+			impactedMoved = ObjNormalsIMP->GetOutput();
+
+	
+
+			vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
+			observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
+			for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				observedMoved->GetPoint(i, ve_obs_init_pos);
+				mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
+
+				observedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_obs_final_pos);
+			}
+			// now transform the norms
+			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsOBS = vtkSmartPointer<vtkPolyDataNormals>::New();
+			ObjNormalsOBS->SetInputData(impactedMoved);
+			ObjNormalsOBS->ComputePointNormalsOn();
+			ObjNormalsOBS->ComputeCellNormalsOn();
+			ObjNormalsOBS->AutoOrientNormalsOff();
+			ObjNormalsOBS->ConsistencyOff();
+			ObjNormalsOBS->Update();
+			observedMoved = ObjNormalsOBS->GetOutput();
+
+			
+
+			double numvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
+			vtkSmartPointer<vtkDoubleArray> newScalars =
+				vtkSmartPointer<vtkDoubleArray>::New();
+			newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+			newScalars->SetNumberOfTuples(numvert);
+			vtkIdType ve;
+
+
+			double pt[3] = { 0,0,1 };
+			double pt2[3] = { 0,0,1 };
+			double projected_pt2[3] = { 0,0,1 };
+
+			double *ptn2;
+
+			double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
+			if (angularLimit > 0 && angularLimit <= 180)
+			{
+				min_cos = cos(angularLimit*vtkMath::Pi() / 180);
+			}
+			cout << "min_cos=" << min_cos << endl;
+
+			double cur_cos = 1.0; // compare ve1's normal and ve2's normal
+			double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
+			double AB[3];
+
+			double ABnorm[3];
+
+			double picked_value = 0;
+			double min_dist = radius;
+			double tmp_dist = 0;
+			auto impactedNorms = vtkFloatArray::SafeDownCast(impactedMoved->GetPointData()->GetNormals());
+			auto observedNorms = vtkFloatArray::SafeDownCast(observedMoved->GetPointData()->GetNormals());
+			if (impactedNorms && observedNorms)
+			{
+				cout << "We have found some norms" << endl;
+				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+					vtkSmartPointer<vtkKdTreePointLocator>::New();
+				kDTree->SetDataSet(observedMoved);
+				kDTree->BuildLocator();
+				//first do only one loop => iterative shrink wrap should start here!
+				for (ve = 0; ve < numvert; ve++)
+				{
+					if ((ve % (int)(numvert / 200)) == 0)
+					{
+						emit iterativeShrinkWrapProgression((int)(100 * ve / numvert));
+					}
+					impactedMoved->GetPoint(ve, ve_imp_final_pos);
+					ptn2 = impactedNorms->GetTuple(ve);
+					ven_imp_final_pos[0] = ptn2[0];
+					ven_imp_final_pos[1] = ptn2[1];
+					ven_imp_final_pos[2] = ptn2[2];
+					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+
+					kDTree->FindPointsWithinRadius(radius, ve_imp_final_pos, observedNeighbours);
+					double newscalar = maxStepAmplitude; // if we do not find neighbours, we will move as far as permitted.
+
+					double currAmpl = 0;
+					vtkIdType cpt = 0;
+					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+					{
+						vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+						observedMoved->GetPoint(observedConnectedVertex, ve_obs_final_pos);
+						ptn2 = observedNorms->GetTuple3(observedConnectedVertex);
+						ven_obs_final_pos[0] = ptn2[0];
+						ven_obs_final_pos[1] = ptn2[1];
+						ven_obs_final_pos[2] = ptn2[2];
+						AB[0] = ve_obs_final_pos[0] - ve_imp_final_pos[0];
+						AB[1] = ve_obs_final_pos[1] - ve_imp_final_pos[1];
+						AB[2] = ve_obs_final_pos[2] - ve_imp_final_pos[2];
+						double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+						ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
+						if (curr_dist > 0)
+						{
+							ABnorm[0] = AB[0] / curr_dist;
+							ABnorm[1] = AB[1] / curr_dist;
+							ABnorm[2] = AB[2] / curr_dist;
+						}
+						cur_cos = ven_obs_final_pos[0] * ven_imp_final_pos[0] + ven_obs_final_pos[1] * ven_imp_final_pos[1] + ven_obs_final_pos[2] * ven_imp_final_pos[2];
+						cur_cos2 = -(ABnorm[0] * ven_imp_final_pos[0] + ABnorm[1] * ven_imp_final_pos[1] + ABnorm[2] * ven_imp_final_pos[2]);
+						if (ve < 10 && j < 3) {
+							cout << "cur_cos=" << cur_cos << endl;
+							cout << "cur_cos2=" << cur_cos2 << endl;
+						}
+
+						if (cur_cos > min_cos && cur_cos2 > min_cos)
+						{
+							// we have a candidate!
+							// compute projected point 2 along vvn1 !
+
+							double factor = cur_cos2*curr_dist / maxStepAmplitude;
+
+
+
+							currAmpl += factor;
+							cpt++;
+
+						}
+
+
+					}
+					if (cpt > 0)
+					{
+						currAmpl /= cpt;
+					}
+					else if (observedNeighbours->GetNumberOfIds() == 0)
+					{
+						currAmpl = newscalar;
+					}
+					else
+					{
+						currAmpl = 0; // case where there are neighbors around but no candinate... we then stop moving!
+					}
+
+
+					if (smoothWrapping == 0 || cpt == 0)
+					{
+
+						newScalars->InsertTuple1(ve, currAmpl);
+					}
+					else
+					{
+						//smoothin scalars begins here!!!
+						//@to modify
+						newScalars->InsertTuple1(ve, currAmpl);
+
+					}
+
+
+
+				}
+				std::cout << "New Scalar computation done " << std::endl;
+				for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
+					// for every triangle 
+					impactedMoved->GetPoint(i, ve_imp_init_pos);
+					double ampli = (double)newScalars->GetTuple1(i);
+					ptn2 = impactedNorms->GetTuple(ve);
+					ven_imp_final_pos[0] = ptn2[0];
+					ven_imp_final_pos[1] = ptn2[1];
+					ven_imp_final_pos[2] = ptn2[2];
+					ve_imp_final_pos[0] = ve_imp_init_pos[0] - ven_imp_final_pos[0] * ampli;
+					ve_imp_final_pos[1] = ve_imp_init_pos[1] - ven_imp_final_pos[1] * ampli;
+					ve_imp_final_pos[2] = ve_imp_init_pos[2] - ven_imp_final_pos[2] * ampli;
+
+					impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
+				}
+				// now transfor the norms!
+				vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP2 = vtkSmartPointer<vtkPolyDataNormals>::New();
+				ObjNormalsIMP2->SetInputData(impactedMoved);
+				ObjNormalsIMP2->ComputePointNormalsOn();
+				ObjNormalsIMP2->ComputeCellNormalsOn();
+				ObjNormalsIMP2->AutoOrientNormalsOff();
+				ObjNormalsIMP2->ConsistencyOff();
+				ObjNormalsIMP2->Update();
+				impactedMoved = ObjNormalsIMP2->GetOutput();
+
+
+				newScalars->SetName(mScalarName.c_str());
+				// test if exists...
+				//
+				int exists = 0;
+
+				// remove this scalar
+				//this->GetPointData()->SetScalars(newScalars);
+				impactedMoved->GetPointData()->RemoveArray(mScalarName.c_str());
+				impactedMoved->GetPointData()->AddArray(newScalars);
+				impactedMoved->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
+
+
+
+				// Not sure I create a new actor. Yes actually... 
+				VTK_CREATE(vtkMDActor, newactor);
+				if (this->mui_BackfaceCulling == 0)
+				{
+					newactor->GetProperty()->BackfaceCullingOff();
+				}
+				else
+				{
+					newactor->GetProperty()->BackfaceCullingOn();
+				}
+
+				VTK_CREATE(vtkPolyDataMapper, newmapper);
+				//newmapper->ImmediateModeRenderingOn();
+				newmapper->SetColorModeToDefault();
+
+				if (
+					(this->mui_ActiveScalars->DataType == VTK_INT || this->mui_ActiveScalars->DataType == VTK_UNSIGNED_INT)
+					&& this->mui_ActiveScalars->NumComp == 1
+					)
+				{
+					newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+					newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+				}
+				else
+				{
+					newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+				}
+
+				newmapper->ScalarVisibilityOn();
+
+
+
+
+				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+				//@@ TO CHANGE
+				cleanPolyDataFilter->SetInputData(impactedMoved);
+				//@@ TO CHANGE
+
+				cleanPolyDataFilter->PieceInvariantOff();
+				cleanPolyDataFilter->ConvertLinesToPointsOff();
+				cleanPolyDataFilter->ConvertPolysToLinesOff();
+				cleanPolyDataFilter->ConvertStripsToPolysOff();
+				cleanPolyDataFilter->PointMergingOn();
+				cleanPolyDataFilter->Update();
+
+
+
+				VTK_CREATE(vtkPolyData, myData);
+
+				myData = cleanPolyDataFilter->GetOutput();
+
+				cout << "shrink wrap output: nv=" << myData->GetNumberOfPoints() << endl;
+				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+
+				newmapper->SetInputData(myData);
+
+
+
+				double color[4] = { 0.5, 0.5, 0.5, 1 };
+				impactedActor->GetmColor(color);
+				newactor->SetmColor(color);
+
+				newactor->SetMapper(newmapper);
+				newactor->SetSelected(0);
+
+				newactor->SetName(impactedActor->GetName() + "_shrinkwrap");
+				cout << "try to add new actor=" << endl;
+				newcoll->AddTmpItem(newactor);
+				modified = 1;
+			}
+		}
+
+	}
+
+	if (modified == 1)
+	{
+		newcoll->InitTraversal();
+		vtkIdType num = newcoll->GetNumberOfItems();
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next actor from newcoll:" << i << endl;
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+			myActor->SetDisplayMode(this->mui_DisplayMode);
+			this->getActorCollection()->AddItem(myActor);
+			emit this->actorsMightHaveChanged();
+			std::string action = "Shrinked wrapped object added: " + myActor->GetName();
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+		}
+		//cout << "camera and grid adjusted" << endl;
+		cout << "new actor(s) added" << endl;
+		this->Initmui_ExistingScalars();
+
+		cout << "Set actor collection changed" << endl;
+		this->getActorCollection()->SetChanged(1);
+		cout << "Actor collection changed" << endl;
+
+		this->AdjustCameraAndGrid();
+		cout << "Camera and grid adjusted" << endl;
+
+		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+		{
+			this->UpdateLandmarkSettings();
+		}
+		this->Render();
+	}
+
+
+
+}
 void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *impactedActor, vtkMDActor* observedActor)
 {
 	cout << "Call ShrinkWrap" << endl;

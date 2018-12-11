@@ -138,7 +138,29 @@ void mqShrinkWrapIterativeDialog::editIterativeShrinkWrap()
 		if (this->observedActor != NULL && this->impactedActor != NULL)
 		{
 		//	cout << "Call mqmorphodigcore iterative shrink wrap function" << endl;
-			//mqMorphoDigCore::instance()->ShrinkWrapIterative(this->Ui->thickness->value(), this->Ui->smoothNormals->isChecked(), this->Ui->avg->value(), this->Ui->scalarName->text(), this->impactedActor, this->observedActor, this->Ui->angularLimit->value(), this->Ui->invertObservedNormals->isChecked());// to update thickness
+			int mode = 0;
+			if (this->Ui->FixedIterationNumber->isChecked() )
+			{
+				mode = 0;
+			}
+			else
+			{
+				mode = 1;
+			}
+			double searchSize = this->Ui->searchSize->value();
+			if (searchSize <= 0) { searchSize = 1; }
+			double maxStepAmplitude = searchSize;
+			if (this->Ui->X->value() > 0) {
+				maxStepAmplitude = searchSize / this->Ui->X->value();
+			}
+
+			double stopCriterion = 1;
+			if (this->Ui->Y->value() > 0) {
+				stopCriterion = searchSize / this->Ui->Y->value();
+			}
+
+			mqMorphoDigCore::instance()->ShrinkWrapIterative(this->Ui->scalarName->text(), mode, this->Ui->iterations->value(), stopCriterion, searchSize, this->Ui->angularLimit->value(), maxStepAmplitude, this->impactedActor, this->observedActor, this->Ui->smooth->isChecked());
+			
 		}
 		
 	}
