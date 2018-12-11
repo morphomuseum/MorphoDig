@@ -13029,6 +13029,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 				{
 					if ((ve % (int)(numvert / 200)) == 0)
 					{
+						cout << "ve=" << ve << endl;
 						emit iterativeShrinkWrapProgression((int)(100 * ve / numvert));
 					}
 					impactedMoved->GetPoint(ve, ve_imp_final_pos);
@@ -13082,7 +13083,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							cpt++;
 
 						}
-
+					
 
 					}
 					if (cpt > 0)
@@ -13120,14 +13121,19 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					// for every triangle 
 					impactedMoved->GetPoint(i, ve_imp_init_pos);
 					double ampli = (double)newScalars->GetTuple1(i);
-					ptn2 = impactedNorms->GetTuple(ve);
+					ptn2 = impactedNorms->GetTuple(i);
 					ven_imp_final_pos[0] = ptn2[0];
 					ven_imp_final_pos[1] = ptn2[1];
 					ven_imp_final_pos[2] = ptn2[2];
 					ve_imp_final_pos[0] = ve_imp_init_pos[0] - ven_imp_final_pos[0] * ampli;
 					ve_imp_final_pos[1] = ve_imp_init_pos[1] - ven_imp_final_pos[1] * ampli;
 					ve_imp_final_pos[2] = ve_imp_init_pos[2] - ven_imp_final_pos[2] * ampli;
-
+					if ((i % (int)(numvert / 200)) == 0)
+					{
+						cout << "i=" << i << endl;
+						cout << "ve_imp_final_pos[0]=" << ve_imp_final_pos[0] << ", ve_imp_final_pos[1]=" << ve_imp_final_pos[1] << "ve_imp_final_pos[2]=" << ve_imp_final_pos[2] << endl;
+						
+					}
 					impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
 				}
 				// now transfor the norms!
