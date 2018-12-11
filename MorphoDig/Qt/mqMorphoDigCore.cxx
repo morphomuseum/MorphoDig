@@ -13065,7 +13065,8 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						}
 						cur_cos = ven_obs_final_pos[0] * ven_imp_final_pos[0] + ven_obs_final_pos[1] * ven_imp_final_pos[1] + ven_obs_final_pos[2] * ven_imp_final_pos[2];
 						cur_cos2 = -(ABnorm[0] * ven_imp_final_pos[0] + ABnorm[1] * ven_imp_final_pos[1] + ABnorm[2] * ven_imp_final_pos[2]);
-						if (ve < 10 && j < 3) {
+						if ((ve % (int)(numvert / 200)) == 0 && j<3)
+						{
 							cout << "cur_cos=" << cur_cos << endl;
 							cout << "cur_cos2=" << cur_cos2 << endl;
 						}
@@ -13098,8 +13099,10 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					{
 						currAmpl = 0; // case where there are neighbors around but no candinate... we then stop moving!
 					}
-
-
+					if (ve % (int)(numvert / 200))
+					{
+						cout << "currampl=" << currAmpl << ", ve="<<ve<< endl;
+					}
 					if (smoothWrapping == 0 || cpt == 0)
 					{
 
@@ -13109,6 +13112,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					{
 						//smoothin scalars begins here!!!
 						//@to modify
+						
 						newScalars->InsertTuple1(ve, currAmpl);
 
 					}
@@ -13128,9 +13132,13 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					ve_imp_final_pos[0] = ve_imp_init_pos[0] - ven_imp_final_pos[0] * ampli;
 					ve_imp_final_pos[1] = ve_imp_init_pos[1] - ven_imp_final_pos[1] * ampli;
 					ve_imp_final_pos[2] = ve_imp_init_pos[2] - ven_imp_final_pos[2] * ampli;
-					if ((i % (int)(numvert / 200)) == 0)
+					if ((i % (int)(numvert / 200)) == 0 )
 					{
 						cout << "i=" << i << endl;
+						cout << "ampli="<<ampli << endl;
+						cout << "ven_imp_final_pos[0]=" << ven_imp_final_pos[0] << endl;
+						cout << "ve_imp_init_pos[0]=" << ve_imp_init_pos[0] << ", ve_imp_init_pos[1]=" << ve_imp_init_pos[1] << "ve_imp_init_pos[2]=" << ve_imp_init_pos[2] << endl;
+						
 						cout << "ve_imp_final_pos[0]=" << ve_imp_final_pos[0] << ", ve_imp_final_pos[1]=" << ve_imp_final_pos[1] << "ve_imp_final_pos[2]=" << ve_imp_final_pos[2] << endl;
 						
 					}
