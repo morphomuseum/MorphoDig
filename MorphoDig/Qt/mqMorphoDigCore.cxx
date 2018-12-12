@@ -12944,15 +12944,43 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			vtkSmartPointer<vtkPolyData> impactedMoved = vtkSmartPointer<vtkPolyData>::New();
 			impactedMoved->DeepCopy(vtkPolyData::SafeDownCast(mImpactedPD));
 
+			vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
+			observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
+			for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
+				// for every triangle 
+				observedMoved->GetPoint(i, ve_obs_init_pos);
+				mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
+
+				observedMoved->GetPoints()->SetPoint(i, ve_obs_final_pos);
+			}
+			// now transform the norms
+			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsOBS = vtkSmartPointer<vtkPolyDataNormals>::New();
+			ObjNormalsOBS->SetInputData(observedMoved);
+			ObjNormalsOBS->ComputePointNormalsOn();
+			ObjNormalsOBS->ComputeCellNormalsOn();
+			ObjNormalsOBS->AutoOrientNormalsOff();
+			ObjNormalsOBS->ConsistencyOff();
+			ObjNormalsOBS->Update();
+			observedMoved = ObjNormalsOBS->GetOutput();
+
+
+
+			double numvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
+
+
 
 			for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
 				// for every triangle 
 				impactedMoved->GetPoint(i, ve_imp_init_pos);
 				mqMorphoDigCore::TransformPoint(impMat, ve_imp_init_pos, ve_imp_final_pos);
 
-				impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
+				impactedMoved->GetPoints()->SetPoint(i, ve_imp_final_pos);
 			}
 			// now compute the norms!
+			
+			int ok = 1;
+		for (vtkIdType it=0; it<iteration;it++)
+		{
 			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP = vtkSmartPointer<vtkPolyDataNormals>::New();
 			ObjNormalsIMP->SetInputData(impactedMoved);
 			ObjNormalsIMP->ComputePointNormalsOn();
@@ -12961,214 +12989,247 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			ObjNormalsIMP->ConsistencyOff();
 			ObjNormalsIMP->Update();
 			impactedMoved = ObjNormalsIMP->GetOutput();
-
-	
-
-			vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
-			observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
-			for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
-				// for every triangle 
-				observedMoved->GetPoint(i, ve_obs_init_pos);
-				mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
-
-				observedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_obs_final_pos);
-			}
-			// now transform the norms
-			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsOBS = vtkSmartPointer<vtkPolyDataNormals>::New();
-			ObjNormalsOBS->SetInputData(impactedMoved);
-			ObjNormalsOBS->ComputePointNormalsOn();
-			ObjNormalsOBS->ComputeCellNormalsOn();
-			ObjNormalsOBS->AutoOrientNormalsOff();
-			ObjNormalsOBS->ConsistencyOff();
-			ObjNormalsOBS->Update();
-			observedMoved = ObjNormalsOBS->GetOutput();
-
+		
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);
 			
+				vtkSmartPointer<vtkDoubleArray> smoothScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+				smoothScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				smoothScalars->SetNumberOfTuples(numvert);
+				double pt[3] = { 0,0,1 };
+				double pt2[3] = { 0,0,1 };
+				double projected_pt2[3] = { 0,0,1 };
 
-			double numvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
-			vtkSmartPointer<vtkDoubleArray> newScalars =
-				vtkSmartPointer<vtkDoubleArray>::New();
-			newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-			newScalars->SetNumberOfTuples(numvert);
-			vtkIdType ve;
+				double *ptn2;
 
-
-			double pt[3] = { 0,0,1 };
-			double pt2[3] = { 0,0,1 };
-			double projected_pt2[3] = { 0,0,1 };
-
-			double *ptn2;
-
-			double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
-			if (angularLimit > 0 && angularLimit <= 180)
-			{
-				min_cos = cos(angularLimit*vtkMath::Pi() / 180);
-			}
-			cout << "min_cos=" << min_cos << endl;
-
-			double cur_cos = 1.0; // compare ve1's normal and ve2's normal
-			double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
-			double AB[3];
-
-			double ABnorm[3];
-
-			double picked_value = 0;
-			double min_dist = radius;
-			double tmp_dist = 0;
-			auto impactedNorms = vtkFloatArray::SafeDownCast(impactedMoved->GetPointData()->GetNormals());
-			auto observedNorms = vtkFloatArray::SafeDownCast(observedMoved->GetPointData()->GetNormals());
-			if (impactedNorms && observedNorms)
-			{
-				cout << "We have found some norms" << endl;
-				vtkSmartPointer<vtkKdTreePointLocator> kDTree =
-					vtkSmartPointer<vtkKdTreePointLocator>::New();
-				kDTree->SetDataSet(observedMoved);
-				kDTree->BuildLocator();
-				//first do only one loop => iterative shrink wrap should start here!
-				for (ve = 0; ve < numvert; ve++)
+				double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
+				if (angularLimit > 0 && angularLimit <= 180)
 				{
-					if ((ve % (int)(numvert / 200)) == 0)
-					{
-						cout << "ve=" << ve << endl;
-						emit iterativeShrinkWrapProgression((int)(100 * ve / numvert));
-					}
-					impactedMoved->GetPoint(ve, ve_imp_final_pos);
-					ptn2 = impactedNorms->GetTuple(ve);
-					ven_imp_final_pos[0] = ptn2[0];
-					ven_imp_final_pos[1] = ptn2[1];
-					ven_imp_final_pos[2] = ptn2[2];
-					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
-
-					kDTree->FindPointsWithinRadius(radius, ve_imp_final_pos, observedNeighbours);
-					double newscalar = maxStepAmplitude; // if we do not find neighbours, we will move as far as permitted.
-
-					double currAmpl = 0;
-					vtkIdType cpt = 0;
-					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
-					{
-						vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
-						observedMoved->GetPoint(observedConnectedVertex, ve_obs_final_pos);
-						ptn2 = observedNorms->GetTuple3(observedConnectedVertex);
-						ven_obs_final_pos[0] = ptn2[0];
-						ven_obs_final_pos[1] = ptn2[1];
-						ven_obs_final_pos[2] = ptn2[2];
-						AB[0] = ve_obs_final_pos[0] - ve_imp_final_pos[0];
-						AB[1] = ve_obs_final_pos[1] - ve_imp_final_pos[1];
-						AB[2] = ve_obs_final_pos[2] - ve_imp_final_pos[2];
-						double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
-						ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
-						if (curr_dist > 0)
-						{
-							ABnorm[0] = AB[0] / curr_dist;
-							ABnorm[1] = AB[1] / curr_dist;
-							ABnorm[2] = AB[2] / curr_dist;
-						}
-						cur_cos = ven_obs_final_pos[0] * ven_imp_final_pos[0] + ven_obs_final_pos[1] * ven_imp_final_pos[1] + ven_obs_final_pos[2] * ven_imp_final_pos[2];
-						cur_cos2 = -(ABnorm[0] * ven_imp_final_pos[0] + ABnorm[1] * ven_imp_final_pos[1] + ABnorm[2] * ven_imp_final_pos[2]);
-						if ((ve % (int)(numvert / 200)) == 0 && j<3)
-						{
-							cout << "cur_cos=" << cur_cos << endl;
-							cout << "cur_cos2=" << cur_cos2 << endl;
-						}
-
-						if (cur_cos > min_cos && cur_cos2 > min_cos)
-						{
-							// we have a candidate!
-							// compute projected point 2 along vvn1 !
-
-							double factor = cur_cos2*curr_dist / maxStepAmplitude;
-
-
-
-							currAmpl += factor;
-							cpt++;
-
-						}
-					
-
-					}
-					if (cpt > 0)
-					{
-						currAmpl /= cpt;
-					}
-					else if (observedNeighbours->GetNumberOfIds() == 0)
-					{
-						currAmpl = newscalar;
-					}
-					else
-					{
-						currAmpl = 0; // case where there are neighbors around but no candinate... we then stop moving!
-					}
-					if (ve % (int)(numvert / 200))
-					{
-						cout << "currampl=" << currAmpl << ", ve="<<ve<< endl;
-					}
-					if (smoothWrapping == 0 || cpt == 0)
-					{
-
-						newScalars->InsertTuple1(ve, currAmpl);
-					}
-					else
-					{
-						//smoothin scalars begins here!!!
-						//@to modify
-						
-						newScalars->InsertTuple1(ve, currAmpl);
-
-					}
-
-
-
+					min_cos = cos(angularLimit*vtkMath::Pi() / 180);
 				}
-				std::cout << "New Scalar computation done " << std::endl;
-				for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
-					// for every triangle 
-					impactedMoved->GetPoint(i, ve_imp_init_pos);
-					double ampli = (double)newScalars->GetTuple1(i);
-					ptn2 = impactedNorms->GetTuple(i);
-					ven_imp_final_pos[0] = ptn2[0];
-					ven_imp_final_pos[1] = ptn2[1];
-					ven_imp_final_pos[2] = ptn2[2];
-					ve_imp_final_pos[0] = ve_imp_init_pos[0] - ven_imp_final_pos[0] * ampli;
-					ve_imp_final_pos[1] = ve_imp_init_pos[1] - ven_imp_final_pos[1] * ampli;
-					ve_imp_final_pos[2] = ve_imp_init_pos[2] - ven_imp_final_pos[2] * ampli;
-					if ((i % (int)(numvert / 200)) == 0 )
+				cout << "min_cos=" << min_cos << endl;
+
+				double cur_cos = 1.0; // compare ve1's normal and ve2's normal
+				double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
+				double AB[3];
+
+				double ABnorm[3];
+
+				double picked_value = 0;
+				double min_dist = radius;
+				double tmp_dist = 0;
+				auto impactedNorms = vtkFloatArray::SafeDownCast(impactedMoved->GetPointData()->GetNormals());
+				auto observedNorms = vtkFloatArray::SafeDownCast(observedMoved->GetPointData()->GetNormals());
+				if (impactedNorms && observedNorms)
+				{
+					cout << "We have found some norms" << endl;
+					vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+						vtkSmartPointer<vtkKdTreePointLocator>::New();
+					kDTree->SetDataSet(observedMoved);
+					kDTree->BuildLocator();
+					//first do only one loop => iterative shrink wrap should start here!
+					for (vtkIdType ve2 = 0; ve2 < numvert; ve2++)
 					{
-						cout << "i=" << i << endl;
-						cout << "ampli="<<ampli << endl;
-						cout << "ven_imp_final_pos[0]=" << ven_imp_final_pos[0] << endl;
-						cout << "ve_imp_init_pos[0]=" << ve_imp_init_pos[0] << ", ve_imp_init_pos[1]=" << ve_imp_init_pos[1] << "ve_imp_init_pos[2]=" << ve_imp_init_pos[2] << endl;
-						
-						cout << "ve_imp_final_pos[0]=" << ve_imp_final_pos[0] << ", ve_imp_final_pos[1]=" << ve_imp_final_pos[1] << "ve_imp_final_pos[2]=" << ve_imp_final_pos[2] << endl;
-						
+						if ((ve2 % (int)(numvert / 10)) == 0)
+						{
+							cout << "ve=" << ve2 << endl;
+							emit iterativeShrinkWrapProgression((int)(100 * ve2 / numvert));
+						}
+						impactedMoved->GetPoint(ve2, ve_imp_final_pos);
+						ptn2 = impactedNorms->GetTuple(ve2);
+						ven_imp_final_pos[0] = ptn2[0];
+						ven_imp_final_pos[1] = ptn2[1];
+						ven_imp_final_pos[2] = ptn2[2];
+						vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+
+						kDTree->FindPointsWithinRadius(radius, ve_imp_final_pos, observedNeighbours);
+						double newscalar = maxStepAmplitude; // if we do not find neighbours, we will move as far as permitted.
+
+						double currAmpl = 0;
+
+						vtkIdType cpt_realneighbors = 0;
+						vtkIdType cpt_notrealneighbors = 0;
+						vtkIdType cpt_candidates = 0;
+						if (((int)ve2 % (int)(numvert / 10)) == 0)
+						{
+							cout << "ve=" << ve2 << ", neighbours" << observedNeighbours->GetNumberOfIds() << ", ve_imp_final_pos:" << ve_imp_final_pos[0] << "," << ve_imp_final_pos[1] << "," << ve_imp_final_pos[2] << endl;
+						}
+						for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+						{
+							vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
+							if (((int)ve2 % (int)(numvert / 10)) == 0 && j == 0)
+							{
+								cout << "first observed neighbour ve_obs_final_pos=" << ve_obs_final_pos[0] << "," << ve_obs_final_pos[1] << "," << ve_obs_final_pos[2] << endl;
+							}
+							observedMoved->GetPoint(observedConnectedVertex, ve_obs_final_pos);
+							ptn2 = observedNorms->GetTuple3(observedConnectedVertex);
+							ven_obs_final_pos[0] = ptn2[0];
+							ven_obs_final_pos[1] = ptn2[1];
+							ven_obs_final_pos[2] = ptn2[2];
+							AB[0] = ve_obs_final_pos[0] - ve_imp_final_pos[0];
+							AB[1] = ve_obs_final_pos[1] - ve_imp_final_pos[1];
+							AB[2] = ve_obs_final_pos[2] - ve_imp_final_pos[2];
+							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+							ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
+							if (curr_dist > 0)
+							{
+								ABnorm[0] = AB[0] / curr_dist;
+								ABnorm[1] = AB[1] / curr_dist;
+								ABnorm[2] = AB[2] / curr_dist;
+							}
+							cur_cos = ven_obs_final_pos[0] * ven_imp_final_pos[0] + ven_obs_final_pos[1] * ven_imp_final_pos[1] + ven_obs_final_pos[2] * ven_imp_final_pos[2];
+							cur_cos2 = -(ABnorm[0] * ven_imp_final_pos[0] + ABnorm[1] * ven_imp_final_pos[1] + ABnorm[2] * ven_imp_final_pos[2]);
+
+							if (curr_dist > radius)
+							{
+								cpt_notrealneighbors++;
+							}
+							else
+							{
+								cpt_realneighbors++;
+							}
+							if (cur_cos > min_cos && curr_dist < radius)
+							{
+								double factor = cur_cos2*curr_dist / maxStepAmplitude;
+								if (((int)ve2 % (int)(numvert / 10)) == 0 && j == 0)
+								{
+									cout << "cur_cos=" << cur_cos << endl;
+									cout << "cur_cos2=" << cur_cos2 << endl;
+									cout << "min_cos=" << min_cos << endl;
+									cout << "curr_dist=" << curr_dist << endl;
+									cout << "factor=" << factor << endl;
+									cout << "ABnorm[0]=" << ABnorm[0] << "ABnorm[1]=" << ABnorm[1] << "ABnorm[2]=" << ABnorm[2] << endl;
+
+								}
+								// we have a candidate!
+								// compute projected point 2 along vvn1 !
+
+
+
+								cpt_candidates++;
+
+								currAmpl += factor;
+
+
+							}
+
+
+						}
+						if (cpt_candidates > 0)
+						{
+							currAmpl /= cpt_candidates;
+							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << ", cpt="<<cpt<< endl;
+						}
+						else if (cpt_realneighbors == 0)
+						{
+							if ((ve2 % (int)(numvert / 10)) == 0)
+							{
+								cout << "currampl=" << currAmpl << ", ve=" << ve2 << "NO REAL NEIGHBOUR FOUND" << endl;
+							}
+							currAmpl = newscalar;
+
+						}
+						else
+						{
+							currAmpl = 0; // case where there are real neighbors around but no one is satisfying the desirfed angular condition(s).
+							if ((ve2 % (int)(numvert / 10)) == 0)
+							{
+								cout << "currampl=" << currAmpl << ", ve=" << ve2 << "Neigh exist but are not satisfactory" << endl;
+							}
+						}
+
+
+
+
+						if ((ve2 % (int)(numvert / 10)) == 0)
+						{
+							cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
+						}
+
+
+
+						newScalars->InsertTuple1(ve2, currAmpl);
+
+
+
+
 					}
-					impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
+					if (smoothWrapping == 1)
+					{
+
+						smoothScalars = this->scalarSmooth(newScalars, impactedMoved, radius, 0, 0, 0, 1);
+						newScalars->DeepCopy(smoothScalars);
+
+					}
+
+
+
+					std::cout << "New Scalar computation done " << std::endl;
+					for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
+						// for every triangle 
+						impactedMoved->GetPoint(i, ve_imp_init_pos);
+						double ampli = newScalars->GetTuple1(i);
+						if ((i % (int)(numvert / 10)) == 0)
+						{
+							cout << "ampli=" << ampli << endl;
+							cout << "ampli smoothed=" << smoothScalars->GetTuple1(i) << endl;
+						}
+						ptn2 = impactedNorms->GetTuple(i);
+						ven_imp_final_pos[0] = ptn2[0];
+						ven_imp_final_pos[1] = ptn2[1];
+						ven_imp_final_pos[2] = ptn2[2];
+						ve_imp_final_pos[0] = ve_imp_init_pos[0] + ven_imp_final_pos[0] * ampli;
+						ve_imp_final_pos[1] = ve_imp_init_pos[1] + ven_imp_final_pos[1] * ampli;
+						ve_imp_final_pos[2] = ve_imp_init_pos[2] + ven_imp_final_pos[2] * ampli;
+						//if (ampli>0){ cout << "i=" << i << ", ampli=" << ampli << endl; }
+						if ((i % (int)(numvert / 10)) == 0)
+						{
+							//	cout << "i=" << i << endl;
+							//	cout << "i="<<i<<", ampli="<<ampli << endl;
+							//	cout << "ven_imp_final_pos[0]=" << ven_imp_final_pos[0] << endl;
+							//	cout << "ve_imp_init_pos[0]=" << ve_imp_init_pos[0] << ", ve_imp_init_pos[1]=" << ve_imp_init_pos[1] << "ve_imp_init_pos[2]=" << ve_imp_init_pos[2] << endl;
+
+							//	cout << "ve_imp_final_pos[0]=" << ve_imp_final_pos[0] << ", ve_imp_final_pos[1]=" << ve_imp_final_pos[1] << "ve_imp_final_pos[2]=" << ve_imp_final_pos[2] << endl;
+
+						}
+						impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
+					}
+					// now transfor the norms!
+					vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP2 = vtkSmartPointer<vtkPolyDataNormals>::New();
+					ObjNormalsIMP2->SetInputData(impactedMoved);
+					ObjNormalsIMP2->ComputePointNormalsOn();
+					ObjNormalsIMP2->ComputeCellNormalsOn();
+					ObjNormalsIMP2->AutoOrientNormalsOff();
+					ObjNormalsIMP2->ConsistencyOff();
+					ObjNormalsIMP2->Update();
+					impactedMoved = ObjNormalsIMP2->GetOutput();
+
+
+					newScalars->SetName(mScalarName.c_str());
+					// test if exists...
+					//
+					int exists = 0;
+
+					// remove this scalar
+					//this->GetPointData()->SetScalars(newScalars);
+					impactedMoved->GetPointData()->RemoveArray(mScalarName.c_str());
+					impactedMoved->GetPointData()->AddArray(newScalars);
+					impactedMoved->GetPointData()->SetActiveScalars(mScalarName.c_str());
+
+				}// end iteration loop
+				else
+				{
+					ok = 0;
 				}
-				// now transfor the norms!
-				vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP2 = vtkSmartPointer<vtkPolyDataNormals>::New();
-				ObjNormalsIMP2->SetInputData(impactedMoved);
-				ObjNormalsIMP2->ComputePointNormalsOn();
-				ObjNormalsIMP2->ComputeCellNormalsOn();
-				ObjNormalsIMP2->AutoOrientNormalsOff();
-				ObjNormalsIMP2->ConsistencyOff();
-				ObjNormalsIMP2->Update();
-				impactedMoved = ObjNormalsIMP2->GetOutput();
+				
 
-
-				newScalars->SetName(mScalarName.c_str());
-				// test if exists...
-				//
-				int exists = 0;
-
-				// remove this scalar
-				//this->GetPointData()->SetScalars(newScalars);
-				impactedMoved->GetPointData()->RemoveArray(mScalarName.c_str());
-				impactedMoved->GetPointData()->AddArray(newScalars);
-				impactedMoved->GetPointData()->SetActiveScalars(mScalarName.c_str());
-
-
-
-
+				
+			}// end iteration loop
+			if (ok == 1)
+			{
 				// Not sure I create a new actor. Yes actually... 
 				VTK_CREATE(vtkMDActor, newactor);
 				if (this->mui_BackfaceCulling == 0)
@@ -13517,7 +13578,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 	//mode = 1: convex hull shape index (sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233)
 	//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
 	//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
-	double defaultSearchSize = this->ActorCollection->GetBoundingBoxLengthOfSelectedActors()/40;
+	double defaultSearchSize = this->ActorCollection->GetBoundingBoxLength()/40;
 	cout << "COmplexity scalars start " << endl;
 	std::string mScalarName = "Complexity";
 	if (scalarName.length() >0)
@@ -13969,6 +14030,237 @@ double mqMorphoDigCore::ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mP
 	//Complexity process is computed on MyObj
 
 }
+vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inputArray, vtkSmartPointer<vtkPolyData> mPD,  double localAreaLimit, int cutMinMax, double cutPercent, int mode, int smoothing_method)
+{
+	//mode = 0: raw smoothing (average of direct neighbours)
+	//mode = 1: smooth within local sphere of radius ~ surface avg size / 40
+	//mode = 2: smooth within local sphere of radius defined by the user
+
+	//smoothing_method = 0 => average
+	//smoothing_method = 1 => median
+	vtkSmartPointer<vtkDoubleArray> newScalars =
+		vtkSmartPointer<vtkDoubleArray>::New();
+	newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+	newScalars->SetNumberOfTuples(inputArray->GetNumberOfTuples());
+
+	vtkIdType numTuples = inputArray->GetNumberOfTuples();
+	vtkIdType numVert = mPD->GetNumberOfPoints();
+	cout << "scalarSmooth : numTuples=" << numTuples << endl;;
+	cout << "scalarSmooth : numVert=" << numTuples << endl;;
+
+	double cutMin = DBL_MAX;
+	double cutMax = -DBL_MAX;
+	if (cutMinMax == 1)
+	{
+		std::vector<float> vals;
+		for (vtkIdType j = 0; j < inputArray->GetNumberOfTuples(); j++)
+		{
+			vals.push_back(inputArray->GetTuple1(j));
+		}
+		std::sort(vals.begin(), vals.end());
+		int iMin = (int)(cutPercent*inputArray->GetNumberOfTuples() / 100);
+		int iMax = (int)((100 - cutPercent)*inputArray->GetNumberOfTuples() / 100);
+
+		if (iMax == inputArray->GetNumberOfTuples()) {
+			iMax = inputArray->GetNumberOfTuples() - 1;
+		}
+		cutMin = (double)vals.at(iMin);
+		cutMax = (double)vals.at(iMax);
+		cout << "Will cut between " << cutMin << ", and " << cutMax << endl;
+
+	}
+
+	if (mode == 0)
+	{
+
+
+	
+		vtkIdType ve;
+
+
+		double vn[3];
+		vn[0] = 0;
+		vn[1] = 0;
+		vn[2] = 1;
+		double picked_value = 0;
+		for (ve = 0; ve < inputArray->GetNumberOfTuples(); ve++)
+		{
+			// get all vertices connected to this point (neighbouring vertices).
+			//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
+			vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
+			connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
+
+			vtkSmartPointer<vtkIdTypeArray> ids =
+				vtkSmartPointer<vtkIdTypeArray>::New();
+			ids->SetNumberOfComponents(1);
+			ids->InsertNextValue(ve);
+			//if (ve<10){std::cout << "Connected vertices: ";}
+			for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
+			{
+				//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+				if (connectedVertices->GetId(j) != ve)
+				{
+					ids->InsertNextValue(connectedVertices->GetId(j));
+				}
+			}
+			float newscalar = 0;
+			int n_vertices = connectedVertices->GetNumberOfIds();
+			float oldscalar = (float)(inputArray->GetTuple(ve))[0];
+			newscalar = 0;			
+			//on ajoute une fois la valeur actuelle.
+
+			// get all scalars 				
+			//if (ve<10){std::cout<<std::endl;}
+
+			if (smoothing_method == 0)
+			{
+				for (vtkIdType j = 0; j < ids->GetNumberOfTuples(); j++)
+				{	// for all neighbouring vertices							
+					vtkIdType at = ids->GetTuple(j)[0];
+					//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
+					double curr_scalar = (double)(inputArray->GetTuple(at))[0];
+					//std::cout<<curr_scalar<<std::endl;
+					if (cutMinMax == 1)
+					{
+						if (newscalar < cutMin) { newscalar = cutMin; }
+						if (newscalar > cutMax) { newscalar = cutMax; }
+					}
+					newscalar += curr_scalar;
+
+				}
+				if (n_vertices > 0)
+				{
+					newscalar /= n_vertices;
+				}				
+			}
+			else
+			{
+				// find median
+				std::vector<double> vals;
+				for (vtkIdType j = 0; j < ids->GetNumberOfTuples(); j++)
+				{	// for all neighbouring vertices							
+					vtkIdType at = ids->GetTuple(j)[0];
+					//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
+					double curr_scalar = (double)(inputArray->GetTuple(at))[0];
+					if (cutMinMax == 1)
+					{
+						if (curr_scalar < cutMin) { curr_scalar = cutMin; }
+						if (curr_scalar > cutMax) { curr_scalar = cutMax; }
+					}
+					vals.push_back(curr_scalar);
+				}
+				std::sort(vals.begin(), vals.end());
+				int iMedian = (int)(ids->GetNumberOfTuples() / 2);
+				newscalar = vals.at(iMedian);
+
+			}
+			// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+			newScalars->InsertTuple1(ve, newscalar);
+
+
+		}
+
+	}
+	else
+	{
+		/*
+		if (this->Ui->localAuto->isChecked()) { mode = 1; }
+		if (this->Ui->localCustom->isChecked()) { mode = 2; }*/
+		double searchSize = localAreaLimit;
+		
+		cout << "mode=" << mode << ", searchSize=" << searchSize << endl;
+		double numvert = inputArray->GetNumberOfTuples();
+
+
+		
+
+		double ve_pos[3];
+		vtkSmartPointer<vtkKdTreePointLocator> kDTree =
+			vtkSmartPointer<vtkKdTreePointLocator>::New();
+		kDTree->SetDataSet(mPD);
+
+		kDTree->BuildLocator();
+
+		for (vtkIdType i = 0; i < numvert; i++) {
+			//clock_t t0, t1, tt0, tt1;
+			//tt0 = clock();
+			/*if (i % 1000 == 0)
+			{
+			cout << "complexity, vertex:" << i << endl;
+			}*/
+			// for every triangle 
+			mPD->GetPoint(i, ve_pos);
+			double currentMean = 0;
+			if ((i % (int)(numvert / 100)) == 0)
+			{
+				emit smoothingProgression((int)(100 * i / numvert));
+			}
+			vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+			double Radius = searchSize;
+
+
+			//double sec0;
+			//double ssec0;
+			//mode = 0: convex hull area ratio
+			//mode = 1: convex hull shape index
+			//t0 = clock();
+			kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
+			//t1 = clock();
+			if (i % 10000 == 0)
+			{
+				cout << "number of neighbours(" << i << "): " << observedNeighbours->GetNumberOfIds() << endl;
+				//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
+				//	cout << "sec0=" << sec0 << endl;
+			}
+			//cout << "mode = " << mode << endl;
+			// now extract surface
+			//compute surface
+			int printmode = 0;
+			if (i % 1000 == 0)
+			{
+				//printmode = 1;
+			}
+			if (Radius <= 0)
+			{
+				Radius = 1;
+			}
+			if (smoothing_method == 0)
+			{
+				currentMean = this->ComputeActiveScalarsMean(mPD, observedNeighbours, cutMinMax, cutMin, cutMax);
+			}
+			else
+			{
+				currentMean = this->ComputeActiveScalarsMedian(mPD, observedNeighbours, cutMinMax, cutMin, cutMax);
+			}
+			if (i % 10000 == 0)
+			{
+				cout << "currentMean:" << currentMean << endl;
+			}
+			if (cutMinMax == 1)
+			{
+				if (currentMean < cutMin) { currentMean = cutMin; }
+				if (currentMean > cutMax) { currentMean = cutMax; }
+			}
+
+			newScalars->InsertTuple1(i, currentMean);
+			//tt1 = clock();
+			/*if (i % 1000 == 0)
+			{
+			ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
+			cout << "Total time for 1 vertex:" << ssec0 << endl;
+
+			}*/
+		}
+
+		
+		
+
+
+
+	}
+		return newScalars;
+}
+
 void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, int cutMinMax, double cutPercent, int mode, int smoothing_method)
 {
 	//mode = 0: raw smoothing (average of direct neighbours)
@@ -14024,19 +14316,13 @@ void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, i
 					}
 					if (currentScalars!=NULL)
 					{
+					
 						cout << "found scalars for :" << i << endl;
 
 						double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
 
-						vtkSmartPointer<vtkDoubleArray> newScalars =
-							vtkSmartPointer<vtkDoubleArray>::New();
 
-						newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-						newScalars->SetNumberOfTuples(numvert);
-						newScalars->SetNumberOfTuples(numvert);
-
-					
 
 						std::string scname = scalarName.toStdString();
 
@@ -14047,232 +14333,17 @@ void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, i
 						}
 						myActor->SaveState(Count, QString(mScalarName.c_str()));
 
-						double cutMin = DBL_MAX;
-						double cutMax = -DBL_MAX;
-						if (cutMinMax == 1)
+						double searchSize = localAreaLimit;
+						if (mode == 1 || localAreaLimit <= 0)
 						{
-							std::vector<float> vals;
-							for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
-							{
-								vals.push_back(currentScalars->GetTuple1(j));
-							}
-							std::sort(vals.begin(), vals.end());
-							int iMin = (int)(cutPercent*mPD->GetNumberOfPoints() / 100);
-							int iMax = (int)((100 - cutPercent)*mPD->GetNumberOfPoints() / 100);
-							
-							if (iMax == mPD->GetNumberOfPoints()) {
-								iMax = mPD->GetNumberOfPoints() - 1;
-							}
-							cutMin = (double)vals.at(iMin);
-							cutMax = (double)vals.at(iMax);
-							cout << "Will cut between " << cutMin << ", and " << cutMax << endl;
-
+							searchSize = myActor->GetXYZAvgPCLength() / 40; // looks like a reasonable neighbourhood sphere radius size.
 						}
 
-						if (mode == 0)
-						{
-
-
-							vtkSmartPointer<vtkFloatArray> newScalars =
-								vtkSmartPointer<vtkFloatArray>::New();
-							newScalars->SetNumberOfComponents(1);
-							newScalars->SetNumberOfTuples(numvert);
-							vtkIdType ve;
-
-
-							double vn[3];
-							vn[0] = 0;
-							vn[1] = 0;
-							vn[2] = 1;
-							double picked_value = 0;
-							for (ve = 0; ve < numvert; ve++)
-							{
-								// get all vertices connected to this point (neighbouring vertices).
-								//if (ve<10){std::cout<<"Try to find connected vertices at : "<<ve<<std::endl;}
-								vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
-								connectedVertices = GetConnectedVertices(mPD, vn, picked_value, ve, -1, 0); //	int tool_mode=-1; //no pencil! no magic wand!
-
-								vtkSmartPointer<vtkIdTypeArray> ids =
-									vtkSmartPointer<vtkIdTypeArray>::New();
-								ids->SetNumberOfComponents(1);
-								//if (ve<10){std::cout << "Connected vertices: ";}
-								for (vtkIdType j = 0; j < connectedVertices->GetNumberOfIds(); j++)
-								{
-									//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
-									ids->InsertNextValue(connectedVertices->GetId(j));
-								}
-								float newscalar = 0;
-								int n_vertices = connectedVertices->GetNumberOfIds();
-
-								newscalar = 0;
-
-								//on ajoute une fois la valeur actuelle.
-
-								// get all scalars 				
-								//if (ve<10){std::cout<<std::endl;}
-
-								if (smoothing_method == 0)
-								{
-									for (vtkIdType j = 0; j < ids->GetNumberOfTuples(); j++)
-									{	// for all neighbouring vertices							
-										vtkIdType at = ids->GetTuple(j)[0];
-										//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
-										double curr_scalar = (double)(currentScalars->GetTuple(at))[0];
-										//std::cout<<curr_scalar<<std::endl;
-										if (cutMinMax == 1)
-										{
-											if (newscalar < cutMin) { newscalar = cutMin; }
-											if (newscalar > cutMax) { newscalar = cutMax; }
-										}
-										newscalar += curr_scalar;
-
-									}
-									if (n_vertices > 0)
-									{
-										newscalar /= n_vertices;
-									}
-								}
-								else
-								{
-									// find median
-									std::vector<double> vals;
-									for (vtkIdType j = 0; j < ids->GetNumberOfTuples(); j++)
-									{	// for all neighbouring vertices							
-										vtkIdType at = ids->GetTuple(j)[0];
-										//if (ve<10){std::cout<<"old scalar value at "<<at<<"=";}
-										double curr_scalar = (double)(currentScalars->GetTuple(at))[0];		
-										if (cutMinMax == 1)
-										{
-											if (curr_scalar < cutMin) { curr_scalar = cutMin; }
-											if (curr_scalar > cutMax) { curr_scalar = cutMax; }
-										}
-											vals.push_back(curr_scalar);
-									}
-									std::sort(vals.begin(), vals.end());
-									int iMedian = (int)(ids->GetNumberOfTuples()/2);
-									newscalar = vals.at(iMedian);
-
-								}
-								// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
-								
-								newScalars->InsertTuple1(ve, newscalar);
-
-
-							}
+						vtkSmartPointer<vtkDoubleArray> newScalars = this->scalarSmooth(currentScalars, mPD,searchSize, cutMinMax, cutPercent, mode, smoothing_method);
+						
 					
 
 							newScalars->SetName(mScalarName.c_str());
-
-							// test if exists...
-
-							// remove this scalar
-							//this->GetPointData()->SetScalars(newScalars);
-							mPD->GetPointData()->RemoveArray(mScalarName.c_str());
-							mPD->GetPointData()->AddArray(newScalars);
-							mPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
-
-
-
-						}
-						else
-						{
-								/*
-						if (this->Ui->localAuto->isChecked()) { mode = 1; }
-						if (this->Ui->localCustom->isChecked()) { mode = 2; }*/
-							double searchSize = localAreaLimit;
-							if (mode == 1 || localAreaLimit <= 0)
-							{
-								searchSize = myActor->GetXYZAvgPCLength() / 40; // looks like a reasonable neighbourhood sphere radius size.
-							}
-							cout << "mode=" << mode << ", searchSize=" << searchSize << endl;
-							double numvert = mPD->GetNumberOfPoints();
-
-
-							vtkSmartPointer<vtkDoubleArray> newScalars =
-								vtkSmartPointer<vtkDoubleArray>::New();
-
-							newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-							newScalars->SetNumberOfTuples(numvert);
-
-							double ve_pos[3];
-							vtkSmartPointer<vtkKdTreePointLocator> kDTree =
-								vtkSmartPointer<vtkKdTreePointLocator>::New();
-							kDTree->SetDataSet(mPD);
-
-							kDTree->BuildLocator();
-
-							for (vtkIdType i = 0; i < numvert; i++) {
-								clock_t t0, t1, tt0, tt1;
-								tt0 = clock();
-								/*if (i % 1000 == 0)
-								{
-									cout << "complexity, vertex:" << i << endl;
-								}*/
-								// for every triangle 
-								mPD->GetPoint(i, ve_pos);
-								double currentMean = 0;
-								if ((i % (int)(numvert / 100)) == 0)
-								{
-									emit smoothingProgression((int)(100 * i / numvert));
-								}
-								vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
-								double Radius = searchSize;
-
-
-								//double sec0;
-								//double ssec0;
-								//mode = 0: convex hull area ratio
-								//mode = 1: convex hull shape index
-								t0 = clock();
-								kDTree->FindPointsWithinRadius(searchSize, ve_pos, observedNeighbours);
-								t1 = clock();
-								if (i % 5000 == 0)
-								{
-									cout << "number of neighbours("<<i<<"): "<< observedNeighbours->GetNumberOfIds() << endl;
-									//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
-									//	cout << "sec0=" << sec0 << endl;
-								}
-								//cout << "mode = " << mode << endl;
-								// now extract surface
-								//compute surface
-								int printmode = 0;
-								if (i % 1000 == 0)
-								{
-									//printmode = 1;
-								}
-								if (Radius <= 0)
-								{
-									Radius = 1;
-								}
-								if (smoothing_method == 0)
-								{
-									currentMean = this->ComputeActiveScalarsMean(mPD, observedNeighbours, cutMinMax, cutMin, cutMax);
-								}
-								else
-								{
-									currentMean = this->ComputeActiveScalarsMedian(mPD, observedNeighbours, cutMinMax, cutMin, cutMax);
-								}
-								if (i % 1000 == 0)
-								{
-									cout << "currentMean:" << currentMean<< endl;
-								}
-								if (cutMinMax == 1)
-								{
-									if (currentMean < cutMin) { currentMean = cutMin; }
-									if (currentMean > cutMax) { currentMean = cutMax; }
-								}
-
-								newScalars->InsertTuple1(i, currentMean);
-								tt1 = clock();
-								/*if (i % 1000 == 0)
-								{
-									ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
-									cout << "Total time for 1 vertex:" << ssec0 << endl;
-
-								}*/
-							}
-
-							newScalars->SetName(mScalarName.c_str());
 							
 							// test if exists...
 
@@ -14284,7 +14355,7 @@ void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, i
 
 
 
-						}
+						
 
 
 

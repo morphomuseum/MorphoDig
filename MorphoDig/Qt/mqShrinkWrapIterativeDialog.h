@@ -39,6 +39,7 @@ public:
   virtual void slotFixedIterationNumber();
   virtual void sloteditIterativeShrinkWrap();
   virtual void slotClose();
+  virtual void slotObservedObjectChanged(int idx);
   virtual void slotProgressBar(int val);
   
 

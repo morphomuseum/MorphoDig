@@ -60,7 +60,13 @@ mqShrinkWrapIterativeDialog::mqShrinkWrapIterativeDialog(QWidget* Parent)
 	this->Ui->searchSize->setMinimum(0);
 	this->Ui->searchSize->setMaximum(DBL_MAX);
 	this->Ui->searchSize->setSingleStep(1);
+
+
 	this->Ui->searchSize->setValue(2);
+	
+	double proposed_value = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLengthOfSelectedActors() / 20;
+	this->Ui->searchSize->setValue(proposed_value);
+
 	this->Ui->progressBar->setVisible(false);
 	//this->Ui->smoothNormals->setChecked(true);
 	
@@ -93,6 +99,7 @@ mqShrinkWrapIterativeDialog::mqShrinkWrapIterativeDialog(QWidget* Parent)
 	connect(this->Ui->IterateUntilLimit, SIGNAL(pressed()), this, SLOT(slotIterateUntilLimit()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(sloteditIterativeShrinkWrap()));
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
+	 connect(this->Ui->observedObject, SIGNAL(activated(int)), this, SLOT(slotObservedObjectChanged(int)));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(iterativeShrinkWrapProgression(int)), this, SLOT(slotProgressBar(int)));
 }
 
@@ -166,7 +173,21 @@ void mqShrinkWrapIterativeDialog::editIterativeShrinkWrap()
 	}
 
 }
-
+ void mqShrinkWrapIterativeDialog::slotObservedObjectChanged(int idx)
+{
+	 if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems() > 0)
+	 {
+		 std::string action = "Update observed object in list";
+		 if (!this->Ui->observedObject->currentText().isEmpty())
+		 {
+			 this->observedActor = mqMorphoDigCore::instance()->getFirstActorFromName(this->Ui->observedObject->currentText());
+			 double searchSize  = this->observedActor->GetXYZAvgPCLength() / 20;
+			 this->Ui->searchSize->setValue(searchSize);
+			 //cout << "Just set the observed actor" << endl;
+		 }
+	 }
+ 
+ }
 
 void mqShrinkWrapIterativeDialog::slotIterateUntilLimit()
 {
