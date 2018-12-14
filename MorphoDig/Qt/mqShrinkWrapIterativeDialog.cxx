@@ -64,7 +64,7 @@ mqShrinkWrapIterativeDialog::mqShrinkWrapIterativeDialog(QWidget* Parent)
 
 	this->Ui->searchSize->setValue(2);
 	
-	double proposed_value = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLengthOfSelectedActors() / 20;
+	double proposed_value = mqMorphoDigCore::instance()->getActorCollection()->GetBoundingBoxLength() / 20;
 	this->Ui->searchSize->setValue(proposed_value);
 
 	this->Ui->progressBar->setVisible(false);
