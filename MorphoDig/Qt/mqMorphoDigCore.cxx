@@ -12905,18 +12905,16 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 	int modified = 0;
 	if (impactedActor != NULL && observedActor != NULL && impactedActor != observedActor)
 	{
-		std::string action = "shrink wrap iterative";
-		action.append(impactedActor->GetName().c_str());
-
 		
-		int Count = BEGIN_UNDO_SET(action);
+		
+		//int Count = BEGIN_UNDO_SET(action);
 
 		std::string mScalarName = "ShrinkWrap_Last_Displacement";
 		if (scalarName.length() > 0)
 		{
 			mScalarName = scalarName.toStdString();
 		}
-		impactedActor->SaveState(Count, QString(mScalarName.c_str()));
+		//impactedActor->SaveState(Count, QString(mScalarName.c_str()));
 
 		vtkPolyDataMapper *myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
 		vtkPolyDataMapper *myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
@@ -13315,7 +13313,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
-			std::string action = "Shrinked wrapped object added: " + myActor->GetName();
+			std::string action = "Iterative shrinked wrapped object added: " + myActor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
 			END_UNDO_SET();
