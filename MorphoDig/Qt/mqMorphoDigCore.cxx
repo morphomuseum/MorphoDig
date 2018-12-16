@@ -13085,9 +13085,19 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 								ABnorm[1] = AB[1] / curr_dist;
 								ABnorm[2] = AB[2] / curr_dist;
 							}
-							cur_cos = obs_norm[0] * imp_norm[0] + obs_norm[1] * imp_norm[1] + obs_norm[2] * imp_norm[2];
+							cur_cos = -1*(obs_norm[0] * imp_norm[0] + obs_norm[1] * imp_norm[1] + obs_norm[2] * imp_norm[2]);
 							cur_cos2 = -(ABnorm[0] * imp_norm[0] + ABnorm[1] * imp_norm[1] + ABnorm[2] * imp_norm[2]);
+							if (cur_cos>0)
+							{ 
+								cout << "Observed neighbour " << obsVerId << ":"
+								 << "cur_cos=" << cur_cos <<", "
+								 << "cur_cos2=" << cur_cos2 << ", "
+								 << "min_cos=" << min_cos << ", "
+								 << "curr_dist=" << curr_dist << ","
+								<< "radius=" << radius << ","
+								<< "ABnorm:" << ABnorm[0] << "," << ABnorm[1] << ", " << ABnorm[2] << endl;
 
+							}
 							if (curr_dist > radius)
 							{
 								cpt_notrealneighbors++;
