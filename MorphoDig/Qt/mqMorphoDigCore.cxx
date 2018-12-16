@@ -12927,13 +12927,12 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
 			mObservedPD = myObservedMapper->GetInput();
 
-			double ve_obs_init_pos[3];;
-			double ve_obs_final_pos[3];
-			double ven_obs_final_pos[3];;
-
-			double ve_imp_init_pos[3];;
+			double init_pos[3];
+			double final_pos[3];
+			
+			/*double ve_imp_init_pos[3];;
 			double ve_imp_final_pos[3];
-			double ven_imp_final_pos[3];;
+			double ven_imp_final_pos[3];;*/
 
 
 			vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
@@ -12946,10 +12945,11 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
 			for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
 				// for every triangle 
-				observedMoved->GetPoint(i, ve_obs_init_pos);
-				mqMorphoDigCore::TransformPoint(obsMat, ve_obs_init_pos, ve_obs_final_pos);
+				observedMoved->GetPoint(i, init_pos);
+				mqMorphoDigCore::TransformPoint(obsMat, 
+					init_pos, final_pos);
 
-				observedMoved->GetPoints()->SetPoint(i, ve_obs_final_pos);
+				observedMoved->GetPoints()->SetPoint(i, final_pos);
 			}
 			// now transform the norms
 			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsOBS = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -12963,16 +12963,16 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 
 
 
-			double numvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
+			vtkIdType impactedNumvert = myImpactedMapper->GetInput()->GetNumberOfPoints();
 
 
 
 			for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
 				// for every triangle 
-				impactedMoved->GetPoint(i, ve_imp_init_pos);
-				mqMorphoDigCore::TransformPoint(impMat, ve_imp_init_pos, ve_imp_final_pos);
+				impactedMoved->GetPoint(i, init_pos);
+				mqMorphoDigCore::TransformPoint(impMat, init_pos, final_pos);
 
-				impactedMoved->GetPoints()->SetPoint(i, ve_imp_final_pos);
+				impactedMoved->GetPoints()->SetPoint(i, final_pos);
 			}
 			// now compute the norms!
 			
@@ -12991,17 +12991,20 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 				vtkSmartPointer<vtkDoubleArray> newScalars =
 					vtkSmartPointer<vtkDoubleArray>::New();
 				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-				newScalars->SetNumberOfTuples(numvert);
+				newScalars->SetNumberOfTuples(impactedNumvert);
 			
 				vtkSmartPointer<vtkDoubleArray> smoothScalars =
 					vtkSmartPointer<vtkDoubleArray>::New();
 				smoothScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-				smoothScalars->SetNumberOfTuples(numvert);
-				double pt[3] = { 0,0,1 };
-				double pt2[3] = { 0,0,1 };
-				double projected_pt2[3] = { 0,0,1 };
+				smoothScalars->SetNumberOfTuples(impactedNumvert);
+				double obs_pt[3] = { 0,0,1 };
+				double imp_pt[3] = { 0,0,1 };
+				double obs_norm[3];
+				double imp_norm[3];
 
-				double *ptn2;
+				double proj_pt[3] = { 0,0,1 };
+
+				double *ptn;
 
 				double min_cos = 0.342; // 70 degrees => Don't want to compute thickness using badly oriented vertices.
 				if (angularLimit > 0 && angularLimit <= 180)
@@ -13029,21 +13032,21 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					kDTree->SetDataSet(observedMoved);
 					kDTree->BuildLocator();
 					//first do only one loop => iterative shrink wrap should start here!
-					for (vtkIdType ve2 = 0; ve2 < numvert; ve2++)
+					for (vtkIdType ve2 = 0; ve2 < impactedNumvert; ve2++)
 					{
-						if ((ve2 % (int)(numvert / 10)) == 0)
+						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
 							cout << "ve=" << ve2 << endl;
-							emit iterativeShrinkWrapProgression((int)(100 * ve2 / numvert));
+							emit iterativeShrinkWrapProgression((int)(100 * ve2 / impactedNumvert));
 						}
-						impactedMoved->GetPoint(ve2, ve_imp_final_pos);
-						ptn2 = impactedNorms->GetTuple(ve2);
-						ven_imp_final_pos[0] = ptn2[0];
-						ven_imp_final_pos[1] = ptn2[1];
-						ven_imp_final_pos[2] = ptn2[2];
+						impactedMoved->GetPoint(ve2, imp_pt);
+						ptn = impactedNorms->GetTuple(ve2);
+						imp_norm[0] = ptn[0];
+						imp_norm[1] = ptn[1];
+						imp_norm[2] = ptn[2];
 						vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 
-						kDTree->FindPointsWithinRadius(radius, ve_imp_final_pos, observedNeighbours);
+						kDTree->FindPointsWithinRadius(radius, init_pos, observedNeighbours);
 						double newscalar = maxStepAmplitude; // if we do not find neighbours, we will move as far as permitted.
 
 						double currAmpl = 0;
@@ -13051,25 +13054,25 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						vtkIdType cpt_realneighbors = 0;
 						vtkIdType cpt_notrealneighbors = 0;
 						vtkIdType cpt_candidates = 0;
-						if (((int)ve2 % (int)(numvert / 10)) == 0)
+						if (((int)ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							cout << "ve=" << ve2 << ", neighbours" << observedNeighbours->GetNumberOfIds() << ", ve_imp_final_pos:" << ve_imp_final_pos[0] << "," << ve_imp_final_pos[1] << "," << ve_imp_final_pos[2] << endl;
+							cout << "ve=" << ve2 << ", neighbours" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << endl;
 						}
 						for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 						{
-							vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
-							if (((int)ve2 % (int)(numvert / 10)) == 0 && j == 0)
+							vtkIdType obsVerId = observedNeighbours->GetId(j);
+							if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 							{
-								cout << "first observed neighbour ve_obs_final_pos=" << ve_obs_final_pos[0] << "," << ve_obs_final_pos[1] << "," << ve_obs_final_pos[2] << endl;
+								cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
 							}
-							observedMoved->GetPoint(observedConnectedVertex, ve_obs_final_pos);
-							ptn2 = observedNorms->GetTuple3(observedConnectedVertex);
-							ven_obs_final_pos[0] = ptn2[0];
-							ven_obs_final_pos[1] = ptn2[1];
-							ven_obs_final_pos[2] = ptn2[2];
-							AB[0] = ve_obs_final_pos[0] - ve_imp_final_pos[0];
-							AB[1] = ve_obs_final_pos[1] - ve_imp_final_pos[1];
-							AB[2] = ve_obs_final_pos[2] - ve_imp_final_pos[2];
+							observedMoved->GetPoint(obsVerId, obs_pt);
+							ptn = observedNorms->GetTuple3(obsVerId);
+							obs_norm[0] = ptn[0];
+							obs_norm[1] = ptn[1];
+							obs_norm[2] = ptn[2];
+							AB[0] = obs_pt[0] - imp_pt[0];
+							AB[1] = obs_pt[1] - imp_pt[1];
+							AB[2] = obs_pt[2] - imp_pt[2];
 							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
 							ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
 							if (curr_dist > 0)
@@ -13078,8 +13081,8 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 								ABnorm[1] = AB[1] / curr_dist;
 								ABnorm[2] = AB[2] / curr_dist;
 							}
-							cur_cos = ven_obs_final_pos[0] * ven_imp_final_pos[0] + ven_obs_final_pos[1] * ven_imp_final_pos[1] + ven_obs_final_pos[2] * ven_imp_final_pos[2];
-							cur_cos2 = -(ABnorm[0] * ven_imp_final_pos[0] + ABnorm[1] * ven_imp_final_pos[1] + ABnorm[2] * ven_imp_final_pos[2]);
+							cur_cos = obs_norm[0] * imp_norm[0] + obs_norm[1] * imp_norm[1] + obs_norm[2] * imp_norm[2];
+							cur_cos2 = -(ABnorm[0] * imp_norm[0] + ABnorm[1] * imp_norm[1] + ABnorm[2] * imp_norm[2]);
 
 							if (curr_dist > radius)
 							{
@@ -13092,7 +13095,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							if (cur_cos > min_cos && curr_dist < radius)
 							{
 								double factor = cur_cos2*curr_dist / maxStepAmplitude;
-								if (((int)ve2 % (int)(numvert / 10)) == 0 && j == 0)
+								if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 								{
 									cout << "cur_cos=" << cur_cos << endl;
 									cout << "cur_cos2=" << cur_cos2 << endl;
@@ -13123,7 +13126,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						}
 						else if (cpt_realneighbors == 0)
 						{
-							if ((ve2 % (int)(numvert / 10)) == 0)
+							if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 							{
 								cout << "currampl=" << currAmpl << ", ve=" << ve2 << "NO REAL NEIGHBOUR FOUND" << endl;
 							}
@@ -13133,7 +13136,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						else
 						{
 							currAmpl = 0; // case where there are real neighbors around but no one is satisfying the desirfed angular condition(s).
-							if ((ve2 % (int)(numvert / 10)) == 0)
+							if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 							{
 								cout << "currampl=" << currAmpl << ", ve=" << ve2 << "Neigh exist but are not satisfactory" << endl;
 							}
@@ -13142,7 +13145,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 
 
 
-						if ((ve2 % (int)(numvert / 10)) == 0)
+						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
 							cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
 						}
@@ -13168,22 +13171,22 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					std::cout << "New Scalar computation done " << std::endl;
 					for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
 						// for every triangle 
-						impactedMoved->GetPoint(i, ve_imp_init_pos);
+						impactedMoved->GetPoint(i, imp_pt);
 						double ampli = newScalars->GetTuple1(i);
-						if ((i % (int)(numvert / 10)) == 0)
+						if ((i % (int)(impactedNumvert / 10)) == 0)
 						{
 							cout << "ampli=" << ampli << endl;
 							cout << "ampli smoothed=" << smoothScalars->GetTuple1(i) << endl;
 						}
-						ptn2 = impactedNorms->GetTuple(i);
-						ven_imp_final_pos[0] = ptn2[0];
-						ven_imp_final_pos[1] = ptn2[1];
-						ven_imp_final_pos[2] = ptn2[2];
-						ve_imp_final_pos[0] = ve_imp_init_pos[0] + ven_imp_final_pos[0] * ampli;
-						ve_imp_final_pos[1] = ve_imp_init_pos[1] + ven_imp_final_pos[1] * ampli;
-						ve_imp_final_pos[2] = ve_imp_init_pos[2] + ven_imp_final_pos[2] * ampli;
+						ptn = impactedNorms->GetTuple(i);
+						imp_norm[0] = ptn[0];
+						imp_norm[1] = ptn[1];
+						imp_norm[2] = ptn[2];
+						proj_pt[0] = imp_pt[0] + imp_norm[0] * ampli;
+						proj_pt[1] = imp_pt[1] + imp_norm[1] * ampli;
+						proj_pt[2] = imp_pt[2] + imp_norm[2] * ampli;
 						//if (ampli>0){ cout << "i=" << i << ", ampli=" << ampli << endl; }
-						if ((i % (int)(numvert / 10)) == 0)
+						if ((i % (int)(impactedNumvert / 10)) == 0)
 						{
 							//	cout << "i=" << i << endl;
 							//	cout << "i="<<i<<", ampli="<<ampli << endl;
@@ -13193,9 +13196,9 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							//	cout << "ve_imp_final_pos[0]=" << ve_imp_final_pos[0] << ", ve_imp_final_pos[1]=" << ve_imp_final_pos[1] << "ve_imp_final_pos[2]=" << ve_imp_final_pos[2] << endl;
 
 						}
-						impactedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_imp_final_pos);
+						impactedMoved->GetPoints()->SetPoint((vtkIdType)i, proj_pt);
 					}
-					// now transfor the norms!
+					// now compute the norms!
 					vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP2 = vtkSmartPointer<vtkPolyDataNormals>::New();
 					ObjNormalsIMP2->SetInputData(impactedMoved);
 					ObjNormalsIMP2->ComputePointNormalsOn();
