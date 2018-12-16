@@ -13036,7 +13036,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					{
 						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							cout << "ve=" << ve2 << endl;
+							//cout << "ve=" << ve2 << endl;
 							emit iterativeShrinkWrapProgression((int)(100 * ve2 / impactedNumvert));
 						}
 						impactedMoved->GetPoint(ve2, imp_pt);
@@ -13046,7 +13046,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						imp_norm[2] = ptn[2];
 						vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 
-						kDTree->FindPointsWithinRadius(radius, init_pos, observedNeighbours);
+						kDTree->FindPointsWithinRadius(radius, imp_pt, observedNeighbours);
 						double newscalar = maxStepAmplitude; // if we do not find neighbours, we will move as far as permitted.
 
 						double currAmpl = 0;
@@ -13056,14 +13056,18 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						vtkIdType cpt_candidates = 0;
 						if (((int)ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							cout << "ve=" << ve2 << ", neighbours" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << endl;
+							//cout << "ve=" << ve2 << ", neighbours" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << endl;
+						}
+						if (observedNeighbours->GetNumberOfIds() > 0)
+						{
+							cout << "ve=" << ve2 << ", KD tree neighbours:" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << endl;
 						}
 						for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 						{
 							vtkIdType obsVerId = observedNeighbours->GetId(j);
 							if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 							{
-								cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
+							//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
 							}
 							observedMoved->GetPoint(obsVerId, obs_pt);
 							ptn = observedNorms->GetTuple3(obsVerId);
@@ -13122,15 +13126,15 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						if (cpt_candidates > 0)
 						{
 							currAmpl /= cpt_candidates;
-							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << ", cpt="<<cpt<< endl;
+							cout << "REAL MOVE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt="<< cpt_candidates << endl;
 						}
 						else if (cpt_realneighbors == 0)
 						{
 							if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 							{
-								cout << "currampl=" << currAmpl << ", ve=" << ve2 << "NO REAL NEIGHBOUR FOUND" << endl;
+								//cout << "currampl=" << currAmpl << ", ve=" << ve2 << "NO REAL NEIGHBOUR FOUND" << endl;
 							}
-							currAmpl = newscalar;
+							currAmpl = maxStepAmplitude;
 
 						}
 						else
@@ -13138,8 +13142,9 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							currAmpl = 0; // case where there are real neighbors around but no one is satisfying the desirfed angular condition(s).
 							if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 							{
-								cout << "currampl=" << currAmpl << ", ve=" << ve2 << "Neigh exist but are not satisfactory" << endl;
+								//cout << "currampl=" << currAmpl << ", ve=" << ve2 << "Neigh exist but are not satisfactory" << endl;
 							}
+							cout << "NO CANDIDATE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt=" << cpt_candidates << endl;
 						}
 
 
@@ -13147,7 +13152,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 
 						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
+							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
 						}
 
 
@@ -13168,7 +13173,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 
 
 
-					std::cout << "New Scalar computation done " << std::endl;
+					//std::cout << "New Scalar computation done " << std::endl;
 					for (vtkIdType i = 0; i < impactedMoved->GetNumberOfPoints(); i++) {
 						// for every triangle 
 						impactedMoved->GetPoint(i, imp_pt);

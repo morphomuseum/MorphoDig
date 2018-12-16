@@ -90,7 +90,7 @@ mqShrinkWrapIterativeDialog::mqShrinkWrapIterativeDialog(QWidget* Parent)
 	}
 	if (myList.size() > 1)
 	{
-		this->Ui->observedObject->setCurrentIndex(1);
+		this->Ui->impactedObject->setCurrentIndex(1);
 		
 
 	}
