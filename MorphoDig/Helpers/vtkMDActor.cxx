@@ -385,7 +385,17 @@ int vtkMDActor::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 		return is_inside;
 	
 }
+vtkIdType vtkMDActor::GetNumberOfCells()
+{
+	vtkIdType nc = 0;
+	vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+	{
+		return vtkPolyData::SafeDownCast(mapper->GetInput())->GetNumberOfCells();
+	}
 
+	return nc;
+}
 vtkIdType vtkMDActor::GetNumberOfPoints()
 {
 	vtkIdType nv = 0;

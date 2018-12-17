@@ -31,7 +31,7 @@ public:
   
   ~mqShrinkWrapIterativeDialog();
   void editIterativeShrinkWrap();
-  
+  void refreshSearchSize();
   public slots:
   
   
@@ -40,6 +40,7 @@ public:
   virtual void sloteditIterativeShrinkWrap();
   virtual void slotClose();
   virtual void slotObservedObjectChanged(int idx);
+  
   virtual void slotProgressBar(int val);
   
 

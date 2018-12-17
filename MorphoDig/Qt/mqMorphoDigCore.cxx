@@ -20,6 +20,7 @@
 #include <vtkSphereSource.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkReverseSense.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkFeatureEdges.h>
 #include <vtkExtractEdges.h>
@@ -7351,9 +7352,15 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 		//GL_VERSION = 1;
 		//@@TODO! 
 		newname = this->CheckingName(newname);
-		vtkNew<vtkPlatonicSolidSource> icosahedron;
+		vtkSmartPointer<vtkPlatonicSolidSource> icosahedron= vtkSmartPointer<vtkPlatonicSolidSource>::New();
 		icosahedron->SetSolidTypeToIcosahedron();
 		icosahedron->Update();
+
+		vtkSmartPointer<vtkReverseSense> rev = vtkSmartPointer<vtkReverseSense>::New();
+		rev->SetInputData(icosahedron->GetOutput());
+		rev->ReverseCellsOn();
+		rev->ReverseNormalsOn();
+		rev->Update();
 		vtkSmartPointer<vtkSphereSource> sphereSource =
 			vtkSmartPointer<vtkSphereSource>::New();
 		sphereSource->SetRadius(mRadius);
@@ -7370,7 +7377,7 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 			}
 			else
 			{
-				loop->SetInputData(icosahedron->GetOutput());
+				loop->SetInputData(rev->GetOutput());
 			}
 			
 			loop->SetNumberOfSubdivisions(msubdivisions);
@@ -7386,7 +7393,7 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 			}
 			else
 			{
-				MyObj = icosahedron->GetOutput();
+				MyObj = rev->GetOutput();
 
 			}
 		}
@@ -7422,7 +7429,9 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 		VTK_CREATE(vtkPolyDataMapper, mapper);
 
 		mapper->SetColorModeToDefault();
-		if (msubdivisions > 0)
+		mapper->SetInputData(MyObj);
+
+		/*if (msubdivisions > 0)
 		{
 			mapper->SetInputData(loop->GetOutput());
 		}
@@ -7440,7 +7449,7 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 			}
 			
 		}
-
+		*/
 
 		//actor->SetmColor(0.68, 0.47, 0.37, 1);//pink
 		actor->SetmColor(0.666667, 0.666667, 1, 0.5);//kind of violet
@@ -12977,8 +12986,11 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			// now compute the norms!
 			
 			int ok = 1;
+			int lmk_max = 10;
+			int lmk_cpt = 0;
 		for (vtkIdType it=0; it<iteration;it++)
 		{
+			cout << "ITERATIVE SHRINK WRAP ITERATION " << it << endl;
 			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP = vtkSmartPointer<vtkPolyDataNormals>::New();
 			ObjNormalsIMP->SetInputData(impactedMoved);
 			ObjNormalsIMP->ComputePointNormalsOn();
@@ -13026,7 +13038,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 				auto observedNorms = vtkFloatArray::SafeDownCast(observedMoved->GetPointData()->GetNormals());
 				if (impactedNorms && observedNorms)
 				{
-					cout << "We have found some norms" << endl;
+					cout << "ITERATION "<< it<< ", We have found some norms" << endl;
 					vtkSmartPointer<vtkKdTreePointLocator> kDTree =
 						vtkSmartPointer<vtkKdTreePointLocator>::New();
 					kDTree->SetDataSet(observedMoved);
@@ -13044,13 +13056,110 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						imp_norm[0] = ptn[0];
 						imp_norm[1] = ptn[1];
 						imp_norm[2] = ptn[2];
+						// 2 choix poissibles 
+						
+						// Choix A: dans tous N plus proches. 
+						// Garder que ceux qui sont dans la sphère
+						// se diriger dans la direction de la normale d'un facteur correspondant à la moyenne des dist pondérés par cos2 
+
+						//
+						// Choix B: dans tous ces ponts vers lesquels on se dirige (utilisation du critère cos2)
+						// repérer le plus proche (ou les N plus proches). 
+						// se diriger vers lui d'un facteur cos2 (ou vers leur moyennen dans l'espace d'un facteur cos2)
+						// le problème de cette approche et ques les trous se dépeuplent et que la sphère se déforme beaucoup.
+
 						vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 
-						kDTree->FindPointsWithinRadius(radius, imp_pt, observedNeighbours);
+
+
+						
 						double newscalar = maxStepAmplitude; // if we do not find neighbours, we will move as far as permitted.
-
 						double currAmpl = 0;
+						double currDist = 0;
+						
+						// Stratégie A
+						kDTree->FindClosestNPoints(20, imp_pt, observedNeighbours);
+						vtkIdType toto = 0;
+						for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+						{
+							vtkIdType obsVerId = observedNeighbours->GetId(j);
+							if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
+							{
+								//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
+							}
+							observedMoved->GetPoint(obsVerId, obs_pt);
+							ptn = observedNorms->GetTuple3(obsVerId);
+							obs_norm[0] = ptn[0];
+							obs_norm[1] = ptn[1];
+							obs_norm[2] = ptn[2];
+							AB[0] = obs_pt[0] - imp_pt[0];
+							AB[1] = obs_pt[1] - imp_pt[1];
+							AB[2] = obs_pt[2] - imp_pt[2];
+							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+							ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
+							if (curr_dist > 0)
+							{
+								ABnorm[0] = AB[0] / curr_dist;
+								ABnorm[1] = AB[1] / curr_dist;
+								ABnorm[2] = AB[2] / curr_dist;
+							}
+							cur_cos = obs_norm[0] * imp_norm[0] + obs_norm[1] * imp_norm[1] + obs_norm[2] * imp_norm[2]; // we do not care about this one, or do we?
+							cur_cos2 = -1 * (ABnorm[0] * imp_norm[0] + ABnorm[1] * imp_norm[1] + ABnorm[2] * imp_norm[2]);// the direction "forward" view angle < 
+							
 
+						
+							if ( curr_dist < radius)
+							{
+								if (lmk_cpt < lmk_max)
+								{
+								/*	this->CreateLandmark(imp_pt, imp_norm, 0);
+									this->CreateLandmark(obs_pt, obs_norm, 1);*/
+									lmk_cpt++;
+								}
+								toto = toto + 1;
+								
+								//cpt_candidates++;
+								double factor = cur_cos2*curr_dist;
+								//cout << ", ve=" << ve2 << ", cur_cos2=" << cur_cos2 << "," << "curr_dist=" << curr_dist << ", factor=" << factor << ", cpt_candidates="<< toto<< endl;
+
+								if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
+								{
+								/*	cout << "cur_cos=" << cur_cos << endl;
+									cout << "cur_cos2=" << cur_cos2 << endl;
+									cout << "min_cos=" << min_cos << endl;
+									cout << "curr_dist=" << curr_dist << endl;
+									cout << "factor=" << factor << endl;
+									cout << "ABnorm[0]=" << ABnorm[0] << "ABnorm[1]=" << ABnorm[1] << "ABnorm[2]=" << ABnorm[2] << endl;*/
+								}		
+
+								currAmpl += factor;
+
+
+							}
+
+
+						}
+						if (toto > 0)
+						{
+							currAmpl /= toto;
+							if (currAmpl > maxStepAmplitude) { currAmpl = maxStepAmplitude; }
+							//cout << "REAL MOVE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt=" << toto << endl;
+						}						
+						else
+						{
+							currAmpl = maxStepAmplitude;
+							
+						}
+
+
+
+
+						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
+						{
+							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
+						}
+						//Stratégie B (non finie)
+						/*kDTree->FindPointsWithinRadius(radius, imp_pt, observedNeighbours);
 						vtkIdType cpt_realneighbors = 0;
 						vtkIdType cpt_notrealneighbors = 0;
 						vtkIdType cpt_candidates = 0;
@@ -13085,19 +13194,15 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 								ABnorm[1] = AB[1] / curr_dist;
 								ABnorm[2] = AB[2] / curr_dist;
 							}
-							cur_cos = -1*(obs_norm[0] * imp_norm[0] + obs_norm[1] * imp_norm[1] + obs_norm[2] * imp_norm[2]);
-							cur_cos2 = -(ABnorm[0] * imp_norm[0] + ABnorm[1] * imp_norm[1] + ABnorm[2] * imp_norm[2]);
-							if (cur_cos>0)
-							{ 
-								cout << "Observed neighbour " << obsVerId << ":"
-								 << "cur_cos=" << cur_cos <<", "
-								 << "cur_cos2=" << cur_cos2 << ", "
-								 << "min_cos=" << min_cos << ", "
-								 << "curr_dist=" << curr_dist << ","
-								<< "radius=" << radius << ","
-								<< "ABnorm:" << ABnorm[0] << "," << ABnorm[1] << ", " << ABnorm[2] << endl;
-
+							cur_cos = obs_norm[0] * imp_norm[0] + obs_norm[1] * imp_norm[1] + obs_norm[2] * imp_norm[2]; // we do not care about this one, or do we?
+							cur_cos2 = -1*(ABnorm[0] * imp_norm[0] + ABnorm[1] * imp_norm[1] + ABnorm[2] * imp_norm[2]);// the direction "forward" view angle < 
+							if (lmk_cpt < lmk_max)
+							{
+								this->CreateLandmark(imp_pt, imp_norm, 0);
+								this->CreateLandmark(obs_pt, obs_norm, 1);
+								lmk_cpt++;
 							}
+							
 							if (curr_dist > radius)
 							{
 								cpt_notrealneighbors++;
@@ -13106,9 +13211,13 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							{
 								cpt_realneighbors++;
 							}
-							if (cur_cos > min_cos && curr_dist < radius)
+							if (cur_cos2 > min_cos && curr_dist < radius)
 							{
-								double factor = cur_cos2*curr_dist / maxStepAmplitude;
+								 
+
+								double factor = cur_cos2*curr_dist;
+								cout << "cur_cos2=" << cur_cos2 << "," << "curr_dist=" << curr_dist <<  ", factor=" << factor << endl;
+
 								if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 								{
 									cout << "cur_cos=" << cur_cos << endl;
@@ -13136,6 +13245,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						if (cpt_candidates > 0)
 						{
 							currAmpl /= cpt_candidates;
+							if (currAmpl > maxStepAmplitude) { currAmpl = maxStepAmplitude; }
 							cout << "REAL MOVE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt="<< cpt_candidates << endl;
 						}
 						else if (cpt_realneighbors == 0)
@@ -13144,7 +13254,8 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							{
 								//cout << "currampl=" << currAmpl << ", ve=" << ve2 << "NO REAL NEIGHBOUR FOUND" << endl;
 							}
-							currAmpl = maxStepAmplitude;
+							// this case should not happen but should be totally trust the KD Tree ? 
+							currAmpl = maxStepAmplitude; 
 
 						}
 						else
@@ -13165,7 +13276,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
 						}
 
-
+						*/
 
 						newScalars->InsertTuple1(ve2, currAmpl);
 
@@ -13176,7 +13287,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					if (smoothWrapping == 1)
 					{
 
-						smoothScalars = this->scalarSmooth(newScalars, impactedMoved, radius, 0, 0, 0, 1);
+						smoothScalars = this->scalarSmooth(newScalars, impactedMoved, radius, 0, 0, 0, 2);
 						newScalars->DeepCopy(smoothScalars);
 
 					}
@@ -13188,18 +13299,14 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						// for every triangle 
 						impactedMoved->GetPoint(i, imp_pt);
 						double ampli = newScalars->GetTuple1(i);
-						if ((i % (int)(impactedNumvert / 10)) == 0)
-						{
-							cout << "ampli=" << ampli << endl;
-							cout << "ampli smoothed=" << smoothScalars->GetTuple1(i) << endl;
-						}
+						
 						ptn = impactedNorms->GetTuple(i);
 						imp_norm[0] = ptn[0];
 						imp_norm[1] = ptn[1];
 						imp_norm[2] = ptn[2];
-						proj_pt[0] = imp_pt[0] + imp_norm[0] * ampli;
-						proj_pt[1] = imp_pt[1] + imp_norm[1] * ampli;
-						proj_pt[2] = imp_pt[2] + imp_norm[2] * ampli;
+						proj_pt[0] = imp_pt[0] - imp_norm[0] * ampli;
+						proj_pt[1] = imp_pt[1] - imp_norm[1] * ampli;
+						proj_pt[2] = imp_pt[2] - imp_norm[2] * ampli;
 						//if (ampli>0){ cout << "i=" << i << ", ampli=" << ampli << endl; }
 						if ((i % (int)(impactedNumvert / 10)) == 0)
 						{

@@ -85,6 +85,8 @@ mqShrinkWrapIterativeDialog::mqShrinkWrapIterativeDialog(QWidget* Parent)
 	if (myList.size() > 0)
 	{
 		this->Ui->observedObject->setCurrentIndex(0);
+		this->refreshSearchSize();
+		
 		this->Ui->impactedObject->setCurrentIndex(0);
 
 	}
@@ -173,19 +175,26 @@ void mqShrinkWrapIterativeDialog::editIterativeShrinkWrap()
 	}
 
 }
+void mqShrinkWrapIterativeDialog::refreshSearchSize()
+{
+	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems() > 0)
+	{	
+		if (!this->Ui->observedObject->currentText().isEmpty())
+		{
+			this->observedActor = mqMorphoDigCore::instance()->getFirstActorFromName(this->Ui->observedObject->currentText());
+			if (this->observedActor != NULL)
+			{
+				double searchSize = this->observedActor->GetXYZAvgPCLength() / 20;
+				this->Ui->searchSize->setValue(searchSize);
+			}
+			//cout << "Just set the observed actor" << endl;
+		}
+	}
+
+}
  void mqShrinkWrapIterativeDialog::slotObservedObjectChanged(int idx)
 {
-	 if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems() > 0)
-	 {
-		 std::string action = "Update observed object in list";
-		 if (!this->Ui->observedObject->currentText().isEmpty())
-		 {
-			 this->observedActor = mqMorphoDigCore::instance()->getFirstActorFromName(this->Ui->observedObject->currentText());
-			 double searchSize  = this->observedActor->GetXYZAvgPCLength() / 20;
-			 this->Ui->searchSize->setValue(searchSize);
-			 //cout << "Just set the observed actor" << endl;
-		 }
-	 }
+	 this->refreshSearchSize();
  
  }
 

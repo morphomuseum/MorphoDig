@@ -36,6 +36,7 @@ public:
   void GetFirstActor();
   void GetNextActor();
   void GetPrecedingActor();
+  void RefreshNumCellsNumPoints();
   void UpdateUI();
   int SomeThingHasChanged();
   int CurrentActorInCollection();

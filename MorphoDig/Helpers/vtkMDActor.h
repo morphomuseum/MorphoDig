@@ -103,6 +103,7 @@ public:
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
 	// Actual actor render method.
 	vtkIdType GetNumberOfPoints();
+	vtkIdType GetNumberOfCells();
 	void Render(vtkRenderer *ren, vtkMapper *mapper);
 	virtual void SetSelected(int selected);
 	virtual void SaveState(int mCount, QString arrayToSave = QString(), int arrayType=0);

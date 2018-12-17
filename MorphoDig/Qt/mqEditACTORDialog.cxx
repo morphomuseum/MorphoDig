@@ -114,6 +114,11 @@ mqEditACTORDialog::mqEditACTORDialog(QWidget* Parent)
 	this->Ui->M32->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
 	this->Ui->M33->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));*/
 
+	this->Ui->numCells->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->numPoints->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->numCells->setMaximum(INT_MAX);
+	this->Ui->numPoints->setMaximum(INT_MAX);
+
 	this->Ui->M00->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->M01->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->M02->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -287,6 +292,17 @@ int mqEditACTORDialog::SomeThingHasChanged()
 }
 // This dialog is non modal, and actors can have been removed from the collection in the meantime... so before saving actors, we should check whether they are still
 //inside the collection.
+void mqEditACTORDialog::RefreshNumCellsNumPoints()
+{
+	if (this->ACTOR != NULL)
+	{
+		vtkIdType numPoints = this->ACTOR->GetNumberOfPoints();
+		vtkIdType numCells = this->ACTOR->GetNumberOfCells();
+		this->Ui->numCells->setValue(numCells);
+		this->Ui->numPoints->setValue(numPoints);
+	}
+
+}
 int mqEditACTORDialog::CurrentActorInCollection()
 {
 	int actor_found = 0;
@@ -496,6 +512,7 @@ void mqEditACTORDialog::UpdateUI()
 
 		//cout << "Color" << Actorcolor[0]<<","<< Actorcolor[1] << "," << Actorcolor[2] << "," << Actorcolor[3] << "." << endl;
 	}
+	this->RefreshNumCellsNumPoints();
 
 }
 
