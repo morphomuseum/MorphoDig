@@ -4001,15 +4001,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		//std::cout << "\nNumber of points 1:" << MyPolyData->GetNumberOfPoints() << std::endl;
 		//std::cout << "\nNumber of cells 1:" << MyPolyData->GetNumberOfCells() << std::endl;
 
-		/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-		ObjNormals->SetInputData(MyPolyData);
-		ObjNormals->ComputePointNormalsOn();
-		ObjNormals->ComputeCellNormalsOn();
-		//ObjNormals->AutoOrientNormalsOff();
-		//ObjNormals->FlipNormalsOn();
-		ObjNormals->ConsistencyOff();
-
-		ObjNormals->Update();*/
+	
 
 		
 		vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
@@ -9234,13 +9226,7 @@ void mqMorphoDigCore::addMirrorXZ()
 
 				//VTK_CREATE(vtkActor, actor);
 
-			/*	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-				ObjNormals->SetInputData(myData);
-				ObjNormals->ComputePointNormalsOn();
-				ObjNormals->ComputeCellNormalsOn();
-				ObjNormals->ConsistencyOff();
-				ObjNormals->Update();*/
-
+		
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
 				cleanPolyDataFilter->SetInputData(myData);
@@ -9593,14 +9579,6 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 				
 
 
-				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-				ObjNormals->SetInputData(My_Output);
-				ObjNormals->ComputePointNormalsOn();
-				ObjNormals->ComputeCellNormalsOn();
-				//ObjNormals->AutoOrientNormalsOff();
-				ObjNormals->ConsistencyOff();
-
-				ObjNormals->Update();*/
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
@@ -10018,14 +9996,6 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 						cleanPolyDataFilter->SetInputData(butterfly->GetOutput());
 					}
 
-					/*	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-						ObjNormals->SetInputData(densify->GetOutput());
-						ObjNormals->ComputePointNormalsOn();
-						ObjNormals->ComputeCellNormalsOn();
-						//ObjNormals->AutoOrientNormalsOff();
-						ObjNormals->ConsistencyOff();
-
-						ObjNormals->Update();*/
 
 
 						//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
@@ -10187,22 +10157,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 				{
 					decimate2->Update();
 				}
-				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-					if (quadric == 0)
-				{
-					ObjNormals->SetInputData(decimate->GetOutput());
-				}
-				else
-				{
-					ObjNormals->SetInputData(decimate2->GetOutput());
-				}
-				ObjNormals->ComputePointNormalsOn();
-				ObjNormals->ComputeCellNormalsOn();
-				//ObjNormals->AutoOrientNormalsOff();
-				ObjNormals->ConsistencyOff();
-
-				ObjNormals->Update();*/
-
+			
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
 				if (quadric == 0)
@@ -10365,13 +10320,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 				Sfilter->Update();
 			
 
-				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-				ObjNormals->SetInputData(Sfilter->GetOutput());
-				ObjNormals->ComputePointNormalsOn();
-				ObjNormals->ComputeCellNormalsOn();
-				ObjNormals->ConsistencyOff();
-
-				ObjNormals->Update();*/
+			
 
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
@@ -12966,7 +12915,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			ObjNormalsOBS->ComputePointNormalsOn();
 			ObjNormalsOBS->ComputeCellNormalsOn();
 			ObjNormalsOBS->AutoOrientNormalsOff();
-			ObjNormalsOBS->ConsistencyOff();
+			ObjNormalsOBS->ConsistencyOn();
 			ObjNormalsOBS->Update();
 			observedMoved = ObjNormalsOBS->GetOutput();
 
@@ -12996,7 +12945,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			ObjNormalsIMP->ComputePointNormalsOn();
 			ObjNormalsIMP->ComputeCellNormalsOn();
 			ObjNormalsIMP->AutoOrientNormalsOff();
-			ObjNormalsIMP->ConsistencyOff();
+			ObjNormalsIMP->ConsistencyOn();
 			ObjNormalsIMP->Update();
 			impactedMoved = ObjNormalsIMP->GetOutput();
 		
@@ -13061,6 +13010,9 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						// Choix A: dans tous N plus proches. 
 						// Garder que ceux qui sont dans la sphère
 						// se diriger dans la direction de la normale d'un facteur correspondant à la moyenne des dist pondérés par cos2 
+
+						// Bon faudrait quand même se diriger un peu vers le barycentre des 20 plus proches, ou faire une pondération qui prenne en compte la proximité (force de gravité)  ????? Sinon on n'y arrrive pas du tout.
+						// il faut aussi à mon avis virer le filtre qui calcule les normales dans cette fonction, j'ai l'impression qu'il modifie la topologie sans prévenir... 
 
 						//
 						// Choix B: dans tous ces ponts vers lesquels on se dirige (utilisation du critère cos2)
@@ -13326,7 +13278,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					ObjNormalsIMP2->ComputePointNormalsOn();
 					ObjNormalsIMP2->ComputeCellNormalsOn();
 					ObjNormalsIMP2->AutoOrientNormalsOff();
-					ObjNormalsIMP2->ConsistencyOff();
+					ObjNormalsIMP2->ConsistencyOn();
 					ObjNormalsIMP2->Update();
 					impactedMoved = ObjNormalsIMP2->GetOutput();
 
@@ -14567,13 +14519,6 @@ void mqMorphoDigCore::addKeepLargest()
 
 				
 
-				/*vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-				ObjNormals->SetInputData(cfilter->GetOutput());
-				ObjNormals->ComputePointNormalsOn();
-				ObjNormals->ComputeCellNormalsOn();
-				ObjNormals->ConsistencyOff();
-				ObjNormals->Update();*/
-
 				vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 				//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
 				cleanPolyDataFilter->SetInputData(cfilter->GetOutput());
@@ -15185,7 +15130,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 						ObjNormals->ComputePointNormalsOn();
 						ObjNormals->ComputeCellNormalsOn();
 						ObjNormals->AutoOrientNormalsOff();
-						ObjNormals->ConsistencyOff();
+						ObjNormals->ConsistencyOn();
 						cout << "update normals " << endl;
 						ObjNormals->Update();
 						mergedObjects->AddInputData(ObjNormals->GetOutput());
@@ -15225,7 +15170,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				ObjNormals->AutoOrientNormalsOff();
-				ObjNormals->ConsistencyOff();
+				ObjNormals->ConsistencyOn();
 				ObjNormals->Update();
 				mergedObjects->AddInputData(ObjNormals->GetOutput());
 		}
@@ -15801,7 +15746,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	ObjNormals->ComputePointNormalsOn();
 	ObjNormals->ComputeCellNormalsOn();
 	//ObjNormals->AutoOrientNormalsOff();
-	ObjNormals->ConsistencyOff();
+	ObjNormals->ConsistencyOn();
 
 	ObjNormals->Update();
 
