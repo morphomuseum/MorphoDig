@@ -12855,13 +12855,14 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 }
 void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 {
+	cout << "Start recompute point normals" << endl;
+
 	auto pointNorms = vtkFloatArray::SafeDownCast(mesh->GetPointData()->GetNormals());
 	vtkSmartPointer<vtkFloatArray> newPointNorms = vtkSmartPointer<vtkFloatArray>::New();
 	if (pointNorms == NULL)
 	{
-		pointNorms = vtkSmartPointer<vtkFloatArray>::New();
-		pointNorms->SetNumberOfComponents(3);
-		pointNorms->SetNumberOfTuples(mesh->GetNumberOfPoints());
+		newPointNorms->SetNumberOfComponents(3);
+		newPointNorms->SetNumberOfTuples(mesh->GetNumberOfPoints());
 	}
 	else
 	{
@@ -12889,6 +12890,10 @@ void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 			}
 			if (norm[0] != 0 || norm[1] != 0 || norm[2] != 0)
 			{
+				if (ve < 10)
+				{
+					cout << "Normalize norm" << endl;
+				}
 				vtkMath::Normalize(norm);
 
 			}
@@ -12904,12 +12909,12 @@ void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 }
 void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
 {
+	cout << "Start recompute cell normals" << endl;
 	vtkSmartPointer<vtkFloatArray>cellNorms = vtkFloatArray::SafeDownCast(mesh->GetCellData()->GetNormals());
 	vtkSmartPointer<vtkFloatArray> newCellNorms = vtkSmartPointer<vtkFloatArray>::New();
 	
 	if (cellNorms == NULL)
 	{
-		cellNorms = vtkSmartPointer<vtkFloatArray>::New();
 		newCellNorms->SetNumberOfComponents(3);
 		newCellNorms->SetNumberOfTuples(mesh->GetNumberOfCells());
 	}
@@ -12935,20 +12940,26 @@ void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
 				double *pt = mesh->GetPoint(cellPts->GetId(j));
 				if (j == 0) { A[0] = pt[0]; A[1] = pt[1]; A[2] = pt[2]; }
 				if (j == 1) { B[0] = pt[0]; B[1] = pt[1]; B[2] = pt[2]; }
-				if (j == 0) { C[0] = pt[0]; C[1] = pt[1]; C[2] = pt[2]; }				
+				if (j == 2) { C[0] = pt[0]; C[1] = pt[1]; C[2] = pt[2]; }				
 
 			}
 			if (cellPts->GetNumberOfIds() >= 3)
 			{
+				if (ce < 10)
+				{
+					cout << "Triangle compute normal" << endl;
+				}
 				vtkTriangle::ComputeNormal(A, B, C, norm);
 			}			
 			else
 			{
 				norm[2] = 1;
 			}
+			
 			newCellNorms->SetTuple3(ce, norm[0], norm[1], norm[2]);
 
 		}
+
 		mesh->GetCellData()->SetNormals(newCellNorms);
 	
 }
