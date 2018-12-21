@@ -12,6 +12,7 @@
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
 #include <time.h>
+#include <vtkTriangle.h>
 #include <vtkBooleanOperationPolyDataFilter.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkLandmarkTransform.h>
@@ -12852,6 +12853,105 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 
 
 }
+void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
+{
+	auto pointNorms = vtkFloatArray::SafeDownCast(mesh->GetPointData()->GetNormals());
+	vtkSmartPointer<vtkFloatArray> newPointNorms = vtkSmartPointer<vtkFloatArray>::New();
+	if (pointNorms == NULL)
+	{
+		pointNorms = vtkSmartPointer<vtkFloatArray>::New();
+		pointNorms->SetNumberOfComponents(3);
+		pointNorms->SetNumberOfTuples(mesh->GetNumberOfPoints());
+	}
+	else
+	{
+		newPointNorms->DeepCopy(pointNorms);
+	}
+	
+
+	auto cellNorms = vtkFloatArray::SafeDownCast(mesh->GetCellData()->GetNormals());
+	if (cellNorms != NULL)
+	{
+		for (vtkIdType ve = 0; ve < mesh->GetNumberOfPoints(); ve++)
+		{
+
+			vtkSmartPointer<vtkIdList> cellPts = vtkSmartPointer<vtkIdList>::New();
+			vtkSmartPointer<vtkIdList> ptCells = vtkSmartPointer<vtkIdList>::New();
+			mesh->GetPointCells(ve, ptCells);
+			double norm[3] = { 0,0,0 };
+			for (vtkIdType j = 0; j<ptCells->GetNumberOfIds(); j++)
+			{
+				double *cn = cellNorms->GetTuple3(ptCells->GetId(j));
+				norm[0] += cn[0];
+				norm[1] += cn[1];
+				norm[2] += cn[2];
+
+			}
+			if (norm[0] != 0 || norm[1] != 0 || norm[2] != 0)
+			{
+				vtkMath::Normalize(norm);
+
+			}
+			else
+			{
+				norm[2] = 1;
+			}
+			newPointNorms->SetTuple3(ve, norm[0], norm[1], norm[2]);			
+			
+		}
+		mesh->GetPointData()->SetNormals(newPointNorms);
+	}
+}
+void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
+{
+	vtkSmartPointer<vtkFloatArray>cellNorms = vtkFloatArray::SafeDownCast(mesh->GetCellData()->GetNormals());
+	vtkSmartPointer<vtkFloatArray> newCellNorms = vtkSmartPointer<vtkFloatArray>::New();
+	
+	if (cellNorms == NULL)
+	{
+		cellNorms = vtkSmartPointer<vtkFloatArray>::New();
+		newCellNorms->SetNumberOfComponents(3);
+		newCellNorms->SetNumberOfTuples(mesh->GetNumberOfCells());
+	}
+	else
+	{
+		newCellNorms->DeepCopy(cellNorms);
+	}
+
+	
+	
+		for (vtkIdType ce = 0; ce < mesh->GetNumberOfCells(); ce++)
+		{
+
+			vtkSmartPointer<vtkIdList> cellPts = vtkSmartPointer<vtkIdList>::New();
+			
+			mesh->GetCellPoints(ce, cellPts);
+			double A[3] = { 0,0,0 };
+			double B[3] = { 0,0,0 };
+			double C[3] = { 0,0,0 };
+			double norm[3] = { 0,0,0 };
+			for (vtkIdType j = 0; j<cellPts->GetNumberOfIds(); j++)
+			{
+				double *pt = mesh->GetPoint(cellPts->GetId(j));
+				if (j == 0) { A[0] = pt[0]; A[1] = pt[1]; A[2] = pt[2]; }
+				if (j == 1) { B[0] = pt[0]; B[1] = pt[1]; B[2] = pt[2]; }
+				if (j == 0) { C[0] = pt[0]; C[1] = pt[1]; C[2] = pt[2]; }				
+
+			}
+			if (cellPts->GetNumberOfIds() >= 3)
+			{
+				vtkTriangle::ComputeNormal(A, B, C, norm);
+			}			
+			else
+			{
+				norm[2] = 1;
+			}
+			newCellNorms->SetTuple3(ce, norm[0], norm[1], norm[2]);
+
+		}
+		mesh->GetCellData()->SetNormals(newCellNorms);
+	
+}
 void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iteration, double stopCriterion, double radius, double angularLimit, double maxStepAmplitude, vtkMDActor *impactedActor, vtkMDActor* observedActor, int smoothWrapping)
 {
 	cout << "Call ShrinkWrap" << endl;
@@ -12910,14 +13010,10 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 				observedMoved->GetPoints()->SetPoint(i, final_pos);
 			}
 			// now transform the norms
-			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsOBS = vtkSmartPointer<vtkPolyDataNormals>::New();
-			ObjNormalsOBS->SetInputData(observedMoved);
-			ObjNormalsOBS->ComputePointNormalsOn();
-			ObjNormalsOBS->ComputeCellNormalsOn();
-			ObjNormalsOBS->AutoOrientNormalsOff();
-			ObjNormalsOBS->ConsistencyOn();
-			ObjNormalsOBS->Update();
-			observedMoved = ObjNormalsOBS->GetOutput();
+			this->RecomputeCellNormals(observedMoved);
+			this->RecomputePointNormals(observedMoved);
+			
+			
 
 
 
@@ -12940,14 +13036,10 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 		for (vtkIdType it=0; it<iteration;it++)
 		{
 			cout << "ITERATIVE SHRINK WRAP ITERATION " << it << endl;
-			vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP = vtkSmartPointer<vtkPolyDataNormals>::New();
-			ObjNormalsIMP->SetInputData(impactedMoved);
-			ObjNormalsIMP->ComputePointNormalsOn();
-			ObjNormalsIMP->ComputeCellNormalsOn();
-			ObjNormalsIMP->AutoOrientNormalsOff();
-			ObjNormalsIMP->ConsistencyOn();
-			ObjNormalsIMP->Update();
-			impactedMoved = ObjNormalsIMP->GetOutput();
+			// now transform the norms
+			this->RecomputeCellNormals(impactedMoved);
+			this->RecomputePointNormals(impactedMoved);
+			
 		
 				vtkSmartPointer<vtkDoubleArray> newScalars =
 					vtkSmartPointer<vtkDoubleArray>::New();
@@ -13273,14 +13365,9 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						impactedMoved->GetPoints()->SetPoint((vtkIdType)i, proj_pt);
 					}
 					// now compute the norms!
-					vtkSmartPointer<vtkPolyDataNormals> ObjNormalsIMP2 = vtkSmartPointer<vtkPolyDataNormals>::New();
-					ObjNormalsIMP2->SetInputData(impactedMoved);
-					ObjNormalsIMP2->ComputePointNormalsOn();
-					ObjNormalsIMP2->ComputeCellNormalsOn();
-					ObjNormalsIMP2->AutoOrientNormalsOff();
-					ObjNormalsIMP2->ConsistencyOn();
-					ObjNormalsIMP2->Update();
-					impactedMoved = ObjNormalsIMP2->GetOutput();
+					this->RecomputeCellNormals(impactedMoved);
+					this->RecomputePointNormals(impactedMoved);
+					
 
 
 					newScalars->SetName(mScalarName.c_str());
