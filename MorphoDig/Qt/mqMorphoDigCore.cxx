@@ -12892,7 +12892,7 @@ void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 			{
 				if (ve < 10)
 				{
-					cout << "Normalize norm" << endl;
+					//cout << "Normalize norm" << endl;
 				}
 				vtkMath::Normalize(norm);
 
@@ -12909,7 +12909,7 @@ void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 }
 void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
 {
-	cout << "Start recompute cell normals" << endl;
+	//cout << "Start recompute cell normals" << endl;
 	vtkSmartPointer<vtkFloatArray>cellNorms = vtkFloatArray::SafeDownCast(mesh->GetCellData()->GetNormals());
 	vtkSmartPointer<vtkFloatArray> newCellNorms = vtkSmartPointer<vtkFloatArray>::New();
 	
@@ -12947,7 +12947,7 @@ void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
 			{
 				if (ce < 10)
 				{
-					cout << "Triangle compute normal" << endl;
+					//cout << "Triangle compute normal" << endl;
 				}
 				vtkTriangle::ComputeNormal(A, B, C, norm);
 			}			
@@ -13096,6 +13096,11 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					kDTree->SetDataSet(observedMoved);
 					kDTree->BuildLocator();
 					//first do only one loop => iterative shrink wrap should start here!
+					vtkSmartPointer<vtkDoubleArray> displacementField = vtkSmartPointer<vtkDoubleArray>::New();
+					
+					displacementField->SetNumberOfComponents(3);
+					displacementField->SetNumberOfTuples(impactedNumvert);
+
 					for (vtkIdType ve2 = 0; ve2 < impactedNumvert; ve2++)
 					{
 						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
@@ -13130,11 +13135,40 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						
 						double newscalar = maxStepAmplitude; // if we do not find neighbours, we will move as far as permitted.
 						double currAmpl = 0;
-						double currDist = 0;
+						//double currDist = 0;
 						
 						// Stratégie A
 						kDTree->FindClosestNPoints(20, imp_pt, observedNeighbours);
 						vtkIdType toto = 0;
+						double maxDist = 0;
+						double sumDist = 0;
+						double minDist = radius;
+						double baryCentre[3] = { 0,0,0 };
+						for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
+						{
+							vtkIdType obsVerId = observedNeighbours->GetId(j);
+							if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
+							{
+								//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
+							}
+							observedMoved->GetPoint(obsVerId, obs_pt);
+							baryCentre[0] += obs_pt[0];
+							baryCentre[1] += obs_pt[1];
+							baryCentre[2] += obs_pt[2];
+							ptn = observedNorms->GetTuple3(obsVerId);
+							obs_norm[0] = ptn[0];
+							obs_norm[1] = ptn[1];
+							obs_norm[2] = ptn[2];
+							AB[0] = obs_pt[0] - imp_pt[0];
+							AB[1] = obs_pt[1] - imp_pt[1];
+							AB[2] = obs_pt[2] - imp_pt[2];
+							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+							sumDist += curr_dist;
+							if (maxDist < curr_dist) { maxDist = curr_dist; }
+							if (minDist > curr_dist) { minDist = curr_dist; }
+						}
+						// we have sumDist, minDist et maxDist
+
 						for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 						{
 							vtkIdType obsVerId = observedNeighbours->GetId(j);
@@ -13150,7 +13184,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							AB[0] = obs_pt[0] - imp_pt[0];
 							AB[1] = obs_pt[1] - imp_pt[1];
 							AB[2] = obs_pt[2] - imp_pt[2];
-							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);
+							double curr_dist = sqrt(AB[0] * AB[0] + AB[1] * AB[1] + AB[2] * AB[2]);							
 							ABnorm[0] = 0; ABnorm[1] = 0; ABnorm[2] = 0;
 							if (curr_dist > 0)
 							{
@@ -13159,9 +13193,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 								ABnorm[2] = AB[2] / curr_dist;
 							}
 							cur_cos = obs_norm[0] * imp_norm[0] + obs_norm[1] * imp_norm[1] + obs_norm[2] * imp_norm[2]; // we do not care about this one, or do we?
-							cur_cos2 = -1 * (ABnorm[0] * imp_norm[0] + ABnorm[1] * imp_norm[1] + ABnorm[2] * imp_norm[2]);// the direction "forward" view angle < 
-							
-
+							cur_cos2 = -1 * (ABnorm[0] * imp_norm[0] + ABnorm[1] * imp_norm[1] + ABnorm[2] * imp_norm[2]);// the direction "forward" view angle < 							
 						
 							if ( curr_dist < radius)
 							{
@@ -13175,8 +13207,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 								
 								//cpt_candidates++;
 								double factor = cur_cos2*curr_dist;
-								//cout << ", ve=" << ve2 << ", cur_cos2=" << cur_cos2 << "," << "curr_dist=" << curr_dist << ", factor=" << factor << ", cpt_candidates="<< toto<< endl;
-
+								
 								if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 								{
 								/*	cout << "cur_cos=" << cur_cos << endl;
