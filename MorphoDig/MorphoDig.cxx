@@ -407,8 +407,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->MorphoDigCore->Setmui_ShowGrid(settings.value("ShowGrid", 
 		this->MorphoDigCore->Getmui_DefaultShowGrid()
 		).toInt());
-	this->MorphoDigCore->Setmui_ScalarVisibility(settings.value("ScalarVisibility",
-		this->MorphoDigCore->Getmui_DefaultScalarVisibility()
+	this->MorphoDigCore->Setmui_ArrayVisibility(settings.value("ScalarVisibility",
+		this->MorphoDigCore->Getmui_DefaultArrayVisibility()
 	).toInt());
 	this->MorphoDigCore->Setmui_GridSpacing(settings.value("GridSpacing",
 		this->MorphoDigCore->Getmui_DefaultGridSpacing()
@@ -1258,7 +1258,7 @@ void MorphoDig::saveSettings()
 	settings.endGroup();
 	settings.beginGroup("display_options");
 	settings.setValue("ShowGrid", this->MorphoDigCore->Getmui_ShowGrid());
-	settings.setValue("ScalarVisibility", this->MorphoDigCore->Getmui_ScalarVisibility());
+	settings.setValue("ScalarVisibility", this->MorphoDigCore->Getmui_ArrayVisibility());
 	
 	settings.setValue("GridSpacing", this->MorphoDigCore->Getmui_GridSpacing());
 	settings.setValue("SizeUnit", this->MorphoDigCore->Getmui_SizeUnit());

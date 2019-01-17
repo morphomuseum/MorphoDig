@@ -457,7 +457,7 @@ void mqEditACTORDialog::UpdateUI()
 		//QItemDelegate
 
 		this->Ui->scalarList->clear();
-		ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfActor(this->ACTOR);
+		ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ArraysOfActor(this->ACTOR);
 		for (int i = 0; i < MyList->Stack.size(); i++)
 		{
 			if (
@@ -579,7 +579,7 @@ void mqEditACTORDialog::slotDuplicateScalar()
 		if (dialogResult)
 		{
 			cout << "new scalar given:" << newScalarName.toStdString() << endl;
-			mqMorphoDigCore::instance()->DuplicateScalar(this->ACTOR, ScalarName, newScalarName);
+			mqMorphoDigCore::instance()->DuplicateArray(this->ACTOR, ScalarName, newScalarName);
 			this->UpdateUI();
 		}
 		else
@@ -603,7 +603,7 @@ void mqEditACTORDialog::slotEditScalar()
 		if (dialogResult)
 		{
 			cout << "new name given:" << newScalarName.toStdString() << endl;
-			mqMorphoDigCore::instance()->EditScalarName(this->ACTOR, oldScalarName, newScalarName);
+			mqMorphoDigCore::instance()->EditArrayName(this->ACTOR, oldScalarName, newScalarName);
 			this->UpdateUI();
 		}
 		else
@@ -621,7 +621,7 @@ void mqEditACTORDialog::slotDeleteScalar()
 	if (this->ACTOR != NULL && row>=0)
 	{
 		cout << this->Ui->scalarList->item(row)->text().toStdString() << endl;
-		mqMorphoDigCore::instance()->DeleteScalar(this->ACTOR, this->Ui->scalarList->item(row)->text());
+		mqMorphoDigCore::instance()->DeleteArray(this->ACTOR, this->Ui->scalarList->item(row)->text());
 		cout << "Try to update UI" << endl;
 		this->UpdateUI();
 		cout << "Try to update UI ok" << endl;

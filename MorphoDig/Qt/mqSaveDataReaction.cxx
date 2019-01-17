@@ -208,16 +208,16 @@ void mqSaveDataReaction::SaveActiveScalarSummary()
 		msgBox.exec();
 		return;
 	}
-	if (numsel>0&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1 &&
+	if (numsel>0&& mqMorphoDigCore::instance()->Getmui_ActiveArray()->NumComp == 1 &&
 
-		(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT
-			|| mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+		(mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_FLOAT
+			|| mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_DOUBLE
 			)
 		)
 
 	{
 
-		QString activeScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+		QString activeScalar = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 		QString myText;
 	
 		myText = tr("Save summary of scalars ")+activeScalar;

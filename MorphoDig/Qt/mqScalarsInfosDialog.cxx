@@ -58,7 +58,7 @@ mqScalarsInfosDialog::mqScalarsInfosDialog(QWidget* Parent)
 {
 	this->Ui->setupUi(this);
 	this->setObjectName("mqScalarsInfosDialog");	
-	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 	
 	this->PopulateComboTags();
 	this->Ui->comboTags->setDisabled(true);
@@ -95,7 +95,7 @@ void mqScalarsInfosDialog::PopulateComboTags()
 {
 
 	this->Ui->comboTags->clear();
-	ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+	ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ExistingArrays();
 	for (int i = 0; i < MyList->Stack.size(); i++)
 	{
 		if ((MyList->Stack.at(i).DataType == VTK_INT || MyList->Stack.at(i).DataType == VTK_UNSIGNED_INT) && MyList->Stack.at(i).NumComp == 1)
@@ -132,16 +132,16 @@ void mqScalarsInfosDialog::editInfos()
 		msgBox.exec();
 		return;
 	}
-	if (numsel>0 && mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1 &&
+	if (numsel>0 && mqMorphoDigCore::instance()->Getmui_ActiveArray()->NumComp == 1 &&
 
-		(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT
-			|| mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE
+		(mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_FLOAT
+			|| mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_DOUBLE
 			)
 		)
 
 	{
 
-		QString activeScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+		QString activeScalar = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 		QString myText;
 
 		myText = tr("Save summary of scalars ") + activeScalar;

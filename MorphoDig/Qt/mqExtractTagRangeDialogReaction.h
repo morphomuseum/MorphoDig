@@ -35,9 +35,9 @@ protected:
   * Called when the action is triggered.
   */
   virtual void onTriggered() {
-	  ActiveScalars *myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars();
+	  ActiveArray *myActiveArray = mqMorphoDigCore::instance()->Getmui_ActiveArray();
 	  int ok = 0;
-	  if ((myActiveScalars->DataType == VTK_INT || myActiveScalars->DataType == VTK_UNSIGNED_INT) && myActiveScalars->NumComp == 1)
+	  if ((myActiveArray->DataType == VTK_INT || myActiveArray->DataType == VTK_UNSIGNED_INT) && myActiveArray->NumComp == 1)
 	  {
 		  ok = 1;
 	  }

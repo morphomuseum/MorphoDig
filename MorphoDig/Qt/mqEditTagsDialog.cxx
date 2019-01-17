@@ -112,7 +112,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	this->Ui->pencilSearchSize->setValue(mqMorphoDigCore::instance()->Getmui_PencilSize());
 	connect(mqMorphoDigCore::instance(), SIGNAL(pencilSizeChanged(int)), this, SLOT(slotRefreshPencilSearchSize(int)));
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
-	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboTags()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(existingArraysChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
@@ -670,7 +670,7 @@ void mqEditTagsDialog::RefreshComboActiveTags()
 {
 	
 	this->Ui->comboActiveTags->clear();
-	ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+	ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ExistingArrays();
 	for (int i = 0; i < MyList->Stack.size(); i++)
 	{
 		if ((MyList->Stack.at(i).DataType == VTK_INT || MyList->Stack.at(i).DataType == VTK_UNSIGNED_INT) && MyList->Stack.at(i).NumComp == 1)
@@ -679,7 +679,7 @@ void mqEditTagsDialog::RefreshComboActiveTags()
 		}
 
 	}
-	QString myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	QString myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 	cout << "DIAL myActiveTags " << myActiveScalars.toStdString() << endl;
 	int exists = -1;
 	for (int i = 0; i < this->Ui->comboActiveTags->count(); i++)
@@ -742,7 +742,7 @@ void mqEditTagsDialog::RefreshComboTagMaps()
 void mqEditTagsDialog::slotRemoveTags()
 {
 	
-	mqMorphoDigCore::instance()->RemoveScalar(this->Ui->comboActiveTags->currentText(), this->Ui->selectedObjects->isChecked());
+	mqMorphoDigCore::instance()->RemoveArray(this->Ui->comboActiveTags->currentText(), this->Ui->selectedObjects->isChecked());
 	this->UpdateUI();
 	
 	
@@ -792,15 +792,15 @@ void mqEditTagsDialog::slotActiveTagsChanged(int idx)
 	
 	cout << "looks like active tags have changed!:: " << idx << endl;
 	QString NewActiveTagName = this->Ui->comboActiveTags->currentText();
-	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.size(); i++)
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.size(); i++)
 	{
-		QString myExisingScalarName = mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).Name;
+		QString myExisingScalarName = mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).Name;
 		if (NewActiveTagName == myExisingScalarName)
 		{
 
-			mqMorphoDigCore::instance()->Setmui_ActiveScalarsAndRender(NewActiveTagName,
-				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).DataType,
-				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).NumComp
+			mqMorphoDigCore::instance()->Setmui_ActiveArrayAndRender(NewActiveTagName,
+				mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).DataType,
+				mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).NumComp
 			);
 			
 			

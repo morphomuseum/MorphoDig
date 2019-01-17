@@ -129,10 +129,10 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	//this->Ui->ColorEditor-
 	this->Ui->comboColorMap->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps()));
-	connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));
-	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboScalars()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(existingArraysChanged()), this, SLOT(slotRefreshComboScalars()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(activeArrayChanged()), this, SLOT(slotRefreshComboScalars()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(actorsMightHaveChanged()), this, SLOT(slotRefreshSuggestedRange()));
-	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshSuggestedRange()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(activeArrayChanged()), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->comboActiveScalar, SIGNAL(activated(int)), this, SLOT(slotActiveScalarChanged(int)));
 	connect(this->Ui->comboColorMap, SIGNAL(activated(int)), this, SLOT(slotActiveColorMapChanged(int)));
 	
@@ -511,7 +511,7 @@ void mqEditScalarsDialog::RefreshRange()
 void mqEditScalarsDialog::RefreshComboScalars()
 {
 	this->Ui->comboActiveScalar->clear();
-	ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+	ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ExistingArrays();
 	for (int i = 0; i < MyList->Stack.size(); i++)
 	{
 		if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
@@ -520,7 +520,7 @@ void mqEditScalarsDialog::RefreshComboScalars()
 		}
 
 	}
-	QString myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	QString myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 	cout << "DIAL myActiveScalars " << myActiveScalars.toStdString() << endl;
 	int exists = -1;
 	for (int i = 0; i < this->Ui->comboActiveScalar->count(); i++)
@@ -581,7 +581,7 @@ void mqEditScalarsDialog::RefreshComboColorMaps()
 
 void mqEditScalarsDialog::slotRemoveScalar()
 {
-	mqMorphoDigCore::instance()->RemoveScalar(this->Ui->comboActiveScalar->currentText(), this->Ui->selectedObjects->isChecked());
+	mqMorphoDigCore::instance()->RemoveArray(this->Ui->comboActiveScalar->currentText(), this->Ui->selectedObjects->isChecked());
 	this->UpdateUI();
 	
 	
@@ -648,15 +648,15 @@ void mqEditScalarsDialog::slotActiveScalarChanged(int idx)
 {
 	cout << "looks like active scalar has changed!:: " << idx << endl;
 	QString NewActiveScalarName = this->Ui->comboActiveScalar->currentText();
-	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.size(); i++)
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.size(); i++)
 	{
-		QString myExisingScalarName = mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).Name;
+		QString myExisingScalarName = mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).Name;
 		if (NewActiveScalarName == myExisingScalarName)
 		{
 
-			mqMorphoDigCore::instance()->Setmui_ActiveScalarsAndRender(NewActiveScalarName,
-				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).DataType,
-				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).NumComp
+			mqMorphoDigCore::instance()->Setmui_ActiveArrayAndRender(NewActiveScalarName,
+				mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).DataType,
+				mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).NumComp
 			);
 			
 			this->RefreshSuggestedRange();

@@ -69,7 +69,7 @@ mqExtractScalarRangeDialog::mqExtractScalarRangeDialog(QWidget* Parent)
 	this->Ui->min->setMaximum(DBL_MAX);
 	this->Ui->max->setMaximum(DBL_MAX);
 	int removePercent = this->Ui->removePercent->value();
-	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 	this->Ui->activeScalarName->setText(ActiveScalar.toStdString().c_str());
 	this->Ui->max->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax(removePercent, 1));
 	this->Ui->min->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin(removePercent, 1));

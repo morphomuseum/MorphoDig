@@ -1210,7 +1210,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 		vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 		if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 		{
-			QString sActiveScalar = this->Getmui_ActiveArray()->Name;
+			QString sActiveArray = this->Getmui_ActiveArray()->Name;
 			vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mymapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
 			//4 if current tags exist, retrieve what tool is active
 			if (currentTags != NULL)
@@ -15385,10 +15385,10 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 					//vtkUnsignedCharArray *colors = (vtkUnsignedCharArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars("RGB");
 					//vtkFloatArray *currentFScalars = (vtkFloatArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveArray.toStdString().c_str());
 					//vtkDoubleArray *currentDScalars = (vtkDoubleArray*)cleanPolyDataFilter->GetOutput()->GetPointData()->GetScalars(ActiveArray.toStdString().c_str());
-					vtkUnsignedCharArray *currentRGBcolors = vtkUnsignedCharArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(ActiveArray.toStdString().c_str()));
-					vtkFloatArray *currentFScalars = vtkFloatArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(ActiveArray.toStdString().c_str()));
-					vtkDoubleArray *currentDScalars = vtkDoubleArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(ActiveArray.toStdString().c_str()));
-					vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(ActiveArray.toStdString().c_str()));
+					vtkUnsignedCharArray *currentRGBcolors = vtkUnsignedCharArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
+					vtkFloatArray *currentFScalars = vtkFloatArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
+					vtkDoubleArray *currentDScalars = vtkDoubleArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
+					vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
 					if (currentRGBcolors == NULL) { cout << "ccurrentRGBcolors is null" << endl; }
 					if (currentFScalars == NULL) { cout << "ccurrentFcolors is null" << endl; }
 					if (currentDScalars == NULL) { cout << "ccurrentDcolors is null" << endl; }

@@ -92,7 +92,7 @@ void mqSurfaceTagInfosDialog::PopulateComboTags()
 {
 
 	this->Ui->comboTags->clear();
-	ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+	ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ExistingArrays();
 	for (int i = 0; i < MyList->Stack.size(); i++)
 	{
 		if ((MyList->Stack.at(i).DataType == VTK_INT || MyList->Stack.at(i).DataType == VTK_UNSIGNED_INT) && MyList->Stack.at(i).NumComp == 1)

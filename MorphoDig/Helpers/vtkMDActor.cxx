@@ -645,10 +645,10 @@ void vtkMDActor::SetSelected(int selected)
 	}
 	else
 	{
-		if (this->GetMapper() != NULL && mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
+		if (this->GetMapper() != NULL && mqMorphoDigCore::instance()->Getmui_ArrayVisibility() == 1)
 		{
 			QString none = QString("Solid color");
-			if (mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name != none)
+			if (mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name != none)
 			{
 				vtkPolyDataMapper::SafeDownCast(this->GetMapper())->ScalarVisibilityOn();
 			}
@@ -842,7 +842,7 @@ void vtkMDActor::PopUndoStack()
 		{
 			cout << "try to restore array found in undo stack" << endl;
 			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
-			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
+			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name.toStdString().c_str());
 		}
 
 		//mqMorphoDigCore::instance()->Initmui_ExistingArrays();
@@ -975,7 +975,7 @@ void vtkMDActor::PopRedoStack()
 		{
 			cout << "POPREDO: try to restor array found in redo stack"  << endl;
 			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
-			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
+			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name.toStdString().c_str());
 		}
 		//mqMorphoDigCore::instance()->Initmui_ExistingArrays();
 

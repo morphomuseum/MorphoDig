@@ -67,7 +67,7 @@ mqExtractTagRangeDialog::mqExtractTagRangeDialog(QWidget* Parent)
 	this->Ui->min->setMaximum(INT_MAX);
 	this->Ui->max->setMaximum(INT_MAX);
 	
-	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 	this->Ui->activeScalarName->setText(ActiveScalar.toStdString().c_str());
 	
 	

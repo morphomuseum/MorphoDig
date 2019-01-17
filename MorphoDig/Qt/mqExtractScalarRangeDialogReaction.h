@@ -37,9 +37,9 @@ protected:
   virtual void onTriggered() { 
 	 
 	  // checks wether active array is scalar array... 	
-	  ActiveScalars *myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars();
+	  ActiveArray *myActiveArray = mqMorphoDigCore::instance()->Getmui_ActiveArray();
 	  int ok = 0;
-	  if ((myActiveScalars->DataType == VTK_FLOAT || myActiveScalars->DataType == VTK_DOUBLE) && myActiveScalars->NumComp == 1)
+	  if ((myActiveArray->DataType == VTK_FLOAT || myActiveArray->DataType == VTK_DOUBLE) && myActiveArray->NumComp == 1)
 	  {
 		  ok = 1;
 	  }

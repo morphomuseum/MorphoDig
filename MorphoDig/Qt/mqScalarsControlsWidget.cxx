@@ -36,7 +36,7 @@ void mqScalarsControlsWidget::constructor()
   
   
   
-  connect(mqMorphoDigCore::instance(), SIGNAL(existingScalarsChanged()), this, SLOT(slotRefreshComboScalars()));
+  connect(mqMorphoDigCore::instance(), SIGNAL(existingArraysChanged()), this, SLOT(slotRefreshComboScalars()));
 
   connect(this->ui->ScalarsVisibility, SIGNAL(pressed()), this, SLOT(slotScalarVisitiliby()));
   connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboScalars()));
@@ -70,7 +70,7 @@ void mqScalarsControlsWidget::constructor()
   //  exportColorMap->setIcon(icon);
   TagEditAction->setIcon(icon2);
   new mqEditTagsDialogReaction(TagEditAction);
-  if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
+  if (mqMorphoDigCore::instance()->Getmui_ArrayVisibility() == 1)
   {
 	  this->comboActiveScalars->setDisabled(false);
 	  this->ui->ColorScaleEdit->setDisabled(false);
@@ -94,15 +94,15 @@ void mqScalarsControlsWidget::slotActiveScalarChanged(int idx)
 {
 	cout << "looks like active scalar has changed!:: " << idx << endl;
 	QString NewActiveScalarName = this->comboActiveScalars->currentText();
-	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.size(); i++)
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.size(); i++)
 	{
-		QString myExisingScalarName = mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).Name;
+		QString myExisingScalarName = mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).Name;
 		if (NewActiveScalarName == myExisingScalarName)
 		{
 		
-			mqMorphoDigCore::instance()->Setmui_ActiveScalarsAndRender(NewActiveScalarName,
-				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).DataType, 
-				mqMorphoDigCore::instance()->Getmui_ExistingScalars()->Stack.at(i).NumComp
+			mqMorphoDigCore::instance()->Setmui_ActiveArrayAndRender(NewActiveScalarName,
+				mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).DataType, 
+				mqMorphoDigCore::instance()->Getmui_ExistingArrays()->Stack.at(i).NumComp
 			);
 			//this->RefreshEditButtons();
 
@@ -117,18 +117,18 @@ void mqScalarsControlsWidget::RefreshEditButtons()
 
 	this->ui->TagEdit->setEnabled(false);
 	this->ui->ColorScaleEdit->setEnabled(false);
-	if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility() == 1)
+	if (mqMorphoDigCore::instance()->Getmui_ArrayVisibility() == 1)
 	{
-		if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_INT ||
-			mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_UNSIGNED_INT)
-			&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1
+		if ((mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_INT ||
+			mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_UNSIGNED_INT)
+			&& mqMorphoDigCore::instance()->Getmui_ActiveArray()->NumComp == 1
 			)
 		{
 			this->ui->TagEdit->setEnabled(true);
 		}
-		if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT ||
-			mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE)
-			&& mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1
+		if ((mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_FLOAT ||
+			mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_DOUBLE)
+			&& mqMorphoDigCore::instance()->Getmui_ActiveArray()->NumComp == 1
 			)
 		{
 			this->ui->ColorScaleEdit->setEnabled(true);
@@ -140,13 +140,13 @@ void mqScalarsControlsWidget::slotRefreshComboScalars()
 {
 	//cout << "Refresh combo "<< endl;
 	this->comboActiveScalars->clear();
-	ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+	ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ExistingArrays();
 	for (int i = 0; i < MyList->Stack.size(); i++)
 	{
 		this->comboActiveScalars->addItem(MyList->Stack.at(i).Name);
 		
 	}
-	QString myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	QString myActiveScalars = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 	//cout << "myActiveScalars " << myActiveScalars.toStdString()<< endl;
 	int exists = -1;
 	for (int i = 0; i < MyList->Stack.size(); i++)
@@ -171,9 +171,9 @@ void mqScalarsControlsWidget::slotRefreshComboScalars()
 }
 void mqScalarsControlsWidget::slotScalarVisitiliby()
 {
-	if (mqMorphoDigCore::instance()->Getmui_ScalarVisibility()==0)	
+	if (mqMorphoDigCore::instance()->Getmui_ArrayVisibility()==0)	
 	{
-		mqMorphoDigCore::instance()->Setmui_ScalarVisibility(1);
+		mqMorphoDigCore::instance()->Setmui_ArrayVisibility(1);
 		this->ui->ScalarsVisibility->setChecked(false);// this should be "true"... but the ui has decided otherwise... 
 		this->comboActiveScalars->setDisabled(false);
 		this->ui->ColorScaleEdit->setDisabled(false);
@@ -181,7 +181,7 @@ void mqScalarsControlsWidget::slotScalarVisitiliby()
 	}
 	else
 	{
-		mqMorphoDigCore::instance()->Setmui_ScalarVisibility(0);
+		mqMorphoDigCore::instance()->Setmui_ArrayVisibility(0);
 		this->ui->ScalarsVisibility->setChecked(true);// this should be "false"... but the ui has decided otherwise... 
 		this->comboActiveScalars->setDisabled(true);
 		this->ui->ColorScaleEdit->setDisabled(true);

@@ -57,7 +57,7 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  this->Ui->Binary->setChecked(true);
  this->Ui->PositionOriginal->setChecked(true);
  this->Ui->scalarList->clear();
- ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ScalarsOfSelectedObjects(0);
+ ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ArraysOfSelectedObjects(0);
  QString none = QString("Solid color");
  for (int i = 0; i < MyList->Stack.size(); i++)
  {
@@ -78,7 +78,7 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  /*
  
  this->Ui->comboActiveScalar->clear();
-	ExistingScalars *MyList = mqMorphoDigCore::instance()->Getmui_ExistingScalars();
+	ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ExistingArrays();
 	for (int i = 0; i < MyList->Stack.size(); i++)
 	{
 		if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)

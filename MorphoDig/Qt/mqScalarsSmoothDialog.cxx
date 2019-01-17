@@ -125,7 +125,7 @@ void mqScalarsSmoothDialog::slotRefreshActiveScalars()
 
 void mqScalarsSmoothDialog::RefreshScalarName()
 {
-	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name;
+	QString ActiveScalar = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
 	this->Ui->activeScalarName->setText(ActiveScalar.toStdString().c_str());
 	QString SuggestedActiveScalarName = "Smooth_" + ActiveScalar;
 	this->Ui->scalarName->setText(SuggestedActiveScalarName.toStdString().c_str());

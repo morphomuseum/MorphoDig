@@ -187,7 +187,7 @@ void vtkMDActorCollection::AddItem(vtkActor *a)
 	this->Renderer->AddActor(a);
 	//cout << "Actor added to renderer" << endl;
 
-	mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+	mqMorphoDigCore::instance()->Initmui_ExistingArrays();
 
 }
 void vtkMDActorCollection::AddTmpItem(vtkActor *a)
@@ -313,7 +313,7 @@ void vtkMDActorCollection::DeleteSelectedActors()
 		this->Changed = 1;
 	}
 	
-	mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+	mqMorphoDigCore::instance()->Initmui_ExistingArrays();
 
 } //delete all selected actors
 void vtkMDActorCollection::Redo(int mCount) {
@@ -330,7 +330,7 @@ void vtkMDActorCollection::Redo(int mCount) {
 		//cout << "Redo actor event " << this->UndoRedo->RedoStack.back().UndoCount << endl;
 		// ici : faire l'appel global à undo de ce count là!!  
 		this->PopRedoStack();
-		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+		mqMorphoDigCore::instance()->Initmui_ExistingArrays();
 	}
 
 } // Try to redo (if exists) "mCount" event
@@ -358,7 +358,7 @@ void vtkMDActorCollection::Undo(int mCount)
 	{
 		cout << "Undo actor event " << this->UndoRedo->UndoStack.back().UndoCount << endl;
 		this->PopUndoStack();
-		mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+		mqMorphoDigCore::instance()->Initmui_ExistingArrays();
 	}
 
 } // Try to undo (if exists) "mCount" event

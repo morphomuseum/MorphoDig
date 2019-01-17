@@ -34,7 +34,7 @@ void mqScalarsSmoothDialogReaction::showScalarsSmoothDialog()
 		msgBox.exec();
 		return;
 	}
-	if ((mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_FLOAT || mqMorphoDigCore::instance()->Getmui_ActiveScalars()->DataType == VTK_DOUBLE) && mqMorphoDigCore::instance()->Getmui_ActiveScalars()->NumComp == 1)
+	if ((mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_FLOAT || mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_DOUBLE) && mqMorphoDigCore::instance()->Getmui_ActiveArray()->NumComp == 1)
 	{
 		mqScalarsSmoothDialog mqSmooth(mqCoreUtilities::mainWidget());
 		mqSmooth.exec();
