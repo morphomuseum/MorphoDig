@@ -41,7 +41,7 @@
 
 
 
-class ExistingScalars
+class ExistingArrays
 {
 public:
 	struct Element
@@ -114,7 +114,7 @@ public:
 
 
 
-class ActiveScalars
+class ActiveArray
 {
 public:
 	QString Name;
@@ -364,7 +364,7 @@ public:
 	void createTags(QString newTags);
 	void createTagsFromRGB(QString newTags, int exact, int N);
 	void createTagsConnectivity(QString newTags);
-	void RemoveScalar(QString scalarName, int onlySelectedObjects);
+	void RemoveArray(QString arrayName, int onlySelectedObjects);
 	void GetDisplayToWorld(double x, double y, double z, double worldPt[4]);
 	void GetWorldToDisplay(double x, double y, double z, double displayPt[3]);
 	double GetHundredPxSU();
@@ -378,9 +378,9 @@ public:
 	int Getmui_Anaglyph();
 	void GetCenterOfMassOfSelectedActors(double com[3]);
 	double GetBoundingBoxLengthOfSelectedActors();
-	void Setmui_ScalarVisibility(int scalarvisibility);
-	int Getmui_DefaultScalarVisibility();
-	int Getmui_ScalarVisibility();
+	void Setmui_ArrayVisibility(int arrayvisibility);
+	int Getmui_DefaultArrayVisibility();
+	int Getmui_ArrayVisibility();
 	int Getmui_TagModeActivated();
 	void Setmui_TagModeActivated(int activated);
 	int Getmui_TagTool();
@@ -466,7 +466,7 @@ public:
 	void SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray);
-	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);
+	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> arraysToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
 	void DeleteSelectedActors();
@@ -538,20 +538,20 @@ public:
 	void Getmui_DefaultBackGroundColor(double bg[3]);
 	void Setmui_BackGroundColor(double bg1, double bg2, double bg3);
 	void Setmui_BackGroundColor(double background[3]);
-	void EditScalarName(vtkSmartPointer<vtkMDActor> actor, QString oldScalarName, QString newScalarName);
-	void DuplicateScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName, QString newScalarName);
-	void DeleteScalar(vtkSmartPointer<vtkMDActor> actor, QString ScalarName);
-	ExistingScalars *Getmui_ScalarsOfActor(vtkSmartPointer<vtkMDActor> actor);
-	ExistingScalars *Getmui_ScalarsOfSelectedObjects(int onlyfirst = 0);
-	ExistingScalars* Getmui_ExistingScalars();
-	void Addmui_ExistingScalars(QString Scalar, int dataType, int numComp, int toglobalList = 1);
+	void EditArrayName(vtkSmartPointer<vtkMDActor> actor, QString oldArrayName, QString newArrayName);
+	void DuplicateArray(vtkSmartPointer<vtkMDActor> actor, QString ArrayName, QString newArrayName);
+	void DeleteArray(vtkSmartPointer<vtkMDActor> actor, QString ArrayName);
+	ExistingArrays *Getmui_ArraysOfActor(vtkSmartPointer<vtkMDActor> actor);
+	ExistingArrays *Getmui_ArraysOfSelectedObjects(int onlyfirst = 0);
+	ExistingArrays* Getmui_ExistingArrays();
+	void Addmui_ExistingArrays(QString Array, int dataType, int numComp, int toglobalList = 1);
 
-	void Initmui_ExistingScalars();
-	void Setmui_ActiveScalars(QString Scalar, int dataType, int numComp);
+	void Initmui_ExistingArrays();
+	void Setmui_ActiveArray(QString Array, int dataType, int numComp);
 
-	void Setmui_ActiveScalarsAndRender(QString Scalar, int dataType, int numComp);
-	void RefreshColorMapsAndScalarVisibility();
-	ActiveScalars* Getmui_ActiveScalars();
+	void Setmui_ActiveArrayAndRender(QString Array, int dataType, int numComp);
+	void RefreshColorMapsAndArrayVisibility();
+	ActiveArray* Getmui_ActiveArray();
 
 
 	ExistingColorMaps* Getmui_ExistingColorMaps();
@@ -736,8 +736,8 @@ public:
   void signal_actorSelectionChanged();
   void signal_projectionModeChanged();
   void signal_zoomChanged();
-  void signal_existingScalarsChanged();
-  void signal_activeScalarChanged();
+  void signal_existingArraysChanged();
+  void signal_activeArrayChanged();
   //void signal_ActorsMightHaveChanged();
   vtkDiscretizableColorTransferFunction* GetOneColorMap();
   void UpdateLookupTablesRanges(double min, double max);
@@ -795,8 +795,8 @@ signals:
   void zoomChanged();
   void lmSelectionChanged();
   void actorSelectionChanged();
-  void existingScalarsChanged();
-  void activeScalarChanged();
+  void existingArrayshanged();
+  void activeArrayChanged();
   void actorsMightHaveChanged();
   void modeModeChanged();
   void thicknessProgression(int percent);
@@ -853,10 +853,10 @@ protected:
 	mqUndoStack* UndoStack;
 	//vtkSmartPointer<vtkUndoStack> UndoStack;
 
-	//QString mui_ActiveScalars;
-	ActiveScalars *mui_ActiveScalars;
-	ExistingScalars *mui_ExistingScalars;
-	ExistingScalars *mui_ScalarsList; //can be of a given actor, or of selected objects
+	//QString mui_ActiveArray;
+	ActiveArray *mui_ActiveArray;
+	ExistingArrays *mui_ExistingArrays;
+	ExistingArrays *mui_ArrayList; //can be of a given actor, or of selected objects
 
 	ActiveColorMap *mui_ActiveColorMap;
 	ExistingColorMaps *mui_ExistingColorMaps;
@@ -882,8 +882,8 @@ protected:
 	int mui_ClippingPlane;
 	int mui_BackfaceCulling;
 
-	int mui_ScalarVisibility;
-	int mui_DefaultScalarVisibility;
+	int mui_ArrayVisibility;
+	int mui_DefaultArrayVisibility;
 
 	int mui_Anaglyph;
 	int mui_DisplayMode;//0 cell 1 point 2 wireframe 3 points

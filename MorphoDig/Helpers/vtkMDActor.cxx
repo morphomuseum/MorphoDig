@@ -845,7 +845,7 @@ void vtkMDActor::PopUndoStack()
 			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
 		}
 
-		//mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+		//mqMorphoDigCore::instance()->Initmui_ExistingArrays();
 		
 		
 		
@@ -977,7 +977,7 @@ void vtkMDActor::PopRedoStack()
 			this->GetMapper()->GetInput()->GetPointData()->AddArray(toRestoreArray);
 			this->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(mqMorphoDigCore::instance()->Getmui_ActiveScalars()->Name.toStdString().c_str());
 		}
-		//mqMorphoDigCore::instance()->Initmui_ExistingScalars();
+		//mqMorphoDigCore::instance()->Initmui_ExistingArrays();
 
 	}
 

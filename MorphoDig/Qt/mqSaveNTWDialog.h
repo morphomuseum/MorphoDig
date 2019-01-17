@@ -32,7 +32,8 @@ public:
   public slots:
   virtual void slotSaveNTWFile();
   
-  
+  virtual void slotPLYWarning();
+  virtual void slotSTLWarning();
 
 protected:
 	
