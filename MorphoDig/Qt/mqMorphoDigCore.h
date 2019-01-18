@@ -374,6 +374,20 @@ public:
 	int Getmui_DisplayMode();
 	int Getmui_DefaultDisplayMode();
 	void Setmui_Anaglyph(int anaglyph);
+	int Getmui_Specular();
+	int Getmui_SpecularPower();
+	int Getmui_DefaultSpecular();
+	int Getmui_DefaultSpecularPower();
+	void Setmui_Specular(int specular);
+	void Setmui_SpecularPower(int specularPower);
+	int Getmui_Diffuse();
+	int Getmui_DefaultDiffuse();
+	void Setmui_Diffuse(int diffuse);
+	int Getmui_Ambiant();
+	void Setmui_Ambiant(int ambiant);
+	int Getmui_DefaultAmbiant();
+	void UpdateColorProperties(); // should browse actor collections and set current properties to all of them
+	
 	int Getmui_DefaultAnaglyph();
 	int Getmui_Anaglyph();
 	void GetCenterOfMassOfSelectedActors(double com[3]);
@@ -868,6 +882,16 @@ protected:
 	int mui_PencilSize;
 	int mui_PencilLimitAngle;
 	int mui_PencilContiguous;
+
+	int mui_Specular;
+	int mui_SpecularPower;
+	int mui_Ambiant;
+	int mui_Diffuse;
+
+	int mui_DefaultSpecular;
+	int mui_DefaultSpecularPower;
+	int mui_DefaultAmbiant;
+	int mui_DefaultDiffuse;
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;
