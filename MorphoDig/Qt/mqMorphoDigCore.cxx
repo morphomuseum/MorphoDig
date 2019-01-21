@@ -9740,7 +9740,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				//ObjNormals->AutoOrientNormalsOff();
-				//ObjNormals->ConsistencyOff();
+				ObjNormals->ConsistencyOff();
 
 				ObjNormals->Update();
 
@@ -15085,7 +15085,7 @@ void mqMorphoDigCore::groupSelectedActors()
 					ObjNormals->ComputePointNormalsOn();
 					ObjNormals->ComputeCellNormalsOn();
 					ObjNormals->AutoOrientNormalsOn();
-					ObjNormals->ConsistencyOn();
+					ObjNormals->ConsistencyOff();
 					cout << "Group 4bis5" << endl;
 					ObjNormals->Update();
 
@@ -15259,7 +15259,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 						ObjNormals->ComputePointNormalsOn();
 						ObjNormals->ComputeCellNormalsOn();
 						ObjNormals->AutoOrientNormalsOff();
-						ObjNormals->ConsistencyOn();
+						ObjNormals->ConsistencyOff();
 						cout << "update normals " << endl;
 						ObjNormals->Update();
 						mergedObjects->AddInputData(ObjNormals->GetOutput());
@@ -15299,7 +15299,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 				ObjNormals->ComputePointNormalsOn();
 				ObjNormals->ComputeCellNormalsOn();
 				ObjNormals->AutoOrientNormalsOff();
-				ObjNormals->ConsistencyOn();
+				ObjNormals->ConsistencyOff();
 				ObjNormals->Update();
 				mergedObjects->AddInputData(ObjNormals->GetOutput());
 		}
@@ -15875,7 +15875,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	ObjNormals->ComputePointNormalsOn();
 	ObjNormals->ComputeCellNormalsOn();
 	//ObjNormals->AutoOrientNormalsOff();
-	ObjNormals->ConsistencyOn();
+	ObjNormals->ConsistencyOff();
 
 	ObjNormals->Update();
 
@@ -17579,6 +17579,47 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfActor(vtkSmartPointer<vtkMDActo
 	int exists = 0;
 	return this->mui_ArrayList;
 }
+
+
+int mqMorphoDigCore::GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb)
+{
+	ExistingArrays *MyList = this->Getmui_ArraysOfSelectedObjects();
+	QString rgb = QString("RGB");
+	int cpt = 0;
+	if (exclude_rgb==0)
+	{
+		return MyList->Stack.size();
+	}
+	else
+	{
+		for (int i = 0; i < MyList->Stack.size(); i++)
+		{
+			//if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
+			// {
+
+
+			if (MyList->Stack.at(i).Name != rgb)
+			{
+				cpt++;
+			}
+			else
+			{
+				if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
+				{
+					//rare case: a Scalar or Tag array named RGB
+					cpt++;
+				}
+			}
+
+			// }
+
+
+		}
+	}
+	return cpt;
+
+}
+
 ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfSelectedObjects(int onlyfirst)
 {
 	

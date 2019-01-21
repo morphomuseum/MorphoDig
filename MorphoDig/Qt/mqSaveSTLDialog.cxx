@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QRadioButton>
 #include <QCheckBox>
+
 #include <QHeaderView>
 
 
@@ -89,6 +90,7 @@ void mqSaveSTLDialog::slotSaveSTLFile()
 	std::vector<std::string> mscalarsToBeRemoved;
 	
 	int RGBopt = 0;
+	
 	mqMorphoDigCore::instance()->SaveSurfaceFile(this->m_fileName, write_type, position_mode, file_type, mscalarsToBeRemoved,RGBopt, save_norms);
 
 }

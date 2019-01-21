@@ -40,6 +40,18 @@ void mqSaveSTLDialogReaction::onTriggered()
 			if (ret == QMessageBox::Cancel) { return; }
 
 		}
+		int cpt = mqMorphoDigCore::instance()->GetNumerOfNonRGBArraysOfSelectedObjects();
+		if (cpt > 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Warning: the arrays contained in the selected surfaces (scalars, tags, and color arrays) can not be saved in STL files. Continue?");
+			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Save);
+			int ret = msgBox.exec();
+			if (ret == QMessageBox::Cancel) { return; }
+
+		}
+
 		cout << "Save STL Dialog Triggered!" << endl;
 		QString fileName;
 		if (num_selected_meshes == 1)

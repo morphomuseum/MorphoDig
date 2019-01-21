@@ -40,6 +40,19 @@ void mqSavePLYDialogReaction::onTriggered()
 			if (ret == QMessageBox::Cancel) { return; }
 
 		}
+
+		int cpt = mqMorphoDigCore::instance()->GetNumerOfNonRGBArraysOfSelectedObjects(1);
+		if (cpt > 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Warning: the arrays contained in selected surfaces (scalars, tags, and color arrays except the \"RGB\" one) can not be saved in PLY files. Continue?");
+			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Save);
+			int ret = msgBox.exec();
+			if (ret == QMessageBox::Cancel) { return; }
+
+		}
+
 		cout << "Save PLY Dialog Triggered!" << endl;
 		QString fileName;
 		if (num_selected_meshes == 1)

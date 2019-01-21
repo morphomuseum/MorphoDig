@@ -61,8 +61,8 @@ mqSaveNTWDialog::mqSaveNTWDialog(QWidget* Parent)
   // Should connect...
   
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveNTWFile()));
- connect(this->Ui->PLY, SIGNAL(clicked()), this, SLOT(slotPLYWarning));
- connect(this->Ui->STL, SIGNAL(clicked()), this, SLOT(slotSTLWarning));
+ connect(this->Ui->PLY, SIGNAL(clicked()), this, SLOT(slotPLYWarning()));
+ connect(this->Ui->STL, SIGNAL(clicked()), this, SLOT(slotSTLWarning()));
 }
 
 
@@ -79,18 +79,29 @@ mqSaveNTWDialog::~mqSaveNTWDialog()
 
 void mqSaveNTWDialog::slotPLYWarning()
 {
-	QMessageBox msgBox;
-	msgBox.setText("Warning: existing arrays arrays (scalars, tags, and color arrays except the \"RGB\" one) can not be saved in PLY files");
-	msgBox.exec();
-	return;
+	cout << "Ply warning!" << endl;
+	int cpt = mqMorphoDigCore::instance()->GetNumerOfNonRGBArraysOfSelectedObjects(1);
+	if (cpt > 0)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Warning: existing arrays arrays (scalars, tags, and color arrays except the \"RGB\" one) can not be saved in PLY files");
+		msgBox.exec();
+		return;
+	}
 }
 
 void mqSaveNTWDialog::slotSTLWarning()
 {
-	QMessageBox msgBox;
-	msgBox.setText("Warning: existing arrays arrays (scalars, tags, and colors) can not be saved in STL files");
-	msgBox.exec();
-	return;
+	cout << "Stl warning!" << endl;
+	int cpt = mqMorphoDigCore::instance()->GetNumerOfNonRGBArraysOfSelectedObjects();
+	if (cpt > 0)
+	{
+
+		QMessageBox msgBox;
+		msgBox.setText("Warning: existing arrays arrays (scalars, tags, and colors) can not be saved in STL files");
+		msgBox.exec();
+		return;
+	}
 }
 void mqSaveNTWDialog::slotSaveNTWFile()
 {

@@ -557,6 +557,7 @@ public:
 	void DeleteArray(vtkSmartPointer<vtkMDActor> actor, QString ArrayName);
 	ExistingArrays *Getmui_ArraysOfActor(vtkSmartPointer<vtkMDActor> actor);
 	ExistingArrays *Getmui_ArraysOfSelectedObjects(int onlyfirst = 0);
+	int GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb=0);
 	ExistingArrays* Getmui_ExistingArrays();
 	void Addmui_ExistingArrays(QString Array, int dataType, int numComp, int toglobalList = 1);
 
