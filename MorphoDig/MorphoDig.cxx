@@ -440,6 +440,21 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	double defaultFlagColor[3];
 	double defaultBackGroundColor[3];
 	double defaultBackGroundColor2[3];
+	int defaultAmbient;
+	int defaultDiffuse;
+	int defaultSpecular;
+	double defaultSpecularPower;
+	
+	defaultAmbient = this->MorphoDigCore->Getmui_DefaultAmbient();
+	defaultDiffuse = this->MorphoDigCore->Getmui_DefaultDiffuse();
+	defaultSpecular = this->MorphoDigCore->Getmui_DefaultSpecular();
+	defaultSpecularPower = this->MorphoDigCore->Getmui_DefaultSpecularPower();
+	
+	this->MorphoDigCore->Setmui_Ambient(settings.value("Ambient",defaultAmbient).toInt());
+	
+	this->MorphoDigCore->Setmui_Diffuse(settings.value("Diffuse", defaultDiffuse).toInt());
+	this->MorphoDigCore->Setmui_Specular(settings.value("Specular", defaultSpecular).toInt());
+	this->MorphoDigCore->Setmui_SpecularPower(settings.value("SpecularPower", defaultSpecularPower).toDouble());
 
 	this->MorphoDigCore->Getmui_DefaultMeshColor(defaultMeshColor);
 	this->MorphoDigCore->Getmui_DefaultFlagColor(defaultFlagColor);
@@ -1276,6 +1291,11 @@ void MorphoDig::saveSettings()
 	settings.endGroup();	
 
 	settings.beginGroup("color_settings");
+	settings.setValue("Ambient", this->MorphoDigCore->Getmui_Ambient());
+	settings.setValue("Diffuse", this->MorphoDigCore->Getmui_Diffuse());
+	settings.setValue("Specular", this->MorphoDigCore->Getmui_Specular());
+	settings.setValue("SpecularPower", this->MorphoDigCore->Getmui_SpecularPower());
+
 	settings.setValue("BackGroundRed", this->MorphoDigCore->Getmui_BackGroundColor()[0]);
 	settings.setValue("BackGroundGreen", this->MorphoDigCore->Getmui_BackGroundColor()[1]);
 	settings.setValue("BackGroundBlue", this->MorphoDigCore->Getmui_BackGroundColor()[2]);

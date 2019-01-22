@@ -117,7 +117,13 @@ public:
 	vtkSmartPointer<vtkFloatArray> GetCellNormals();
 	vtkSmartPointer<vtkFloatArray> pointNormals;
 	vtkSmartPointer<vtkFloatArray> cellNormals;
-
+	void SetColorAmbient(double ambient);
+	void SetColorSpecular(double specular);
+	void SetColorSpecularPower(double specularPower);
+	void SetColorDiffuse(double diffuse);
+	void SetColorProperties(double ambient, double diffuse, double specular, double specularPower);
+	void SetColorProperties(int ambient, int diffuse, int specular, double specularPower);
+	
 protected:
 	vtkMDActor();
 	~vtkMDActor();

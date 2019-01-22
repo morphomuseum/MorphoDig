@@ -70,7 +70,8 @@ public:
 	vtkGetMacro(Changed, int);
 	vtkBooleanMacro(Changed, int);
 	void PrintSelf(ostream& os, vtkIndent indent);
-	
+	void UpdateColorProperties(int ambient, int diffuse, int specular, double specularPower);
+
 	void ApplyProperties(vtkProperty *p);
 	virtual vtkIdType GetNumberOfSelectedActors();
 	void GetCenterOfMass(double center[3]);

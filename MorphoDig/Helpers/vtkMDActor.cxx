@@ -79,6 +79,38 @@ vtkSmartPointer<vtkFloatArray> vtkMDActor::GetPointNormals()
 {
 	return this->pointNormals;
 }
+
+void vtkMDActor::SetColorAmbient(double ambient)
+{
+	this->GetProperty()->SetAmbient(ambient);
+}
+
+void vtkMDActor::SetColorSpecular(double specular)
+{
+	this->GetProperty()->SetSpecular(specular);
+}
+void vtkMDActor::SetColorDiffuse(double diffuse)
+{
+	this->GetProperty()->SetDiffuse(diffuse);
+}
+void  vtkMDActor::SetColorSpecularPower(double specularPower)
+{
+	this->GetProperty()->SetSpecularPower(specularPower);
+}
+void vtkMDActor::SetColorProperties(int ambient, int diffuse, int specular, double specularPower)
+{
+	double mAmbient = (double)ambient / 100;
+	double mDiffuse = (double)diffuse / 100;
+	double mSpecular = (double)specular / 100;	
+	this->SetColorProperties(mAmbient, mDiffuse, mSpecular, specularPower);
+}
+void vtkMDActor::SetColorProperties(double ambient, double diffuse, double specular, double specularPower)
+{
+	this->SetColorDiffuse(diffuse);
+	this->SetColorSpecular(specular);
+	this->SetColorSpecularPower(specularPower);
+	this->SetColorAmbient(ambient);
+}
 void vtkMDActor::SetDisplayMode(int mode)
 {
 	vtkPolyData* mPD= vtkPolyData::SafeDownCast(this->GetMapper()->GetInput());
@@ -103,82 +135,39 @@ void vtkMDActor::SetDisplayMode(int mode)
 		mcellNormals = vtkFloatArray::SafeDownCast(ObjNormals->GetOutput()->GetCellData()->GetNormals());
 		this->pointNormals = mpointNormals;
 		this->cellNormals = mcellNormals;
-		//mPD->GetPointData()->SetNormals(this->pointNormals);
-		//mPD->GetCellData()->SetNormals(this->cellNormals);
+
+		// 2 below lines were //
+		mPD->GetPointData()->SetNormals(this->pointNormals);
+		mPD->GetCellData()->SetNormals(this->cellNormals);
 
 	}
+
 	if (mode == 0 || mode == 1)
 	{
+		this->GetProperty()->SetRepresentationToSurface();
 		if (mPD != NULL)
 		{
 			if (mode == 0)
 			{
 				
-				//mPD->GetCellData()->RemoveArray("Normals");
-				//mPD->GetPointData()->SetNormals(this->pointNormals);
 				mPD->GetCellData()->SetNormals(this->cellNormals);
-				//cout << "Remove point normals" << endl;
-				mPD->GetPointData()->RemoveArray("Normals");
-				if (this->cellNormals!=nullptr)
-				{
-
-					//cout << "There are here " << this->cellNormals->GetNumberOfTuples()
-					//	<< "  Cells in cellNormals" << endl;
-				}
-				else
-				{
-					//cout << "this->cellNormals  is null " << endl;
-				}
+				//mPD->GetPointData()->RemoveArray("Normals");
+				cout << "Try to interpolate to flat..." << endl;
+				this->GetProperty()->SetInterpolationToFlat();
 				
 			}
 			else
 			{
-				//cout <<"Try mode 1 point normals" << endl;
-				//cout << "Remove cell normals" << endl;
-				mPD->GetCellData()->RemoveArray("Normals");
-				mPD->GetPointData()->SetNormals(this->pointNormals);
-				if (this->pointNormals != nullptr)
-				{
-
-					//cout << "There are here " << this->pointNormals->GetNumberOfTuples()
-					//	<< " Float point normals inside pointNormals" << endl;
-				}
-				else
-				{
-					//cout << "this->pointNormals  is null " << endl;
-				}
-
-
-
+				//mPD->GetCellData()->RemoveArray("Normals");
+				mPD->GetPointData()->SetNormals(this->pointNormals);			
+				cout << "Try to interpolate to phong..." << endl;
+				this->GetProperty()->SetInterpolationToPhong();
 			}
-			//cout << "Now what we REALLY map:" << endl;
-			vtkFloatArray* norms = vtkFloatArray::SafeDownCast(mPD->GetCellData()->GetNormals());
-			if (norms)
-			{
-
-				//cout << "There are here " << norms->GetNumberOfTuples()
-				//	<< " Float Cell normals" << endl;
-			}
-			else
-			{
-			//	cout << "cell norms  is null " << endl;
-			}
-
-			norms = vtkFloatArray::SafeDownCast(mPD->GetPointData()->GetNormals());
-			if (norms)
-			{
-
-				//cout << "There are here " << norms->GetNumberOfTuples()
-				//	<< " Float point normals" << endl;
-			}
-			else
-			{
-				//cout << "point norms  is null " << endl;
-				
-			}
+			
 
 		}
-		this->GetProperty()->SetRepresentationToSurface();
+		
+		
 
 	}
 	else if (mode == 2)

@@ -124,9 +124,18 @@ mqMorphoDigCore* mqMorphoDigCore::instance()
 
 mqMorphoDigCore::mqMorphoDigCore()
 {
-
-
 	mqMorphoDigCore::Instance = this;
+	/*VTK_CREATE(vtkMDActor, newactor);
+	double defaultAmbient = newactor->GetProperty()->GetAmbient();
+	double defaultDiffuse = newactor->GetProperty()->GetDiffuse();
+	double defaultSpecular = newactor->GetProperty()->GetSpecular();
+	double defaultSpecularPower = newactor->GetProperty()->GetSpecularPower();
+	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << endl;*/
+	this->mui_DefaultSpecularPower = this->mui_SpecularPower = 1;
+	this->mui_DefaultSpecular = this->mui_Specular= 0;
+	this->mui_DefaultAmbient = this->mui_Ambient= 0;
+	this->mui_DefaultDiffuse = this->mui_Diffuse = 100;
+
 	this->mui_OpenGL_minor_version = 0;
 	this->mui_OpenGL_major_version = 0;
 	this->mui_DisplayMode = 1; // point normals by defaults
@@ -906,7 +915,8 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -1115,7 +1125,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -4260,7 +4270,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			actor->SetMapper(mapper);
 			actor->SetSelected(1);
 			actor->SetName(newname);
-			
+			actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			actor->SetDisplayMode(this->mui_DisplayMode);
 			//actor->GetProperty()->SetRepresentationToPoints();
 			this->getActorCollection()->AddItem(actor);
@@ -5689,6 +5699,59 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 	}
 	file.close();
 	return 1;
+}
+
+int mqMorphoDigCore::Getmui_Specular() {
+	return this->mui_Specular;
+}
+double mqMorphoDigCore::Getmui_SpecularPower(){
+	return this->mui_SpecularPower;
+}
+int mqMorphoDigCore::Getmui_DefaultSpecular(){
+	return this->mui_DefaultSpecular;
+}
+double mqMorphoDigCore::Getmui_DefaultSpecularPower(){
+	return this->mui_DefaultSpecularPower;
+}
+void mqMorphoDigCore::Setmui_Specular(int specular){
+	this->mui_Specular = specular;
+	this->UpdateColorProperties();
+}
+void mqMorphoDigCore::Setmui_SpecularPower(double specularPower){
+	this->mui_SpecularPower = specularPower;
+	this->UpdateColorProperties();
+}
+int mqMorphoDigCore::Getmui_Diffuse(){
+	return this->mui_Diffuse;
+}
+int mqMorphoDigCore::Getmui_DefaultDiffuse(){
+	return this->mui_DefaultDiffuse;
+}
+void mqMorphoDigCore::Setmui_Diffuse(int diffuse){
+
+	this->mui_Diffuse = diffuse;
+	this->UpdateColorProperties();
+}
+int mqMorphoDigCore::Getmui_Ambient(){
+	return this->mui_Ambient;
+
+}
+void mqMorphoDigCore::Setmui_Ambient(int ambient){
+	this->mui_Ambient = ambient;
+	this->UpdateColorProperties();
+}
+int mqMorphoDigCore::Getmui_DefaultAmbient(){
+
+	return this->mui_DefaultAmbient;
+}
+void mqMorphoDigCore::UpdateColorProperties()
+{
+	if (this->ActorCollection && this->ActorCollection->GetNumberOfItems()>0)
+	{
+		this->ActorCollection->UpdateColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+		this->Render();
+	}
+
 }
 
 void mqMorphoDigCore::SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName)
@@ -7449,7 +7512,7 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 		actor->SetMapper(mapper);
 		actor->SetSelected(0);
 		actor->SetName(newname);
-
+		actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 		actor->SetDisplayMode(this->mui_DisplayMode);
 
 		vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -7557,7 +7620,7 @@ void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double size
 		actor->SetMapper(mapper);
 		actor->SetSelected(0);
 		actor->SetName(newname);
-
+		actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 		actor->SetDisplayMode(this->mui_DisplayMode);
 
 		vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -7676,7 +7739,7 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, d
 		  actor->SetMapper(mapper);
 		  actor->SetSelected(0);
 		  actor->SetName(newname);
-
+		  actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 		  actor->SetDisplayMode(this->mui_DisplayMode);
 		 
 		  vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -8434,7 +8497,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 			{
 				cout << "try to get next actor from newcoll:" << i << endl;
 				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				myActor->SetDisplayMode(this->mui_DisplayMode);
 				this->getActorCollection()->AddItem(myActor);
 				emit this->actorsMightHaveChanged();
@@ -8698,7 +8761,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 			{
 				cout << "try to get next actor from newcoll:" << i << endl;
 				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				myActor->SetDisplayMode(this->mui_DisplayMode);
 				this->getActorCollection()->AddItem(myActor);
 				emit this->actorsMightHaveChanged();
@@ -9304,7 +9367,7 @@ void mqMorphoDigCore::addMirrorXZ()
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -9646,7 +9709,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -9809,7 +9872,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -10059,7 +10122,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -10233,7 +10296,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -10388,7 +10451,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -10631,7 +10694,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -12825,6 +12888,7 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -13516,6 +13580,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -13678,6 +13743,7 @@ void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *i
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -14704,7 +14770,7 @@ void mqMorphoDigCore::addKeepLargest()
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -14874,7 +14940,7 @@ void mqMorphoDigCore::addInvert()
 		{
 			cout << "try to get next actor from newcoll:" << i << endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
-
+			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
 			this->getActorCollection()->AddItem(myActor);
 			emit this->actorsMightHaveChanged();
@@ -15158,6 +15224,7 @@ void mqMorphoDigCore::groupSelectedActors()
 			newactor->SetName(actorName);
 			cout << "Group 7" << endl;
 			cout << "try to add new actor=" << endl;
+			newactor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			newactor->SetDisplayMode(this->mui_DisplayMode);
 			cout << "Group 7 display passed" << endl;
 			this->getActorCollection()->AddItem(newactor);

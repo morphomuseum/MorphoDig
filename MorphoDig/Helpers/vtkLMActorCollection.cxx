@@ -39,6 +39,8 @@ vtkLMActorCollection::~vtkLMActorCollection()
 	
 
 }
+
+
 void vtkLMActorCollection::LandmarksMoveUp()
 {
 // mode = 0 : user landmark move up (more than one can be selected

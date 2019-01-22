@@ -77,6 +77,20 @@ mqColorDialog::mqColorDialog(QWidget* Parent)
   connect(this->Ui->backgroundColorButton2, SIGNAL(colorChosen()), this, SLOT(slotBackGroundColorChanged2()));
 
   connect(this->Ui->reinitcolorsButton, SIGNAL(clicked()), this, SLOT(slotReinitializeColors()));
+
+  this->Ui->ambient->setValue(mqMorphoDigCore::instance()->Getmui_Ambient());
+  this->Ui->diffuse->setValue(mqMorphoDigCore::instance()->Getmui_Diffuse());
+  this->Ui->specular->setValue(mqMorphoDigCore::instance()->Getmui_Specular());
+  this->Ui->specularPower->setValue(mqMorphoDigCore::instance()->Getmui_SpecularPower());
+
+  connect(this->Ui->ambient, SIGNAL(valueChanged(int)), this, SLOT(slotAmbient(int)));
+  connect(this->Ui->diffuse, SIGNAL(valueChanged(int)), this, SLOT(slotDiffuse(int)));
+  connect(this->Ui->specular, SIGNAL(valueChanged(int)), this, SLOT(slotSpecular(int)));
+  connect(this->Ui->specularPower, SIGNAL(valueChanged(double)), this, SLOT(slotSpecularPower(double)));
+
+
+
+
   /*this->Ui->VersionLabel->setText(
 	  QString("<html><b>Version: <i>%1</i></b></html>")
 	  .arg(QString(MORPHODIG_VERSION) + " " + QString(ENVIRONMENT) + "-bit"));*/
@@ -111,6 +125,19 @@ mqColorDialog::~mqColorDialog()
 	mqMorphoDigCore::instance()->Setmui_BackGroundColor2(bgcolor2);
 	
   delete this->Ui;
+}
+
+void mqColorDialog::slotAmbient(int ambient){
+	mqMorphoDigCore::instance()->Setmui_Ambient(ambient);
+}
+void mqColorDialog::slotDiffuse(int diffuse){
+	mqMorphoDigCore::instance()->Setmui_Diffuse(diffuse);
+}
+void mqColorDialog::slotSpecular(int specular){
+	mqMorphoDigCore::instance()->Setmui_Specular(specular);
+}
+void mqColorDialog::slotSpecularPower(double specularPower){
+	mqMorphoDigCore::instance()->Setmui_SpecularPower(specularPower);
 }
 
 void mqColorDialog::slotMeshColorChanged()
@@ -150,6 +177,15 @@ void mqColorDialog::slotReinitializeColors()
 	double defaultBackGroundColor[3];
 	double defaultBackGroundColor2[3];
 	
+	int defaultAmbient;
+	int defaultDiffuse;
+	int defaultSpecular;
+	double defaultSpecularPower;
+
+	defaultAmbient = mqMorphoDigCore::instance()->Getmui_DefaultAmbient();
+	defaultDiffuse = mqMorphoDigCore::instance()->Getmui_DefaultDiffuse();
+	defaultSpecular = mqMorphoDigCore::instance()->Getmui_DefaultSpecular();
+	defaultSpecularPower = mqMorphoDigCore::instance()->Getmui_DefaultSpecularPower();
 	mqMorphoDigCore::instance()->Getmui_DefaultMeshColor(defaultMeshColor);
 	mqMorphoDigCore::instance()->Getmui_DefaultBackGroundColor(defaultBackGroundColor);
 	mqMorphoDigCore::instance()->Getmui_DefaultBackGroundColor2(defaultBackGroundColor2);
@@ -157,6 +193,11 @@ void mqColorDialog::slotReinitializeColors()
 	mqMorphoDigCore::instance()->Setmui_MeshColor(defaultMeshColor);
 	mqMorphoDigCore::instance()->Setmui_BackGroundColor(defaultBackGroundColor);
 	mqMorphoDigCore::instance()->Setmui_BackGroundColor2(defaultBackGroundColor2);
+
+	mqMorphoDigCore::instance()->Setmui_Ambient(defaultAmbient);
+	mqMorphoDigCore::instance()->Setmui_Diffuse(defaultDiffuse);
+	mqMorphoDigCore::instance()->Setmui_Specular(defaultSpecular);
+	mqMorphoDigCore::instance()->Setmui_SpecularPower(defaultSpecularPower);
 
 	myDefaultMeshColor.setRedF(defaultMeshColor[0]);
 	myDefaultMeshColor.setGreenF(defaultMeshColor[1]);
@@ -175,6 +216,10 @@ void mqColorDialog::slotReinitializeColors()
 	this->Ui->meshColorButton->setChosenColor(myDefaultMeshColor);	
 	this->Ui->backgroundColorButton->setChosenColor(myDefaultBGColor);	
 	this->Ui->backgroundColorButton2->setChosenColor(myDefaultBGColor2);
+	this->Ui->ambient->setValue(defaultAmbient);
+	this->Ui->diffuse->setValue(defaultDiffuse);
+	this->Ui->specular->setValue(defaultSpecular);
+	this->Ui->specularPower->setValue(defaultSpecularPower);
 	mqMorphoDigCore::instance()->Render();
 	
 }

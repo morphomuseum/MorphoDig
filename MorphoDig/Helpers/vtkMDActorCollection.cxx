@@ -151,6 +151,26 @@ vtkMDActor* vtkMDActorCollection::GetFirstSelectedActor()
 
 	return NULL;
 }
+void vtkMDActorCollection::UpdateColorProperties(int ambient, int diffuse, int specular, double specularPower)
+{
+
+	double mAmbient = (double)ambient / 100;
+	double mDiffuse = (double)diffuse / 100;
+	double mSpecular = (double)specular / 100;
+	this->InitTraversal();
+	for (vtkIdType i = 0; i < this->GetNumberOfItems(); i++)
+	{
+
+		vtkMDActor *act = vtkMDActor::SafeDownCast(this->GetNextActor());
+		if (act != NULL) {
+			act->SetColorProperties(mAmbient, mDiffuse, mSpecular, specularPower);			
+
+		}
+
+	}
+
+
+}
 //----------------------------------------------------------------------------
 void vtkMDActorCollection::SetDisplayMode(int mode)
 {
