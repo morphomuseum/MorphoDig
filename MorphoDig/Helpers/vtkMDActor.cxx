@@ -150,16 +150,22 @@ void vtkMDActor::SetDisplayMode(int mode)
 			if (mode == 0)
 			{
 				
-				mPD->GetCellData()->SetNormals(this->cellNormals);
+				//mPD->GetCellData()->SetNormals(this->cellNormals);
 				//mPD->GetPointData()->RemoveArray("Normals");
 				cout << "Try to interpolate to flat..." << endl;
+				//@@ ??? Dirty hack otherwise morphodig fails....
+				this->GetProperty()->SetRepresentationToWireframe();
+				mqMorphoDigCore::instance()->Render();			
+				this->GetProperty()->SetRepresentationToSurface();
+				//@@ end dirty hack
+
 				this->GetProperty()->SetInterpolationToFlat();
 				
 			}
 			else
 			{
 				//mPD->GetCellData()->RemoveArray("Normals");
-				mPD->GetPointData()->SetNormals(this->pointNormals);			
+				//mPD->GetPointData()->SetNormals(this->pointNormals);			
 				cout << "Try to interpolate to phong..." << endl;
 				this->GetProperty()->SetInterpolationToPhong();
 			}
