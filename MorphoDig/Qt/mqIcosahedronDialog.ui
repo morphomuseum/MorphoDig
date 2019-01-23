@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Create 3D printing conective material</string>
+   <string>Create icosahedrons / spheres</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -464,7 +464,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Create icosahedons or spheres (connective material for 3D printing)</string>
+    <string>Create icosahedons or spheres</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
