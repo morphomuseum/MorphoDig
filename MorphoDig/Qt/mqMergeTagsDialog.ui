@@ -426,7 +426,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Merge 2 tags</string>
+   <string>Merge 2 tag regions</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -464,7 +464,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Merge tags</string>
+    <string>Merge tag regions</string>
    </property>
    <widget class="QComboBox" name="sourceTags">
     <property name="geometry">
@@ -486,7 +486,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Source Tags:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Source tag region:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QComboBox" name="targetTags">
@@ -509,7 +509,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Target Tags:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Target tag region:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>

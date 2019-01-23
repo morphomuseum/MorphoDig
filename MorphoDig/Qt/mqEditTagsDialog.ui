@@ -759,7 +759,7 @@
      </rect>
     </property>
     <property name="toolTip">
-     <string>merge 2 tags</string>
+     <string>merge 2 tag regions</string>
     </property>
     <property name="text">
      <string>...</string>
