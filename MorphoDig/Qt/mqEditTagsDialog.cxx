@@ -113,7 +113,7 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(mqMorphoDigCore::instance(), SIGNAL(pencilSizeChanged(int)), this, SLOT(slotRefreshPencilSearchSize(int)));
 	connect(mqMorphoDigCore::instance(), SIGNAL(tagMapsChanged()), this, SLOT(slotRefreshTagMaps())); // when loading a new .tag file or when deleting tag maps
 	connect(mqMorphoDigCore::instance(), SIGNAL(existingArraysChanged()), this, SLOT(slotRefreshComboTags()));
-	connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboTags()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(activeArrayChanged()), this, SLOT(slotRefreshComboTags()));
 	connect(this->Ui->comboActiveTags, SIGNAL(activated(int)), this, SLOT(slotActiveTagsChanged(int)));
 	connect(this->Ui->comboTagMaps, SIGNAL(activated(int)), this, SLOT(slotActiveTagMapChanged(int)));
 	connect(this->Ui->pushRemoveTags, SIGNAL(pressed()), this, SLOT(slotRemoveTags()));
@@ -401,7 +401,7 @@ void mqEditTagsDialog::RefreshTagMapTable()
 	this->Ui->tableWidget->clear();
 	this->Ui->tableWidget->setColumnCount(4);
 	QTableWidgetItem *header1 = new QTableWidgetItem();
-	header1->setText("Tag");
+	header1->setText("Tag region");
 	this->Ui->tableWidget->setHorizontalHeaderItem(0, header1);
 	QTableWidgetItem *header2 = new QTableWidgetItem();
 	header2->setText("Active");

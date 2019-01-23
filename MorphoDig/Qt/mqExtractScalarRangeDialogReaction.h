@@ -50,6 +50,15 @@ protected:
 		  msgBox.exec();
 		  return;
 	  }
+
+	  vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	  if (num_selected_meshes == 0) {
+		  QMessageBox msgBox;
+		  msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		  msgBox.exec();
+		  return;
+	  }
+
 	  mqExtractScalarRangeDialogReaction::showExtractScalarRangeDialog();
 	 // mqExtractScalarRangeDialogReaction::showExtractScalarRangeDialog(this->esr_dialog); 
   }

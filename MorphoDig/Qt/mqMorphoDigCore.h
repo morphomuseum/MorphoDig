@@ -476,8 +476,8 @@ public:
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
 	void SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName);
-	void SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId);
-	void SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray);
+	void SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray, int numVer, vtkIdType TagId);
+	void SaveSurfaceTagSummary(QString fileName, int useTags, int numVer, QString TagArray);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray);
 	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> arraysToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);

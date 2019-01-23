@@ -6983,7 +6983,7 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 
 }
 //SaveSurfaceTagSummary
-void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId)
+void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray, int numVer, vtkIdType TagId)
 {
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
@@ -7056,13 +7056,27 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 						int ok = 1;
 						if (pointIdList->GetNumberOfIds() == 3)//only triangles are investigated here
 						{
-							if (currentTags != NULL && currentTags->GetTuple1(pointIdList->GetId(0)) == TagId								
+
+							/*if (currentTags != NULL && currentTags->GetTuple1(pointIdList->GetId(0)) == TagId								
 								&& currentTags->GetTuple1(pointIdList->GetId(1)) == TagId
 								&& currentTags->GetTuple1(pointIdList->GetId(2)) == TagId
 								)
 							{
 								// the 3 points of this cell are tagged the same way!
 								cellIdList->InsertNextId(j);
+							}*/
+							if (currentTags != NULL)
+							{
+								int cnumVer = 0;
+								if (currentTags->GetTuple1(pointIdList->GetId(0)) == TagId) { cnumVer++; }
+								if (currentTags->GetTuple1(pointIdList->GetId(1)) == TagId) { cnumVer++; }
+								if (currentTags->GetTuple1(pointIdList->GetId(2)) == TagId) { cnumVer++; }
+									
+								// cnumVer points of this cell are tagged with TagId! Is it enough to consider this cell as belonging to the cell region ? 
+								if (cnumVer >= numVer)
+								{
+									cellIdList->InsertNextId(j);
+								}
 							}
 						}
 
@@ -7126,7 +7140,7 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 
 
 }
-void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QString TagArray)
+void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, int numVer, QString TagArray)
 {
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -7135,7 +7149,7 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 		stream << "Name	Area	Volume	Vertex_nr	Triangle_nr	Structure" << endl;
 		cout << "First Summary Done" << endl;
 		file.close();
-		this->SaveSurfaceTagSummary(fileName, 0, TagArray, 0);
+		this->SaveSurfaceTagSummary(fileName, 0, TagArray, numVer, 0);
 		//if useTags =1, search Max tagged value in all opened objects
 		if (useTags == 1 && TagArray.length() > 0)
 		{
@@ -7150,7 +7164,7 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 				for (vtkIdType i = 0; i <= maxTagId; i++)
 				{
 					cout << "SaveActiveScalarSummary(" << i << ")" << endl;
-					this->SaveSurfaceTagSummary(fileName, 1, TagArray, i);
+					this->SaveSurfaceTagSummary(fileName, 1, TagArray, numVer, i);
 				}
 			}
 
@@ -19056,6 +19070,13 @@ void mqMorphoDigCore::slotEditGridInfos()
 }
 void mqMorphoDigCore::slotExtractActiveTag()
 {
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
 	this->Extract_Tag_Range(this->Getmui_ActiveTag(), this->Getmui_ActiveTag());
 }
 void mqMorphoDigCore::slotDecomposeTag()

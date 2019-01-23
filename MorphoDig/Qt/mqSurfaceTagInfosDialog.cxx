@@ -61,6 +61,9 @@ mqSurfaceTagInfosDialog::mqSurfaceTagInfosDialog(QWidget* Parent)
 	
 	this->PopulateComboTags();
 	this->Ui->comboTags->setDisabled(true);
+	this->Ui->tag1->setDisabled(true);
+	this->Ui->tag2->setDisabled(true);
+	this->Ui->tag3->setDisabled(true);
 	if (this->Ui->comboTags->count()==0)
 	{ 
 		this->Ui->includeTags->setDisabled(true);
@@ -111,10 +114,18 @@ void mqSurfaceTagInfosDialog::slotIncludeTags()
 	if (this->Ui->includeTags->isChecked())
 	{
 		this->Ui->comboTags->setDisabled(true);
+		this->Ui->tag1->setDisabled(true);
+		this->Ui->tag2->setDisabled(true);
+		this->Ui->tag3->setDisabled(true);
+
 	}
 	else
 	{
 		this->Ui->comboTags->setDisabled(false);
+		this->Ui->tag1->setDisabled(false);
+		this->Ui->tag2->setDisabled(false);
+		this->Ui->tag3->setDisabled(false);
+
 	}
 }
 void mqSurfaceTagInfosDialog::editInfos()
@@ -158,8 +169,11 @@ void mqSurfaceTagInfosDialog::editInfos()
 		{
 			fileName.append(".txt");
 		}
-
-		mqMorphoDigCore::instance()->SaveSurfaceTagSummary(fileName, this->Ui->includeTags->isChecked(), this->Ui->comboTags->currentText());
+		int numVer = 3;
+		if (this->Ui->tag3->isChecked()) { numVer = 3; }
+		if (this->Ui->tag2->isChecked()) { numVer = 2; }
+		if (this->Ui->tag1->isChecked()) { numVer = 1; }
+		mqMorphoDigCore::instance()->SaveSurfaceTagSummary(fileName, this->Ui->includeTags->isChecked(), numVer, this->Ui->comboTags->currentText());
 	}
 	else
 	{

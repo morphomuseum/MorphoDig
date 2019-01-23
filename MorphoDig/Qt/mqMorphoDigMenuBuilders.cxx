@@ -277,12 +277,12 @@ void mqMorphoDigMenuBuilders::buildTagsMenu(QMenu& menu)
 	QAction::connect(CreateNewTagArray, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArray()));
 	QAction *CreateNewTagArrayConnectivity = menu.addAction("Create new tag array based on connectivity for each selected surface");
 	QAction::connect(CreateNewTagArrayConnectivity, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateTagArrayConnectivity()));
-	QAction *extractActiveTag = menu.addAction("Extract active tag corresponding region");
+	QAction *extractActiveTag = menu.addAction("Extract active tag region for each selected surface");
 	QAction::connect(extractActiveTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotExtractActiveTag()));
 	
-	new mqExtractTagRangeDialogReaction(menu.addAction("Extract tag range for each selected surface") << mqSetName("actionExtractTagRange"));
+	new mqExtractTagRangeDialogReaction(menu.addAction("Extract tag region range for each selected surface") << mqSetName("actionExtractTagRange"));
 	//QAction::connect(extractActiveTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotExtractActiveTag()));
-	QAction *decomposeTag = menu.addAction("Extract each tagged region as a new object, for all regions of all selected surfaces");
+	QAction *decomposeTag = menu.addAction("Extract each tag region as a new object, for all tag regions of all selected surfaces");
 	QAction::connect(decomposeTag, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotDecomposeTag()));
 	
 }
@@ -322,7 +322,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *ConvexHULL = submenuWrapping->addAction("Create a convex hull for each selected surface");
 
 	new mqShrinkWrapDialogReaction(submenuWrapping->addAction("Shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionShrinkWrap"));
-	new mqShrinkWrapIterativeDialogReaction(submenuWrapping->addAction("Iterative shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionIterativeShrinkWrap"));
+	//new mqShrinkWrapIterativeDialogReaction(submenuWrapping->addAction("Iterative shrink and wrap 1 surface over a 2nd surface") << mqSetName("actionIterativeShrinkWrap"));
 
 
 	QMenu* submenuBoolean = menu.addMenu("Boolean operations");

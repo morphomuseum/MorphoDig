@@ -39,7 +39,7 @@ void mqScalarsControlsWidget::constructor()
   connect(mqMorphoDigCore::instance(), SIGNAL(existingArraysChanged()), this, SLOT(slotRefreshComboScalars()));
 
   connect(this->ui->ScalarsVisibility, SIGNAL(pressed()), this, SLOT(slotScalarVisitiliby()));
-  connect(mqMorphoDigCore::instance(), SIGNAL(activeScalarChanged()), this, SLOT(slotRefreshComboScalars()));
+  connect(mqMorphoDigCore::instance(), SIGNAL(activeArrayChanged()), this, SLOT(slotRefreshComboScalars()));
   connect(this->comboActiveScalars, SIGNAL(activated(int)), this, SLOT(slotActiveScalarChanged(int)));
 
   //@@@
