@@ -432,7 +432,7 @@ void mqMorphoDigCore::SetRubberInteractorStyle(vtkSmartPointer<vtkInteractorStyl
 }
 QString mqMorphoDigCore::GetVTKVersion() 
 {
-	QString myVersion = QString::number(VTK_MAJOR_VERSION) + "." + QString::number(VTK_MINOR_VERSION);
+	QString myVersion = QString::number(VTK_MAJOR_VERSION) + "." + QString::number(VTK_MINOR_VERSION)+ "." + QString::number(VTK_BUILD_VERSION);
 	return myVersion;
 }
 
