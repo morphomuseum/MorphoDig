@@ -229,7 +229,7 @@ void mqMorphoDigMenuBuilders::buildEditMenu(QMenu& menu)
 
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
-  new mqColorDialogReaction(menu.addAction("Edit color options") << mqSetName("actionColor"));
+  new mqColorDialogReaction(menu.addAction("Edit color and lighting options") << mqSetName("actionColor"));
   new mqGridSizeDialogReaction(menu.addAction("Edit size unit, grid spacing and scale") << mqSetName("actionGridSize"));
   new mqLandmarkDialogReaction(menu.addAction("Edit landmark and flag rendering options") << mqSetName("actionLandmark"));
   new mqOrientationLabelsDialogReaction(menu.addAction("Edit orientation labels") << mqSetName("actionOrientationLabels"));
