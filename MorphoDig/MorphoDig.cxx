@@ -859,9 +859,11 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	mqMorphoDigMenuBuilders::buildToolbars(*this);
 	mqMorphoDigMenuBuilders::buildStatusBar(*this);
 	mqMorphoDigMenuBuilders::buildProjectDocks(*projectWindow);
+	cout << "OpenGL version:" << this->MorphoDigCore->GetOpenGLVersion().toStdString() << endl;
 	cout << "About to build view Menu!" << endl;
 	mqMorphoDigMenuBuilders::buildViewMenu(*this->menuView, *this, *projectWindow);
-
+	cout << "View Menu built!" << endl;
+	
 
 	double myorigin[3];
 	myorigin[0] = 0;
@@ -934,12 +936,13 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
  //same thing !!!!
   window->GetInteractor()->SetPicker(this->AreaPicker);
   window->GetInteractor()->SetInteractorStyle(style);
-
+  cout << "Set interaction styles (normal style, lassostyle and rubberband style)" << endl;
   // mqMorphoDigCore should be aware of the 2 coexisting interactor styles (so that we can switch between them
   mqMorphoDigCore::instance()->SetNormalInteractorStyle(style);
   mqMorphoDigCore::instance()->SetLassoInteractorStyle(lassostyle);
   mqMorphoDigCore::instance()->SetRubberInteractorStyle(rubberstyle);
 
+  cout << "Bezier stuff" << endl;
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetHandles(mqMorphoDigCore::instance()->getHandleLandmarkCollection());
   mqMorphoDigCore::instance()->getBezierCurveSource()->SetNodes(mqMorphoDigCore::instance()->getNodeLandmarkCollection());
   
@@ -947,16 +950,17 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 
   mqMorphoDigCore::instance()->getBezierCurveSource()->Update();
 
-
+  cout << "Callbacks for node and handle landmarks" << endl;
   vtkSmartPointer<vtkMyNodeHandleCallBack> callback = vtkSmartPointer<vtkMyNodeHandleCallBack>::New();
   mqMorphoDigCore::instance()->getNodeLandmarkCollection()->AddObserver(vtkCommand::ModifiedEvent, callback);
   mqMorphoDigCore::instance()->getHandleLandmarkCollection()->AddObserver(vtkCommand::ModifiedEvent, callback);
 
+  cout << "Adds Bezier NH actor, selected and normals actor" << endl;
   this->MorphoDigCore->getRenderer()->AddActor(mqMorphoDigCore::instance()->getBezierNHActor());
   this->MorphoDigCore->getRenderer()->AddActor(mqMorphoDigCore::instance()->getBezierSelectedActor());
   this->MorphoDigCore->getRenderer()->AddActor(mqMorphoDigCore::instance()->getBezierActor());
 
-
+  cout << "Grid visibility, infos and orientation helper..." << endl;
   this->MorphoDigCore->SetGridVisibility();
   this->MorphoDigCore->SetGridInfos();
   this->MorphoDigCore->InitializeOrientationHelper(); // creates orientation helper...
@@ -1063,9 +1067,9 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
  
 
   //@@ end rubber band selection!
-
+  cout << "Accept Drops..." << endl;
   setAcceptDrops(true);
-  
+  cout << "OpenGL version:" << this->MorphoDigCore->GetOpenGLVersion().toStdString() << endl;
 };
 
 
