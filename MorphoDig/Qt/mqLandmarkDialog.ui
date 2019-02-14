@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>393</width>
-    <height>406</height>
+    <height>449</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,7 +432,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>370</y>
+     <y>390</y>
      <width>247</width>
      <height>25</height>
     </rect>
@@ -461,7 +461,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>30</y>
+     <y>20</y>
      <width>351</width>
      <height>221</height>
     </rect>
@@ -1000,7 +1000,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>260</y>
+     <y>250</y>
      <width>351</width>
      <height>91</height>
     </rect>
@@ -1472,6 +1472,32 @@
      <string>Size unit</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>360</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Font size:</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="fontSize">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>360</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>10</number>
+   </property>
   </widget>
  </widget>
  <customwidgets>

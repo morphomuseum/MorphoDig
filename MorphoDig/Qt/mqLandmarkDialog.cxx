@@ -94,6 +94,9 @@ mqLandmarkDialog::mqLandmarkDialog(QWidget* Parent)
   cout << "mt scale factor=" << scale_factor << endl;
   this->Ui->AdjustScaleFactor->setValue(scale_factor);
 
+  int fontSize = mqMorphoDigCore::instance()->Getmui_FontSize();
+  this->Ui->fontSize->setValue(fontSize);
+
   double landmark_rendering_size = mqMorphoDigCore::instance()->Getmui_LandmarkRenderingSize();
   //cout << "LRS=" << landmark_rendering_size<< endl;
   this->Ui->LandmarkRenderingSizeValue->setMinimum(0);
@@ -114,6 +117,7 @@ mqLandmarkDialog::mqLandmarkDialog(QWidget* Parent)
   connect(this->Ui->LandmarkRenderingSizeValue, SIGNAL(valueChanged(double)), this, SLOT(slotLandmarkRenderingSizeChanged()));
   connect(this->Ui->FlagRenderingSizeValue, SIGNAL(valueChanged(double)), this, SLOT(slotFlagRenderingSizeChanged()));
   connect(this->Ui->AdjustScaleFactor, SIGNAL(valueChanged(double)), this, SLOT(slotAdjustScaleFactorChanged()));
+  connect(this->Ui->fontSize, SIGNAL(valueChanged(int)), this, SLOT(slotFontSizeChanged()));
   connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotRender()));
 }
 
@@ -134,6 +138,13 @@ mqLandmarkDialog::~mqLandmarkDialog()
 	
   delete this->Ui;
 }
+void mqLandmarkDialog::slotFontSizeChanged()
+{
+	int fontSize = this->Ui->fontSize->value();
+	mqMorphoDigCore::instance()->Setmui_FontSize(fontSize);
+
+}
+
 void mqLandmarkDialog::slotAdjustScaleFactorChanged()
 {
 	double scale_factor = 1;

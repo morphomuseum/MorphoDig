@@ -34,6 +34,7 @@ public:
   virtual void slotFlagColorChanged();
   virtual void slotAdjustLandmarkRenderingSizeChanged();
   virtual void slotAdjustScaleFactorChanged();
+  virtual void slotFontSizeChanged();
   virtual void slotLandmarkRenderingSizeChanged();
   virtual void slotFlagRenderingSizeChanged();
   virtual void slotLandmarkBodyTypeChanged();

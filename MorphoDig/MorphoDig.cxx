@@ -456,6 +456,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->MorphoDigCore->Setmui_Specular(settings.value("Specular", defaultSpecular).toInt());
 	this->MorphoDigCore->Setmui_SpecularPower(settings.value("SpecularPower", defaultSpecularPower).toDouble());
 
+	
 	this->MorphoDigCore->Getmui_DefaultMeshColor(defaultMeshColor);
 	this->MorphoDigCore->Getmui_DefaultFlagColor(defaultFlagColor);
 	this->MorphoDigCore->Getmui_DefaultBackGroundColor(defaultBackGroundColor);
@@ -542,6 +543,11 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 			this->MorphoDigCore->Getmui_DefaultAdjustScaleFactor()
 			).toDouble()
 		);
+
+	int defaultFontSize = this->MorphoDigCore->Getmui_DefaultFontSize();
+	this->MorphoDigCore->Setmui_FontSize(settings.value("FontSize", defaultFontSize).toInt());
+
+
 	//cout << settings.value("AdjustScaleFactor",
 	//	this->MorphoDigCore->Getmui_DefaultAdjustScaleFactor()
 	//	).toDouble() << endl;
@@ -1331,7 +1337,8 @@ void MorphoDig::saveSettings()
 	
 	settings.setValue("AdjustLandmarkRenderingSize", this->MorphoDigCore->Getmui_AdjustLandmarkRenderingSize());
 	settings.setValue("AdjustScaleFactor", this->MorphoDigCore->Getmui_AdjustScaleFactor());
-	
+	settings.setValue("FontSize", this->MorphoDigCore->Getmui_FontSize());
+
 	settings.endGroup();
 	settings.beginGroup("renderer_settings");
 	settings.setValue("Anaglyph", this->MorphoDigCore->Getmui_Anaglyph());	

@@ -269,6 +269,7 @@ void vtkLMActor::CreateLMLabelText()
 	//mproperty->Set
 
 	mproperty->SetFontFamilyToArial();
+	mproperty->SetFontSize(mqMorphoDigCore::instance()->Getmui_FontSize());
 
 	this->LMLabel->SetTextProperty(mproperty);
 	this->LMLabel->SetPosition(final_pos);

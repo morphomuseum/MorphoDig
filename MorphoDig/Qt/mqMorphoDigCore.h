@@ -380,9 +380,13 @@ public:
 	double Getmui_DefaultSpecularPower();
 	void Setmui_Specular(int specular);
 	void Setmui_SpecularPower(double specularPower);
+	void Setmui_Diffuse(int diffuse);
 	int Getmui_Diffuse();
 	int Getmui_DefaultDiffuse();
-	void Setmui_Diffuse(int diffuse);
+	int Getmui_FontSize(); // LM Actors font size
+	int Getmui_DefaultFontSize(); // LM Actors font size
+	void Setmui_FontSize(int fontSize); // LM Actors font size
+	
 	int Getmui_Ambient();
 	void Setmui_Ambient(int ambient);
 	int Getmui_DefaultAmbient();
@@ -888,7 +892,8 @@ protected:
 	double mui_SpecularPower;
 	int mui_Ambient;
 	int mui_Diffuse;
-
+	int mui_FontSize;
+	int mui_DefaultFontSize;
 	int mui_DefaultSpecular;
 	double mui_DefaultSpecularPower;
 	int mui_DefaultAmbient;

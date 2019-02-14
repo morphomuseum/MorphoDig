@@ -135,6 +135,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_DefaultSpecular = this->mui_Specular= 0;
 	this->mui_DefaultAmbient = this->mui_Ambient= 0;
 	this->mui_DefaultDiffuse = this->mui_Diffuse = 100;
+	this->mui_DefaultFontSize = this->mui_FontSize = 10;
+
 
 	this->mui_OpenGL_minor_version = 0;
 	this->mui_OpenGL_major_version = 0;
@@ -5721,6 +5723,7 @@ void mqMorphoDigCore::Setmui_SpecularPower(double specularPower){
 	this->mui_SpecularPower = specularPower;
 	this->UpdateColorProperties();
 }
+
 int mqMorphoDigCore::Getmui_Diffuse(){
 	return this->mui_Diffuse;
 }
@@ -5732,6 +5735,20 @@ void mqMorphoDigCore::Setmui_Diffuse(int diffuse){
 	this->mui_Diffuse = diffuse;
 	this->UpdateColorProperties();
 }
+
+
+int mqMorphoDigCore::Getmui_FontSize() {
+	return this->mui_FontSize;
+}
+int mqMorphoDigCore::Getmui_DefaultFontSize() {
+	return this->mui_DefaultFontSize;
+}
+void mqMorphoDigCore::Setmui_FontSize(int fontSize) {
+
+	this->mui_FontSize = fontSize;
+	this->UpdateLandmarkSettings();
+}
+
 int mqMorphoDigCore::Getmui_Ambient(){
 	return this->mui_Ambient;
 
