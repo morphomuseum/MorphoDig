@@ -118,6 +118,7 @@ void mqGridSizeDialog::adjustParallelScale()
 			double newScale = currentScale*newHundredPxSu / currentHundredPxSU;
 			mqMorphoDigCore::instance()->getCamera()->SetParallelScale(newScale);
 			// now change camera position
+			cout << "call Dolly4Perspective, from Grid Size Dialog" << endl;
 			mqMorphoDigCore::instance()->DollyCameraForPerspectiveMode();
 			mqMorphoDigCore::instance()->getRenderer()->ResetCameraClippingRange();
 			//change grid infos
@@ -167,6 +168,7 @@ void mqGridSizeDialog::slotEditGridSize()
 }
 void mqGridSizeDialog::Refresh()
 {
+	const QSignalBlocker blocker(this->Ui->hundredpxsu);
 	if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
 	{
 		if (this->Ui->hundredpxsu->isEnabled()==false)
@@ -174,6 +176,7 @@ void mqGridSizeDialog::Refresh()
 			this->Ui->hundredpxsu->setDisabled(false);
 		}
 		double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+		
 		this->Ui->hundredpxsu->setValue(HundredPxSU);
 	}
 	else

@@ -11,7 +11,11 @@ mqViewMenuManager.cxx
   mqAboutDialog.h
   mqAboutDialogReaction.cxx
   mqAboutDialogReaction.h
-  mqCoreUtilities.cxx
+ mqCameraDialog.h
+  mqCameraDialog.cxx
+  mqCameraDialogReaction.h
+  mqCameraDialogReaction.cxx  
+ mqCoreUtilities.cxx
   mqCoreUtilities.h
   mqCylinderDialog.h
   mqCylinderDialog.cxx
@@ -296,6 +300,7 @@ mqBooleanOperationDialog.ui
 mqCylinderDialog.ui 
 mqShrinkWrapDialog.ui 
 mqShrinkWrapIterativeDialog.ui 
+mqCameraDialog.ui
 mqCubeDialog.ui 
 mqIcosahedronDialog.ui
 mqLandmarkDialog.ui  

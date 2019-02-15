@@ -466,6 +466,10 @@ public:
 
 	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName);
+	void SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ);
+	void SaveCAM(QString fileName, double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ);
+	void SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ, double parallel);
+	double GetCAMParameters(double cp[2], double position[3], double focal[3], double up[3]);
 	void SaveORI(QString fileName);
 	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int apply_position_to_surfaces = 0);
 	int SaveSTVFile(QString fileName, int save_only_selected);
@@ -501,6 +505,7 @@ public:
 	QString GetVTKVersion();
 	QString GetOpenGLVersion();
 	void SetOpenGLVersion(int major, int minor);
+	void OpenCAM(QString fileName);
 	void OpenVER(QString fileName, int mode);
 	void OpenLMK(QString fileName, int mode);
 	void OpenMesh(QString fileName);

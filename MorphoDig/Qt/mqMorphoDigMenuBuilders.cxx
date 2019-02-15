@@ -38,6 +38,7 @@
 #include "mqCylinderDialogReaction.h"
 #include "mqCubeDialogReaction.h"
 #include "mqIcosahedronDialogReaction.h"
+#include "mqCameraDialogReaction.h"
 #include "mqSaveSTLDialogReaction.h"
 #include "mqColorDialogReaction.h"
 #include "mqLandmarkDialogReaction.h"
@@ -233,6 +234,7 @@ void mqMorphoDigMenuBuilders::buildEditMenu(QMenu& menu)
   new mqGridSizeDialogReaction(menu.addAction("Edit size unit, grid spacing and scale") << mqSetName("actionGridSize"));
   new mqLandmarkDialogReaction(menu.addAction("Edit landmark and flag rendering options") << mqSetName("actionLandmark"));
   new mqOrientationLabelsDialogReaction(menu.addAction("Edit orientation labels") << mqSetName("actionOrientationLabels"));
+  new mqCameraDialogReaction(menu.addAction("Edit camera orientation") << mqSetName("actionOrientationCamera"));
   //new pqUndoRedoReaction(ui.actionEditUndo, true);
   //new pqUndoRedoReaction(ui.actionEditRedo, false);
   //new pqCameraUndoRedoReaction(ui.actionEditCameraUndo, true);

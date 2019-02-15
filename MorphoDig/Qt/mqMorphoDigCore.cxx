@@ -466,12 +466,13 @@ void mqMorphoDigCore::ActivateClippingPlane()
 		
 		this->getRenderer()->GetActiveCamera()->GetPosition(cameracentre);
 		this->getRenderer()->GetActiveCamera()->GetFocalPoint(camerafocalpoint);
-	
+		
 
 		double dist = sqrt(vtkMath::Distance2BetweenPoints(cameracentre, camerafocalpoint));
 		this->getRenderer()->GetActiveCamera()->GetClippingRange(cr);
-
+		
 		this->getRenderer()->GetActiveCamera()->SetClippingRange(dist, cr[1]);
+
 	}
 }
 void mqMorphoDigCore::ActivateBackfaceCulling() {
@@ -5771,6 +5772,164 @@ void mqMorphoDigCore::UpdateColorProperties()
 
 }
 
+void mqMorphoDigCore::OpenCAM(QString fileName)
+{
+	double  cNear, cFar, cx, cy, cz, fx, fy, fz, ux, uy, uz, parallel;
+	QString someText;
+	//Open a camera file!
+
+
+	size_t  length;
+
+
+	length = fileName.toStdString().length();
+
+	int done = 0;
+	if (length>0)
+	{
+		int file_exists = 1;
+		ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			file.close();
+		}
+		else
+		{
+
+			std::cout << "file:" << fileName.toStdString().c_str() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+
+		if (file_exists == 1)
+		{
+			
+			
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				QFile inputFile(fileName);
+				int ok = 0;
+				if (inputFile.open(QIODevice::ReadOnly))
+				{
+					QTextStream in(&inputFile);					
+					QString line = in.readLine();
+					QTextStream myteststream(&line);				
+					// 1st line
+					myteststream >> someText >> cNear >> cFar ;
+					line = in.readLine();
+					myteststream.setString(&line);
+					myteststream >> someText >> cx>>cy>>cz;
+					line = in.readLine();
+					myteststream.setString(&line);
+					myteststream >> someText >> fx >> fy >> fz;
+
+					line = in.readLine();
+					myteststream.setString(&line);
+					myteststream >> someText >> ux >> uy >> uz;
+					
+					line = in.readLine();
+					myteststream.setString(&line);
+					myteststream >> someText >> parallel;
+					
+					inputFile.close();
+					this->SetCAM(cNear, cFar, cx, cy, cz, fx, fy, fz, ux, uy, uz, parallel);
+
+				}																	
+
+		}//file exists...
+	}	//length
+
+
+}
+
+
+double  mqMorphoDigCore::GetCAMParameters(double cp[2], double position[3], double focal[3], double up[3])
+{
+	this->getRenderer()->GetActiveCamera()->GetClippingRange(cp);
+	this->getRenderer()->GetActiveCamera()->GetPosition(position);
+	this->getRenderer()->GetActiveCamera()->GetFocalPoint(focal);
+	this->getRenderer()->GetActiveCamera()->GetViewUp(up);
+	return this->getRenderer()->GetActiveCamera()->GetParallelScale();
+}
+void mqMorphoDigCore::SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ, double parallel)
+{
+	//if (this->Getmui_CameraOrtho() == 1)
+	//{
+
+		this->getCamera()->SetParallelScale(parallel);
+	//	this->DollyCameraForPerspectiveMode();
+	//	this->getRenderer()->ResetCameraClippingRange();
+	//	this->SetGridInfos();
+
+	//}
+	this->SetCAM(cNear, cFar, cX, cY, cZ, fX, fY, fZ, uX, uY, uZ);
+
+}
+void mqMorphoDigCore::SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ)
+{
+
+	this->getRenderer()->GetActiveCamera()->SetClippingRange(cNear, cFar);
+	this->getRenderer()->GetActiveCamera()->SetPosition(cX, cY, cZ);
+	this->getRenderer()->GetActiveCamera()->SetFocalPoint(fX, fY, fZ);
+	this->getRenderer()->GetActiveCamera()->SetViewUp(uX, uY, uZ);
+
+
+
+	this->Render();
+
+}
+
+void mqMorphoDigCore::SaveCAM(QString fileName, double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ)
+{
+	// this value is not correct when in perspective mode et qu'on a fait des zoom en orthographic.
+	// quand on fait des zoom en parallel, tout va bien.
+	double parallel = this->getRenderer()->GetActiveCamera()->GetParallelScale();
+	std::string CAMext = ".cam";
+	std::string CAMext2 = ".CAM";
+	std::size_t found = fileName.toStdString().find(CAMext);
+	std::size_t found2 = fileName.toStdString().find(CAMext2);
+	if (found == std::string::npos && found2 == std::string::npos)
+	{
+		fileName.append(".cam");
+	}
+
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+
+		stream << "Clipping: " <<  cNear << " " << cFar<<endl;
+		stream << "Center: " << cX << " " << cY << " " << cZ << endl;
+		stream << "Focal: " << fX << " " << fY << " " << fZ << endl;
+		stream << "Up: " << uX << " " << uY << " " << uZ << endl;
+		stream << "Parallel: " << parallel << endl;
+		/*
+		if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
+	{
+		double currentScale = mqMorphoDigCore::instance()->getCamera()->GetParallelScale();
+		double currentHundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+		double newHundredPxSu = this->Ui->hundredpxsu->value();
+		if (currentHundredPxSU>0 && newHundredPxSu>0)
+		{
+			double newScale = currentScale*newHundredPxSu / currentHundredPxSU;
+			mqMorphoDigCore::instance()->getCamera()->SetParallelScale(newScale);
+			// now change camera position
+			mqMorphoDigCore::instance()->DollyCameraForPerspectiveMode();
+			mqMorphoDigCore::instance()->getRenderer()->ResetCameraClippingRange();
+			//change grid infos
+			mqMorphoDigCore::instance()->SetGridInfos();
+			mqMorphoDigCore::instance()->Render();
+		}
+		
+		
+		
+	}
+		*/
+
+	}
+	file.close();
+
+
+
+}
 void mqMorphoDigCore::SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName)
 {
 
@@ -16925,7 +17084,7 @@ void mqMorphoDigCore::DollyCameraForParallelScale()
 
 	double newparallelscale = dist / multfactor;
 	this->getCamera()->SetParallelScale(newparallelscale);
-
+	cout << "Dolly4Parallel" << endl;
 }
 
 /*
@@ -16967,7 +17126,7 @@ void mqMorphoDigCore::DollyCameraForPerspectiveMode()
 	this->getCamera()->SetPosition(newpos);
 
 
-
+	cout << "Dolly4Perspective" << endl;
 }
 
 //On ajoute un indice au nom si le nom existe déjà.
