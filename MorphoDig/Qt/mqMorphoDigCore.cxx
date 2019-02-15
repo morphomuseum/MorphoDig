@@ -5851,15 +5851,15 @@ double  mqMorphoDigCore::GetCAMParameters(double cp[2], double position[3], doub
 }
 void mqMorphoDigCore::SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ, double parallel)
 {
-	//if (this->Getmui_CameraOrtho() == 1)
-	//{
+	if (this->Getmui_CameraOrtho() == 1)
+	{
 
 		this->getCamera()->SetParallelScale(parallel);
-	//	this->DollyCameraForPerspectiveMode();
-	//	this->getRenderer()->ResetCameraClippingRange();
-	//	this->SetGridInfos();
+		this->DollyCameraForPerspectiveMode();
+		this->getRenderer()->ResetCameraClippingRange();
+		this->SetGridInfos();
 
-	//}
+	}
 	this->SetCAM(cNear, cFar, cX, cY, cZ, fX, fY, fZ, uX, uY, uZ);
 
 }
