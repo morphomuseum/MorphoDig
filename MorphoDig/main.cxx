@@ -10,7 +10,7 @@
 
 #include <QApplication>
 #include <QSurfaceFormat>
-#include <QVTKOpenGLWidget.h>
+//#include <QVTKOpenGLWidget.h>
 
 #include <QTextCodec>
 #if QT_VERSION < 0x050000

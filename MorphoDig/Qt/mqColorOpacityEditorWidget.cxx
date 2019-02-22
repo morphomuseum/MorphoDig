@@ -318,9 +318,9 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     this->Internals->Ui.AdvancedButton->setChecked(
       settings->value("showAdvancedPropertiesColorOpacityEditorWidget", false).toBool());
   }*/
-  cout << "Will call updateCurrentData... " << endl;
+  //cout << "Will call updateCurrentData... " << endl;
   this->updateCurrentData();
-  cout << "Will call updatePanel... " << endl;
+  //cout << "Will call updatePanel... " << endl;
   this->updatePanel();
 }
 

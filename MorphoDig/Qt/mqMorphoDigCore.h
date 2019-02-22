@@ -29,7 +29,9 @@
 //#include "vtkUndoStackInternal.h"
 
 #include <QProgressBar>
-#include <QVTKOpenGLWidget.h>
+//#include <QVTKOpenGLWidget.h>
+#include <QVTKOpenGLNativeWidget.h>
+
 #include <vtkScalarBarActor.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkDiscretizableColorTransferFunction.h>
@@ -781,9 +783,9 @@ public:
   void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
   void GetDefaultTagColor(int tagnr, double rgba[4]);
-  void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
+  void setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget);
   
-  QVTKOpenGLWidget* getQVTKWidget();
+  QVTKOpenGLNativeWidget* getQVTKWidget();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
   void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
@@ -1024,7 +1026,7 @@ public slots:
 	
 private:
 	static mqMorphoDigCore* Instance;
-	QVTKOpenGLWidget *qvtkWidget;
+	QVTKOpenGLNativeWidget *qvtkWidget;
 	int currentLassoMode;
 	int currentRubberMode;
 	int selected_file_exists(QString path, QString ext, QString postfix);

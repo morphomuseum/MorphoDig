@@ -38,20 +38,21 @@ make
 Windows binaries are downloadable at the following address : http://morphomuseum.com/morphodig 
   
 ## Build morphodig on Windows
-1.  install visual studio 2015 express for desktop.
+1.  install visual studio 2017 express for desktop.
 2.  install Qt 5
-4.  download and install CMAKE (>=3.3.x) (http://cmake.org).
-5.  download and build VTK (>=8.1) (http://vtk.org) using CMAKE with the following options
-VTK_QT_VERSION : 5
+4.  download and install CMAKE (>=3.4.x) (http://cmake.org).
+5.  download and build VTK (>=8.1) (http://vtk.org) using CMAKE with the following options:
 VTK_Group_Qt : v
 vtlGuiSupportQt: v
 Module_vtkGUISupportQtOpenGL : v
+Module_vtkRenderingQt : v
+Module_vtkViewsQt : v
 
-Then d to environmentvariables QTDIR {PATH TO QT}\5.X\msvc2015_64
-Append environment PATH : D:\Qt\5.X\msvc2015_64\bin
+Then d to environmentvariables QTDIR {PATH TO QT}\5.X\msvc201_64
+Append environment PATH : D:\Qt\5.X\msvc2017_64\bin
 Append PATH {PATH TO VTK_BIN}\bin\Release (needed to access the .dll!)
 Append PATH {PATH TO VTK_BIN} (needed for CMAKE to find which version of VTK is present on the computer)
-Append PATH {PATH TO QT}\5.X\msvc2015_64\bin 
+Append PATH {PATH TO QT}\5.X\msvc2017_64\bin 
 
 Load CMAKE after Path has been modified
 

@@ -9,7 +9,8 @@
 //#include "pqQVTKWidgetBase.h"
 //#include "pqTimer.h"
 #include <QTimer>
-#include <QVTKOpenGLWidget.h>
+//#include <QVTKOpenGLWidget.h>
+#include <QVTKOpenGLNativeWidget.h>
 //#include <QVTKWidget.h>
 //#include <vtkAutoInit.h>
 #include <vtkAxis.h>
@@ -59,7 +60,7 @@ class mqMinimalWidget::pqInternals
 	//vtkNew<vtkRenderer> Renderer;
 
 public:
-	QPointer<QVTKOpenGLWidget> Widget;
+	QPointer<QVTKOpenGLNativeWidget> Widget;
 	vtkNew<vtkChartXY> ChartXY;
 	vtkNew<vtkContextView> ContextView;
 	
@@ -67,7 +68,7 @@ public:
 	
 
 	pqInternals(mqMinimalWidget* editor)
-		: Widget(new QVTKOpenGLWidget(editor))
+		: Widget(new QVTKOpenGLNativeWidget(editor))
 		
 	{
 		//this->Window->AddRenderer(Renderer.Get());

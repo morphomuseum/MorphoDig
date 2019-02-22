@@ -10,7 +10,8 @@
 //#include "pqQVTKWidgetBase.h"
 //#include "pqTimer.h"
 #include <QTimer>
-#include <QVTKOpenGLWidget.h>
+#include <QVTKOpenGLNativeWidget.h> 
+//#include <QVTKOpenGLWidget.h> // issues with vtk8.2
 //#include <QVTKWidget.h>
 #include <vtkAxis.h>
 #include <vtkBoundingBox.h>
@@ -168,7 +169,7 @@ class mqTransferFunctionWidget::mqInternals
 
 public:
   //QPointer<QVTKWidget> Widget;
-	QPointer<QVTKOpenGLWidget> Widget;
+	QPointer<QVTKOpenGLNativeWidget> Widget;
   vtkNew<vtkTransferFunctionChartXY> ChartXY;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
@@ -180,7 +181,7 @@ public:
   unsigned long CurrentPointEditEventId;
 
   mqInternals(mqTransferFunctionWidget* editor)
-    : Widget(new QVTKOpenGLWidget(editor))
+    : Widget(new QVTKOpenGLNativeWidget(editor))
     , CurrentPointEditEventId(0)
   {
 	//  cout << "mqTransferFunctionWidget Internals Creator" << endl;

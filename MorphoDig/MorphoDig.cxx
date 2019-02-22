@@ -18,7 +18,9 @@
 #include "vtkMDInteractorStyle.h"
 //#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
-#include <QVTKOpenGLWidget.h>
+//#include <QVTKOpenGLWidget.h>
+#include <QVTKOpenGLNativeWidget.h>
+
 //#include "vtkUndoStack.h"
 //#include "vtkUndoSet.h"
 //#include "vtkUndoElement.h"
@@ -331,7 +333,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//this->mdiArea->addSubWindow(projectWindow);
 
 	
-	this->qvtkWidget2 = new QVTKOpenGLWidget();
+	this->qvtkWidget2 = new QVTKOpenGLNativeWidget();
 
 
 

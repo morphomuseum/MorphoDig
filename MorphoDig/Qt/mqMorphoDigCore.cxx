@@ -414,12 +414,12 @@ mqMorphoDigCore::~mqMorphoDigCore()
 }
 
 
-void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget) 
+void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget)
 {
 	this->qvtkWidget = mqvtkWidget;
 }
 
-QVTKOpenGLWidget* mqMorphoDigCore::getQVTKWidget() { return this->qvtkWidget; }
+QVTKOpenGLNativeWidget* mqMorphoDigCore::getQVTKWidget() { return this->qvtkWidget; }
 void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
 {
 	this->Style = mStyle;

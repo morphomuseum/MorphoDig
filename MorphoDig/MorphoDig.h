@@ -18,7 +18,8 @@
 #include "mqMorphoDigCore.h"
 
 
-#include <QVTKOpenGLWidget.h>
+//#include <QVTKOpenGLWidget.h>
+#include <QVTKOpenGLNativeWidget.h>
 #include <vtkSmartPointer.h>    // Required for smart pointer internal ivars.
 #include <vtkRenderedAreaPicker.h>   
 #include <vtkAreaPicker.h>   
@@ -79,7 +80,7 @@ protected:
 protected slots:
 	
 private:
-	QVTKOpenGLWidget *qvtkWidget2;
+	QVTKOpenGLNativeWidget *qvtkWidget2;
 	
 	
 	

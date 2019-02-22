@@ -87,15 +87,22 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 
 	//this->Ui->frame->setVisible(false);
 	//mqColorOpacityEditorWidget *mColorMap = new mqColorOpacityEditorWidget(STC, this->Ui->scrollAreaWidgetContents);
-	QVBoxLayout* vbox = new QVBoxLayout(this->Ui->PropertiesFrame);
+	/*QVBoxLayout* vbox = new QVBoxLayout(this->Ui->PropertiesFrame);
 	vbox->setMargin(0);
-	vbox->setSpacing(0);
+	vbox->setSpacing(0);*/
 	cout << "Create mqColorOpacityEditorWidget!" << endl;
-	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this);
+	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this->Ui->PropertiesFrame);
 	//cout << "Try that!" << endl;
 	this->mColorMap = someMap;
+
 	//cout << "And?" << endl;
-	this->Ui->PropertiesFrame->layout()->addWidget(this->mColorMap);
+
+	//@@ Ca fout en l'air la fenêtre principale! (or je vois pas bien le rapport...) Il faudrait essayer de voi si on ne pourrait pas l'instancier autrement... 
+	//this->Ui->PropertiesFrame->layout()->addWidget(this->mColorMap);
+	
+	//
+	
+	
 	//mqTransferFunctionWidget *mColorScale = new mqTransferFunctionWidget(this->Ui->frame);
 
 	/*mqTransferFunctionWidget *ColorEditor = new mqTransferFunctionWidget ();
@@ -296,7 +303,7 @@ void mqEditScalarsDialog::UpdateUI()
 	currentMax->value(MT->Get_sc_max());
 	currentMin->value(MT->Get_sc_min());
 */
-
+	cout << "Call UpdateUI" << endl;
 	//1 populate comboActiveScalar
 
 	this->RefreshComboScalars();
