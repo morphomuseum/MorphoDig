@@ -10,9 +10,13 @@
 //#include "pqQVTKWidgetBase.h"
 //#include "pqTimer.h"
 #include <QTimer>
-#include <QVTKOpenGLNativeWidget.h> 
-//#include <QVTKOpenGLWidget.h> // issues with vtk8.2
-//#include <QVTKWidget.h>
+#if VTK_MAJOR_VERSION<8
+#include <QVTKWidget.h>
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+#include <QVTKOpenGLWidget.h>
+#else
+#include <QVTKOpenGLNativeWidget.h>
+#endif
 #include <vtkAxis.h>
 #include <vtkBoundingBox.h>
 #include <vtkChartXY.h>
@@ -168,8 +172,16 @@ class mqTransferFunctionWidget::mqInternals
   vtkNew<vtkGenericOpenGLRenderWindow> Window;
 
 public:
-  //QPointer<QVTKWidget> Widget;
-	QPointer<QVTKOpenGLNativeWidget> Widget;
+  	
+#if VTK_MAJOR_VERSION<8	  	
+	QPointer<QVTKWidget> Widget;
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	QPointer<QVTKOpenGLWidget> Widget;
+#else
+	QPointer<QVTKOpenGLNativeWidget> Widget; 
+#endif
+
+
   vtkNew<vtkTransferFunctionChartXY> ChartXY;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
@@ -181,7 +193,13 @@ public:
   unsigned long CurrentPointEditEventId;
 
   mqInternals(mqTransferFunctionWidget* editor)
-    : Widget(new QVTKOpenGLNativeWidget(editor))
+#if VTK_MAJOR_VERSION<8
+	  : Widget(new QVTKWidget(editor))
+	  #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	  : Widget(new QVTKOpenGLWidget(editor))
+#else
+	  : Widget(new QVTKOpenGLNativeWidget(editor))
+#endif    
     , CurrentPointEditEventId(0)
   {
 	//  cout << "mqTransferFunctionWidget Internals Creator" << endl;

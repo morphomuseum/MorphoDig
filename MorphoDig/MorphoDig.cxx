@@ -18,8 +18,13 @@
 #include "vtkMDInteractorStyle.h"
 //#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
-//#include <QVTKOpenGLWidget.h>
+#if VTK_MAJOR_VERSION<8
+#include <QVTKWidget.h>
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+#include <QVTKOpenGLWidget.h>
+#else
 #include <QVTKOpenGLNativeWidget.h>
+#endif
 
 //#include "vtkUndoStack.h"
 //#include "vtkUndoSet.h"
@@ -333,8 +338,14 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//this->mdiArea->addSubWindow(projectWindow);
 
 	
-	this->qvtkWidget2 = new QVTKOpenGLNativeWidget();
-
+	
+#if VTK_MAJOR_VERSION<8	
+	this->qvtkWidget2 = new QVTKWidget();
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	this->qvtkWidget2 = new QVTKOpenGLWidget();	
+#else
+	this->qvtkWidget2 = new QVTKOpenGLNativeWidget();	
+#endif
 
 
 	qvtkWidget2->setObjectName(QStringLiteral("qvtkWidget"));

@@ -9,8 +9,14 @@
 //#include "pqQVTKWidgetBase.h"
 //#include "pqTimer.h"
 #include <QTimer>
-//#include <QVTKOpenGLWidget.h>
+
+#if VTK_MAJOR_VERSION<8
+#include <QVTKWidget.h>
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+#include <QVTKOpenGLWidget.h>
+#else
 #include <QVTKOpenGLNativeWidget.h>
+#endif
 //#include <QVTKWidget.h>
 //#include <vtkAutoInit.h>
 #include <vtkAxis.h>
@@ -60,7 +66,15 @@ class mqMinimalWidget::pqInternals
 	//vtkNew<vtkRenderer> Renderer;
 
 public:
+	
+#if VTK_MAJOR_VERSION<8
+	QPointer<QVTKWidget> Widget;
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	QPointer<QVTKOpenGLWidget> Widget; 
+#else
 	QPointer<QVTKOpenGLNativeWidget> Widget;
+#endif
+
 	vtkNew<vtkChartXY> ChartXY;
 	vtkNew<vtkContextView> ContextView;
 	
@@ -68,7 +82,14 @@ public:
 	
 
 	pqInternals(mqMinimalWidget* editor)
-		: Widget(new QVTKOpenGLNativeWidget(editor))
+#if VTK_MAJOR_VERSION<8
+	: Widget(new QVTKWidget(editor))
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	: Widget(new QVTKOpenGLWidget(editor))
+#else
+	: Widget(new QVTKOpenGLNativeWidget(editor))
+#endif
+		
 		
 	{
 		//this->Window->AddRenderer(Renderer.Get());

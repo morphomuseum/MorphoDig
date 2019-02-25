@@ -413,13 +413,25 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	}
 }
 
-
-void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget)
+#if VTK_MAJOR_VERSION<8	  	
+	void mqMorphoDigCore::setQVTKWidget(QVTKWidget *mqvtkWidget)
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget)
+#else
+	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget)
+#endif
 {
 	this->qvtkWidget = mqvtkWidget;
 }
 
-QVTKOpenGLNativeWidget* mqMorphoDigCore::getQVTKWidget() { return this->qvtkWidget; }
+#if VTK_MAJOR_VERSION<8	  	
+	QVTKWidget* mqMorphoDigCore::getQVTKWidget()
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	QVTKOpenGLWidget* mqMorphoDigCore::getQVTKWidget()
+#else
+	QVTKOpenGLNativeWidget* mqMorphoDigCore::getQVTKWidget()
+#endif
+{ return this->qvtkWidget; }
 void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
 {
 	this->Style = mStyle;

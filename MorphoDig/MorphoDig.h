@@ -17,9 +17,15 @@
 #include "ui_MorphoDig.h"
 #include "mqMorphoDigCore.h"
 
-
-//#include <QVTKOpenGLWidget.h>
+#if VTK_MAJOR_VERSION<8
+#include <QVTKWidget.h>
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION<2
+#include <QVTKOpenGLWidget.h>
+#else
 #include <QVTKOpenGLNativeWidget.h>
+#endif
+
+
 #include <vtkSmartPointer.h>    // Required for smart pointer internal ivars.
 #include <vtkRenderedAreaPicker.h>   
 #include <vtkAreaPicker.h>   
@@ -80,8 +86,14 @@ protected:
 protected slots:
 	
 private:
+	//
+#if VTK_MAJOR_VERSION<8
+	QVTKWidget *qvtkWidget2;
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	QVTKOpenGLWidget *qvtkWidget2;
+#else
 	QVTKOpenGLNativeWidget *qvtkWidget2;
-	
+#endif
 	
 	
 	

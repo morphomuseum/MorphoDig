@@ -29,8 +29,14 @@
 //#include "vtkUndoStackInternal.h"
 
 #include <QProgressBar>
-//#include <QVTKOpenGLWidget.h>
+
+#if VTK_MAJOR_VERSION<8
+#include <QVTKWidget.h>
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+#include <QVTKOpenGLWidget.h>
+#else
 #include <QVTKOpenGLNativeWidget.h>
+#endif
 
 #include <vtkScalarBarActor.h>
 #include <vtkKdTreePointLocator.h>
@@ -783,9 +789,19 @@ public:
   void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
   void GetDefaultTagColor(int tagnr, double rgba[4]);
+
+#if VTK_MAJOR_VERSION<8	  
+  void setQVTKWidget(QVTKWidget *mqvtkWidget);
+  QVTKWidget* getQVTKWidget();
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2 
+  void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
+  QVTKOpenGLWidget* getQVTKWidget();
+#else
   void setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget);
-  
   QVTKOpenGLNativeWidget* getQVTKWidget();
+#endif
+
+ 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
   void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
@@ -1026,7 +1042,14 @@ public slots:
 	
 private:
 	static mqMorphoDigCore* Instance;
-	QVTKOpenGLNativeWidget *qvtkWidget;
+	
+#if VTK_MAJOR_VERSION<8	  	
+	QVTKWidget *qvtkWidget;
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2		
+	QVTKOpenGLWidget *qvtkWidget;
+#else
+	QVTKOpenGLNativeWidget *qvtkWidget;	
+#endif
 	int currentLassoMode;
 	int currentRubberMode;
 	int selected_file_exists(QString path, QString ext, QString postfix);
