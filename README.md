@@ -10,7 +10,7 @@ Unfortunately, MorphoDig cannot be compiled using the VTK packages in the reposi
 
 0. Install the necessary build tools
 `sudo apt install build-essential qtbase5-dev cmake-curses-gui`
-1. Install the current VTK version (8.1)
+1. Install the current VTK version (8.2)
 ```
 wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
 tar -xzfv VTK-8.2.0.tar.gz`
