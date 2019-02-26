@@ -12,11 +12,11 @@ Unfortunately, MorphoDig cannot be compiled using the VTK packages in the reposi
 `sudo apt install build-essential qtbase5-dev cmake-curses-gui`
 1. Install the current VTK version (8.1)
 ```
-wget https://www.vtk.org/files/release/8.1/VTK-8.1.1.tar.gz
-tar -xzfv VTK-8.1.1.tar.gz`
-mkdir vtk8.1-build
-cd vtk8.1-build
-cmake ../VTK-8.1.1 -DVTK_Group_Imaging=ON -DVTK_Group_Qt=ON -DVTK_Group_Rendering=ON -DVTK_Group_StandAlone=ON -DVTK_Group_Views=ON
+wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
+tar -xzfv VTK-8.2.0.tar.gz`
+mkdir vtk8.2-build
+cd vtk8.2-build
+cmake ../VTK-8.2.0 -DVTK_Group_Imaging=ON -DVTK_Group_Qt=ON -DVTK_Group_Rendering=ON -DVTK_Group_StandAlone=ON -DVTK_Group_Views=ON
 make 
 sudo make install
 ```
@@ -41,12 +41,11 @@ Windows binaries are downloadable at the following address : http://morphomuseum
 1.  install visual studio 2017 express for desktop.
 2.  install Qt 5
 4.  download and install CMAKE (>=3.4.x) (http://cmake.org).
-5.  download and build VTK (>=8.1) (http://vtk.org) using CMAKE with the following options:
+5.  download and build VTK (>=8.2) (http://vtk.org) using CMAKE with the following options:
 * VTK_Group_Qt : v
-* vtlGuiSupportQt: v
-* Module_vtkGUISupportQtOpenGL : v
-* Module_vtkRenderingQt : v
-* Module_vtkViewsQt : v
+* Module vtlGuiSupportQt: v
+* Module vtkGUISupportQtOpenGL : v
+
 
 
 Then add to environment variables: 

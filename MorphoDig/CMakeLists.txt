@@ -201,7 +201,7 @@ IF (WIN32)
     "${VTK_DIR}/bin/Release/vtkFiltersStatistics-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkImagingFourier-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkImagingCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-    "${VTK_DIR}/bin/Release/vtkalglib-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+
     "${VTK_DIR}/bin/Release/vtkImagingHybrid-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkglew-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkIOImage-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
@@ -223,8 +223,8 @@ IF (WIN32)
     "${VTK_DIR}/bin/Release/vtkRenderingContextOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkRenderingGL2PSOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkgl2ps-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-
-
+    "${VTK_DIR}/bin/Release/vtklzma-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkdoubleconversion-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
 
     "${qtcore}"
@@ -247,4 +247,6 @@ IF (WIN32)
     COMPONENT applications)
 ELSE()
   #TO DO FOR OTHER SYSTEMS
+# not sure if needed in VTK 8.1
+# but not in VTK 8.2     "${VTK_DIR}/bin/Release/vtkalglib-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 ENDIF()
