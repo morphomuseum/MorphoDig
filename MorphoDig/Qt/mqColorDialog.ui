@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>276</height>
+    <height>303</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>521</width>
-     <height>201</height>
+     <height>231</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -129,13 +129,98 @@
       </item>
      </layout>
     </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QPushButton" name="preset0">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/preset00.png</normaloff>:/Icons/preset00.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>31</width>
+          <height>31</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="preset1">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/preset01.png</normaloff>:/Icons/preset01.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>31</width>
+          <height>31</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="preset2">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/preset02.png</normaloff>:/Icons/preset02.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>31</width>
+          <height>31</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="preset3">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/preset03.png</normaloff>:/Icons/preset03.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>31</width>
+          <height>31</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>240</y>
+     <y>270</y>
      <width>239</width>
      <height>25</height>
     </rect>
@@ -168,7 +253,9 @@
    <header location="global">mqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../Icons/icons.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
