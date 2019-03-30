@@ -35,6 +35,10 @@ public:
   virtual void slotBackGroundColorChanged();
   virtual void slotBackGroundColorChanged2();
   virtual void slotReinitializeColors();
+  virtual void slotPreset0();
+  virtual void slotPreset1();
+  virtual void slotPreset2();
+  virtual void slotPreset3();
   virtual void slotAmbient(int ambient);
   virtual void slotDiffuse(int diffuse);
   virtual void slotSpecular(int specular);

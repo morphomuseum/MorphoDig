@@ -77,7 +77,10 @@ mqColorDialog::mqColorDialog(QWidget* Parent)
   connect(this->Ui->backgroundColorButton2, SIGNAL(colorChosen()), this, SLOT(slotBackGroundColorChanged2()));
 
   connect(this->Ui->reinitcolorsButton, SIGNAL(clicked()), this, SLOT(slotReinitializeColors()));
-
+  connect(this->Ui->preset0, SIGNAL(clicked()), this, SLOT(slotPreset0()));
+  connect(this->Ui->preset1, SIGNAL(clicked()), this, SLOT(slotPreset1()));
+  connect(this->Ui->preset2, SIGNAL(clicked()), this, SLOT(slotPreset2()));
+  connect(this->Ui->preset3, SIGNAL(clicked()), this, SLOT(slotPreset3()));
   this->Ui->ambient->setValue(mqMorphoDigCore::instance()->Getmui_Ambient());
   this->Ui->diffuse->setValue(mqMorphoDigCore::instance()->Getmui_Diffuse());
   this->Ui->specular->setValue(mqMorphoDigCore::instance()->Getmui_Specular());
@@ -222,6 +225,102 @@ void mqColorDialog::slotReinitializeColors()
 	this->Ui->specularPower->setValue(defaultSpecularPower);
 	mqMorphoDigCore::instance()->Render();
 	
+}
+void mqColorDialog::slotPreset0()
+{
+	
+
+	int defaultAmbient;//0
+	int defaultDiffuse;//100
+	int defaultSpecular;//0
+	double defaultSpecularPower;//1
+
+	defaultAmbient = mqMorphoDigCore::instance()->Getmui_DefaultAmbient();
+	defaultDiffuse = mqMorphoDigCore::instance()->Getmui_DefaultDiffuse();
+	defaultSpecular = mqMorphoDigCore::instance()->Getmui_DefaultSpecular();
+	defaultSpecularPower = mqMorphoDigCore::instance()->Getmui_DefaultSpecularPower();
+	
+	mqMorphoDigCore::instance()->Setmui_Ambient(defaultAmbient);
+	mqMorphoDigCore::instance()->Setmui_Diffuse(defaultDiffuse);
+	mqMorphoDigCore::instance()->Setmui_Specular(defaultSpecular);
+	mqMorphoDigCore::instance()->Setmui_SpecularPower(defaultSpecularPower);
+
+	
+	this->Ui->ambient->setValue(defaultAmbient);
+	this->Ui->diffuse->setValue(defaultDiffuse);
+	this->Ui->specular->setValue(defaultSpecular);
+	this->Ui->specularPower->setValue(defaultSpecularPower);
+	mqMorphoDigCore::instance()->Render();
+
+}
+void mqColorDialog::slotPreset1()
+{
+
+
+	int Ambient=10;
+	int Diffuse=60;
+	int Specular=50;
+	double SpecularPower=40;
+
+	
+	mqMorphoDigCore::instance()->Setmui_Ambient(Ambient);
+	mqMorphoDigCore::instance()->Setmui_Diffuse(Diffuse);
+	mqMorphoDigCore::instance()->Setmui_Specular(Specular);
+	mqMorphoDigCore::instance()->Setmui_SpecularPower(SpecularPower);
+
+
+	this->Ui->ambient->setValue(Ambient);
+	this->Ui->diffuse->setValue(Diffuse);
+	this->Ui->specular->setValue(Specular);
+	this->Ui->specularPower->setValue(SpecularPower);
+	mqMorphoDigCore::instance()->Render();
+
+}
+void mqColorDialog::slotPreset2()
+{
+
+
+	int Ambient = 10;
+	int Diffuse = 90;
+	int Specular = 20;
+	double SpecularPower = 10;
+
+
+	mqMorphoDigCore::instance()->Setmui_Ambient(Ambient);
+	mqMorphoDigCore::instance()->Setmui_Diffuse(Diffuse);
+	mqMorphoDigCore::instance()->Setmui_Specular(Specular);
+	mqMorphoDigCore::instance()->Setmui_SpecularPower(SpecularPower);
+
+
+	this->Ui->ambient->setValue(Ambient);
+	this->Ui->diffuse->setValue(Diffuse);
+	this->Ui->specular->setValue(Specular);
+	this->Ui->specularPower->setValue(SpecularPower);
+	mqMorphoDigCore::instance()->Render();
+
+}
+void mqColorDialog::slotPreset3()
+{
+
+
+	int Ambient = 20;
+	int Diffuse = 100;
+	int Specular = 0;
+	double SpecularPower = 1;
+
+
+	mqMorphoDigCore::instance()->Setmui_Ambient(Ambient);
+	mqMorphoDigCore::instance()->Setmui_Diffuse(Diffuse);
+	mqMorphoDigCore::instance()->Setmui_Specular(Specular);
+	mqMorphoDigCore::instance()->Setmui_SpecularPower(SpecularPower);
+
+
+	this->Ui->ambient->setValue(Ambient);
+	this->Ui->diffuse->setValue(Diffuse);
+	this->Ui->specular->setValue(Specular);
+	this->Ui->specularPower->setValue(SpecularPower);
+	mqMorphoDigCore::instance()->Render();
+
 }
 //-----------------------------------------------------------------------------
 
