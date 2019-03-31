@@ -131,6 +131,10 @@ mqViewMenuManager.cxx
   mqSaveSTLDialog.h
   mqSaveSTLDialogReaction.cxx
   mqSaveSTLDialogReaction.h
+  mqSaveOBJDialog.cxx
+  mqSaveOBJDialog.h
+  mqSaveOBJDialogReaction.cxx
+  mqSaveOBJDialogReaction.h
   mqSaveLandmarksDialog.cxx
   mqSaveLandmarksDialog.h
   mqSaveLandmarksDialogReaction.cxx
@@ -310,6 +314,7 @@ mqMainControlsWidget.ui
 mqSavePLYDialog.ui 
 mqSaveVTKDialog.ui 
 mqSaveSTLDialog.ui 
+mqSaveOBJDialog.ui 
 mqSaveLandmarksDialog.ui 
 mqSaveFlagsDialog.ui 
 mqSaveCURDialog.ui 
