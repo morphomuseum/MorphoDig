@@ -1122,7 +1122,14 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 						newactor->SetSelected(0);
 
 						//std::string newname = this->CheckingName(myActor->GetName());
-						newactor->SetName(myActor->GetName() + "_lc");
+						if (array_min != array_max)
+						{
+							newactor->SetName(myActor->GetName() + "_ar");
+						}
+						else
+						{
+							newactor->SetName(myActor->GetName() + QString::number(array_min).toStdString());
+						}
 						//newactor->SetName(newname);
 						cout << "try to add new actor=" << endl;
 						newcoll->AddTmpItem(newactor);
@@ -8950,7 +8957,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 						newactor->SetSelected(0);
 
 						//std::string newname = this->CheckingName(myActor->GetName());
-						newactor->SetName(myActor->GetName() + "_lc");
+						newactor->SetName(myActor->GetName() + "_rc");
 						//newactor->SetName(newname);
 						cout << "try to add new actor=" << endl;
 						newcoll->AddTmpItem(newactor);
