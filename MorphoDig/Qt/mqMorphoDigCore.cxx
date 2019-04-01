@@ -51,6 +51,7 @@
 #include <vtkCellData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkSTLWriter.h>
+#include <vtkOBJWriter.h>
 #include <vtkPLYWriter.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkThinPlateSplineTransform.h>
@@ -65,6 +66,7 @@
 #include <vtkPLYReader.h>
 #include <vtkMath.h>
 #include <vtkSTLReader.h>
+#include <vtkOBJReader.h>
 #include <vtkCleanPolyData.h>
 #include <vtkFloatArray.h>
 #include <vtkDoubleArray.h>
@@ -3989,6 +3991,13 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			type = 2; //PLY
 		}
 
+		//std::cout << "3Type= " <<type<< std::endl;
+		found = fileName.toStdString().find(OBJext);
+		found2 = fileName.toStdString().find(OBJext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 3; //OBJ
+		}
 		// Read and display for verification
 
 		vtkSmartPointer<vtkPolyData> MyPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -4015,11 +4024,19 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
-		else
+		else if (type ==2)
 		{
 
 			vtkSmartPointer<vtkPLYReader> reader =
 				vtkSmartPointer<vtkPLYReader>::New();
+			reader->SetFileName(fileName.toLocal8Bit());
+			reader->Update();
+			MyPolyData = reader->GetOutput();
+		}
+		else
+		{
+			vtkSmartPointer<vtkOBJReader> reader =
+				vtkSmartPointer<vtkOBJReader>::New();
 			reader->SetFileName(fileName.toLocal8Bit());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
@@ -4471,15 +4488,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 	}
 
 
-	/*	if (fileName.isEmpty()) return;
-
-	//if (img.loadImage(fileName.toLocal8Bit()))
-
-	fileName = QFileDialog::getOpenFileName(this,
-	tr("Open File"), "/home/jana", tr("Surface Files (*.vtk *.stl *.ply)"));
-	VTK_CREATE(vtkActor, actor);
-	actor->GetProperty()->SetColor(0.5, 1, 0.5);
-	actor->GetProperty()->SetOpacity(0.5);*/
+	
 	//this->MainWindow->vtkWidgetUpdate();
 	//cout << "call matchTagMapToActorCollection" << endl;
 	
@@ -15471,6 +15480,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	// File_type 0 : stl
 	// File_type 1 : vtk-vtp
 	// File_type 2 : ply
+	// File_type 3 : obj
 
 	// If myActor is NULL : => what will be saved is an aggregation of all selected surface objects.
 	// If myActor is not NULL: => what will be saved is the underlying surface object.
@@ -15484,6 +15494,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	std::string VTKext4(".VTP");
 	std::string PLYext(".ply");
 	std::string PLYext2(".PLY");
+	std::string OBJext(".obj");
+	std::string OBJext2(".OBJ");
 
 
 	vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -15862,7 +15874,27 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 		*/
 	}
+	if (file_type == 3)
+	{
+		vtkSmartPointer<vtkOBJWriter> Writer =
+			vtkSmartPointer<vtkOBJWriter>::New();
+		
+		// test if "extension exists!"
+		//
+		std::size_t found = fileName.toStdString().find(OBJext);
+		std::size_t found2 = fileName.toStdString().find(OBJext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".obj");
 
+		}
+
+		Writer->SetFileName(fileName.toLocal8Bit());
+		Writer->SetInputData(cleanPolyDataFilter->GetOutput());
+		//  stlWrite->Update();
+		Writer->Write();
+
+	}
 
 	if (file_type == 0)
 	{

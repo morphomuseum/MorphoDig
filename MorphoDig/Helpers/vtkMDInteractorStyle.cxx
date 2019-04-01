@@ -517,7 +517,7 @@ void vtkMDInteractorStyle::StartSelect()
 
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.vtp)"));
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp)"));
 
 			if (!filenames.isEmpty())
 			{
@@ -537,6 +537,8 @@ void vtkMDInteractorStyle::StartSelect()
 					std::string VTKext4(".VTP");
 					std::string PLYext(".ply");
 					std::string PLYext2(".PLY");
+					std::string OBJext(".obj");
+					std::string OBJext2(".OBJ");
 					std::string NTWext(".ntw");
 					std::string NTWext2(".NTW");
 					std::string VERext(".ver");
@@ -585,13 +587,21 @@ void vtkMDInteractorStyle::StartSelect()
 						type = 2; //PLY
 					}
 
+					//std::cout << "2Type= " <<type<< std::endl;
+					found = fileName.toStdString().find(OBJext);
+					found2 = fileName.toStdString().find(OBJext2);
+
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 3; //OBJ
+					}
 
 					//0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk
 					found = fileName.toStdString().find(NTWext);
 					found2 = fileName.toStdString().find(NTWext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 3; //NTW
+						type = 4; //NTW
 					}
 
 					//4 ver, 5 cur, 6 flg, 7 lmk
@@ -599,26 +609,26 @@ void vtkMDInteractorStyle::StartSelect()
 					found2 = fileName.toStdString().find(VERext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 4; //VER
+						type = 5; //VER
 					}
 
 					found = fileName.toStdString().find(CURext);
 					found2 = fileName.toStdString().find(CURext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 5; //CUR
+						type = 6; //CUR
 					}
 					found = fileName.toStdString().find(FLGext);
 					found2 = fileName.toStdString().find(FLGext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 6; //FLG
+						type = 7; //FLG
 					}
 					found = fileName.toStdString().find(LMKext);
 					found2 = fileName.toStdString().find(LMKext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 7; //LMK
+						type = 8; //LMK
 					}
 					found = fileName.toStdString().find(TAGext);
 					found2 = fileName.toStdString().find(TAGext2);
@@ -626,66 +636,66 @@ void vtkMDInteractorStyle::StartSelect()
 					found4 = fileName.toStdString().find(TAGext4);
 					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
 					{
-						type = 8; //TAG
+						type = 9; //TAG
 					}
 					found = fileName.toStdString().find(STVext);
 					found2 = fileName.toStdString().find(STVext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 9; //STV
+						type = 10; //STV
 					}
 					//8 tag, 9 stv, 10 ori, 11 pos
 					found = fileName.toStdString().find(ORIext);
 					found2 = fileName.toStdString().find(ORIext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 10; //ORI
+						type = 11; //ORI
 					}
 					found = fileName.toStdString().find(POSext);
 					found2 = fileName.toStdString().find(POSext2);
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
-						type = 11; //POS
+						type = 12; //POS
 					}
 
 
-					if (type < 3)
+					if (type < 4)
 					{
 						mqMorphoDigCore::instance()->OpenMesh(fileName);
 					}
-					else if (type == 3)
+					else if (type == 4)
 					{
 						mqMorphoDigCore::instance()->OpenNTW(fileName);
 					}
-					else if (type == 4)
+					else if (type == 5)
 					{
 						mqMorphoDigCore::instance()->OpenVER(fileName, 0);
 					}
-					else if (type == 5)
+					else if (type == 6)
 					{
 						mqMorphoDigCore::instance()->OpenCUR(fileName);
 					}
-					else if (type == 6)
+					else if (type == 7)
 					{
 						mqMorphoDigCore::instance()->OpenFLG(fileName);
 					}
-					else if (type == 7)
+					else if (type == 8)
 					{
 						mqMorphoDigCore::instance()->OpenLMK(fileName, 0);
 					}
-					else if (type == 8)
+					else if (type == 9)
 					{
 						mqMorphoDigCore::instance()->OpenTAGMAP(fileName);
 					}
-					else if (type == 9)
+					else if (type == 10)
 					{
 						mqMorphoDigCore::instance()->OpenSTV(fileName);
 					}
-					else if (type == 10)
+					else if (type == 11)
 					{
 						mqMorphoDigCore::instance()->OpenORI(fileName);
 					}
-					else if (type == 11)
+					else if (type == 12)
 					{
 						mqMorphoDigCore::instance()->OpenPOS(fileName, 1);
 					}
