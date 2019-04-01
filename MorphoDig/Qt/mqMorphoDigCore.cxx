@@ -17886,10 +17886,15 @@ int mqMorphoDigCore::GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb)
 {
 	ExistingArrays *MyList = this->Getmui_ArraysOfSelectedObjects();
 	QString rgb = QString("RGB");
+	QString sc = QString("Solid color");
 	int cpt = 0;
 	if (exclude_rgb==0)
 	{
-		return MyList->Stack.size();
+		if (MyList->Stack.size() > 1)
+		{
+			cout << "Scalar name" << MyList->Stack.at(0).Name.toStdString() << endl;
+		}
+		return (MyList->Stack.size()-1);
 	}
 	else
 	{
@@ -17898,12 +17903,12 @@ int mqMorphoDigCore::GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb)
 			//if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
 			// {
 
-
-			if (MyList->Stack.at(i).Name != rgb)
+			cout <<"Scalar name"<< MyList->Stack.at(i).Name.toStdString() << endl;
+			if (MyList->Stack.at(i).Name != rgb && MyList->Stack.at(i).Name != sc)
 			{
 				cpt++;
 			}
-			else
+			else if (MyList->Stack.at(i).Name == rgb)
 			{
 				if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
 				{
