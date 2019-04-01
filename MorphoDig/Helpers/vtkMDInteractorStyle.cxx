@@ -94,6 +94,9 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define T_PRESSED 7
 #define T_RELEASED 8
 
+//#define SHIFT_PRESSED 9
+#define SHIFT_RELEASED 10
+
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
@@ -108,6 +111,7 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	this->T = T_RELEASED;
 	this->MoveWhat = CAM;
 	this->Ctrl = CTRL_RELEASED;
+	this->Shift = SHIFT_RELEASED;
 	this->LM_Button = LBUTTON_UP;
 	this->RM_Button = RBUTTON_UP;
 	this->StartPosition[0] = this->StartPosition[1] = 0;
@@ -287,7 +291,7 @@ void vtkMDInteractorStyle::StartSelect()
 	std::string key = rwi->GetKeySym();
 	
 	// Output the key that was pressed
-	//cout << key << endl;
+	cout << key << endl;
 	if (key.compare("Escape") == 0)
 	{
 		mqMorphoDigCore::instance()->SwitchMoveMode();
@@ -326,6 +330,14 @@ void vtkMDInteractorStyle::StartSelect()
 				mqMorphoDigCore::instance()->setCurrentCursor(6);
 			}
 		}
+	}
+	if (key.compare("Shift_L") == 0)
+	{
+		this->Shift = SHIFT_PRESSED;
+		this->L = L_PRESSED;
+		/*QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
+		QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
+		//std::cout << key<< "Pressed" << '\n';*/
 	}
 	if (key.compare("Control_L") == 0)
 	{
@@ -826,8 +838,16 @@ void vtkMDInteractorStyle::StartSelect()
 	  if (key.compare("Control_L") == 0)
 	  {
 		  this->Ctrl = CTRL_RELEASED;
-		 // std::cout << key << "Released" << '\n';
+		  
 	  }
+
+	  if (key.compare("Shift") == 0)
+	  {
+		  this->Ctrl = SHIFT_RELEASED;
+		  this->L = L_RELEASED;
+		  // std::cout << key << "Released" << '\n';
+	  }
+
 	  if (key.compare("Alt_L") == 0)
 	  {
 		  this->Alt = ALT_RELEASED;
@@ -1062,6 +1082,7 @@ void vtkMDInteractorStyle::Tag(int mode)
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnRightButtonDown()
 {
+	cout << "Right button down" << endl;
 	this->RM_Button = RBUTTON_DOWN;
 	if (this->T == T_PRESSED)
 	{
@@ -1202,7 +1223,7 @@ void vtkMDInteractorStyle::ResetMoveWhat()
 }
 void vtkMDInteractorStyle::OnLeftButtonDown()
 {
-	//cout << "Left button down!" << endl;
+	cout << "Left button down!" << endl;
 	this->LM_Button = LBUTTON_DOWN;
 	
   if (this->CurrentMode != VTKISMD_SELECT)
@@ -1217,7 +1238,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  //int* clickPos = this->GetInteractor()->GetEventPosition();
 		  int x = this->Interactor->GetEventPosition()[0];
 		  int y = this->Interactor->GetEventPosition()[1];
-		  // std::cout << "Clicked at "
+		  //std::cout << "Clicked at "
 		  //	  << x << " " << y   << std::endl;
 		  if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
 		  if (this->CurrentRenderer != NULL)
@@ -1258,7 +1279,9 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 		  this->L = L_RELEASED;
 	  }//left button down, no landmark 
-	  else  if (this->T == T_PRESSED && this->Ctrl != CTRL_PRESSED)
+	  else  if (this->T == T_PRESSED 
+		  && this->Ctrl != CTRL_PRESSED
+		  )
 	  {
 
 		  this->Tag(1);

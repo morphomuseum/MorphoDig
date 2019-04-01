@@ -113,6 +113,7 @@ protected:
   void ResetMoveWhat();
   int CurrentMode;
   int Ctrl;
+  int Shift;
   int L;
   int T;
   int Alt;
