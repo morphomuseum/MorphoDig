@@ -4030,6 +4030,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		}
 		else 
 		{
+			cout << "Try visualize!!!" << endl;
+
 			vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 			vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
@@ -4037,30 +4039,35 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
-			property->SetIndependentComponents(false);
+			property->SetIndependentComponents(true);
 			property->SetColor(colorFun);
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
+			//mapper->SetInputData(input);
+			mapper->SetInputConnection(reader->GetOutputPort());
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
 			volume->SetMapper(mapper);
 			//colorFun->AddRGBPoint()
-			colorFun->AddRGBPoint(100, 0, 0, 0, 0.5, 0.0);
-			colorFun->AddRGBPoint(5000, 0.73, 0.25, 0.30, 0.49, .61);
-			colorFun->AddRGBPoint(641, .90, .82, .56, .5, 0.0);
-			colorFun->AddRGBPoint(3071, 1, 1, 1, .5, 0.0);
-			opacityFun->AddPoint(-3024, 0, 0.5, 0.0);
-			opacityFun->AddPoint(-16, 0, .49, .61);
-			opacityFun->AddPoint(641, .72, .5, 0.0);
-			opacityFun->AddPoint(3071, .71, 0.5, 0.0);
-			/*461
-				462       mapper->SetBlendModeToComposite();
-			463       property->ShadeOn();
-			464       property->SetAmbient(0.1);
-			465       property->SetDiffuse(0.9);
-			466       property->SetSpecular(0.2);
-			467       property->SetSpecularPower(10.0);
-			468       property->SetScalarOpacityUnitDistance(0.8919);*/
+			colorFun->AddRGBPoint(0, 0, 0, 0, 0.5, 0.0);
+			colorFun->AddRGBPoint(3000, 0.73, 0.25, 0.30, 0.49, .61);
+			colorFun->AddRGBPoint(5000, .90, .82, .56, .5, 0.0);
+			colorFun->AddRGBPoint(9000, 1, 1, 1, .5, 0.0);
+			opacityFun->AddPoint(0, 0, 0.5, 0.0);
+			opacityFun->AddPoint(3000, 0, .49, .61);
+			opacityFun->AddPoint(5000, 1, .5, 0.0);
+			opacityFun->AddPoint(9000, 1, 0.5, 0.0);
+			      mapper->SetBlendModeToComposite();
+			       property->ShadeOn();
+			      property->SetAmbient(0.1);
+			      property->SetDiffuse(0.9);
+			      property->SetSpecular(0.2);
+			      property->SetSpecularPower(10.0);
+			     property->SetScalarOpacityUnitDistance(0.8919);
+				 mapper->Update();
+				 volume->Update();
+			this->getRenderer()->AddVolume(volume);
+
 		}
 	}
 
