@@ -156,7 +156,6 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   QMenu* submenuMeasurements = menu.addMenu("Measurements");
   
   
-
   new mqOpenDataReaction(submenuProject->addAction("Open Project") << mqSetName("actionOpenNTW"), 1);
   new mqSaveNTWDialogReaction(submenuProject->addAction("Save Project") << mqSetName("actionSaveNTW"));
   
@@ -217,6 +216,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveDataReaction(submenuMeasurements->addAction("Save scalar values of first selected surface") << mqSetName("actionSaveSCInfos"), 23);
 
   
+  QMenu* submenuVolume = menu.addMenu("Volume");
+  new mqOpenDataReaction(submenuVolume->addAction("Open MHD/MHA/VTI Volume") << mqSetName("actionOpenVolume"), 18);
 
   
 }

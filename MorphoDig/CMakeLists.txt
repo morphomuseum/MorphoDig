@@ -70,6 +70,7 @@ set( required_vtk_modules
   vtkRenderingGL2PSOpenGL2
   vtkViewsContext2D
   vtkViewsCore
+  vtkRenderingVolumeOpenGL2
   )
 if(VTK_RENDERING_BACKEND) #in vtk 7, the rendering backend is exported as a var.
   LIST(APPEND required_vtk_modules vtkRendering${VTK_RENDERING_BACKEND})

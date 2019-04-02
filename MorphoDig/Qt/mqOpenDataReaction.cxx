@@ -54,6 +54,28 @@ void mqOpenDataReaction::OpenMesh()
 	
 	mqMorphoDigCore::instance()->OpenMesh(fileName);
 }
+
+void mqOpenDataReaction::OpenVolume()
+{
+	//mqMorphoDigCore::instance()->getUndoStack();
+	cout << "Open MHA MHD VTI!" << endl;
+
+	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
+		tr("Load MHD/MHA volume"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("surfaces (*.mhd *.mha)"));
+
+
+
+	cout << fileName.toStdString();
+	if (fileName.isEmpty()) return;
+
+	QFileInfo fileInfo(fileName);
+	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+
+	mqMorphoDigCore::instance()->OpenVolume(fileName);
+}
+
 void mqOpenDataReaction::OpenLMK_or_VER(int mode)
 {
 	//mode 0=> inside normal landmarks

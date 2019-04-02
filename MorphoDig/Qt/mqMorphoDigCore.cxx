@@ -13,12 +13,16 @@
 #include "vtkBezierCurveSource.h"
 #include <time.h>
 #include <vtkTriangle.h>
+#include <vtkSmartVolumeMapper.h>
+#include <vtkVolumeProperty.h>
+#include <vtkVolume.h>
 #include <vtkBooleanOperationPolyDataFilter.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkTextProperty.h>
 #include <vtkPlatonicSolidSource.h>
 #include <vtkSphereSource.h>
+#include <vtkImageData.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkReverseSense.h>
@@ -62,6 +66,8 @@
 #include <vtkSmartPointer.h>
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataReader.h>
+#include <vtkMetaImageReader.h>
+#include <vtkXMLImageDataReader.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPLYReader.h>
 #include <vtkMath.h>
@@ -3939,6 +3945,126 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 
 }
 
+void mqMorphoDigCore::OpenVolume(QString fileName)
+{
+	int file_exists = 1;
+	QFile file(fileName);
+	QString name = "";
+	if (file.exists()) {
+		// Message
+		name = file.fileName(); // Return only a file name		
+		file.close();
+	}
+	else
+	{
+		file_exists = 0;
+
+
+	}
+
+
+	if (file_exists == 1)
+	{
+		std::string MHDext(".mhd");
+		std::string MHDext2(".MHD");
+		std::string MHAext(".mha");
+		std::string MHAext2(".MHA");
+		std::string VTIext(".vti");
+		std::string VTIext2(".VTI");
+
+		int type = 0; //0 = mhd, 1 = mha, 2 = vti,
+		std::size_t found = fileName.toStdString().find(MHDext);
+		std::size_t found2 = fileName.toStdString().find(MHDext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 0;
+			//MHD
+		}
+
+		
+		found = fileName.toStdString().find(MHAext);
+		found2 = fileName.toStdString().find(MHAext2);
+		if (found != std::string::npos || found2 != std::string::npos )
+		{
+			type = 1; //MHA
+		}
+
+		
+		found = fileName.toStdString().find(VTIext);
+		found2 = fileName.toStdString().find(VTIext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 2; //VTI
+		}
+		vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+		vtkSmartPointer<vtkAlgorithm> reader = vtkSmartPointer <vtkAlgorithm>::New();
+
+		if (type < 2)
+		{
+			vtkSmartPointer <vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
+			 metaReader->SetFileName(fileName.toLocal8Bit());
+		     metaReader->Update();
+		     input = metaReader->GetOutput();
+		     reader = metaReader;		
+
+		}
+		else
+		{ 
+			vtkSmartPointer <vtkXMLImageDataReader> xmlReader = vtkSmartPointer<vtkXMLImageDataReader>::New();
+			xmlReader->SetFileName(fileName.toLocal8Bit());
+			xmlReader->Update();
+			input = xmlReader->GetOutput();
+			reader = xmlReader;
+
+		
+		}
+
+		int dim[3];
+		input->GetDimensions(dim);
+		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << endl;
+		if (dim[0] < 2 ||
+		        dim[1] < 2 ||
+		        dim[2] < 2)
+		{
+			return;
+		}
+		else 
+		{
+			vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
+			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
+			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
+			
+			  // Create the property and attach the transfer functions
+			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
+			property->SetIndependentComponents(false);
+			property->SetColor(colorFun);
+			property->SetScalarOpacity(opacityFun);
+			property->SetInterpolationTypeToLinear();
+			// connect up the volume to the property and the mapper
+			volume->SetProperty(property);
+			volume->SetMapper(mapper);
+			//colorFun->AddRGBPoint()
+			colorFun->AddRGBPoint(100, 0, 0, 0, 0.5, 0.0);
+			colorFun->AddRGBPoint(5000, 0.73, 0.25, 0.30, 0.49, .61);
+			colorFun->AddRGBPoint(641, .90, .82, .56, .5, 0.0);
+			colorFun->AddRGBPoint(3071, 1, 1, 1, .5, 0.0);
+			opacityFun->AddPoint(-3024, 0, 0.5, 0.0);
+			opacityFun->AddPoint(-16, 0, .49, .61);
+			opacityFun->AddPoint(641, .72, .5, 0.0);
+			opacityFun->AddPoint(3071, .71, 0.5, 0.0);
+			/*461
+				462       mapper->SetBlendModeToComposite();
+			463       property->ShadeOn();
+			464       property->SetAmbient(0.1);
+			465       property->SetDiffuse(0.9);
+			466       property->SetSpecular(0.2);
+			467       property->SetSpecularPower(10.0);
+			468       property->SetScalarOpacityUnitDistance(0.8919);*/
+		}
+	}
+
+}
 void mqMorphoDigCore::OpenMesh(QString fileName)
 {
 

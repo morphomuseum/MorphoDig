@@ -41,6 +41,7 @@ public:
    void OpenMAP();
    void OpenTAGMAP();
    void OpenORI();
+   void OpenVolume();
    
   
 protected:
@@ -122,7 +123,11 @@ protected:
 	{
 		this->OpenMAP();
 	}
-	
+	else if (this->Mode == 18)
+	{
+		this->OpenVolume();
+	}
+
   }
 
 private:

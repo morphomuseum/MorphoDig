@@ -517,6 +517,7 @@ public:
 	void OpenVER(QString fileName, int mode);
 	void OpenLMK(QString fileName, int mode);
 	void OpenMesh(QString fileName);
+	void OpenVolume(QString fileName);
 	void OpenPOS(QString fileName, int mode);
 	void OpenPOSTrans(QString fileName, int mode);
 	void GetVertexColor(vtkMDActor *myActor, vtkIdType ve, int color[4]);
