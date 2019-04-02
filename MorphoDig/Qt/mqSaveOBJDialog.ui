@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Save STL</string>
+   <string>Save OBJ</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">

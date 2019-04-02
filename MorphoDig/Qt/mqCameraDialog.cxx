@@ -182,9 +182,12 @@ void mqCameraDialog::slotSaveCAM(){
 	mqMorphoDigCore::instance()->SaveCAM(fileName,cNear, cFar, cX, cY, cZ, fX, fY, fZ, uX, uY, uZ);
 
 }
-void mqCameraDialog::slotReinitialize(){}
+void mqCameraDialog::slotReinitialize()
+{
+}
 void mqCameraDialog::slotRefresh() 
 {
+	cout << "Refresh" << endl;
 	this->RefreshDialog();
 }
 
