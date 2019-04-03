@@ -4050,13 +4050,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			volume->SetMapper(mapper);
 			//colorFun->AddRGBPoint()
 			colorFun->AddRGBPoint(0, 0, 0, 0, 0.5, 0.0);
-			colorFun->AddRGBPoint(3000, 0.73, 0.25, 0.30, 0.49, .61);
-			colorFun->AddRGBPoint(5000, .90, .82, .56, .5, 0.0);
-			colorFun->AddRGBPoint(9000, 1, 1, 1, .5, 0.0);
+			colorFun->AddRGBPoint(4000, 0.73, 0.25, 0.30, 0.49, .61);
+			colorFun->AddRGBPoint(8000, .90, .82, .56, .5, 0.0);
+			colorFun->AddRGBPoint(12000, 1, 1, 1, .5, 0.0);
 			opacityFun->AddPoint(0, 0, 0.5, 0.0);
-			opacityFun->AddPoint(3000, 0, .49, .61);
-			opacityFun->AddPoint(5000, 1, .5, 0.0);
-			opacityFun->AddPoint(9000, 1, 0.5, 0.0);
+			opacityFun->AddPoint(4000, 0, .49, .61);
+			opacityFun->AddPoint(8000, 1, .5, 0.0);
+			opacityFun->AddPoint(12000, 1, 0.5, 0.0);
 			      mapper->SetBlendModeToComposite();
 			       property->ShadeOn();
 			      property->SetAmbient(0.1);

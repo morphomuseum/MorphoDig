@@ -1257,22 +1257,27 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 			  double* pos = picker->GetPickPosition();
 			  
-			  //  std::cout << "Pick position (world coordinates) is: "
-			  //	  << pos[0] << " " << pos[1]
-			  //	  << " " << pos[2] << std::endl;
+			    std::cout << "Pick position (world coordinates) is: "
+			  	  << pos[0] << " " << pos[1]
+			  	  << " " << pos[2] << std::endl;
 			  double* norm = picker->GetPickNormal();
-			  //  std::cout << "Pick normal : "
-			  //	  << norm[0] << " " << norm[1]
-			  //	  << " " << norm[2] << std::endl;
+			   std::cout << "Pick normal : "
+			  	  << norm[0] << " " << norm[1]
+			  	  << " " << norm[2] << std::endl;
 
 			  //  std::cout << "Picked actor: " << picker->GetActor() << std::endl;
-			  if (picker->GetActor() == NULL) { cout << "Picked Null actor" << endl; }
-			  else
-			  {
-				  mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
+			   
+			   if (picker->GetActor() != NULL || picker->GetVolume() != NULL)
+			   {
+				   cout << "An actor or a volume was picked" << endl;
+			   
+				   // else
+				  //  {
+				   mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
 
-				  mqMorphoDigCore::instance()->Render();
-			  }
+				   mqMorphoDigCore::instance()->Render();
+				   //  }
+			   }
 
 		  }
 		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
