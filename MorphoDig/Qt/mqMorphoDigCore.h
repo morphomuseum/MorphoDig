@@ -18,6 +18,7 @@
 #include "QRAMThread.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkMDActorCollection.h"
+
 #include "vtkBezierCurveSource.h"
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
@@ -37,7 +38,7 @@
 #else
 #include <QVTKOpenGLNativeWidget.h>
 #endif
-
+#include <vtkVolumeCollection.h>
 #include <vtkScalarBarActor.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkDiscretizableColorTransferFunction.h>

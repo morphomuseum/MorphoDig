@@ -56,6 +56,7 @@ set( required_vtk_modules
   vtkFiltersStatistics
   vtkGUISupportQt
   vtkImagingHybrid
+  vtkImagingStatistics
   vtkInteractionStyle
   vtkIOCore
   vtkIOGeometry

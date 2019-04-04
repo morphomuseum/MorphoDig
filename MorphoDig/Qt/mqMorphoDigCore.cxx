@@ -16,6 +16,8 @@
 #include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 #include <vtkVolume.h>
+#include <vtkImageAccumulate.h>
+#include <vtkImageHistogram.h>
 #include <vtkBooleanOperationPolyDataFilter.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkLandmarkTransform.h>
@@ -4021,7 +4023,18 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 		int dim[3];
 		input->GetDimensions(dim);
-		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << endl;
+		int numcells = input->GetNumberOfCells();
+		input->GetScalarTypeAsString();
+		//input->Get
+		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< endl;
+		cout << "Dim0*Dim1*Dim2:" << dim[0]* dim[1]* dim[2] << endl;
+		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
+		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
+		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+		int* range;
+		
+		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+
 		if (dim[0] < 2 ||
 		        dim[1] < 2 ||
 		        dim[2] < 2)
@@ -4036,7 +4049,230 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 			vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
-			
+			vtkSmartPointer<vtkImageAccumulate> histogram =
+				  vtkSmartPointer<vtkImageAccumulate>::New();
+
+			histogram->SetInputData(input);
+			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
+			{
+				histogram->SetComponentExtent(VTK_UNSIGNED_SHORT_MIN, VTK_UNSIGNED_SHORT_MAX, 0, 0, 0, 0);
+				histogram->SetComponentOrigin(0, 0, 0);
+			}
+			if (input->GetScalarType() == VTK_SHORT)
+			{
+				cout << "signed shorts !" << endl;
+				cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << endl;
+				histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
+				histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
+			}
+		
+			int bin_spacing = 1000;
+			histogram->SetComponentSpacing(bin_spacing, 0, 0);
+			histogram->Update();
+			int first_peak = 0;
+			int first_peak_bin = 0;
+			int first_low = 0;
+			int second_peak = 0;
+			int second_peak_bin = 0;
+			int second_low = 0;
+			int third_peak = 0;
+			int third_peak_bin = 0;
+			int third_low = 0;
+			int fourth_peak = 0;
+			int fourth_peak_bin = 0;
+			int fourth_low = 0;
+			int fifth_peak = 0;
+			int fifth_peak_bin = 0;
+			int fifth_low = 0;
+			int dims[3];
+			histogram->GetOutput()->GetDimensions(dims);
+			cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
+			vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
+			cout << "Histogram (used) dims=" << used_bins  << endl;
+			int prevbin = 0;
+			int fst = 0; // 0: search first peak to be set: 
+						 //1: search first low (first peak is set)
+						// 2: search second peak (first low is set)
+						// 3: seach second low (second peak is set)
+						// 4: search third peak (second low is set)
+						// 5 : search third low (third peak is set)
+						// 6: search fourth peak  (third peak is set)
+			for (vtkIdType bin = 0; bin < used_bins; ++bin)
+			{
+				int curbin = *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0)));
+					//histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin);
+				if (fst == 0)
+				{
+					if (curbin >= prevbin )
+					{
+						first_peak = bin;
+						first_peak_bin = curbin;
+					}
+					else
+					{
+						// starts do decrease: 
+						fst = 1;
+						first_low = bin;
+					}
+				}
+				if (fst == 1)
+				{
+					if (curbin < prevbin)
+					{
+						first_low = bin;
+					}
+					else
+					{
+						// starts do re-increase: 
+						fst = 2;
+						second_peak = bin; second_peak_bin = curbin;
+					}
+				}
+				if (fst == 2)
+				{
+					if (curbin >= prevbin)
+					{
+						if (curbin > 0)
+						{
+							second_peak = bin;
+							second_peak_bin = curbin;
+						}
+					}
+					else
+					{
+						// starts do decrease: 
+						fst = 3;
+						second_low = bin;
+					}
+				}	
+				if (fst == 3)
+				{
+					if (curbin < prevbin)
+					{
+						second_low = bin;
+					}
+					else
+					{
+						// starts do re-increase: 
+						fst = 4;
+						third_peak = bin; third_peak_bin = curbin;
+					}
+				}
+				if (fst == 4)
+				{
+					if (curbin >= prevbin )
+					{
+						if (curbin > 0)
+						{
+							third_peak = bin;  third_peak_bin = curbin;
+						}
+					}
+					else
+					{
+						// starts do decrease: 
+						fst = 5;
+						third_low = bin;
+					}
+				}	
+				if (fst == 5)
+				{
+					if (curbin < prevbin)
+					{
+						third_low = bin;
+					}
+					else
+					{
+						// starts do re-increase: 
+						fst = 6;
+						fourth_peak = bin; fourth_peak_bin = curbin;
+					}
+				}
+				if (fst == 6)
+				{
+					if (curbin >= prevbin)
+					{
+						if (curbin > 0)
+						{
+							fourth_peak = bin; fourth_peak_bin = curbin;
+						}
+					}
+					else
+					{
+						// starts do decrease: 
+						fst = 7;
+						fourth_low = bin;
+					}
+				}
+				if (fst == 7)
+				{
+					if (curbin < prevbin)
+					{
+						fourth_low = bin;
+					}
+					else
+					{
+						// starts do re-increase: 
+						fst = 8;
+						fifth_peak = bin; fifth_peak_bin = curbin;
+					}
+				}
+				if (fst == 8)
+				{
+					if (curbin >= prevbin )
+					{
+						if (curbin > 0)
+						{
+							fifth_peak = bin; fifth_peak_bin = curbin;
+						}
+					}
+					else
+					{
+						// starts do decrease: 
+						fst = 9;
+						fifth_low = bin;
+					}
+				}
+				if (fst == 9)
+				{
+					if (curbin < prevbin)
+					{
+						fifth_low = bin;
+					}
+					else
+					{
+						// starts do re-increase: 
+						fst = 10;
+						//sixth_peak = bin;
+					}
+				}
+				//if (bin % 655 == 0)
+				//{
+					cout <<"bin="<<bin<<"|"<< *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0))) << " ";
+					cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << endl;
+				//}
+				prevbin = curbin;
+			}
+			if (first_peak_bin == 0) { first_peak = 0; }
+			if (second_peak_bin == 0) { second_peak = 0; }
+			if (third_peak_bin == 0) { third_peak = 0; }
+			if (fourth_peak_bin == 0) { fourth_peak = 0; }
+			if (fifth_peak_bin == 0) { fifth_peak = 0; }
+			cout << "1p=" << first_peak << endl;
+			cout << "1l=" << first_low << endl;
+
+			cout << "2p=" << second_peak << endl;
+			cout << "2l=" << second_low << endl;
+
+
+			cout << "3p=" << third_peak << endl;
+			cout << "3l=" << third_low << endl;
+
+
+			cout << "4p=" << fourth_peak << endl;
+			cout << "4l=" << fourth_low << endl;
+
+			cout << "5p=" << fifth_peak << endl;
+			cout << "5l=" << fifth_low << endl;
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
@@ -4049,14 +4285,25 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			volume->SetProperty(property);
 			volume->SetMapper(mapper);
 			//colorFun->AddRGBPoint()
+			/*colorFun->AddRGBPoint(1350, 0, 0, 0, 0.5, 0.0);
+			colorFun->AddRGBPoint(5000, 0.73, 0.25, 0.30, 0.49, .61);
+			colorFun->AddRGBPoint(8500, .90, .82, .56, .5, 0.0);
+			colorFun->AddRGBPoint(12232, 1, 1, 1, .5, 0.0);
+			opacityFun->AddPoint(1350, 0, 0.5, 0.0);
+			opacityFun->AddPoint(5000, 0.5, .49, .61);
+			opacityFun->AddPoint(8500, 0.75, .5, 0.0);
+			opacityFun->AddPoint(12232, 1, 0.5, 0.0);*/
+
+
 			colorFun->AddRGBPoint(0, 0, 0, 0, 0.5, 0.0);
-			colorFun->AddRGBPoint(4000, 0.73, 0.25, 0.30, 0.49, .61);
-			colorFun->AddRGBPoint(8000, .90, .82, .56, .5, 0.0);
-			colorFun->AddRGBPoint(12000, 1, 1, 1, .5, 0.0);
+			colorFun->AddRGBPoint(7250, 0.73, 0.25, 0.30, 0.49, .61);
+			colorFun->AddRGBPoint(14520, .90, .82, .56, .5, 0.0);
+			colorFun->AddRGBPoint(22000, 1, 1, 1, .5, 0.0);
 			opacityFun->AddPoint(0, 0, 0.5, 0.0);
-			opacityFun->AddPoint(4000, 0, .49, .61);
-			opacityFun->AddPoint(8000, 1, .5, 0.0);
-			opacityFun->AddPoint(12000, 1, 0.5, 0.0);
+			opacityFun->AddPoint(7250, 0.5, .49, .61);
+			opacityFun->AddPoint(14520, 0.75, .5, 0.0);
+			opacityFun->AddPoint(22000, 1, 0.5, 0.0);
+
 			      mapper->SetBlendModeToComposite();
 			       property->ShadeOn();
 			      property->SetAmbient(0.1);
@@ -4067,6 +4314,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 mapper->Update();
 				 volume->Update();
 			this->getRenderer()->AddVolume(volume);
+			this->Render();
 
 		}
 	}
