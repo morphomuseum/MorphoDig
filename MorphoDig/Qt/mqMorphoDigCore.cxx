@@ -12,6 +12,7 @@
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
 #include <time.h>
+#include <vtkLight.h>
 #include <vtkTriangle.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
@@ -4277,6 +4278,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 mapper->Update();
 				 volume->Update();
 			this->getRenderer()->AddVolume(volume);
+			vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+			cout << "front light!" << endl;
+			light->SetLightTypeToCameraLight();
+			light->SetPosition(0, 0, 1);
+			this->getRenderer()->RemoveAllLights();
+			this->getRenderer()->AddLight(light);
+			
 			this->Render();
 
 		}
