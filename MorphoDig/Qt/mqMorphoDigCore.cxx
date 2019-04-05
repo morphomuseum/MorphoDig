@@ -4249,20 +4249,23 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 					}
 				}
 			}
-			int second_point = (int)(first_point + 0.33*(last_point - first_point));
-			int third_point = (int)(first_point + 0.66*(last_point - first_point));
+			//let's put first point a little bit further!
+			first_point = (int)(first_point + 0.2*(last_point - first_point));
+
+			int second_point = (int)(first_point + 0.2*(last_point - first_point));
+			int third_point = (int)(first_point + 0.4*(last_point - first_point));
 			cout << "first_point=" << first_point << endl;
 			cout << "second_point=" << second_point << endl;
 			cout << "third_point=" << third_point << endl;
 			cout << "last_point=" << last_point << endl;
-			colorFun->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0.0);
-			colorFun->AddRGBPoint(second_point, 0.73, 0.25, 0.30, 0.49, .61);
-			colorFun->AddRGBPoint(third_point, .90, .82, .56, .5, 0.0);
-			colorFun->AddRGBPoint(last_point, 1, 1, 1, .5, 0.0);
-			opacityFun->AddPoint(first_point, 0, 0.5, 0.0);
-			opacityFun->AddPoint(second_point, 0.25, .49, .61);
-			opacityFun->AddPoint(third_point, 0.75, .5, 0.0);
-			opacityFun->AddPoint(last_point, 1, 0.5, 0.0);
+			colorFun->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+			colorFun->AddRGBPoint(second_point, 0.73, 0, 0, 0.5,0);
+			colorFun->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
+			colorFun->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
+			opacityFun->AddPoint(first_point, 0, 0.5, 0);
+			opacityFun->AddPoint(second_point, 0.5, .5, 0);
+			opacityFun->AddPoint(third_point, 0.8, .5, 0);
+			opacityFun->AddPoint(last_point, 1, 0.5, 0);
 
 			      mapper->SetBlendModeToComposite();
 			       property->ShadeOn();
