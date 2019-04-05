@@ -4177,8 +4177,19 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			opacityFun->AddPoint(5000, 0.5, .49, .61);
 			opacityFun->AddPoint(8500, 0.75, .5, 0.0);
 			opacityFun->AddPoint(12232, 1, 0.5, 0.0);*/
-
 			int first_point = 0; // as first low... a
+			int last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+
+			if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
+				first_point = VTK_UNSIGNED_SHORT_MIN;
+				last_point = VTK_UNSIGNED_SHORT_MAX;
+			}
+			else
+			{
+				first_point = VTK_SHORT_MIN;
+				last_point = VTK_SHORT_MAX;
+				
+			}
 			if (l_i >= 0) 
 			{ 
 				first_point = lowsT.at(0); 
@@ -4186,18 +4197,64 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 					first_point = (int)(0.5*(lowsT.at(0) + peaksT.at(1)));
 				}
 			}
-			int last_point=0; //somme pondérée autres peaks,  puis recher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
 
-			int second_largest_peak=0;
-			int low_after_second_largest_peak=0;
+			//now search last point
+			int avg_peaks= 0;
+
+			int low_after_avgpeaks = 0;
+			if (p_i>0)
+			{ 
+				int sum_peaks=0;
+				int sum_peakVals=0;
+				for (int i = 1; i <= p_i; i++)
+				{
+					//peaksT.at(i) peakVals.at(i) ;
+					sum_peaks += peaks.at(i)*peakVals.at(i);
+					sum_peakVals += peakVals.at(i);
+				}
+				if (sum_peakVals>0)
+				{
+					avg_peaks = sum_peaks / sum_peakVals;
+					// search if a low exists after avg_peaks
+					int exists = 0;
+					int i_low=0;
+					if (l_i>=0)
+					{ 
+						for (int i = 0; i <= l_i; i++)
+						{
+							if (lowsT.at(i) > avg_peaks)
+							{
+								if (exists==0){ i_low = i; }
+								exists = 1;
+								
+							}
+						}
+						if (exists == 1)
+						{
+							low_after_avgpeaks = lowsT.at(i_low);
+							last_point = (int)((low_after_avgpeaks + avg_peaks) / 2);
+						}
+					}
+					else
+					{
+						last_point = avg_peaks;
+					}
+				}
+			}
+			int second_point = (int)(first_point + 0.33*(last_point - first_point));
+			int third_point = (int)(first_point + 0.66*(last_point - first_point));
+			cout << "first_point=" << first_point << endl;
+			cout << "second_point=" << second_point << endl;
+			cout << "third_point=" << third_point << endl;
+			cout << "last_point=" << last_point << endl;
 			colorFun->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0.0);
-			colorFun->AddRGBPoint(7250, 0.73, 0.25, 0.30, 0.49, .61);
-			colorFun->AddRGBPoint(14520, .90, .82, .56, .5, 0.0);
-			colorFun->AddRGBPoint(22000, 1, 1, 1, .5, 0.0);
+			colorFun->AddRGBPoint(second_point, 0.73, 0.25, 0.30, 0.49, .61);
+			colorFun->AddRGBPoint(third_point, .90, .82, .56, .5, 0.0);
+			colorFun->AddRGBPoint(last_point, 1, 1, 1, .5, 0.0);
 			opacityFun->AddPoint(first_point, 0, 0.5, 0.0);
-			opacityFun->AddPoint(7250, 0.5, .49, .61);
-			opacityFun->AddPoint(14520, 0.75, .5, 0.0);
-			opacityFun->AddPoint(22000, 1, 0.5, 0.0);
+			opacityFun->AddPoint(second_point, 0.5, .49, .61);
+			opacityFun->AddPoint(third_point, 0.75, .5, 0.0);
+			opacityFun->AddPoint(last_point, 1, 0.5, 0.0);
 
 			      mapper->SetBlendModeToComposite();
 			       property->ShadeOn();
