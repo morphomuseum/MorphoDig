@@ -4204,17 +4204,25 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			int low_after_avgpeaks = 0;
 			if (p_i>0)
 			{ 
-				int sum_peaks=0;
-				int sum_peakVals=0;
+				double sum_peaks=0;
+				double sum_peakVals=0;
 				for (int i = 1; i <= p_i; i++)
 				{
 					//peaksT.at(i) peakVals.at(i) ;
-					sum_peaks += peaks.at(i)*peakVals.at(i);
-					sum_peakVals += peakVals.at(i);
+					cout << "peaksT.at(i)="<<peaksT.at(i) << endl;
+					cout << "peakVals.at(i)=" << peakVals.at(i) << endl;
+					double mult = (double)peaksT.at(i)*(double)peakVals.at(i);
+					cout << "mult=" << mult << endl;
+					sum_peakVals += (double)peakVals.at(i);
+					sum_peaks += mult;
+					cout << "sum_peaks=" << sum_peaks << endl;
+					cout << "sum_peakVals=" << sum_peakVals << endl;
+
 				}
 				if (sum_peakVals>0)
 				{
-					avg_peaks = sum_peaks / sum_peakVals;
+					avg_peaks = (int)(sum_peaks / sum_peakVals);
+					cout << "avg_peaks="<<avg_peaks << endl;
 					// search if a low exists after avg_peaks
 					int exists = 0;
 					int i_low=0;
@@ -4252,7 +4260,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			colorFun->AddRGBPoint(third_point, .90, .82, .56, .5, 0.0);
 			colorFun->AddRGBPoint(last_point, 1, 1, 1, .5, 0.0);
 			opacityFun->AddPoint(first_point, 0, 0.5, 0.0);
-			opacityFun->AddPoint(second_point, 0.5, .49, .61);
+			opacityFun->AddPoint(second_point, 0.25, .49, .61);
 			opacityFun->AddPoint(third_point, 0.75, .5, 0.0);
 			opacityFun->AddPoint(last_point, 1, 0.5, 0.0);
 
