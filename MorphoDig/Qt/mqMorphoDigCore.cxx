@@ -15421,6 +15421,7 @@ void mqMorphoDigCore::addKeepLargest()
 void mqMorphoDigCore::DeleteSelectedActors()
 {
 	this->ActorCollection->DeleteSelectedActors();
+	this->VolumeCollection->DeleteSelectedVolumes();
 	this->NormalLandmarkCollection->DeleteSelectedActors();
 	this->TargetLandmarkCollection->DeleteSelectedActors();
 	this->NodeLandmarkCollection->DeleteSelectedActors();
