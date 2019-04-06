@@ -4281,26 +4281,25 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 volume->Update();
 				 volume->SetSelected(1);
 				 volume->SetName("New Volume");
-				 //volume->SetColorProperties(, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+
+				 //this->getRenderer()->AddVolume(volume);
 				 this->getVolumeCollection()->AddItem(volume);
 				 //emit this->actorsMightHaveChanged();
 				 //this->Initmui_ExistingArrays();
 				 std::string action = "Load volume";
-				 int mCount = BEGIN_UNDO_SET(action);
-				 this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
-				 END_UNDO_SET();
+				 //int mCount = BEGIN_UNDO_SET(action);
+				 //this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
+				 //END_UNDO_SET();
 
 
 
-				 this->getVolumeCollection()->SetChanged(1);
+				 //this->getVolumeCollection()->SetChanged(1);
 
-				 //double BoundingBoxLength = MyPolyData->GetLength();
+				 cout << "try adjust camera grid" << endl;
 				 this->AdjustCameraAndGrid();
-				 //cout << "camera and grid adjusted" << endl;
-				 if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
-				 {
-					 this->UpdateLandmarkSettings();
-				 }
+				 cout << "camera and grid adjusted" << endl;
+				 
 				 //this->getRenderer()->AddVolume(volume);
 			/*actor->SetSelected(1);
 			actor->SetName(newname);
