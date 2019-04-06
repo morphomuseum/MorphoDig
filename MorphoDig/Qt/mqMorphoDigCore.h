@@ -18,7 +18,7 @@
 #include "QRAMThread.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkMDActorCollection.h"
-
+#include "vtkMDVolumeCollection.h"
 #include "vtkBezierCurveSource.h"
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
@@ -657,7 +657,7 @@ public:
 	{
 		this->RenderWindow = renwin;
 	}
-
+	double GetBoundingBoxLength();
 	vtkSmartPointer<vtkActor> getBezierActor();
 	vtkSmartPointer<vtkActor> getBezierNHActor();
 	vtkSmartPointer<vtkActor> getBezierSelectedActor();
@@ -667,7 +667,7 @@ public:
 	vtkSmartPointer<vtkLMActorCollection> getNodeLandmarkCollection();
 	vtkSmartPointer<vtkLMActorCollection> getHandleLandmarkCollection();
 	vtkSmartPointer<vtkLMActorCollection> getFlagLandmarkCollection();
-
+	vtkSmartPointer<vtkMDVolumeCollection> getVolumeCollection();
 	vtkSmartPointer<vtkMDActorCollection> getActorCollection();
 	//vtkMDActorCollection* getActorCollection();
 	vtkSmartPointer<vtkRenderer> getRenderer();
@@ -878,6 +878,7 @@ protected:
 	
 
 	vtkSmartPointer<vtkMDActorCollection> ActorCollection;
+	vtkSmartPointer<vtkMDVolumeCollection> VolumeCollection;
 	vtkSmartPointer<vtkLMActorCollection> NormalLandmarkCollection;
 	vtkSmartPointer<vtkLMActorCollection> TargetLandmarkCollection;
 	vtkSmartPointer<vtkLMActorCollection> NodeLandmarkCollection;

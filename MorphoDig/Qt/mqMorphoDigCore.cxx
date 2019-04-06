@@ -7,6 +7,7 @@
 =========================================================================*/
 #include "mqMorphoDigCore.h"
 #include "vtkMDActor.h"
+#include "vtkMDVolume.h"
 #include "vtkLMActor.h"
 #include "vtkOrientationHelperActor.h"
 #include "vtkOrientationHelperWidget.h"
@@ -178,6 +179,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_ExistingTagMaps = new ExistingTagMaps;
 	this->InitLuts();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
+	this->VolumeCollection = vtkSmartPointer<vtkMDVolumeCollection>::New();
 	cout << "try to create mui_ActiveArrays" << endl;
 	this->mui_ActiveArray = new ActiveArray;
 	this->mui_ExistingArrays = new ExistingArrays;
@@ -312,7 +314,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	
 
 	this->ActorCollection->SetRenderer(this->Renderer);
-
+	this->VolumeCollection->SetRenderer(this->Renderer);
 	this->BezierCurveSource = vtkSmartPointer<vtkBezierCurveSource>::New();
 	this->BezierMapper=vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->BezierSelectedMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -4046,7 +4048,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		{
 			cout << "Try visualize!!!" << endl;
 
-			vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
+			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 			vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -4270,14 +4272,61 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			      mapper->SetBlendModeToComposite();
 			       property->ShadeOn();
-			      property->SetAmbient(0.1);
-			      property->SetDiffuse(0.9);
-			      property->SetSpecular(0.2);
-			      property->SetSpecularPower(10.0);
+			      property->SetAmbient(this->mui_Ambient);
+			      property->SetDiffuse(this->mui_Diffuse);
+			      property->SetSpecular(this->mui_Specular);
+			      property->SetSpecularPower(this->mui_SpecularPower);
 			     property->SetScalarOpacityUnitDistance(0.8919);
 				 mapper->Update();
 				 volume->Update();
-			this->getRenderer()->AddVolume(volume);
+				 volume->SetSelected(1);
+				 volume->SetName("New Volume");
+				 //volume->SetColorProperties(, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+				 this->getVolumeCollection()->AddItem(volume);
+				 //emit this->actorsMightHaveChanged();
+				 //this->Initmui_ExistingArrays();
+				 std::string action = "Load volume";
+				 int mCount = BEGIN_UNDO_SET(action);
+				 this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
+				 END_UNDO_SET();
+
+
+
+				 this->getVolumeCollection()->SetChanged(1);
+
+				 //double BoundingBoxLength = MyPolyData->GetLength();
+				 this->AdjustCameraAndGrid();
+				 //cout << "camera and grid adjusted" << endl;
+				 if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+				 {
+					 this->UpdateLandmarkSettings();
+				 }
+				 //this->getRenderer()->AddVolume(volume);
+			/*actor->SetSelected(1);
+			actor->SetName(newname);
+			actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+			actor->SetDisplayMode(this->mui_DisplayMode);
+			//actor->GetProperty()->SetRepresentationToPoints();
+			this->getActorCollection()->AddItem(actor);
+			emit this->actorsMightHaveChanged(); 
+			this->Initmui_ExistingArrays();
+			std::string action = "Load surface file";
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+
+
+
+			this->getActorCollection()->SetChanged(1);
+
+			//double BoundingBoxLength = MyPolyData->GetLength();
+			this->AdjustCameraAndGrid();
+			//cout << "camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}*/
 			vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 			cout << "front light!" << endl;
 			light->SetLightTypeToCameraLight();
@@ -17376,16 +17425,24 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 void mqMorphoDigCore::AdjustCameraAndGrid()
 {
 	double newcamerafocalpoint[3] = { 0,0,0 };
+	double actorCOM[3] = { 0,0,0 };
+	double volumeCOM[3] = { 0,0,0 };
 	if (this->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		this->getActorCollection()->GetCenterOfMass(newcamerafocalpoint);
+		this->getActorCollection()->GetCenterOfMass(actorCOM);
+		this->getVolumeCollection()->GetCenterOfMass(volumeCOM);
+		newcamerafocalpoint[0] = (actorCOM[0] + volumeCOM[0]) / 2;
+		newcamerafocalpoint[1] = (actorCOM[1] + volumeCOM[1]) / 2;
+		newcamerafocalpoint[2] = (actorCOM[2] + volumeCOM[2]) / 2;
 		this->getGridActor()->SetGridOrigin(newcamerafocalpoint);
 
 
 	}
 
 	double multfactor = 1 / tan(this->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
-	double GlobalBoundingBoxLength = this->getActorCollection()->GetBoundingBoxLength();
+	double ActorBoxLength = this->getActorCollection()->GetBoundingBoxLength();
+	double VolumeBoxLength = this->getVolumeCollection()->GetBoundingBoxLength();
+	double GlobalBoundingBoxLength = (VolumeBoxLength + ActorBoxLength);
 	if (GlobalBoundingBoxLength == std::numeric_limits<double>::infinity() || GlobalBoundingBoxLength == 0)
 	{
 		GlobalBoundingBoxLength = 120;
@@ -19486,6 +19543,10 @@ vtkSmartPointer<vtkBezierCurveSource> mqMorphoDigCore::getBezierCurveSource()
 vtkSmartPointer<vtkMDActorCollection> mqMorphoDigCore::getActorCollection()
 {
 	return this->ActorCollection;
+}
+vtkSmartPointer<vtkMDVolumeCollection> mqMorphoDigCore::getVolumeCollection()
+{
+	return this->VolumeCollection;
 }
 vtkSmartPointer<vtkLMActorCollection> mqMorphoDigCore::getNormalLandmarkCollection()
 {
