@@ -3,8 +3,10 @@ SET (Helpers_SRCS
 vtkOrientationHelperActor.cxx 
 vtkGridActor.cxx 
 vtkMDActor.cxx 
+vtkMDVolume.cxx 
 vtkLMActor.cxx 
 vtkMDActorCollection.cxx 
+vtkMDVolumeCollection.cxx 
 vtkLMActorCollection.cxx 
 vtkOrientationHelperWidget.cxx 
 vtkMDInteractorStyle.cxx 
@@ -21,8 +23,10 @@ vtkMDCubeSource.cxx
 set( Helpers_HDRS 
 vtkOrientationHelperActor.h 
 vtkMDActor.h 
+vtkMDVolume.h
 vtkLMActor.h 
 vtkMDActorCollection.h 
+vtkMDVolumeCollection.h 
 vtkLMActorCollection.h 
 vtkGridActor.h 
 vtkOrientationHelperWidget.h 
