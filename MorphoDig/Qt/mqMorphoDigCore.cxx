@@ -4288,9 +4288,9 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 //emit this->actorsMightHaveChanged();
 				 //this->Initmui_ExistingArrays();
 				 std::string action = "Load volume";
-				 //int mCount = BEGIN_UNDO_SET(action);
-				 //this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
-				 //END_UNDO_SET();
+				 int mCount = BEGIN_UNDO_SET(action);
+				 this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
+				 END_UNDO_SET();
 
 
 
