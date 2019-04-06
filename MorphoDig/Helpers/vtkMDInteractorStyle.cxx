@@ -15,6 +15,7 @@
 #include "vtkMDInteractorStyle.h"
 #include "vtkMDActor.h"
 #include "vtkLMActor.h"
+#include "vtkMDVolume.h"
 #include "mqUndoStack.h"
 #include "mqMorphoDigCore.h"
 #include "mqSaveNTWDialog.h"
@@ -122,6 +123,7 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	this->PixelArray = vtkUnsignedCharArray::New();
 	this->PixelArray2 = vtkUnsignedCharArray::New();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
+	this->VolumeCollection = vtkSmartPointer<vtkMDVolumeCollection>::New();
 	this->NormalLandmarkCollection = vtkSmartPointer<vtkLMActorCollection>::New();
 	this->TargetLandmarkCollection = vtkSmartPointer<vtkLMActorCollection>::New();
 	this->NodeLandmarkCollection = vtkSmartPointer<vtkLMActorCollection>::New();
@@ -130,7 +132,10 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	this->ActorsPositionsSaved = 0;
 	this->NumberOfSelectedActors = 0;
 }
-
+void vtkMDInteractorStyle::SetVolumeCollection(vtkSmartPointer<vtkMDVolumeCollection> VolColl)
+{
+	this->VolumeCollection = VolColl;
+}
 void vtkMDInteractorStyle::SetActorCollection(vtkSmartPointer<vtkMDActorCollection> ActColl)
 {
 	this->ActorCollection = ActColl;
@@ -364,6 +369,16 @@ void vtkMDInteractorStyle::StartSelect()
 			{
 				std::string action = "Select all actors";
 				int Count = BEGIN_UNDO_SET(action);
+				this->VolumeCollection->InitTraversal();
+				for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+				{
+					vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+					if (myVolume->GetSelected() == 0)
+					{
+						myVolume->SaveState(Count);
+					}
+				}
+
 				this->ActorCollection->InitTraversal();
 				for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 				{
@@ -432,6 +447,19 @@ void vtkMDInteractorStyle::StartSelect()
 						myActor->SetSelected(1);
 						myActor->SetChanged(1);
 						
+					}
+
+
+				}
+				this->VolumeCollection->InitTraversal();
+				for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+				{
+					vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+					if (myVolume->GetSelected() == 0)
+					{
+						myVolume->SetSelected(1);
+						myVolume->SetChanged(1);
+
 					}
 
 
@@ -1375,6 +1403,18 @@ int vtkMDInteractorStyle::getNumberOfSelectedActors()
 		}
 		
 	}
+	this->VolumeCollection->InitTraversal();
+	
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor *myVolume = vtkMDActor::SafeDownCast(this->VolumeCollection->GetNextVolume());
+
+		if (myVolume->GetSelected() == 1)
+		{
+			cpt++;
+		}
+
+	}
 	this->NormalLandmarkCollection->InitTraversal();
 	
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
@@ -1474,6 +1514,16 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 			{
 				//cout << "Call myActor Save Position with count"<<Count << endl;
 				myActor->SaveState(Count);
+			}
+		}
+		this->VolumeCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+			if (myVolume->GetSelected() == 1)
+			{
+				//cout << "Call myActor Save Position with count"<<Count << endl;
+				myVolume->SaveState(Count);
 			}
 		}
 		this->NormalLandmarkCollection->InitTraversal();
@@ -2418,6 +2468,33 @@ void vtkMDInteractorStyle::RotateActors()
 				myActor->SetChanged(1);
 			}
 		}
+		this->VolumeCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
+			if (myVolume->GetSelected() == 1)
+			{
+				//cout << "Apply prop3Dtransform" << endl;
+				for (vtkIdType j = 0; j < 2; j++)
+				{
+					for (vtkIdType k = 0; k < 4; k++)
+					{
+						//cout << "rotate["<<j<<"]"<<"["<<k<<"]="<< rotate[j][k] << endl;
+
+					}
+				}
+
+				//cout << "scale:" << scale[0] << ","<< scale[1] << ","<< scale[2] << endl;
+
+				this->Prop3DTransform(myPropr,
+					rot_center,
+					2,
+					rotate,
+					scale);
+				myVolume->SetChanged(1);
+			}
+		}
 		this->NormalLandmarkCollection->InitTraversal();
 		for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
 		{
@@ -2591,6 +2668,22 @@ void vtkMDInteractorStyle::SpinActors()
 		}
 		
 	}
+	this->VolumeCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
+		if (myVolume->GetSelected() == 1)
+		{
+			this->Prop3DTransform(myPropr,
+				spin_center,
+				1,
+				rotate,
+				scale);
+			myVolume->SetChanged(1);
+		}
+
+	}
 	this->NormalLandmarkCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
 	{
@@ -2742,6 +2835,31 @@ void vtkMDInteractorStyle::PanActors()
 					motion_vector[2]);
 			}
 			myActor->SetChanged(1);
+		}
+	}
+	this->VolumeCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
+		if (myVolume->GetSelected() == 1)
+		{
+			if (myPropr->GetUserMatrix() != NULL)
+			{
+				vtkTransform *t = vtkTransform::New();
+				t->PostMultiply();
+				t->SetMatrix(myPropr->GetUserMatrix());
+				t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
+				myPropr->GetUserMatrix()->DeepCopy(t->GetMatrix());
+				t->Delete();
+			}
+			else
+			{
+				myPropr->AddPosition(motion_vector[0],
+					motion_vector[1],
+					motion_vector[2]);
+			}
+			myVolume->SetChanged(1);
 		}
 	}
 	this->NormalLandmarkCollection->InitTraversal();

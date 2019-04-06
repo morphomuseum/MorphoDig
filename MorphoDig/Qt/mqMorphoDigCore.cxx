@@ -17960,7 +17960,15 @@ void mqMorphoDigCore::SelectAll(int Count)
 void mqMorphoDigCore::UnselectAll(int Count)
 {
 	int node_handle_collections_changed = 0;
-	
+	this->VolumeCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		if (myVolume->GetSelected() == 1 && Count > 0)
+		{
+			myVolume->SaveState(Count);
+		}
+	}
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{

@@ -437,6 +437,31 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 				myActor->SetChanged(1);
 			}
 		}
+		mqMorphoDigCore::instance()->getVolumeCollection()->InitTraversal();
+		for (vtkIdType i = 0; i < mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems(); i++)
+		{
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
+			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
+			if (myVolume->GetSelected() == 1)
+			{
+				if (myPropr->GetUserMatrix() != NULL)
+				{
+					vtkTransform *t = vtkTransform::New();
+					t->PostMultiply();
+					t->SetMatrix(myPropr->GetUserMatrix());
+					t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
+					myPropr->GetUserMatrix()->DeepCopy(t->GetMatrix());
+					t->Delete();
+				}
+				else
+				{
+					myPropr->AddPosition(motion_vector[0],
+						motion_vector[1],
+						motion_vector[2]);
+				}
+				myVolume->SetChanged(1);
+			}
+		}
 		mqMorphoDigCore::instance()->getNormalLandmarkCollection()->InitTraversal();
 		for (vtkIdType i = 0; i < mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfItems(); i++)
 		{
@@ -710,6 +735,33 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 				myActor->SetChanged(1);
 			}
 		}
+		mqMorphoDigCore::instance()->getVolumeCollection()->InitTraversal();
+		for (vtkIdType i = 0; i < mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems(); i++)
+		{
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
+			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
+			if (myVolume->GetSelected() == 1)
+			{
+				//cout << "Apply prop3Dtransform" << endl;
+				for (vtkIdType j = 0; j < 1; j++)
+				{
+					for (vtkIdType k = 0; k < 4; k++)
+					{
+						//cout << "rotate["<<j<<"]"<<"["<<k<<"]="<< rotate[j][k] << endl;
+
+					}
+				}
+
+				//cout << "scale:" << scale[0] << ","<< scale[1] << ","<< scale[2] << endl;
+
+				this->Prop3DTransform(myPropr,
+					rot_center,
+					1,
+					rotate,
+					scale);
+				myVolume->SetChanged(1);
+			}
+		}
 		mqMorphoDigCore::instance()->getNormalLandmarkCollection()->InitTraversal();
 		for (vtkIdType i = 0; i < mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfItems(); i++)
 		{
@@ -858,6 +910,16 @@ void mqObjectsControlsWidget::SavePositions(int val)
 		{
 			//cout << "Call myActor Save Position with count"<<Count << endl;
 			myActor->SaveState(Count);
+		}
+	}
+	mqMorphoDigCore::instance()->getVolumeCollection()->InitTraversal();
+	for (vtkIdType i = 0; i < mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
+		if (myVolume->GetSelected() == 1)
+		{
+			//cout << "Call myActor Save Position with count"<<Count << endl;
+			myVolume->SaveState(Count);
 		}
 	}
 	mqMorphoDigCore::instance()->getNormalLandmarkCollection()->InitTraversal();

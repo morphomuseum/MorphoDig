@@ -908,6 +908,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 		 vtkSmartPointer<vtkInteractorStyleRubberBand3D>::New();
 
 	 style->SetActorCollection(this->MorphoDigCore->getActorCollection());
+	 style->SetVolumeCollection(this->MorphoDigCore->getVolumeCollection());
 	 style->SetNormalLandmarkCollection(this->MorphoDigCore->getNormalLandmarkCollection());
 	 style->SetTargetLandmarkCollection(this->MorphoDigCore->getTargetLandmarkCollection());
 	 style->SetNodeLandmarkCollection(this->MorphoDigCore->getNodeLandmarkCollection());

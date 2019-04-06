@@ -66,6 +66,7 @@ public:
   virtual void PanActors();
   void EndLandmarkMovements(vtkLMActor *myActor);
   void EndLandmarkMovements();
+  void SetVolumeCollection(vtkSmartPointer<vtkMDVolumeCollection> VolColl);
   void SetActorCollection(vtkSmartPointer<vtkMDActorCollection>ActColl);
   void SetNormalLandmarkCollection(vtkSmartPointer<vtkLMActorCollection>LmkColl);
   void SetTargetLandmarkCollection(vtkSmartPointer<vtkLMActorCollection>LmkColl);
@@ -120,6 +121,8 @@ protected:
   int LM_Button;
   int RM_Button;
   //vtkProp3D *InteractionProp;
+  vtkSmartPointer<vtkMDVolumeCollection> VolumeCollection;
+
   vtkSmartPointer<vtkMDActorCollection> ActorCollection;
   vtkSmartPointer<vtkLMActorCollection> NormalLandmarkCollection;
   vtkSmartPointer<vtkLMActorCollection> TargetLandmarkCollection;
