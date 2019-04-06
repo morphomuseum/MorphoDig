@@ -18,6 +18,7 @@
 #ifndef vtkMDInteractorStyle_h
 #define vtkMDInteractorStyle_h
 #include "vtkMDActorCollection.h"
+#include "vtkMDVolumeCollection.h"
 #include "vtkLMActorCollection.h"
 
 #include <vtkInteractorStyleTrackballCamera.h>
