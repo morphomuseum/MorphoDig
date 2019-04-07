@@ -123,7 +123,7 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 			
 					bbox.GetCorner(j, pt);
 					mqMorphoDigCore::TransformPoint(Mat, pt, ptwc);
-					 dist = plane->EvaluateFunction(ptwc);
+					 dist = plane->EvaluateFunction(pt);
 					 if (dist < 0) {						
 						 is_insideALL[i] = 1;}
 			}
@@ -293,7 +293,6 @@ void vtkMDVolume::PopUndoStack()
 
 	
 	
-	double myCurrentColor[4];
 	int mCurrentSelected = this->Selected;
 	this->SetSelected(this->UndoRedo->UndoStack.back().Selected);
 	this->Name = this->UndoRedo->UndoStack.back().Name;
@@ -331,7 +330,6 @@ void vtkMDVolume::PopRedoStack()
 	newTransform->Delete();*/
 	this->ApplyMatrix(Mat);
 	
-	double myCurrentColor[4];
 	int mCurrentSelected = this->Selected;
 	this->SetSelected(this->UndoRedo->RedoStack.back().Selected);
 	cout << "PopRedoStack Set Selected: " << mCurrentSelected << endl;
@@ -356,7 +354,6 @@ void vtkMDVolume::SaveState(int mCount)
 	//to do!
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);
-	double myColor[4];
 	int mSelected = this->Selected;
 	//std::cout << "Saved Matrix: " << endl << *Mat << std::endl;
 	std::string name = this->Name;
