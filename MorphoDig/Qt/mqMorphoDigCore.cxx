@@ -4294,7 +4294,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 
 
-				 //this->getVolumeCollection()->SetChanged(1);
+				 this->getVolumeCollection()->SetChanged(1);
 
 				 cout << "try adjust camera grid" << endl;
 				 this->AdjustCameraAndGrid();
@@ -17418,6 +17418,18 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 	if (nv > 0) {
 		com[0] /= nv; com[1] /= nv; com[2] /= nv;
 	}
+	if (this->VolumeCollection->GetNumberOfSelectedVolumes() > 0)
+	{
+		double *Volcom = this->VolumeCollection->GetCenterOfMassOfSelectedVolumes();
+		com[0] += Volcom[0];
+		com[1] += Volcom[1];
+		com[2] += Volcom[2];
+		if (nv > 0) {
+			com[0] /= 2;
+			com[1] /= 2;
+			com[2] /= 2;
+		}
+	}
 	//cout << "global selected com:" << com[0] << ","<<com[1] << "," << com[2] << endl;
 	//cout << "global selected nv:" << nv << endl;
 	//return com;
@@ -19521,6 +19533,11 @@ void mqMorphoDigCore::signal_actorSelectionChanged()
 {
 	//cout << "Emit actor Selection changed" << endl;
 	emit this->actorSelectionChanged();
+}
+void mqMorphoDigCore::signal_volumeSelectionChanged()
+{
+	//cout << "Emit volume Selection changed" << endl;
+	emit this->volumeSelectionChanged();
 }
 void mqMorphoDigCore::signal_lmSelectionChanged()
 {

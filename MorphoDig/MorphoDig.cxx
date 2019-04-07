@@ -216,6 +216,7 @@ void RubberBandSelect(vtkObject* caller,
 	props->InitTraversal();
 	int landmarks_have_changed = 0;
 	int mesh_actors_have_changed = 0;
+	int volume_actors_have_changed = 0;
 	for (vtkIdType i = 0; i < props->GetNumberOfItems(); i++)
 	{
 		
@@ -281,6 +282,34 @@ void RubberBandSelect(vtkObject* caller,
 
 				}
 			}
+			std::string str3("vtkMDVolume");
+			if (str3.compare(myprop3D->GetClassName()) == 0)
+			{
+				cout << "One volume actor found!" << endl;
+				vtkMDVolume *myVolume;
+				myVolume = vtkMDVolume::SafeDownCast(myprop3D);
+
+
+				if (myVolume->IsInsideFrustum(areaPicker->GetFrustum()))
+				{
+					if (myVolume->GetSelected() == 0)
+					{
+						myVolume->SaveState(Count);
+						myVolume->SetChanged(1);
+						myVolume->SetSelected(1);
+
+					}
+					else
+					{
+						myVolume->SaveState(Count);
+						myVolume->SetChanged(1);
+						myVolume->SetSelected(0);
+
+					}
+					volume_actors_have_changed = 1;
+
+				}
+			}
 		}
 		
 	}
@@ -302,6 +331,11 @@ void RubberBandSelect(vtkObject* caller,
 	{
 		//cout << "Signal actor selection changed!" << endl;
 		mqMorphoDigCore::instance()->signal_actorSelectionChanged();
+	}
+	if (volume_actors_have_changed == 1)
+	{
+		//cout << "Signal actor selection changed!" << endl;
+		mqMorphoDigCore::instance()->signal_volumeSelectionChanged();
 	}
 	//cout << "Am I done ? " << endl;
 

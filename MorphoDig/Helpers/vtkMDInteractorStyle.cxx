@@ -1386,6 +1386,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 void vtkMDInteractorStyle::DeleteSelectedActors()
 {
 	this->ActorCollection->DeleteSelectedActors();
+	this->VolumeCollection->DeleteSelectedVolumes();
 	this->NormalLandmarkCollection->DeleteSelectedActors();
 	this->TargetLandmarkCollection->DeleteSelectedActors();
 	this->NodeLandmarkCollection->DeleteSelectedActors();
@@ -1593,7 +1594,7 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnMouseMove()
 {
-	cout << "Mouse move" << endl;
+	
   if (this->CurrentMode != VTKISMD_SELECT &&  this->CurrentMode != VTKISMD_TAGPENCIL)
   {
 	 // this->ResetMoveWhat();
@@ -2246,6 +2247,18 @@ void vtkMDInteractorStyle::GetCenterOfMassOfSelectedActors(double com[3])
 
 	if (nv > 0) { com[0] /= nv; com[1] /= nv; com[2] /= nv;
 	}
+	if (this->VolumeCollection->GetNumberOfSelectedVolumes() > 0)
+	{
+		double *Volcom = this->VolumeCollection->GetCenterOfMassOfSelectedVolumes();
+		com[0] += Volcom[0];
+		com[1] += Volcom[1];
+		com[2] += Volcom[2];
+		if (nv > 0) {
+			com[0] /= 2;
+			com[1] /= 2;
+			com[2] /= 2;
+		}
+	}
 	//cout << "global selected com:" << com[0] << ","<<com[1] << "," << com[2] << endl;
 	//cout << "global selected nv:" << nv << endl;
 	//return com;
@@ -2255,6 +2268,9 @@ double vtkMDInteractorStyle::GetBoundingBoxLengthOfSelectedActors()
 {
 	double boundsa[6];
 	this->ActorCollection->GetBoundingBoxSelected(boundsa);
+	double boundsv[6];
+	this->VolumeCollection->GetBoundingBoxSelected(boundsv);
+
 	double Normalboundslm[6];
 	this->NormalLandmarkCollection->GetBoundingBoxSelected(Normalboundslm);
 	double Targetboundslm[6];
@@ -2282,6 +2298,14 @@ double vtkMDInteractorStyle::GetBoundingBoxLengthOfSelectedActors()
 	if (boundsa[3] > largestboundsselected[3]) { largestboundsselected[3] = boundsa[3]; }
 	if (boundsa[4] < largestboundsselected[4]) { largestboundsselected[4] = boundsa[4]; }
 	if (boundsa[5] > largestboundsselected[5]) { largestboundsselected[5] = boundsa[5]; }
+
+	if (boundsv[0] < largestboundsselected[0]) { largestboundsselected[0] = boundsv[0]; }
+	if (boundsv[1] > largestboundsselected[1]) { largestboundsselected[1] = boundsv[1]; }
+	if (boundsv[2] < largestboundsselected[2]) { largestboundsselected[2] = boundsv[2]; }
+	if (boundsv[3] > largestboundsselected[3]) { largestboundsselected[3] = boundsv[3]; }
+	if (boundsv[4] < largestboundsselected[4]) { largestboundsselected[4] = boundsv[4]; }
+	if (boundsv[5] > largestboundsselected[5]) { largestboundsselected[5] = boundsv[5]; }
+
 
 	if (Normalboundslm[0] < largestboundsselected[0]) { largestboundsselected[0] = Normalboundslm[0]; }
 	if (Normalboundslm[1] > largestboundsselected[1]) { largestboundsselected[1] = Normalboundslm[1]; }
@@ -2358,7 +2382,7 @@ void vtkMDInteractorStyle::RotateActors()
 	{
 		return;
 	}
-
+	cout << "Rotate Actors" << endl;
 	vtkRenderWindowInteractor *rwi = this->Interactor;
 	vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
 
@@ -2367,11 +2391,9 @@ void vtkMDInteractorStyle::RotateActors()
 	double rot_center[3] = { 0,0,0 };
 	
 	this->GetCenterOfMassOfSelectedActors(rot_center);
-	//cout << "rotation center: " << rot_centerendl;
-	//cout << "Rotation center: " << rot_center[0] << "," << rot_center[1] << "," << rot_center[2] << endl;
-	//cout << "bb length...." << endl;
+	cout << "Rotation center: " << rot_center[0] << "," << rot_center[1] << "," << rot_center[2] << endl;
 	double boundRadius = this->GetBoundingBoxLengthOfSelectedActors();
-	//cout << "Bound Radius: " << boundRadius << endl;
+	cout << "Bound Radius: " << boundRadius << endl;
 	if (boundRadius == std::numeric_limits<double>::infinity())
 	{
 		boundRadius = 60;
@@ -2420,10 +2442,11 @@ void vtkMDInteractorStyle::RotateActors()
 	double oxf = (rwi->GetLastEventPosition()[0] - disp_obj_center[0]) / radius;
 
 	double oyf = (rwi->GetLastEventPosition()[1] - disp_obj_center[1]) / radius;
-
+	cout << "here" << endl;
 	if (((nxf * nxf + nyf * nyf) <= 1.0) &&
 		((oxf * oxf + oyf * oyf) <= 1.0))
 	{
+		cout << "and there" << endl;
 		double newXAngle = vtkMath::DegreesFromRadians(asin(nxf));
 		double newYAngle = vtkMath::DegreesFromRadians(asin(nyf));
 		double oldXAngle = vtkMath::DegreesFromRadians(asin(oxf));

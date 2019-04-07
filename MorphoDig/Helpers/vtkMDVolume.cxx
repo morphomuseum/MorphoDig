@@ -7,6 +7,7 @@ Module:    vtkMDVolume.cxx
 #include "vtkMDVolume.h"
 
 #include <vtkObjectFactory.h>
+#include <vtkBoundingBox.h>
 #include <vtkMath.h>
 #include <vtkDataArray.h>
 #include <vtkSmartPointer.h>
@@ -91,17 +92,20 @@ void vtkMDVolume::SetColorProperties(double ambient, double diffuse, double spec
 }
 int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {
+	cout << "Is inside frustum!" << endl;
 	int is_inside = 0;
 	int is_insideALL[6] = { 0,0,0,0,0,0 };
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);
 	vtkSmartVolumeMapper *mapper = vtkSmartVolumeMapper::SafeDownCast(this->GetMapper());
-	/*if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+	vtkBoundingBox bbox (this->GetBounds());
+	//this->GetB
+	if (mapper != NULL)
 	{
-		vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+		
 
 		//we have six planes
-		for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j+=20)
+		for (vtkIdType j = 0; j < 8; j++)
 		{
 			is_insideALL[0] = 0;
 			is_insideALL[1] = 0;
@@ -117,7 +121,7 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 				
 				vtkPlane *plane = myPlanes->GetPlane(i);
 			
-					myPD->GetPoint(j, pt);
+					bbox.GetCorner(j, pt);
 					mqMorphoDigCore::TransformPoint(Mat, pt, ptwc);
 					 dist = plane->EvaluateFunction(ptwc);
 					 if (dist < 0) {						
@@ -132,7 +136,7 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 			}
 			
 		}
-	}*/
+	}
 	
 		return is_inside;
 	

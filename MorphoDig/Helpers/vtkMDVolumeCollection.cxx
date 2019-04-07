@@ -465,9 +465,11 @@ void vtkMDVolumeCollection::ComputeCenterOfMass()
 		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->GetNextVolume());
 		double Vcenter[3];
 		myVolume->GetMCenter(Vcenter);
+		cout << "Vcenter:" << Vcenter[0] << "," << Vcenter[1] << "," << Vcenter[2] << endl;
 		vtkTransform *Transform = vtkTransform::New();
 		if (myVolume->GetMatrix() != NULL)
 		{
+			// Actually: Vcenter already takes into account the Matrix. No need to retransform this Vcenter...
 			Transform->SetMatrix(myVolume->GetMatrix());
 			
 	
@@ -493,9 +495,10 @@ void vtkMDVolumeCollection::ComputeCenterOfMass()
 			//MultiplyPoint(const double in[4], double out[4])
 
 			//cout << "tcenter:" << tcenter[0] << "," << tcenter[1] << "," << tcenter[2] << endl;
-			Vcenter[0] = tcenter[0];
+			//We do not do the following 3 lines any longer.
+			/*Vcenter[0] = tcenter[0];
 			Vcenter[1] = tcenter[1];
-			Vcenter[2] = tcenter[2];
+			Vcenter[2] = tcenter[2];*/
 
 		}
 		else
@@ -629,11 +632,11 @@ void vtkMDVolumeCollection::ComputeBoundingBoxLength()
 
 void vtkMDVolumeCollection::ApplyChanges()
 {
-	//cout << "Compute center of mass" << endl;
+	cout << "Compute center of mass" << endl;
 	this->ComputeCenterOfMass();
-	//cout << "that?" << endl;
+	cout << "that?" << endl;
 	this->ComputeBoundingBoxLength();
-	//cout << "or?" << endl;
+	cout << "or?" << endl;
 
 	// Reset state "changed" to 0 for this and all Volumes.
 	this->Changed = 0;
@@ -646,7 +649,7 @@ void vtkMDVolumeCollection::ApplyChanges()
 		std::string str1("vtkMDVolume");
 		if (str1.compare(Volume->GetClassName()) == 0)
 		{
-			vtkMDActor *myMDVolume= vtkMDActor::SafeDownCast(Volume);
+			vtkMDVolume *myMDVolume= vtkMDVolume::SafeDownCast(Volume);
 			myMDVolume->SetChanged(0);
 		}
 		

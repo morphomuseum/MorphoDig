@@ -768,6 +768,7 @@ public:
   void signal_colorMapsChanged();
   void signal_lmSelectionChanged();
   void signal_actorSelectionChanged();
+  void signal_volumeSelectionChanged();
   void signal_projectionModeChanged();
   void signal_zoomChanged();
   void signal_existingArraysChanged();
@@ -839,6 +840,7 @@ signals:
   void zoomChanged();
   void lmSelectionChanged();
   void actorSelectionChanged();
+  void volumeSelectionChanged();
   void existingArraysChanged();
   void activeArrayChanged();
   void actorsMightHaveChanged();
