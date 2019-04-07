@@ -1342,6 +1342,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  }
 		  else
 		  {
+			  cout << "here" << endl;
 			  this->ActorsPositionsSaved = 0;//allow to save position
 			  int x = this->Interactor->GetEventPosition()[0];
 			  int y = this->Interactor->GetEventPosition()[1];
@@ -1355,7 +1356,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 			  this->GrabFocus(this->EventCallbackCommand);
 
-			  //cout << "Start Rotate CTRL" << endl;
+			  cout << "Start Rotate or Spin" << endl;
 			  this->NumberOfSelectedActors = this->getNumberOfSelectedActors();
 			  if (this->Alt == ALT_PRESSED)
 			  {
@@ -1363,7 +1364,10 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 			  }
 			  else
 			  {
+				  cout << "?" << endl;
 				  this->StartRotate();
+				  cout << "??" << endl;
+					  
 			  }
 			  
 
@@ -1407,10 +1411,11 @@ int vtkMDInteractorStyle::getNumberOfSelectedActors()
 	
 	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
 	{
-		vtkMDActor *myVolume = vtkMDActor::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 
 		if (myVolume->GetSelected() == 1)
 		{
+			cout << "Interactor style, found 1 selected volume" << endl;
 			cpt++;
 		}
 
@@ -1483,7 +1488,7 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 {
 	if (this->ActorsPositionsSaved == 0)
 	{
-		//cout << "SavePositions" << endl;
+		cout << "SavePositions" << endl;
 
 		std::string action = "Action!";
 		//cout << "State = " << this->State << endl;
@@ -1502,7 +1507,7 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 			//cout << "VTK_IS_SPIN: action=" << action.c_str() << endl;
 			break;
 		}
-
+		cout << "Begin undo set" << action << endl;
 		int Count = BEGIN_UNDO_SET(action);
 
 		//cout << action.c_str() << endl;
@@ -1522,7 +1527,7 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			if (myVolume->GetSelected() == 1)
 			{
-				//cout << "Call myActor Save Position with count"<<Count << endl;
+				cout << "Call myVolume Save Position with count"<<Count << endl;
 				myVolume->SaveState(Count);
 			}
 		}
@@ -1581,13 +1586,14 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 		
 		END_UNDO_SET();
 		this->ActorsPositionsSaved = 1;
+		cout << "End undo set" << action << endl;
 	}
 
 }
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnMouseMove()
 {
-	
+	cout << "Mouse move" << endl;
   if (this->CurrentMode != VTKISMD_SELECT &&  this->CurrentMode != VTKISMD_TAGPENCIL)
   {
 	 // this->ResetMoveWhat();
@@ -1619,14 +1625,14 @@ void vtkMDInteractorStyle::OnMouseMove()
 		  {
 		  case VTKIS_ROTATE:
 			  this->FindPokedRenderer(x, y);
-			  //cout << "ROTATE" << endl;
+			  cout << "ROTATE" << endl;
 			  this->RotateActors();
 			  this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
 			  break;
 
 		  case VTKIS_PAN:
 			  this->FindPokedRenderer(x, y);
-			  //cout << "PAN" << endl;
+			  cout << "PAN" << endl;
 			  this->PanActors();
 			  this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
 			  break;		  
@@ -2468,6 +2474,7 @@ void vtkMDInteractorStyle::RotateActors()
 				myActor->SetChanged(1);
 			}
 		}
+		cout << "rotate volume" << endl;
 		this->VolumeCollection->InitTraversal();
 		for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
 		{
