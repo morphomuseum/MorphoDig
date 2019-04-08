@@ -18,12 +18,14 @@ class QReleaseSliderValue : public QWidget
 public:
 	QReleaseSliderValue(Qt::Orientation orientation, const QString &title,
 		QWidget *parent = 0);
-
+	QReleaseSlider *slider;
 signals:
 	void valueChanged(int value);
-
-	public slots:
+	void sliderPressed();
+	
+public slots:
 	void setValue(int value);
+	void sliderWasPressed();
 	void setMinimum(int value);
 	void setMaximum(int value);
 	void invertAppearance(bool invert);
@@ -34,7 +36,7 @@ signals:
 
 private:
 	//QReleaseSlider *slider;
-	QReleaseSlider *slider;
+	
 	QSpinBox *spinbox;
 	QDial *dial;
 	QLabel *label;

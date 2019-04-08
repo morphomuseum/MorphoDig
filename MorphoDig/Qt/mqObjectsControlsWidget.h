@@ -87,6 +87,7 @@ private:
 		int oldtrval;
 	void SavePositions(int val);
 	
+	int State;
 	QReleaseSliderValue * zRot;
 
 	//QDoubleReleaseSlider * zRot;

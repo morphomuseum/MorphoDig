@@ -4280,7 +4280,23 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 mapper->Update();
 				 volume->Update();
 				 volume->SetSelected(1);
-				 volume->SetName("New Volume");
+				 QFileInfo fileInfo(fileName);
+				 QString onlyfilename(fileInfo.fileName());
+				 std::string only_filename = onlyfilename.toStdString();
+				 std::string newname = only_filename.c_str();
+				 size_t nPos = newname.find_last_of(".");
+				 if (nPos > 0)
+				 {
+
+					 newname = newname.substr(0, nPos);
+				 }
+
+				 //@@TODO! 
+
+				 newname = this->CheckingName(newname);
+				 cout << "Volume Name= " << newname << endl;
+
+				 volume->SetName(newname);
 				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 
 				 //this->getRenderer()->AddVolume(volume);
@@ -4326,12 +4342,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			{
 				this->UpdateLandmarkSettings();
 			}*/
-			vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+		/*	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 			cout << "front light!" << endl;
+			
 			light->SetLightTypeToCameraLight();
 			light->SetPosition(0, 0, 1);
 			this->getRenderer()->RemoveAllLights();
-			this->getRenderer()->AddLight(light);
+			this->getRenderer()->AddLight(light);*/
 			
 			this->Render();
 
@@ -18053,6 +18070,19 @@ void mqMorphoDigCore::UnselectAll(int Count)
 
 
 	}
+	this->VolumeCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		if (myVolume->GetSelected() == 1)
+		{
+			myVolume->SetSelected(0);
+			myVolume->SetChanged(1);
+
+		}
+
+
+	}
 	this->NormalLandmarkCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
 	{
@@ -19276,6 +19306,14 @@ void mqMorphoDigCore::Undo(int Count)
 	}
 	this->ActorCollection->Undo(Count);
 
+	this->VolumeCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		cout << "MyVolume" << myVolume->GetName() << "undo " << Count << endl;
+		myVolume->Undo(Count);
+	}
+	this->VolumeCollection->Undo(Count);
 	
 	this->NormalLandmarkCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
@@ -19357,6 +19395,14 @@ void mqMorphoDigCore::Redo(int Count)
 	}
 	this->ActorCollection->Redo(Count);
 
+	this->VolumeCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		cout << "MyVolume" << myVolume->GetName() << "redo " << Count << endl;
+		myVolume->Redo(Count);
+	}
+	this->VolumeCollection->Redo(Count);
 	
 	this->NormalLandmarkCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)

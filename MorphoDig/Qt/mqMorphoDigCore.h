@@ -844,6 +844,8 @@ signals:
   void existingArraysChanged();
   void activeArrayChanged();
   void actorsMightHaveChanged();
+  void volumesMightHaveChanged();
+  
   void modeModeChanged();
   void thicknessProgression(int percent);
   void iterativeShrinkWrapProgression(int percent);

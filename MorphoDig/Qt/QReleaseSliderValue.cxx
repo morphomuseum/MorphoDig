@@ -26,7 +26,7 @@ QReleaseSliderValue::QReleaseSliderValue(Qt::Orientation orientation, const QStr
 	this->label->setText("T");
 	connect(slider, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
 	connect(slider, SIGNAL(valueChanged(int)), this, SIGNAL(valueChanged(int)));
-
+	connect(slider, SIGNAL(sliderPressed()), this, SLOT(sliderWasPressed()));
 	QBoxLayout::Direction direction;
 
 	if (orientation == Qt::Vertical)
@@ -47,6 +47,10 @@ QReleaseSliderValue::QReleaseSliderValue(Qt::Orientation orientation, const QStr
 	this->layout->setMargin(0);
 	this->setMaximumWidth(16);
 	
+}
+void QReleaseSliderValue::sliderWasPressed()
+{
+	emit this->sliderPressed();
 }
 void QReleaseSliderValue::setLabelVisible(int visible)
 {

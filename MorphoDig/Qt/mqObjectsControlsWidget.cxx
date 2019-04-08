@@ -219,14 +219,22 @@ void mqObjectsControlsWidget::constructor()
   connect(yTr, SIGNAL(valueChanged(int)), this, SLOT(slotYtr(int)));
   connect(xTr, SIGNAL(valueChanged(int)), this, SLOT(slotXtr(int)));
 
-  /*connect(zRot, SIGNAL(sliderPressed()), this, SLOT(slotZrotPressed()));
+  /*connect(zRot->slider, SIGNAL(sliderPressed()), this, SLOT(slotZrotPressed()));
+  connect(yRot->slider, SIGNAL(sliderPressed()), this, SLOT(slotYrotPressed()));
+  connect(xRot->slider, SIGNAL(sliderPressed()), this, SLOT(slotXrotPressed()));
+
+  connect(zTr->slider, SIGNAL(sliderPressed()), this, SLOT(slotZtrPressed()));
+  connect(yTr->slider, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
+  connect(xTr->slider, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));*/
+  
+  connect(zRot, SIGNAL(sliderPressed()), this, SLOT(slotZrotPressed()));
   connect(yRot, SIGNAL(sliderPressed()), this, SLOT(slotYrotPressed()));
   connect(xRot, SIGNAL(sliderPressed()), this, SLOT(slotXrotPressed()));
 
   connect(zTr, SIGNAL(sliderPressed()), this, SLOT(slotZtrPressed()));
   connect(yTr, SIGNAL(sliderPressed()), this, SLOT(slotYtrPressed()));
-  connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));*/
-  
+  connect(xTr, SIGNAL(sliderPressed()), this, SLOT(slotXtrPressed()));
+
   //connect(this->ui->LassoCut, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
   //connect(this->ui->LassoCutKeepOutside, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));
   //connect(this->ui->RubberCut, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberCutKeepOutside()));
@@ -870,7 +878,7 @@ void mqObjectsControlsWidget::SavePositions(int val)
 {
 
 	std::string action = "Action!";
-	//cout << "State = " << this->State << endl;
+	cout << "State = " << this->State << endl;
 	switch (val)
 	{
 	case 0:
