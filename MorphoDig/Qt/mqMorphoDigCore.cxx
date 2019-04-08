@@ -4301,8 +4301,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 				 //this->getRenderer()->AddVolume(volume);
 				 this->getVolumeCollection()->AddItem(volume);
-				 //emit this->actorsMightHaveChanged();
-				 //this->Initmui_ExistingArrays();
+				 emit this->actorsMightHaveChanged();
+				 this->Initmui_ExistingArrays();
 				 std::string action = "Load volume";
 				 int mCount = BEGIN_UNDO_SET(action);
 				 this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
@@ -17218,12 +17218,39 @@ QMainWindow* mqMorphoDigCore::GetProjectWindow() {
 }
 //Called to repplace camera and grid positions when switching from "orange grid mode" to "blue grid mode"
 //= when camera focalpoint and grid center are changed between 0,0,0 and COM of all opened meshes.
+
+void mqMorphoDigCore::GetCenterOfMass(double center[3])
+{
+	double newcamerafocalpoint[3] = { 0,0,0 };
+	double actorsCOM[3] = { 0,0,0 };
+	double volumesCOM[3] = { 0,0,0 };
+	this->getActorCollection()->GetCenterOfMass(actorsCOM);
+	this->getActorCollection()->GetCenterOfMass(newcamerafocalpoint);
+	this->getVolumeCollection()->GetCenterOfMass(volumesCOM);
+	if (this->getVolumeCollection()->GetNumberOfItems() > 0)
+	{
+		newcamerafocalpoint[0] += volumesCOM[0];
+		newcamerafocalpoint[1] += volumesCOM[1];
+		newcamerafocalpoint[2] += volumesCOM[2];
+		if (this->getActorCollection()->GetNumberOfItems() > 0)
+		{
+			newcamerafocalpoint[0] /= 2;
+			newcamerafocalpoint[1] /= 2;
+			newcamerafocalpoint[2] /= 2;
+		}
+	}
+	center[0] = newcamerafocalpoint[0];
+	center[1] = newcamerafocalpoint[1];
+	center[2] = newcamerafocalpoint[2];
+}
+
 void mqMorphoDigCore::ReplaceCameraAndGrid()
 {
 	double newcamerafocalpoint[3] = { 0,0,0 };
 	if (this->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		this->getActorCollection()->GetCenterOfMass(newcamerafocalpoint);
+		this->GetCenterOfMass(newcamerafocalpoint);
+		
 	}
 
 	double oldcampos[3];

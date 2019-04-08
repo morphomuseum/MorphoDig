@@ -31,7 +31,7 @@ void mqCameraReaction::CameraFront()
 	double cameracentre[3] = { 0, 0, 0 };
 	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		mqMorphoDigCore::instance()->getActorCollection()->GetCenterOfMass(cameracentre);
+		mqMorphoDigCore::instance()->GetCenterOfMass(cameracentre);
 		mqMorphoDigCore::instance()->getGridActor()->SetGridOrigin(cameracentre);
 	}
 	double multfactor = 1 / tan(mqMorphoDigCore::instance()->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
@@ -60,7 +60,7 @@ void mqCameraReaction::CameraBack() {
 	double cameracentre[3] = { 0, 0, 0 };
 	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		mqMorphoDigCore::instance()->getActorCollection()->GetCenterOfMass(cameracentre);
+		mqMorphoDigCore::instance()->GetCenterOfMass(cameracentre);
 		mqMorphoDigCore::instance()->getGridActor()->SetGridOrigin(cameracentre);
 	}
 	double multfactor = 1 / tan(mqMorphoDigCore::instance()->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
@@ -82,7 +82,7 @@ void mqCameraReaction::CameraLeft() {
 	double cameracentre[3] = { 0, 0, 0 };
 	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		mqMorphoDigCore::instance()->getActorCollection()->GetCenterOfMass(cameracentre);
+		mqMorphoDigCore::instance()->GetCenterOfMass(cameracentre);
 		mqMorphoDigCore::instance()->getGridActor()->SetGridOrigin(cameracentre);
 	}
 	double multfactor = 1 / tan(mqMorphoDigCore::instance()->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
@@ -106,7 +106,7 @@ void mqCameraReaction::CameraRight()
 	double cameracentre[3] = { 0, 0, 0 };
 	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		mqMorphoDigCore::instance()->getActorCollection()->GetCenterOfMass(cameracentre);
+		mqMorphoDigCore::instance()->GetCenterOfMass(cameracentre);
 		mqMorphoDigCore::instance()->getGridActor()->SetGridOrigin(cameracentre);
 	}
 	double multfactor = 1 / tan(mqMorphoDigCore::instance()->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
@@ -129,7 +129,7 @@ void mqCameraReaction::CameraAbove() {
 	double cameracentre[3] = { 0, 0, 0 };
 	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		mqMorphoDigCore::instance()->getActorCollection()->GetCenterOfMass(cameracentre);
+		mqMorphoDigCore::instance()->GetCenterOfMass(cameracentre);
 		mqMorphoDigCore::instance()->getGridActor()->SetGridOrigin(cameracentre);
 	}
 	double multfactor = 1 / tan(mqMorphoDigCore::instance()->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
@@ -152,7 +152,7 @@ void mqCameraReaction::CameraBelow() {
 	double cameracentre[3] = { 0, 0, 0 };
 	if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		mqMorphoDigCore::instance()->getActorCollection()->GetCenterOfMass(cameracentre);
+		mqMorphoDigCore::instance()->GetCenterOfMass(cameracentre);
 		mqMorphoDigCore::instance()->getGridActor()->SetGridOrigin(cameracentre);
 	}
 	double multfactor = 1 / tan(mqMorphoDigCore::instance()->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);

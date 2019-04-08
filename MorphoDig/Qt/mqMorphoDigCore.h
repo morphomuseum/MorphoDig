@@ -823,7 +823,7 @@ public:
   int getTagMapId(QString tagMapName);
   void deleteColorMap(int i);
   void matchTagMapToActorCollection();
-  
+  void GetCenterOfMass(double center[3]);
   void deleteTagMap(int i);
   void addTagToTagMap(int i);
   void removeTagFromTagMap(int i);
