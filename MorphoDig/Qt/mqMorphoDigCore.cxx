@@ -4050,11 +4050,12 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
+			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			vtkSmartPointer<vtkImageAccumulate> histogram =
 				  vtkSmartPointer<vtkImageAccumulate>::New();
-
+			volume->SetColorTransferFunction(TF);
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
 			{
@@ -4163,7 +4164,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
-			property->SetColor(colorFun);
+			property->SetColor(TF);
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
 			//mapper->SetInputData(input);
@@ -4261,15 +4262,23 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//cout << "second_point=" << second_point << endl;
 			//cout << "third_point=" << third_point << endl;
 			//cout << "last_point=" << last_point << endl;
-			colorFun->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+			/*colorFun->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
 			colorFun->AddRGBPoint(second_point, 0.73, 0, 0, 0.5,0);
 			colorFun->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
 			colorFun->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
+			*/
+			TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+			TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
+			TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
+			TF->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
+
 			opacityFun->AddPoint(first_point, 0, 0.5, 0);
 			opacityFun->AddPoint(second_point, 0.5, .5, 0);
 			opacityFun->AddPoint(third_point, 0.8, .5, 0);
 			opacityFun->AddPoint(last_point, 1, 0.5, 0);
-
+			TF->SetEnableOpacityMapping(true);
+			TF->SetScalarOpacityFunction(opacityFun);
+			TF->Build();
 			      mapper->SetBlendModeToComposite();
 				  property->ShadeOn();
 				  //property->set

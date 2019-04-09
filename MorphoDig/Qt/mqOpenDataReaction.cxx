@@ -374,7 +374,7 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp)"));
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti)"));
 
 	if (!filenames.isEmpty())
 	{
@@ -416,8 +416,15 @@ void mqOpenDataReaction::OpenData()
 			std::string ORIext2(".ORI");
 			std::string POSext(".pos");
 			std::string POSext2(".POS");
+			std::string MHAext(".mha");
+			std::string MHAext2(".MHA");
+			std::string MHDext(".mhd");
+			std::string MHDext2(".MHD");
+			std::string VTIext(".vti");
+			std::string VTIext2(".VTI");
 
-			int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
+
+			int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos 13 mhd mha vti
 			std::size_t found = fileName.toStdString().find(STLext);
 			std::size_t found2 = fileName.toStdString().find(STLext2);
 			if (found != std::string::npos || found2 != std::string::npos)
@@ -513,7 +520,24 @@ void mqOpenDataReaction::OpenData()
 			{
 				type = 12; //POS
 			}
-
+			found = fileName.toStdString().find(MHAext);
+			found2 = fileName.toStdString().find(MHAext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				type = 13; //MHA MHD VTI
+			}
+			found = fileName.toStdString().find(MHDext);
+			found2 = fileName.toStdString().find(MHDext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				type = 13; //MHA MHD VTI
+			}
+			found = fileName.toStdString().find(VTIext);
+			found2 = fileName.toStdString().find(VTIext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				type = 13; //MHA MHD VTI
+			}
 
 			if (type < 4)
 			{
@@ -555,6 +579,11 @@ void mqOpenDataReaction::OpenData()
 			{
 				mqMorphoDigCore::instance()->OpenPOS(fileName, 1);
 			}
+			else if (type == 13)
+			{
+				mqMorphoDigCore::instance()->OpenVolume(fileName);
+			}
+
 		}
 	}
 	
