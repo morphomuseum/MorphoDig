@@ -1251,7 +1251,7 @@ void vtkMDInteractorStyle::ResetMoveWhat()
 }
 void vtkMDInteractorStyle::OnLeftButtonDown()
 {
-	cout << "Left button down!" << endl;
+	//cout << "Left button down!" << endl;
 	this->LM_Button = LBUTTON_DOWN;
 	
   if (this->CurrentMode != VTKISMD_SELECT)
@@ -1262,6 +1262,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 	  //special case : landmark setting!
 	  if (this->L == L_PRESSED && this->Ctrl != CTRL_PRESSED)
 	  {
+
 
 		  //int* clickPos = this->GetInteractor()->GetEventPosition();
 		  int x = this->Interactor->GetEventPosition()[0];

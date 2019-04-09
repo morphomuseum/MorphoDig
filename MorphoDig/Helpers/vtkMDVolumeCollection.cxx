@@ -210,6 +210,7 @@ void vtkMDVolumeCollection::CreateLoadUndoSet(int count, int creationcount)
 		for (vtkIdType i = 0; i < num_toremain; i++)
 		{
 			//these Volumes will remain in the renderer in case of undo
+			cout << "this one remains" << endl;
 			myVolume = this->GetNextVolume();
 		}	
 		for (vtkIdType i = 0; i < creationcount; i++)
@@ -325,6 +326,7 @@ void vtkMDVolumeCollection::Undo(int mCount)
 	cout << "Inside MDVolumeCollection Undo " <<mCount<< endl;
 	if (this->UndoRedo->UndoStack.empty())
 	{
+		cout << "Stack is empty" << endl;
 		return;
 	}
 	if (mCount == this->UndoRedo->UndoStack.back().UndoCount)
@@ -332,6 +334,10 @@ void vtkMDVolumeCollection::Undo(int mCount)
 		cout << "Undo Volume event " << this->UndoRedo->UndoStack.back().UndoCount << endl;
 		this->PopUndoStack();
 		mqMorphoDigCore::instance()->Initmui_ExistingArrays();
+	}
+	else
+	{
+
 	}
 
 } // Try to undo (if exists) "mCount" event
@@ -355,7 +361,7 @@ void vtkMDVolumeCollection::PopUndoStack() {
 			this->Renderer->AddVolume(myVolume);
 			// if myVolume is a landmark => Add label to the renderer
 
-
+			
 			
 			this->Changed = 1;
 		}
@@ -364,11 +370,21 @@ void vtkMDVolumeCollection::PopUndoStack() {
 	// If stored event was a CREATE_EVENT, we need to remove last inserted objects + from this
 	else
 	{	
-		//cout << "Try to remove last created objects" << endl;
+		cout << "Try to remove last created objects" << endl;
 		ActColl->InitTraversal();
-		// Volume(s) creation (file loading / create 1 landmark etc...)
+		// Volume(s) creation (file loadingetc...)
 		// this means that this action corresponds to "create a new Volume (or load a bunch of new Volumes)".
-		
+		for (vtkIdType i = 0; i < ActColl->GetNumberOfItems(); i++)
+		{
+
+
+			vtkVolume *myVolume= ActColl->GetNextVolume();
+			this->RemoveItem(myVolume);
+			this->Renderer->RemoveActor(myVolume);
+			
+
+		}
+
 		this->UndoRedo->RedoStack.push_back(vtkMDVolumeCollectionUndoRedo::Element(ActColl, CREATE_EVENT, this->UndoRedo->UndoStack.back().UndoCount));
 	}		
 	this->UndoRedo->UndoStack.pop_back();

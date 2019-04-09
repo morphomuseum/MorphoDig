@@ -4063,8 +4063,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			}
 			if (input->GetScalarType() == VTK_SHORT)
 			{
-				cout << "signed shorts !" << endl;
-				cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << endl;
+				//cout << "signed shorts !" << endl;
+				//cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << endl;
 				histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
 			}
@@ -4083,9 +4083,9 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			
 			int dims[3];
 			histogram->GetOutput()->GetDimensions(dims);
-			cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
+			//cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
 			vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
-			cout << "Histogram (used) dims=" << used_bins  << endl;
+			//cout << "Histogram (used) dims=" << used_bins  << endl;
 			int prevbin = 0;
 		
 
@@ -4124,7 +4124,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 						lows.push_back(bin);
 						lowsT.push_back(binT);
 						lowVals.push_back(curbin);
-						l_i++; cout << "l_i" << l_i << endl;
+						l_i++; //cout << "l_i" << l_i << endl;
 					}
 				}
 				if (p_or_l == 0)//search low
@@ -4146,18 +4146,18 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 					}
 				}
 				
-					cout <<"bin="<<bin<<"|"<< *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0))) << " ";
-					cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << endl;				
+					//cout <<"bin="<<bin<<"|"<< *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0))) << " ";
+				//	cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << endl;				
 				prevbin = curbin;
 			}
 			
 			for (int i = 0; i <= p_i;  i++)
 			{
-				cout << "p" << i <<":"<< peaksT.at(i) << ", val=" << peakVals.at(i) << endl;
+				//cout << "p" << i <<":"<< peaksT.at(i) << ", val=" << peakVals.at(i) << endl;
 			}
 			for (int i = 0; i <= l_i; i++)
 			{
-				cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
+				//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
 			}
 		
 			  // Create the property and attach the transfer functions
@@ -4212,20 +4212,20 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				for (int i = 1; i <= p_i; i++)
 				{
 					//peaksT.at(i) peakVals.at(i) ;
-					cout << "peaksT.at(i)="<<peaksT.at(i) << endl;
-					cout << "peakVals.at(i)=" << peakVals.at(i) << endl;
+					//cout << "peaksT.at(i)="<<peaksT.at(i) << endl;
+					//cout << "peakVals.at(i)=" << peakVals.at(i) << endl;
 					double mult = (double)peaksT.at(i)*(double)peakVals.at(i);
-					cout << "mult=" << mult << endl;
+					//cout << "mult=" << mult << endl;
 					sum_peakVals += (double)peakVals.at(i);
 					sum_peaks += mult;
-					cout << "sum_peaks=" << sum_peaks << endl;
-					cout << "sum_peakVals=" << sum_peakVals << endl;
+					//cout << "sum_peaks=" << sum_peaks << endl;
+					//cout << "sum_peakVals=" << sum_peakVals << endl;
 
 				}
 				if (sum_peakVals>0)
 				{
 					avg_peaks = (int)(sum_peaks / sum_peakVals);
-					cout << "avg_peaks="<<avg_peaks << endl;
+					//cout << "avg_peaks="<<avg_peaks << endl;
 					// search if a low exists after avg_peaks
 					int exists = 0;
 					int i_low=0;
@@ -4257,10 +4257,10 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			int second_point = (int)(first_point + 0.2*(last_point - first_point));
 			int third_point = (int)(first_point + 0.4*(last_point - first_point));
-			cout << "first_point=" << first_point << endl;
-			cout << "second_point=" << second_point << endl;
-			cout << "third_point=" << third_point << endl;
-			cout << "last_point=" << last_point << endl;
+			//cout << "first_point=" << first_point << endl;
+			//cout << "second_point=" << second_point << endl;
+			//cout << "third_point=" << third_point << endl;
+			//cout << "last_point=" << last_point << endl;
 			colorFun->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
 			colorFun->AddRGBPoint(second_point, 0.73, 0, 0, 0.5,0);
 			colorFun->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
@@ -4271,12 +4271,14 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			opacityFun->AddPoint(last_point, 1, 0.5, 0);
 
 			      mapper->SetBlendModeToComposite();
-			       property->ShadeOn();
+				  property->ShadeOn();
+				  //property->set
+
 			      property->SetAmbient(this->mui_Ambient);
 			      property->SetDiffuse(this->mui_Diffuse);
 			      property->SetSpecular(this->mui_Specular);
 			      property->SetSpecularPower(this->mui_SpecularPower);
-			     property->SetScalarOpacityUnitDistance(0.8919);
+			     property->SetScalarOpacityUnitDistance(30); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
 				 mapper->Update();
 				 volume->Update();
 				 volume->SetSelected(1);
@@ -4295,7 +4297,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 				 newname = this->CheckingName(newname);
 				 cout << "Volume Name= " << newname << endl;
-
+				 
 				 volume->SetName(newname);
 				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 
@@ -4342,13 +4344,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			{
 				this->UpdateLandmarkSettings();
 			}*/
-		/*	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+			vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 			cout << "front light!" << endl;
 			
 			light->SetLightTypeToCameraLight();
-			light->SetPosition(0, 0, 1);
+			light->SetPosition(0, 0, 200);
 			this->getRenderer()->RemoveAllLights();
-			this->getRenderer()->AddLight(light);*/
+			this->getRenderer()->AddLight(light);
 			
 			this->Render();
 
@@ -19337,7 +19339,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
-		cout << "MyVolume" << myVolume->GetName() << "undo " << Count << endl;
+		cout << "MyVolume " << myVolume->GetName() << " undo " << Count << endl;
 		myVolume->Undo(Count);
 	}
 	this->VolumeCollection->Undo(Count);

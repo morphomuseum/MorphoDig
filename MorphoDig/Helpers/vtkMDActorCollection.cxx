@@ -232,6 +232,7 @@ void vtkMDActorCollection::CreateLoadUndoSet(int count, int creationcount)
 		for (vtkIdType i = 0; i < num_toremain; i++)
 		{
 			//these actors will remain in the renderer in case of undo
+			
 			myActor = this->GetNextActor();
 		}	
 		for (vtkIdType i = 0; i < creationcount; i++)
