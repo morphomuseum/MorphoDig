@@ -30,11 +30,14 @@ public:
 	struct Element
 	{
 		vtkSmartPointer<vtkMatrix4x4> Matrix;
+		vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 		int Selected;
 		int UndoCount;
+		
 		std::string Name;
-		Element(vtkSmartPointer<vtkMatrix4x4> m,  int selected, int Count, std::string name)
+		Element(vtkSmartPointer<vtkMatrix4x4> m, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf, int selected, int Count, std::string name)
 		{
+			this->Ctf = ctf;
 			this->Matrix =m;
 			this->UndoCount = Count;
 			this->Selected = selected;

@@ -2897,7 +2897,7 @@ void mqMorphoDigCore::ComputeSelectedNamesLists()
 
 	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
 	{
-		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this-VolumeCollection->GetNextVolume());
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 		if (myVolume->GetSelected() == 1)
 		{
 			g_selected_names.push_back(myVolume->GetName());

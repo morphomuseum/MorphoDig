@@ -43,6 +43,7 @@ vtkMDVolume::vtkMDVolume()
 {
 	this->UndoRedo = new vtkMDVolumeUndoRedo;
 	this->Selected = 1;
+	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->Changed = 0;
 	this->Name = "New Volume";
 }
@@ -265,40 +266,37 @@ void vtkMDVolume::PopUndoStack()
 	{
 		return;
 	}
-		
+
+	
+
+
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);	
 	vtkSmartPointer<vtkMatrix4x4> SavedMat = vtkSmartPointer<vtkMatrix4x4>::New();
 	SavedMat->DeepCopy(Mat);
 	// Now put undo Matrix inside object : 
-	vtkSmartPointer<vtkDataArray> toRestoreArray = nullptr;
-	//auto toRestoreArray = vtkSmartPointer<vtkDataArray>::New();	
-	vtkDataArray *toSaveArray;
-	toSaveArray = NULL;
-	vtkSmartPointer<vtkDataArray> savedArray = nullptr;
-	//savedArray = NULL;
-	
-	
-
-
-
-
-	Mat->DeepCopy(this->UndoRedo->UndoStack.back().Matrix);
-	
+	Mat->DeepCopy(this->UndoRedo->UndoStack.back().Matrix);	
 	this->ApplyMatrix(Mat);
-
-
 	this->GetMatrix(Mat);
 	//std::cout << "Real Matrix: " << endl << *Mat << std::endl;
 
 	
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction>ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	ctf = this->GetCtf();
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	Savedctf->DeepCopy(ctf);
+	ctf->DeepCopy(this->UndoRedo->UndoStack.back().Ctf);
+	this->SetCtf(ctf);
+
+	//maybe we need to Deep copy the opacity function as well????
+
 	
 	int mCurrentSelected = this->Selected;
 	this->SetSelected(this->UndoRedo->UndoStack.back().Selected);
 	this->Name = this->UndoRedo->UndoStack.back().Name;
 	//cout << "Undo name: " << this->UndoRedo->UndoStack.back().Name;
 	cout << "PopUndoStack Set Selected: " << mCurrentSelected << endl;
-	this->UndoRedo->RedoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name));
+	this->UndoRedo->RedoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name));
 	this->UndoRedo->UndoStack.pop_back();
 	this->Modified();
 }
@@ -311,30 +309,25 @@ void vtkMDVolume::PopRedoStack()
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);
 	vtkSmartPointer<vtkMatrix4x4> SavedMat = vtkSmartPointer<vtkMatrix4x4>::New();
-	SavedMat->DeepCopy(Mat);
-
-	
-	
-
-	
-
+	SavedMat->DeepCopy(Mat);	
 	// Now put redp Matrix inside object : 
 	Mat->DeepCopy(this->UndoRedo->RedoStack.back().Matrix);
-	/*vtkProp3D *prop3D = vtkProp3D::SafeDownCast(this);
-	vtkTransform *newTransform = vtkTransform::New();
-	newTransform->PostMultiply();
-	newTransform->SetMatrix(Mat);
-	prop3D->SetPosition(newTransform->GetPosition());
-	prop3D->SetScale(newTransform->GetScale());
-	prop3D->SetOrientation(newTransform->GetOrientation());
-	newTransform->Delete();*/
 	this->ApplyMatrix(Mat);
-	
+
+
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction>ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	ctf = this->GetCtf();
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	Savedctf->DeepCopy(ctf);
+	ctf->DeepCopy(this->UndoRedo->RedoStack.back().Ctf);
+	this->SetCtf(ctf);
+	//maybe we need to Deep copy the opacity function as well????
+
 	int mCurrentSelected = this->Selected;
 	this->SetSelected(this->UndoRedo->RedoStack.back().Selected);
 	cout << "PopRedoStack Set Selected: " << mCurrentSelected << endl;
 	this->Name = this->UndoRedo->RedoStack.back().Name;	
-	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name));
+	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name));
 	this->UndoRedo->RedoStack.pop_back();
 	this->Modified();
 }
@@ -354,19 +347,28 @@ void vtkMDVolume::SaveState(int mCount)
 	//to do!
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);
+	vtkSmartPointer<vtkMatrix4x4> SavedMat = vtkSmartPointer<vtkMatrix4x4>::New();
+	SavedMat->DeepCopy(Mat);
+
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction>ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	ctf = this->GetCtf();
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	Savedctf->DeepCopy(ctf);
+	
+	//maybe we need to Deep copy the opacity function as well????
+
+
 	int mSelected = this->Selected;
 	//std::cout << "Saved Matrix: " << endl << *Mat << std::endl;
 	std::string name = this->Name;
 	//cout << "Save name=" << name << endl;
-	vtkSmartPointer<vtkMatrix4x4> SavedMat = vtkSmartPointer<vtkMatrix4x4>::New();
-	SavedMat->DeepCopy(Mat);
-
+	
 	
 	
 
 
 	
-	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, mSelected, mCount, name));
+	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mSelected, mCount, name));
 
 }
 //----------------------------------------------------------------------------
