@@ -44,6 +44,7 @@ vtkMDVolume::vtkMDVolume()
 	this->UndoRedo = new vtkMDVolumeUndoRedo;
 	this->Selected = 1;
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	this->ImageData = vtkSmartPointer<vtkImageData>::New();
 	this->Changed = 0;
 	this->Name = "New Volume";
 }
@@ -77,6 +78,14 @@ void  vtkMDVolume::SetColorSpecularPower(double specularPower)
 {
 	this->GetProperty()->SetSpecularPower(specularPower);
 }
+void vtkMDVolume::SetCtf(vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf)
+{
+	this->Ctf = ctf;
+	this->GetProperty()->SetColor(ctf);
+	this->GetProperty()->SetScalarOpacity(ctf->GetScalarOpacityFunction());
+
+}
+
 void vtkMDVolume::SetColorProperties(int ambient, int diffuse, int specular, double specularPower)
 {
 	double mAmbient = (double)ambient / 100;

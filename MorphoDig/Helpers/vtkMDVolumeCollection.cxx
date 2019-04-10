@@ -133,13 +133,13 @@ vtkMDVolume* vtkMDVolumeCollection::GetFirstSelectedVolume()
 	for (vtkIdType i = 0; i < this->GetNumberOfItems(); i++)
 	{
 
-		vtkVolume *act = this->GetNextVolume();
-		if (act == NULL) { return NULL; }
+		vtkVolume *vol = this->GetNextVolume();
+		if (vol == NULL) { return NULL; }
 		std::string str1("vtkMDVolume");
-		if (str1.compare(act->GetClassName()) == 0)
+		if (str1.compare(vol->GetClassName()) == 0)
 		{
 
-			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(act);
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(vol);
 			if (myVolume->GetSelected() == 1) { return myVolume; }
 		}
 

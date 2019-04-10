@@ -155,9 +155,16 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 								  // File_type 0 : stl
 								  // File_type 1 : vtk-vtp
 								  // File_type 2 : ply
+
+	int save_volumes_format = 0;
+	// save_volumes_format 0 : mhd
+	// save_surfaces_format 1 : mha
+	// save_surfaces_format 2 : vti
+
 	int apply_position_to_surfaces = 0;
 
-
+	if (this->Ui->VTI->isChecked()) { save_volumes_format = 2; }
+	if (this->Ui->MHA->isChecked()) { save_volumes_format = 1; }
 
 	if (this->Ui->SaveORI->isChecked()) { save_ori = 1; }
 	if (this->Ui->SaveTAG->isChecked()) { save_tag = 1; }
@@ -167,7 +174,7 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 
 	
 
-	mqMorphoDigCore::instance()->SaveNTWFile(fileName, save_ori, save_tag, save_surfaces_format, apply_position_to_surfaces);
+	mqMorphoDigCore::instance()->SaveNTWFile(fileName, save_ori, save_tag, save_surfaces_format, save_volumes_format, apply_position_to_surfaces);
 
 }
 

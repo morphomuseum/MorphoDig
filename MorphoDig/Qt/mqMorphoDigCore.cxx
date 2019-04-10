@@ -10,11 +10,17 @@
 #include "vtkMDVolume.h"
 #include "vtkLMActor.h"
 #include "vtkOrientationHelperActor.h"
+#include <vtkMetaImageWriter.h>
+#include <vtkXMLImageDataWriter.h>
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
 #include <time.h>
+#include <vtkAlgorithm.h>
+
 #include <vtkLight.h>
 #include <vtkTriangle.h>
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <vtkOpenGLGPUVolumeRayCastMapper.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 #include <vtkVolume.h>
@@ -4080,12 +4086,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			vtkSmartPointer<vtkImageAccumulate> histogram =
 				  vtkSmartPointer<vtkImageAccumulate>::New();
-			volume->SetCtf(TF);
+			//mapper->SetRequestedRenderModeToRayCast();
+			
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
 			{
@@ -4194,7 +4203,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
-			property->SetColor(TF);
+			volume->SetCtf(TF);
+			//property->SetColor(TF);
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
 			//mapper->SetInputData(input);
@@ -4202,6 +4212,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
 			volume->SetMapper(mapper);
+			volume->SetImageData(input);
 			//colorFun->AddRGBPoint()
 			/*colorFun->AddRGBPoint(1350, 0, 0, 0, 0.5, 0.0);
 			colorFun->AddRGBPoint(5000, 0.73, 0.25, 0.30, 0.49, .61);
@@ -4312,12 +4323,11 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			      mapper->SetBlendModeToComposite();
 				  property->ShadeOn();
 				  //property->set
-
-			      property->SetAmbient(this->mui_Ambient);
+				       property->SetAmbient(this->mui_Ambient);
 			      property->SetDiffuse(this->mui_Diffuse);
 			      property->SetSpecular(this->mui_Specular);
 			      property->SetSpecularPower(this->mui_SpecularPower);
-			     property->SetScalarOpacityUnitDistance(30); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+			     property->SetScalarOpacityUnitDistance(50); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
 				 mapper->Update();
 				 volume->Update();
 				 volume->SetSelected(1);
@@ -5406,6 +5416,29 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 								this->OpenPOS(qposfile, 3);								
 							}
 						}
+						if (i == 2)
+						{
+							if (ok)
+							{
+
+								//length= (int)strlen(oneline);						
+								//strncpy(param1, oneline, length-1);
+								std::string mapfile = line.toStdString();
+								// Now open TAG file!
+								QFileInfo mapfileInfo(line);
+								QString onlymapfilename(mapfileInfo.fileName());
+								std::string mapfilename = onlymapfilename.toStdString();
+
+								if (mapfile.length() == mapfilename.length())
+								{
+									mapfile = path.c_str();
+									mapfile.append(mapfilename.c_str());
+								}
+								std::cout << "Try to load ColorTransform Function .map :<<" << mapfile.c_str() << std::endl;
+								QString qmapfile(mapfile.c_str());
+								this->OpenMAP(qmapfile, 1);
+							}
+						}
 						i++;
 						if (i > 2)
 						{
@@ -5805,15 +5838,18 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 		*/
 
 }
-void mqMorphoDigCore::OpenMAP(QString fileName)
+void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 {
+	//mode 0: add map to Existing color maps... (for vtkPolyData objects)
+	// mode 1: add map to Last Volume (for Volume objects)
+	// mode 2: add map to All selected Volumes (for Volume objects)
 	int nr, discretize, discretizenr, enableopacity, nc, no; 
 	double  cx, r, g, b, ox, ov;
 	QString ColorMapName;
 	QString SomeText;
 	//Open a STV file!
 
-	cout << "start: " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+	//cout << "start: " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
 	size_t  length;
 
 	int type = 1;
@@ -5965,17 +6001,55 @@ void mqMorphoDigCore::OpenMAP(QString fileName)
 								}
 							}
 							
-							cout << "here: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+							//cout << "here: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+							if (mode == 0)
+							{
+								this->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(ColorMapName, newSTC, 1));
+							}
+							else if (mode == 1 && i == 0)
+							{
+								//mode 1: sets the MAP to the last inserted volume
+								// can only add one STC to a gve
+								vtkMDVolume *myVolume = this->GetLastVolume();
+								if (myVolume != NULL)
+								{
+									myVolume->SetCtf(newSTC);
+								}
+							}
+							else if (mode == 2 && i == 0)
+							{
+								//mode 2: sets the MAP to the all selected volumes.
+								// can only add one STC to a gve
+								this->getVolumeCollection()->InitTraversal();
+								for (vtkIdType i = 0; i < this->getVolumeCollection()->GetNumberOfItems(); i++)
+								{
 
-							this->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(ColorMapName, newSTC, 1));
-							cout << "and now: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+									vtkVolume *vol = this->getVolumeCollection()->GetNextVolume();
+									if (vol != NULL)
+									{
+										std::string str1("vtkMDVolume");
+										if (str1.compare(vol->GetClassName()) == 0)
+										{
+
+											vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(vol);
+											if (myVolume->GetSelected() == 1) { myVolume->SetCtf(newSTC); }
+										}
+									}
+
+								}
+
+							}
+							//cout << "and now: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
 							
 
 						}
 					
-						cout << "have Just Imported "<<nr<<" ColorMaps" << endl;
-						cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
-						this->signal_colorMapsChanged();// emit this->colorMapsChanged();
+						if (mode == 0)
+						{
+							cout << "have Just Imported " << nr << " ColorMaps" << endl;
+							cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+							this->signal_colorMapsChanged();// emit this->colorMapsChanged();
+						}
 					}
 
 				}
@@ -5991,12 +6065,16 @@ void mqMorphoDigCore::OpenMAP(QString fileName)
 }	
 
 
-int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int apply_position_to_surfaces)
+int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int apply_position_to_surfaces)
 {
 	//save_surfaces_format: 0:VTK 1:PLY 2:STL
 	// save_surfaces_format 0 : stl
 	// save_surfaces_format 1 : vtk-vtp
 	// save_surfaces_format 2 : ply
+
+	// save_volumes_format 0 : mhd
+	// save_surfaces_format 1 : mha
+	// save_surfaces_format 2 : vti
 	cout << "apply_position_to_surfaces=" << apply_position_to_surfaces << endl;
 	std::string NTWext = ".ntw";
 	std::string NTWext2 = ".NTW";
@@ -6041,8 +6119,17 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		QString verExt = ".ver";
 		QString stvExt = ".stv";
 		QString curExt = ".cur";
+		QString mhdExt = ".mhd";
+		QString mhaExt = ".mha";
+		QString rawExt = ".raw";
+		QString vtiExt = ".vti";
+		QString mapExt = ".map";
+
 		int overwrite_pos = 1;
 		int overwrite_mesh = 1;
+		//int overwrite_pos = 1;
+		int overwrite_vol = 1;
+		int overwrite_map = 1;
 		int overwrite_ori = 1;
 		int overwrite_tag = 1;
 		int overwrite_flg = 1;
@@ -6081,6 +6168,30 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		{
 			mesh_exists = this->selected_file_exists(onlypath, stlExt, no_postfix);
 		}
+
+		int vol_exists = 0;
+		if (save_volumes_format == 0)//MHD
+		{
+			vol_exists = this->selected_file_exists(onlypath, mhdExt, no_postfix);
+			if (vol_exists ==0)
+			{
+				vol_exists = this->selected_file_exists(onlypath, rawExt, no_postfix);
+			}
+		}
+		else if (save_surfaces_format == 1)//MHA
+		{
+			vol_exists = this->selected_file_exists(onlypath, mhaExt, no_postfix);
+		}
+		else //2 VTI
+		{
+			vol_exists = this->selected_file_exists(onlypath, vtiExt, no_postfix);
+		}
+
+		int map_exists = 0;
+		
+		map_exists = this->selected_file_exists(onlypath, mapExt, no_postfix);
+		
+		
 
 		if (save_ori == 1)
 		{
@@ -6126,6 +6237,28 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			if (ret == QMessageBox::Cancel) { overwrite_mesh = 0; }
 
 			
+		}
+		if (vol_exists == 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("At least one volume file already exists: update existing volume files?");
+			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Yes);
+			int ret = msgBox.exec();
+			if (ret == QMessageBox::Cancel) { overwrite_vol = 0; }
+
+
+		}
+		if (map_exists == 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("At least one Color Transfer Function file (.map) already exists: update existing Color Transfer Function ?");
+			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Yes);
+			int ret = msgBox.exec();
+			if (ret == QMessageBox::Cancel) { overwrite_map = 0; }
+
+
 		}
 		if (pos_exists == 1)
 		{
@@ -6337,10 +6470,123 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				stream << colors[0]<<" "<< colors[1]<<" "<< colors[2]<<" "<< colors[3] << endl;
 
 					
-				}
+			}
+
 				
 
+		}
+		this->VolumeCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+			if (myVolume->GetSelected() == 1)
+			{
+				QString _vol_fullpath;
+				QString _pos_fullpath;
+				QString _map_fullpath;
+				QString _vol_file;
+				QString _pos_file;
+				QString _map_file;
+				_vol_file.append(myVolume->GetName().c_str());
+				_pos_file.append(myVolume->GetName().c_str());
+				_map_file.append(myVolume->GetName().c_str());
+
+				if (save_volumes_format == 0)
+				{
+					_vol_file.append(".mhd");
+				}
+				else if (save_volumes_format == 1)
+				{
+					_vol_file.append(".mha");
+				}
+				else
+				{
+					_vol_file.append(".vti");
+				}
+
+				if (pos_special == 0)
+				{
+					_pos_file += postfix;
+				}
+				_pos_file.append(".pos");
+				_map_file.append(".map");
+
+
+				_vol_fullpath = onlypath;
+				_vol_fullpath += _vol_file;
+
+				_pos_fullpath = onlypath;
+				_pos_fullpath += _pos_file;
+
+				_map_fullpath = onlypath;
+				_map_fullpath += _map_file;
+
+				int write = 1;
+				if (overwrite_vol == 0)
+				{
+					// in that case, check if file exists...								
+					ifstream file2(_vol_fullpath.toLocal8Bit());
+					if (file2)
+					{
+						write = 0;
+						file2.close();
+					}
+				}
+				if (write == 1)
+				{
+														
+					this->SaveVolume(_vol_fullpath, save_volumes_format, myVolume);
+				}
+
+				write = 1;
+				if (overwrite_pos == 0)
+				{
+					// in that case, check if file exists...								
+					ifstream file2(_pos_fullpath.toLocal8Bit());
+					if (file2)
+					{
+						write = 0;
+						file2.close();
+					}
+				}
+
+				if (write == 1)
+				{
+					
+						vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
+						this->SavePOS(Mat, _pos_fullpath);					
+				}
+				write = 1;
+				if (overwrite_map == 0)
+				{
+					// in that case, check if file exists...								
+					ifstream file2(_map_fullpath.toLocal8Bit());
+					if (file2)
+					{
+						write = 0;
+						file2.close();
+					}
+				}
+
+				if (write == 1)
+				{
+					
+					vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf = myVolume->GetCtf();
+					this->SaveMAP(_map_fullpath, myVolume->GetName().c_str(), ctf);
+					
+				}
+				stream << _vol_file.toStdString().c_str() << endl;
+				stream << _pos_file.toStdString().c_str() << endl;
+				stream << _map_file.toStdString().c_str() << endl;
+				
+
+
 			}
+
+
+
+		}
+
 				
 	}
 	file.close();
@@ -16086,6 +16332,79 @@ void mqMorphoDigCore::groupSelectedActors()
 		}
 
 	}
+}
+void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, vtkMDVolume *myVolume)
+{
+	// File_type 0 : mhd
+	// File_type 1 : mha
+	// File_type 2 : vti
+	std::string MHAext(".mha");
+	std::string MHAext2(".MHA");
+	std::string MHDext(".mhd");
+	std::string MHDext2(".MHD");
+	std::string VTIext(".vti");
+	std::string VTIext2(".VTI");
+	int Ok = 1;
+	cout << "here am I" << endl;
+	vtkMDVolume *myVolume2 = myVolume;
+
+	if (myVolume == NULL) // from menu => then save first selected volume!
+	{
+		cout << "myVolume is null => we save first selected volume!" << endl;
+		myVolume2 = this->GetFirstSelectedVolume();
+
+
+	}
+
+	if (myVolume2 != NULL)
+	{
+		vtkSmartPointer<vtkImageData> output = vtkSmartPointer<vtkImageData>::New();
+		output = myVolume2->GetImageData();
+		if (file_type == 0 || file_type == 1)
+		{
+			std::size_t found = fileName.toStdString().find(MHDext);
+			std::size_t found2 = fileName.toStdString().find(MHDext2);			
+			if (file_type == 0 && found == std::string::npos && found2 == std::string::npos)
+			{
+				fileName.append(".mhd");
+
+			}
+
+			found = fileName.toStdString().find(MHAext);
+			found2 = fileName.toStdString().find(MHAext2);
+			if (file_type == 1 && found == std::string::npos && found2 == std::string::npos)
+			{
+				fileName.append(".mha");
+			}
+
+			vtkSmartPointer<vtkMetaImageWriter> mhWriter = vtkSmartPointer<vtkMetaImageWriter>::New();
+			mhWriter->SetFileName(fileName.toLocal8Bit());
+			mhWriter->SetInputData(output);
+			mhWriter->Write();
+			
+		}
+		else if (file_type == 2)
+		{
+
+			std::size_t found = fileName.toStdString().find(VTIext);
+			std::size_t found2 = fileName.toStdString().find(VTIext2);
+			if (found == std::string::npos && found2 == std::string::npos)
+			{
+				fileName.append(".vti");
+
+			}			
+			vtkSmartPointer<vtkXMLImageDataWriter> xmlWriter = vtkSmartPointer<vtkXMLImageDataWriter>::New();
+			xmlWriter->SetFileName(fileName.toLocal8Bit());
+			xmlWriter->SetInputData(output);
+			xmlWriter->Write();
+			
+		}
+
+		
+
+	}
+
+
 }
 int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> scalarsToBeRemoved, int RGBopt, int save_norms, vtkMDActor *myActor)
 {

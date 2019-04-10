@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
-    <height>466</height>
+    <width>378</width>
+    <height>601</height>
    </rect>
   </property>
   <property name="palette">
@@ -142,6 +142,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -285,6 +294,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </inactive>
     <disabled>
      <colorrole role="WindowText">
@@ -422,6 +440,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </disabled>
    </palette>
   </property>
@@ -432,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>430</y>
+     <y>560</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -578,13 +605,13 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>330</y>
+     <y>450</y>
      <width>341</width>
      <height>91</height>
     </rect>
    </property>
    <property name="title">
-    <string>Position :</string>
+    <string>Position (surfaces only):</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget_12">
     <property name="geometry">
@@ -607,6 +634,55 @@
       <widget class="QRadioButton" name="ApplyPositionToSurfaces">
        <property name="text">
         <string>Apply position to surfaces , and set .POS as identity matrix</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="SurfaceFormat_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>340</y>
+     <width>341</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Save volumes  as :</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget_13">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>290</width>
+      <height>65</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout1_9">
+     <item>
+      <widget class="QRadioButton" name="MHD">
+       <property name="text">
+        <string>Metaimage Header and RAW volume files (.mhd .raw)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="MHA">
+       <property name="text">
+        <string> Metaimage volumes  (.mha)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="VTI">
+       <property name="text">
+        <string>VTK Images  (.vtil)</string>
        </property>
       </widget>
      </item>
