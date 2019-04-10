@@ -148,6 +148,27 @@ vtkMDVolume* vtkMDVolumeCollection::GetFirstSelectedVolume()
 
 	return NULL;
 }
+vtkMDVolume* vtkMDVolumeCollection::GetLastVolume()
+{
+	this->InitTraversal();
+	vtkVolume *act=NULL; 
+	for (vtkIdType i = 0; i < this->GetNumberOfItems(); i++)
+	{
+		act = this->GetNextVolume();				
+
+	}
+	if (act == NULL) { return NULL; }
+	std::string str1("vtkMDVolume");
+	if (str1.compare(act->GetClassName()) == 0)
+	{
+
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(act);
+		return myVolume; 
+	}
+
+
+	return NULL;
+}
 void vtkMDVolumeCollection::UpdateColorProperties(int ambient, int diffuse, int specular, double specularPower)
 {
 

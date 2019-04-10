@@ -48,6 +48,7 @@ public:
 	void AddItem(vtkVolume *a);
 	void AddTmpItem(vtkVolume *a);
 	vtkMDVolume* GetFirstSelectedVolume();
+	vtkMDVolume* GetLastVolume();
 	vtkMDVolume *GetVolumeBefore(vtkMDVolume *Volume);
 	vtkMDVolume *GetVolumeAfter(vtkMDVolume *Volume);
 	vtkSetMacro(BoundingBoxLength, double);

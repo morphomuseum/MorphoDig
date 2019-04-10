@@ -753,6 +753,7 @@ public:
   void SetOrientationHelperVisibility();
   std::string CheckingName(std::string name_obj);
   vtkMDActor* GetLastActor();
+  vtkMDVolume* GetLastVolume();
   vtkLMActor* GetLastLandmark(int mode);
   vtkMDActor * GetFirstSelectedActor();
   void ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode);

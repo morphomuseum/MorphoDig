@@ -3433,10 +3433,11 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 }
 void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 {
-	// mode : 0 for last inserted mesh
-	// mode : 1 for all selected meshes
+	// mode : 0 for last inserted surface
+	// mode : 1 for all selected surfaces AND volumes
 	// mode : 2 for all selected landmarks/flags
-
+	// mode : 3 for last inserted volume	
+	
 
 	//Open a position file!
 
@@ -3581,11 +3582,10 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 
 void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 {
-	// mode : 0 for last inserted mesh
-	// mode : 1 for all selected meshes
+	// mode : 0 for last inserted surface
+	// mode : 1 for all selected surfaces AND volumes
 	// mode : 2 for all selected landmarks/flags
-
-
+	// mode : 3 for last inserted volume	
 	//Open a position file!
 
 	int i, j, l;
@@ -4055,7 +4055,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			vtkSmartPointer<vtkImageAccumulate> histogram =
 				  vtkSmartPointer<vtkImageAccumulate>::New();
-			volume->SetColorTransferFunction(TF);
+			volume->SetCtf(TF);
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
 			{
@@ -4306,7 +4306,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 				 newname = this->CheckingName(newname);
 				 cout << "Volume Name= " << newname << endl;
-				 
+				 //volume->SetOrientation(0, 0, 180);
 				 volume->SetName(newname);
 				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 
@@ -4327,6 +4327,12 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 this->AdjustCameraAndGrid();
 				 cout << "camera and grid adjusted" << endl;
 				 
+				 //cout << "camera and grid adjusted" << endl;
+
+				 if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+				 {
+					 this->UpdateLandmarkSettings();
+				 }
 				 //this->getRenderer()->AddVolume(volume);
 			/*actor->SetSelected(1);
 			actor->SetName(newname);
@@ -4739,6 +4745,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			actor->SetName(newname);
 			actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			actor->SetDisplayMode(this->mui_DisplayMode);
+			//actor->SetOrientation(0, 0, 180);
 			//actor->GetProperty()->SetRepresentationToPoints();
 			this->getActorCollection()->AddItem(actor);
 			emit this->actorsMightHaveChanged(); 
@@ -4973,6 +4980,8 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 		{
 			QTextStream in(&inputFile);
 			in.setCodec("UTF-8");
+			int surface_file = 0;
+			int volume_file = 0;
 			while (!in.atEnd())
 			{
 				QString line = in.readLine();
@@ -4996,8 +5005,28 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 				std::string TAGext4(".TGP");
 				std::string ORIext(".ori");
 				std::string ORIext2(".ORI");
-				int lmk_file = 0;
+				
+				std::string POSext(".pos");
+				std::string POSext2(".POS");
+				std::string MHAext(".mha");
+				std::string MHAext2(".MHA");
+				std::string MHDext(".mhd");
+				std::string MHDext2(".MHD");
+				std::string VTIext(".vti");
+				std::string VTIext2(".VTI");
+				std::string STLext(".stl");
+				std::string STLext2(".STL");
+				std::string VTKext(".vtk");
+				std::string VTKext2(".VTK");
+				std::string VTKext3(".vtp");
+				std::string VTKext4(".VTP");
+				std::string PLYext(".ply");
+				std::string PLYext2(".PLY");
+				std::string OBJext(".obj");
+				std::string OBJext2(".OBJ");
 
+				int lmk_file = 0; // top lines
+				
 				std::size_t found = myline.find(FLGext);
 				std::size_t found2 = myline.find(FLGext2);
 				if (found != std::string::npos || found2 != std::string::npos)
@@ -5126,106 +5155,234 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 
 				}
+				found = fileName.toStdString().find(STLext);
+				found2 = fileName.toStdString().find(STLext2);
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+					surface_file = 1; volume_file = 0;
+					
+				}
 
-				//NOW THE SURFACES!!!
+				found = fileName.toStdString().find(VTKext);
+				found2 = fileName.toStdString().find(VTKext2);
+				found3 = fileName.toStdString().find(VTKext3);
+				found4 = fileName.toStdString().find(VTKext4);
+				if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+				{
+					surface_file = 1; volume_file = 0;
+				}
+
+				found = fileName.toStdString().find(PLYext);
+				found2 = fileName.toStdString().find(PLYext2);
+
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+					surface_file = 1; volume_file = 0; 
+				}
+
+				//std::cout << "2Type= " <<type<< std::endl;
+				found = fileName.toStdString().find(OBJext);
+				found2 = fileName.toStdString().find(OBJext2);
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+					surface_file = 1; volume_file = 0;
+				}
+				found = fileName.toStdString().find(MHAext);
+				found2 = fileName.toStdString().find(MHAext2);
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+					surface_file = 0; volume_file = 1;
+				}
+				found = fileName.toStdString().find(MHDext);
+				found2 = fileName.toStdString().find(MHDext2);
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+					surface_file = 0; volume_file = 1;
+				}
+				found = fileName.toStdString().find(VTIext);
+				found2 = fileName.toStdString().find(VTIext2);
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+					surface_file = 0; volume_file = 1;
+				}
+
+				//NOW THE SURFACES and VOLUMES!!!
+				//SURFACES STRUCTURE : 
+						// i= 0 surface file
+						// i= 1 pos file
+						// i= 2 color and opacity.
+
+						//VOLUME STRUCTURE : 
+						// i= 0 volume file
+						// i= 1 pos file
+						// i= 2 map file.
 
 				if (lmk_file == 0)
 				{
-					if (i == 0)
+					if (surface_file == 1)
 					{
-
-						//length=(int)strlen(oneline);						
-						//strncpy(param1, oneline, length-1);
-						std::string meshname = line.toStdString();
-						QFileInfo meshfileInfo(line);
-						QString onlymeshfilename(meshfileInfo.fileName());
-						std::string meshfilename = onlymeshfilename.toStdString();
-
-						if (meshname.length() == meshfilename.length())
-						{
-							meshname = path.c_str();
-							meshname.append(meshfilename.c_str());
-						}
-						QString meshfile(meshname.c_str());
-
-
-
-						this->OpenMesh(meshfile);
-						vtkMDActor* actor = this->GetLastActor();
-
-						if (actor != NULL && actor->GetNumberOfPoints() > 10)
+						if (i == 0)
 						{
 
-							ok = 1;
-							cout << "Object has more than 10 points <<" << endl;
-						}
-						else
-						{
-							ok = 0;
-						}
-
-
-					}
-					if (i == 1)
-					{
-						if (ok)
-						{
-
-							//length= (int)strlen(oneline);						
+							//length=(int)strlen(oneline);						
 							//strncpy(param1, oneline, length-1);
-							std::string posfile = line.toStdString();
-							// Now open TAG file!
-							QFileInfo posfileInfo(line);
-							QString onlyposfilename(posfileInfo.fileName());
-							std::string posfilename = onlyposfilename.toStdString();
+							std::string meshname = line.toStdString();
+							QFileInfo meshfileInfo(line);
+							QString onlymeshfilename(meshfileInfo.fileName());
+							std::string meshfilename = onlymeshfilename.toStdString();
 
-							if (posfile.length() == posfilename.length())
+							if (meshname.length() == meshfilename.length())
 							{
-								posfile = path.c_str();
-								posfile.append(posfilename.c_str());
+								meshname = path.c_str();
+								meshname.append(meshfilename.c_str());
 							}
-							std::cout << "Try to load position :<<" << posfile.c_str() << std::endl;
-							QString qposfile(posfile.c_str());
-							this->OpenPOS(qposfile, 0);
-							//@@TODO!
-							//this->Open_POS_File(posfile, My_Obj);
-							//std::cout <<"Object <<"<<My_Obj->name.c_str()<<">> position loaded"<< std::endl;
-							//My_Obj->selected = 0;
+							QString meshfile(meshname.c_str());
+
+
+
+							this->OpenMesh(meshfile);
+							vtkMDActor* actor = this->GetLastActor();
+
+							if (actor != NULL && actor->GetNumberOfPoints() > 10)
+							{
+
+								ok = 1;
+								cout << "Object has more than 10 points <<" << endl;
+							}
+							else
+							{
+								ok = 0;
+							}
+
+
 						}
-					}
-					if (i == 2)
-					{
-						if (ok)
+						if (i == 1)
 						{
-							vtkMDActor *actor = this->GetLastActor();
-							double r, g, b, a;
-							QTextStream myteststream(&line);
-							myteststream >> r >> g >> b >> a;
-							if (r > 1 || g > 1 || b > 1) {
-								r /= 255; g /= 255;
-								b /= 255;
+
+
+							if (ok)
+							{
+
+								//length= (int)strlen(oneline);						
+								//strncpy(param1, oneline, length-1);
+								std::string posfile = line.toStdString();
+								// Now open TAG file!
+								QFileInfo posfileInfo(line);
+								QString onlyposfilename(posfileInfo.fileName());
+								std::string posfilename = onlyposfilename.toStdString();
+
+								if (posfile.length() == posfilename.length())
+								{
+									posfile = path.c_str();
+									posfile.append(posfilename.c_str());
+								}
+								std::cout << "Try to load position :<<" << posfile.c_str() << std::endl;
+								QString qposfile(posfile.c_str());
+								this->OpenPOS(qposfile, 0);
+								//@@TODO!
+								//this->Open_POS_File(posfile, My_Obj);
+								//std::cout <<"Object <<"<<My_Obj->name.c_str()<<">> position loaded"<< std::endl;
+								//My_Obj->selected = 0;
 							}
+						}
+						if (i == 2)
+						{
+							if (ok)
+							{
+								vtkMDActor *actor = this->GetLastActor();
+								double r, g, b, a;
+								QTextStream myteststream(&line);
+								myteststream >> r >> g >> b >> a;
+								if (r > 1 || g > 1 || b > 1) {
+									r /= 255; g /= 255;
+									b /= 255;
+								}
 
 
-							actor->SetmColor(r, g, b, a);
-							actor->SetSelected(0);
-							actor->SetChanged(1);
+								actor->SetmColor(r, g, b, a);
+								actor->SetSelected(0);
+								actor->SetChanged(1);
 
-							this->getActorCollection()->SetChanged(1);
-							/*sscanf(oneline, "%f %f %f %f\n", &color1, &color2, &color3, &color4);
-							//std::cout <<"color 1"<<color1<<",color 2"<<color3<<",color 3"<<color3<<",color 4"<<color4<< std::endl;
-							My_Obj->color[0] = color1; My_Obj->color[1] = color2; My_Obj->color[2] = color3; My_Obj->color[3] = color4;
-							My_Obj->blend = color4;
-							My_Obj->Update_RGB();*/
+								this->getActorCollection()->SetChanged(1);
+								/*sscanf(oneline, "%f %f %f %f\n", &color1, &color2, &color3, &color4);
+								//std::cout <<"color 1"<<color1<<",color 2"<<color3<<",color 3"<<color3<<",color 4"<<color4<< std::endl;
+								My_Obj->color[0] = color1; My_Obj->color[1] = color2; My_Obj->color[2] = color3; My_Obj->color[3] = color4;
+								My_Obj->blend = color4;
+								My_Obj->Update_RGB();*/
+							}
+						}
+						i++;
+						if (i > 2)
+						{
+							i = 0;
 						}
 					}
-					i++;
-					if (i > 2)
-					{
-						i = 0;
-					}
-				}
 
+					else if (volume_file == 1)
+					{
+
+						if (i == 0)
+						{
+
+							//length=(int)strlen(oneline);						
+							//strncpy(param1, oneline, length-1);
+							std::string volname = line.toStdString();
+							QFileInfo volfileInfo(line);
+							QString onlyvolumefilename(volfileInfo.fileName());
+							std::string volumefilename = onlyvolumefilename.toStdString();
+
+							if (volname.length() == volumefilename.length())
+							{
+								volname = path.c_str();
+								volname.append(volumefilename.c_str());
+							}
+							QString volumefile(volname.c_str());
+
+
+
+							this->OpenVolume(volumefile);
+							vtkMDVolume* volume = this->GetLastVolume();
+
+							if (volume != NULL)
+							{
+
+								ok = 1;								
+							}
+							else
+							{
+								ok = 0;
+							}
+						}
+						if (i == 1)
+						{
+							if (ok)
+							{
+
+								//length= (int)strlen(oneline);						
+								//strncpy(param1, oneline, length-1);
+								std::string posfile = line.toStdString();
+								// Now open TAG file!
+								QFileInfo posfileInfo(line);
+								QString onlyposfilename(posfileInfo.fileName());
+								std::string posfilename = onlyposfilename.toStdString();
+
+								if (posfile.length() == posfilename.length())
+								{
+									posfile = path.c_str();
+									posfile.append(posfilename.c_str());
+								}
+								std::cout << "Try to load position :<<" << posfile.c_str() << std::endl;
+								QString qposfile(posfile.c_str());
+								this->OpenPOS(qposfile, 3);								
+							}
+						}
+						i++;
+						if (i > 2)
+						{
+							i = 0;
+						}
+					}//volume_file == 1
+				}//if lmk_file == 0
 
 			}
 			inputFile.close();
@@ -17496,11 +17653,7 @@ void mqMorphoDigCore::AdjustCameraAndGrid()
 	double volumeCOM[3] = { 0,0,0 };
 	if (this->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
-		this->getActorCollection()->GetCenterOfMass(actorCOM);
-		this->getVolumeCollection()->GetCenterOfMass(volumeCOM);
-		newcamerafocalpoint[0] = (actorCOM[0] + volumeCOM[0]) / 2;
-		newcamerafocalpoint[1] = (actorCOM[1] + volumeCOM[1]) / 2;
-		newcamerafocalpoint[2] = (actorCOM[2] + volumeCOM[2]) / 2;
+		this->GetCenterOfMass(newcamerafocalpoint);
 		this->getGridActor()->SetGridOrigin(newcamerafocalpoint);
 
 
@@ -17914,6 +18067,10 @@ vtkMDActor* mqMorphoDigCore::GetLastActor()
 {
 	return vtkMDActor::SafeDownCast(this->getActorCollection()->GetLastActor());
 }
+vtkMDVolume* mqMorphoDigCore::GetLastVolume()
+{
+	return this->getVolumeCollection()->GetLastVolume();
+}
 
 vtkLMActor* mqMorphoDigCore::GetLastLandmark(int mode)
 {
@@ -17937,87 +18094,108 @@ vtkLMActor* mqMorphoDigCore::GetLastLandmark(int mode)
 
 void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 {
-	// mode : 0 for last inserted mesh
-	// mode : 1 for all selected meshes
-	// mode : 2 for all selected landmarks/flags
 	
+	// mode : 0 for last inserted surface
+	// mode : 1 for all selected surfaces AND volumes
+	// mode : 2 for all selected landmarks/flags
+	// mode : 3 for last inserted volume	
+
 	if (mode == 0)
 	{
 		vtkMDActor *actor = this->GetLastActor();
-		actor->ApplyMatrix(Mat);
+		if (actor != NULL)
+		{
+			actor->ApplyMatrix(Mat);
+		}
 	}
-	else
+	if (mode == 3)
 	{
-		if (mode == 1 )
+		vtkMDVolume *volume = this->GetLastVolume();
+		if (volume != NULL)
 		{
-			this->ActorCollection->InitTraversal();
-			for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
-			{
-				vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-				if (myActor->GetSelected() == 1)
-				{
-					myActor->ApplyMatrix(Mat);
-					myActor->SetSelected(0);
-				}
-			}
-
+			volume->ApplyMatrix(Mat);
 		}
-		else // mode ==2
+	}	
+	else if (mode == 1 )
+	{
+		this->ActorCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 		{
-
-			this->NormalLandmarkCollection->InitTraversal();
-			for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
 			{
-				vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NormalLandmarkCollection->GetNextActor());
-				if (myActor->GetSelected() == 1 )
-				{
-					myActor->ApplyMatrix(Mat);;
-					myActor->SetSelected(0);
-				}
-			}
-			this->TargetLandmarkCollection->InitTraversal();
-			for (vtkIdType i = 0; i < this->TargetLandmarkCollection->GetNumberOfItems(); i++)
-			{
-				vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->TargetLandmarkCollection->GetNextActor());
-				if (myActor->GetSelected() == 1)
-				{
-					myActor->ApplyMatrix(Mat);;
-					myActor->SetSelected(0);
-				}
-			}
-			this->NodeLandmarkCollection->InitTraversal();
-			for (vtkIdType i = 0; i < this->NodeLandmarkCollection->GetNumberOfItems(); i++)
-			{
-				vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NodeLandmarkCollection->GetNextActor());
-				if (myActor->GetSelected() == 1)
-				{
-					myActor->ApplyMatrix(Mat);;
-					myActor->SetSelected(0);
-				}
-			}
-			this->HandleLandmarkCollection->InitTraversal();
-			for (vtkIdType i = 0; i < this->HandleLandmarkCollection->GetNumberOfItems(); i++)
-			{
-				vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->HandleLandmarkCollection->GetNextActor());
-				if (myActor->GetSelected() == 1)
-				{
-					myActor->ApplyMatrix(Mat);;
-					myActor->SetSelected(0);
-				}
-			}
-			this->FlagLandmarkCollection->InitTraversal();
-			for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
-			{
-				//cout << "modify flag " << i << endl;
-				vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->FlagLandmarkCollection->GetNextActor());
-				if (myActor->GetSelected() == 1)
-				{
-					myActor->ApplyMatrix(Mat);;
-					myActor->SetSelected(0);
-					//cout << "modify flag " << i << "done"<< endl;
-				}
+				myActor->ApplyMatrix(Mat);
+				myActor->SetSelected(0);
 			}
 		}
+		this->VolumeCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+			if (myVolume->GetSelected() == 1)
+			{
+				myVolume->ApplyMatrix(Mat);
+				myVolume->SetSelected(0);
+			}
+		}
+
+	}
+	else if (mode ==2) 
+	{
+
+		this->NormalLandmarkCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
+		{
+			vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NormalLandmarkCollection->GetNextActor());
+			if (myActor->GetSelected() == 1 )
+			{
+				myActor->ApplyMatrix(Mat);;
+				myActor->SetSelected(0);
+			}
+		}
+		this->TargetLandmarkCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->TargetLandmarkCollection->GetNumberOfItems(); i++)
+		{
+			vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->TargetLandmarkCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				myActor->ApplyMatrix(Mat);;
+				myActor->SetSelected(0);
+			}
+		}
+		this->NodeLandmarkCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->NodeLandmarkCollection->GetNumberOfItems(); i++)
+		{
+			vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NodeLandmarkCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				myActor->ApplyMatrix(Mat);;
+				myActor->SetSelected(0);
+			}
+		}
+		this->HandleLandmarkCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->HandleLandmarkCollection->GetNumberOfItems(); i++)
+		{
+			vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->HandleLandmarkCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				myActor->ApplyMatrix(Mat);;
+				myActor->SetSelected(0);
+			}
+		}
+		this->FlagLandmarkCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
+		{
+			//cout << "modify flag " << i << endl;
+			vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->FlagLandmarkCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				myActor->ApplyMatrix(Mat);;
+				myActor->SetSelected(0);
+				//cout << "modify flag " << i << "done"<< endl;
+			}
+		}
+		
 	}
 	cout <<" Actor collection changed" << endl;
 	this->ActorCollection->SetChanged(1);

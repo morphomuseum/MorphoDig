@@ -19,6 +19,7 @@ Module:    vtkMDVolume.h
 #include <vtkSmartPointer.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkSmartPointer.h>
+#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkPolyDataConnectivityFilter.h>
 #include <vector>
@@ -66,7 +67,8 @@ public:
 
 	vtkGetMacro(Name, std::string);
 	vtkSetMacro(Name, std::string);
-
+	vtkSetMacro(Ctf, vtkSmartPointer<vtkDiscretizableColorTransferFunction>);
+	vtkGetMacro(Ctf, vtkSmartPointer<vtkDiscretizableColorTransferFunction>);
 	
 	double GetBoundingBoxLength();
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
@@ -93,6 +95,7 @@ protected:
 	
 	int Selected;
 	int Changed; // used by vtkMDVolumeCollectionUndoRedo class to recompute global center of mass and center of mass
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 	//of selected objects etc... 
 	vtkMDVolumeUndoRedo* UndoRedo;
 	std::string Name;
