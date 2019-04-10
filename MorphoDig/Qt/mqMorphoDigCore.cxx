@@ -2893,6 +2893,36 @@ void mqMorphoDigCore::ComputeSelectedNamesLists()
 
 		}
 	}
+	this->VolumeCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this-VolumeCollection->GetNextVolume());
+		if (myVolume->GetSelected() == 1)
+		{
+			g_selected_names.push_back(myVolume->GetName());
+
+			int already = 0;
+
+			for (int j = 0; j < g_distinct_selected_names.size(); j++)
+			{
+				//std::cout<<"i"<<i<<std::endl;
+				std::size_t found = g_distinct_selected_names.at(j).find(myVolume->GetName());
+				size_t length1 = myVolume->GetName().length();
+				size_t length2 = g_distinct_selected_names.at(j).length();
+				if (length1 == length2 && found != std::string::npos)
+				{
+					already = 1;
+				}
+			}
+			if (already == 0)
+			{
+				g_distinct_selected_names.push_back(myVolume->GetName());
+			}
+
+
+		}
+	}
 	
 }
 
@@ -18063,6 +18093,20 @@ vtkMDActor * mqMorphoDigCore::GetFirstSelectedActor()
 	return NULL;
 }
 
+vtkMDVolume * mqMorphoDigCore::GetFirstSelectedVolume()
+{
+	this->VolumeCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		if (myVolume->GetSelected() == 1)
+		{
+			return myVolume;
+		}
+	}
+
+	return NULL;
+}
 vtkMDActor* mqMorphoDigCore::GetLastActor()
 {
 	return vtkMDActor::SafeDownCast(this->getActorCollection()->GetLastActor());

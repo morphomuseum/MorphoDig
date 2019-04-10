@@ -43,51 +43,105 @@ mqSaveDataReaction::mqSaveDataReaction(QAction* parentObject,  int _mode)
 
 
 
-void mqSaveDataReaction::SavePOS()
+void mqSaveDataReaction::SavePOS(int mode)
 {
+	//mode = 0 : for selected surfaces
+	//mode = 1 : for selected volumes
 	
-	
-	vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
-	if (num_selected_meshes == 0) {
-		QMessageBox msgBox;
-		msgBox.setText("No surface selected. Please select at one single surface to use this option.");
-		msgBox.exec();
-		return;
-	}
-	else if (num_selected_meshes > 1)
+	if (mode == 0)
 	{
-		QMessageBox msgBox;
-		msgBox.setText("More than one surface are currently selected. Please select at one single surface to use this option.");		
-		int ret = msgBox.exec();
-		return;
+		vtkIdType num_selected_surfaces = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+		if (num_selected_surfaces == 0) {
+			QMessageBox msgBox;
+			msgBox.setText("No surface selected. Please select one single surface to use this option.");
+			msgBox.exec();
+			return;
+		}
+		else if (num_selected_surfaces > 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Several surfaces are currently selected. Please select one single surface to use this option.");
+			int ret = msgBox.exec();
+			return;
 
+		}
+		vtkMDActor *FirstSelectedActor = mqMorphoDigCore::instance()->GetFirstSelectedActor();
+		if (FirstSelectedActor != NULL) {
+
+			vtkSmartPointer<vtkMatrix4x4> Mat = FirstSelectedActor->GetMatrix();
+			mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+
+			QString fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+				tr("Save POS files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
+				tr("Pos file (*.pos)"), NULL
+				//, QFileDialog::DontConfirmOverwrite
+			);
+
+
+			cout << fileName.toStdString();
+			if (fileName.isEmpty()) return;
+			QFileInfo fileInfo(fileName);
+			mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+
+			//Save and applies position 
+			//mqMorphoDigCore::instance()->getUndoStack();
+			cout << "Save POS" << endl;
+
+			mqMorphoDigCore::instance()->SavePOS(Mat, fileName);
+		}
 	}
-	vtkMDActor *FirstSelectedActor = mqMorphoDigCore::instance()->GetFirstSelectedActor();
-	if (FirstSelectedActor != NULL) {	
+	else
+	{
+		vtkIdType num_selected_surfaces = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+		if (num_selected_surfaces != 0) {
+			QMessageBox msgBox;
+			msgBox.setText("Some surfaces are selected. Please unselect selected surfaces to save volume position.");
+			msgBox.exec();
+			return;
+		}
+		
+		vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+		if (num_selected_volumes == 0) {
+			QMessageBox msgBox;
+			msgBox.setText("No volume selected. Please select one single volume to use this option.");
+			msgBox.exec();
+			return;
+		}
+		else if (num_selected_volumes > 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Several volumes are currently selected. Please select one single volume to use this option.");
+			int ret = msgBox.exec();
+			return;
 
-		vtkSmartPointer<vtkMatrix4x4> Mat = FirstSelectedActor->GetMatrix();		
-		mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+		}
+		vtkMDVolume *FirstSelectedVolume = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
+		if (FirstSelectedVolume != NULL) {
 
-		QString fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-			tr("Save POS files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
-			tr("Pos file (*.pos)"), NULL
-			//, QFileDialog::DontConfirmOverwrite
-		);
+			vtkSmartPointer<vtkMatrix4x4> Mat = FirstSelectedVolume->GetMatrix();
+			mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+
+			QString fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+				tr("Save POS files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
+				tr("Pos file (*.pos)"), NULL
+				//, QFileDialog::DontConfirmOverwrite
+			);
 
 
-		cout << fileName.toStdString();
-		if (fileName.isEmpty()) return;
-		QFileInfo fileInfo(fileName);
-		mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+			cout << fileName.toStdString();
+			if (fileName.isEmpty()) return;
+			QFileInfo fileInfo(fileName);
+			mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
 
-	
-		//Save and applies position 
-		//mqMorphoDigCore::instance()->getUndoStack();
-		cout << "Save POS" << endl;
 
-		mqMorphoDigCore::instance()->SavePOS(Mat, fileName);
+			//Save and applies position 
+			//mqMorphoDigCore::instance()->getUndoStack();
+			cout << "Save POS" << endl;
+
+			mqMorphoDigCore::instance()->SavePOS(Mat, fileName);
+		}
 	}
-
 	
 }
 

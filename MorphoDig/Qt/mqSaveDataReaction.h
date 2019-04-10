@@ -33,7 +33,7 @@ public:
   /* void SavePLY();
    void SaveSTL();
    void SaveVTP();*/
-   void SavePOS();
+   void SavePOS(int mode);
    void SaveActiveScalarSummary();
    void SaveSelectedSurfaceScalars();
    void SaveCURInfos();
@@ -80,11 +80,11 @@ protected:
 	}	
 	else if (this->Mode == 9)
 	{
-		
+		  this->SavePOS(1);//save pos for volumes
 	}
 	else if (this->Mode == 8)
 	{
-		this->SavePOS();
+		this->SavePOS(0);//save pos for surfaces
 	}	
 	
 	else if (this->Mode == 13)

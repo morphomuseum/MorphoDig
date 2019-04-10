@@ -756,6 +756,7 @@ public:
   vtkMDVolume* GetLastVolume();
   vtkLMActor* GetLastLandmark(int mode);
   vtkMDActor * GetFirstSelectedActor();
+  vtkMDVolume * GetFirstSelectedVolume();
   void ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode);
   void InitializeOrientationHelper();
   void SetOrientationHelperLabels(std::string X1, std::string X2, std::string Y1, std::string Y2, std::string Z1, std::string Z2);

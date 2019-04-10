@@ -195,12 +195,13 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveDataReaction(submenuCurves->addAction("Save curve infos (length per curve segment)") << mqSetName("actionSaveCURInfos"), 17);
   
 
-  new mqOpenDataReaction(submenuPosition->addAction("Open position for selected surfaces") << mqSetName("actionOpenPOS"), 8);
-  new mqOpenDataReaction(submenuPosition->addAction("Open transposed position for selected surfaces") << mqSetName("actionOpenPOS2"), 10);
+  new mqOpenDataReaction(submenuPosition->addAction("Open position for selected surfaces or volumes") << mqSetName("actionOpenPOS"), 8);
+  new mqOpenDataReaction(submenuPosition->addAction("Open transposed position for selected surfaces or volumes") << mqSetName("actionOpenPOS2"), 10);
   new mqOpenDataReaction(submenuPosition->addAction("Open position for selected landmarks/flags") << mqSetName("actionOpenPOS3"), 11);
+  
   new mqOpenDataReaction(submenuPosition->addAction("Open transposed position for selected landmarks/flags") << mqSetName("actionOpenPOS4"), 12);
   new mqSaveDataReaction(submenuPosition->addAction("Save position for selected surface") << mqSetName("actionSavePOS"), 8);
-
+  new mqSaveDataReaction(submenuPosition->addAction("Save position for selected volume") << mqSetName("actionSavePOS"), 9);
   
   new mqOpenDataReaction(submenuOrientationLabels->addAction("Open Orientation Labels") << mqSetName("actionOpenORI"), 7);
   new mqSaveDataReaction(submenuOrientationLabels->addAction("Save Orientation Labels") << mqSetName("actionSaveORI"), 7);
