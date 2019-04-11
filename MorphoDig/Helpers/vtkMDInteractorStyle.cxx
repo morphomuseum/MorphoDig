@@ -1655,14 +1655,14 @@ void vtkMDInteractorStyle::OnMouseMove()
 		  {
 		  case VTKIS_ROTATE:
 			  this->FindPokedRenderer(x, y);
-			  cout << "ROTATE" << endl;
+			  //cout << "ROTATE" << endl;
 			  this->RotateActors();
 			  this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
 			  break;
 
 		  case VTKIS_PAN:
 			  this->FindPokedRenderer(x, y);
-			  cout << "PAN" << endl;
+			  //cout << "PAN" << endl;
 			  this->PanActors();
 			  this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
 			  break;		  

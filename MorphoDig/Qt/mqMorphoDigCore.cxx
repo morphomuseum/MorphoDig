@@ -4085,15 +4085,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			vtkSmartPointer<vtkImageAccumulate> histogram =
 				  vtkSmartPointer<vtkImageAccumulate>::New();
-			//mapper->SetRequestedRenderModeToRayCast();
+			//mapper->SetRequestedRenderModeToDefault();
 			
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
@@ -4203,8 +4203,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
-			volume->SetCtf(TF);
-			//property->SetColor(TF);
+			//volume->SetCtf(TF);
+			property->SetColor(TF);
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
 			//mapper->SetInputData(input);
@@ -4327,7 +4327,12 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			      property->SetDiffuse(this->mui_Diffuse);
 			      property->SetSpecular(this->mui_Specular);
 			      property->SetSpecularPower(this->mui_SpecularPower);
-			     property->SetScalarOpacityUnitDistance(50); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+
+				  double bblength = volume->GetBoundingBoxLength();
+				  double SOUD = bblength / 50;
+				  cout << "Scalar Opacity Unit Distance:" << bblength << "/50=" << SOUD << endl;
+				  if (SOUD == 0) { SOUD = 0.89; }
+			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
 				 mapper->Update();
 				 volume->Update();
 				 volume->SetSelected(1);
@@ -6658,7 +6663,11 @@ void mqMorphoDigCore::UpdateColorProperties()
 		this->ActorCollection->UpdateColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 		this->Render();
 	}
-
+	if (this->VolumeCollection && this->VolumeCollection->GetNumberOfItems() > 0)
+	{
+		this->VolumeCollection->UpdateColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+		this->Render();
+	}
 }
 
 void mqMorphoDigCore::OpenCAM(QString fileName)
@@ -17742,8 +17751,11 @@ void mqMorphoDigCore::GetCenterOfMass(double center[3])
 	double actorsCOM[3] = { 0,0,0 };
 	double volumesCOM[3] = { 0,0,0 };
 	this->getActorCollection()->GetCenterOfMass(actorsCOM);
+	cout << "actorsCOM:" << actorsCOM[0] << "," << actorsCOM[1] << "," << actorsCOM[2] << "," << endl;
+	
 	this->getActorCollection()->GetCenterOfMass(newcamerafocalpoint);
 	this->getVolumeCollection()->GetCenterOfMass(volumesCOM);
+	cout << "volumesCOM:" << volumesCOM[0] << "," << volumesCOM[1] << "," << volumesCOM[2] << "," << endl;
 	if (this->getVolumeCollection()->GetNumberOfItems() > 0)
 	{
 		newcamerafocalpoint[0] += volumesCOM[0];
@@ -17759,6 +17771,7 @@ void mqMorphoDigCore::GetCenterOfMass(double center[3])
 	center[0] = newcamerafocalpoint[0];
 	center[1] = newcamerafocalpoint[1];
 	center[2] = newcamerafocalpoint[2];
+	cout << "centerofmass=" << center[0] << "," << center[1] << "," << center[2] << "," << endl;
 }
 
 void mqMorphoDigCore::ReplaceCameraAndGrid()
@@ -17767,7 +17780,7 @@ void mqMorphoDigCore::ReplaceCameraAndGrid()
 	if (this->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
 		this->GetCenterOfMass(newcamerafocalpoint);
-		
+		cout << "Replace camera and grid : new Cam Foc Point" << newcamerafocalpoint[0] << "," << newcamerafocalpoint[1] << "," << newcamerafocalpoint[1] << "," << endl;
 	}
 
 	double oldcampos[3];
@@ -18003,6 +18016,7 @@ void mqMorphoDigCore::AdjustCameraAndGrid()
 	if (this->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
 		this->GetCenterOfMass(newcamerafocalpoint);
+		cout << "Adjust new Cam Foc Point" << newcamerafocalpoint[0] << "," << newcamerafocalpoint[1] << "," << newcamerafocalpoint[2] << "," << endl;
 		this->getGridActor()->SetGridOrigin(newcamerafocalpoint);
 
 

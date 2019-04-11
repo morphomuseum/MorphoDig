@@ -543,7 +543,7 @@ void vtkMDVolumeCollection::ComputeCenterOfMass()
 			cout << "My Volume Matrix is null!" << endl;
 		}
 		centerOfMass[0] += Vcenter[0] ;
-		centerOfMass[1] += Vcenter[0];
+		centerOfMass[1] += Vcenter[1];
 		centerOfMass[2] += Vcenter[2];
 		if (myVolume->GetSelected() == 1)
 		{

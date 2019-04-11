@@ -30,14 +30,15 @@ void mqSaveNTWDialogReaction::onTriggered()
 	vtkIdType num_sel_Target_Landmarks = 0;
 	vtkIdType num_sel_Node_Landmarks = 0;
 	vtkIdType num_sel_Handle_Landmarks = 0;
-	
+	vtkIdType num_sel_Volumes = 0;
+
 	vtkIdType num_Actors = 0;
 	vtkIdType num_Fags = 0;
 	vtkIdType num_Normal_Landmarks = 0;
 	vtkIdType num_Target_Landmarks = 0;
 	vtkIdType num_Node_Landmarks = 0;
 	vtkIdType num_Handle_Landmarks = 0;
-
+	vtkIdType num_Volumes = 0;
 
 	num_sel_Actors = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
 	num_sel_Fags = mqMorphoDigCore::instance()->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
@@ -45,14 +46,15 @@ void mqSaveNTWDialogReaction::onTriggered()
 	num_sel_Target_Landmarks = mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
 	num_sel_Node_Landmarks = mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
 	num_sel_Handle_Landmarks = mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
-	
+	num_sel_Volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+
 	num_Actors = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems();
 	num_Fags = mqMorphoDigCore::instance()->getFlagLandmarkCollection()->GetNumberOfItems();
 	num_Normal_Landmarks = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfItems();
 	num_Target_Landmarks = mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfItems();
 	num_Node_Landmarks = mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfItems();
 	num_Handle_Landmarks = mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfItems();
-
+	num_Volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems();
 	
 		if (num_sel_Actors ==0
 			&& num_sel_Fags==0
@@ -60,10 +62,11 @@ void mqSaveNTWDialogReaction::onTriggered()
 			&& num_sel_Target_Landmarks ==0
 			&& num_sel_Node_Landmarks == 0
 			&& num_sel_Handle_Landmarks==0
+			&& num_sel_Volumes == 0
 			
 			) {
 			QMessageBox msgBox;
-			msgBox.setText("Select at least one surface/flag/landmark/curve element to use this function!");
+			msgBox.setText("Select at least one surface/flag/landmark/curve/volume element to use this function!");
 			msgBox.exec();
 			return;
 		}
@@ -71,7 +74,7 @@ void mqSaveNTWDialogReaction::onTriggered()
 		if (mqMorphoDigCore::instance()->g_distinct_selected_names.size() != mqMorphoDigCore::instance()->g_selected_names.size())
 		{
 			QMessageBox msgBox;
-			msgBox.setText("Several selected surface objects have the same name. Impossible to save the project");
+			msgBox.setText("Several selected surface or volume objects share the same name. Impossible to save the project");
 			msgBox.exec();
 			return;
 
@@ -83,6 +86,7 @@ void mqSaveNTWDialogReaction::onTriggered()
 			|| num_sel_Target_Landmarks != num_Target_Landmarks
 			|| num_sel_Node_Landmarks != num_Node_Landmarks
 			|| num_sel_Handle_Landmarks != num_Handle_Landmarks
+			|| num_sel_Volumes != num_Volumes
 			
 
 			) {
