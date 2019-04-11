@@ -4085,15 +4085,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			vtkSmartPointer<vtkImageAccumulate> histogram =
 				  vtkSmartPointer<vtkImageAccumulate>::New();
-			//mapper->SetRequestedRenderModeToDefault();
+			mapper->SetRequestedRenderModeToDefault();
 			
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
@@ -4203,7 +4203,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
-			//volume->SetCtf(TF);
+			volume->SetCtf(TF);
 			property->SetColor(TF);
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
@@ -4336,6 +4336,11 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 mapper->Update();
 				 volume->Update();
 				 volume->SetSelected(1);
+				 volume->SetScalarOpacityUnitDistance(SOUD);
+				 volume->SetScalarDisplayMin((double)first_point);
+				 volume->SetScalarDisplayMax((double)last_point);
+
+
 				 QFileInfo fileInfo(fileName);
 				 QString onlyfilename(fileInfo.fileName());
 				 std::string only_filename = onlyfilename.toStdString();
@@ -5170,7 +5175,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						myline = path.c_str();
 						myline.append(orifilename.c_str());
 					}
-					std::cout << "Try to load orientaiton file :<<" << myline.c_str() << std::endl;
+					std::cout << "Try to load orientation file :<<" << myline.c_str() << std::endl;
 					QString orifile(myline.c_str());
 					this->OpenORI(orifile);
 
@@ -5200,25 +5205,25 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 
 				}
-				found = fileName.toStdString().find(STLext);
-				found2 = fileName.toStdString().find(STLext2);
+				found = myline.find(STLext);
+				found2 = myline.find(STLext2);
 				if (found != std::string::npos || found2 != std::string::npos)
 				{
 					surface_file = 1; volume_file = 0;
 					
 				}
 
-				found = fileName.toStdString().find(VTKext);
-				found2 = fileName.toStdString().find(VTKext2);
-				found3 = fileName.toStdString().find(VTKext3);
-				found4 = fileName.toStdString().find(VTKext4);
+				found = myline.find(VTKext);
+				found2 = myline.find(VTKext2);
+				found3 = myline.find(VTKext3);
+				found4 = myline.find(VTKext4);
 				if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
 				{
 					surface_file = 1; volume_file = 0;
 				}
 
-				found = fileName.toStdString().find(PLYext);
-				found2 = fileName.toStdString().find(PLYext2);
+				found = myline.find(PLYext);
+				found2 = myline.find(PLYext2);
 
 				if (found != std::string::npos || found2 != std::string::npos)
 				{
@@ -5226,28 +5231,36 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 				}
 
 				//std::cout << "2Type= " <<type<< std::endl;
-				found = fileName.toStdString().find(OBJext);
-				found2 = fileName.toStdString().find(OBJext2);
+				found = myline.find(OBJext);
+				found2 = myline.find(OBJext2);
 				if (found != std::string::npos || found2 != std::string::npos)
 				{
 					surface_file = 1; volume_file = 0;
 				}
-				found = fileName.toStdString().find(MHAext);
-				found2 = fileName.toStdString().find(MHAext2);
+				found = myline.find(MHAext);
+				found2 = myline.find(MHAext2);
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+					std::cout << "found a MHA file!:<<" << myline.c_str() << std::endl;
+					surface_file = 0; volume_file = 1;
+				}
+				found = myline.find(MHDext);
+				found2 = myline.find(MHDext2);
 				if (found != std::string::npos || found2 != std::string::npos)
 				{
 					surface_file = 0; volume_file = 1;
+					std::cout << "found a MHD file!:<<" << myline.c_str() <<", volume_file ="<< volume_file << std::endl;
+				
 				}
-				found = fileName.toStdString().find(MHDext);
-				found2 = fileName.toStdString().find(MHDext2);
+				else
+				{
+					//cout << "no mhd????" << myline << endl;
+				}
+				found = myline.find(VTIext);
+				found2 = myline.find(VTIext2);
 				if (found != std::string::npos || found2 != std::string::npos)
 				{
-					surface_file = 0; volume_file = 1;
-				}
-				found = fileName.toStdString().find(VTIext);
-				found2 = fileName.toStdString().find(VTIext2);
-				if (found != std::string::npos || found2 != std::string::npos)
-				{
+					std::cout << "found a VTI file!:<<" << myline.c_str() << std::endl;
 					surface_file = 0; volume_file = 1;
 				}
 
@@ -5264,11 +5277,12 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 				if (lmk_file == 0)
 				{
+					cout << "Definitely not a landmark file. Ok status:" <<ok<< endl;
 					if (surface_file == 1)
 					{
+						cout << "A surface file or related with surfaces" << endl;
 						if (i == 0)
 						{
-
 							//length=(int)strlen(oneline);						
 							//strncpy(param1, oneline, length-1);
 							std::string meshname = line.toStdString();
@@ -5282,7 +5296,6 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 								meshname.append(meshfilename.c_str());
 							}
 							QString meshfile(meshname.c_str());
-
 
 
 							this->OpenMesh(meshfile);
@@ -5362,10 +5375,9 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 							i = 0;
 						}
 					}
-
 					else if (volume_file == 1)
 					{
-
+						cout << "A volume file or related with volume" << endl;
 						if (i == 0)
 						{
 
@@ -5384,7 +5396,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 							QString volumefile(volname.c_str());
 
 
-
+							cout << "Open volume!" << endl;
 							this->OpenVolume(volumefile);
 							vtkMDVolume* volume = this->GetLastVolume();
 
@@ -5416,7 +5428,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 									posfile = path.c_str();
 									posfile.append(posfilename.c_str());
 								}
-								std::cout << "Try to load position :<<" << posfile.c_str() << std::endl;
+								std::cout << "Try to load position vor a volume <<" << posfile.c_str() << std::endl;
 								QString qposfile(posfile.c_str());
 								this->OpenPOS(qposfile, 3);								
 							}
@@ -5439,13 +5451,27 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 									mapfile = path.c_str();
 									mapfile.append(mapfilename.c_str());
 								}
-								std::cout << "Try to load ColorTransform Function .map :<<" << mapfile.c_str() << std::endl;
+								std::cout << "Try to load ColorTransform Function .map .. and apply it to a volume!<<" << mapfile.c_str() << std::endl;
 								QString qmapfile(mapfile.c_str());
 								this->OpenMAP(qmapfile, 1);
 							}
 						}
+						if (i == 3)
+						{
+							if (ok)
+							{
+								vtkMDVolume *volume = this->GetLastVolume();
+								double Scalar_opacity, Scalar_min, Scalar_max;
+								QTextStream myteststream(&line);
+								myteststream >> Scalar_opacity >> Scalar_min >> Scalar_max;
+								volume->SetScalarOpacityUnitDistance(Scalar_opacity);
+								volume->SetScalarDisplayMax(Scalar_max);
+								volume->SetScalarDisplayMax(Scalar_max);
+								
+							}
+						}
 						i++;
-						if (i > 2)
+						if (i > 3)
 						{
 							i = 0;
 						}
@@ -6583,6 +6609,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				stream << _vol_file.toStdString().c_str() << endl;
 				stream << _pos_file.toStdString().c_str() << endl;
 				stream << _map_file.toStdString().c_str() << endl;
+				stream << myVolume->GetScalarOpacityUnitDistance() << " " << myVolume->GetScalarDisplayMin() << " "<< myVolume->GetScalarDisplayMax() << endl;
 				
 
 

@@ -118,9 +118,9 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 		filename = path.c_str();
 		filename.append(g_distinct_selected_names.at(i).c_str());*/
 
-	cout << "SAVE NTW: number of distinct selected surfaces:" << mqMorphoDigCore::instance()->g_distinct_selected_names.size() << endl;
-	
-	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() == 1)
+	cout << "SAVE NTW: number of distinct selected surfaces/volumes:" << mqMorphoDigCore::instance()->g_distinct_selected_names.size() << endl;
+	int num_surf_vol_sel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() + mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+	if (num_surf_vol_sel == 1)
 	{
 		
 		//cout << "preferred name:" << mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str();

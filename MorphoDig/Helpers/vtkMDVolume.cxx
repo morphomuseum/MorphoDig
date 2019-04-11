@@ -47,6 +47,11 @@ vtkMDVolume::vtkMDVolume()
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
 	this->Changed = 0;
 	this->Name = "New Volume";
+	this->ScalarDisplayMax = (double)VTK_UNSIGNED_INT_MAX;
+	this->ScalarDisplayMin = (double) VTK_UNSIGNED_INT_MIN;
+	this->ScalarOpacityUnitDistance = 1;
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -294,6 +299,7 @@ void vtkMDVolume::PopUndoStack()
 	ctf = this->GetCtf();
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	Savedctf->DeepCopy(ctf);
+
 	ctf->DeepCopy(this->UndoRedo->UndoStack.back().Ctf);
 	this->SetCtf(ctf);
 
@@ -302,10 +308,32 @@ void vtkMDVolume::PopUndoStack()
 	
 	int mCurrentSelected = this->Selected;
 	this->SetSelected(this->UndoRedo->UndoStack.back().Selected);
+	std::string savedName = this->Name;	
 	this->Name = this->UndoRedo->UndoStack.back().Name;
 	//cout << "Undo name: " << this->UndoRedo->UndoStack.back().Name;
 	cout << "PopUndoStack Set Selected: " << mCurrentSelected << endl;
-	this->UndoRedo->RedoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name));
+
+	double ScalarDisplayMax;
+	double ScalarDisplayMin;
+	double ScalarOpacityUnitDistance;
+
+	double mCurrentScalarDisplayMax = this->ScalarDisplayMax;
+	this->SetScalarDisplayMax(this->UndoRedo->UndoStack.back().ScalarDisplayMax);
+
+	double mCurrentScalarDisplayMin = this->ScalarDisplayMin;
+	this->SetScalarDisplayMin(this->UndoRedo->UndoStack.back().ScalarDisplayMin);
+
+	double mCurrentScalarOpacityUnitDistance = this->ScalarOpacityUnitDistance;
+	this->SetScalarOpacityUnitDistance(this->UndoRedo->UndoStack.back().ScalarOpacityUnitDistance);
+
+
+
+	this->UndoRedo->RedoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, savedName, 
+		mCurrentScalarOpacityUnitDistance,
+		mCurrentScalarDisplayMin,
+		mCurrentScalarDisplayMax
+		
+		));
 	this->UndoRedo->UndoStack.pop_back();
 	this->Modified();
 }
@@ -335,8 +363,27 @@ void vtkMDVolume::PopRedoStack()
 	int mCurrentSelected = this->Selected;
 	this->SetSelected(this->UndoRedo->RedoStack.back().Selected);
 	cout << "PopRedoStack Set Selected: " << mCurrentSelected << endl;
+	std::string savedName = this->Name;
 	this->Name = this->UndoRedo->RedoStack.back().Name;	
-	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name));
+	
+
+	double mCurrentScalarDisplayMax = this->ScalarDisplayMax;
+	this->SetScalarDisplayMax(this->UndoRedo->RedoStack.back().ScalarDisplayMax);
+
+	double mCurrentScalarDisplayMin = this->ScalarDisplayMin;
+	this->SetScalarDisplayMin(this->UndoRedo->RedoStack.back().ScalarDisplayMin);
+
+	double mCurrentScalarOpacityUnitDistance = this->ScalarOpacityUnitDistance;
+	this->SetScalarOpacityUnitDistance(this->UndoRedo->RedoStack.back().ScalarOpacityUnitDistance);
+
+
+
+	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, savedName,
+		mCurrentScalarOpacityUnitDistance,
+		mCurrentScalarDisplayMin,
+		mCurrentScalarDisplayMax
+	
+	));
 	this->UndoRedo->RedoStack.pop_back();
 	this->Modified();
 }
@@ -374,10 +421,21 @@ void vtkMDVolume::SaveState(int mCount)
 	
 	
 	
+	double mCurrentScalarDisplayMax = this->ScalarDisplayMax;
+	
 
+	double mCurrentScalarDisplayMin = this->ScalarDisplayMin;
+	
+
+	double mCurrentScalarOpacityUnitDistance = this->ScalarOpacityUnitDistance;
+	
 
 	
-	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mSelected, mCount, name));
+	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mSelected, mCount, name,
+		mCurrentScalarOpacityUnitDistance,
+		mCurrentScalarDisplayMin,
+		mCurrentScalarDisplayMax
+		));
 
 }
 //----------------------------------------------------------------------------

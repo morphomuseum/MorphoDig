@@ -34,15 +34,21 @@ public:
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 		int Selected;
 		int UndoCount;
+		double ScalarOpacityUnitDistance;
+		double ScalarDisplayMin;
+		double ScalarDisplayMax;
 		
 		std::string Name;
-		Element(vtkSmartPointer<vtkMatrix4x4> m, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf, int selected, int Count, std::string name)
+		Element(vtkSmartPointer<vtkMatrix4x4> m, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf, int selected, int Count, std::string name, double SOUD, double DisplayMin, double DisplayMax)
 		{
 			this->Ctf = ctf;
 			this->Matrix =m;
 			this->UndoCount = Count;
 			this->Selected = selected;
 			this->Name = name;
+			this->ScalarDisplayMax = DisplayMax;
+			this->ScalarDisplayMin = DisplayMin;
+			this->ScalarOpacityUnitDistance = SOUD;
 		}
 	};
 	typedef std::vector<Element> VectorOfElements;
@@ -64,6 +70,18 @@ public:
 	//vtkSetMacro(Selected, int);
 	vtkGetMacro(Selected, int);
 	vtkBooleanMacro(Selected, int);
+
+
+	vtkGetMacro(ScalarDisplayMax, double);
+	vtkSetMacro(ScalarDisplayMax, double);
+
+	vtkGetMacro(ScalarDisplayMin, double);
+	vtkSetMacro(ScalarDisplayMin, double);
+
+	vtkGetMacro(ScalarOpacityUnitDistance, double);
+	vtkSetMacro(ScalarOpacityUnitDistance, double);
+
+	
 
 	vtkSetMacro(Changed, int);
 	vtkGetMacro(Changed, int);
@@ -110,6 +128,9 @@ protected:
 	//of selected objects etc... 
 	vtkMDVolumeUndoRedo* UndoRedo;
 	std::string Name;
+	double ScalarDisplayMax;
+	double ScalarDisplayMin;
+	double ScalarOpacityUnitDistance;
 
 private:
 	vtkMDVolume(const vtkMDVolume&);  // Not implemented.
