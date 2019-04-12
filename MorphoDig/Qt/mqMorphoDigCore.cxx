@@ -18518,6 +18518,7 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 		if (volume != NULL)
 		{
 			volume->ApplyMatrix(Mat);
+			
 		}
 	}	
 	else if (mode == 1 )

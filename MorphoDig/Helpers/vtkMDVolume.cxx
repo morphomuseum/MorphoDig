@@ -254,6 +254,8 @@ void vtkMDVolume::Erase(int mCount)
 void vtkMDVolume::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat)
 
 {
+	//double *mCenter = this->GetCenter();
+	//cout << "Center:" << mCenter[0] << "," << mCenter[1] << "," << mCenter[2] << "," << endl;
 	vtkProp3D *prop3D = vtkProp3D::SafeDownCast(this);
 	vtkTransform *newTransform = vtkTransform::New();
 	newTransform->PostMultiply();
@@ -262,6 +264,9 @@ void vtkMDVolume::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat)
 	prop3D->SetScale(newTransform->GetScale());
 	prop3D->SetOrientation(newTransform->GetOrientation());
 	newTransform->Delete();
+	
+	//cout << "Center:" << mCenter[0] << "," << mCenter[1] << "," << mCenter[2] << "," << endl;
+	this->SetChanged(1);
 
 }
 void vtkMDVolume::GetMCenter(double center[3])
@@ -313,9 +318,7 @@ void vtkMDVolume::PopUndoStack()
 	//cout << "Undo name: " << this->UndoRedo->UndoStack.back().Name;
 	cout << "PopUndoStack Set Selected: " << mCurrentSelected << endl;
 
-	double ScalarDisplayMax;
-	double ScalarDisplayMin;
-	double ScalarOpacityUnitDistance;
+	
 
 	double mCurrentScalarDisplayMax = this->ScalarDisplayMax;
 	this->SetScalarDisplayMax(this->UndoRedo->UndoStack.back().ScalarDisplayMax);
