@@ -329,9 +329,9 @@ void vtkMDVolume::PopUndoStack()
 	double mCurrentScalarOpacityUnitDistance = this->ScalarOpacityUnitDistance;
 	this->SetScalarOpacityUnitDistance(this->UndoRedo->UndoStack.back().ScalarOpacityUnitDistance);
 
+	// savedName => avant, c'était this->UndoRedo->UndoStack.back().Name ???? Ok ????
 
-
-	this->UndoRedo->RedoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, savedName, 
+	this->UndoRedo->RedoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->UndoStack.back().UndoCount, this->UndoRedo->UndoStack.back().Name,
 		mCurrentScalarOpacityUnitDistance,
 		mCurrentScalarDisplayMin,
 		mCurrentScalarDisplayMax
@@ -380,8 +380,8 @@ void vtkMDVolume::PopRedoStack()
 	this->SetScalarOpacityUnitDistance(this->UndoRedo->RedoStack.back().ScalarOpacityUnitDistance);
 
 
-
-	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, savedName,
+	// savedName => avant, c'était this->UndoRedo->RedoStack.back().Name ???? Ok ????
+	this->UndoRedo->UndoStack.push_back(vtkMDVolumeUndoRedo::Element(SavedMat, Savedctf, mCurrentSelected, this->UndoRedo->RedoStack.back().UndoCount, this->UndoRedo->RedoStack.back().Name,
 		mCurrentScalarOpacityUnitDistance,
 		mCurrentScalarDisplayMin,
 		mCurrentScalarDisplayMax

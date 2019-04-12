@@ -34,6 +34,7 @@
 #include <sstream>
 #include <iostream>
 #include <vtkPiecewiseFunction.h>
+#include <vtkSmartVolumeMapper.h>
 #include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkInteractorStyleRubberBand3D.h>
 #include <vtkGenericOpenGLRenderWindow.h>
@@ -166,6 +167,8 @@ void rubberselect(vtkObject* caller,
 	mqMorphoDigCore::instance()->stopRubber();
 
 }
+
+
 
 //Select meshes, landmarks and tags ... first try!
 void RubberBandSelect(vtkObject* caller,

@@ -22,6 +22,8 @@
 #include "vtkBezierCurveSource.h"
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
+#include <vtkSmartVolumeMapper.h>
+#include <vtkBoxWidget.h>
 #include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkInteractorStyleRubberBand3D.h>
 #include "vtkGridActor.h"
@@ -48,7 +50,36 @@
 #include <vtkRenderWindow.h>
 #include <QMainWindow>
 
-
+class vtkBoxWidgetCallback : public vtkCommand
+{
+public:
+	static vtkBoxWidgetCallback *New()
+	{
+		return new vtkBoxWidgetCallback;
+	}
+	void Execute(vtkObject *caller, unsigned long, void*) override
+	{
+		cout << "Execute!!!" << endl;
+		vtkBoxWidget *widget = reinterpret_cast<vtkBoxWidget*>(caller);
+		if (this->Mapper)
+		{
+			vtkPlanes *planes = vtkPlanes::New();
+			widget->GetPlanes(planes);
+			this->Mapper->SetClippingPlanes(planes);
+			planes->Delete();
+		}
+	}
+	void SetMapper(vtkSmartPointer<vtkSmartVolumeMapper> m)
+	{
+		this->Mapper = m;
+	}
+protected:
+	vtkBoxWidgetCallback()
+	{
+		this->Mapper = NULL;
+	}
+	vtkSmartPointer<vtkSmartVolumeMapper> Mapper;
+};
 
 class ExistingArrays
 {

@@ -17,6 +17,8 @@
 #include <time.h>
 #include <vtkAlgorithm.h>
 
+#include<vtkBoxWidget.h>
+
 #include <vtkLight.h>
 #include <vtkTriangle.h>
 #include <vtkGPUVolumeRayCastMapper.h>
@@ -132,6 +134,9 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 //-----------------------------------------------------------------------------
 mqMorphoDigCore* mqMorphoDigCore::Instance = 0;
+
+
+
 
 //-----------------------------------------------------------------------------
 mqMorphoDigCore* mqMorphoDigCore::instance()
@@ -4074,6 +4079,9 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		
 		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
 
+	
+		
+		
 		if (dim[0] < 2 ||
 		        dim[1] < 2 ||
 		        dim[2] < 2)
@@ -4095,6 +4103,23 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  vtkSmartPointer<vtkImageAccumulate>::New();
 			mapper->SetRequestedRenderModeToDefault();
 			
+			vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
+			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
+			box->SetPlaceFactor(1.01);
+			box->SetInputData(input);
+
+			//box->SetDefaultRenderer(this->getRenderer());
+			box->InsideOutOn();
+			box->PlaceWidget();
+			vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
+			callback->SetMapper(mapper);
+			box->AddObserver(vtkCommand::InteractionEvent, callback);
+			//callback->Delete();
+			box->EnabledOn();
+			box->GetSelectedFaceProperty()->SetOpacity(0.0);
+
+
+
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
 			{
@@ -9173,7 +9198,7 @@ void mqMorphoDigCore::startRubber(int rubber_mode)
 
 	//cout << "Set Lasso style as current interaction style!" << endl;
 	//1 change interaction mode
-	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->RubberStyle);
+	this->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->RubberStyle);
 	this->currentRubberMode = rubber_mode;
 	if (rubber_mode == 0) { this->setCurrentCursor(9); }
 	if (rubber_mode == 1) { this->setCurrentCursor(8); }
