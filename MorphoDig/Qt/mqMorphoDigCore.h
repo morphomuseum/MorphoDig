@@ -49,6 +49,8 @@
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include <QMainWindow>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 
 class vtkBoxWidgetCallback : public vtkCommand
 {
