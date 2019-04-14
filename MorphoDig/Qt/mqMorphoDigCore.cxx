@@ -9,6 +9,8 @@
 #include "vtkMDActor.h"
 #include "vtkMDVolume.h"
 #include "vtkLMActor.h"
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
 #include <vtkXMLImageDataWriter.h>
@@ -443,6 +445,7 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget)
 #else
 	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget)
+//void mqMorphoDigCore::setQVTKWidget(QVTKWidget *mqvtkWidget)
 #endif
 {
 	this->qvtkWidget = mqvtkWidget;
@@ -454,6 +457,7 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	QVTKOpenGLWidget* mqMorphoDigCore::getQVTKWidget()
 #else
 	QVTKOpenGLNativeWidget* mqMorphoDigCore::getQVTKWidget()
+		//QVTKWidget* mqMorphoDigCore::getQVTKWidget()
 #endif
 { return this->qvtkWidget; }
 void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
@@ -4104,16 +4108,21 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			mapper->SetRequestedRenderModeToDefault();
 			
 			vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
-			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
-			box->SetPlaceFactor(1.01);
+				box->SetPlaceFactor(1.01);
 			box->SetInputData(input);
 
-			//box->SetDefaultRenderer(this->getRenderer());
+			box->SetDefaultRenderer(this->getRenderer());
 			box->InsideOutOn();
 			box->PlaceWidget();
+			box->SetInteractor(this->RenderWindow->GetInteractor());
+
 			vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
 			callback->SetMapper(mapper);
-			box->AddObserver(vtkCommand::InteractionEvent, callback);
+
+			/* vtkSmartPointer<vtkMyNodeHandleCallBack> callback = vtkSmartPointer<vtkMyNodeHandleCallBack>::New();
+  mqMorphoDigCore::instance()->getNodeLandmarkCollection()->AddObserver(vtkCommand::ModifiedEvent, callback);
+ */
+			//box->AddObserver(vtkCommand::InteractionEvent, callback);
 			//callback->Delete();
 			box->EnabledOn();
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
