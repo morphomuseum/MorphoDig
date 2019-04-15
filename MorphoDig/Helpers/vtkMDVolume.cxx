@@ -45,6 +45,7 @@ vtkMDVolume::vtkMDVolume()
 	this->Selected = 1;
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
+	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
 	this->Changed = 0;
 	this->Name = "New Volume";
 	this->ScalarDisplayMax = (double)VTK_UNSIGNED_INT_MAX;

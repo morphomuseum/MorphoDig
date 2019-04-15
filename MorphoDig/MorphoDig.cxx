@@ -115,7 +115,7 @@ int MorphoDig::getTestInt()
 }*/
 
 
-/*class vtkMyCallback : public vtkCommand
+class vtkMyCallback : public vtkCommand
 {
 public:
 	static vtkMyCallback *New() { return new vtkMyCallback; }
@@ -126,7 +126,7 @@ public:
 		vtkBoxWidget *widget = reinterpret_cast<vtkBoxWidget*>(caller);
 		widget->GetTransform(t);    widget->GetProp3D()->SetUserTransform(t);
 	}
-};*/
+};
 
 
 //When node landmarks or handle landmarks are modified : do this!
@@ -1025,8 +1025,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   //this->qvtkWidget2->SetRenderWindow(window);
   
   //EXAMPLE vtkBoxWidget
-
   /*
+  
   vtkSmartPointer<vtkConeSource> coneSource =
 	  vtkSmartPointer<vtkConeSource>::New();
   coneSource->SetHeight(1.5);
@@ -1041,27 +1041,28 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   //DNEW
   this->MorphoDigCore->getRenderer()->AddActor(actor);
 
-  vtkSmartPointer<vtkBoxWidget> boxWidget = vtkSmartPointer<vtkBoxWidget>::New();
-  boxWidget->SetInteractor(this->ui->qvtkWidget->GetRenderWindow()->GetInteractor());
-  boxWidget->SetProp3D(actor);
-  boxWidget->SetPlaceFactor(1.25);
-  boxWidget->PlaceWidget();
-  vtkSmartPointer<vtkMyCallback> callback = vtkSmartPointer<vtkMyCallback>::New();
-  boxWidget->AddObserver(vtkCommand::InteractionEvent, callback);
-  boxWidget->On();*/
+  this->_boxWidget = vtkSmartPointer<vtkBoxWidget>::New();
+  //
+  this->_boxWidget->SetInteractor(this->qvtkWidget2->GetRenderWindow()->GetInteractor());
+  //boxWidget->SetInteractor(this->ui->qvtkWidget->GetRenderWindow()->GetInteractor());
+  this->_boxWidget->SetProp3D(actor);
+  this->_boxWidget->SetPlaceFactor(1.25);
+  this->_boxWidget->PlaceWidget();
+  vtkSmartPointer<vtkMyCallback> Boxcallback = vtkSmartPointer<vtkMyCallback>::New();
+  this->_boxWidget->AddObserver(vtkCommand::InteractionEvent, Boxcallback);
+  this->_boxWidget->On();
 
-
-  
+  */
   
 
   //EXAMPLE BEZIER SOURCE + BEZIER WIDGET
-  
+  /*
   unsigned int controlPointsX = 4;
   unsigned int controlPointsY = 4;
   
   // Create an arbitrary plane that we can use
   // to initialize the control points for the Bezier surface
-  /*
+  
   vtkSmartPointer<vtkPlaneSource> planeSource =
 	  vtkSmartPointer<vtkPlaneSource>::New();
   planeSource->SetOrigin(0, 0, 0);

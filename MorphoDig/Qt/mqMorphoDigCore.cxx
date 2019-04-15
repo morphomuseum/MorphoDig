@@ -4103,12 +4103,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  vtkSmartPointer<vtkImageAccumulate>::New();
 			mapper->SetRequestedRenderModeToDefault();
 			
-			vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
+
+			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
 			box->SetPlaceFactor(1.01);
 			box->SetInputData(input);
 
-			//box->SetDefaultRenderer(this->getRenderer());
+			box->SetDefaultRenderer(this->getRenderer());
 			box->InsideOutOn();
 			box->PlaceWidget();
 			vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
@@ -4117,6 +4118,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//callback->Delete();
 			box->EnabledOn();
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
+			volume->SetBox(box);
 
 
 

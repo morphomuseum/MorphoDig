@@ -23,6 +23,7 @@ Module:    vtkMDVolume.h
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkPolyDataConnectivityFilter.h>
+#include <vtkBoxWidget.h>
 #include <vector>
 #include <QString>
 class vtkMDVolumeUndoRedo
@@ -96,6 +97,8 @@ public:
 	vtkSetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 
+	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
+	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	
 	
 	double GetBoundingBoxLength();
@@ -125,6 +128,7 @@ protected:
 	int Changed; // used by vtkMDVolumeCollectionUndoRedo class to recompute global center of mass and center of mass
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 	vtkSmartPointer<vtkImageData> ImageData;
+	vtkSmartPointer<vtkBoxWidget> Box;
 	//of selected objects etc... 
 	vtkMDVolumeUndoRedo* UndoRedo;
 	std::string Name;
