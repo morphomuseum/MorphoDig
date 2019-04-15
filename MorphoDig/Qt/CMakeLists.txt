@@ -61,6 +61,10 @@ mqViewMenuManager.cxx
   mqEditACTORDialogReaction.cxx
   mqEditACTORDialog.h
   mqEditACTORDialog.cxx
+  mqEditVolumeDialogReaction.h
+  mqEditVolumeDialogReaction.cxx
+  mqEditVolumeDialog.h
+  mqEditVolumeDialog.cxx
   mqEditAllFLGColorDialogReaction.h
   mqEditAllFLGColorDialogReaction.cxx
   mqEditAllFLGColorDialog.h
@@ -327,6 +331,7 @@ mqEditAlphaDialog.ui
 mqCreateLMKDialog.ui
 mqEditFLGDialog.ui
 mqEditACTORDialog.ui
+mqEditVolumeDialog.ui
 mqEditTagsDialog.ui
 mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
