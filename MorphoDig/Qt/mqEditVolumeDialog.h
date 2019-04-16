@@ -32,6 +32,9 @@ public:
   
   ~mqEditVolumeDialog();
   void saveVolume();
+  double GetCTFMin();
+  double GetCTFMax();
+
   void GetFirstSelectedVolume();
   void GetFirstVolume();
   void GetNextVolume();
@@ -40,8 +43,12 @@ public:
   int SomeThingHasChanged();
   int CurrentVolumeInCollection();
   void RefreshDialog();
+  void MoveSliders();
+  void UpdateLookupTableRange(double min, double max);
   public slots:
-  
+ virtual void slotRefreshSliders();
+ virtual void slotMoveSliders();
+ virtual void slotCurrentMinMaxEdited();
   virtual void slotRefreshDialog();
   virtual void slotGetPrecedingVolume();
   virtual void slotGetNextVolume();

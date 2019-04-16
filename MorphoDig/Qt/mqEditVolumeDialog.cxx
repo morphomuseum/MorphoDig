@@ -18,6 +18,7 @@
 #include "mqColorOpacityEditorWidget.h"
 #include "mqTransferFunctionWidget.h"
 #include <vtkDiscretizableColorTransferFunction.h>
+#include<vtkPiecewiseFunction.h>
 
 // we actually do not need glew...
 //#include <GL/glew.h>
@@ -175,11 +176,41 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 
 	this->UpdateUI();
+	this->Ui->currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->currentMin->setMinimum(-DBL_MAX);
+	this->Ui->currentMax->setMinimum(-DBL_MAX);
+	this->Ui->currentMax->setValue(1);
+	this->Ui->currentMin->setValue(0);
 	
+	this->Ui->currentMin->setMaximum(DBL_MAX);
+	this->Ui->currentMax->setMaximum(DBL_MAX);
+
+	this->Ui->sliderMin->setDoubleValue(0);
+	this->Ui->sliderMin->setDoubleMaximum(1);
+	this->Ui->sliderMin->setDoubleMinimum(-1);
+
+
+
+
+	this->Ui->sliderMax->setDoubleValue(1);
+	this->Ui->sliderMax->setDoubleMaximum(2);
+	this->Ui->sliderMax->setDoubleMinimum(0);
+	this->Ui->sliderMin->setDoubleSingleStep((this->Ui->sliderMin->doubleMaximum() - this->Ui->sliderMin->doubleMinimum()) / 100);
+
+	this->Ui->sliderMax->setDoubleSingleStep((this->Ui->sliderMax->doubleMaximum() - this->Ui->sliderMax->doubleMinimum()) / 100);
+
  
 	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedVolumes()));
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveVolume()));
  connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
+ connect(this->Ui->sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotMoveSliders()));
+ connect(this->Ui->sliderMax, SIGNAL(valueChanged(int)), this, SLOT(slotMoveSliders()));
+
+ connect(this->Ui->sliderMin, SIGNAL(sliderReleased()), this, SLOT(slotRefreshSliders()));
+ connect(this->Ui->sliderMax, SIGNAL(sliderReleased()), this, SLOT(slotRefreshSliders()));
+ connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
+ connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
 
 }
 
@@ -236,6 +267,87 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 	}
 
 	return something_has_changed;
+}
+void mqEditVolumeDialog::slotCurrentMinMaxEdited()
+{
+	//cout << "Min max edited!" << endl;
+	double new_min = this->Ui->currentMin->value();
+	double new_max = this->Ui->currentMax->value();
+	if (new_min < new_max)
+	{
+		this->Ui->sliderMin->setDoubleValue(this->Ui->currentMin->value());
+		this->Ui->sliderMax->setDoubleValue(this->Ui->currentMax->value());
+		this->RefreshSliders();
+		this->UpdateLookupTableRange(new_min, new_max);
+	}
+	else
+	{
+		this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
+		this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
+	}
+
+}
+void mqEditVolumeDialog::slotMoveSliders()
+{
+	this->MoveSliders();
+	//this->UpdateLookupTables();
+}
+void mqEditVolumeDialog::MoveSliders()
+{
+
+	cout << "Volume: Move Slider" << endl;
+	double curr_max = this->Ui->sliderMax->doubleValue();
+	double curr_min = this->Ui->sliderMin->doubleValue();
+
+	this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
+
+	this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
+
+	
+}
+void mqEditVolumeDialog::RefreshSliders()
+{
+
+	//this->Ui->sliderMin->setDoubleValue(this->Ui->currentMin->value());
+	//this->Ui->sliderMax->setDoubleValue(this->Ui->currentMax->value());
+	cout << "Volume: Refresh Sliders" << endl;
+	double curr_max = this->Ui->sliderMax->doubleValue();
+	double curr_min = this->Ui->sliderMin->doubleValue();
+
+	double new_max_min = (curr_max + curr_min) / 2;
+	double new_half = new_max_min - curr_min;
+	double new_max_max = curr_max + new_half;
+
+	double new_min_min = curr_min - new_half;
+	double new_min_max = new_max_min;
+	cout << "Min:" << new_min_min << "|" << curr_min << "|" << new_min_max << endl;
+	cout << "Max:" << new_max_min << "|" << curr_max << "|" << new_max_max << endl;
+	this->Ui->sliderMin->setDoubleValue(curr_min);
+	this->Ui->sliderMax->setDoubleValue(curr_max);
+
+	this->Ui->sliderMin->setDoubleMaximum(new_min_max);
+	this->Ui->sliderMin->setDoubleMinimum(new_min_min);
+
+	this->Ui->sliderMax->setDoubleMinimum(new_max_min);
+	this->Ui->sliderMax->setDoubleMaximum(new_max_max);
+	this->Ui->sliderMin->setDoubleSingleStep((curr_max - curr_min) / 1000);
+	this->Ui->sliderMax->setDoubleSingleStep((curr_max - curr_min) / 1000);
+
+	this->Ui->sliderMin->setDoubleValue(curr_min);
+	this->Ui->sliderMax->setDoubleValue(curr_max);
+
+	this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
+
+	this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
+
+	/*
+	sliderMin->maximum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
+	sliderMin->minimum((3 * MT->Get_sc_min() - MT->Get_sc_max()) / 2);
+	sliderMax->minimum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
+	sliderMax->maximum((3 * MT->Get_sc_max() - MT->Get_sc_min()) / 2);
+	sliderMax->redraw();
+	sliderMax->redraw();
+	*/
 }
 // This dialog is non modal, and Volumes can have been removed from the collection in the meantime... so before saving Volumes, we should check whether they are still
 //inside the collection.
@@ -370,10 +482,148 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->M31->setValue(Mat->GetElement(3, 1));
 		this->Ui->M32->setValue(Mat->GetElement(3, 2));
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
+		double min = this->GetCTFMin();
+		double max = this->GetCTFMax();
+		this->Ui->currentMin->setValue(min);
+		this->Ui->currentMax->setValue(max);
+		this->slotRefreshSliders();
 	}
 	
 }
+double mqEditVolumeDialog::GetCTFMin()
+{
+	if (this->Volume != NULL) {
+		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->Volume->GetCtf();
 
+		double *pts = CM->GetDataPointer();
+
+		int numnodes = CM->GetSize();
+		double old_min = DBL_MAX;
+		
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min) { old_min = curr; }
+			
+		}
+		
+		vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		double old_min2 = DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			//cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min2) { old_min2 = curr; }
+		}
+		if (old_min < old_min2) { return old_min2; }
+		else { return old_min; }
+
+
+	}
+	return -1;
+
+}
+double mqEditVolumeDialog::GetCTFMax()
+{
+	if (this->Volume != NULL) {
+		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->Volume->GetCtf();
+
+		double *pts = CM->GetDataPointer();
+
+		int numnodes = CM->GetSize();
+		double old_max = -DBL_MAX;
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			if (curr > old_max) { old_max = curr; }
+
+		}
+	
+		vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		double old_max2 = -DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			if (curr > old_max2) { old_max2 = curr; }
+
+		}
+		if (old_max2 > old_max) { return old_max2; }
+		else { return old_max; }
+
+	}
+	return 1;
+}
+void mqEditVolumeDialog::UpdateLookupTableRange(double min, double max)
+{
+	if (this->Volume != NULL) {
+		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->Volume->GetCtf();
+
+		double *pts = CM->GetDataPointer();
+
+		int numnodes = CM->GetSize();
+		double old_min = DBL_MAX;
+		double old_max = -DBL_MAX;
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min) { old_min = curr; }
+			if (curr > old_max) { old_max = curr; }
+
+		}
+		cout << "old max:" << old_max << ", old min:" << old_min << endl;
+		if (old_max > old_min)
+		{
+			double old_range = old_max - old_min;
+			double new_range = max - min;
+			double mult = new_range / old_range;
+			double c = min - old_min * mult;
+			for (int k = 0; k < numnodes; k++)
+			{
+				pts[4 * k] = pts[4 * k] * mult + c;
+				cout << "nx" << k << "=" << pts[4 * k] << endl;
+			}
+			CM->FillFromDataPointer(numnodes, pts);
+
+		}
+		vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		double old_min2 = DBL_MAX;
+		double old_max2 = -DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			//cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min2) { old_min2 = curr; }
+			if (curr > old_max2) { old_max2 = curr; }
+
+		}
+		if (old_max2 > old_min2)
+		{
+			double old_range = old_max2 - old_min2;
+			double new_range = max - min;
+			double mult = new_range / old_range;
+			double c = min - old_min2 * mult;
+			for (int k = 0; k < numnodes2; k++)
+			{
+				pts2[2 * k] = pts2[2 * k] * mult + c;
+				//cout << "nx" << k << "=" << pts2[2*k] << endl;
+			}
+			OF->FillFromDataPointer(numnodes2, pts2);
+
+		}
+
+	}
+
+}
 
 void mqEditVolumeDialog::GetNextVolume()
 {
