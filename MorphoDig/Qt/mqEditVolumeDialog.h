@@ -11,7 +11,7 @@
 #include "vtkMDVolumeCollection.h"
 #include <vtkSmartPointer.h>
 #include <QDialog>
-
+#include "mqColorOpacityEditorWidget.h"
 namespace Ui
 {
 class mqEditVolumeDialog;
@@ -53,7 +53,7 @@ public:
 protected:
 	
 private:
-	
+	mqColorOpacityEditorWidget *mColorMap;
 
   Q_DISABLE_COPY(mqEditVolumeDialog)
   Ui::mqEditVolumeDialog* const Ui;

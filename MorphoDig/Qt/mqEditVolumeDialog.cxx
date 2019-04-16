@@ -15,6 +15,9 @@
 #include "vtkMDVolume.h"
 #include "vtkMDVolumeCollection.h"
 #include <vtkMatrix4x4.h>
+#include "mqColorOpacityEditorWidget.h"
+#include "mqTransferFunctionWidget.h"
+#include <vtkDiscretizableColorTransferFunction.h>
 
 // we actually do not need glew...
 //#include <GL/glew.h>
@@ -72,9 +75,12 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	QString mylabel("...");
 	this->Ui->VolumeName->setText(mylabel);
 	
+	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
 	
-	
-
+	cout << "Edit Volume Dialog: Create mqColorOpacityEditorWidget!" << endl;
+	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this->Ui->PropertiesFrame);
+	//cout << "Try that!" << endl;
+	this->mColorMap = someMap;
 	
 
 	this->GetFirstSelectedVolume();
@@ -345,7 +351,7 @@ void mqEditVolumeDialog::UpdateUI()
 		
 		QString mylabel(this->Volume->GetName().c_str());
 		this->Ui->VolumeName->setText(mylabel);
-
+		this->mColorMap->reInitialize(this->Volume->GetCtf());
 
 		vtkSmartPointer<vtkMatrix4x4> Mat = this->Volume->GetMatrix();
 		this->Ui->M00->setValue(Mat->GetElement(0, 0));

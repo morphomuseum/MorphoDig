@@ -29,6 +29,8 @@
 
 #include "mqEditACTORDialogReaction.h"
 #include "mqEditVolumeDialogReaction.h"
+#include "mqEditFLGDialogReaction.h"
+#include "mqEditLMKDialogReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
 #include "mqEditTagsDialogReaction.h"
 #include "mqICPDialogReaction.h"
@@ -405,6 +407,9 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	//ui.setupUi(&menu);
 	// since the UI file tends to change the name of the menu.
 	menu.setObjectName(objectName);
+	new mqEditLMKDialogReaction(menu.addAction("Edit first selected landmark") << mqSetName("actionEditLMK"));
+	new mqEditFLGDialogReaction(menu.addAction("Edit first selected flag") << mqSetName("actionEditFLG"));
+
 	// QAction *openNtw = menu.addAction("Open Project");
 
 	//new mqOpenDataReaction(openNtw, 1);//1= open NTW 
