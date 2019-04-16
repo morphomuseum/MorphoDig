@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>27</width>
-    <height>248</height>
+    <width>31</width>
+    <height>288</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -226,10 +226,10 @@
          </property>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
         <widget class="QToolButton" name="EditVolumes">
          <property name="toolTip">
-          <string>Edit first selected volume name, matrix and properties</string>
+          <string>Edit first selected volume name, matrix and other properties</string>
          </property>
          <property name="text">
           <string/>
