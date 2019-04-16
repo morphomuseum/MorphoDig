@@ -26,8 +26,9 @@
 #include "mqMorphoDigCore.h"
 #include "mqAboutDialogReaction.h"
 #include "mqChangeNodeReaction.h"
-//	new mqEditACTORDialogReaction(actionEditActors);
+
 #include "mqEditACTORDialogReaction.h"
+#include "mqEditVolumeDialogReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
 #include "mqEditTagsDialogReaction.h"
 #include "mqICPDialogReaction.h"
@@ -302,7 +303,11 @@ void mqMorphoDigMenuBuilders::buildRGBMenu(QMenu& menu)
 	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
 
 }
-
+void mqMorphoDigMenuBuilders::buildEditVolumesMenu(QMenu& menu)
+{
+	new mqEditVolumeDialogReaction(menu.addAction("Edit first selected volume") << mqSetName("actionEditVolume"));
+	
+}
 
 void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 {
