@@ -36,8 +36,7 @@ public:
   void GetFirstVolume();
   void GetNextVolume();
   void GetPrecedingVolume();
-  void RefreshNumCellsNumPoints();
-  void UpdateUI();
+ void UpdateUI();
   int SomeThingHasChanged();
   int CurrentVolumeInCollection();
   void RefreshDialog();
@@ -49,9 +48,7 @@ public:
   virtual void slotsaveVolume();
   virtual void slotReinitMatrix();
   virtual void slotapplyMatrixToAllSelectedVolumes();
-  virtual void slotEditScalar();
-  virtual void slotDuplicateScalar();
-  virtual void slotDeleteScalar();
+ 
 
 protected:
 	
