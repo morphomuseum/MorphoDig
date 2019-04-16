@@ -311,6 +311,26 @@ void mqEditVolumeDialog::MoveSliders()
 
 	
 }
+void mqEditVolumeDialog::SetSlidersMinMax(double min, double max)
+{
+	double new_max_min = (min + max) / 2;
+	double new_half = new_max_min - min;
+	double new_max_max = max + new_half;
+
+	double new_min_min = min - new_half;
+	double new_min_max = new_max_min;
+	
+	
+
+	this->Ui->sliderMin->setDoubleMaximum(new_min_max);
+	this->Ui->sliderMin->setDoubleMinimum(new_min_min);
+
+	this->Ui->sliderMax->setDoubleMinimum(new_max_min);
+	this->Ui->sliderMax->setDoubleMaximum(new_max_max);
+	this->Ui->sliderMin->setDoubleValue(min);
+	this->Ui->sliderMax->setDoubleValue(max);
+
+}
 void mqEditVolumeDialog::RefreshSliders()
 {
 
@@ -345,6 +365,7 @@ void mqEditVolumeDialog::RefreshSliders()
 	this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
 
 	this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
+	this->UpdateLookupTableRange(this->Ui->sliderMin->doubleValue(), this->Ui->sliderMax->doubleValue());
 
 	/*
 	sliderMin->maximum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
@@ -490,8 +511,9 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
 		double min = this->GetCTFMin();
 		double max = this->GetCTFMax();
-		this->Ui->currentMin->setValue(min);
-		this->Ui->currentMax->setValue(max);
+		cout << "UpdateUI: CTF min" << min << ", max" << max<< endl;
+		this->SetSlidersMinMax(min, max);
+		
 		this->slotRefreshSliders();
 	}
 	

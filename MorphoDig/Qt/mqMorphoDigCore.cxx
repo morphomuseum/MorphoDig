@@ -4076,6 +4076,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
 		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
 		
+		
 		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
 
 	
@@ -6220,7 +6221,19 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		{
 			pos_exists = this->selected_file_exists(onlypath, posExt, postfix);
 		}
-			
+		int map_exists = 0;
+
+
+		int map_special = 0;
+		if (g_distinct_selected_names.size() == 1 && projectname.toStdString().compare(g_distinct_selected_names.at(0)) == 0)
+		{
+			map_special = 1;
+			map_exists = this->selected_file_exists(onlypath, mapExt, no_postfix);
+		}
+		else
+		{
+			map_exists = this->selected_file_exists(onlypath, mapExt, postfix);
+		}
 
 		int mesh_exists = 0;
 		if (save_surfaces_format == 1)//VTK
@@ -6254,9 +6267,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			vol_exists = this->selected_file_exists(onlypath, vtiExt, no_postfix);
 		}
 
-		int map_exists = 0;
 		
-		map_exists = this->selected_file_exists(onlypath, mapExt, no_postfix);
+	
 		
 		
 
@@ -6574,6 +6586,10 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (pos_special == 0)
 				{
 					_pos_file += postfix;
+				}
+				if (map_special == 0)
+				{
+					_map_file += postfix;
 				}
 				_pos_file.append(".pos");
 				_map_file.append(".map");

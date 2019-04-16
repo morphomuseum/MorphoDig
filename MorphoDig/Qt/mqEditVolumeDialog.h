@@ -43,6 +43,7 @@ public:
   int SomeThingHasChanged();
   int CurrentVolumeInCollection();
   void RefreshDialog();
+  void SetSlidersMinMax(double min, double max);
   void MoveSliders();
   void UpdateLookupTableRange(double min, double max);
   public slots:
