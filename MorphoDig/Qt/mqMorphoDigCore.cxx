@@ -4075,7 +4075,6 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
 		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
 		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
-		int* range;
 		
 		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
 

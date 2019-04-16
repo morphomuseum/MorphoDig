@@ -34,7 +34,7 @@ public:
   void saveVolume();
   double GetCTFMin();
   double GetCTFMax();
-
+  void RefreshSliders();
   void GetFirstSelectedVolume();
   void GetFirstVolume();
   void GetNextVolume();
