@@ -268,6 +268,12 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 
 	return something_has_changed;
 }
+
+void mqEditVolumeDialog::slotRefreshSliders()
+{
+	this->RefreshSliders();
+	
+}
 void mqEditVolumeDialog::slotCurrentMinMaxEdited()
 {
 	//cout << "Min max edited!" << endl;
