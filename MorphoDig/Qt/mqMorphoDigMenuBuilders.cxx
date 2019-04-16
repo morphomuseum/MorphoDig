@@ -26,6 +26,8 @@
 #include "mqMorphoDigCore.h"
 #include "mqAboutDialogReaction.h"
 #include "mqChangeNodeReaction.h"
+//	new mqEditACTORDialogReaction(actionEditActors);
+#include "mqEditACTORDialogReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
 #include "mqEditTagsDialogReaction.h"
 #include "mqICPDialogReaction.h"
@@ -307,6 +309,8 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QString objectName = menu.objectName();
 	std::cout << "Menu object name" << objectName.toStdString() << std::endl;
 	menu.setObjectName(objectName);
+	
+	new mqEditACTORDialogReaction(menu.addAction("Edit first selected surface") << mqSetName("actionEditSurface"));
 	QMenu* submenuStructureModification = menu.addMenu("Structure modification");
 
 	

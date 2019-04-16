@@ -226,7 +226,7 @@
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
+       <item alignment="Qt::AlignHCenter">
         <widget class="QToolButton" name="EditVolumes">
          <property name="toolTip">
           <string>Edit first selected volume name, matrix and other properties</string>

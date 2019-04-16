@@ -4103,7 +4103,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  vtkSmartPointer<vtkImageAccumulate>::New();
 			mapper->SetRequestedRenderModeToDefault();
 			
-
+			/*
 			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
 			box->SetPlaceFactor(1.01);
@@ -4119,7 +4119,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			box->EnabledOn();
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
 			volume->SetBox(box);
-
+			*/
 
 
 			histogram->SetInputData(input);
