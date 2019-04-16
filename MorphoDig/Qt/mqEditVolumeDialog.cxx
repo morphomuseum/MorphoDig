@@ -6,14 +6,14 @@
  
 =========================================================================*/
 
-#include "mqEditACTORDialog.h"
+#include "mqEditVolumeDialog.h"
 
-#include "ui_mqEditACTORDialog.h"
+#include "ui_mqEditVolumeDialog.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
-#include "vtkMDActor.h"
-#include "vtkMDActorCollection.h"
+#include "vtkMDVolume.h"
+#include "vtkMDVolumeCollection.h"
 #include <vtkMatrix4x4.h>
 
 // we actually do not need glew...
@@ -55,70 +55,31 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqEditACTORDialog::mqEditACTORDialog(QWidget* Parent)
+mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
   : QDialog(Parent)
-  , Ui(new Ui::mqEditACTORDialog())
+  , Ui(new Ui::mqEditVolumeDialog())
 {
 
 	this->Ui->setupUi(this);
-	this->setObjectName("mqEditACTORDialog");
-	connect(mqMorphoDigCore::instance(), SIGNAL(actorSelectionChanged()), this, SLOT(slotRefreshDialog()));
-	connect(this->Ui->next, SIGNAL(pressed()), this, SLOT(slotGetNextActor()));
-	connect(this->Ui->prec, SIGNAL(pressed()), this, SLOT(slotGetPrecedingActor()));
+	this->setObjectName("mqEditVolumeDialog");
+	connect(mqMorphoDigCore::instance(), SIGNAL(volumeSelectionChanged()), this, SLOT(slotRefreshDialog()));
+	connect(this->Ui->next, SIGNAL(pressed()), this, SLOT(slotGetNextVolume()));
+	connect(this->Ui->prec, SIGNAL(pressed()), this, SLOT(slotGetPrecedingVolume()));
 	
-	this->ACTOR_Coll = NULL;
-	this->ACTOR = NULL;
+	this->Volume_Coll = NULL;
+	this->Volume = NULL;
 
 	QString mylabel("...");
-	this->Ui->ActorName->setText(mylabel);
+	this->Ui->VolumeName->setText(mylabel);
 	
 	
-	QColor myActorColor;
-
-	double Actorcolor[4];
-
-	this->Ui->ActorColorButton->setShowAlphaChannel(false);
-
-
-	mqMorphoDigCore::instance()->Getmui_MeshColor(Actorcolor);
-
-	myActorColor.setRedF(Actorcolor[0]);
-	myActorColor.setGreenF(Actorcolor[1]);
-	myActorColor.setBlueF(Actorcolor[2]);
-
-	this->Ui->ActorColorButton->setChosenColor(myActorColor);
-	this->Ui->ActorAlpha->setValue(Actorcolor[3]);
-	this->Ui->ActorAlpha->setMinimum(0);
-	this->Ui->ActorAlpha->setMaximum(1);
-	this->Ui->ActorAlpha->setSingleStep(0.01);
-	this->Ui->ActorAlpha->setValue(Actorcolor[4]);
 	
 
 	
 
-	this->GetFirstSelectedActor();
-	/*this->Ui->M00->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M01->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M02->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M03->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M10->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M11->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M12->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M13->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M20->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M21->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M22->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M23->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M30->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M31->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M32->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));
-	this->Ui->M33->setValidator(new QDoubleValidator(-DBL_MAX, DBL_MAX, 7, this));*/
-
-	this->Ui->numCells->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	this->Ui->numPoints->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	this->Ui->numCells->setMaximum(INT_MAX);
-	this->Ui->numPoints->setMaximum(INT_MAX);
-
+	this->GetFirstSelectedVolume();
+	
+	
 	this->Ui->M00->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->M01->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->M02->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -210,12 +171,9 @@ mqEditACTORDialog::mqEditACTORDialog(QWidget* Parent)
 	this->UpdateUI();
 	
  
-	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedActors()));
- connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveActor()));
+	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedVolumes()));
+ connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveVolume()));
  connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
-connect(this->Ui->deleteScalar, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()));
-connect(this->Ui->editScalar, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
-connect(this->Ui->duplicateScalar, SIGNAL(pressed()), this, SLOT(slotDuplicateScalar()));
 
 }
 
@@ -223,7 +181,7 @@ connect(this->Ui->duplicateScalar, SIGNAL(pressed()), this, SLOT(slotDuplicateSc
 
 
 //-----------------------------------------------------------------------------
-mqEditACTORDialog::~mqEditACTORDialog()
+mqEditVolumeDialog::~mqEditVolumeDialog()
 {
 
  //depending on what is 
@@ -231,30 +189,13 @@ mqEditACTORDialog::~mqEditACTORDialog()
   delete this->Ui;
 }
 
-int mqEditACTORDialog::SomeThingHasChanged()
+int mqEditVolumeDialog::SomeThingHasChanged()
 {
 	int something_has_changed = 0;
-	if (this->ACTOR != NULL)
+	if (this->Volume != NULL)
 	{
-		QColor muiActorColor = this->Ui->ActorColorButton->chosenColor();
-		double uiActorcolor[4];
-		muiActorColor.getRgbF(&uiActorcolor[0], &uiActorcolor[1], &uiActorcolor[2], &uiActorcolor[3]);
-		uiActorcolor[3] = this->Ui->ActorAlpha->value();
-
-		QColor myActorColor;
-		double Actorcolor[4];		
-		this->ACTOR->GetmColor(Actorcolor);
-
-		if (
-			Actorcolor[0] != uiActorcolor[0]
-			|| Actorcolor[1] != uiActorcolor[1]
-			|| Actorcolor[2] != uiActorcolor[2]
-			|| Actorcolor[3] != uiActorcolor[3]
-			)
-		{
-			something_has_changed = 1;
-		}
-		vtkSmartPointer<vtkMatrix4x4> Mat = this->ACTOR->GetMatrix();
+		
+		vtkSmartPointer<vtkMatrix4x4> Mat = this->Volume->GetMatrix();
 
 		if (
 			Mat->GetElement(0, 0) != this->Ui->M00->value() ||
@@ -278,9 +219,9 @@ int mqEditACTORDialog::SomeThingHasChanged()
 			something_has_changed = 1;
 		}
 
-		QString myname(this->ACTOR->GetName().c_str());
+		QString myname(this->Volume->GetName().c_str());
 		
-		if (QString::compare(myname, this->Ui->ActorName->text(), Qt::CaseInsensitive)!=0)
+		if (QString::compare(myname, this->Ui->VolumeName->text(), Qt::CaseInsensitive)!=0)
 		{
 			something_has_changed = 1;
 			
@@ -290,59 +231,43 @@ int mqEditACTORDialog::SomeThingHasChanged()
 
 	return something_has_changed;
 }
-// This dialog is non modal, and actors can have been removed from the collection in the meantime... so before saving actors, we should check whether they are still
+// This dialog is non modal, and Volumes can have been removed from the collection in the meantime... so before saving Volumes, we should check whether they are still
 //inside the collection.
-void mqEditACTORDialog::RefreshNumCellsNumPoints()
+int mqEditVolumeDialog::CurrentVolumeInCollection()
 {
-	if (this->ACTOR != NULL)
+	int Volume_found = 0;
+	vtkMDVolume * Act;
+	if (this->Volume != NULL && this->Volume_Coll != NULL)
 	{
-		vtkIdType numPoints = this->ACTOR->GetNumberOfPoints();
-		vtkIdType numCells = this->ACTOR->GetNumberOfCells();
-		this->Ui->numCells->setValue(numCells);
-		this->Ui->numPoints->setValue(numPoints);
-	}
+		this->Volume_Coll->InitTraversal();
 
-}
-int mqEditACTORDialog::CurrentActorInCollection()
-{
-	int actor_found = 0;
-	vtkMDActor * Act;
-	if (this->ACTOR != NULL && this->ACTOR_Coll != NULL)
-	{
-		this->ACTOR_Coll->InitTraversal();
-
-		for (vtkIdType i = 0; i < this->ACTOR_Coll->GetNumberOfItems(); i++)
+		for (vtkIdType i = 0; i < this->Volume_Coll->GetNumberOfItems(); i++)
 		{
-			Act = vtkMDActor::SafeDownCast(this->ACTOR_Coll->GetNextActor());
-			if (actor_found == 1) { return actor_found; }
-			if (Act == this->ACTOR)
+			Act = vtkMDVolume::SafeDownCast(this->Volume_Coll->GetNextVolume());
+			if (Volume_found == 1) { return Volume_found; }
+			if (Act == this->Volume)
 			{
-				actor_found = 1;
+				Volume_found = 1;
 			}
 		}
 	}
-	return actor_found;
+	return Volume_found;
 }
-void mqEditACTORDialog::saveActor()
+void mqEditVolumeDialog::saveVolume()
 {
-	//cout << "Save ACTOR!" << endl;
-	cout << "Save actor: in collection?:" << this->CurrentActorInCollection() << endl;
-	if (this->ACTOR != NULL && this->CurrentActorInCollection())
+	//cout << "Save Volume!" << endl;
+	cout << "Save Volume: in collection?:" << this->CurrentVolumeInCollection() << endl;
+	if (this->Volume != NULL && this->CurrentVolumeInCollection())
 	{
 		int something_has_changed = this->SomeThingHasChanged();
 		if (something_has_changed)
 		{
-			std::string action = "Update actor's color and Matrix";
+			std::string action = "Update volume's Matrix";
 
 			int mCount = BEGIN_UNDO_SET(action);
-			this->ACTOR->SaveState(mCount);
-			QColor myActorColor = this->Ui->ActorColorButton->chosenColor();
-			double Actorcolor[4];
-			myActorColor.getRgbF(&Actorcolor[0], &Actorcolor[1], &Actorcolor[2], &Actorcolor[3]);
-			Actorcolor[3] = this->Ui->ActorAlpha->value();
-			this->ACTOR->SetmColor(Actorcolor);
-			this->ACTOR->SetName(this->Ui->ActorName->text().toStdString());
-			vtkSmartPointer<vtkMatrix4x4> Mat = this->ACTOR->GetMatrix();
+			this->Volume->SaveState(mCount);
+			this->Volume->SetName(this->Ui->VolumeName->text().toStdString());
+			vtkSmartPointer<vtkMatrix4x4> Mat = this->Volume->GetMatrix();
 			Mat->SetElement(0, 0, this->Ui->M00->value());
 			Mat->SetElement(0, 1, this->Ui->M01->value());
 			Mat->SetElement(0, 2, this->Ui->M02->value());
@@ -359,8 +284,8 @@ void mqEditACTORDialog::saveActor()
 			Mat->SetElement(3, 1, this->Ui->M31->value());
 			Mat->SetElement(3, 2, this->Ui->M32->value());
 			Mat->SetElement(3, 3, this->Ui->M33->value());
-			this->ACTOR->ApplyMatrix(Mat);
-			this->ACTOR->Modified();
+			this->Volume->ApplyMatrix(Mat);
+			this->Volume->Modified();
 			END_UNDO_SET();			
 		}
 		
@@ -370,73 +295,59 @@ void mqEditACTORDialog::saveActor()
 
 
 
-void mqEditACTORDialog::GetFirstSelectedActor()
+void mqEditVolumeDialog::GetFirstSelectedVolume()
 {
-	this->ACTOR_Coll = NULL;
-	this->ACTOR = NULL;
+	this->Volume_Coll = NULL;
+	this->Volume = NULL;
 
 
-	this->ACTOR_Coll = mqMorphoDigCore::instance()->getActorCollection();
+	this->Volume_Coll = mqMorphoDigCore::instance()->getVolumeCollection();
 	int num_selected = 0;
-	num_selected = this->ACTOR_Coll->GetNumberOfSelectedActors();
+	num_selected = this->Volume_Coll->GetNumberOfSelectedVolumes();
 	if (num_selected > 0) {
-		this->ACTOR = this->ACTOR_Coll->GetFirstSelectedActor();
+		this->Volume = this->Volume_Coll->GetFirstSelectedVolume();
 		
 	}
 	
 
-	if (this->ACTOR != NULL)
+	if (this->Volume != NULL)
 	{
 	
-		this->ACTOR_Coll->Modified();
+		this->Volume_Coll->Modified();
 	}
 	
 }
 
-void mqEditACTORDialog::GetFirstActor()
+void mqEditVolumeDialog::GetFirstVolume()
 {
 	
-	this->ACTOR_Coll = mqMorphoDigCore::instance()->getActorCollection();
+	this->Volume_Coll = mqMorphoDigCore::instance()->getVolumeCollection();
 	int num = 0;
-	num = this->ACTOR_Coll->GetNumberOfItems();
+	num = this->Volume_Coll->GetNumberOfItems();
 	if (num > 0) {
-		this->ACTOR_Coll->InitTraversal();
-		this->ACTOR = vtkMDActor::SafeDownCast(this->ACTOR_Coll->GetNextActor());
+		this->Volume_Coll->InitTraversal();
+		this->Volume = vtkMDVolume::SafeDownCast(this->Volume_Coll->GetNextVolume());
 		
 	}
 	
 
-	if (this->ACTOR != NULL)
+	if (this->Volume != NULL)
 	{
-		this->ACTOR->SetSelected(1);
-		this->ACTOR_Coll->Modified();
+		this->Volume->SetSelected(1);
+		this->Volume_Coll->Modified();
 	}
 
 }
 
-void mqEditACTORDialog::UpdateUI()
+void mqEditVolumeDialog::UpdateUI()
 {
-	if (this->ACTOR != NULL) {
+	if (this->Volume != NULL) {
 		
-		QString mylabel(this->ACTOR->GetName().c_str());
-		this->Ui->ActorName->setText(mylabel);
+		QString mylabel(this->Volume->GetName().c_str());
+		this->Ui->VolumeName->setText(mylabel);
 
-	//	cout << "Update UI!" << endl;
-		QColor myActorColor;
-		double Actorcolor[4];
 
-		//cout << "Name" <<mylabel.toStdString()<< endl;
-		this->ACTOR->GetmColor(Actorcolor);
-
-		myActorColor.setRedF(Actorcolor[0]);
-		myActorColor.setGreenF(Actorcolor[1]);
-		myActorColor.setBlueF(Actorcolor[2]);
-
-		this->Ui->ActorColorButton->setChosenColor(myActorColor);
-
-		this->Ui->ActorAlpha->setValue(Actorcolor[3]);
-
-		vtkSmartPointer<vtkMatrix4x4> Mat = this->ACTOR->GetMatrix();
+		vtkSmartPointer<vtkMatrix4x4> Mat = this->Volume->GetMatrix();
 		this->Ui->M00->setValue(Mat->GetElement(0, 0));
 		this->Ui->M01->setValue(Mat->GetElement(0, 1));
 		this->Ui->M02->setValue(Mat->GetElement(0, 2));
@@ -453,198 +364,75 @@ void mqEditACTORDialog::UpdateUI()
 		this->Ui->M31->setValue(Mat->GetElement(3, 1));
 		this->Ui->M32->setValue(Mat->GetElement(3, 2));
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
-		//QListView
-		//QItemDelegate
-
-		this->Ui->scalarList->clear();
-		ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ArraysOfActor(this->ACTOR);
-		for (int i = 0; i < MyList->Stack.size(); i++)
-		{
-			if (
-				((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1) // conventional scalars
-				|| (MyList->Stack.at(i).DataType == VTK_UNSIGNED_CHAR  && MyList->Stack.at(i).NumComp >= 3 //RGB-like arrays
-					)
-				|| 
-				((MyList->Stack.at(i).DataType == VTK_INT || MyList->Stack.at(i).DataType == VTK_UNSIGNED_INT) && MyList->Stack.at(i).NumComp == 1) // conventional tag arrays
-				
-				
-				)
-			{
-				
-				
-				QListWidgetItem* item = new QListWidgetItem(MyList->Stack.at(i).Name, this->Ui->scalarList);
-				
-				/*QWidget* widget = new QWidget();
-				QLabel* widgetText = new QLabel(MyList->Stack.at(i).Name);						
-				//QPushButton* widgetButtonDelete = new QPushButton("D");
-				//QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
-				//widgetButtonDelete->setFixedWidth(20);
-				//widgetButtonDelete->setAccessibleName
-				//QPushButton* widgetButtonEdit = new QPushButton("E");
-				//widgetButtonEdit->setFixedWidth(20);
-				QHBoxLayout * widgetLayout = new QHBoxLayout();
-				widgetLayout->addWidget(widgetText);
-				//widgetLayout->addWidget(widgetButtonEdit);
-				//widgetLayout->addWidget(widgetButtonDelete);
-				widgetLayout->addStretch();
-
-				//connect(widgetButtonDelete, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()));
-				//connect(widgetButtonEdit, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
-
-				widgetLayout->setSizeConstraint(QLayout::SetFixedSize);
-				widget->setLayout(widgetLayout);					
-				item->setSizeHint(widget->sizeHint());
-				this->Ui->scalarList->addItem(item);
-				this->Ui->scalarList->setItemWidget(item, widget);*/
-			
-				
-			}
-
-		}
-
-		/*stream << Mat->GetElement(0, 0) << " " << Mat->GetElement(1, 0) << " " << Mat->GetElement(2, 0) << " " << Mat->GetElement(3, 0) << endl;
-		stream << Mat->GetElement(0, 1) << " " << Mat->GetElement(1, 1) << " " << Mat->GetElement(2, 1) << " " << Mat->GetElement(3, 1) << endl;
-		stream << Mat->GetElement(0, 2) << " " << Mat->GetElement(1, 2) << " " << Mat->GetElement(2, 2) << " " << Mat->GetElement(3, 2) << endl;
-		stream << Mat->GetElement(0, 3) << " " << Mat->GetElement(1, 3) << " " << Mat->GetElement(2, 3) << " " << Mat->GetElement(3, 3) << endl;*/
-		
-		//this->Ui->M00->SetText()
-		
-
-		//cout << "Color" << Actorcolor[0]<<","<< Actorcolor[1] << "," << Actorcolor[2] << "," << Actorcolor[3] << "." << endl;
 	}
-	this->RefreshNumCellsNumPoints();
-
+	
 }
 
 
-void mqEditACTORDialog::GetNextActor()
+void mqEditVolumeDialog::GetNextVolume()
 {
 
-	if (ACTOR == NULL)
+	if (Volume == NULL)
 	{
-		this->GetFirstActor();
+		this->GetFirstVolume();
 	}
 	else
 	{
-		this->ACTOR->SetSelected(0);
-		this->ACTOR_Coll->Modified();
+		this->Volume->SetSelected(0);
+		this->Volume_Coll->Modified();
 		int cpt = 0;
 		
-		this->ACTOR = this->ACTOR_Coll->GetActorAfter(this->ACTOR);
-		if (this->ACTOR != NULL) { this->ACTOR->SetSelected(1); this->ACTOR_Coll->Modified(); }
+		this->Volume = this->Volume_Coll->GetVolumeAfter(this->Volume);
+		if (this->Volume != NULL) { this->Volume->SetSelected(1); this->Volume_Coll->Modified(); }
 		else
 		{
-			this->GetFirstActor();
+			this->GetFirstVolume();
 				
 		}
 
 	}
 
 }
-void mqEditACTORDialog::GetPrecedingActor()
+void mqEditVolumeDialog::GetPrecedingVolume()
 {
 
-	if (this->ACTOR == NULL)
+	if (this->Volume == NULL)
 	{
-		this->GetFirstActor();
+		this->GetFirstVolume();
 	}
 	else
 	{
-		this->ACTOR->SetSelected(0);
-		this->ACTOR_Coll->Modified();
+		this->Volume->SetSelected(0);
+		this->Volume_Coll->Modified();
 		
-		this->ACTOR = this->ACTOR_Coll->GetActorBefore(this->ACTOR); 
-		if (this->ACTOR != NULL) { this->ACTOR->SetSelected(1); }
+		this->Volume = this->Volume_Coll->GetVolumeBefore(this->Volume); 
+		if (this->Volume != NULL) { this->Volume->SetSelected(1); }
 		else
 		{
-			this->ACTOR= vtkMDActor::SafeDownCast(this->ACTOR_Coll->GetLastActor());
-			this->ACTOR->SetSelected(1);
+			this->Volume= vtkMDVolume::SafeDownCast(this->Volume_Coll->GetLastVolume());
+			this->Volume->SetSelected(1);
 		}
 	}
 
 }
 
-void mqEditACTORDialog::slotDuplicateScalar()
+void mqEditVolumeDialog::slotapplyMatrixToAllSelectedVolumes()
 {
-	int row = this->Ui->scalarList->currentIndex().row();
-	if (this->ACTOR != NULL && row >= 0)
-	{
-		QString ScalarName = this->Ui->scalarList->item(row)->text();
-		cout << "try to duplicate scalar" << endl;
-		cout << "try to duplicate scalar " << row << ":" << this->Ui->scalarList->item(row)->text().toStdString() << endl;
-		QInputDialog *renameDialog = new QInputDialog();
-		bool dialogResult;
-		QString newScalarName = renameDialog->getText(0, "Duplicate array", "New name:", QLineEdit::Normal,
-			this->Ui->scalarList->item(row)->text(), &dialogResult);
-		if (dialogResult)
-		{
-			cout << "new scalar given:" << newScalarName.toStdString() << endl;
-			mqMorphoDigCore::instance()->DuplicateArray(this->ACTOR, ScalarName, newScalarName);
-			this->UpdateUI();
-		}
-		else
-		{
-			cout << "cancel " << endl;
-		}
-	}
-}
-void mqEditACTORDialog::slotEditScalar()
-{
-	int row = this->Ui->scalarList->currentIndex().row();
-	if (this->ACTOR != NULL && row >= 0)
-	{
-		QString oldScalarName = this->Ui->scalarList->item(row)->text();
-		cout << "try to edit scalar" << endl;
-		cout << "try to edit scalar " << row << ":" << this->Ui->scalarList->item(row)->text().toStdString() << endl;
-		QInputDialog *renameDialog = new QInputDialog();
-		bool dialogResult;
-		QString newScalarName = renameDialog->getText(0, "Rename Label", "New name:", QLineEdit::Normal,
-			this->Ui->scalarList->item(row)->text(), &dialogResult);
-		if (dialogResult)
-		{
-			cout << "new name given:" << newScalarName.toStdString() << endl;
-			mqMorphoDigCore::instance()->EditArrayName(this->ACTOR, oldScalarName, newScalarName);
-			this->UpdateUI();
-		}
-		else
-		{
-			cout << "cancel " << endl;
-		}
-	}
-}
-void mqEditACTORDialog::slotDeleteScalar()
-{
-	int row = this->Ui->scalarList->currentIndex().row();
-	cout << "try to delete scalar " << row << ":";
-
-	
-	if (this->ACTOR != NULL && row>=0)
-	{
-		cout << this->Ui->scalarList->item(row)->text().toStdString() << endl;
-		mqMorphoDigCore::instance()->DeleteArray(this->ACTOR, this->Ui->scalarList->item(row)->text());
-		cout << "Try to update UI" << endl;
-		this->UpdateUI();
-		cout << "Try to update UI ok" << endl;
-	}
-
-}
-void mqEditACTORDialog::slotapplyMatrixToAllSelectedActors()
-{
-	int num_sel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
-	int num_act = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems();
+	int num_sel = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+	int num_act = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems();
 	if (num_sel > 0)
 	{
-		std::string action = "Apply same matrix to all selected actors";
+		std::string action = "Apply same matrix to all selected Volumes";
 		int mCount = BEGIN_UNDO_SET(action);
-		mqMorphoDigCore::instance()->getActorCollection()->InitTraversal();
+		mqMorphoDigCore::instance()->getVolumeCollection()->InitTraversal();
 
 		for (int i = 0; i < num_act; i++)
 		{
-			vtkMDActor *myActor = vtkMDActor::SafeDownCast(mqMorphoDigCore::instance()->getActorCollection()->GetNextActor());
-			if (myActor->GetSelected() == 1)
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
+			if (myVolume->GetSelected() == 1)
 			{
-				vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
-				this->ACTOR->SaveState(mCount);
+				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
+				this->Volume->SaveState(mCount);
 				Mat->SetElement(0, 0, this->Ui->M00->value());
 				Mat->SetElement(0, 1, this->Ui->M01->value());
 				Mat->SetElement(0, 2, this->Ui->M02->value());
@@ -661,8 +449,8 @@ void mqEditACTORDialog::slotapplyMatrixToAllSelectedActors()
 				Mat->SetElement(3, 1, this->Ui->M31->value());
 				Mat->SetElement(3, 2, this->Ui->M32->value());
 				Mat->SetElement(3, 3, this->Ui->M33->value());
-				myActor->ApplyMatrix(Mat);
-				myActor->Modified();
+				myVolume->ApplyMatrix(Mat);
+				myVolume->Modified();
 			}
 		}
 		END_UNDO_SET();
@@ -670,52 +458,52 @@ void mqEditACTORDialog::slotapplyMatrixToAllSelectedActors()
 	}
 
 }
-void mqEditACTORDialog::slotsaveActor()
+void mqEditVolumeDialog::slotsaveVolume()
 {
 	
 
-	this->saveActor();
-	if (this->ACTOR != NULL)
+	this->saveVolume();
+	if (this->Volume != NULL)
 	{
-		this->ACTOR->SetSelected(0);
-		this->ACTOR->Modified();
+		this->Volume->SetSelected(0);
+		this->Volume->Modified();
 		mqMorphoDigCore::instance()->Render();
 	}
 }
-void mqEditACTORDialog::slotGetPrecedingActor()
+void mqEditVolumeDialog::slotGetPrecedingVolume()
 {
-	this->saveActor();
-	this->GetPrecedingActor();
+	this->saveVolume();
+	this->GetPrecedingVolume();
 	this->UpdateUI();
 	mqMorphoDigCore::instance()->Render();
 }
-void mqEditACTORDialog::slotGetNextActor()
+void mqEditVolumeDialog::slotGetNextVolume()
 {
 	
-	this->saveActor();
-	this->GetNextActor();
+	this->saveVolume();
+	this->GetNextVolume();
 	this->UpdateUI();
 	mqMorphoDigCore::instance()->Render();
 }
 
-void mqEditACTORDialog::RefreshDialog()
+void mqEditVolumeDialog::RefreshDialog()
 {
 	
-	this->GetFirstSelectedActor();
+	this->GetFirstSelectedVolume();
 	
 	this->UpdateUI();
 	
 	mqMorphoDigCore::instance()->Render();
 	
 }
-void mqEditACTORDialog::slotRefreshDialog()
+void mqEditVolumeDialog::slotRefreshDialog()
 {
 	
 	this->RefreshDialog();
 
 }
 
-void mqEditACTORDialog::slotReinitMatrix()
+void mqEditVolumeDialog::slotReinitMatrix()
 {
 	this->Ui->M00->setValue(1);
 	this->Ui->M01->setValue(0);

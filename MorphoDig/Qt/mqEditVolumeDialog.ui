@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqEditACTORDialog</class>
- <widget class="QDialog" name="mqEditACTORDialog">
+ <class>mqEditVolumeDialog</class>
+ <widget class="QDialog" name="mqEditVolumeDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -25,8 +25,8 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -43,8 +43,8 @@
      <colorrole role="Midlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>212</red>
-        <green>255</green>
+        <red>255</red>
+        <green>212</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -52,8 +52,8 @@
      <colorrole role="Dark">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>85</red>
-        <green>127</green>
+        <red>127</red>
+        <green>85</green>
         <blue>127</blue>
        </color>
       </brush>
@@ -61,8 +61,8 @@
      <colorrole role="Mid">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>113</red>
-        <green>170</green>
+        <red>170</red>
+        <green>113</green>
         <blue>170</blue>
        </color>
       </brush>
@@ -106,8 +106,8 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -124,8 +124,8 @@
      <colorrole role="AlternateBase">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>212</red>
-        <green>255</green>
+        <red>255</red>
+        <green>212</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -142,6 +142,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -162,8 +171,8 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -180,8 +189,8 @@
      <colorrole role="Midlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>212</red>
-        <green>255</green>
+        <red>255</red>
+        <green>212</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -189,8 +198,8 @@
      <colorrole role="Dark">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>85</red>
-        <green>127</green>
+        <red>127</red>
+        <green>85</green>
         <blue>127</blue>
        </color>
       </brush>
@@ -198,8 +207,8 @@
      <colorrole role="Mid">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>113</red>
-        <green>170</green>
+        <red>170</red>
+        <green>113</green>
         <blue>170</blue>
        </color>
       </brush>
@@ -243,8 +252,8 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -261,8 +270,8 @@
      <colorrole role="AlternateBase">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>212</red>
-        <green>255</green>
+        <red>255</red>
+        <green>212</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -279,6 +288,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -290,8 +308,8 @@
      <colorrole role="WindowText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>85</red>
-        <green>127</green>
+        <red>127</red>
+        <green>85</green>
         <blue>127</blue>
        </color>
       </brush>
@@ -299,8 +317,8 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -317,8 +335,8 @@
      <colorrole role="Midlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>212</red>
-        <green>255</green>
+        <red>255</red>
+        <green>212</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -326,8 +344,8 @@
      <colorrole role="Dark">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>85</red>
-        <green>127</green>
+        <red>127</red>
+        <green>85</green>
         <blue>127</blue>
        </color>
       </brush>
@@ -335,8 +353,8 @@
      <colorrole role="Mid">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>113</red>
-        <green>170</green>
+        <red>170</red>
+        <green>113</green>
         <blue>170</blue>
        </color>
       </brush>
@@ -344,8 +362,8 @@
      <colorrole role="Text">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>85</red>
-        <green>127</green>
+        <red>127</red>
+        <green>85</green>
         <blue>127</blue>
        </color>
       </brush>
@@ -362,8 +380,8 @@
      <colorrole role="ButtonText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>85</red>
-        <green>127</green>
+        <red>127</red>
+        <green>85</green>
         <blue>127</blue>
        </color>
       </brush>
@@ -371,8 +389,8 @@
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -380,8 +398,8 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -398,8 +416,8 @@
      <colorrole role="AlternateBase">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>170</red>
-        <green>255</green>
+        <red>255</red>
+        <green>170</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -416,6 +434,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -449,19 +476,19 @@
     </rect>
    </property>
    <property name="title">
-    <string>Edit selected surface</string>
+    <string>Edit selected volume</string>
    </property>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>20</y>
       <width>91</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Object Name:</string>
+     <string>Volume Name:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="next">
@@ -500,20 +527,7 @@
       <normalon>:/Icons/s_left.png</normalon>:/Icons/s_left.png</iconset>
     </property>
    </widget>
-   <widget class="mqColorChooserButton" name="ActorColorButton">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>50</y>
-      <width>131</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Object solid color</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="ActorName">
+   <widget class="QLineEdit" name="VolumeName">
     <property name="geometry">
      <rect>
       <x>92</x>
@@ -523,34 +537,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="ActorAlpha">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>50</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>50</y>
-      <width>111</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Object translucency</string>
-    </property>
-   </widget>
    <widget class="QDoubleSpinBox" name="M00">
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>100</y>
+      <y>60</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -560,7 +551,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>100</y>
+      <y>60</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -570,7 +561,7 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>100</y>
+      <y>60</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -580,7 +571,7 @@
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>100</y>
+      <y>60</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -590,7 +581,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>130</y>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -600,7 +591,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>130</y>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -610,7 +601,7 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>130</y>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -620,7 +611,7 @@
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>130</y>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -630,7 +621,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>160</y>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -640,7 +631,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>160</y>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -650,7 +641,7 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>160</y>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -660,7 +651,7 @@
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>160</y>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -670,7 +661,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>190</y>
+      <y>150</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -680,7 +671,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>190</y>
+      <y>150</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -690,7 +681,7 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>190</y>
+      <y>150</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -700,7 +691,7 @@
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>190</y>
+      <y>150</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -709,8 +700,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>100</y>
+      <x>0</x>
+      <y>60</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -722,9 +713,9 @@
    <widget class="QPushButton" name="Reinit">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>190</y>
-      <width>75</width>
+      <x>0</x>
+      <y>150</y>
+      <width>91</width>
       <height>23</height>
      </rect>
     </property>
@@ -735,122 +726,14 @@
    <widget class="QPushButton" name="ApplyMatrix">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>230</y>
-      <width>191</width>
+      <x>0</x>
+      <y>180</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Apply matrix to all selected surfaces</string>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="ActorScalars">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>260</y>
-      <width>331</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Existing arrays (scalars/RGB colors/tags)</string>
-    </property>
-    <widget class="QListWidget" name="scalarList">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>301</width>
-       <height>61</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QWidget" name="horizontalLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>90</y>
-       <width>261</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="editScalar">
-        <property name="text">
-         <string>Edit array name</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="duplicateScalar">
-        <property name="text">
-         <string>Duplicate array</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="deleteScalar">
-        <property name="text">
-         <string>Delete array</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QSpinBox" name="numPoints">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>80</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>80</y>
-      <width>47</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Num pts:</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="numCells">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>80</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>80</y>
-      <width>47</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Num cells:</string>
+     <string>Apply matrix to all selected volumes</string>
     </property>
    </widget>
   </widget>
@@ -871,13 +754,6 @@
    </property>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>mqColorChooserButton</class>
-   <extends>QToolButton</extends>
-   <header location="global">mqColorChooserButton.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../Icons/icons.qrc"/>
   <include location="../Icons/icons.qrc"/>
@@ -886,7 +762,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>mqEditACTORDialog</receiver>
+   <receiver>mqEditVolumeDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -902,7 +778,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>mqEditACTORDialog</receiver>
+   <receiver>mqEditVolumeDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

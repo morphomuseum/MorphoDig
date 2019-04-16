@@ -1,42 +1,42 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqEditACTORDialogReaction.h
+   Module:    mqEditVolumeDialogReaction.h
 
 
 ========================================================================*/
-#ifndef mqEditACTORDialogReaction_h
-#define mqEditACTORDialogReaction_h
+#ifndef mqEditVolumeDialogReaction_h
+#define mqEditVolumeDialogReaction_h
 
 #include "mqReaction.h"
-#include "mqEditACTORDialog.h"
+#include "mqEditVolumeDialog.h"
 /**
 * @ingroup Reactions
-* mqEditACTORDialogReaction used to show the standard ACTOR dialog for the
+* mqEditVolumeDialogReaction used to show the standard Volume dialog for the
 * application.
 */
-class  mqEditACTORDialogReaction : public mqReaction
+class  mqEditVolumeDialogReaction : public mqReaction
 {
   Q_OBJECT
   typedef mqReaction Superclass;
 
 public:
-  mqEditACTORDialogReaction(QAction* parent);
+  mqEditVolumeDialogReaction(QAction* parent);
 
   /**
-  * Shows the ACTOR dialog for the application.
+  * Shows the Volume dialog for the application.
   */
-  static void showEditACTORDialog(mqEditACTORDialog *ACTOR_dialog);
+  static void showEditVolumeDialog(mqEditVolumeDialog *Volume_dialog);
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { mqEditACTORDialogReaction::showEditACTORDialog(this->ACTOR_dialog); }
+  virtual void onTriggered() { mqEditVolumeDialogReaction::showEditVolumeDialog(this->Volume_dialog); }
 
 private:
-	Q_DISABLE_COPY(mqEditACTORDialogReaction)
-		mqEditACTORDialog *ACTOR_dialog;
+	Q_DISABLE_COPY(mqEditVolumeDialogReaction)
+		mqEditVolumeDialog *Volume_dialog;
 };
 
 #endif

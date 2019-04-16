@@ -1,30 +1,30 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqEditACTORDialogReaction.cxx
+   Module:    mqEditVolumeDialogReaction.cxx
 
 
 ========================================================================*/
-#include "mqEditACTORDialogReaction.h"
+#include "mqEditVolumeDialogReaction.h"
 #include "mqCoreUtilities.h"
-#include "mqEditACTORDialog.h"
+#include "mqEditVolumeDialog.h"
 #include "mqReaction.h"
 
 
 //-----------------------------------------------------------------------------
-mqEditACTORDialogReaction::mqEditACTORDialogReaction(QAction* parentObject)
+mqEditVolumeDialogReaction::mqEditVolumeDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-	this->ACTOR_dialog = new mqEditACTORDialog(mqCoreUtilities::mainWidget());
+	this->Volume_dialog = new mqEditVolumeDialog(mqCoreUtilities::mainWidget());
 
 	
 }
 
 
 //-----------------------------------------------------------------------------
-void mqEditACTORDialogReaction::showEditACTORDialog(mqEditACTORDialog *ACTOR_dialog)
+void mqEditVolumeDialogReaction::showEditVolumeDialog(mqEditVolumeDialog *Volume_dialog)
 {
 	
-	ACTOR_dialog->RefreshDialog();
-  ACTOR_dialog->show();
+	Volume_dialog->RefreshDialog();
+  Volume_dialog->show();
 }

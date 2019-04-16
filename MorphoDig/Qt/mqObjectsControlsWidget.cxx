@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mqCreateLMKDialogReaction.h"
 #include "mqEditFLGDialogReaction.h"
 #include "mqEditACTORDialogReaction.h"
+#include "mqEditVolumeDialogReaction.h"
 
 #include "mqUndoStack.h"
 
@@ -313,7 +314,7 @@ void mqObjectsControlsWidget::constructor()
 
 
   QAction* actionEditActors = new QAction(tr("&EditActors"), this);
-  actionEditActors->setToolTip(tr("Edit first selected object name, color and matrix."));
+  actionEditActors->setToolTip(tr("Edit first selected surface name, color, matrix and other properties."));
   this->ui->EditActors->addAction(actionEditActors);
   this->ui->EditActors->setDefaultAction(actionEditActors);
   QIcon icon4;
@@ -322,6 +323,16 @@ void mqObjectsControlsWidget::constructor()
 
 	new mqEditACTORDialogReaction(actionEditActors);
  
+	QAction* actionEditVolumes = new QAction(tr("&EditVolumes"), this);
+	actionEditVolumes->setToolTip(tr("Edit first selected volume name, matrix and other properties."));
+	this->ui->EditVolumes->addAction(actionEditVolumes);
+	this->ui->EditVolumes->setDefaultAction(actionEditVolumes);
+	QIcon icon5;
+	icon5.addFile(QStringLiteral(":/Icons/volume_edit.png"), QSize(), QIcon::Normal, QIcon::Off);
+	actionEditVolumes->setIcon(icon5);
+
+	new mqEditVolumeDialogReaction(actionEditVolumes);
+
 }
 
 /*

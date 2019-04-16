@@ -4,51 +4,51 @@
    
 
 =========================================================================*/
-#ifndef _mqEditACTORDialog_h
-#define _mqEditACTORDialog_h
+#ifndef _mqEditVolumeDialog_h
+#define _mqEditVolumeDialog_h
 
-#include "vtkMDActor.h"
-#include "vtkMDActorCollection.h"
+#include "vtkMDVolume.h"
+#include "vtkMDVolumeCollection.h"
 #include <vtkSmartPointer.h>
 #include <QDialog>
 
 namespace Ui
 {
-class mqEditACTORDialog;
+class mqEditVolumeDialog;
 }
 
 
 
 
 /**
-* mqEditACTORDialog is the dialog used by MorphoDig to save CUR files.
+* mqEditVolumeDialog is the dialog used by MorphoDig to save CUR files.
 */
-class  mqEditACTORDialog : public QDialog
+class  mqEditVolumeDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  mqEditACTORDialog(QWidget* Parent);
+  mqEditVolumeDialog(QWidget* Parent);
   
-  ~mqEditACTORDialog();
-  void saveActor();
-  void GetFirstSelectedActor();
-  void GetFirstActor();
-  void GetNextActor();
-  void GetPrecedingActor();
+  ~mqEditVolumeDialog();
+  void saveVolume();
+  void GetFirstSelectedVolume();
+  void GetFirstVolume();
+  void GetNextVolume();
+  void GetPrecedingVolume();
   void RefreshNumCellsNumPoints();
   void UpdateUI();
   int SomeThingHasChanged();
-  int CurrentActorInCollection();
+  int CurrentVolumeInCollection();
   void RefreshDialog();
   public slots:
   
   virtual void slotRefreshDialog();
-  virtual void slotGetPrecedingActor();
-  virtual void slotGetNextActor();
-  virtual void slotsaveActor();
+  virtual void slotGetPrecedingVolume();
+  virtual void slotGetNextVolume();
+  virtual void slotsaveVolume();
   virtual void slotReinitMatrix();
-  virtual void slotapplyMatrixToAllSelectedActors();
+  virtual void slotapplyMatrixToAllSelectedVolumes();
   virtual void slotEditScalar();
   virtual void slotDuplicateScalar();
   virtual void slotDeleteScalar();
@@ -58,11 +58,11 @@ protected:
 private:
 	
 
-  Q_DISABLE_COPY(mqEditACTORDialog)
-  Ui::mqEditACTORDialog* const Ui;
-  vtkSmartPointer<vtkMDActor> ACTOR;
-  //vtkMDActor *ACTOR;
-  vtkMDActorCollection *ACTOR_Coll;
+  Q_DISABLE_COPY(mqEditVolumeDialog)
+  Ui::mqEditVolumeDialog* const Ui;
+  vtkSmartPointer<vtkMDVolume> Volume;
+  //vtkMDVolume *Volume;
+  vtkMDVolumeCollection *Volume_Coll;
   int current_coll;
 
   // Here we should have the file name, no ?

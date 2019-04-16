@@ -61,7 +61,7 @@ public:
 	}
 	void Execute(vtkObject *caller, unsigned long, void*) override
 	{
-		cout << "Execute!!!" << endl;
+		//cout << "Execute!!!" << endl;
 		vtkBoxWidget *widget = reinterpret_cast<vtkBoxWidget*>(caller);
 		if (this->Mapper)
 		{
