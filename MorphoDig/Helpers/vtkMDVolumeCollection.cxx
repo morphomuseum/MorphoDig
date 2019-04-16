@@ -290,6 +290,7 @@ void vtkMDVolumeCollection::DeleteSelectedVolumes()
 							undocoll->AddItem(myVolume);
 							this->RemoveItem(myVolume);
 							this->Renderer->RemoveVolume(myVolume);
+							this->Renderer->RemoveVolume(myVolume->GetOutlineActor());
 							found = 1;
 						}
 					}
@@ -376,10 +377,15 @@ void vtkMDVolumeCollection::PopUndoStack() {
 		ActColl->InitTraversal();
 		for (vtkIdType i = 0; i < ActColl->GetNumberOfItems(); i++)
 		{
-			//vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(ActColl->GetNextVolume());
-			vtkVolume *myVolume = ActColl->GetNextVolume();
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(ActColl->GetNextVolume());
+			//vtkVolume *myVolume = ActColl->GetNextVolume();
 			this->AddItem(myVolume);
+			
 			this->Renderer->AddVolume(myVolume);
+			if (myVolume->GetSelected())
+			{
+				this->Renderer->AddVolume(myVolume->GetOutlineActor());
+			}
 			// if myVolume is a landmark => Add label to the renderer
 
 			
@@ -426,10 +432,11 @@ void vtkMDVolumeCollection::PopRedoStack() {
 		for (vtkIdType i = 0; i < ActColl->GetNumberOfItems(); i++)
 		{
 
-			//vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(ActColl->GetNextVolume());
-			vtkVolume *myVolume = ActColl->GetNextVolume();
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(ActColl->GetNextVolume());
+			//vtkVolume *myVolume = ActColl->GetNextVolume();
 			this->RemoveItem(myVolume);
 			this->Renderer->RemoveVolume(myVolume);
+			this->Renderer->RemoveVolume(myVolume->GetOutlineActor());
 			
 			this->Changed = 1;
 		}
@@ -446,12 +453,16 @@ void vtkMDVolumeCollection::PopRedoStack() {
 		ActColl->InitTraversal();
 		for (vtkIdType i = 0; i < ActColl->GetNumberOfItems(); i++)
 		{
-
-			vtkVolume *myVolume = ActColl->GetNextVolume();
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(ActColl->GetNextVolume());
+			//vtkVolume *myVolume = ActColl->GetNextVolume();
 			//cout << "Try to get last Volume, creation count = " << this->UndoRedo->RedoStack.back().CreationCount << "this->Number of itemps=" << this->GetNumberOfItems() << endl;
 
 			this->AddItem(myVolume);
 			this->Renderer->AddVolume(myVolume);
+			if (myVolume->GetSelected())
+			{
+				this->Renderer->AddVolume(myVolume->GetOutlineActor());
+			}
 			// if myVolume is a landmark => Add label to the renderer
 			
 			this->Changed = 1;

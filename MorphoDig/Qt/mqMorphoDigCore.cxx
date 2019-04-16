@@ -4120,7 +4120,17 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
 			volume->SetBox(box);
 			*/
-
+			/*
+			  vtkSmartPointer<vtkPolyDataMapper> outlineMapper = 
+			  vtkSmartPointer<vtkPolyDataMapper>::New();
+			  outlineMapper->SetInputConnection(outline->GetOutputPort());
+			  vtkSmartPointer<vtkActor> outlineActor = 
+			  vtkSmartPointer<vtkActor>::New();
+			  outlineActor->SetMapper(outlineMapper);
+			  outlineActor->GetProperty()->SetColor(0,0,0);
+			
+			*/
+			volume->GetOutline()->SetInputData(input);
 
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
@@ -6123,7 +6133,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 }	
 
 
-int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int apply_position_to_surfaces)
+int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int compression, int apply_position_to_surfaces)
 {
 	//save_surfaces_format: 0:VTK 1:PLY 2:STL
 	// save_surfaces_format 0 : stl
@@ -6593,7 +6603,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (write == 1)
 				{
 														
-					this->SaveVolume(_vol_fullpath, save_volumes_format, myVolume);
+					this->SaveVolume(_vol_fullpath, save_volumes_format, compression, myVolume);
 				}
 
 				write = 1;
@@ -16396,7 +16406,7 @@ void mqMorphoDigCore::groupSelectedActors()
 
 	}
 }
-void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, vtkMDVolume *myVolume)
+void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compression, vtkMDVolume *myVolume)
 {
 	// File_type 0 : mhd
 	// File_type 1 : mha
@@ -16442,6 +16452,8 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, vtkMDVolume *m
 
 			vtkSmartPointer<vtkMetaImageWriter> mhWriter = vtkSmartPointer<vtkMetaImageWriter>::New();
 			mhWriter->SetFileName(fileName.toLocal8Bit());
+			if (compression == 0) { mhWriter->SetCompression(false); }
+			else{ mhWriter->SetCompression(true); } 
 			mhWriter->SetInputData(output);
 			mhWriter->Write();
 			
@@ -16459,6 +16471,7 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, vtkMDVolume *m
 			vtkSmartPointer<vtkXMLImageDataWriter> xmlWriter = vtkSmartPointer<vtkXMLImageDataWriter>::New();
 			xmlWriter->SetFileName(fileName.toLocal8Bit());
 			xmlWriter->SetInputData(output);
+			
 			xmlWriter->Write();
 			
 		}

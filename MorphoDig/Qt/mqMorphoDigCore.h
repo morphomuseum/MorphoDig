@@ -514,7 +514,7 @@ public:
 	double GetCAMParameters(double cp[2], double position[3], double focal[3], double up[3]);
 	void SaveORI(QString fileName);
 	
-	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int apply_position_to_surfaces = 0);
+	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int compression, int apply_position_to_surfaces = 0);
 	int SaveSTVFile(QString fileName, int save_only_selected);
 	int SaveMAPFile(QString fileName, int save_only_active);
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
@@ -532,7 +532,7 @@ public:
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray);
 	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> arraysToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);
-	void SaveVolume(QString fileName, int file_type, vtkMDVolume *myVolume=NULL);
+	void SaveVolume(QString fileName, int file_type, int compression=1, vtkMDVolume *myVolume=NULL);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
 	void DeleteSelectedActors();

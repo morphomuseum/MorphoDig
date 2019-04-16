@@ -63,6 +63,9 @@ mqSaveNTWDialog::mqSaveNTWDialog(QWidget* Parent)
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveNTWFile()));
  connect(this->Ui->PLY, SIGNAL(clicked()), this, SLOT(slotPLYWarning()));
  connect(this->Ui->STL, SIGNAL(clicked()), this, SLOT(slotSTLWarning()));
+ connect(this->Ui->MHA, SIGNAL(clicked()), this, SLOT(slotMHAClicked()));
+ connect(this->Ui->MHD, SIGNAL(clicked()), this, SLOT(slotMHDClicked()));
+ connect(this->Ui->VTI, SIGNAL(clicked()), this, SLOT(slotVTIClicked()));
 }
 
 
@@ -89,7 +92,18 @@ void mqSaveNTWDialog::slotPLYWarning()
 		return;
 	}
 }
-
+void mqSaveNTWDialog::slotMHDClicked()
+{
+	this->Ui->compressionOn->setEnabled(true);
+}
+void mqSaveNTWDialog::slotMHAClicked()
+{
+	this->Ui->compressionOn->setEnabled(true);
+}
+void mqSaveNTWDialog::slotVTIClicked()
+{
+	this->Ui->compressionOn->setDisabled(true);
+}
 void mqSaveNTWDialog::slotSTLWarning()
 {
 	cout << "Stl warning!" << endl;
@@ -171,10 +185,11 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 	if (this->Ui->PLY->isChecked()) { save_surfaces_format = 2; }
 	if (this->Ui->STL->isChecked()) { save_surfaces_format = 0; }
 	if (this->Ui->ApplyPositionToSurfaces->isChecked()) { apply_position_to_surfaces = 1; }
-
+	int compression = 1;
+	if (this->Ui->compressionOn->isChecked() == 0) { compression = 0; }
 	
 
-	mqMorphoDigCore::instance()->SaveNTWFile(fileName, save_ori, save_tag, save_surfaces_format, save_volumes_format, apply_position_to_surfaces);
+	mqMorphoDigCore::instance()->SaveNTWFile(fileName, save_ori, save_tag, save_surfaces_format, save_volumes_format, compression, apply_position_to_surfaces);
 
 }
 

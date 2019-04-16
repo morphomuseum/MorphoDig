@@ -17,6 +17,9 @@ Module:    vtkMDVolume.h
 #include <vtkDataArray.h>
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkOutlineFilter.h>
 #include <vtkImageData.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkSmartPointer.h>
@@ -100,6 +103,12 @@ public:
 	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	
+	vtkSetMacro(Outline, vtkSmartPointer<vtkOutlineFilter>);
+	vtkGetMacro(Outline, vtkSmartPointer<vtkOutlineFilter>);
+	vtkSetMacro(OutlineMapper, vtkSmartPointer<vtkPolyDataMapper>);
+	vtkGetMacro(OutlineMapper, vtkSmartPointer<vtkPolyDataMapper>);
+	vtkSetMacro(OutlineActor, vtkSmartPointer<vtkActor>);
+	vtkGetMacro(OutlineActor, vtkSmartPointer<vtkActor>);
 	
 	double GetBoundingBoxLength();
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
@@ -129,6 +138,9 @@ protected:
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 	vtkSmartPointer<vtkImageData> ImageData;
 	vtkSmartPointer<vtkBoxWidget> Box;
+	vtkSmartPointer<vtkOutlineFilter> Outline;
+	vtkSmartPointer<vtkPolyDataMapper> OutlineMapper;
+	vtkSmartPointer<vtkActor> OutlineActor;
 	//of selected objects etc... 
 	vtkMDVolumeUndoRedo* UndoRedo;
 	std::string Name;

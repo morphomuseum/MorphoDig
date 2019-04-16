@@ -907,6 +907,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	mqMorphoDigMenuBuilders::buildFileMenu(*this->menuFile);
 	mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(*this->menuEditSelectedSurfaces);
 	mqMorphoDigMenuBuilders::buildTagsMenu(*this->menuTags);
+	mqMorphoDigMenuBuilders::buildEditVolumesMenu(*this->menuVolumes);
 	mqMorphoDigMenuBuilders::buildScalarsMenu(*this->menuScalars);
 	mqMorphoDigMenuBuilders::buildRGBMenu(*this->menuRGB);
 	mqMorphoDigMenuBuilders::buildEditMenu(*this->menuEdit);

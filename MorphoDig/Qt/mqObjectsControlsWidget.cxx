@@ -461,6 +461,7 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 		{
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
 			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
+			vtkProp3D *myPropr2 = vtkProp3D::SafeDownCast(myVolume->GetOutlineActor());
 			if (myVolume->GetSelected() == 1)
 			{
 				if (myPropr->GetUserMatrix() != NULL)
@@ -475,6 +476,21 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 				else
 				{
 					myPropr->AddPosition(motion_vector[0],
+						motion_vector[1],
+						motion_vector[2]);
+				}
+				if (myPropr2->GetUserMatrix() != NULL)
+				{
+					vtkTransform *t = vtkTransform::New();
+					t->PostMultiply();
+					t->SetMatrix(myPropr2->GetUserMatrix());
+					t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
+					myPropr2->GetUserMatrix()->DeepCopy(t->GetMatrix());
+					t->Delete();
+				}
+				else
+				{
+					myPropr2->AddPosition(motion_vector[0],
 						motion_vector[1],
 						motion_vector[2]);
 				}
@@ -759,6 +775,7 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 		{
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
 			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
+			vtkProp3D *myPropr2 = vtkProp3D::SafeDownCast(myVolume->GetOutlineActor());
 			if (myVolume->GetSelected() == 1)
 			{
 				//cout << "Apply prop3Dtransform" << endl;
@@ -774,6 +791,11 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 				//cout << "scale:" << scale[0] << ","<< scale[1] << ","<< scale[2] << endl;
 
 				this->Prop3DTransform(myPropr,
+					rot_center,
+					1,
+					rotate,
+					scale);
+				this->Prop3DTransform(myPropr2,
 					rot_center,
 					1,
 					rotate,

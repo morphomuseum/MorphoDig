@@ -34,7 +34,10 @@ public:
   
   virtual void slotPLYWarning();
   virtual void slotSTLWarning();
-
+  virtual void slotMHAClicked();
+  virtual void slotMHDClicked();
+  virtual void slotVTIClicked();
+  
 protected:
 	
 private:

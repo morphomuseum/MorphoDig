@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
-    <height>601</height>
+    <width>440</width>
+    <height>636</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,9 +459,9 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>560</y>
-     <width>161</width>
-     <height>25</height>
+     <y>600</y>
+     <width>195</width>
+     <height>30</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -482,7 +482,7 @@
     <rect>
      <x>20</x>
      <y>20</y>
-     <width>341</width>
+     <width>411</width>
      <height>91</height>
     </rect>
    </property>
@@ -521,7 +521,7 @@
     <rect>
      <x>20</x>
      <y>130</y>
-     <width>341</width>
+     <width>411</width>
      <height>91</height>
     </rect>
    </property>
@@ -560,8 +560,8 @@
     <rect>
      <x>20</x>
      <y>230</y>
-     <width>341</width>
-     <height>91</height>
+     <width>411</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="title">
@@ -573,7 +573,7 @@
       <x>20</x>
       <y>20</y>
       <width>290</width>
-      <height>65</height>
+      <height>76</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout1_7">
@@ -605,8 +605,8 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>450</y>
-     <width>341</width>
+     <y>490</y>
+     <width>411</width>
      <height>91</height>
     </rect>
    </property>
@@ -640,13 +640,13 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="SurfaceFormat_2">
+  <widget class="QGroupBox" name="SurfaceVolumeFormat">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>340</y>
-     <width>341</width>
-     <height>91</height>
+     <width>411</width>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -657,8 +657,8 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>290</width>
-      <height>65</height>
+      <width>371</width>
+      <height>76</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout1_9">
@@ -687,6 +687,22 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QCheckBox" name="compressionOn">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>100</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Volume compression (MHD/MHA)</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
   </widget>
  </widget>

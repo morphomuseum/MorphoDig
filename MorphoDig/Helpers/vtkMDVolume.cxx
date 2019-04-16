@@ -6,6 +6,7 @@ Module:    vtkMDVolume.cxx
 #include "mqMorphoDigCore.h"
 #include "vtkMDVolume.h"
 
+#include <vtkProperty.h>
 #include <vtkObjectFactory.h>
 #include <vtkBoundingBox.h>
 #include <vtkMath.h>
@@ -43,6 +44,14 @@ vtkMDVolume::vtkMDVolume()
 {
 	this->UndoRedo = new vtkMDVolumeUndoRedo;
 	this->Selected = 1;
+	this->Outline = vtkSmartPointer<vtkOutlineFilter>::New();
+	this->OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	this->OutlineActor = vtkSmartPointer<vtkActor>::New();
+	this->OutlineMapper->SetInputConnection(this->Outline->GetOutputPort());
+	vtkSmartPointer<vtkActor> outlineActor =
+		vtkSmartPointer<vtkActor>::New();
+	this->OutlineActor->SetMapper(this->OutlineMapper);
+	this->OutlineActor->GetProperty()->SetColor(0.5, 0.5, 0.5);
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
 	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
@@ -191,13 +200,14 @@ void vtkMDVolume::SetSelected(int selected)
 		//ici, ajouter une box visible
 		if (this->GetMapper() != NULL)
 		{
-		
+			mqMorphoDigCore::instance()->getRenderer()->AddActor(this->OutlineActor);
 		}
 		
 	}
 	else
 	{
 		//enlever la box
+		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->OutlineActor);
 
 	}
 }
@@ -258,14 +268,19 @@ void vtkMDVolume::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat)
 	//double *mCenter = this->GetCenter();
 	//cout << "Center:" << mCenter[0] << "," << mCenter[1] << "," << mCenter[2] << "," << endl;
 	vtkProp3D *prop3D = vtkProp3D::SafeDownCast(this);
+	vtkProp3D *prop3D2 = vtkProp3D::SafeDownCast(this->GetOutlineActor());
 	vtkTransform *newTransform = vtkTransform::New();
 	newTransform->PostMultiply();
 	newTransform->SetMatrix(Mat);
 	prop3D->SetPosition(newTransform->GetPosition());
 	prop3D->SetScale(newTransform->GetScale());
 	prop3D->SetOrientation(newTransform->GetOrientation());
+	prop3D2->SetPosition(newTransform->GetPosition());
+	prop3D2->SetScale(newTransform->GetScale());
+	prop3D2->SetOrientation(newTransform->GetOrientation());
 	newTransform->Delete();
 	
+
 	//cout << "Center:" << mCenter[0] << "," << mCenter[1] << "," << mCenter[2] << "," << endl;
 	this->SetChanged(1);
 
