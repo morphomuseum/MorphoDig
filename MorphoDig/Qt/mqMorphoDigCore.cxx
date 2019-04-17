@@ -4449,8 +4449,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 			cout << "front light!" << endl;
 			
-			light->SetLightTypeToCameraLight();
-			light->SetPosition(0, 0, 200);
+			light->SetLightTypeToSceneLight();
+			light->SetPosition(0, 0,1);
 			this->getRenderer()->RemoveAllLights();
 			this->getRenderer()->AddLight(light);
 			
