@@ -56,7 +56,8 @@ public:
   virtual void slotsaveVolume();
   virtual void slotReinitMatrix();
   virtual void slotapplyMatrixToAllSelectedVolumes();
- 
+  virtual void slotInterpolationToLinear(bool isChecked);
+  virtual void slotScalarOpacityUnitDistance(double SOUD);
 
 protected:
 	

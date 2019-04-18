@@ -14,6 +14,7 @@
 #include "mqUndoStack.h"
 #include "vtkMDVolume.h"
 #include "vtkMDVolumeCollection.h"
+#include <vtkVolumeProperty.h>
 #include <vtkMatrix4x4.h>
 #include "mqColorOpacityEditorWidget.h"
 #include "mqTransferFunctionWidget.h"
@@ -191,7 +192,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->sliderMin->setDoubleMinimum(-1);
 
 
-
+	this->Ui->scalarOpacityUnitDistance->setMaximum(DBL_MAX);
 
 	this->Ui->sliderMax->setDoubleValue(1);
 	this->Ui->sliderMax->setDoubleMaximum(2);
@@ -211,7 +212,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
  connect(this->Ui->sliderMax, SIGNAL(sliderReleased()), this, SLOT(slotRefreshSliders()));
  connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
  connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
-
+ connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
+ connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
 }
 
 
@@ -268,7 +270,32 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 
 	return something_has_changed;
 }
+void mqEditVolumeDialog::slotInterpolationToLinear(bool isChecked)
+{
+	if (this->Volume != NULL) {
+		cout << "InterpolationToLinear: isChecked:" << isChecked<<endl;
+		if (isChecked)
+		{
+			this->Volume->GetProperty()->SetInterpolationTypeToLinear();
+		}
+		else
+		{
+			this->Volume->GetProperty()->SetInterpolationTypeToNearest();
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
 
+ }
+void mqEditVolumeDialog::slotScalarOpacityUnitDistance(double SOUD)
+{
+	if (this->Volume != NULL && SOUD>0) {
+		cout << "ScalarOpacityUnitDistance:" << SOUD << endl;
+
+			this->Volume->GetProperty()->SetScalarOpacityUnitDistance(SOUD);
+		
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotRefreshSliders()
 {
 	this->RefreshSliders();
@@ -491,7 +518,15 @@ void mqEditVolumeDialog::UpdateUI()
 		QString mylabel(this->Volume->GetName().c_str());
 		this->Ui->VolumeName->setText(mylabel);
 		this->mColorMap->reInitialize(this->Volume->GetCtf());
-
+		if (this->Volume->GetProperty()->GetInterpolationType() == VTK_LINEAR_INTERPOLATION)
+		{
+			this->Ui->interpolationToLinear->setChecked(true);
+		}
+		else
+		{
+			this->Ui->interpolationToLinear->setChecked(false);
+		}
+		this->Ui->scalarOpacityUnitDistance->setValue(this->Volume->GetProperty()->GetScalarOpacityUnitDistance());
 		vtkSmartPointer<vtkMatrix4x4> Mat = this->Volume->GetMatrix();
 		this->Ui->M00->setValue(Mat->GetElement(0, 0));
 		this->Ui->M01->setValue(Mat->GetElement(0, 1));

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>471</width>
-    <height>723</height>
+    <height>866</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>690</y>
+     <y>820</y>
      <width>195</width>
      <height>30</height>
     </rect>
@@ -472,7 +472,7 @@
      <x>10</x>
      <y>10</y>
      <width>421</width>
-     <height>601</height>
+     <height>801</height>
     </rect>
    </property>
    <property name="title">
@@ -740,7 +740,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>210</y>
+      <y>320</y>
       <width>372</width>
       <height>361</height>
      </rect>
@@ -795,12 +795,161 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QDoubleSlider" name="sliderMin">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>740</y>
+      <width>201</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="currentMax">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>770</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>6</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>740</y>
+      <width>31</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>min: </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>770</y>
+      <width>31</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>max: </string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="currentMin">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>740</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>6</number>
+    </property>
+   </widget>
+   <widget class="QDoubleSlider" name="sliderMax">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>770</y>
+      <width>201</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="interpolationToLinear">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>220</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Interpolation to linear</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="scalarOpacityUnitDistance">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>250</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>4</number>
+    </property>
+    <property name="singleStep">
+     <double>0.200000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>250</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Scalar opacity unit distance:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSlider" name="shift">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>710</y>
+      <width>201</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>710</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>shift:</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>690</y>
+     <y>820</y>
      <width>193</width>
      <height>28</height>
     </rect>
@@ -810,84 +959,6 @@
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="currentMin">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>620</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="decimals">
-    <number>6</number>
-   </property>
-  </widget>
-  <widget class="QDoubleSlider" name="sliderMax">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>650</y>
-     <width>201</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>620</y>
-     <width>31</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>min: </string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>650</y>
-     <width>31</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>max: </string>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="currentMax">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>650</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="decimals">
-    <number>6</number>
-   </property>
-  </widget>
-  <widget class="QDoubleSlider" name="sliderMin">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>620</y>
-     <width>201</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
  </widget>

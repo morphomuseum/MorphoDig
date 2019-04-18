@@ -4369,10 +4369,10 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  property->SetInterpolationTypeToLinear();
 				  property->ShadeOn();
 				  double bblength = volume->GetBoundingBoxLength();
-				  double SOUD = bblength / 50;
-				  cout << "Scalar Opacity Unit Distance:" << bblength << "/50=" << SOUD << endl;
+				  double SOUD = bblength / 500;
+				  cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
 				  if (SOUD == 0) { SOUD = 0.89; }
-				  SOUD = 0.89;
+				 
 			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
 				 mapper->Update();
 				 volume->Update();
