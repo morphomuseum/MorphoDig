@@ -78,7 +78,10 @@ vtkMDVolume::~vtkMDVolume()
 
 void vtkMDVolume::SetColorAmbient(double ambient)
 {
+	//cout << "Volume ambient property:" << ambient << endl;
 	this->GetProperty()->SetAmbient(ambient);
+	//this->GetProperty()->ShadeOn();
+	//this->GetProperty()->SetInterpolationTypeToLinear();
 }
 
 void vtkMDVolume::SetColorSpecular(double specular)

@@ -4103,6 +4103,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  vtkSmartPointer<vtkImageAccumulate>::New();
 			mapper->SetRequestedRenderModeToDefault();
 			
+			
 			/*
 			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
@@ -4353,22 +4354,25 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			opacityFun->AddPoint(first_point, 0, 0.5, 0);
 			opacityFun->AddPoint(second_point, 0.5, .5, 0);
 			opacityFun->AddPoint(third_point, 0.8, .5, 0);
-			opacityFun->AddPoint(last_point, 1, 0.5, 0);
+			opacityFun->AddPoint(last_point, 0.99, 0.5, 0);
 			TF->SetEnableOpacityMapping(true);
 			TF->SetScalarOpacityFunction(opacityFun);
 			TF->Build();
-			      mapper->SetBlendModeToComposite();
-				  property->ShadeOn();
+				mapper->SetBlendModeToComposite();
+				  
+				  
 				  //property->set
-				       property->SetAmbient(this->mui_Ambient);
+				  property->SetAmbient(this->mui_Ambient);
 			      property->SetDiffuse(this->mui_Diffuse);
 			      property->SetSpecular(this->mui_Specular);
 			      property->SetSpecularPower(this->mui_SpecularPower);
-
+				  property->SetInterpolationTypeToLinear();
+				  property->ShadeOn();
 				  double bblength = volume->GetBoundingBoxLength();
 				  double SOUD = bblength / 50;
 				  cout << "Scalar Opacity Unit Distance:" << bblength << "/50=" << SOUD << endl;
 				  if (SOUD == 0) { SOUD = 0.89; }
+				  SOUD = 0.89;
 			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
 				 mapper->Update();
 				 volume->Update();
@@ -4446,13 +4450,14 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			{
 				this->UpdateLandmarkSettings();
 			}*/
-			vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+			/*vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 			cout << "front light!" << endl;
 			
 			light->SetLightTypeToSceneLight();
 			light->SetPosition(0, 0,1);
 			this->getRenderer()->RemoveAllLights();
-			this->getRenderer()->AddLight(light);
+			this->getRenderer()->AddLight(light);*/
+
 			
 			this->Render();
 
