@@ -12,6 +12,7 @@
 #include <vtkSmartPointer.h>
 #include <QDialog>
 #include "mqColorOpacityEditorWidget.h"
+class QReleaseSliderValue;
 namespace Ui
 {
 class mqEditVolumeDialog;
@@ -34,8 +35,7 @@ public:
   void saveVolume();
   double GetCTFMin();
   double GetCTFMax();
-  void RefreshSliders();
-  void GetFirstSelectedVolume();
+ void GetFirstSelectedVolume();
   void GetFirstVolume();
   void GetNextVolume();
   void GetPrecedingVolume();
@@ -43,13 +43,14 @@ public:
   int SomeThingHasChanged();
   int CurrentVolumeInCollection();
   void RefreshDialog();
-  void SetSlidersMinMax(double min, double max);
-  void MoveSliders();
-  void UpdateLookupTableRange(double min, double max);
+
+ 
+  void UpdateLookupTableRange();
   public slots:
- virtual void slotRefreshSliders();
- virtual void slotMoveSliders();
- virtual void slotCurrentMinMaxEdited();
+ //virtual void slotRefreshSliders();
+ //virtual void slotMoveSliders();
+ virtual void slotCurrentMinEdited();
+ virtual void slotCurrentMaxEdited();
   virtual void slotRefreshDialog();
   virtual void slotGetPrecedingVolume();
   virtual void slotGetNextVolume();
@@ -58,11 +59,21 @@ public:
   virtual void slotapplyMatrixToAllSelectedVolumes();
   virtual void slotInterpolationToLinear(bool isChecked);
   virtual void slotScalarOpacityUnitDistance(double SOUD);
+  virtual void slotShiftSlider(int shift);
+  virtual void slotSliderStart();
+  virtual void slotSlideMin(int slideMin);
+  virtual void slotSlideMax(int slideMax);
+  virtual void slotSliderStop();
 
 protected:
 	
 private:
 	mqColorOpacityEditorWidget *mColorMap;
+	double maxShiftAmplitude;
+	double slideMin;
+	double slideMax;
+	double ctfMin;
+	double ctfMax;
 
   Q_DISABLE_COPY(mqEditVolumeDialog)
   Ui::mqEditVolumeDialog* const Ui;
