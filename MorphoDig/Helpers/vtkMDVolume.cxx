@@ -8,6 +8,7 @@ Module:    vtkMDVolume.cxx
 
 #include <vtkProperty.h>
 #include <vtkObjectFactory.h>
+#include <vtkPiecewiseFunction.h>
 #include <vtkBoundingBox.h>
 #include <vtkMath.h>
 #include <vtkDataArray.h>
@@ -82,6 +83,164 @@ void vtkMDVolume::SetColorAmbient(double ambient)
 	this->GetProperty()->SetAmbient(ambient);
 	//this->GetProperty()->ShadeOn();
 	//this->GetProperty()->SetInterpolationTypeToLinear();
+}
+
+void vtkMDVolume::SetScalarDisplayMax(double max)
+{
+	this->ScalarDisplayMax = max;
+	this->UpdateLookupTableRange();
+}
+void vtkMDVolume::SetScalarDisplayMin(double min)
+{
+	this->ScalarDisplayMin = min;
+	this->UpdateLookupTableRange();
+}
+void vtkMDVolume::SetScalarOpacityUnitDistance(double SOUD)
+{
+	this->ScalarOpacityUnitDistance = SOUD;
+	this->GetProperty()->SetScalarOpacityUnitDistance(SOUD);
+}
+void vtkMDVolume::SetInterpolationToLinear(bool linear)
+{
+
+	if (linear)
+	{
+		this->GetProperty()->SetInterpolationTypeToLinear();
+	}
+	else
+	{
+		this->GetProperty()->SetInterpolationTypeToNearest();
+	}
+
+}
+double vtkMDVolume::GetLookupTableMax(){
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->GetCtf();
+
+	double *pts = CM->GetDataPointer();
+
+	int numnodes = CM->GetSize();
+	double old_max = -DBL_MAX;
+	for (int j = 0; j < numnodes; j++)
+	{
+		double curr = pts[4 * j];
+		if (curr > old_max) { old_max = curr; }
+
+	}
+
+	vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
+	int numnodes2 = OF->GetSize();
+	double *pts2 = OF->GetDataPointer();
+	double old_max2 = -DBL_MAX;
+	for (int j = 0; j < numnodes2; j++)
+	{
+		double curr = pts2[2 * j];
+		if (curr > old_max2) { old_max2 = curr; }
+
+	}
+	if (old_max2 > old_max) { return old_max2; }
+	else { return old_max; }
+}
+double vtkMDVolume::GetLookupTableMin()
+{
+
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->GetCtf();
+
+	double *pts = CM->GetDataPointer();
+
+	int numnodes = CM->GetSize();
+	double old_min = DBL_MAX;
+
+	for (int j = 0; j < numnodes; j++)
+	{
+		double curr = pts[4 * j];
+		cout << "x" << j << "=" << curr << endl;
+		if (curr < old_min) { old_min = curr; }
+
+	}
+
+	vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
+	int numnodes2 = OF->GetSize();
+	double *pts2 = OF->GetDataPointer();
+	//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+	double old_min2 = DBL_MAX;
+	for (int j = 0; j < numnodes2; j++)
+	{
+		double curr = pts2[2 * j];
+		//cout << "x" << j << "=" << curr << endl;
+		if (curr < old_min2) { old_min2 = curr; }
+	}
+	if (old_min < old_min2) { return old_min2; }
+	else { return old_min; }
+
+}
+void vtkMDVolume::UpdateLookupTableRange()
+{
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->GetCtf();
+
+	double *pts = CM->GetDataPointer();
+
+	int numnodes = CM->GetSize();
+	double old_min = DBL_MAX;
+	double old_max = -DBL_MAX;
+	for (int j = 0; j < numnodes; j++)
+	{
+		double curr = pts[4 * j];
+		cout << "x" << j << "=" << curr << endl;
+		if (curr < old_min) { old_min = curr; }
+		if (curr > old_max) { old_max = curr; }
+
+	}
+	cout << "old max:" << old_max << ", old min:" << old_min << endl;
+	if (old_max > old_min)
+	{
+		double old_range = old_max - old_min;
+		double new_range = this->ScalarDisplayMax - this->ScalarDisplayMin;
+		double mult = new_range / old_range;
+		double c = this->ScalarDisplayMin - old_min * mult;
+		for (int k = 0; k < numnodes; k++)
+		{
+			pts[4 * k] = pts[4 * k] * mult + c;
+			cout << "nx" << k << "=" << pts[4 * k] << endl;
+		}
+		CM->FillFromDataPointer(numnodes, pts);
+
+	}
+	vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
+	int numnodes2 = OF->GetSize();
+	double *pts2 = OF->GetDataPointer();
+	//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+	double old_min2 = DBL_MAX;
+	double old_max2 = -DBL_MAX;
+	for (int j = 0; j < numnodes2; j++)
+	{
+		double curr = pts2[2 * j];
+		//cout << "x" << j << "=" << curr << endl;
+		if (curr < old_min2) { old_min2 = curr; }
+		if (curr > old_max2) { old_max2 = curr; }
+
+	}
+	if (old_max2 > old_min2)
+	{
+		double old_range = old_max2 - old_min2;
+		double new_range = this->ScalarDisplayMax - this->ScalarDisplayMin;
+		double mult = new_range / old_range;
+		double c = this->ScalarDisplayMin - old_min2 * mult;
+		for (int k = 0; k < numnodes2; k++)
+		{
+			pts2[2 * k] = pts2[2 * k] * mult + c;
+			//cout << "nx" << k << "=" << pts2[2*k] << endl;
+		}
+		OF->FillFromDataPointer(numnodes2, pts2);
+
+	}
+}
+void vtkMDVolume::UpdateLookupTableRange(double min, double max)
+{
+	this->ScalarDisplayMax = max;
+	this->ScalarDisplayMin = min;
+	this->UpdateLookupTableRange();
+	
+
 }
 
 void vtkMDVolume::SetColorSpecular(double specular)

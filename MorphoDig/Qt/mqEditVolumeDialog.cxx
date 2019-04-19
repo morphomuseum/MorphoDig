@@ -334,8 +334,8 @@ void mqEditVolumeDialog::slotShiftSlider(int shift)
 		double newMax = this->slideMax + shift * this->maxShiftAmplitude / 100;
 		this->Ui->currentMin->setValue(newMin);
 		this->Ui->currentMax->setValue(newMax);
-		cout << "Min:" << newMin << endl;
-		cout << "Max:" << newMax << endl;
+		//cout << "Min:" << newMin << endl;
+		//cout << "Max:" << newMax << endl;
 		this->ctfMin = newMin;
 		this->ctfMax = newMax;
 
@@ -361,15 +361,7 @@ void mqEditVolumeDialog::slotSliderStop()
 void mqEditVolumeDialog::slotInterpolationToLinear(bool isChecked)
 {
 	if (this->Volume != NULL) {
-		cout << "InterpolationToLinear: isChecked:" << isChecked<<endl;
-		if (isChecked)
-		{
-			this->Volume->GetProperty()->SetInterpolationTypeToLinear();
-		}
-		else
-		{
-			this->Volume->GetProperty()->SetInterpolationTypeToNearest();
-		}
+		this->Volume->SetInterpolationToLinear(isChecked);
 		mqMorphoDigCore::instance()->Render();
 	}
 
@@ -377,9 +369,9 @@ void mqEditVolumeDialog::slotInterpolationToLinear(bool isChecked)
 void mqEditVolumeDialog::slotScalarOpacityUnitDistance(double SOUD)
 {
 	if (this->Volume != NULL && SOUD>0) {
-		cout << "ScalarOpacityUnitDistance:" << SOUD << endl;
+		//cout << "ScalarOpacityUnitDistance:" << SOUD << endl;
 
-			this->Volume->GetProperty()->SetScalarOpacityUnitDistance(SOUD);
+			this->Volume->SetScalarOpacityUnitDistance(SOUD);
 		
 		mqMorphoDigCore::instance()->Render();
 	}
@@ -387,7 +379,7 @@ void mqEditVolumeDialog::slotScalarOpacityUnitDistance(double SOUD)
 
 void mqEditVolumeDialog::slotCurrentMinEdited()
 {
-	cout << "Current Min edited!" << endl;
+	//cout << "Current Min edited!" << endl;
 	if (this->Ui->currentMin->value() < this->Ui->currentMax->value())
 	{
 		this->ctfMin = this->Ui->currentMin->value();
@@ -406,7 +398,7 @@ void mqEditVolumeDialog::slotCurrentMinEdited()
 
 void mqEditVolumeDialog::slotCurrentMaxEdited()
 {
-	cout << "Current max edited!" << endl;
+	//cout << "Current max edited!" << endl;
 	if (this->Ui->currentMin->value() < this->Ui->currentMax->value())
 	{
 		this->ctfMax = this->Ui->currentMax->value();
@@ -578,34 +570,8 @@ void mqEditVolumeDialog::UpdateUI()
 double mqEditVolumeDialog::GetCTFMin()
 {
 	if (this->Volume != NULL) {
-		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->Volume->GetCtf();
-
-		double *pts = CM->GetDataPointer();
-
-		int numnodes = CM->GetSize();
-		double old_min = DBL_MAX;
-		
-		for (int j = 0; j < numnodes; j++)
-		{
-			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
-			if (curr < old_min) { old_min = curr; }
-			
-		}
-		
-		vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
-		int numnodes2 = OF->GetSize();
-		double *pts2 = OF->GetDataPointer();
-		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
-		double old_min2 = DBL_MAX;
-		for (int j = 0; j < numnodes2; j++)
-		{
-			double curr = pts2[2 * j];
-			//cout << "x" << j << "=" << curr << endl;
-			if (curr < old_min2) { old_min2 = curr; }
-		}
-		if (old_min < old_min2) { return old_min2; }
-		else { return old_min; }
+		return this->Volume->GetLookupTableMin();
+	
 
 
 	}
@@ -615,31 +581,9 @@ double mqEditVolumeDialog::GetCTFMin()
 double mqEditVolumeDialog::GetCTFMax()
 {
 	if (this->Volume != NULL) {
-		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->Volume->GetCtf();
-
-		double *pts = CM->GetDataPointer();
-
-		int numnodes = CM->GetSize();
-		double old_max = -DBL_MAX;
-		for (int j = 0; j < numnodes; j++)
-		{
-			double curr = pts[4 * j];
-			if (curr > old_max) { old_max = curr; }
-
-		}
-	
-		vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
-		int numnodes2 = OF->GetSize();
-		double *pts2 = OF->GetDataPointer();
-		double old_max2 = -DBL_MAX;
-		for (int j = 0; j < numnodes2; j++)
-		{
-			double curr = pts2[2 * j];
-			if (curr > old_max2) { old_max2 = curr; }
-
-		}
-		if (old_max2 > old_max) { return old_max2; }
-		else { return old_max; }
+		return this->Volume->GetLookupTableMax();
+		
+		
 
 	}
 	return 1;
@@ -647,64 +591,8 @@ double mqEditVolumeDialog::GetCTFMax()
 void mqEditVolumeDialog::UpdateLookupTableRange()
 {
 	if (this->Volume != NULL) {
-		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->Volume->GetCtf();
-
-		double *pts = CM->GetDataPointer();
-
-		int numnodes = CM->GetSize();
-		double old_min = DBL_MAX;
-		double old_max = -DBL_MAX;
-		for (int j = 0; j < numnodes; j++)
-		{
-			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
-			if (curr < old_min) { old_min = curr; }
-			if (curr > old_max) { old_max = curr; }
-
-		}
-		cout << "old max:" << old_max << ", old min:" << old_min << endl;
-		if (old_max > old_min)
-		{
-			double old_range = old_max - old_min;
-			double new_range = this->ctfMax - this->ctfMin;
-			double mult = new_range / old_range;
-			double c = this->ctfMin - old_min * mult;
-			for (int k = 0; k < numnodes; k++)
-			{
-				pts[4 * k] = pts[4 * k] * mult + c;
-				cout << "nx" << k << "=" << pts[4 * k] << endl;
-			}
-			CM->FillFromDataPointer(numnodes, pts);
-
-		}
-		vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
-		int numnodes2 = OF->GetSize();
-		double *pts2 = OF->GetDataPointer();
-		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
-		double old_min2 = DBL_MAX;
-		double old_max2 = -DBL_MAX;
-		for (int j = 0; j < numnodes2; j++)
-		{
-			double curr = pts2[2 * j];
-			//cout << "x" << j << "=" << curr << endl;
-			if (curr < old_min2) { old_min2 = curr; }
-			if (curr > old_max2) { old_max2 = curr; }
-
-		}
-		if (old_max2 > old_min2)
-		{
-			double old_range = old_max2 - old_min2;
-			double new_range = this->ctfMax - this->ctfMin;
-			double mult = new_range / old_range;
-			double c = this->ctfMin - old_min2 * mult;
-			for (int k = 0; k < numnodes2; k++)
-			{
-				pts2[2 * k] = pts2[2 * k] * mult + c;
-				//cout << "nx" << k << "=" << pts2[2*k] << endl;
-			}
-			OF->FillFromDataPointer(numnodes2, pts2);
-
-		}
+		this->Volume->UpdateLookupTableRange(this->ctfMin, this->ctfMax);
+		
 
 	}
 

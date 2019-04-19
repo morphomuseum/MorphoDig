@@ -77,13 +77,13 @@ public:
 
 
 	vtkGetMacro(ScalarDisplayMax, double);
-	vtkSetMacro(ScalarDisplayMax, double);
+	//vtkSetMacro(ScalarDisplayMax, double);
 
 	vtkGetMacro(ScalarDisplayMin, double);
-	vtkSetMacro(ScalarDisplayMin, double);
+	//vtkSetMacro(ScalarDisplayMin, double);
 
 	vtkGetMacro(ScalarOpacityUnitDistance, double);
-	vtkSetMacro(ScalarOpacityUnitDistance, double);
+	//vtkSetMacro(ScalarOpacityUnitDistance, double);
 
 	
 
@@ -111,6 +111,14 @@ public:
 	vtkGetMacro(OutlineActor, vtkSmartPointer<vtkActor>);
 	
 	double GetBoundingBoxLength();
+	double GetLookupTableMin();
+	double GetLookupTableMax();
+	void SetInterpolationToLinear(bool linear);
+	void SetScalarOpacityUnitDistance(double SOUD);
+	void SetScalarDisplayMax(double max);
+	void SetScalarDisplayMin(double min);
+	void UpdateLookupTableRange(double min, double max);
+	void UpdateLookupTableRange();
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
 	// Actual Volume render method.
 	virtual void SetSelected(int selected);
