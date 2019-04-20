@@ -65,7 +65,7 @@ public:
   void dropEvent(QDropEvent *e);
   //vtkSmartPointer<vtkRenderedAreaPicker> AreaPicker;
  vtkSmartPointer<vtkAreaPicker> AreaPicker;
-
+ void ambientLightToWhite();
   
   
   

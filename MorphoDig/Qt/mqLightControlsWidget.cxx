@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_mqLightControlsWidget.h"
 
 // For later!
+#include <vtkLightCollection.h>
 #include "mqSaveNTWDialogReaction.h"
 #include "mqUndoRedoReaction.h"
 #include "mqEditLMKDialogReaction.h"
@@ -69,15 +70,21 @@ void mqLightControlsWidget::constructor()
 
 void mqLightControlsWidget::slotFrontLight()
 {
+
+	
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
-	cout << "front light!" << endl;
 	light->SetLightTypeToHeadlight();
+	light->SetAmbientColor(0, 0, 0);
 	
-	light->SetPosition(0, 0, 1);
-	light->SetAmbientColor(1, 1, 1);
-	
+	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
+
+	light2->SetLightTypeToSceneLight();
+	light2->SetPosition(0, 0, 1);
+	//light2->SetAmbientColor(1, 1, 1);
+
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
 	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
+	//mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
 	mqMorphoDigCore::instance()->Render();
 
 
@@ -91,13 +98,15 @@ void mqLightControlsWidget::slotBackLight()
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 	cout << "back light!" << endl;
 	light->SetLightTypeToHeadlight();
-	light->SetPosition(-1, -1, -1);
+	light->SetAmbientColor(0, 0, 0);
 	
-	
-
 	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
+
 	light2->SetLightTypeToSceneLight();
-	light2->SetPosition(1, 1, -1);
+	light2->SetPosition(-1, -1, -1);
+	light2->SetAmbientColor(1, 1, 1);
+
+	
 	
 	vtkSmartPointer<vtkLight> light3= vtkSmartPointer<vtkLight>::New();
 	light3->SetLightTypeToSceneLight();
@@ -109,7 +118,7 @@ void mqLightControlsWidget::slotBackLight()
 
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
 	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
-	//mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
+	mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
 	//mqMorphoDigCore::instance()->getRenderer()->AddLight(light3);
 	//mqMorphoDigCore::instance()->getRenderer()->AddLight(light4);
 	mqMorphoDigCore::instance()->Render();
@@ -119,14 +128,22 @@ void mqLightControlsWidget::slotBackLight()
 }
 void mqLightControlsWidget::slotAboveLight()
 {
-
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+	cout << "above light!" << endl;
 	light->SetLightTypeToHeadlight();
-	light->SetPosition(0, 1, 1);
+	light->SetAmbientColor(0, 0, 0);
+
+	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
+
+	light2->SetLightTypeToSceneLight();
+	light2->SetPosition(0, 1, 1);
+	light2->SetAmbientColor(1, 1, 1);
 	
 
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
 	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
+	mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
+
 	mqMorphoDigCore::instance()->Render();
 
 
@@ -136,11 +153,21 @@ void mqLightControlsWidget::slotAboveLight()
 void mqLightControlsWidget::slotBelowLight()
 {
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+	cout << "below light!" << endl;
 	light->SetLightTypeToHeadlight();
-	light->SetPosition(0, -1, 1);
+	light->SetAmbientColor(0, 0, 0);
+
+	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
+
+	light2->SetLightTypeToSceneLight();
+	light2->SetAmbientColor(1, 1, 1);
+	light2->SetPosition(0, -1, 1);
+
+	
 	
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
 	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
+	mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
 	mqMorphoDigCore::instance()->Render();
 
 	
@@ -149,28 +176,45 @@ void mqLightControlsWidget::slotBelowLight()
 
 void mqLightControlsWidget::slotLeftLight()
 {
-
-	cout << "left light!" << endl;
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+	cout << "left!" << endl;
 	light->SetLightTypeToHeadlight();
-	light->SetPosition(-1, 0, 1);
+	light->SetAmbientColor(0, 0, 0);
+
+	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
+
+	light2->SetLightTypeToSceneLight();
+	light2->SetPosition(-1, 0, 1);
+	light2->SetAmbientColor(1, 1, 1);
+
+
+	
 	
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
 	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
+	mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
 	mqMorphoDigCore::instance()->Render();
 
 
 }
 void mqLightControlsWidget::slotRightLight()
 {
-
-	cout << "right light!" << endl;
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+	cout << "right!" << endl;
 	light->SetLightTypeToHeadlight();
-	light->SetPosition(1, 0, 1);
+	light->SetAmbientColor(0, 0, 0);
+
+	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
+
+	light2->SetLightTypeToSceneLight();
+	light2->SetAmbientColor(1, 1, 1);
+	light2->SetPosition(1, 0, 1);
+
+	
 	
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
 	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
+	mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
 	mqMorphoDigCore::instance()->Render();
 
 }

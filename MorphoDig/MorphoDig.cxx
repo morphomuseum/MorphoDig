@@ -6,6 +6,8 @@
 
 
 
+
+
 #include "mqMorphoDigMenuBuilders.h"
 #include "mqOpenDataReaction.h"
 #include "vtkBezierSurfaceWidget.h"
@@ -33,6 +35,8 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vtkLightCollection.h>
+#include <vtkLight.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkInteractorStyleDrawPolygon.h>
@@ -1129,7 +1133,11 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   cout << "Accept Drops..." << endl;
   setAcceptDrops(true);
   cout << "OpenGL version:" << this->MorphoDigCore->GetOpenGLVersion().toStdString() << endl;
-};
+
+
+  
+}
+
 
 
 
@@ -1703,7 +1711,27 @@ void MorphoDig::saveSettings()
 // et lorsqu'on change entre "camera
 
 
+void MorphoDig::ambientLightToWhite()
+{
+	vtkSmartPointer<vtkLightCollection> originalLights = vtkSmartPointer<vtkLightCollection>::New();
+	originalLights = mqMorphoDigCore::instance()->getRenderer()->GetLights();
+	std::cout << "Originally there are " << originalLights->GetNumberOfItems() << " lights." << std::endl;
+	originalLights->InitTraversal();
+	cout << "VTK_LIGHT_TYPE_CAMERA_LIGHT" << VTK_LIGHT_TYPE_CAMERA_LIGHT << endl;
+	cout << "VTK_LIGHT_TYPE_HEADLIGHT" << VTK_LIGHT_TYPE_HEADLIGHT << endl;
+	cout << "VTK_LIGHT_TYPE_HEADLIGHT" << VTK_LIGHT_TYPE_SCENE_LIGHT << endl;
 
+	for (int i = 0; i < originalLights->GetNumberOfItems(); i++)
+	{
+		vtkLight *light = originalLights->GetNextItem();
+		cout << "light type" << light->GetLightType() << endl;
+		cout << "light ambient" << light->GetAmbientColor()[0] << "," << light->GetAmbientColor()[1] << "," << light->GetAmbientColor()[2] << endl;
+		light->SetAmbientColor(1, 1, 1);
+
+	}
+
+	
+}
 void MorphoDig::slotExit() {
 	//maybe we should save the .ini files!
 	qApp->exit();
