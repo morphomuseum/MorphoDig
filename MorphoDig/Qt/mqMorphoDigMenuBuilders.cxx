@@ -560,9 +560,9 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	dock4->titleBarWidget()->hide();
 	dock4->setAllowedAreas(Qt::AllDockWidgetAreas);
 	//QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow);
-	QWidget* lightWidget = new mqLightControlsWidget(&projectWindow);
-	lightWidget->layout()->setSpacing(0);
-	dock4->setWidget(lightWidget);
+	//QWidget* lightWidget = new mqLightControlsWidget(&projectWindow);
+	//lightWidget->layout()->setSpacing(0);
+	//dock4->setWidget(lightWidget);
 	
 	
 	//cout << "create light tool bar" << endl;
