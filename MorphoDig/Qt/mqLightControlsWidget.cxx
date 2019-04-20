@@ -71,8 +71,11 @@ void mqLightControlsWidget::slotFrontLight()
 {
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 	cout << "front light!" << endl;
-	light->SetLightTypeToCameraLight();
+	light->SetLightTypeToHeadlight();
+	
 	light->SetPosition(0, 0, 1);
+	light->SetAmbientColor(1, 1, 1);
+	
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
 	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
 	mqMorphoDigCore::instance()->Render();
@@ -87,21 +90,21 @@ void mqLightControlsWidget::slotBackLight()
 	
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 	cout << "back light!" << endl;
-	light->SetLightTypeToCameraLight();
+	light->SetLightTypeToHeadlight();
 	light->SetPosition(-1, -1, -1);
 	
 	
 
 	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
-	light2->SetLightTypeToCameraLight();
+	light2->SetLightTypeToSceneLight();
 	light2->SetPosition(1, 1, -1);
 	
 	vtkSmartPointer<vtkLight> light3= vtkSmartPointer<vtkLight>::New();
-	light3->SetLightTypeToCameraLight();
+	light3->SetLightTypeToSceneLight();
 	light3->SetPosition(0, 1, -1);
 	
 	vtkSmartPointer<vtkLight> light4 = vtkSmartPointer<vtkLight>::New();
-	light4->SetLightTypeToCameraLight();
+	light4->SetLightTypeToSceneLight();
 	light4->SetPosition(0, -1, -1);
 
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
@@ -118,7 +121,7 @@ void mqLightControlsWidget::slotAboveLight()
 {
 
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
-	light->SetLightTypeToCameraLight();
+	light->SetLightTypeToHeadlight();
 	light->SetPosition(0, 1, 1);
 	
 
@@ -133,7 +136,7 @@ void mqLightControlsWidget::slotAboveLight()
 void mqLightControlsWidget::slotBelowLight()
 {
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
-	light->SetLightTypeToCameraLight();
+	light->SetLightTypeToHeadlight();
 	light->SetPosition(0, -1, 1);
 	
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
@@ -149,7 +152,7 @@ void mqLightControlsWidget::slotLeftLight()
 
 	cout << "left light!" << endl;
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
-	light->SetLightTypeToCameraLight();
+	light->SetLightTypeToHeadlight();
 	light->SetPosition(-1, 0, 1);
 	
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
@@ -163,7 +166,7 @@ void mqLightControlsWidget::slotRightLight()
 
 	cout << "right light!" << endl;
 	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
-	light->SetLightTypeToCameraLight();
+	light->SetLightTypeToHeadlight();
 	light->SetPosition(1, 0, 1);
 	
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
