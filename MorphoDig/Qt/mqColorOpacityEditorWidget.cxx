@@ -31,40 +31,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "mqColorOpacityEditorWidget.h"
 #include "ui_mqColorOpacityEditorWidget.h"
-//#include "ui_pqSavePresetOptions.h"
 
-//#include "pqActiveObjects.h"
-//#include "pqChooseColorPresetReaction.h"
-
-//#include "pqDataRepresentation.h"
 
 #include "mqMorphoDigCore.h"
-//#include "pqPipelineRepresentation.h"
-//#include "pqPropertiesPanel.h"
-//#include "pqPropertyWidgetDecorator.h"
-//#include "pqResetScalarRangeReaction.h"
-//#include "pqSettings.h"
 #include "mqTransferFunctionWidget.h"
-//#include "pqUndoStack.h"
 #include <vtkCommand.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkEventQtSlotConnect.h>
 #include <vtkNew.h>
-//#include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
-//#include "vtkSMCoreUtilities.h"
-//#include "vtkSMPVRepresentationProxy.h"
-//#include "vtkSMProperty.h"
-//#include "vtkSMPropertyGroup.h"
-//#include "vtkSMPropertyHelper.h"
-//#include "vtkSMRenderViewProxy.h"
-//#include "vtkSMSessionProxyManager.h"
-//#include "vtkSMTransferFunctionPresets.h"
-//#include "vtkSMTransferFunctionProxy.h"
+
 #include <vtkVector.h>
 #include <vtkWeakPointer.h>
-//#include "vtk_jsoncpp.h"
-
 #include <QDoubleValidator>
 #include <QMessageBox>
 #include <QPointer>
@@ -82,12 +60,7 @@ class mqColorOpacityEditorWidget::mqInternals
 public:
   Ui::ColorOpacityEditorWidget Ui;
     
-  //QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
-  //vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
-  //vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
-
-  // We use this pqPropertyLinks instance to simply monitor smproperty changes.
-  //pqPropertyLinks LinksForMonitoringChanges;
+ 
   vtkNew<vtkEventQtSlotConnect> IndexedLookupConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
 
@@ -97,13 +70,10 @@ public:
     this->Ui.setupUi(self);
 	cout << "mqInternals instantiation : set validator" << endl;
     this->Ui.CurrentDataValue->setValidator(new QDoubleValidator(self));
-    //this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-    // this->Ui.mainLayout->setSpacing(
-    //  pqPropertiesPanel::suggestedVerticalSpacing());
-
-   // this->Decorator = new pqColorOpacityEditorWidgetDecorator(NULL, self);
+    
 	
 	this->Ui.EnableOpacityMapping->setChecked(true);
+	this->Ui.EnableOpacityMapping->setVisible(false);
 	this->Ui.Discretize->setChecked(false);
 	this->Ui.currentDiscretizeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui.currentDiscretizeValue->setMinimum(1);
@@ -120,19 +90,7 @@ public:
   void render()
   {
 	  cout << "mqColorOpacityEditorWidget render" << endl;
-	  //@@ do not think this is needed!
-    /*pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-    if (repr)
-    {
-      repr->renderViewEventually();
-      return;
-    }
-    pqView* activeView = pqActiveObjects::instance().activeView();
-    if (activeView)
-    {
-      activeView->render();
-      return;
-    }*/
+	 
     mqMorphoDigCore::instance()->Render();
   }
 };
@@ -186,11 +144,7 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 	  cout << "STC is not null, that is something... " << endl;
 
   }
-  //Not sure this is needed!
- /* QObject::connect(&pqActiveObjects::instance(), SIGNAL(representationChanged(pqRepresentation*)),
-    this, SLOT(representationOrViewChanged()));
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
-    SLOT(representationOrViewChanged()));*/
+  
 
   QObject::connect(ui.OpacityEditor, SIGNAL(currentPointChanged(vtkIdType)), this,
     SLOT(opacityCurrentChanged(vtkIdType)));
