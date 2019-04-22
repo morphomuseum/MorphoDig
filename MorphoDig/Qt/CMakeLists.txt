@@ -73,16 +73,24 @@ mqViewMenuManager.cxx
   mqEditAllFLGLengthDialogReaction.cxx
   mqEditAllFLGLengthDialog.h
   mqEditAllFLGLengthDialog.cxx
+ mqExtractScalarRangeDialog.cxx
+  mqExtractScalarRangeDialog.h
+  mqExtractScalarRangeDialogReaction.cxx
+  mqExtractScalarRangeDialogReaction.h
+ mqExtractTagRangeDialog.cxx
+  mqExtractTagRangeDialog.h
+  mqExtractTagRangeDialogReaction.cxx
+  mqExtractTagRangeDialogReaction.h
   mqGridSizeDialogReaction.h
   mqGridSizeDialogReaction.cxx
   mqGridSizeDialog.h
   mqGridSizeDialog.cxx
   mqOpenDataReaction.cxx
   mqOpenDataReaction.h
-  mqSetName.cxx
   mqSaveDataReaction.cxx
-  mqSaveDataReaction.h
+  mqSaveDataReaction.h  
   mqSetName.h
+  mqSetName.cxx
   mqMorphoDigMenuBuilders.cxx
   mqMorphoDigMenuBuilders.h
   mqChangeNodeReaction.h
@@ -179,22 +187,6 @@ mqShrinkWrapIterativeDialog.cxx
 mqShrinkWrapIterativeDialog.h
 mqShrinkWrapIterativeDialogReaction.cxx
 mqShrinkWrapIterativeDialogReaction.h
-QDoubleSlider.cxx
-QDoubleSlider.h
-QRAMThread.cxx
-QRAMThread.h
-QReleaseSlider.cxx
-QReleaseSlider.h
-QReleaseDial.cxx
-QReleaseDial.h
-QReleaseScrollBar.cxx
-QReleaseScrollBar.h
-QReleaseScrollBarValue.cxx
-QReleaseScrollBarValue.h
-QDoubleReleaseSlider.cxx
-QDoubleReleaseSlider.h
-QReleaseSliderValue.cxx
-QReleaseSliderValue.h
  mqSmoothDialog.cxx
   mqSmoothDialog.h
   mqSmoothDialogReaction.cxx
@@ -283,18 +275,28 @@ mqMergeTagsDialog.cxx
 mqMergeTagsDialog.h
 mqMergeTagsDialogReaction.cxx
 mqMergeTagsDialogReaction.h
- mqExtractScalarRangeDialog.cxx
-  mqExtractScalarRangeDialog.h
-  mqExtractScalarRangeDialogReaction.cxx
-  mqExtractScalarRangeDialogReaction.h
- mqExtractTagRangeDialog.cxx
-  mqExtractTagRangeDialog.h
-  mqExtractTagRangeDialogReaction.cxx
-  mqExtractTagRangeDialogReaction.h
+
 mqSurfaceTagInfosDialog.cxx
 mqSurfaceTagInfosDialog.h
 mqSurfaceTagInfosDialogReaction.cxx
 mqSurfaceTagInfosDialogReaction.h
+QDoubleSlider.cxx
+QDoubleSlider.h
+QRAMThread.cxx
+QRAMThread.h
+QReleaseSlider.cxx
+QReleaseSlider.h
+QReleaseDial.cxx
+QReleaseDial.h
+QReleaseScrollBar.cxx
+QReleaseScrollBar.h
+QReleaseScrollBarValue.cxx
+QReleaseScrollBarValue.h
+QDoubleReleaseSlider.cxx
+QDoubleReleaseSlider.h
+QReleaseSliderValue.cxx
+QReleaseSliderValue.h
+
 )
 
 set (Qt_MOC_HDRS
