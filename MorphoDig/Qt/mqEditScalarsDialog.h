@@ -41,8 +41,8 @@ public:
  void RefreshComboColorMaps();
  void RefreshSuggestedRange();
  void UpdateLookupTables();
- void RefreshSliders();
- void MoveSliders();
+ //void RefreshSliders();
+ //void MoveSliders();
  void RefreshRange();
   public slots:
   virtual void slotEditColorMapName();
@@ -69,6 +69,11 @@ protected:
 	
 private:
 	mqColorOpacityEditorWidget *mColorMap; 
+	double maxShiftAmplitude;
+	double slideMin;
+	double slideMax;
+	double ctfMin;
+	double ctfMax;
 
   Q_DISABLE_COPY(mqEditScalarsDialog)
   Ui::mqEditScalarsDialog* const Ui;

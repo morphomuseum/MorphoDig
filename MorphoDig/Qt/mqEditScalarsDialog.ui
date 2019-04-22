@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>476</width>
-    <height>704</height>
+    <height>742</height>
    </rect>
   </property>
   <property name="palette">
@@ -142,6 +142,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -285,6 +294,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </inactive>
     <disabled>
      <colorrole role="WindowText">
@@ -422,6 +440,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </disabled>
    </palette>
   </property>
@@ -432,9 +459,9 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>670</y>
-     <width>161</width>
-     <height>25</height>
+     <y>700</y>
+     <width>195</width>
+     <height>30</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -456,7 +483,7 @@
      <x>10</x>
      <y>10</y>
      <width>441</width>
-     <height>651</height>
+     <height>681</height>
     </rect>
    </property>
    <property name="title">
@@ -466,7 +493,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>590</y>
+      <y>620</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -528,7 +555,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>590</y>
+      <y>620</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -541,7 +568,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>620</y>
+      <y>650</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -554,7 +581,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>620</y>
+      <y>650</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -567,7 +594,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>590</y>
+      <y>620</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -580,7 +607,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>620</y>
+      <y>650</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -593,7 +620,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>620</y>
+      <y>650</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -606,7 +633,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>590</y>
+      <y>620</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -619,7 +646,7 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>590</y>
+      <y>620</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -632,7 +659,7 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>620</y>
+      <y>650</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -645,7 +672,7 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>490</y>
+      <y>530</y>
       <width>31</width>
       <height>16</height>
      </rect>
@@ -654,14 +681,17 @@
      <string>min: </string>
     </property>
    </widget>
-   <widget class="QDoubleSlider" name="sliderMax">
+   <widget class="QReleaseSlider" name="sliderMax">
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>520</y>
+      <y>560</y>
       <width>201</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="minimum">
+     <number>-99</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -671,7 +701,7 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>520</y>
+      <y>560</y>
       <width>31</width>
       <height>16</height>
      </rect>
@@ -680,14 +710,17 @@
      <string>max: </string>
     </property>
    </widget>
-   <widget class="QDoubleSlider" name="sliderMin">
+   <widget class="QReleaseSlider" name="sliderMin">
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>490</y>
+      <y>530</y>
       <width>201</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="minimum">
+     <number>-99</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -774,7 +807,7 @@
       <x>110</x>
       <y>90</y>
       <width>291</width>
-      <height>24</height>
+      <height>28</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -859,7 +892,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>560</y>
+      <y>590</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -875,13 +908,42 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>560</y>
+      <y>590</y>
       <width>331</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
      <string>% of extreme values removed to compute suggested Min and Max:</string>
+    </property>
+   </widget>
+   <widget class="QReleaseSlider" name="sliderShift">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>500</y>
+      <width>201</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>-99</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>500</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>shift:</string>
     </property>
    </widget>
   </widget>
@@ -901,9 +963,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QDoubleSlider</class>
+   <class>QReleaseSlider</class>
    <extends>QSlider</extends>
-   <header>QDoubleSlider.h</header>
+   <header>QReleaseSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources>
