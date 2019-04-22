@@ -47,8 +47,6 @@ public:
  
   void UpdateLookupTableRange();
   public slots:
- //virtual void slotRefreshSliders();
- //virtual void slotMoveSliders();
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();
   virtual void slotRefreshDialog();

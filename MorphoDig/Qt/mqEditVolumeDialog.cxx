@@ -189,22 +189,11 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->ctfMin = 0;
 	this->ctfMax = 1;
 
-	/*this->Ui->sliderMin->setDoubleValue(0);
-	this->Ui->sliderMin->setDoubleMaximum(1);
-	this->Ui->sliderMin->setDoubleMinimum(-1);*/
-
+	
 
 	this->Ui->scalarOpacityUnitDistance->setMaximum(DBL_MAX);
 
-	/*this->Ui->sliderMax->setDoubleValue(1);
-	this->Ui->sliderMax->setDoubleMaximum(2);
-	this->Ui->sliderMax->setDoubleMinimum(0);*/
-	/*
-		this->Ui->sliderMin->setDoubleSingleStep((this->Ui->sliderMin->doubleMaximum() - this->Ui->sliderMin->doubleMinimum()) / 100);
-
-		this->Ui->sliderMax->setDoubleSingleStep((this->Ui->sliderMax->doubleMaximum() - this->Ui->sliderMax->doubleMinimum()) / 100);*/
-
-
+	
 	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedVolumes()));
 	connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveVolume()));
 	connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));

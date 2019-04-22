@@ -41,8 +41,6 @@ public:
  void RefreshComboColorMaps();
  void RefreshSuggestedRange();
  void UpdateLookupTables();
- //void RefreshSliders();
- //void MoveSliders();
  void RefreshRange();
   public slots:
   virtual void slotEditColorMapName();
@@ -55,10 +53,15 @@ public:
   virtual void slotAccepted();
   virtual void slotRefreshComboScalars();
   virtual void slotAcceptSuggestedMax();
-  virtual void slotRefreshSliders();
-  virtual void slotMoveSliders();
+  virtual void slotCurrentMinEdited();
+  virtual void slotCurrentMaxEdited();
+  virtual void slotShiftSlider(int shift);
+  virtual void slotSliderStart();
+  virtual void slotSlideMin(int slideMin);
+  virtual void slotSlideMax(int slideMax);
+  virtual void slotSliderStop();
+
   virtual void slotAcceptSuggestedMin();
-  virtual void slotCurrentMinMaxEdited();
   virtual void slotRemoveScalar();
   virtual void slotRefreshColorMaps();
   
