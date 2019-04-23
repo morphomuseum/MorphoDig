@@ -11,7 +11,7 @@
 #include "vtkLMActorCollection.h"
 #include <vtkSmartPointer.h>
 #include <QDialog>
-#include "mqColorOpacityEditorWidget.h"
+
 
 
 namespace Ui

@@ -78,13 +78,13 @@ void mqLightControlsWidget::slotFrontLight()
 	
 	vtkSmartPointer<vtkLight> light2 = vtkSmartPointer<vtkLight>::New();
 
-	light2->SetLightTypeToSceneLight();
+	light2->SetLightTypeToCameraLight();
 	light2->SetPosition(0, 0, 1);
 	//light2->SetAmbientColor(1, 1, 1);
 
 	mqMorphoDigCore::instance()->getRenderer()->RemoveAllLights();
-	mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
-	//mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
+	//mqMorphoDigCore::instance()->getRenderer()->AddLight(light);
+	mqMorphoDigCore::instance()->getRenderer()->AddLight(light2);
 	mqMorphoDigCore::instance()->Render();
 
 

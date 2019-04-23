@@ -15,7 +15,7 @@
 #include "mqUndoStack.h"
 #include "QDoubleSlider.h"
 #include "mqColorChooserButton.h"
-#include "mqColorOpacityEditorWidget.h"
+
 #include "mqTransferFunctionWidget.h"
 #include "mqSaveTAGMAPDialogReaction.h"
 #include "mqMergeTagsDialogReaction.h"
@@ -36,6 +36,7 @@
 #include <QComboBox>
 #include <QHeaderView>
 #include <QSpinBox>
+#include <QCloseEvent>
 #include <QStandardItemModel>
 
 #include <sstream>

@@ -84,6 +84,15 @@ public:
 	this->Ui.discretizeSlider->setMaximum(1024);
 	this->Ui.discretizeSlider->setValue(256);
 	this->Ui.discretizeSlider->setEnabled(false);
+	this->Ui.currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui.currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui.currentMin->setMinimum(-DBL_MAX);
+	this->Ui.currentMax->setMinimum(-DBL_MAX);
+	this->Ui.currentMax->setValue(1);
+	this->Ui.currentMin->setValue(0);
+	this->Ui.currentMin->setMaximum(DBL_MAX);
+	this->Ui.currentMax->setMaximum(DBL_MAX);
+	
 	cout << "mqInternals instantiation : done" << endl;
   }
 
@@ -100,6 +109,12 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 	this->STC = stc;
 	if (stc != NULL)
 	{
+		
+		this->ctfMin = this->getSTCMin();
+		this->ctfMax = this->getSTCMax();
+		cout << "reinitialize: min=" << this->ctfMin << endl;
+		cout << "reinitialize: max=" << this->ctfMax << endl;
+		
 		if (stc->GetEnableOpacityMapping()) { this->Internals->Ui.EnableOpacityMapping->setChecked(true); }		
 		else { this->Internals->Ui.EnableOpacityMapping->setChecked(false); }
 		this->Internals->Ui.discretizeSlider->setValue(this->STC->GetNumberOfValues());
@@ -122,6 +137,7 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 		cout << "reinitialize: updatePanel... " << endl;
 		this->updatePanel();
 	}
+	
 }
 //-----------------------------------------------------------------------------
 mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
@@ -138,6 +154,8 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
    
 	cout << "Initialize OpacityEditor widget " << endl;
 	this->initializeOpacityEditor(stc->GetScalarOpacityFunction());
+	this->ctfMin = this->getSTCMin();
+	this->ctfMax = this->getSTCMax();
   }
   else
   {
@@ -174,27 +192,23 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   QObject::connect(ui.currentDiscretizeValue, SIGNAL(valueChanged(int)), this, SLOT(changedDiscretizeValue(int)));
   QObject::connect(ui.currentDiscretizeValue, SIGNAL(valueChanged(int)), ui.discretizeSlider, SLOT(setValue(int)));
 
-  //QObject::connect(ui.Discretize, SIGNAL(clicked()), this, SLOT(changedDiscretize()));
-
- // connect(slider, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
- // connect(slider, SIGNAL(valueChanged(int)), this, SIGNAL(valueChanged(int)));
-
-
-
- // QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
-
- /* QObject::connect(
-    ui.ResetRangeToDataOverTime, SIGNAL(clicked()), this, SLOT(resetRangeToDataOverTime()));*/
-
- /* QObject::connect(
-    ui.ResetRangeToVisibleData, SIGNAL(clicked()), this, SLOT(resetRangeToVisibleData()));*/
-
-/*  QObject::connect(
-    ui.InvertTransferFunctions, SIGNAL(clicked()), this, SLOT(invertTransferFunctions()));*/
-
- // QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
-  //QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
+ 
   QObject::connect(ui.SaveAsCustom, SIGNAL(clicked()), this, SLOT(saveAsCustom()));
+
+  QObject::connect(ui.sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMin(int)));
+  QObject::connect(ui.sliderMin, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+  
+
+  QObject::connect(ui.sliderMax, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMax(int)));  
+  QObject::connect(ui.sliderMax, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+
+  QObject::connect(ui.sliderShift, SIGNAL(valueChanged(int)), this, SLOT(slotShiftSlider(int)));
+  QObject::connect(ui.sliderShift, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+  
+
+
+  QObject::connect(ui.currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinEdited()));
+  QObject::connect(ui.currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMaxEdited()));
   
   
 
@@ -205,73 +219,6 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
     ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
 
 
-  /*vtkSMProperty* smproperty = smgroup->GetProperty("XRGBPoints");
-  if (smproperty)
-  {
-    this->addPropertyLink(this, "xrgbPoints", SIGNAL(xrgbPointsChanged()), smproperty);
-  }
-  else
-  {
-    qCritical("Missing 'XRGBPoints' property. Widget may not function correctly.");
-  }*/
-
-  //ui.OpacityEditor->hide();
-
-  /*smproperty = smgroup->GetProperty("ScalarOpacityFunction");
-  if (smproperty)
-  {
-    this->addPropertyLink(
-      this, "scalarOpacityFunctionProxy", SIGNAL(scalarOpacityFunctionProxyChanged()), smproperty);
-  }*/
-
-  /*smproperty = smgroup->GetProperty("EnableOpacityMapping");
-  if (smproperty)
-  {
-    this->addPropertyLink(ui.EnableOpacityMapping, "checked", SIGNAL(toggled(bool)), smproperty);
-  }
-  else
-  {
-    ui.EnableOpacityMapping->hide();
-    ui.UseLogScaleOpacity->hide();
-  }*/
-
-  /*smproperty = smgroup->GetProperty("UseLogScale");
-  if (smproperty)
-  {
-    this->addPropertyLink(this, "useLogScale", SIGNAL(useLogScaleChanged()), smproperty);
-    QObject::connect(ui.UseLogScale, SIGNAL(clicked(bool)), this, SLOT(useLogScaleClicked(bool)));
-    // QObject::connect(ui.UseLogScale, SIGNAL(toggled(bool)),
-    //  this, SIGNAL(useLogScaleChanged()));
-  }
-  else
-  {
-    ui.UseLogScale->hide();
-  }*/
-
-
-  // if proxy has a property named IndexedLookup, we hide this entire widget
-  // when IndexedLookup is ON.
-
-  /*if (smproxy->GetProperty("IndexedLookup"))
-  {
-    // we are not controlling the IndexedLookup property, we are merely
-    // observing it to ensure the UI is updated correctly. Hence we don't fire
-    // any signal to update the smproperty.
-    this->Internals->IndexedLookupConnector->Connect(smproxy->GetProperty("IndexedLookup"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateIndexedLookupState()));
-    this->updateIndexedLookupState();
-
-    // Add decorator so the widget can be hidden when IndexedLookup is ON.
-    this->addDecorator(this->Internals->Decorator);
-  }
-  */
-
-  /*pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings)
-  {
-    this->Internals->Ui.AdvancedButton->setChecked(
-      settings->value("showAdvancedPropertiesColorOpacityEditorWidget", false).toBool());
-  }*/
   //cout << "Will call updateCurrentData... " << endl;
   this->updateCurrentData();
   //cout << "Will call updatePanel... " << endl;
@@ -287,6 +234,9 @@ int mqColorOpacityEditorWidget::hasSTC()
 	if (this->STC != NULL) { return 1; }
 	else { return 0; }
 }
+
+
+
 //-----------------------------------------------------------------------------
 mqColorOpacityEditorWidget::~mqColorOpacityEditorWidget()
 {
@@ -301,116 +251,237 @@ mqColorOpacityEditorWidget::~mqColorOpacityEditorWidget()
   delete this->Internals;
   this->Internals = NULL;
 }
-
-//-----------------------------------------------------------------------------
-/*void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProxy)
+void mqColorOpacityEditorWidget::slotCurrentMinEdited()
 {
-  pqInternals& internals = (*this->Internals);
-  Ui::ColorOpacityEditorWidget& ui = internals.Ui;
-
-  vtkSMProxy* newSofProxy = NULL;
-  vtkPiecewiseFunction* pwf =
-    sofProxy ? vtkPiecewiseFunction::SafeDownCast(sofProxy->GetClientSideObject()) : NULL;
-  if (sofProxy && sofProxy->GetProperty("Points") && pwf)
-  {
-    newSofProxy = sofProxy.GetPointer();
-  }
-  if (internals.ScalarOpacityFunctionProxy == newSofProxy)
-  {
-    return;
-  }
-  if (internals.ScalarOpacityFunctionProxy)
-  {
-    // cleanup old property links.
-    this->links().removePropertyLink(this, "xvmsPoints", SIGNAL(xvmsPointsChanged()),
-      internals.ScalarOpacityFunctionProxy,
-      internals.ScalarOpacityFunctionProxy->GetProperty("Points"));
-    this->links().removePropertyLink(this, "useLogScaleOpacity",
-      SIGNAL(useLogScaleOpacityChanged()), internals.ScalarOpacityFunctionProxy,
-      internals.ScalarOpacityFunctionProxy->GetProperty("UseLogScale"));
-  }
-  internals.ScalarOpacityFunctionProxy = newSofProxy;
-  if (internals.ScalarOpacityFunctionProxy)
-  {
-    pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-    vtkSMPVRepresentationProxy* proxy = static_cast<vtkSMPVRepresentationProxy*>(repr->getProxy());
-
-    // When representation changes, we have to initialize the opacity widget when
-    // "MultiComponentsMapping" is modified
-    this->Internals->RangeConnector->Disconnect();
-    vtkSMProperty* msProp = proxy->GetProperty("MapScalars");
-    vtkSMProperty* mcmProp = proxy->GetProperty("MultiComponentsMapping");
-    if (msProp && mcmProp)
-    {
-      this->Internals->RangeConnector->Connect(msProp, vtkCommand::ModifiedEvent, this,
-        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-
-      this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
-        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-
-      // FIXME: need to verify that repeated initializations are okay.
-      this->initializeOpacityEditor(pwf);
-    }
-
-    // add new property links.
-    this->links().addPropertyLink(this, "xvmsPoints", SIGNAL(xvmsPointsChanged()),
-      internals.ScalarOpacityFunctionProxy,
-      internals.ScalarOpacityFunctionProxy->GetProperty("Points"));
-    this->links().addPropertyLink(this, "useLogScaleOpacity", SIGNAL(useLogScaleOpacityChanged()),
-      internals.ScalarOpacityFunctionProxy,
-      internals.ScalarOpacityFunctionProxy->GetProperty("UseLogScale"));
-  }
-  ui.OpacityEditor->setVisible(newSofProxy != NULL);
-}*/
-/*
-
-//-----------------------------------------------------------------------------
-pqSMProxy pqColorOpacityEditorWidget::scalarOpacityFunctionProxy() const
-{
-  return this->Internals->ScalarOpacityFunctionProxy.GetPointer();
-}
-*/
-
-//-----------------------------------------------------------------------------
-/*
-void pqColorOpacityEditorWidget::updateIndexedLookupState()
-{
-  if (this->proxy()->GetProperty("IndexedLookup"))
-  {
-    bool val = vtkSMPropertyHelper(this->proxy(), "IndexedLookup").GetAsInt() != 0;
-    this->Internals->Decorator->setHidden(val);
-  }
-}
-*/
-/*
-
-//-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::multiComponentsMappingChanged(vtkObject* vtkNotUsed(sender),
-  unsigned long vtkNotUsed(event), void* clientData, void* vtkNotUsed(callData))
-{
-  pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-  vtkSMPVRepresentationProxy* proxy = static_cast<vtkSMPVRepresentationProxy*>(repr->getProxy());
-
-  if (proxy->GetVolumeIndependentRanges())
-  {
-    // force separate color map
-    vtkSMProperty* separateProperty = proxy->GetProperty("UseSeparateColorMap");
-    bool sepEnabled = vtkSMPropertyHelper(separateProperty).GetAsInt() != 0;
-    if (!sepEnabled)
-    {
-      vtkSMPropertyHelper(separateProperty).Set(1);
-      vtkSMPropertyHelper helper(proxy->GetProperty("ColorArrayName"));
-      proxy->SetScalarColoring(helper.GetAsString(4), vtkDataObject::POINT);
-      proxy->RescaleTransferFunctionToDataRange();
-      return;
-    }
-  }
-
-  this->initializeOpacityEditor(static_cast<vtkPiecewiseFunction*>(clientData));
-  proxy->RescaleTransferFunctionToDataRange();
+	//cout << "Current Min edited!" << endl;
+	if (this->Internals->Ui.currentMin->value() < this->Internals->Ui.currentMax->value())
+	{
+		this->ctfMin = this->Internals->Ui.currentMin->value();
+	}
+	else
+	{
+		this->ctfMin = this->Internals->Ui.currentMax->value() - 10;
+	}
+	this->UpdateLookupTableRange();
 }
 
-*/
+void mqColorOpacityEditorWidget::slotCurrentMaxEdited()
+{
+	//cout << "Current max edited!" << endl;
+	if (this->Internals->Ui.currentMin->value() < this->Internals->Ui.currentMax->value())
+	{
+		this->ctfMax = this->Internals->Ui.currentMax->value();
+	}
+	else
+	{
+		this->ctfMax = this->Internals->Ui.currentMin->value() + 10;
+	}
+
+
+
+
+	this->UpdateLookupTableRange();
+
+}
+
+void mqColorOpacityEditorWidget::slotSliderStart()
+{
+	cout << "ShiftSliderStart" << endl;
+	this->slideMin = this->ctfMin;
+	this->slideMax = this->ctfMax;
+	this->maxShiftAmplitude = (this->slideMax - this->slideMin) / 2;
+
+}
+
+void mqColorOpacityEditorWidget::slotSlideMin(int slideMin)
+{
+	if (slideMin != 0)
+	{
+		cout << "slideMin:" << slideMin << endl;
+		double newMin = this->slideMin + slideMin * this->maxShiftAmplitude / 100;
+		this->Internals->Ui.currentMin->setValue(newMin);
+
+		cout << "Min:" << newMin << endl;
+		this->ctfMin = newMin;
+		this->UpdateLookupTableRange();
+	}
+
+
+}
+void mqColorOpacityEditorWidget::slotSlideMax(int slideMax)
+{
+	if (slideMax != 0)
+	{
+		cout << "slideMax:" << slideMax << endl;
+		double newMax = this->slideMax + slideMax * this->maxShiftAmplitude / 100;
+
+		this->Internals->Ui.currentMax->setValue(newMax);
+		cout << "Max:" << newMax << endl;
+
+		this->ctfMax = newMax;
+		this->UpdateLookupTableRange();
+	}
+
+}
+void mqColorOpacityEditorWidget::slotShiftSlider(int shift)
+{
+	if (shift != 0)
+	{
+		cout << "shift:" << shift << endl;
+		double newMin = this->slideMin + shift * this->maxShiftAmplitude / 100;
+		double newMax = this->slideMax + shift * this->maxShiftAmplitude / 100;
+		this->Internals->Ui.currentMin->setValue(newMin);
+		this->Internals->Ui.currentMax->setValue(newMax);
+		//cout << "Min:" << newMin << endl;
+		//cout << "Max:" << newMax << endl;
+		this->ctfMin = newMin;
+		this->ctfMax = newMax;
+
+		this->UpdateLookupTableRange();
+	}
+}
+
+double mqColorOpacityEditorWidget::getSTCMax() {
+	
+	if (this->STC != NULL)
+	{
+		
+		double *pts = this->STC->GetDataPointer();
+
+		int numnodes = this->STC->GetSize();
+		double old_max = -DBL_MAX;
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			if (curr > old_max) { old_max = curr; }
+
+		}
+
+		vtkPiecewiseFunction* OF = this->STC->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		double old_max2 = -DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			if (curr > old_max2) { old_max2 = curr; }
+
+		}
+		if (old_max2 > old_max) { return old_max2; }
+		else { return old_max; }
+	}
+	else
+	{
+		return 1;
+	}
+}
+double mqColorOpacityEditorWidget::getSTCMin()
+{
+	if (this->STC != NULL)
+	{
+
+	
+		double *pts = this->STC->GetDataPointer();
+
+		int numnodes = this->STC->GetSize();
+		double old_min = DBL_MAX;
+
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min) { old_min = curr; }
+
+		}
+
+		vtkPiecewiseFunction* OF = this->STC->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		double old_min2 = DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			//cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min2) { old_min2 = curr; }
+		}
+		if (old_min < old_min2) { return old_min2; }
+		else { return old_min; }
+	}
+	else
+	{
+		return 0;
+	}
+
+}
+
+void mqColorOpacityEditorWidget::UpdateLookupTableRange()
+{
+	if (this->STC != NULL)
+	{
+
+
+		double *pts = STC->GetDataPointer();
+
+		int numnodes = STC->GetSize();
+		double old_min = DBL_MAX;
+		double old_max = -DBL_MAX;
+		for (int j = 0; j < numnodes; j++)
+		{
+			double curr = pts[4 * j];
+			cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min) { old_min = curr; }
+			if (curr > old_max) { old_max = curr; }
+
+		}
+		cout << "old max:" << old_max << ", old min:" << old_min << endl;
+		if (old_max > old_min)
+		{
+			double old_range = old_max - old_min;
+			double new_range = this->ctfMax - this->ctfMin;
+			double mult = new_range / old_range;
+			double c = this->ctfMin - old_min * mult;
+			for (int k = 0; k < numnodes; k++)
+			{
+				pts[4 * k] = pts[4 * k] * mult + c;
+				cout << "nx" << k << "=" << pts[4 * k] << endl;
+			}
+			STC->FillFromDataPointer(numnodes, pts);
+
+		}
+		vtkPiecewiseFunction* OF = STC->GetScalarOpacityFunction();
+		int numnodes2 = OF->GetSize();
+		double *pts2 = OF->GetDataPointer();
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		double old_min2 = DBL_MAX;
+		double old_max2 = -DBL_MAX;
+		for (int j = 0; j < numnodes2; j++)
+		{
+			double curr = pts2[2 * j];
+			//cout << "x" << j << "=" << curr << endl;
+			if (curr < old_min2) { old_min2 = curr; }
+			if (curr > old_max2) { old_max2 = curr; }
+
+		}
+		if (old_max2 > old_min2)
+		{
+			double old_range = old_max2 - old_min2;
+			double new_range = this->ctfMax - this->ctfMin;
+			double mult = new_range / old_range;
+			double c = this->ctfMin - old_min2 * mult;
+			for (int k = 0; k < numnodes2; k++)
+			{
+				pts2[2 * k] = pts2[2 * k] * mult + c;
+				//cout << "nx" << k << "=" << pts2[2*k] << endl;
+			}
+			OF->FillFromDataPointer(numnodes2, pts2);
+
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
 //-----------------------------------------------------------------------------
 void mqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* pwf)
 {

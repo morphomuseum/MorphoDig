@@ -199,8 +199,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
 
 
-
-
+	
 	connect(this->Ui->sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMin(int)));
 	connect(this->Ui->sliderMin, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
 	connect(this->Ui->sliderMin, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
@@ -519,6 +518,7 @@ void mqEditVolumeDialog::UpdateUI()
 		
 		QString mylabel(this->Volume->GetName().c_str());
 		this->Ui->VolumeName->setText(mylabel);
+		//this->mColorMap->setMinMax(this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());
 		this->mColorMap->reInitialize(this->Volume->GetCtf());
 		if (this->Volume->GetProperty()->GetInterpolationType() == VTK_LINEAR_INTERPOLATION)
 		{
