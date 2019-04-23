@@ -434,7 +434,9 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->MorphoDigCore =  new mqMorphoDigCore();
 	this->MorphoDigCore->setQVTKWidget(this->qvtkWidget2);
 	MorphoDigCore->SetProjectWindow(projectWindow);
-	window->AddRenderer(this->MorphoDigCore->getRenderer());
+	//window->AddRenderer(this->MorphoDigCore->getRenderer());
+	this->qvtkWidget2->SetRenderWindow(window);
+	this->qvtkWidget2->GetRenderWindow()->AddRenderer(this->MorphoDigCore->getRenderer());
 
 	this->MorphoDigCore->setCurrentCursor(0);
 	//vtkUndoStack* undoStack = vtkUndoStack::New();
@@ -1133,7 +1135,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   cout << "Accept Drops..." << endl;
   setAcceptDrops(true);
   cout << "OpenGL version:" << this->MorphoDigCore->GetOpenGLVersion().toStdString() << endl;
-
+  //Activate this only for test purposes...
+  //this->MorphoDigCore->TestVolume();
 
   
 }

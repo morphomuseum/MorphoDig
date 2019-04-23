@@ -403,7 +403,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 	this->Renderer->AddViewProp(cornerAnnotation);
 	this->Renderer->AddActor(this->GridActor);
-	this->Renderer->TwoSidedLightingOff();
+	this->Renderer->TwoSidedLightingOn();
 	connect(this, SIGNAL(zoomChanged()), this, SLOT(slotEditGridInfos()));
 	connect(this, SIGNAL(projectionModeChanged()), this, SLOT(slotEditGridInfos()));
 }
@@ -484,7 +484,281 @@ QString mqMorphoDigCore::GetOpenGLVersion()
 	//QString myVersion = QString::number(maj) + "." + QString::number(min);
 	return myVersion;
 }
+void mqMorphoDigCore::TestVolume()
+{
+	//only used at startup fo open a volume and rendering it!
+	vtkSmartPointer <vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
+	vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+	metaReader->SetFileName("head.mha");
+	metaReader->Update();
+	input = metaReader->GetOutput();
+	int dim[3];
+	input->GetDimensions(dim);
+	int numcells = input->GetNumberOfCells();
+	input->GetScalarTypeAsString();
+	//input->Get
+	cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
+	cout << "Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
+	cout << "Image type:" << input->GetScalarTypeAsString() << endl;
+	cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
+	cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
 
+
+	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+
+	if (dim[0] < 2 ||
+		dim[1] < 2 ||
+		dim[2] < 2)
+	{
+		return;
+	}
+	else
+	{
+		cout << "Try visualize!!!" << endl;
+
+		vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
+		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+		//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
+		vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
+		vtkSmartPointer<vtkImageAccumulate> histogram =
+			vtkSmartPointer<vtkImageAccumulate>::New();
+		//mapper->SetRequestedRenderModeToDefault();
+
+
+		histogram->SetInputData(input);
+		if (input->GetScalarType() == VTK_UNSIGNED_SHORT)
+		{
+			histogram->SetComponentExtent(VTK_UNSIGNED_SHORT_MIN, VTK_UNSIGNED_SHORT_MAX, 0, 0, 0, 0);
+			histogram->SetComponentOrigin(0, 0, 0);
+		}
+		if (input->GetScalarType() == VTK_SHORT)
+		{
+			//cout << "signed shorts !" << endl;
+			//cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << endl;
+			histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
+			histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
+		}
+
+		int bin_spacing = 1000;
+		histogram->SetComponentSpacing(bin_spacing, 0, 0);
+		histogram->Update();
+		// faire plutôt une liste avec push.
+
+		std::vector<int> peaks;
+		std::vector<int> peaksT;
+		std::vector<int> peakVals;
+		std::vector<int> lows;
+		std::vector<int> lowsT;
+		std::vector<int> lowVals;
+
+		int dims[3];
+		histogram->GetOutput()->GetDimensions(dims);
+		//cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
+		vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
+		//cout << "Histogram (used) dims=" << used_bins  << endl;
+		int prevbin = 0;
+
+
+		int p_or_l = 1; //1 search peak //2 search low
+		int p_i = 0;
+		int l_i = -1;
+
+		peaks.push_back(0);
+		peaksT.push_back(0);
+		peakVals.push_back(0);
+		for (vtkIdType bin = 0; bin < used_bins; ++bin)
+		{
+			int binT;
+			if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
+				binT = VTK_UNSIGNED_SHORT_MIN + bin * bin_spacing;
+			}
+			if (input->GetScalarType() == VTK_SHORT) {
+				binT = VTK_SHORT_MIN + bin * bin_spacing;
+			}
+			int curbin = *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0)));
+			//histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin);
+			if (p_or_l == 1)//search peak
+			{
+				if (curbin >= prevbin)
+				{
+					if (curbin > 0)
+					{
+						peaks.at(p_i) = bin;
+						peaksT.at(p_i) = binT;
+						peakVals.at(p_i) = curbin;
+					}
+				}
+				else
+				{
+					// starts do decrease: 
+					p_or_l = 0;
+					lows.push_back(bin);
+					lowsT.push_back(binT);
+					lowVals.push_back(curbin);
+					l_i++; //cout << "l_i" << l_i << endl;
+				}
+			}
+			if (p_or_l == 0)//search low
+			{
+				if (curbin < prevbin)
+				{
+					lows.at(l_i) = bin;
+					lowsT.at(l_i) = binT;
+					lowVals.at(l_i) = curbin;
+				}
+				else
+				{
+					// starts do re-increase: 
+					p_or_l = 1;
+					peaks.push_back(bin);
+					peaksT.push_back(binT);
+					peakVals.push_back(curbin);
+					p_i++;
+				}
+			}
+
+			//cout <<"bin="<<bin<<"|"<< *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0))) << " ";
+		//	cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << endl;				
+			prevbin = curbin;
+		}
+
+		for (int i = 0; i <= p_i; i++)
+		{
+			//cout << "p" << i <<":"<< peaksT.at(i) << ", val=" << peakVals.at(i) << endl;
+		}
+		for (int i = 0; i <= l_i; i++)
+		{
+			//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
+		}
+
+		// Create the property and attach the transfer functions
+		vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
+		property->SetIndependentComponents(true);
+		property->SetColor(TF);
+		property->SetScalarOpacity(opacityFun);
+		property->SetInterpolationTypeToLinear();
+		//mapper->SetInputData(input);
+		mapper->SetInputConnection(metaReader->GetOutputPort());
+		// connect up the volume to the property and the mapper
+		volume->SetProperty(property);
+		volume->SetMapper(mapper);
+
+		int first_point = 0; // as first low... a
+		int last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+
+		if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
+			first_point = VTK_UNSIGNED_SHORT_MIN;
+			last_point = VTK_UNSIGNED_SHORT_MAX;
+		}
+		else
+		{
+			first_point = VTK_SHORT_MIN;
+			last_point = VTK_SHORT_MAX;
+
+		}
+		if (l_i >= 0)
+		{
+			first_point = lowsT.at(0);
+			if (p_i > 0) {
+				first_point = (int)(0.5*(lowsT.at(0) + peaksT.at(1)));
+			}
+		}
+
+		//now search last point
+		int avg_peaks = 0;
+
+		int low_after_avgpeaks = 0;
+		if (p_i > 0)
+		{
+			double sum_peaks = 0;
+			double sum_peakVals = 0;
+			for (int i = 1; i <= p_i; i++)
+			{
+				//peaksT.at(i) peakVals.at(i) ;
+				//cout << "peaksT.at(i)="<<peaksT.at(i) << endl;
+				//cout << "peakVals.at(i)=" << peakVals.at(i) << endl;
+				double mult = (double)peaksT.at(i)*(double)peakVals.at(i);
+				//cout << "mult=" << mult << endl;
+				sum_peakVals += (double)peakVals.at(i);
+				sum_peaks += mult;
+				//cout << "sum_peaks=" << sum_peaks << endl;
+				//cout << "sum_peakVals=" << sum_peakVals << endl;
+
+			}
+			if (sum_peakVals > 0)
+			{
+				avg_peaks = (int)(sum_peaks / sum_peakVals);
+				//cout << "avg_peaks="<<avg_peaks << endl;
+				// search if a low exists after avg_peaks
+				int exists = 0;
+				int i_low = 0;
+				if (l_i >= 0)
+				{
+					for (int i = 0; i <= l_i; i++)
+					{
+						if (lowsT.at(i) > avg_peaks)
+						{
+							if (exists == 0) { i_low = i; }
+							exists = 1;
+
+						}
+					}
+					if (exists == 1)
+					{
+						low_after_avgpeaks = lowsT.at(i_low);
+						last_point = (int)((low_after_avgpeaks + avg_peaks) / 2);
+					}
+				}
+				else
+				{
+					last_point = avg_peaks;
+				}
+			}
+		}
+		//let's put first point a little bit further!
+		first_point = (int)(first_point + 0.2*(last_point - first_point));
+
+		int second_point = (int)(first_point + 0.2*(last_point - first_point));
+		int third_point = (int)(first_point + 0.4*(last_point - first_point));
+
+		TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+		TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
+		TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
+		TF->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
+
+		opacityFun->AddPoint(first_point, 0, 0.5, 0);
+		opacityFun->AddPoint(second_point, 0.5, .5, 0);
+		opacityFun->AddPoint(third_point, 0.8, .5, 0);
+		opacityFun->AddPoint(last_point, 0.99, 0.5, 0);
+		TF->SetEnableOpacityMapping(true);
+		TF->SetScalarOpacityFunction(opacityFun);
+		TF->Build();
+		mapper->SetBlendModeToComposite();
+
+
+		//property->set
+		property->SetAmbient(0.2);
+		property->SetDiffuse(1.0);
+		property->SetSpecular(0.2);
+		property->SetSpecularPower(14);
+		property->SetInterpolationTypeToLinear();
+		property->ShadeOn();
+
+		double SOUD = 0.89;
+		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+		if (SOUD == 0) { SOUD = 0.89; }
+
+		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+		mapper->Update();
+		volume->Update();
+
+	
+		this->getRenderer()->AddVolume(volume);
+	}
+}
 void mqMorphoDigCore::SetOpenGLVersion(int major, int minor)
 {
 	this->mui_OpenGL_major_version = major;
@@ -4095,13 +4369,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
-			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			vtkSmartPointer<vtkImageAccumulate> histogram =
 				  vtkSmartPointer<vtkImageAccumulate>::New();
-			mapper->SetRequestedRenderModeToDefault();
+			//mapper->SetRequestedRenderModeToDefault();
 			
 			
 			/*

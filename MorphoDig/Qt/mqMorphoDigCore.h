@@ -869,6 +869,7 @@ public:
   double ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, double sphere_radius, int mode, int printmode);
   double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int cutMinMax, double cutMin, double cutMax);
   double ComputeActiveScalarsMedian(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int cutMinMax, double cutMin, double cutMax);
+  void TestVolume();
 signals:
   void pencilSizeChanged(int pencilSize);
   void projectionModeChanged();
