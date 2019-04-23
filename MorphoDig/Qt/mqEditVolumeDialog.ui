@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>495</width>
-    <height>958</height>
+    <height>870</height>
    </rect>
   </property>
   <property name="palette">
@@ -458,8 +458,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>930</y>
+     <x>140</x>
+     <y>830</y>
      <width>195</width>
      <height>30</height>
     </rect>
@@ -472,7 +472,7 @@
      <x>20</x>
      <y>10</y>
      <width>451</width>
-     <height>911</height>
+     <height>811</height>
     </rect>
    </property>
    <property name="title">
@@ -795,90 +795,6 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QReleaseSlider" name="sliderMin">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>850</y>
-      <width>201</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-99</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="currentMax">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>880</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>6</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>850</y>
-      <width>31</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>min: </string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>880</y>
-      <width>31</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>max: </string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="currentMin">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>850</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>6</number>
-    </property>
-   </widget>
-   <widget class="QReleaseSlider" name="sliderMax">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>880</y>
-      <width>201</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-99</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="interpolationToLinear">
     <property name="geometry">
      <rect>
@@ -924,41 +840,12 @@
      <string>Scalar opacity unit distance:</string>
     </property>
    </widget>
-   <widget class="QReleaseSlider" name="sliderShift">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>820</y>
-      <width>201</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-99</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>820</y>
-      <width>55</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>shift:</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>930</y>
+     <x>140</x>
+     <y>830</y>
      <width>193</width>
      <height>28</height>
     </rect>
@@ -971,13 +858,6 @@
    </property>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QReleaseSlider</class>
-   <extends>QSlider</extends>
-   <header>QReleaseSlider.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../Icons/icons.qrc"/>
   <include location="../Icons/icons.qrc"/>
