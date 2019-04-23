@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>476</width>
-    <height>742</height>
+    <height>687</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,23 +459,12 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>700</y>
+     <y>640</y>
      <width>195</width>
      <height>30</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QDialogButtonBox" name="buttonBox">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <layout class="QHBoxLayout" name="horizontalLayout_2"/>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
@@ -483,7 +472,7 @@
      <x>10</x>
      <y>10</y>
      <width>441</width>
-     <height>681</height>
+     <height>621</height>
     </rect>
    </property>
    <property name="title">
@@ -493,8 +482,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>620</y>
-      <width>81</width>
+      <y>560</y>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -555,7 +544,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>620</y>
+      <y>560</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -568,7 +557,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>650</y>
+      <y>590</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -581,8 +570,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>650</y>
-      <width>81</width>
+      <y>590</y>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -594,10 +583,13 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>620</y>
+      <y>560</y>
       <width>31</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Apply suggested min</string>
     </property>
     <property name="text">
      <string>-&gt;</string>
@@ -607,123 +599,16 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>650</y>
+      <y>590</y>
       <width>31</width>
       <height>23</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Apply suggested max</string>
+    </property>
     <property name="text">
      <string>-&gt;</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>650</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>map max:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>620</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>map min:</string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="currentMin">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>620</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>6</number>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="currentMax">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>650</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>6</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>530</y>
-      <width>31</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>min: </string>
-    </property>
-   </widget>
-   <widget class="QReleaseSlider" name="sliderMax">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>560</y>
-      <width>201</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-99</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>560</y>
-      <width>31</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>max: </string>
-    </property>
-   </widget>
-   <widget class="QReleaseSlider" name="sliderMin">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>530</y>
-      <width>201</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-99</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
     </property>
    </widget>
    <widget class="QCheckBox" name="selectedObjects">
@@ -747,8 +632,8 @@
      <rect>
       <x>30</x>
       <y>120</y>
-      <width>372</width>
-      <height>361</height>
+      <width>402</width>
+      <height>393</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -765,8 +650,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>372</width>
-       <height>361</height>
+       <width>402</width>
+       <height>393</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
@@ -891,8 +776,8 @@
    <widget class="QSpinBox" name="removePercent">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>590</y>
+      <x>360</x>
+      <y>530</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -908,7 +793,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>590</y>
+      <y>530</y>
       <width>331</width>
       <height>16</height>
      </rect>
@@ -917,35 +802,22 @@
      <string>% of extreme values removed to compute suggested Min and Max:</string>
     </property>
    </widget>
-   <widget class="QReleaseSlider" name="sliderShift">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>500</y>
-      <width>201</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-99</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_11">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>500</y>
-      <width>55</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>shift:</string>
-    </property>
-   </widget>
+  </widget>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>640</y>
+     <width>193</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
   </widget>
   <action name="actionExportColorMaps">
    <property name="icon">
@@ -961,13 +833,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QReleaseSlider</class>
-   <extends>QSlider</extends>
-   <header>QReleaseSlider.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../Icons/icons.qrc"/>
   <include location="../Icons/icons.qrc"/>

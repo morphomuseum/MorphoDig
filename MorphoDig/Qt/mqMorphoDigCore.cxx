@@ -1793,7 +1793,68 @@ vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScala
 {
 	return this->ScalarRedLut;
 }
+double mqMorphoDigCore::GetVolumeRangeMin()
+{
 
+	//return this->ScalarRangeMin;
+	double my_min;
+	double my_currmin;
+
+	my_min = DBL_MAX;
+	my_currmin = DBL_MAX;
+
+	this->VolumeCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		my_currmin = myVolume->GetImageData()->GetScalarRange()[0];
+		if (my_currmin < my_min)
+		{
+			my_min = my_currmin;
+		}
+	}
+	if (my_min == VTK_DOUBLE_MAX )
+	{
+		cout << "Strange!!!" << endl;
+		return 0;
+	}
+	else
+	{
+		return my_min;
+	}
+}
+double mqMorphoDigCore::GetVolumeRangeMax()
+{
+
+	//return this->ScalarRangeMin;
+	double my_max;
+	double my_currmax;
+
+	my_max = -DBL_MAX;
+	my_currmax = -DBL_MAX;
+
+	this->VolumeCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		my_currmax = myVolume->GetImageData()->GetScalarRange()[1];
+		if (my_currmax > my_max)
+		{
+			my_max = my_currmax;
+		}
+	}
+	if (my_max == VTK_DOUBLE_MIN)
+	{
+		cout << "Strange!!!" << endl;
+		return 1;
+	}
+	else
+	{
+		return my_max;
+	}
+}
 double mqMorphoDigCore::GetScalarRangeMin()
 {
 
@@ -2023,6 +2084,7 @@ int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
 		return my_max;
 	}
 }
+
 double mqMorphoDigCore::GetScalarRangeMax()
 {
 

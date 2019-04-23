@@ -64,7 +64,7 @@ public:
   vtkNew<vtkEventQtSlotConnect> IndexedLookupConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
 
-  mqInternals(mqColorOpacityEditorWidget* self) 
+  mqInternals(mqColorOpacityEditorWidget* self, int mapSurfaces) 
   {
 	  cout << "mqInternals instantiation" << endl;
     this->Ui.setupUi(self);
@@ -73,8 +73,9 @@ public:
     
 	
 	this->Ui.EnableOpacityMapping->setChecked(true);
-	this->Ui.EnableOpacityMapping->setVisible(false);
+	
 	this->Ui.Discretize->setChecked(false);
+	
 	this->Ui.currentDiscretizeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui.currentDiscretizeValue->setMinimum(1);
 	this->Ui.currentDiscretizeValue->setMaximum(1024);
@@ -84,8 +85,19 @@ public:
 	this->Ui.discretizeSlider->setMaximum(1024);
 	this->Ui.discretizeSlider->setValue(256);
 	this->Ui.discretizeSlider->setEnabled(false);
+	if (mapSurfaces == 0)
+	{
+		this->Ui.EnableOpacityMapping->setVisible(false);
+		this->Ui.Discretize->setVisible(false);
+		this->Ui.currentDiscretizeValue->setVisible(false);
+		this->Ui.discretizeSlider->setVisible(false);
+		this->Ui.lDiscretizeSlider->setVisible(false);
+
+	}
+	
 	this->Ui.currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui.currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
 	this->Ui.currentMin->setMinimum(-DBL_MAX);
 	this->Ui.currentMax->setMinimum(-DBL_MAX);
 	this->Ui.currentMax->setValue(1);
@@ -104,16 +116,22 @@ public:
   }
 };
 
-void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunction *stc)
+void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunction *stc, int keepMinMax)
 {
 	this->STC = stc;
 	if (stc != NULL)
 	{
-		
-		this->ctfMin = this->getSTCMin();
-		this->ctfMax = this->getSTCMax();
-		this->Internals->Ui.currentMin->setValue(this->ctfMin);
-		this->Internals->Ui.currentMax->setValue(this->ctfMax);
+		if (keepMinMax == 0)
+		{
+			this->ctfMin = this->getSTCMin();
+			this->ctfMax = this->getSTCMax();
+			this->Internals->Ui.currentMin->setValue(this->ctfMin);
+			this->Internals->Ui.currentMax->setValue(this->ctfMax);
+		}
+		else
+		{
+			this->UpdateLookupTableRange();
+		}
 		cout << "reinitialize: min=" << this->ctfMin << endl;
 		cout << "reinitialize: max=" << this->ctfMax << endl;
 		
@@ -143,12 +161,14 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 }
 //-----------------------------------------------------------------------------
 mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
-	vtkDiscretizableColorTransferFunction *stc, QWidget* parentObject)
+	vtkDiscretizableColorTransferFunction *stc, QWidget* parentObject, int mapSurfaces)
   : Superclass(parentObject)
-  , Internals(new mqInternals(this))
+  , Internals(new mqInternals(this, mapSurfaces))
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   this->STC = stc;
+  this->_mapSurfaces = mapSurfaces;
+
   if (stc!=NULL)
   {
 	  cout << "Initialize ColorEditor widget. " << endl;
@@ -416,7 +436,24 @@ double mqColorOpacityEditorWidget::getSTCMin()
 	}
 
 }
-
+void mqColorOpacityEditorWidget::SetCTFMin(double newMin)
+{
+	if (newMin < this->ctfMax)
+	{
+		this->ctfMin = newMin;
+		this->UpdateLookupTableRange();
+		this->Internals->Ui.currentMin->setValue(newMin);
+	}
+}
+void mqColorOpacityEditorWidget::SetCTFMax(double newMax)
+{
+	if (newMax > this->ctfMin)
+	{
+		this->ctfMax = newMax;
+		this->UpdateLookupTableRange();
+		this->Internals->Ui.currentMax->setValue(newMax);
+	}
+}
 void mqColorOpacityEditorWidget::UpdateLookupTableRange()
 {
 	if (this->STC != NULL)
@@ -820,7 +857,39 @@ void mqColorOpacityEditorWidget::resetRangeToData()
   //if (pqResetScalarRangeReaction::resetScalarRangeToData(NULL))
   //{
    // this->Internals->render();
-	mqMorphoDigCore::instance()->UpdateLookupTablesToData();
+	double min; double max;
+	min = DBL_MAX;
+	max = -DBL_MAX;
+
+	if (this->_mapSurfaces == 1)
+	{
+		//mqMorphoDigCore::instance()->UpdateLookupTablesToData();
+		//dirty: update all lookup tables...
+		// would be better to get min, max and only update current lookup table
+
+		min = mqMorphoDigCore::instance()->GetScalarRangeMin();
+		
+		max = mqMorphoDigCore::instance()->GetScalarRangeMax();
+	}
+	else
+	{
+		min = mqMorphoDigCore::instance()->GetVolumeRangeMin();
+
+		max = mqMorphoDigCore::instance()->GetVolumeRangeMax();
+
+	}
+	cout << "min=" << min << endl;
+		cout << "max=" << max << endl;
+	if (min <DBL_MAX && max>-DBL_MAX && min < max)
+	{
+		this->ctfMin = min;
+		this->ctfMax = max;
+		this->Internals->Ui.currentMin->setValue(min);
+		this->Internals->Ui.currentMax->setValue(max);
+		this->UpdateLookupTableRange();
+	}
+	
+
     emit this->changeFinished();
   //}
 }

@@ -826,7 +826,10 @@ public:
 	int GetTagRangeMax(QString TagArray="");
 	double GetScalarRangeMin();
 	double GetScalarRangeMax();
-  void SetSelectedActorsTransparency(int trans);
+	double GetVolumeRangeMin();
+	double GetVolumeRangeMax();
+
+	void SetSelectedActorsTransparency(int trans);
   vtkSmartPointer<vtkLookupTable> GetTagLut();
   void GetDefaultTagColor(int tagnr, double rgba[4]);
 

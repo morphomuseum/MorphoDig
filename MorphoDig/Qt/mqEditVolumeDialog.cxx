@@ -80,7 +80,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
 
 	cout << "Edit Volume Dialog: Create mqColorOpacityEditorWidget!" << endl;
-	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this->Ui->PropertiesFrame);
+	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this->Ui->PropertiesFrame,0);
 	//cout << "Try that!" << endl;
 	this->mColorMap = someMap;
 
@@ -178,18 +178,6 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 	this->UpdateUI();
 
-	/*
-	this->Ui->currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	this->Ui->currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	this->Ui->currentMin->setMinimum(-DBL_MAX);
-	this->Ui->currentMax->setMinimum(-DBL_MAX);
-	this->Ui->currentMax->setValue(1);
-	this->Ui->currentMin->setValue(0);
-	this->Ui->currentMin->setMaximum(DBL_MAX);
-	this->Ui->currentMax->setMaximum(DBL_MAX);
-	this->ctfMin = 0;
-	this->ctfMax = 1;
-	*/
 	
 
 	this->Ui->scalarOpacityUnitDistance->setMaximum(DBL_MAX);
@@ -200,23 +188,6 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
 
 
-	/*
-	connect(this->Ui->sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMin(int)));
-	connect(this->Ui->sliderMin, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
-	connect(this->Ui->sliderMin, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
-
-	connect(this->Ui->sliderMax, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMax(int)));
-	connect(this->Ui->sliderMax, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
-	connect(this->Ui->sliderMax, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
-
-	connect(this->Ui->sliderShift, SIGNAL(valueChanged(int)), this, SLOT(slotShiftSlider(int)));
-	connect(this->Ui->sliderShift, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
-	connect(this->Ui->sliderShift, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
-
-
-	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinEdited()));
-	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMaxEdited()));
-	*/
 	
 	connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
@@ -276,74 +247,7 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 
 	return something_has_changed;
 }
-/*
-void mqEditVolumeDialog::slotSliderStart()
-{
-	cout << "ShiftSliderStart" << endl;
-	this->slideMin = this->Ui->currentMin->value();
-	this->slideMax = this->Ui->currentMax->value();
-	this->maxShiftAmplitude = (this->slideMax - this->slideMin) / 2;
 
-}
-
-void mqEditVolumeDialog::slotSlideMin(int slideMin)
-{
-	if (slideMin != 0)
-	{
-		cout << "slideMin:" << slideMin << endl;
-		double newMin = this->slideMin + slideMin * this->maxShiftAmplitude / 100;
-		this->Ui->currentMin->setValue(newMin);
-
-		cout << "Min:" << newMin << endl;
-		this->ctfMin = newMin;
-		this->UpdateLookupTableRange();
-	}
-
-
-}
-void mqEditVolumeDialog::slotSlideMax(int slideMax)
-{
-	if (slideMax != 0)
-	{
-		cout << "slideMax:" << slideMax << endl;
-		double newMax = this->slideMax + slideMax * this->maxShiftAmplitude / 100;
-
-		this->Ui->currentMax->setValue(newMax);
-		cout << "Max:" << newMax << endl;
-
-		this->ctfMax = newMax;
-		this->UpdateLookupTableRange();
-	}
-
-}
-void mqEditVolumeDialog::slotShiftSlider(int shift)
-{
-	if (shift != 0)
-	{
-		cout << "shift:" << shift << endl;
-		double newMin = this->slideMin + shift * this->maxShiftAmplitude / 100;
-		double newMax = this->slideMax + shift * this->maxShiftAmplitude / 100;
-		this->Ui->currentMin->setValue(newMin);
-		this->Ui->currentMax->setValue(newMax);
-		//cout << "Min:" << newMin << endl;
-		//cout << "Max:" << newMax << endl;
-		this->ctfMin = newMin;
-		this->ctfMax = newMax;
-
-		this->UpdateLookupTableRange();
-	}
-}
-
-void mqEditVolumeDialog::slotSliderStop()
-{
-	
-	
-	
-
-	//cout << "ShiftSliderStop" << endl;
-
-}
-*/
 void mqEditVolumeDialog::slotInterpolationToLinear(bool isChecked)
 {
 	if (this->Volume != NULL) {
@@ -362,46 +266,7 @@ void mqEditVolumeDialog::slotScalarOpacityUnitDistance(double SOUD)
 		mqMorphoDigCore::instance()->Render();
 	}
 }
-/*
-void mqEditVolumeDialog::slotCurrentMinEdited()
-{
-	//cout << "Current Min edited!" << endl;
-	if (this->Ui->currentMin->value() < this->Ui->currentMax->value())
-	{
-		this->ctfMin = this->Ui->currentMin->value();
-	}
-	else
-	{ 
-		this->ctfMin= this->Ui->currentMax->value() -10;
-	}
 
-	
-	
-	
-		this->UpdateLookupTableRange();
-	
-}
-
-void mqEditVolumeDialog::slotCurrentMaxEdited()
-{
-	//cout << "Current max edited!" << endl;
-	if (this->Ui->currentMin->value() < this->Ui->currentMax->value())
-	{
-		this->ctfMax = this->Ui->currentMax->value();
-	}
-	else
-	{
-		this->ctfMax = this->Ui->currentMin->value() + 10;
-	}
-
-
-
-
-	this->UpdateLookupTableRange();
-
-}
-
-*/
 // This dialog is non modal, and Volumes can have been removed from the collection in the meantime... so before saving Volumes, we should check whether they are still
 //inside the collection.
 int mqEditVolumeDialog::CurrentVolumeInCollection()
@@ -544,49 +409,11 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->M31->setValue(Mat->GetElement(3, 1));
 		this->Ui->M32->setValue(Mat->GetElement(3, 2));
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
-		/*
-		this->ctfMin= this->GetCTFMin();
-		this->ctfMax = this->GetCTFMax();
-		this->Ui->currentMin->setValue(this->ctfMin);
-		this->Ui->currentMax->setValue(this->ctfMax);
-		*/
 		
 		
 	}
 	
 }
-/*
-double mqEditVolumeDialog::GetCTFMin()
-{
-	if (this->Volume != NULL) {
-		return this->Volume->GetLookupTableMin();
-	
-
-
-	}
-	return -1;
-
-}
-double mqEditVolumeDialog::GetCTFMax()
-{
-	if (this->Volume != NULL) {
-		return this->Volume->GetLookupTableMax();
-		
-		
-
-	}
-	return 1;
-}
-void mqEditVolumeDialog::UpdateLookupTableRange()
-{
-	if (this->Volume != NULL) {
-		this->Volume->UpdateLookupTableRange(this->ctfMin, this->ctfMax);
-		
-
-	}
-
-}
-*/
 void mqEditVolumeDialog::GetNextVolume()
 {
 

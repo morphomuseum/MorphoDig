@@ -40,7 +40,7 @@ public:
  void RefreshComboScalars();
  void RefreshComboColorMaps();
  void RefreshSuggestedRange();
- void UpdateLookupTables();
+ //void UpdateLookupTables();
  void RefreshRange();
   public slots:
   virtual void slotEditColorMapName();
@@ -52,16 +52,17 @@ public:
   virtual void slotRefreshDialog();
   virtual void slotAccepted();
   virtual void slotRefreshComboScalars();
+  virtual void slotAcceptSuggestedMin();
   virtual void slotAcceptSuggestedMax();
-  virtual void slotCurrentMinEdited();
+  
+  /*virtual void slotCurrentMinEdited();
   virtual void slotCurrentMaxEdited();
   virtual void slotShiftSlider(int shift);
   virtual void slotSliderStart();
   virtual void slotSlideMin(int slideMin);
   virtual void slotSlideMax(int slideMax);
   virtual void slotSliderStop();
-
-  virtual void slotAcceptSuggestedMin();
+  */
   virtual void slotRemoveScalar();
   virtual void slotRefreshColorMaps();
   
@@ -72,12 +73,12 @@ protected:
 	
 private:
 	mqColorOpacityEditorWidget *mColorMap; 
-	double maxShiftAmplitude;
+	/*double maxShiftAmplitude;
 	double slideMin;
 	double slideMax;
 	double ctfMin;
 	double ctfMax;
-
+	*/
   Q_DISABLE_COPY(mqEditScalarsDialog)
   Ui::mqEditScalarsDialog* const Ui;
  

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>361</width>
-    <height>455</height>
+    <width>402</width>
+    <height>393</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -195,7 +195,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout3" stretch="0,0,0">
      <item>
-      <widget class="QLabel" name="label2">
+      <widget class="QLabel" name="lDiscretizeSlider">
        <property name="text">
         <string>Nr of values:</string>
        </property>
@@ -279,69 +279,6 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="HLayoutRemovePercent">
-       <item>
-        <widget class="QLabel" name="labelRemovePercent">
-         <property name="text">
-          <string>% of extreme values removed in suggested Min and Max:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="removePercent">
-         <property name="singleStep">
-          <number>1</number>
-         </property>
-         <property name="value">
-          <number>5</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="HLayoutSuggestedMin">
-       <item>
-        <widget class="QLabel" name="lSuggestedMin">
-         <property name="text">
-          <string>suggested min:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="suggestedMin"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushScalarSuggestedMin">
-         <property name="text">
-          <string>-&gt;</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="HLayoutSuggestedMax">
-       <item>
-        <widget class="QLabel" name="lSuggestedMax">
-         <property name="text">
-          <string>suggested max:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="suggestedMax"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushScalarSuggestedMax">
-         <property name="text">
-          <string>-&gt;</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="HLayoutMinMax">
        <item>
         <widget class="QLabel" name="LMapMin">
@@ -379,6 +316,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QReleaseSlider</class>
+   <extends>QSlider</extends>
+   <header>QReleaseSlider.h</header>
+  </customwidget>
+  <customwidget>
    <class>mqTransferFunctionWidget</class>
    <extends>QWidget</extends>
    <header>mqTransferFunctionWidget.h</header>
@@ -388,11 +330,6 @@
    <class>mqLineEdit</class>
    <extends>QLineEdit</extends>
    <header>mqLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QReleaseSlider</class>
-   <extends>QSlider</extends>
-   <header>QReleaseSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources>
