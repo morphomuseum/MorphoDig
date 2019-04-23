@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>471</width>
-    <height>866</height>
+    <width>495</width>
+    <height>958</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>820</y>
+     <y>930</y>
      <width>195</width>
      <height>30</height>
     </rect>
@@ -471,8 +471,8 @@
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>431</width>
-     <height>801</height>
+     <width>451</width>
+     <height>911</height>
     </rect>
    </property>
    <property name="title">
@@ -741,8 +741,8 @@
      <rect>
       <x>30</x>
       <y>290</y>
-      <width>372</width>
-      <height>361</height>
+      <width>402</width>
+      <height>498</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -759,8 +759,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>372</width>
-       <height>361</height>
+       <width>402</width>
+       <height>498</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
@@ -799,7 +799,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>740</y>
+      <y>850</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -815,8 +815,8 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>770</y>
-      <width>71</width>
+      <y>880</y>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -828,7 +828,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>740</y>
+      <y>850</y>
       <width>31</width>
       <height>16</height>
      </rect>
@@ -841,7 +841,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>770</y>
+      <y>880</y>
       <width>31</width>
       <height>16</height>
      </rect>
@@ -854,8 +854,8 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>740</y>
-      <width>71</width>
+      <y>850</y>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -867,7 +867,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>770</y>
+      <y>880</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -928,7 +928,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>710</y>
+      <y>820</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -944,7 +944,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>710</y>
+      <y>820</y>
       <width>55</width>
       <height>16</height>
      </rect>
@@ -958,7 +958,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>820</y>
+     <y>930</y>
      <width>193</width>
      <height>28</height>
     </rect>
