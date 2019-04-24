@@ -16,6 +16,7 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
+//#include <QVTKWidget.h>
 #endif
 //#include <QVTKWidget.h>
 //#include <vtkAutoInit.h>
@@ -73,6 +74,7 @@ public:
 	QPointer<QVTKOpenGLWidget> Widget; 
 #else
 	QPointer<QVTKOpenGLNativeWidget> Widget;
+	//QPointer<QVTKWidget> Widget;
 #endif
 
 	vtkNew<vtkChartXY> ChartXY;
@@ -88,6 +90,7 @@ public:
 	: Widget(new QVTKOpenGLWidget(editor))
 #else
 	: Widget(new QVTKOpenGLNativeWidget(editor))
+	//	: Widget(new QVTKWidget(editor))
 #endif
 		
 		
@@ -98,8 +101,8 @@ public:
 		QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
 		fmt.setSamples(8);
 		//fmt.setSamples(0);
-		this->Widget->setFormat(fmt);
-		this->Widget->setEnableHiDPI(true);
+		//@@this->Widget->setFormat(fmt);
+		//@@this->Widget->setEnableHiDPI(true);
 		cout << "mqMinimalWidget Widget constructor" << endl;
 		//vtkSmartPointer<vtkGenericOpenGLRenderWindow> totoche
 		//vtkSmartPointer<vtkGenericOpenGLRenderWindow> oneWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();

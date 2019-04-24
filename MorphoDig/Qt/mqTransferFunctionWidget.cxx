@@ -16,6 +16,7 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
+//#include <QVTKWidget.h>
 #endif
 #include <vtkAxis.h>
 #include <vtkBoundingBox.h>
@@ -179,6 +180,7 @@ public:
 	QPointer<QVTKOpenGLWidget> Widget;
 #else
 	QPointer<QVTKOpenGLNativeWidget> Widget; 
+	//QPointer<QVTKWidget> Widget;
 #endif
 
 
@@ -195,10 +197,12 @@ public:
   mqInternals(mqTransferFunctionWidget* editor)
 #if VTK_MAJOR_VERSION<8
 	  : Widget(new QVTKWidget(editor))
-	  #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+	  
+#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
 	  : Widget(new QVTKOpenGLWidget(editor))
 #else
 	  : Widget(new QVTKOpenGLNativeWidget(editor))
+	 // : Widget(new QVTKWidget(editor))
 #endif    
     , CurrentPointEditEventId(0)
   {
@@ -209,8 +213,8 @@ public:
 #if QT_VERSION >= 0x050000
     QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
     fmt.setSamples(8);
-    this->Widget->setFormat(fmt);
-    this->Widget->setEnableHiDPI(true);
+   //@@ this->Widget->setFormat(fmt);
+    //@@this->Widget->setEnableHiDPI(true);
 #endif
 
     this->Widget->setObjectName("1QVTKWidget0");

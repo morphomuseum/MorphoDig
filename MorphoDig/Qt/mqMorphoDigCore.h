@@ -25,6 +25,7 @@
 #include <vtkSmartVolumeMapper.h>
 #include <vtkBoxWidget.h>
 #include <vtkInteractorStyleDrawPolygon.h>
+#include <vtkPlanes.h>
 #include <vtkInteractorStyleRubberBand3D.h>
 #include "vtkGridActor.h"
 #include "vtkLMActor.h"
@@ -39,6 +40,7 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
+//#include <QVTKWidget.h>
 #endif
 #include <vtkVolumeCollection.h>
 #include <vtkScalarBarActor.h>
@@ -57,6 +59,7 @@ class vtkBoxWidgetCallback : public vtkCommand
 public:
 	static vtkBoxWidgetCallback *New()
 	{
+		cout << "New box callback!!!" << endl;
 		return new vtkBoxWidgetCallback;
 	}
 	void Execute(vtkObject *caller, unsigned long, void*) override
@@ -73,6 +76,8 @@ public:
 	}
 	void SetMapper(vtkSmartPointer<vtkSmartVolumeMapper> m)
 	{
+		cout << "Command: set Mapper!!!" << endl;
+
 		this->Mapper = m;
 	}
 protected:
@@ -840,8 +845,10 @@ public:
   void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
   QVTKOpenGLWidget* getQVTKWidget();
 #else
-  void setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget);
+ void setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget);
   QVTKOpenGLNativeWidget* getQVTKWidget();
+  //void setQVTKWidget(QVTKWidget *mqvtkWidget);
+  //QVTKWidget* getQVTKWidget();
 #endif
 
  
@@ -1097,6 +1104,7 @@ private:
 	QVTKOpenGLWidget *qvtkWidget;
 #else
 	QVTKOpenGLNativeWidget *qvtkWidget;	
+	//QVTKWidget *qvtkWidget;
 #endif
 	int currentLassoMode;
 	int currentRubberMode;

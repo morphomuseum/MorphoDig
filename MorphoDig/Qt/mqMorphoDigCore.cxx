@@ -9,6 +9,8 @@
 #include "vtkMDActor.h"
 #include "vtkMDVolume.h"
 #include "vtkLMActor.h"
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
 #include <vtkXMLImageDataWriter.h>
@@ -443,6 +445,7 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget)
 #else
 	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget)
+//void mqMorphoDigCore::setQVTKWidget(QVTKWidget *mqvtkWidget)
 #endif
 {
 	this->qvtkWidget = mqvtkWidget;
@@ -454,6 +457,7 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	QVTKOpenGLWidget* mqMorphoDigCore::getQVTKWidget()
 #else
 	QVTKOpenGLNativeWidget* mqMorphoDigCore::getQVTKWidget()
+		//QVTKWidget* mqMorphoDigCore::getQVTKWidget()
 #endif
 { return this->qvtkWidget; }
 void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
@@ -545,7 +549,7 @@ void mqMorphoDigCore::TestVolume()
 		int bin_spacing = 1000;
 		histogram->SetComponentSpacing(bin_spacing, 0, 0);
 		histogram->Update();
-		// faire plutôt une liste avec push.
+		// faire plutÃ´t une liste avec push.
 
 		std::vector<int> peaks;
 		std::vector<int> peaksT;
@@ -647,7 +651,7 @@ void mqMorphoDigCore::TestVolume()
 		volume->SetMapper(mapper);
 
 		int first_point = 0; // as first low... a
-		int last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+		int last_point = 0; //somme pondÃ©rÃ©e autres peaks,  puis chercher s'il y a un low aprÃ¨s cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondÃ©rÃ©e.
 
 		if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
 			first_point = VTK_UNSIGNED_SHORT_MIN;
@@ -751,7 +755,7 @@ void mqMorphoDigCore::TestVolume()
 		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
 		if (SOUD == 0) { SOUD = 0.89; }
 
-		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit Ãªtre fonction de la taille des spÃ©cimens, sinon Ã§a va pas... 
 		mapper->Update();
 		volume->Update();
 
@@ -1606,9 +1610,9 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
 					
 					// two cases:
-					// 1 angle limit = 180°
+					// 1 angle limit = 180Â°
 					// in that cases the observed Neighbours I am interested in is the WHOLE list
-					// 1 angle limit < 180°
+					// 1 angle limit < 180Â°
 					// in that case propagate from picked_id through observedneighbours to construct a new vtkIdList
 					vtkSmartPointer<vtkPolyData> mesh = vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput());
 					
@@ -3508,7 +3512,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 						if (id_min != -1) // means that mesh i could be the mesh that contains the closest vertex of flag k
 						{
 							//now get current color of point id_min of mesh i!
-							//@TODO! => On va faire 1 variable globale de type G_Current_Active_Scalar => Ce premier if sera changé par 
+							//@TODO! => On va faire 1 variable globale de type G_Current_Active_Scalar => Ce premier if sera changÃ© par 
 							// if (visibility ==0 OU GetScalar(G_Current_Active_Scalar)==NULL)
 							QString none = QString("Solid color");
 							if (this->Getmui_ArrayVisibility() == 0 || this->mui_ActiveArray->Name== none||
@@ -4440,18 +4444,26 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//mapper->SetRequestedRenderModeToDefault();
 			
 			
+
 			/*
 			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
 			box->SetPlaceFactor(1.01);
+
 			box->SetInputData(input);
 
 			box->SetDefaultRenderer(this->getRenderer());
 			box->InsideOutOn();
 			box->PlaceWidget();
+			box->SetInteractor(this->RenderWindow->GetInteractor());
+
 			vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
 			callback->SetMapper(mapper);
-			box->AddObserver(vtkCommand::InteractionEvent, callback);
+
+			//vtkSmartPointer<vtkMyNodeHandleCallBack> callback = vtkSmartPointer<vtkMyNodeHandleCallBack>::New();
+  //mqMorphoDigCore::instance()->getNodeLandmarkCollection()->AddObserver(vtkCommand::ModifiedEvent, callback);
+
+			//box->AddObserver(vtkCommand::InteractionEvent, callback);
 			//callback->Delete();
 			box->EnabledOn();
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
@@ -4486,7 +4498,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			int bin_spacing = 1000;
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
 			histogram->Update();
-			// faire plutôt une liste avec push.
+			// faire plutÃ´t une liste avec push.
 
 			std::vector<int> peaks;
 			std::vector<int> peaksT;
@@ -4597,7 +4609,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			opacityFun->AddPoint(8500, 0.75, .5, 0.0);
 			opacityFun->AddPoint(12232, 1, 0.5, 0.0);*/
 			int first_point = 0; // as first low... a
-			int last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+			int last_point = 0; //somme pondÃ©rÃ©e autres peaks,  puis chercher s'il y a un low aprÃ¨s cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondÃ©rÃ©e.
 
 			if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
 				first_point = VTK_UNSIGNED_SHORT_MIN;
@@ -4709,7 +4721,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
 				  if (SOUD == 0) { SOUD = 0.89; }
 				 
-			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit Ãªtre fonction de la taille des spÃ©cimens, sinon Ã§a va pas... 
 				 mapper->Update();
 				 volume->Update();
 				 volume->SetSelected(1);
@@ -11105,7 +11117,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 				MyInput=mymapper->GetInput();
 				MyTPSInput->DeepCopy(mymapper->GetInput());
 
-				// recupère la position de l'object s'il a bougé
+				// recupÃ¨re la position de l'object s'il a bougÃ©
 				double ve_init_pos[3];;
 				double ve_final_pos[3];
 				double ve_trans_pos[3];
@@ -11124,11 +11136,11 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 				transformFilter->SetInputData(MyTPSInput);
 
-				/// applique le calcul du tps à l'objet
+				/// applique le calcul du tps Ã  l'objet
 				transformFilter->SetTransform(tps);
 				transformFilter->Update();
 
-				// mise à jour du maillage sortant pour le tps
+				// mise Ã  jour du maillage sortant pour le tps
 				vtkSmartPointer<vtkPolyData> My_Output = vtkSmartPointer<vtkPolyData>::New();
 				My_Output = transformFilter->GetOutput();
 
@@ -14688,17 +14700,17 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						// 2 choix poissibles 
 						
 						// Choix A: dans tous N plus proches. 
-						// Garder que ceux qui sont dans la sphère
-						// se diriger dans la direction de la normale d'un facteur correspondant à la moyenne des dist pondérés par cos2 
+						// Garder que ceux qui sont dans la sphÃ¨re
+						// se diriger dans la direction de la normale d'un facteur correspondant Ã  la moyenne des dist pondÃ©rÃ©s par cos2 
 
-						// Bon faudrait quand même se diriger un peu vers le barycentre des 20 plus proches, ou faire une pondération qui prenne en compte la proximité (force de gravité)  ????? Sinon on n'y arrrive pas du tout.
-						// il faut aussi à mon avis virer le filtre qui calcule les normales dans cette fonction, j'ai l'impression qu'il modifie la topologie sans prévenir... 
+						// Bon faudrait quand mÃªme se diriger un peu vers le barycentre des 20 plus proches, ou faire une pondÃ©ration qui prenne en compte la proximitÃ© (force de gravitÃ©)  ????? Sinon on n'y arrrive pas du tout.
+						// il faut aussi Ã  mon avis virer le filtre qui calcule les normales dans cette fonction, j'ai l'impression qu'il modifie la topologie sans prÃ©venir... 
 
 						//
-						// Choix B: dans tous ces ponts vers lesquels on se dirige (utilisation du critère cos2)
-						// repérer le plus proche (ou les N plus proches). 
+						// Choix B: dans tous ces ponts vers lesquels on se dirige (utilisation du critÃ¨re cos2)
+						// repÃ©rer le plus proche (ou les N plus proches). 
 						// se diriger vers lui d'un facteur cos2 (ou vers leur moyennen dans l'espace d'un facteur cos2)
-						// le problème de cette approche et ques les trous se dépeuplent et que la sphère se déforme beaucoup.
+						// le problÃ¨me de cette approche et ques les trous se dÃ©peuplent et que la sphÃ¨re se dÃ©forme beaucoup.
 
 						vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 
@@ -14709,7 +14721,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						double currAmpl = 0;
 						//double currDist = 0;
 						
-						// Stratégie A
+						// StratÃ©gie A
 						kDTree->FindClosestNPoints(20, imp_pt, observedNeighbours);
 						vtkIdType toto = 0;
 						double maxDist = 0;
@@ -14816,7 +14828,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						{
 							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
 						}
-						//Stratégie B (non finie)
+						//StratÃ©gie B (non finie)
 						/*kDTree->FindPointsWithinRadius(radius, imp_pt, observedNeighbours);
 						vtkIdType cpt_realneighbors = 0;
 						vtkIdType cpt_notrealneighbors = 0;
@@ -18569,7 +18581,7 @@ void mqMorphoDigCore::DollyCameraForPerspectiveMode()
 	double dispvector[3];
 	this->getCamera()->GetPosition(campos);
 	this->getCamera()->GetFocalPoint(foc);
-	double multfactor = 3.73; // at 30° vtk : angle = 2*atan((h/2)/d). 
+	double multfactor = 3.73; // at 30Â° vtk : angle = 2*atan((h/2)/d). 
 							  // then 2*d  =12/tan(viewangle/2) 
 	multfactor = 1 / tan(this->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
 	//cout << "DollyCameraForPerspectiveMode" << endl;
@@ -18595,7 +18607,7 @@ void mqMorphoDigCore::DollyCameraForPerspectiveMode()
 	cout << "Dolly4Perspective" << endl;
 }
 
-//On ajoute un indice au nom si le nom existe déjà.
+//On ajoute un indice au nom si le nom existe dÃ©jÃ .
 //fonction recurente pour savoir quel indice lui donner.
 std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	//cout << "check: " << name_obj << endl;

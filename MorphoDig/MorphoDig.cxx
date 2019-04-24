@@ -18,6 +18,7 @@
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
+
 //#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
 #if VTK_MAJOR_VERSION<8
@@ -26,6 +27,7 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
+//#include <QVTKWidget.h>
 #endif
 
 //#include "vtkUndoStack.h"
@@ -59,7 +61,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataReader.h>
-#include <vtkRenderWindow.h>
+//#include <vtkRenderWindow.h>
 #include <vtkVectorText.h>
 #include <vtkImageData.h>
 #include <vtkBillboardTextActor3D.h>
@@ -75,6 +77,7 @@
 #include <vtkPointData.h>
 #include <vtkSmartPointer.h>
 //
+#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInteractorStyleTrackballActor.h>
 #include <vtkInteractorStyleRubberBandPick.h>
 #include <vtkInteractorStyleSwitch.h>
@@ -103,7 +106,8 @@
 //#include <QLabel>
 #include <QTreeView>
 
-#include <vtkRenderWindowInteractor.h>
+//#include <vtkRenderWindowInteractor.h>
+#include <QVTKInteractor.h>
 
 //-----------------------------------------------------------------------------
 //MorphoDig* MorphoDig::Instance = 0;
@@ -119,10 +123,12 @@ int MorphoDig::getTestInt()
 }*/
 
 
-class vtkMyCallback : public vtkCommand
+
+
+class vtkMyTextBoxCallback : public vtkCommand
 {
 public:
-	static vtkMyCallback *New() { return new vtkMyCallback; }
+	static vtkMyTextBoxCallback *New() { return new vtkMyTextBoxCallback; }
 	virtual void Execute(vtkObject *caller, unsigned long, void*)
 	{    // Here we use the vtkBoxWidget to transform the underlying coneActor   
 		 // (by manipulating its transformation matrix).  
@@ -386,8 +392,9 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->qvtkWidget2 = new QVTKOpenGLWidget();	
 #else
 	this->qvtkWidget2 = new QVTKOpenGLNativeWidget();	
+	//this->qvtkWidget2 = new QVTKWidget();
 #endif
-
+	
 
 	qvtkWidget2->setObjectName(QStringLiteral("qvtkWidget"));
 	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -966,7 +973,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	 lassostyle->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
 	 lassostyle->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());*/
 
-	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
+	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style2 =		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
 	//vtkSmartPointer<vtkInteractorStyleTrackballActor> style =
 	//	vtkSmartPointer<vtkInteractorStyleTrackballActor>::New();
 	//vtkSmartPointer<vtkInteractorStyleSwitch> style =
@@ -993,16 +1000,16 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 		// vtkSmartPointer<vtkRenderedAreaPicker>::New();
 	 this->AreaPicker->AddObserver(vtkCommand::EndPickEvent, pickCallback);
 	
- style->SetCurrentRenderer(this->MorphoDigCore->getRenderer());
+ style2->SetCurrentRenderer(this->MorphoDigCore->getRenderer());
   //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
   //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   
  //same thing !!!!
   window->GetInteractor()->SetPicker(this->AreaPicker);
-  window->GetInteractor()->SetInteractorStyle(style);
+  window->GetInteractor()->SetInteractorStyle(style2);
   cout << "Set interaction styles (normal style, lassostyle and rubberband style)" << endl;
   // mqMorphoDigCore should be aware of the 2 coexisting interactor styles (so that we can switch between them
-  mqMorphoDigCore::instance()->SetNormalInteractorStyle(style);
+  mqMorphoDigCore::instance()->SetNormalInteractorStyle(style2);
   mqMorphoDigCore::instance()->SetLassoInteractorStyle(lassostyle);
   mqMorphoDigCore::instance()->SetRubberInteractorStyle(rubberstyle);
 
@@ -1032,8 +1039,8 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   //this->qvtkWidget2->SetRenderWindow(window);
   
   //EXAMPLE vtkBoxWidget
+
   /*
-  
   vtkSmartPointer<vtkConeSource> coneSource =
 	  vtkSmartPointer<vtkConeSource>::New();
   coneSource->SetHeight(1.5);
@@ -1048,6 +1055,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   //DNEW
   this->MorphoDigCore->getRenderer()->AddActor(actor);
 
+
   this->_boxWidget = vtkSmartPointer<vtkBoxWidget>::New();
   //
   this->_boxWidget->SetInteractor(this->qvtkWidget2->GetRenderWindow()->GetInteractor());
@@ -1058,6 +1066,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   vtkSmartPointer<vtkMyCallback> Boxcallback = vtkSmartPointer<vtkMyCallback>::New();
   this->_boxWidget->AddObserver(vtkCommand::InteractionEvent, Boxcallback);
   this->_boxWidget->On();
+
 
   */
   
