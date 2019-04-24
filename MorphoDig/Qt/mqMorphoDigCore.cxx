@@ -6552,6 +6552,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		QString mhdExt = ".mhd";
 		QString mhaExt = ".mha";
 		QString rawExt = ".raw";
+		QString zrawExt = ".zraw";
 		QString vtiExt = ".vti";
 		QString mapExt = ".map";
 
@@ -6612,21 +6613,28 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		}
 
 		int vol_exists = 0;
+		cout << "Save volume format =" << save_volumes_format << endl;
 		if (save_volumes_format == 0)//MHD
 		{
 			vol_exists = this->selected_file_exists(onlypath, mhdExt, no_postfix);
-			if (vol_exists ==0)
+			if (vol_exists ==0 && compression==0)
 			{
 				vol_exists = this->selected_file_exists(onlypath, rawExt, no_postfix);
 			}
+			if (vol_exists == 0 && compression ==1)
+			{
+				vol_exists = this->selected_file_exists(onlypath, zrawExt, no_postfix);
+			}
 		}
-		else if (save_surfaces_format == 1)//MHA
+		else if (save_volumes_format == 1)//MHA
 		{
 			vol_exists = this->selected_file_exists(onlypath, mhaExt, no_postfix);
 		}
 		else //2 VTI
 		{
+			//cout << "checks if vti file already exists" << endl;
 			vol_exists = this->selected_file_exists(onlypath, vtiExt, no_postfix);
+			//cout << "vol_exists:" << vol_exists << endl;
 		}
 
 		
