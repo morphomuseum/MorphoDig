@@ -23,7 +23,6 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
-//#include <QVTKWidget.h>
 #endif
 
 
@@ -94,7 +93,6 @@ private:
 	QVTKOpenGLWidget *qvtkWidget2;
 #else
 	QVTKOpenGLNativeWidget *qvtkWidget2;
-	//QVTKWidget *qvtkWidget2;
 #endif
 	
 	

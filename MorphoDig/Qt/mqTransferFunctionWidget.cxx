@@ -16,7 +16,6 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
-//#include <QVTKWidget.h>
 #endif
 #include <vtkAxis.h>
 #include <vtkBoundingBox.h>
@@ -179,8 +178,7 @@ public:
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
 	QPointer<QVTKOpenGLWidget> Widget;
 #else
-	QPointer<QVTKOpenGLNativeWidget> Widget; 
-	//QPointer<QVTKWidget> Widget;
+	QPointer<QVTKOpenGLNativeWidget> Widget; 	
 #endif
 
 
@@ -201,8 +199,7 @@ public:
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
 	  : Widget(new QVTKOpenGLWidget(editor))
 #else
-	  : Widget(new QVTKOpenGLNativeWidget(editor))
-	 // : Widget(new QVTKWidget(editor))
+	  : Widget(new QVTKOpenGLNativeWidget(editor))	 
 #endif    
     , CurrentPointEditEventId(0)
   {

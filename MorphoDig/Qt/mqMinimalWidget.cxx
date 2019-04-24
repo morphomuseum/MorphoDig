@@ -16,9 +16,8 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
-//#include <QVTKWidget.h>
 #endif
-//#include <QVTKWidget.h>
+
 //#include <vtkAutoInit.h>
 #include <vtkAxis.h>
 #include <vtkFloatArray.h>
@@ -74,7 +73,6 @@ public:
 	QPointer<QVTKOpenGLWidget> Widget; 
 #else
 	QPointer<QVTKOpenGLNativeWidget> Widget;
-	//QPointer<QVTKWidget> Widget;
 #endif
 
 	vtkNew<vtkChartXY> ChartXY;
@@ -89,8 +87,7 @@ public:
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
 	: Widget(new QVTKOpenGLWidget(editor))
 #else
-	: Widget(new QVTKOpenGLNativeWidget(editor))
-	//	: Widget(new QVTKWidget(editor))
+	: Widget(new QVTKOpenGLNativeWidget(editor))	
 #endif
 		
 		

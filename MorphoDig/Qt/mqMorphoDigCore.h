@@ -40,7 +40,6 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
-//#include <QVTKWidget.h>
 #endif
 #include <vtkVolumeCollection.h>
 #include <vtkScalarBarActor.h>
@@ -846,9 +845,7 @@ public:
   QVTKOpenGLWidget* getQVTKWidget();
 #else
  void setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget);
-  QVTKOpenGLNativeWidget* getQVTKWidget();
-  //void setQVTKWidget(QVTKWidget *mqvtkWidget);
-  //QVTKWidget* getQVTKWidget();
+  QVTKOpenGLNativeWidget* getQVTKWidget();  
 #endif
 
  
@@ -1103,8 +1100,7 @@ private:
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2		
 	QVTKOpenGLWidget *qvtkWidget;
 #else
-	QVTKOpenGLNativeWidget *qvtkWidget;	
-	//QVTKWidget *qvtkWidget;
+	QVTKOpenGLNativeWidget *qvtkWidget;		
 #endif
 	int currentLassoMode;
 	int currentRubberMode;

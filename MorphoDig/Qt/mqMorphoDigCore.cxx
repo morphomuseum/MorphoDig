@@ -445,7 +445,6 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget)
 #else
 	void mqMorphoDigCore::setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget)
-//void mqMorphoDigCore::setQVTKWidget(QVTKWidget *mqvtkWidget)
 #endif
 {
 	this->qvtkWidget = mqvtkWidget;
@@ -457,7 +456,6 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	QVTKOpenGLWidget* mqMorphoDigCore::getQVTKWidget()
 #else
 	QVTKOpenGLNativeWidget* mqMorphoDigCore::getQVTKWidget()
-		//QVTKWidget* mqMorphoDigCore::getQVTKWidget()
 #endif
 { return this->qvtkWidget; }
 void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)

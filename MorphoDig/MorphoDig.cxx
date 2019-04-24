@@ -27,7 +27,6 @@
 #include <QVTKOpenGLWidget.h>
 #else
 #include <QVTKOpenGLNativeWidget.h>
-//#include <QVTKWidget.h>
 #endif
 
 //#include "vtkUndoStack.h"
@@ -61,7 +60,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataReader.h>
-//#include <vtkRenderWindow.h>
+#include <vtkRenderWindow.h>
 #include <vtkVectorText.h>
 #include <vtkImageData.h>
 #include <vtkBillboardTextActor3D.h>
@@ -107,7 +106,7 @@
 #include <QTreeView>
 
 //#include <vtkRenderWindowInteractor.h>
-#include <QVTKInteractor.h>
+//#include <QVTKInteractor.h>
 
 //-----------------------------------------------------------------------------
 //MorphoDig* MorphoDig::Instance = 0;
@@ -391,8 +390,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
 	this->qvtkWidget2 = new QVTKOpenGLWidget();	
 #else
-	this->qvtkWidget2 = new QVTKOpenGLNativeWidget();	
-	//this->qvtkWidget2 = new QVTKWidget();
+	this->qvtkWidget2 = new QVTKOpenGLNativeWidget();		
 #endif
 	
 
@@ -973,7 +971,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	 lassostyle->SetHandleLandmarkCollection(this->MorphoDigCore->getHandleLandmarkCollection());
 	 lassostyle->SetFlagLandmarkCollection(this->MorphoDigCore->getFlagLandmarkCollection());*/
 
-	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style2 =		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
+	//vtkSmartPointer<vtkInteractorStyleTrackballCamera> style2 =		vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
 	//vtkSmartPointer<vtkInteractorStyleTrackballActor> style =
 	//	vtkSmartPointer<vtkInteractorStyleTrackballActor>::New();
 	//vtkSmartPointer<vtkInteractorStyleSwitch> style =
@@ -1000,16 +998,16 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 		// vtkSmartPointer<vtkRenderedAreaPicker>::New();
 	 this->AreaPicker->AddObserver(vtkCommand::EndPickEvent, pickCallback);
 	
- style2->SetCurrentRenderer(this->MorphoDigCore->getRenderer());
+ //style2->SetCurrentRenderer(this->MorphoDigCore->getRenderer());
   //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetPicker(this->AreaPicker);
   //this->qvtkWidget2->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   
  //same thing !!!!
   window->GetInteractor()->SetPicker(this->AreaPicker);
-  window->GetInteractor()->SetInteractorStyle(style2);
+  window->GetInteractor()->SetInteractorStyle(style);
   cout << "Set interaction styles (normal style, lassostyle and rubberband style)" << endl;
   // mqMorphoDigCore should be aware of the 2 coexisting interactor styles (so that we can switch between them
-  mqMorphoDigCore::instance()->SetNormalInteractorStyle(style2);
+  mqMorphoDigCore::instance()->SetNormalInteractorStyle(style);
   mqMorphoDigCore::instance()->SetLassoInteractorStyle(lassostyle);
   mqMorphoDigCore::instance()->SetRubberInteractorStyle(rubberstyle);
 
