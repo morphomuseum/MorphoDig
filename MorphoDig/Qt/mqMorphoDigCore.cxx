@@ -7018,7 +7018,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 					
 					vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf = myVolume->GetCtf();
 					cout << "SaveNTW: call SaveMAP in volume mode" << endl;
-					this->SaveMAP(_map_fullpath, myVolume->GetName().c_str(), ctf, 1);
+					//this->SaveMAP(_map_fullpath, myVolume->GetName().c_str(), ctf, 1);
+					this->SaveMAPFile(_map_fullpath, 1, _map_file, myVolume);
 					
 				}
 				stream << _vol_file.toStdString().c_str() << endl;
@@ -7769,12 +7770,15 @@ void mqMorphoDigCore::SaveTAGMAP(QString fileName, int mapId, int mode)
 }
 
 
-int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active)
+int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active, QString Name, vtkMDVolume *volume)
 {
 	//save_only_active 
 	// 1: save only active color map
 	// 0: save ALL colormaps (custom + "hard coded native" ones)
 	// 2 : save ALL custom colormaps
+
+
+	// Name !="" and volume!=NULL only when saving the single CTF of a volume
 
 	std::string MAPext = ".map";
 	std::string MAPext2 = ".MAP";
@@ -7790,11 +7794,18 @@ int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active)
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
 			QTextStream stream(&file);
-		if (save_only_active ==1)
+		if (save_only_active ==1 ||volume !=NULL)
 		{
 			stream << "nr: 1" << endl;
 			file.close();
-			this->SaveMAP(fileName, this->Getmui_ActiveColorMap()->Name, this->Getmui_ActiveColorMap()->ColorMap);
+			if (volume == NULL)
+			{
+				this->SaveMAP(fileName, this->Getmui_ActiveColorMap()->Name, this->Getmui_ActiveColorMap()->ColorMap);
+			}
+			else
+			{
+				this->SaveMAP(fileName, Name, volume->GetCtf());
+			}
 		}
 		else if (save_only_active == 0)//save all
 		{
@@ -7836,16 +7847,13 @@ int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active)
 	return 1;
 
 }
-void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap, int volumeMode)
+void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap)
 {
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
 	{
 		QTextStream stream(&file);
-		if (volumeMode == 1)
-		{
-			stream << "nr: 1" << endl;
-		}
+		
 		stream << "name: " << Name << endl;
 				
 		stream << "discretize: " << ColorMap->GetDiscretize() << endl;
