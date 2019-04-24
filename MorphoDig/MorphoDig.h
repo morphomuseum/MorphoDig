@@ -66,7 +66,7 @@ public:
   void dropEvent(QDropEvent *e);
   //vtkSmartPointer<vtkRenderedAreaPicker> AreaPicker;
  vtkSmartPointer<vtkAreaPicker> AreaPicker;
-
+ void ambientLightToWhite();
   
   
   
@@ -102,7 +102,7 @@ private:
 	
 	void saveSettings();
 	
-	
+	vtkSmartPointer<vtkBoxWidget> _boxWidget;
   vtkSmartPointer<vtkQtTableView>         TableView;
    //Ui_MorphoDig *ui;
 };

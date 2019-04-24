@@ -17,12 +17,16 @@ Module:    vtkMDVolume.h
 #include <vtkDataArray.h>
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkOutlineFilter.h>
 #include <vtkImageData.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkSmartPointer.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkPolyDataConnectivityFilter.h>
+#include <vtkBoxWidget.h>
 #include <vector>
 #include <QString>
 class vtkMDVolumeUndoRedo
@@ -73,13 +77,13 @@ public:
 
 
 	vtkGetMacro(ScalarDisplayMax, double);
-	vtkSetMacro(ScalarDisplayMax, double);
+	//vtkSetMacro(ScalarDisplayMax, double);
 
 	vtkGetMacro(ScalarDisplayMin, double);
-	vtkSetMacro(ScalarDisplayMin, double);
+	//vtkSetMacro(ScalarDisplayMin, double);
 
 	vtkGetMacro(ScalarOpacityUnitDistance, double);
-	vtkSetMacro(ScalarOpacityUnitDistance, double);
+	//vtkSetMacro(ScalarOpacityUnitDistance, double);
 
 	
 
@@ -96,9 +100,25 @@ public:
 	vtkSetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 
+	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
+	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	
+	vtkSetMacro(Outline, vtkSmartPointer<vtkOutlineFilter>);
+	vtkGetMacro(Outline, vtkSmartPointer<vtkOutlineFilter>);
+	vtkSetMacro(OutlineMapper, vtkSmartPointer<vtkPolyDataMapper>);
+	vtkGetMacro(OutlineMapper, vtkSmartPointer<vtkPolyDataMapper>);
+	vtkSetMacro(OutlineActor, vtkSmartPointer<vtkActor>);
+	vtkGetMacro(OutlineActor, vtkSmartPointer<vtkActor>);
 	
 	double GetBoundingBoxLength();
+	double GetLookupTableMin();
+	double GetLookupTableMax();
+	void SetInterpolationToLinear(bool linear);
+	void SetScalarOpacityUnitDistance(double SOUD);
+	void SetScalarDisplayMax(double max);
+	void SetScalarDisplayMin(double min);
+	void UpdateLookupTableRange(double min, double max);
+	void UpdateLookupTableRange();
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
 	// Actual Volume render method.
 	virtual void SetSelected(int selected);
@@ -125,6 +145,10 @@ protected:
 	int Changed; // used by vtkMDVolumeCollectionUndoRedo class to recompute global center of mass and center of mass
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 	vtkSmartPointer<vtkImageData> ImageData;
+	vtkSmartPointer<vtkBoxWidget> Box;
+	vtkSmartPointer<vtkOutlineFilter> Outline;
+	vtkSmartPointer<vtkPolyDataMapper> OutlineMapper;
+	vtkSmartPointer<vtkActor> OutlineActor;
 	//of selected objects etc... 
 	vtkMDVolumeUndoRedo* UndoRedo;
 	std::string Name;

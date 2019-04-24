@@ -50,7 +50,7 @@ int main( int argc, char* argv[] )
 
   MorphoDig myMorphoDig;
   myMorphoDig.show();
-
+  myMorphoDig.ambientLightToWhite();
   // Create a table with some points in it
 
   return app.exec();

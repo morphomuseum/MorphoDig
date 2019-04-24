@@ -6,6 +6,8 @@
 
 
 
+
+
 #include "mqMorphoDigMenuBuilders.h"
 #include "mqOpenDataReaction.h"
 #include "vtkBezierSurfaceWidget.h"
@@ -35,6 +37,8 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vtkLightCollection.h>
+#include <vtkLight.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkInteractorStyleDrawPolygon.h>
@@ -117,6 +121,8 @@ int MorphoDig::getTestInt()
 {
 	return MorphoDig::testint;
 }*/
+
+
 
 
 class vtkMyTextBoxCallback : public vtkCommand
@@ -435,7 +441,9 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->MorphoDigCore =  new mqMorphoDigCore();
 	this->MorphoDigCore->setQVTKWidget(this->qvtkWidget2);
 	MorphoDigCore->SetProjectWindow(projectWindow);
-	window->AddRenderer(this->MorphoDigCore->getRenderer());
+	//window->AddRenderer(this->MorphoDigCore->getRenderer());
+	this->qvtkWidget2->SetRenderWindow(window);
+	this->qvtkWidget2->GetRenderWindow()->AddRenderer(this->MorphoDigCore->getRenderer());
 
 	this->MorphoDigCore->setCurrentCursor(0);
 	//vtkUndoStack* undoStack = vtkUndoStack::New();
@@ -912,6 +920,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	mqMorphoDigMenuBuilders::buildFileMenu(*this->menuFile);
 	mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(*this->menuEditSelectedSurfaces);
 	mqMorphoDigMenuBuilders::buildTagsMenu(*this->menuTags);
+	mqMorphoDigMenuBuilders::buildEditVolumesMenu(*this->menuVolumes);
 	mqMorphoDigMenuBuilders::buildScalarsMenu(*this->menuScalars);
 	mqMorphoDigMenuBuilders::buildRGBMenu(*this->menuRGB);
 	mqMorphoDigMenuBuilders::buildEditMenu(*this->menuEdit);
@@ -1031,7 +1040,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   
   //EXAMPLE vtkBoxWidget
 
-  
+  /*
   vtkSmartPointer<vtkConeSource> coneSource =
 	  vtkSmartPointer<vtkConeSource>::New();
   coneSource->SetHeight(1.5);
@@ -1046,29 +1055,30 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   //DNEW
   this->MorphoDigCore->getRenderer()->AddActor(actor);
 
-  vtkSmartPointer<vtkBoxWidget> boxWidget = vtkSmartPointer<vtkBoxWidget>::New();
-  boxWidget->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
-  cout << "Interactor" << mqMorphoDigCore::instance()->getQVTKWidget()->GetInteractor()<< endl;
- // boxWidget->SetI(mqMorphoDigCore::instance()->getQVTKWidget()->GetInteractor());
-  boxWidget->SetProp3D(actor);
-  boxWidget->SetPlaceFactor(1.25);
-  boxWidget->PlaceWidget();
-  vtkSmartPointer<vtkMyTextBoxCallback> mbcallback = vtkSmartPointer<vtkMyTextBoxCallback>::New();
-  boxWidget->AddObserver(vtkCommand::InteractionEvent, mbcallback);
-  boxWidget->On();
+
+  this->_boxWidget = vtkSmartPointer<vtkBoxWidget>::New();
+  //
+  this->_boxWidget->SetInteractor(this->qvtkWidget2->GetRenderWindow()->GetInteractor());
+  //boxWidget->SetInteractor(this->ui->qvtkWidget->GetRenderWindow()->GetInteractor());
+  this->_boxWidget->SetProp3D(actor);
+  this->_boxWidget->SetPlaceFactor(1.25);
+  this->_boxWidget->PlaceWidget();
+  vtkSmartPointer<vtkMyCallback> Boxcallback = vtkSmartPointer<vtkMyCallback>::New();
+  this->_boxWidget->AddObserver(vtkCommand::InteractionEvent, Boxcallback);
+  this->_boxWidget->On();
 
 
-  
+  */
   
 
   //EXAMPLE BEZIER SOURCE + BEZIER WIDGET
-  
+  /*
   unsigned int controlPointsX = 4;
   unsigned int controlPointsY = 4;
   
   // Create an arbitrary plane that we can use
   // to initialize the control points for the Bezier surface
-  /*
+  
   vtkSmartPointer<vtkPlaneSource> planeSource =
 	  vtkSmartPointer<vtkPlaneSource>::New();
   planeSource->SetOrigin(0, 0, 0);
@@ -1134,7 +1144,12 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
   cout << "Accept Drops..." << endl;
   setAcceptDrops(true);
   cout << "OpenGL version:" << this->MorphoDigCore->GetOpenGLVersion().toStdString() << endl;
-};
+  //Activate this only for test purposes...
+  //this->MorphoDigCore->TestVolume();
+
+  
+}
+
 
 
 
@@ -1708,7 +1723,27 @@ void MorphoDig::saveSettings()
 // et lorsqu'on change entre "camera
 
 
+void MorphoDig::ambientLightToWhite()
+{
+	vtkSmartPointer<vtkLightCollection> originalLights = vtkSmartPointer<vtkLightCollection>::New();
+	originalLights = mqMorphoDigCore::instance()->getRenderer()->GetLights();
+	std::cout << "Originally there are " << originalLights->GetNumberOfItems() << " lights." << std::endl;
+	originalLights->InitTraversal();
+	cout << "VTK_LIGHT_TYPE_CAMERA_LIGHT" << VTK_LIGHT_TYPE_CAMERA_LIGHT << endl;
+	cout << "VTK_LIGHT_TYPE_HEADLIGHT" << VTK_LIGHT_TYPE_HEADLIGHT << endl;
+	cout << "VTK_LIGHT_TYPE_HEADLIGHT" << VTK_LIGHT_TYPE_SCENE_LIGHT << endl;
 
+	for (int i = 0; i < originalLights->GetNumberOfItems(); i++)
+	{
+		vtkLight *light = originalLights->GetNextItem();
+		cout << "light type" << light->GetLightType() << endl;
+		cout << "light ambient" << light->GetAmbientColor()[0] << "," << light->GetAmbientColor()[1] << "," << light->GetAmbientColor()[2] << endl;
+		light->SetAmbientColor(1, 1, 1);
+
+	}
+
+	
+}
 void MorphoDig::slotExit() {
 	//maybe we should save the .ini files!
 	qApp->exit();

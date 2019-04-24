@@ -1,172 +1,266 @@
 set (Qt_SRCS
-mqViewMenuManager.h
-mqViewMenuManager.cxx
-  mqActorTreePanel.cxx
-  mqActorTreePanel.h
-  mqBooleanOperationDialog.cxx
-  mqBooleanOperationDialog.h
-  mqBooleanOperationDialogReaction.cxx
-  mqBooleanOperationDialogReaction.h
-  mqAboutDialog.cxx
-  mqAboutDialog.h
-  mqAboutDialogReaction.cxx
-  mqAboutDialogReaction.h
- mqCameraDialog.h
-  mqCameraDialog.cxx
-  mqCameraDialogReaction.h
-  mqCameraDialogReaction.cxx  
- mqCoreUtilities.cxx
-  mqCoreUtilities.h
-  mqCylinderDialog.h
-  mqCylinderDialog.cxx
-  mqCylinderDialogReaction.h
-  mqCylinderDialogReaction.cxx
-  mqCubeDialog.h
-  mqCubeDialog.cxx
-  mqCubeDialogReaction.h
-  mqCubeDialogReaction.cxx
-  mqIcosahedronDialog.h
-  mqIcosahedronDialog.cxx
-  mqIcosahedronDialogReaction.h
-  mqIcosahedronDialogReaction.cxx
-  mqDesktopServicesReaction.cxx
-  mqDesktopServicesReaction.h
-  mqReaction.cxx
-  mqReaction.h
-  mqCreateLMKDialogReaction.h
-  mqCreateLMKDialogReaction.cxx
-  mqCreateLMKDialog.h
-  mqCreateLMKDialog.cxx
-  mqEditLMKDialogReaction.h
-  mqEditLMKDialogReaction.cxx
-  mqEditLMKDialog.h
-  mqEditLMKDialog.cxx
-  mqEditAlphaDialogReaction.h
-  mqEditAlphaDialogReaction.cxx
-  mqEditAlphaDialog.h
-  mqEditAlphaDialog.cxx
-  mqEditFLGDialogReaction.h
-  mqEditFLGDialogReaction.cxx
-  mqEditFLGDialog.h
-  mqEditFLGDialog.cxx
-  mqEditScalarsDialog.h
-  mqEditScalarsDialog.cxx
-  mqEditScalarsDialogReaction.h
-  mqEditScalarsDialogReaction.cxx
-  mqEditTagsDialog.h
-  mqEditTagsDialog.cxx
-  mqEditTagsDialogReaction.h
-  mqEditTagsDialogReaction.cxx
-  mqEditACTORDialogReaction.h
-  mqEditACTORDialogReaction.cxx
-  mqEditACTORDialog.h
-  mqEditACTORDialog.cxx
-  mqEditAllFLGColorDialogReaction.h
-  mqEditAllFLGColorDialogReaction.cxx
-  mqEditAllFLGColorDialog.h
-  mqEditAllFLGColorDialog.cxx
-  mqEditAllFLGLengthDialogReaction.h
-  mqEditAllFLGLengthDialogReaction.cxx
-  mqEditAllFLGLengthDialog.h
-  mqEditAllFLGLengthDialog.cxx
-  mqGridSizeDialogReaction.h
-  mqGridSizeDialogReaction.cxx
-  mqGridSizeDialog.h
-  mqGridSizeDialog.cxx
-  mqOpenDataReaction.cxx
-  mqOpenDataReaction.h
-  mqSetName.cxx
-  mqSaveDataReaction.cxx
-  mqSaveDataReaction.h
-  mqSetName.h
-  mqMorphoDigMenuBuilders.cxx
-  mqMorphoDigMenuBuilders.h
-  mqChangeNodeReaction.h
-  mqChangeNodeReaction.cxx
-  mqColorChooserButton.cxx
-  mqColorChooserButton.h
-  mqColorDialogReaction.h
-  mqColorDialogReaction.cxx
-  mqCameraReaction.h
-  mqDisplayReaction.cxx
-  mqDisplayReaction.h
-  mqCameraReaction.cxx
-  mqColorDialog.cxx
-  mqColorDialog.h
-  mqLandmarkDialogReaction.h
-  mqLandmarkDialogReaction.cxx
-  mqLandmarkDialog.cxx
-  mqLandmarkDialog.h
-  mqMoveCurveHandlesDialog.h
-  mqMoveCurveHandlesDialog.cxx
-  mqUndoRedoReaction.h
-  mqUndoRedoReaction.cxx
-  mqUndoStack.h
-  mqUndoStack.cxx
-  mqObjectsControlsWidget.h
-  mqObjectsControlsWidget.cxx
-  mqCameraControlsWidget.h
-  mqCameraControlsWidget.cxx
-  mqMainControlsWidget.h
-  mqMainControlsWidget.cxx
-  mqDisplayControlsWidget.h
-  mqDisplayControlsWidget.cxx
-  mqInteractionControlsWidget.h
-  mqInteractionControlsWidget.cxx
-  mqLightControlsWidget.h
-  mqLightControlsWidget.cxx
-  mqScalarsControlsWidget.h
-  mqScalarsControlsWidget.cxx
-  mqMorphoDigCore.h
-  mqMorphoDigCore.cxx
-  mqSavePLYDialog.cxx
-  mqSavePLYDialog.h
-  mqSavePLYDialogReaction.cxx
-  mqSavePLYDialogReaction.h
-  mqSaveVTKDialog.cxx
-  mqSaveVTKDialog.h
-  mqSaveVTKDialogReaction.cxx
-  mqSaveVTKDialogReaction.h
-  mqSaveSTLDialog.cxx
-  mqSaveSTLDialog.h
-  mqSaveSTLDialogReaction.cxx
-  mqSaveSTLDialogReaction.h
-  mqSaveOBJDialog.cxx
-  mqSaveOBJDialog.h
-  mqSaveOBJDialogReaction.cxx
-  mqSaveOBJDialogReaction.h
-  mqSaveLandmarksDialog.cxx
-  mqSaveLandmarksDialog.h
-  mqSaveLandmarksDialogReaction.cxx
-  mqSaveLandmarksDialogReaction.h
-  mqSaveFlagsDialog.cxx
-  mqSaveFlagsDialog.h
-  mqSaveFlagsDialogReaction.cxx
-  mqSaveFlagsDialogReaction.h
-  mqSaveCURDialog.cxx
-  mqSaveCURDialog.h
-  mqSaveCURDialogReaction.cxx
-  mqSaveCURDialogReaction.h
-  mqSaveCURasVERDialogReaction.cxx
-  mqSaveCURasVERDialogReaction.h
-  mqSaveCURasVERDialog.cxx
-  mqSaveCURasVERDialog.h
-  mqSaveSTVDialog.cxx
-  mqSaveSTVDialog.h
-  mqSaveSTVDialogReaction.cxx
-  mqSaveSTVDialogReaction.h
-  mqSaveNTWDialog.cxx
-  mqSaveNTWDialog.h
-  mqSaveNTWDialogReaction.cxx
-  mqSaveNTWDialogReaction.h
-mqSelectLandmarkRangeDialog.h
+QDoubleReleaseSlider.cxx
+QDoubleReleaseSlider.h
+QDoubleSlider.cxx
+QDoubleSlider.h
+QRAMThread.cxx
+QRAMThread.h
+QReleaseDial.cxx
+QReleaseDial.h
+QReleaseScrollBar.cxx
+QReleaseScrollBar.h
+QReleaseScrollBarValue.cxx
+QReleaseScrollBarValue.h
+QReleaseSlider.cxx
+QReleaseSlider.h
+QReleaseSliderValue.cxx
+QReleaseSliderValue.h
+mqAboutDialog.cxx
+mqAboutDialog.h
+mqAboutDialogReaction.cxx
+mqAboutDialogReaction.h
+mqActorTreePanel.cxx
+mqActorTreePanel.h
+mqBooleanOperationDialog.cxx
+mqBooleanOperationDialog.h
+mqBooleanOperationDialogReaction.cxx
+mqBooleanOperationDialogReaction.h
+mqCameraControlsWidget.cxx
+mqCameraControlsWidget.h
+mqCameraDialog.cxx
+mqCameraDialog.h
+mqCameraDialogReaction.cxx
+mqCameraDialogReaction.h
+mqCameraReaction.cxx
+mqCameraReaction.h
+mqChangeNodeReaction.cxx
+mqChangeNodeReaction.h
+mqColorChooserButton.cxx
+mqColorChooserButton.h
+mqColorDialog.cxx
+mqColorDialog.h
+mqColorDialogReaction.cxx
+mqColorDialogReaction.h
+mqColorOpacityEditorWidget.cxx
+mqColorOpacityEditorWidget.h
+mqCoreUtilities.cxx
+mqCoreUtilities.h
+mqCreateLMKDialog.cxx
+mqCreateLMKDialog.h
+mqCreateLMKDialogReaction.cxx
+mqCreateLMKDialogReaction.h
+mqCubeDialog.cxx
+mqCubeDialog.h
+mqCubeDialogReaction.cxx
+mqCubeDialogReaction.h
+mqCylinderDialog.cxx
+mqCylinderDialog.h
+mqCylinderDialogReaction.cxx
+mqCylinderDialogReaction.h
+mqDecimateDialog.cxx
+mqDecimateDialog.h
+mqDecimateDialogReaction.cxx
+mqDecimateDialogReaction.h
+mqDecomposeDialog.cxx
+mqDecomposeDialog.h
+mqDecomposeDialogReaction.cxx
+mqDecomposeDialogReaction.h
+mqDensifyDialog.cxx
+mqDensifyDialog.h
+mqDensifyDialogReaction.cxx
+mqDensifyDialogReaction.h
+mqDesktopServicesReaction.cxx
+mqDesktopServicesReaction.h
+mqDisplayControlsWidget.cxx
+mqDisplayControlsWidget.h
+mqDisplayReaction.cxx
+mqDisplayReaction.h
+mqEditACTORDialog.cxx
+mqEditACTORDialog.h
+mqEditACTORDialogReaction.cxx
+mqEditACTORDialogReaction.h
+mqEditAllFLGColorDialog.cxx
+mqEditAllFLGColorDialog.h
+mqEditAllFLGColorDialogReaction.cxx
+mqEditAllFLGColorDialogReaction.h
+mqEditAllFLGLengthDialog.cxx
+mqEditAllFLGLengthDialog.h
+mqEditAllFLGLengthDialogReaction.cxx
+mqEditAllFLGLengthDialogReaction.h
+mqEditAlphaDialog.cxx
+mqEditAlphaDialog.h
+mqEditAlphaDialogReaction.cxx
+mqEditAlphaDialogReaction.h
+mqEditFLGDialog.cxx
+mqEditFLGDialog.h
+mqEditFLGDialogReaction.cxx
+mqEditFLGDialogReaction.h
+mqEditLMKDialog.cxx
+mqEditLMKDialog.h
+mqEditLMKDialogReaction.cxx
+mqEditLMKDialogReaction.h
+mqEditScalarsDialog.cxx
+mqEditScalarsDialog.h
+mqEditScalarsDialogReaction.cxx
+mqEditScalarsDialogReaction.h
+mqEditTagsDialog.cxx
+mqEditTagsDialog.h
+mqEditTagsDialogReaction.cxx
+mqEditTagsDialogReaction.h
+mqEditVolumeDialog.cxx
+mqEditVolumeDialog.h
+mqEditVolumeDialogReaction.cxx
+mqEditVolumeDialogReaction.h
+mqExpandableTableView.cxx
+mqExpandableTableView.h
+mqExtractScalarRangeDialog.cxx
+mqExtractScalarRangeDialog.h
+mqExtractScalarRangeDialogReaction.cxx
+mqExtractScalarRangeDialogReaction.h
+mqExtractTagRangeDialog.cxx
+mqExtractTagRangeDialog.h
+mqExtractTagRangeDialogReaction.cxx
+mqExtractTagRangeDialogReaction.h
+mqFillHolesDialog.cxx
+mqFillHolesDialog.h
+mqFillHolesDialogReaction.cxx
+mqFillHolesDialogReaction.h
+mqGridSizeDialog.cxx
+mqGridSizeDialog.h
+mqGridSizeDialogReaction.cxx
+mqGridSizeDialogReaction.h
+mqICPDialog.cxx
+mqICPDialog.h
+mqICPDialogReaction.cxx
+mqICPDialogReaction.h
+mqIcosahedronDialog.cxx
+mqIcosahedronDialog.h
+mqIcosahedronDialogReaction.cxx
+mqIcosahedronDialogReaction.h
+mqInteractionControlsWidget.cxx
+mqInteractionControlsWidget.h
+mqLandmarkDialog.cxx
+mqLandmarkDialog.h
+mqLandmarkDialogReaction.cxx
+mqLandmarkDialogReaction.h
+mqLightControlsWidget.cxx
+mqLightControlsWidget.h
+mqLineEdit.cxx
+mqLineEdit.h
+mqMainControlsWidget.cxx
+mqMainControlsWidget.h
+mqMergeTagsDialog.cxx
+mqMergeTagsDialog.h
+mqMergeTagsDialogReaction.cxx
+mqMergeTagsDialogReaction.h
+mqMinimalWidget.cxx
+mqMinimalWidget.h
+mqMorphoDigCore.cxx
+mqMorphoDigCore.h
+mqMorphoDigMenuBuilders.cxx
+mqMorphoDigMenuBuilders.h
+mqMoveCurveHandlesDialog.cxx
+mqMoveCurveHandlesDialog.h
+mqObjectsControlsWidget.cxx
+mqObjectsControlsWidget.h
+mqOpenDataReaction.cxx
+mqOpenDataReaction.h
+mqOrientationLabelsDialog.cxx
+mqOrientationLabelsDialog.h
+mqOrientationLabelsDialogReaction.cxx
+mqOrientationLabelsDialogReaction.h
+mqReaction.cxx
+mqReaction.h
+mqSaveCURDialog.cxx
+mqSaveCURDialog.h
+mqSaveCURDialogReaction.cxx
+mqSaveCURDialogReaction.h
+mqSaveCURasVERDialog.cxx
+mqSaveCURasVERDialog.h
+mqSaveCURasVERDialogReaction.cxx
+mqSaveCURasVERDialogReaction.h
+mqSaveDataReaction.cxx
+mqSaveDataReaction.h
+mqSaveFlagsDialog.cxx
+mqSaveFlagsDialog.h
+mqSaveFlagsDialogReaction.cxx
+mqSaveFlagsDialogReaction.h
+mqSaveLandmarksDialog.cxx
+mqSaveLandmarksDialog.h
+mqSaveLandmarksDialogReaction.cxx
+mqSaveLandmarksDialogReaction.h
+mqSaveMAPDialog.cxx
+mqSaveMAPDialog.h
+mqSaveMAPDialogReaction.cxx
+mqSaveMAPDialogReaction.h
+mqSaveNTWDialog.cxx
+mqSaveNTWDialog.h
+mqSaveNTWDialogReaction.cxx
+mqSaveNTWDialogReaction.h
+mqSaveOBJDialog.cxx
+mqSaveOBJDialog.h
+mqSaveOBJDialogReaction.cxx
+mqSaveOBJDialogReaction.h
+mqSavePLYDialog.cxx
+mqSavePLYDialog.h
+mqSavePLYDialogReaction.cxx
+mqSavePLYDialogReaction.h
+mqSaveSTLDialog.cxx
+mqSaveSTLDialog.h
+mqSaveSTLDialogReaction.cxx
+mqSaveSTLDialogReaction.h
+mqSaveSTVDialog.cxx
+mqSaveSTVDialog.h
+mqSaveSTVDialogReaction.cxx
+mqSaveSTVDialogReaction.h
+mqSaveTAGMAPDialog.cxx
+mqSaveTAGMAPDialog.h
+mqSaveTAGMAPDialogReaction.cxx
+mqSaveTAGMAPDialogReaction.h
+mqSaveVTKDialog.cxx
+mqSaveVTKDialog.h
+mqSaveVTKDialogReaction.cxx
+mqSaveVTKDialogReaction.h
+mqScalarsComplexityDialog.cxx
+mqScalarsComplexityDialog.h
+mqScalarsComplexityDialogReaction.cxx
+mqScalarsComplexityDialogReaction.h
+mqScalarsControlsWidget.cxx
+mqScalarsControlsWidget.h
+mqScalarsCurvatureDialog.cxx
+mqScalarsCurvatureDialog.h
+mqScalarsCurvatureDialogReaction.cxx
+mqScalarsCurvatureDialogReaction.h
+mqScalarsDistanceDialog.cxx
+mqScalarsDistanceDialog.h
+mqScalarsDistanceDialogReaction.cxx
+mqScalarsDistanceDialogReaction.h
+mqScalarsInfosDialog.cxx
+mqScalarsInfosDialog.h
+mqScalarsInfosDialogReaction.cxx
+mqScalarsInfosDialogReaction.h
+mqScalarsNormalizationDialog.cxx
+mqScalarsNormalizationDialog.h
+mqScalarsNormalizationDialogReaction.cxx
+mqScalarsNormalizationDialogReaction.h
+mqScalarsSmoothDialog.cxx
+mqScalarsSmoothDialog.h
+mqScalarsSmoothDialogReaction.cxx
+mqScalarsSmoothDialogReaction.h
+mqScalarsThicknessBetweenDialog.cxx
+mqScalarsThicknessBetweenDialog.h
+mqScalarsThicknessBetweenDialogReaction.cxx
+mqScalarsThicknessBetweenDialogReaction.h
+mqScalarsThicknessDialog.cxx
+mqScalarsThicknessDialog.h
+mqScalarsThicknessDialogReaction.cxx
+mqScalarsThicknessDialogReaction.h
 mqSelectLandmarkRangeDialog.cxx
-mqSelectLandmarkRangeDialogReaction.h
+mqSelectLandmarkRangeDialog.h
 mqSelectLandmarkRangeDialogReaction.cxx
- mqOrientationLabelsDialog.cxx
-  mqOrientationLabelsDialog.h
-  mqOrientationLabelsDialogReaction.cxx
-  mqOrientationLabelsDialogReaction.h
+mqSelectLandmarkRangeDialogReaction.h
+mqSetName.cxx
+mqSetName.h
 mqShrinkWrapDialog.cxx
 mqShrinkWrapDialog.h
 mqShrinkWrapDialogReaction.cxx
@@ -175,122 +269,33 @@ mqShrinkWrapIterativeDialog.cxx
 mqShrinkWrapIterativeDialog.h
 mqShrinkWrapIterativeDialogReaction.cxx
 mqShrinkWrapIterativeDialogReaction.h
-QDoubleSlider.cxx
-QDoubleSlider.h
-QRAMThread.cxx
-QRAMThread.h
-QReleaseSlider.cxx
-QReleaseSlider.h
-QReleaseDial.cxx
-QReleaseDial.h
-QReleaseScrollBar.cxx
-QReleaseScrollBar.h
-QReleaseScrollBarValue.cxx
-QReleaseScrollBarValue.h
-QDoubleReleaseSlider.cxx
-QDoubleReleaseSlider.h
-QReleaseSliderValue.cxx
-QReleaseSliderValue.h
- mqSmoothDialog.cxx
-  mqSmoothDialog.h
-  mqSmoothDialogReaction.cxx
-  mqSmoothDialogReaction.h
- mqDecimateDialog.cxx
-  mqDecimateDialog.h
-  mqDecimateDialogReaction.cxx
-  mqDecimateDialogReaction.h
- mqFillHolesDialog.cxx
-  mqFillHolesDialog.h
-  mqFillHolesDialogReaction.cxx
-  mqFillHolesDialogReaction.h
- mqDensifyDialog.cxx
-  mqDensifyDialog.h
-  mqDensifyDialogReaction.cxx
-  mqDensifyDialogReaction.h
- mqTPSDialog.cxx
-  mqTPSDialog.h
-  mqTPSDialogReaction.cxx
-  mqTPSDialogReaction.h
- mqDecomposeDialog.cxx
-  mqDecomposeDialog.h
-  mqDecomposeDialogReaction.cxx
-  mqDecomposeDialogReaction.h
-mqScalarsComplexityDialog.h
-mqScalarsComplexityDialog.cxx
-mqScalarsComplexityDialogReaction.h
-mqScalarsComplexityDialogReaction.cxx
-mqScalarsSmoothDialog.h
-mqScalarsSmoothDialog.cxx
-mqScalarsSmoothDialogReaction.h
-mqScalarsSmoothDialogReaction.cxx
-mqScalarsInfosDialog.h
-mqScalarsInfosDialog.cxx
-mqScalarsInfosDialogReaction.h
-mqScalarsInfosDialogReaction.cxx
-mqScalarsThicknessDialog.h
-mqScalarsThicknessDialog.cxx
-mqScalarsThicknessDialogReaction.h
-mqScalarsThicknessDialogReaction.cxx
-mqScalarsThicknessBetweenDialog.h
-mqScalarsThicknessBetweenDialog.cxx
-mqScalarsThicknessBetweenDialogReaction.h
-mqScalarsThicknessBetweenDialogReaction.cxx
-mqScalarsCurvatureDialog.h
-mqScalarsCurvatureDialog.cxx
-mqScalarsCurvatureDialogReaction.h
-mqScalarsCurvatureDialogReaction.cxx
-mqScalarsNormalizationDialog.h
-mqScalarsNormalizationDialog.cxx
-mqScalarsNormalizationDialogReaction.h
-mqScalarsNormalizationDialogReaction.cxx
-mqICPDialog.h
-mqICPDialog.cxx
-mqICPDialogReaction.h
-mqICPDialogReaction.cxx
-mqScalarsDistanceDialog.h
-mqScalarsDistanceDialog.cxx
-mqScalarsDistanceDialogReaction.h
-mqScalarsDistanceDialogReaction.cxx
-mqMinimalWidget.h
-mqMinimalWidget.cxx
-mqTransferFunctionWidget.h
-mqTransferFunctionWidget.cxx
-mqExpandableTableView.cxx
-mqExpandableTableView.h
-mqTableView.cxx
-mqTableView.h
-mqLineEdit.h
-mqLineEdit.cxx
-mqColorOpacityEditorWidget.cxx
-mqColorOpacityEditorWidget.h
-mqSaveTAGMAPDialog.cxx
-mqSaveTAGMAPDialog.h
-mqSaveTAGMAPDialogReaction.cxx
-mqSaveTAGMAPDialogReaction.h
-mqSaveMAPDialog.cxx
-mqSaveMAPDialog.h
-mqSaveMAPDialogReaction.cxx
-mqSaveMAPDialogReaction.h
-mqTagFromRGBDialog.cxx
-mqTagFromRGBDialog.h
-mqTagFromRGBDialogReaction.cxx
-mqTagFromRGBDialogReaction.h
-mqMergeTagsDialog.cxx
-mqMergeTagsDialog.h
-mqMergeTagsDialogReaction.cxx
-mqMergeTagsDialogReaction.h
- mqExtractScalarRangeDialog.cxx
-  mqExtractScalarRangeDialog.h
-  mqExtractScalarRangeDialogReaction.cxx
-  mqExtractScalarRangeDialogReaction.h
- mqExtractTagRangeDialog.cxx
-  mqExtractTagRangeDialog.h
-  mqExtractTagRangeDialogReaction.cxx
-  mqExtractTagRangeDialogReaction.h
+mqSmoothDialog.cxx
+mqSmoothDialog.h
+mqSmoothDialogReaction.cxx
+mqSmoothDialogReaction.h
 mqSurfaceTagInfosDialog.cxx
 mqSurfaceTagInfosDialog.h
 mqSurfaceTagInfosDialogReaction.cxx
 mqSurfaceTagInfosDialogReaction.h
+mqTPSDialog.cxx
+mqTPSDialog.h
+mqTPSDialogReaction.cxx
+mqTPSDialogReaction.h
+mqTableView.cxx
+mqTableView.h
+mqTagFromRGBDialog.cxx
+mqTagFromRGBDialog.h
+mqTagFromRGBDialogReaction.cxx
+mqTagFromRGBDialogReaction.h
+mqTransferFunctionWidget.cxx
+mqTransferFunctionWidget.h
+mqUndoRedoReaction.cxx
+mqUndoRedoReaction.h
+mqUndoStack.cxx
+mqUndoStack.h
+mqViewMenuManager.cxx
+mqViewMenuManager.h
+
 )
 
 set (Qt_MOC_HDRS
@@ -298,70 +303,71 @@ set (Qt_MOC_HDRS
   mqAboutDialog.h
 )
 
-set (Qt_UIs mqAboutDialog.ui 
-mqColorDialog.ui 
+set (Qt_UIs mqAboutDialog.ui
+mqActorTreePanel.ui
 mqBooleanOperationDialog.ui
-mqCylinderDialog.ui 
-mqShrinkWrapDialog.ui 
-mqShrinkWrapIterativeDialog.ui 
+mqCameraControlsWidget.ui
 mqCameraDialog.ui
-mqCubeDialog.ui 
-mqIcosahedronDialog.ui
-mqLandmarkDialog.ui  
-mqCameraControlsWidget.ui 
-mqObjectsControlsWidget.ui 
-mqMainControlsWidget.ui 
-mqSavePLYDialog.ui 
-mqSaveVTKDialog.ui 
-mqSaveSTLDialog.ui 
-mqSaveOBJDialog.ui 
-mqSaveLandmarksDialog.ui 
-mqSaveFlagsDialog.ui 
-mqSaveCURDialog.ui 
-mqSaveCURasVERDialog.ui 
-mqSaveSTVDialog.ui
-mqSaveNTWDialog.ui
-mqMoveCurveHandlesDialog.ui
-mqEditLMKDialog.ui
-mqEditAlphaDialog.ui
+mqColorDialog.ui
+mqColorOpacityEditorWidget.ui
 mqCreateLMKDialog.ui
-mqEditFLGDialog.ui
+mqCubeDialog.ui
+mqCylinderDialog.ui
+mqDecimateDialog.ui
+mqDecomposeDialog.ui
+mqDensifyDialog.ui
+mqDisplayControlsWidget.ui
 mqEditACTORDialog.ui
-mqEditTagsDialog.ui
 mqEditAllFLGColorDialog.ui
 mqEditAllFLGLengthDialog.ui
-mqSelectLandmarkRangeDialog.ui
-mqLightControlsWidget.ui
-mqInteractionControlsWidget.ui
-mqDisplayControlsWidget.ui
-mqScalarsControlsWidget.ui
-mqGridSizeDialog.ui
-mqOrientationLabelsDialog.ui
+mqEditAlphaDialog.ui
+mqEditFLGDialog.ui
+mqEditLMKDialog.ui
 mqEditScalarsDialog.ui
-mqSmoothDialog.ui
-mqDecimateDialog.ui
-mqDensifyDialog.ui
+mqEditTagsDialog.ui
+mqEditVolumeDialog.ui
+mqExtractScalarRangeDialog.ui
+mqExtractTagRangeDialog.ui
 mqFillHolesDialog.ui
-mqTPSDialog.ui
-mqDecomposeDialog.ui
-mqActorTreePanel.ui
+mqGridSizeDialog.ui
+mqICPDialog.ui
+mqIcosahedronDialog.ui
+mqInteractionControlsWidget.ui
+mqLandmarkDialog.ui
+mqLightControlsWidget.ui
+mqMainControlsWidget.ui
+mqMergeTagsDialog.ui
+mqMoveCurveHandlesDialog.ui
+mqObjectsControlsWidget.ui
+mqOrientationLabelsDialog.ui
+mqSaveCURDialog.ui
+mqSaveCURasVERDialog.ui
+mqSaveFlagsDialog.ui
+mqSaveLandmarksDialog.ui
+mqSaveMAPDialog.ui
+mqSaveNTWDialog.ui
+mqSaveOBJDialog.ui
+mqSavePLYDialog.ui
+mqSaveSTLDialog.ui
+mqSaveSTVDialog.ui
+mqSaveTAGMAPDialog.ui
+mqSaveVTKDialog.ui
 mqScalarsComplexityDialog.ui
-mqScalarsSmoothDialog.ui
-mqScalarsThicknessDialog.ui
-mqScalarsInfosDialog.ui
-mqScalarsThicknessBetweenDialog.ui
+mqScalarsControlsWidget.ui
 mqScalarsCurvatureDialog.ui
 mqScalarsDistanceDialog.ui
-mqICPDialog.ui
-mqColorOpacityEditorWidget.ui
-mqSaveMAPDialog.ui
-mqSaveTAGMAPDialog.ui
-mqTagFromRGBDialog.ui
-mqMergeTagsDialog.ui
+mqScalarsInfosDialog.ui
 mqScalarsNormalizationDialog.ui
-mqExtractScalarRangeDialog.ui 
-mqExtractTagRangeDialog.ui 
+mqScalarsSmoothDialog.ui
+mqScalarsThicknessBetweenDialog.ui
+mqScalarsThicknessDialog.ui
+mqSelectLandmarkRangeDialog.ui
+mqShrinkWrapDialog.ui
+mqShrinkWrapIterativeDialog.ui
+mqSmoothDialog.ui
 mqSurfaceTagInfosDialog.ui
+mqTPSDialog.ui
+mqTagFromRGBDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

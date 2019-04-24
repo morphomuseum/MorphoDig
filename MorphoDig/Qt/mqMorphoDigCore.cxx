@@ -405,7 +405,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 	this->Renderer->AddViewProp(cornerAnnotation);
 	this->Renderer->AddActor(this->GridActor);
-	this->Renderer->TwoSidedLightingOff();
+	this->Renderer->TwoSidedLightingOn();
 	connect(this, SIGNAL(zoomChanged()), this, SLOT(slotEditGridInfos()));
 	connect(this, SIGNAL(projectionModeChanged()), this, SLOT(slotEditGridInfos()));
 }
@@ -488,7 +488,281 @@ QString mqMorphoDigCore::GetOpenGLVersion()
 	//QString myVersion = QString::number(maj) + "." + QString::number(min);
 	return myVersion;
 }
+void mqMorphoDigCore::TestVolume()
+{
+	//only used at startup fo open a volume and rendering it!
+	vtkSmartPointer <vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
+	vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+	metaReader->SetFileName("head.mha");
+	metaReader->Update();
+	input = metaReader->GetOutput();
+	int dim[3];
+	input->GetDimensions(dim);
+	int numcells = input->GetNumberOfCells();
+	input->GetScalarTypeAsString();
+	//input->Get
+	cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
+	cout << "Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
+	cout << "Image type:" << input->GetScalarTypeAsString() << endl;
+	cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
+	cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
 
+
+	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+
+	if (dim[0] < 2 ||
+		dim[1] < 2 ||
+		dim[2] < 2)
+	{
+		return;
+	}
+	else
+	{
+		cout << "Try visualize!!!" << endl;
+
+		vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
+		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+		//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
+		vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
+		vtkSmartPointer<vtkImageAccumulate> histogram =
+			vtkSmartPointer<vtkImageAccumulate>::New();
+		//mapper->SetRequestedRenderModeToDefault();
+
+
+		histogram->SetInputData(input);
+		if (input->GetScalarType() == VTK_UNSIGNED_SHORT)
+		{
+			histogram->SetComponentExtent(VTK_UNSIGNED_SHORT_MIN, VTK_UNSIGNED_SHORT_MAX, 0, 0, 0, 0);
+			histogram->SetComponentOrigin(0, 0, 0);
+		}
+		if (input->GetScalarType() == VTK_SHORT)
+		{
+			//cout << "signed shorts !" << endl;
+			//cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << endl;
+			histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
+			histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
+		}
+
+		int bin_spacing = 1000;
+		histogram->SetComponentSpacing(bin_spacing, 0, 0);
+		histogram->Update();
+		// faire plutÃ´t une liste avec push.
+
+		std::vector<int> peaks;
+		std::vector<int> peaksT;
+		std::vector<int> peakVals;
+		std::vector<int> lows;
+		std::vector<int> lowsT;
+		std::vector<int> lowVals;
+
+		int dims[3];
+		histogram->GetOutput()->GetDimensions(dims);
+		//cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
+		vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
+		//cout << "Histogram (used) dims=" << used_bins  << endl;
+		int prevbin = 0;
+
+
+		int p_or_l = 1; //1 search peak //2 search low
+		int p_i = 0;
+		int l_i = -1;
+
+		peaks.push_back(0);
+		peaksT.push_back(0);
+		peakVals.push_back(0);
+		for (vtkIdType bin = 0; bin < used_bins; ++bin)
+		{
+			int binT;
+			if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
+				binT = VTK_UNSIGNED_SHORT_MIN + bin * bin_spacing;
+			}
+			if (input->GetScalarType() == VTK_SHORT) {
+				binT = VTK_SHORT_MIN + bin * bin_spacing;
+			}
+			int curbin = *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0)));
+			//histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin);
+			if (p_or_l == 1)//search peak
+			{
+				if (curbin >= prevbin)
+				{
+					if (curbin > 0)
+					{
+						peaks.at(p_i) = bin;
+						peaksT.at(p_i) = binT;
+						peakVals.at(p_i) = curbin;
+					}
+				}
+				else
+				{
+					// starts do decrease: 
+					p_or_l = 0;
+					lows.push_back(bin);
+					lowsT.push_back(binT);
+					lowVals.push_back(curbin);
+					l_i++; //cout << "l_i" << l_i << endl;
+				}
+			}
+			if (p_or_l == 0)//search low
+			{
+				if (curbin < prevbin)
+				{
+					lows.at(l_i) = bin;
+					lowsT.at(l_i) = binT;
+					lowVals.at(l_i) = curbin;
+				}
+				else
+				{
+					// starts do re-increase: 
+					p_or_l = 1;
+					peaks.push_back(bin);
+					peaksT.push_back(binT);
+					peakVals.push_back(curbin);
+					p_i++;
+				}
+			}
+
+			//cout <<"bin="<<bin<<"|"<< *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0))) << " ";
+		//	cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << endl;				
+			prevbin = curbin;
+		}
+
+		for (int i = 0; i <= p_i; i++)
+		{
+			//cout << "p" << i <<":"<< peaksT.at(i) << ", val=" << peakVals.at(i) << endl;
+		}
+		for (int i = 0; i <= l_i; i++)
+		{
+			//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
+		}
+
+		// Create the property and attach the transfer functions
+		vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
+		property->SetIndependentComponents(true);
+		property->SetColor(TF);
+		property->SetScalarOpacity(opacityFun);
+		property->SetInterpolationTypeToLinear();
+		//mapper->SetInputData(input);
+		mapper->SetInputConnection(metaReader->GetOutputPort());
+		// connect up the volume to the property and the mapper
+		volume->SetProperty(property);
+		volume->SetMapper(mapper);
+
+		int first_point = 0; // as first low... a
+		int last_point = 0; //somme pondÃ©rÃ©e autres peaks,  puis chercher s'il y a un low aprÃ¨s cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondÃ©rÃ©e.
+
+		if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
+			first_point = VTK_UNSIGNED_SHORT_MIN;
+			last_point = VTK_UNSIGNED_SHORT_MAX;
+		}
+		else
+		{
+			first_point = VTK_SHORT_MIN;
+			last_point = VTK_SHORT_MAX;
+
+		}
+		if (l_i >= 0)
+		{
+			first_point = lowsT.at(0);
+			if (p_i > 0) {
+				first_point = (int)(0.5*(lowsT.at(0) + peaksT.at(1)));
+			}
+		}
+
+		//now search last point
+		int avg_peaks = 0;
+
+		int low_after_avgpeaks = 0;
+		if (p_i > 0)
+		{
+			double sum_peaks = 0;
+			double sum_peakVals = 0;
+			for (int i = 1; i <= p_i; i++)
+			{
+				//peaksT.at(i) peakVals.at(i) ;
+				//cout << "peaksT.at(i)="<<peaksT.at(i) << endl;
+				//cout << "peakVals.at(i)=" << peakVals.at(i) << endl;
+				double mult = (double)peaksT.at(i)*(double)peakVals.at(i);
+				//cout << "mult=" << mult << endl;
+				sum_peakVals += (double)peakVals.at(i);
+				sum_peaks += mult;
+				//cout << "sum_peaks=" << sum_peaks << endl;
+				//cout << "sum_peakVals=" << sum_peakVals << endl;
+
+			}
+			if (sum_peakVals > 0)
+			{
+				avg_peaks = (int)(sum_peaks / sum_peakVals);
+				//cout << "avg_peaks="<<avg_peaks << endl;
+				// search if a low exists after avg_peaks
+				int exists = 0;
+				int i_low = 0;
+				if (l_i >= 0)
+				{
+					for (int i = 0; i <= l_i; i++)
+					{
+						if (lowsT.at(i) > avg_peaks)
+						{
+							if (exists == 0) { i_low = i; }
+							exists = 1;
+
+						}
+					}
+					if (exists == 1)
+					{
+						low_after_avgpeaks = lowsT.at(i_low);
+						last_point = (int)((low_after_avgpeaks + avg_peaks) / 2);
+					}
+				}
+				else
+				{
+					last_point = avg_peaks;
+				}
+			}
+		}
+		//let's put first point a little bit further!
+		first_point = (int)(first_point + 0.2*(last_point - first_point));
+
+		int second_point = (int)(first_point + 0.2*(last_point - first_point));
+		int third_point = (int)(first_point + 0.4*(last_point - first_point));
+
+		TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+		TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
+		TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
+		TF->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
+
+		opacityFun->AddPoint(first_point, 0, 0.5, 0);
+		opacityFun->AddPoint(second_point, 0.5, .5, 0);
+		opacityFun->AddPoint(third_point, 0.8, .5, 0);
+		opacityFun->AddPoint(last_point, 0.99, 0.5, 0);
+		TF->SetEnableOpacityMapping(true);
+		TF->SetScalarOpacityFunction(opacityFun);
+		TF->Build();
+		mapper->SetBlendModeToComposite();
+
+
+		//property->set
+		property->SetAmbient(0.2);
+		property->SetDiffuse(1.0);
+		property->SetSpecular(0.2);
+		property->SetSpecularPower(14);
+		property->SetInterpolationTypeToLinear();
+		property->ShadeOn();
+
+		double SOUD = 0.89;
+		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+		if (SOUD == 0) { SOUD = 0.89; }
+
+		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit Ãªtre fonction de la taille des spÃ©cimens, sinon Ã§a va pas... 
+		mapper->Update();
+		volume->Update();
+
+	
+		this->getRenderer()->AddVolume(volume);
+	}
+}
 void mqMorphoDigCore::SetOpenGLVersion(int major, int minor)
 {
 	this->mui_OpenGL_major_version = major;
@@ -1336,9 +1610,9 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
 					
 					// two cases:
-					// 1 angle limit = 180°
+					// 1 angle limit = 180Â°
 					// in that cases the observed Neighbours I am interested in is the WHOLE list
-					// 1 angle limit < 180°
+					// 1 angle limit < 180Â°
 					// in that case propagate from picked_id through observedneighbours to construct a new vtkIdList
 					vtkSmartPointer<vtkPolyData> mesh = vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput());
 					
@@ -1523,7 +1797,68 @@ vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScala
 {
 	return this->ScalarRedLut;
 }
+double mqMorphoDigCore::GetVolumeRangeMin()
+{
 
+	//return this->ScalarRangeMin;
+	double my_min;
+	double my_currmin;
+
+	my_min = DBL_MAX;
+	my_currmin = DBL_MAX;
+
+	this->VolumeCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		my_currmin = myVolume->GetImageData()->GetScalarRange()[0];
+		if (my_currmin < my_min)
+		{
+			my_min = my_currmin;
+		}
+	}
+	if (my_min == VTK_DOUBLE_MAX )
+	{
+		cout << "Strange!!!" << endl;
+		return 0;
+	}
+	else
+	{
+		return my_min;
+	}
+}
+double mqMorphoDigCore::GetVolumeRangeMax()
+{
+
+	//return this->ScalarRangeMin;
+	double my_max;
+	double my_currmax;
+
+	my_max = -DBL_MAX;
+	my_currmax = -DBL_MAX;
+
+	this->VolumeCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		my_currmax = myVolume->GetImageData()->GetScalarRange()[1];
+		if (my_currmax > my_max)
+		{
+			my_max = my_currmax;
+		}
+	}
+	if (my_max == VTK_DOUBLE_MIN)
+	{
+		cout << "Strange!!!" << endl;
+		return 1;
+	}
+	else
+	{
+		return my_max;
+	}
+}
 double mqMorphoDigCore::GetScalarRangeMin()
 {
 
@@ -1753,6 +2088,7 @@ int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
 		return my_max;
 	}
 }
+
 double mqMorphoDigCore::GetScalarRangeMax()
 {
 
@@ -3176,7 +3512,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 						if (id_min != -1) // means that mesh i could be the mesh that contains the closest vertex of flag k
 						{
 							//now get current color of point id_min of mesh i!
-							//@TODO! => On va faire 1 variable globale de type G_Current_Active_Scalar => Ce premier if sera changé par 
+							//@TODO! => On va faire 1 variable globale de type G_Current_Active_Scalar => Ce premier if sera changÃ© par 
 							// if (visibility ==0 OU GetScalar(G_Current_Active_Scalar)==NULL)
 							QString none = QString("Solid color");
 							if (this->Getmui_ArrayVisibility() == 0 || this->mui_ActiveArray->Name== none||
@@ -4079,7 +4415,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
 		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
 		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
-		int* range;
+		
 		
 		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
 
@@ -4099,16 +4435,21 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
-			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 			vtkSmartPointer<vtkImageAccumulate> histogram =
 				  vtkSmartPointer<vtkImageAccumulate>::New();
-			mapper->SetRequestedRenderModeToDefault();
+			//mapper->SetRequestedRenderModeToDefault();
 			
-			vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
-				box->SetPlaceFactor(1.01);
+			
+
+			/*
+			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
+			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
+			box->SetPlaceFactor(1.01);
+
 			box->SetInputData(input);
 
 			box->SetDefaultRenderer(this->getRenderer());
@@ -4119,15 +4460,26 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
 			callback->SetMapper(mapper);
 
-			/* vtkSmartPointer<vtkMyNodeHandleCallBack> callback = vtkSmartPointer<vtkMyNodeHandleCallBack>::New();
-  mqMorphoDigCore::instance()->getNodeLandmarkCollection()->AddObserver(vtkCommand::ModifiedEvent, callback);
- */
+			//vtkSmartPointer<vtkMyNodeHandleCallBack> callback = vtkSmartPointer<vtkMyNodeHandleCallBack>::New();
+  //mqMorphoDigCore::instance()->getNodeLandmarkCollection()->AddObserver(vtkCommand::ModifiedEvent, callback);
+
 			//box->AddObserver(vtkCommand::InteractionEvent, callback);
 			//callback->Delete();
 			box->EnabledOn();
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
-
-
+			volume->SetBox(box);
+			*/
+			/*
+			  vtkSmartPointer<vtkPolyDataMapper> outlineMapper = 
+			  vtkSmartPointer<vtkPolyDataMapper>::New();
+			  outlineMapper->SetInputConnection(outline->GetOutputPort());
+			  vtkSmartPointer<vtkActor> outlineActor = 
+			  vtkSmartPointer<vtkActor>::New();
+			  outlineActor->SetMapper(outlineMapper);
+			  outlineActor->GetProperty()->SetColor(0,0,0);
+			
+			*/
+			volume->GetOutline()->SetInputData(input);
 
 			histogram->SetInputData(input);
 			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
@@ -4146,7 +4498,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			int bin_spacing = 1000;
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
 			histogram->Update();
-			// faire plutôt une liste avec push.
+			// faire plutÃ´t une liste avec push.
 
 			std::vector<int> peaks;
 			std::vector<int> peaksT;
@@ -4257,7 +4609,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			opacityFun->AddPoint(8500, 0.75, .5, 0.0);
 			opacityFun->AddPoint(12232, 1, 0.5, 0.0);*/
 			int first_point = 0; // as first low... a
-			int last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+			int last_point = 0; //somme pondÃ©rÃ©e autres peaks,  puis chercher s'il y a un low aprÃ¨s cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondÃ©rÃ©e.
 
 			if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
 				first_point = VTK_UNSIGNED_SHORT_MIN;
@@ -4350,23 +4702,26 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			opacityFun->AddPoint(first_point, 0, 0.5, 0);
 			opacityFun->AddPoint(second_point, 0.5, .5, 0);
 			opacityFun->AddPoint(third_point, 0.8, .5, 0);
-			opacityFun->AddPoint(last_point, 1, 0.5, 0);
+			opacityFun->AddPoint(last_point, 0.99, 0.5, 0);
 			TF->SetEnableOpacityMapping(true);
 			TF->SetScalarOpacityFunction(opacityFun);
 			TF->Build();
-			      mapper->SetBlendModeToComposite();
-				  property->ShadeOn();
+				mapper->SetBlendModeToComposite();
+				  
+				  
 				  //property->set
-				       property->SetAmbient(this->mui_Ambient);
+				  property->SetAmbient(this->mui_Ambient);
 			      property->SetDiffuse(this->mui_Diffuse);
 			      property->SetSpecular(this->mui_Specular);
 			      property->SetSpecularPower(this->mui_SpecularPower);
-
+				  property->SetInterpolationTypeToLinear();
+				  property->ShadeOn();
 				  double bblength = volume->GetBoundingBoxLength();
-				  double SOUD = bblength / 50;
-				  cout << "Scalar Opacity Unit Distance:" << bblength << "/50=" << SOUD << endl;
+				  double SOUD = bblength / 500;
+				  cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
 				  if (SOUD == 0) { SOUD = 0.89; }
-			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+				 
+			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit Ãªtre fonction de la taille des spÃ©cimens, sinon Ã§a va pas... 
 				 mapper->Update();
 				 volume->Update();
 				 volume->SetSelected(1);
@@ -4443,13 +4798,14 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			{
 				this->UpdateLandmarkSettings();
 			}*/
-			vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+			/*vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 			cout << "front light!" << endl;
 			
-			light->SetLightTypeToCameraLight();
-			light->SetPosition(0, 0, 200);
+			light->SetLightTypeToSceneLight();
+			light->SetPosition(0, 0,1);
 			this->getRenderer()->RemoveAllLights();
-			this->getRenderer()->AddLight(light);
+			this->getRenderer()->AddLight(light);*/
+
 			
 			this->Render();
 
@@ -6130,7 +6486,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 }	
 
 
-int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int apply_position_to_surfaces)
+int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int compression, int apply_position_to_surfaces)
 {
 	//save_surfaces_format: 0:VTK 1:PLY 2:STL
 	// save_surfaces_format 0 : stl
@@ -6218,7 +6574,19 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		{
 			pos_exists = this->selected_file_exists(onlypath, posExt, postfix);
 		}
-			
+		int map_exists = 0;
+
+
+		int map_special = 0;
+		if (g_distinct_selected_names.size() == 1 && projectname.toStdString().compare(g_distinct_selected_names.at(0)) == 0)
+		{
+			map_special = 1;
+			map_exists = this->selected_file_exists(onlypath, mapExt, no_postfix);
+		}
+		else
+		{
+			map_exists = this->selected_file_exists(onlypath, mapExt, postfix);
+		}
 
 		int mesh_exists = 0;
 		if (save_surfaces_format == 1)//VTK
@@ -6252,9 +6620,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			vol_exists = this->selected_file_exists(onlypath, vtiExt, no_postfix);
 		}
 
-		int map_exists = 0;
 		
-		map_exists = this->selected_file_exists(onlypath, mapExt, no_postfix);
+	
 		
 		
 
@@ -6573,6 +6940,10 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				{
 					_pos_file += postfix;
 				}
+				if (map_special == 0)
+				{
+					_map_file += postfix;
+				}
 				_pos_file.append(".pos");
 				_map_file.append(".map");
 
@@ -6600,7 +6971,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (write == 1)
 				{
 														
-					this->SaveVolume(_vol_fullpath, save_volumes_format, myVolume);
+					this->SaveVolume(_vol_fullpath, save_volumes_format, compression, myVolume);
 				}
 
 				write = 1;
@@ -10746,7 +11117,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 				MyInput=mymapper->GetInput();
 				MyTPSInput->DeepCopy(mymapper->GetInput());
 
-				// recupère la position de l'object s'il a bougé
+				// recupÃ¨re la position de l'object s'il a bougÃ©
 				double ve_init_pos[3];;
 				double ve_final_pos[3];
 				double ve_trans_pos[3];
@@ -10765,11 +11136,11 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 				transformFilter->SetInputData(MyTPSInput);
 
-				/// applique le calcul du tps à l'objet
+				/// applique le calcul du tps Ã  l'objet
 				transformFilter->SetTransform(tps);
 				transformFilter->Update();
 
-				// mise à jour du maillage sortant pour le tps
+				// mise Ã  jour du maillage sortant pour le tps
 				vtkSmartPointer<vtkPolyData> My_Output = vtkSmartPointer<vtkPolyData>::New();
 				My_Output = transformFilter->GetOutput();
 
@@ -14329,17 +14700,17 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						// 2 choix poissibles 
 						
 						// Choix A: dans tous N plus proches. 
-						// Garder que ceux qui sont dans la sphère
-						// se diriger dans la direction de la normale d'un facteur correspondant à la moyenne des dist pondérés par cos2 
+						// Garder que ceux qui sont dans la sphÃ¨re
+						// se diriger dans la direction de la normale d'un facteur correspondant Ã  la moyenne des dist pondÃ©rÃ©s par cos2 
 
-						// Bon faudrait quand même se diriger un peu vers le barycentre des 20 plus proches, ou faire une pondération qui prenne en compte la proximité (force de gravité)  ????? Sinon on n'y arrrive pas du tout.
-						// il faut aussi à mon avis virer le filtre qui calcule les normales dans cette fonction, j'ai l'impression qu'il modifie la topologie sans prévenir... 
+						// Bon faudrait quand mÃªme se diriger un peu vers le barycentre des 20 plus proches, ou faire une pondÃ©ration qui prenne en compte la proximitÃ© (force de gravitÃ©)  ????? Sinon on n'y arrrive pas du tout.
+						// il faut aussi Ã  mon avis virer le filtre qui calcule les normales dans cette fonction, j'ai l'impression qu'il modifie la topologie sans prÃ©venir... 
 
 						//
-						// Choix B: dans tous ces ponts vers lesquels on se dirige (utilisation du critère cos2)
-						// repérer le plus proche (ou les N plus proches). 
+						// Choix B: dans tous ces ponts vers lesquels on se dirige (utilisation du critÃ¨re cos2)
+						// repÃ©rer le plus proche (ou les N plus proches). 
 						// se diriger vers lui d'un facteur cos2 (ou vers leur moyennen dans l'espace d'un facteur cos2)
-						// le problème de cette approche et ques les trous se dépeuplent et que la sphère se déforme beaucoup.
+						// le problÃ¨me de cette approche et ques les trous se dÃ©peuplent et que la sphÃ¨re se dÃ©forme beaucoup.
 
 						vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 
@@ -14350,7 +14721,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						double currAmpl = 0;
 						//double currDist = 0;
 						
-						// Stratégie A
+						// StratÃ©gie A
 						kDTree->FindClosestNPoints(20, imp_pt, observedNeighbours);
 						vtkIdType toto = 0;
 						double maxDist = 0;
@@ -14457,7 +14828,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						{
 							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
 						}
-						//Stratégie B (non finie)
+						//StratÃ©gie B (non finie)
 						/*kDTree->FindPointsWithinRadius(radius, imp_pt, observedNeighbours);
 						vtkIdType cpt_realneighbors = 0;
 						vtkIdType cpt_notrealneighbors = 0;
@@ -16403,7 +16774,7 @@ void mqMorphoDigCore::groupSelectedActors()
 
 	}
 }
-void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, vtkMDVolume *myVolume)
+void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compression, vtkMDVolume *myVolume)
 {
 	// File_type 0 : mhd
 	// File_type 1 : mha
@@ -16449,6 +16820,8 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, vtkMDVolume *m
 
 			vtkSmartPointer<vtkMetaImageWriter> mhWriter = vtkSmartPointer<vtkMetaImageWriter>::New();
 			mhWriter->SetFileName(fileName.toLocal8Bit());
+			if (compression == 0) { mhWriter->SetCompression(false); }
+			else{ mhWriter->SetCompression(true); } 
 			mhWriter->SetInputData(output);
 			mhWriter->Write();
 			
@@ -16466,6 +16839,7 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, vtkMDVolume *m
 			vtkSmartPointer<vtkXMLImageDataWriter> xmlWriter = vtkSmartPointer<vtkXMLImageDataWriter>::New();
 			xmlWriter->SetFileName(fileName.toLocal8Bit());
 			xmlWriter->SetInputData(output);
+			
 			xmlWriter->Write();
 			
 		}
@@ -18207,7 +18581,7 @@ void mqMorphoDigCore::DollyCameraForPerspectiveMode()
 	double dispvector[3];
 	this->getCamera()->GetPosition(campos);
 	this->getCamera()->GetFocalPoint(foc);
-	double multfactor = 3.73; // at 30° vtk : angle = 2*atan((h/2)/d). 
+	double multfactor = 3.73; // at 30Â° vtk : angle = 2*atan((h/2)/d). 
 							  // then 2*d  =12/tan(viewangle/2) 
 	multfactor = 1 / tan(this->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
 	//cout << "DollyCameraForPerspectiveMode" << endl;
@@ -18233,7 +18607,7 @@ void mqMorphoDigCore::DollyCameraForPerspectiveMode()
 	cout << "Dolly4Perspective" << endl;
 }
 
-//On ajoute un indice au nom si le nom existe déjà.
+//On ajoute un indice au nom si le nom existe dÃ©jÃ .
 //fonction recurente pour savoir quel indice lui donner.
 std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	//cout << "check: " << name_obj << endl;

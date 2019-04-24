@@ -33,6 +33,7 @@ public:
   static void buildTagsMenu(QMenu& menu);
   static void buildRGBMenu(QMenu& menu);
   static void buildEditSelectedSurfacesMenu(QMenu& menu);
+  static void buildEditVolumesMenu(QMenu& menu);
   /**
   * Builds the standard Edit menu.
   */

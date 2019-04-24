@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>27</width>
-    <height>226</height>
+    <width>31</width>
+    <height>288</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -215,7 +215,7 @@
        <item alignment="Qt::AlignHCenter">
         <widget class="QToolButton" name="EditActors">
          <property name="toolTip">
-          <string>Edit first selected object name, color and matrix</string>
+          <string>Edit first selected surface name, color and matrix</string>
          </property>
          <property name="text">
           <string>...</string>
@@ -223,6 +223,20 @@
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/actor_edit.png</normaloff>:/Icons/actor_edit.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QToolButton" name="EditVolumes">
+         <property name="toolTip">
+          <string>Edit first selected volume name, matrix and other properties</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/volume_edit.png</normaloff>:/Icons/volume_edit.png</iconset>
          </property>
         </widget>
        </item>

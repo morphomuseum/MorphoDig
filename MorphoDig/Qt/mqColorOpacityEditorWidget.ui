@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>346</height>
+    <width>402</width>
+    <height>393</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,7 +41,7 @@
          <property name="minimumSize">
           <size>
            <width>287</width>
-           <height>182</height>
+           <height>90</height>
           </size>
          </property>
         </widget>
@@ -195,7 +195,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout3" stretch="0,0,0">
      <item>
-      <widget class="QLabel" name="label2">
+      <widget class="QLabel" name="lDiscretizeSlider">
        <property name="text">
         <string>Nr of values:</string>
        </property>
@@ -213,9 +213,113 @@
      </item>
     </layout>
    </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <layout class="QHBoxLayout" name="HLayoutSliderShift">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Shift</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QReleaseSlider" name="sliderShift">
+         <property name="minimum">
+          <number>-99</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="HLayoutSliderMin">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Min</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QReleaseSlider" name="sliderMin">
+         <property name="minimum">
+          <number>-99</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="HLayoutSliderMax">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Max</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QReleaseSlider" name="sliderMax">
+         <property name="minimum">
+          <number>-99</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="HLayoutMinMax">
+       <item>
+        <widget class="QLabel" name="LMapMin">
+         <property name="text">
+          <string>Mapped min:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="currentMin">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Mapped max:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="currentMax">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QReleaseSlider</class>
+   <extends>QSlider</extends>
+   <header>QReleaseSlider.h</header>
+  </customwidget>
   <customwidget>
    <class>mqTransferFunctionWidget</class>
    <extends>QWidget</extends>

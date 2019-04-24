@@ -26,6 +26,11 @@
 #include "mqMorphoDigCore.h"
 #include "mqAboutDialogReaction.h"
 #include "mqChangeNodeReaction.h"
+
+#include "mqEditACTORDialogReaction.h"
+#include "mqEditVolumeDialogReaction.h"
+#include "mqEditFLGDialogReaction.h"
+#include "mqEditLMKDialogReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
 #include "mqEditTagsDialogReaction.h"
 #include "mqICPDialogReaction.h"
@@ -300,13 +305,19 @@ void mqMorphoDigMenuBuilders::buildRGBMenu(QMenu& menu)
 	QAction::connect(RGBFromCurrentColor, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotScalarsRGB()));
 
 }
-
+void mqMorphoDigMenuBuilders::buildEditVolumesMenu(QMenu& menu)
+{
+	new mqEditVolumeDialogReaction(menu.addAction("Edit first selected volume") << mqSetName("actionEditVolume"));
+	
+}
 
 void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 {
 	QString objectName = menu.objectName();
 	std::cout << "Menu object name" << objectName.toStdString() << std::endl;
 	menu.setObjectName(objectName);
+	
+	new mqEditACTORDialogReaction(menu.addAction("Edit first selected surface") << mqSetName("actionEditSurface"));
 	QMenu* submenuStructureModification = menu.addMenu("Structure modification");
 
 	
@@ -396,6 +407,9 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	//ui.setupUi(&menu);
 	// since the UI file tends to change the name of the menu.
 	menu.setObjectName(objectName);
+	new mqEditLMKDialogReaction(menu.addAction("Edit first selected landmark") << mqSetName("actionEditLMK"));
+	new mqEditFLGDialogReaction(menu.addAction("Edit first selected flag") << mqSetName("actionEditFLG"));
+
 	// QAction *openNtw = menu.addAction("Open Project");
 
 	//new mqOpenDataReaction(openNtw, 1);//1= open NTW 
@@ -546,9 +560,9 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	dock4->titleBarWidget()->hide();
 	dock4->setAllowedAreas(Qt::AllDockWidgetAreas);
 	//QToolBar* lightToolBar = new mqLightControlsToolbar(&projectWindow);
-	QWidget* lightWidget = new mqLightControlsWidget(&projectWindow);
-	lightWidget->layout()->setSpacing(0);
-	dock4->setWidget(lightWidget);
+	//QWidget* lightWidget = new mqLightControlsWidget(&projectWindow);
+	//lightWidget->layout()->setSpacing(0);
+	//dock4->setWidget(lightWidget);
 	
 	
 	//cout << "create light tool bar" << endl;

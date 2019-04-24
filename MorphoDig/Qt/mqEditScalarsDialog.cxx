@@ -20,6 +20,7 @@
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
 #include <vtkDiscretizableColorTransferFunction.h>
+#include<vtkPiecewiseFunction.h>
 // we actually do not need glew...
 //#include <GL/glew.h>
 #include <QApplication>
@@ -144,48 +145,49 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->comboColorMap, SIGNAL(activated(int)), this, SLOT(slotActiveColorMapChanged(int)));
 	
 	
-	this->Ui->currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	this->Ui->currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	//this->Ui->currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	//this->Ui->currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->suggestedMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->suggestedMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	this->Ui->currentMin->setMinimum(-DBL_MAX);
+	/*this->Ui->currentMin->setMinimum(-DBL_MAX);
 	this->Ui->currentMax->setMinimum(-DBL_MAX);
 	this->Ui->currentMax->setValue(1);
 	this->Ui->currentMin->setValue(0);
+	this->ctfMin = 0;
+	this->ctfMax = 1;
+	*/
+	
 	this->Ui->suggestedMin->setMinimum(-DBL_MAX);
 	this->Ui->suggestedMax->setMinimum(-DBL_MAX);
 
-	this->Ui->currentMin->setMaximum(DBL_MAX);
-	this->Ui->currentMax->setMaximum(DBL_MAX);
+	/*this->Ui->currentMin->setMaximum(DBL_MAX);
+	this->Ui->currentMax->setMaximum(DBL_MAX);*/
 	this->Ui->suggestedMin->setMaximum(DBL_MAX);
 	this->Ui->suggestedMax->setMaximum(DBL_MAX);
-	this->Ui->sliderMin->setDoubleValue(0);
-	this->Ui->sliderMin->setDoubleMaximum(1);
-	this->Ui->sliderMin->setDoubleMinimum(-1);
-	
 
 	
 
-	this->Ui->sliderMax->setDoubleValue(1);
-	this->Ui->sliderMax->setDoubleMaximum(2);
-	this->Ui->sliderMax->setDoubleMinimum(0);
-	this->Ui->sliderMin->setDoubleSingleStep((this->Ui->sliderMin->doubleMaximum() - this->Ui->sliderMin->doubleMinimum()) / 100);
-
-	this->Ui->sliderMax->setDoubleSingleStep((this->Ui->sliderMax->doubleMaximum() - this->Ui->sliderMax->doubleMinimum()) / 100);
 
 
 	connect(this->Ui->pushScalarSuggestedMax, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMax()));
 	connect(this->Ui->pushScalarSuggestedMin, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMin()));
 	
-	connect(this->Ui->sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotMoveSliders()));
-	connect(this->Ui->sliderMax, SIGNAL(valueChanged(int)), this, SLOT(slotMoveSliders()));
+	/*connect(this->Ui->sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMin(int)));
+	connect(this->Ui->sliderMin, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+	connect(this->Ui->sliderMin, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
+
+	connect(this->Ui->sliderMax, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMax(int)));
+	connect(this->Ui->sliderMax, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
+	connect(this->Ui->sliderMax, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+
+	connect(this->Ui->sliderShift, SIGNAL(valueChanged(int)), this, SLOT(slotShiftSlider(int)));
+	connect(this->Ui->sliderShift, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+	connect(this->Ui->sliderShift, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
+
 	
-	connect(this->Ui->sliderMin, SIGNAL(sliderReleased()), this, SLOT(slotRefreshSliders()));
-	connect(this->Ui->sliderMax, SIGNAL(sliderReleased()), this, SLOT(slotRefreshSliders()));
-
-
-	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
-	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinMaxEdited()));
+	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinEdited()));
+	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMaxEdited()));
+	*/
 	connect(this->Ui->pushRemoveScalar, SIGNAL(pressed()), this, SLOT(slotRemoveScalar()));
 
 	this->Ui->reinitializeColorMap->setDisabled(false);
@@ -207,70 +209,8 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->removePercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 	
-	this->RefreshSliders();
-	/*
-	sc_show:
-scWindow->show();
 
-
-
-sliderMin->value(MT->Get_sc_min());
-sliderMax->value(MT->Get_sc_max());
-currentMax->value(MT->Get_sc_max());
-currentMin->value(MT->Get_sc_min());
-suggestedMax->value(MT->scalars_get_max());
-suggestedMin->value(MT->scalars_get_min());
-Refresh();
-	*/
-
-	/*connect(mqMorphoDigCore::instance(), SIGNAL(lmSelectionChanged()), this, SLOT(slotRefreshDialog()));
-	connect(this->Ui->next, SIGNAL(pressed()), this, SLOT(slotGetNextFlag()));
-	connect(this->Ui->prec, SIGNAL(pressed()), this, SLOT(slotGetPrecedingFlag()));
 	
-	this->FLG_Coll = NULL;
-	this->FLG = NULL;
-	
-	QString mylabel("...");
-	this->Ui->FlagLabel->setText(mylabel);
-	
-	double flag_rendering_size = mqMorphoDigCore::instance()->Getmui_FlagRenderingSize();
-	this->Ui->FlagRenderingSizeValue->setMinimum(0);
-	this->Ui->FlagRenderingSizeValue->setSingleStep(1);
-	this->Ui->FlagRenderingSizeValue->setValue(flag_rendering_size);
-
-	QColor myFlagColor;
-
-	double flagcolor[4];
-
-	this->Ui->FlagColorButton->setShowAlphaChannel(false);
-	mqMorphoDigCore::instance()->Getmui_FlagColor(flagcolor);
-
-	myFlagColor.setRedF(flagcolor[0]);
-	myFlagColor.setGreenF(flagcolor[1]);
-	myFlagColor.setBlueF(flagcolor[2]);
-
-
-	this->Ui->FlagColorButton->setChosenColor(myFlagColor);
-
-	this->Ui->x->setDecimals(10);
-	this->Ui->y->setDecimals(10);
-	this->Ui->z->setDecimals(10);
-	this->Ui->x->setMinimum(-DBL_MAX);
-	this->Ui->y->setMinimum(-DBL_MAX);
-	this->Ui->z->setMinimum(-DBL_MAX);
-
-	this->Ui->x->setMaximum(DBL_MAX);
-	this->Ui->y->setMaximum(DBL_MAX);
-	this->Ui->z->setMaximum(DBL_MAX);
-	
-
-	this->GetFirstSelectedFlag();
-	this->UpdateUI();
-	
- 
-  
- connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveFLG()));
- */
 
 }
 
@@ -293,16 +233,76 @@ int mqEditScalarsDialog::SomeThingHasChanged()
 	return something_has_changed;
 }
 
+/*void mqEditScalarsDialog::slotSliderStart()
+{
+	cout << "ShiftSliderStart" << endl;
+	this->slideMin = this->Ui->currentMin->value();
+	this->slideMax = this->Ui->currentMax->value();
+	this->maxShiftAmplitude = (this->slideMax - this->slideMin) / 2;
+
+}
+
+void mqEditScalarsDialog::slotSlideMin(int slideMin)
+{
+	if (slideMin != 0)
+	{
+		cout << "slideMin:" << slideMin << endl;
+		double newMin = this->slideMin + slideMin * this->maxShiftAmplitude / 100;
+		this->Ui->currentMin->setValue(newMin);
+
+		cout << "Min:" << newMin << endl;
+		this->ctfMin = newMin;
+		this->UpdateLookupTables();
+	}
 
 
+}
+void mqEditScalarsDialog::slotSlideMax(int slideMax)
+{
+	if (slideMax != 0)
+	{
+		cout << "slideMax:" << slideMax << endl;
+		double newMax = this->slideMax + slideMax * this->maxShiftAmplitude / 100;
+
+		this->Ui->currentMax->setValue(newMax);
+		cout << "Max:" << newMax << endl;
+
+		this->ctfMax = newMax;
+		this->UpdateLookupTables();
+	}
+
+}
+void mqEditScalarsDialog::slotShiftSlider(int shift)
+{
+	if (shift != 0)
+	{
+		cout << "shift:" << shift << endl;
+		double newMin = this->slideMin + shift * this->maxShiftAmplitude / 100;
+		double newMax = this->slideMax + shift * this->maxShiftAmplitude / 100;
+		this->Ui->currentMin->setValue(newMin);
+		this->Ui->currentMax->setValue(newMax);
+		//cout << "Min:" << newMin << endl;
+		//cout << "Max:" << newMax << endl;
+		this->ctfMin = newMin;
+		this->ctfMax = newMax;
+
+		this->UpdateLookupTables();
+	}
+}
+
+void mqEditScalarsDialog::slotSliderStop()
+{
+
+
+	
+
+	//cout << "ShiftSliderStop" << endl;
+
+}
+*/
 
 void mqEditScalarsDialog::UpdateUI()
 {
-	/*int color_scale_id = MT->GetColorScaleId();
-	
-	currentMax->value(MT->Get_sc_max());
-	currentMin->value(MT->Get_sc_min());
-*/
 	cout << "Call UpdateUI" << endl;
 	//1 populate comboActiveScalar
 
@@ -334,9 +334,9 @@ void mqEditScalarsDialog::slotReinitializeColorMap()
 			
 			this->RefreshComboColorMaps();
 
-			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap);
-			this->Ui->currentMin->setValue(0);
-			this->Ui->currentMax->setValue(1);
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap, 1);
+			//this->Ui->currentMin->setValue(0);
+			//this->Ui->currentMax->setValue(1);
 			
 			mqMorphoDigCore::instance()->Render();
 			//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
@@ -418,7 +418,7 @@ void mqEditScalarsDialog::slotDeleteColorMap()
 			//mqMorphoDigCore::instance()->Setmui_ActiveColorMap(newColormapName, mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
 
 			this->RefreshComboColorMaps();
-			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap);
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap, 1);
 			mqMorphoDigCore::instance()->Render();
 				//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
 				//this->UpdateUI();
@@ -443,73 +443,7 @@ void mqEditScalarsDialog::RefreshSuggestedRange()
 	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax(removePercent));
 	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin(removePercent));
 }
-void mqEditScalarsDialog::RefreshSliders() 
-{
-	
-	//this->Ui->sliderMin->setDoubleValue(this->Ui->currentMin->value());
-	//this->Ui->sliderMax->setDoubleValue(this->Ui->currentMax->value());
-	cout << "Refresh Sliders" << endl;
-	double curr_max = this->Ui->sliderMax->doubleValue();
-	double curr_min = this->Ui->sliderMin->doubleValue();
 
-	double new_max_min = (curr_max + curr_min) / 2;
-	double new_half = new_max_min - curr_min;
-	double new_max_max = curr_max+new_half;
-	
-	double new_min_min = curr_min - new_half;
-	double new_min_max = new_max_min;
-	cout << "Min:" << new_min_min << "|" << curr_min << "|" << new_min_max << endl;
-	cout << "Max:" << new_max_min << "|" << curr_max << "|" << new_max_max << endl;
-	this->Ui->sliderMin->setDoubleValue(curr_min);
-	this->Ui->sliderMax->setDoubleValue(curr_max);
-
-	this->Ui->sliderMin->setDoubleMaximum(new_min_max);
-	this->Ui->sliderMin->setDoubleMinimum(new_min_min);
-
-	this->Ui->sliderMax->setDoubleMinimum(new_max_min);
-	this->Ui->sliderMax->setDoubleMaximum(new_max_max);
-	this->Ui->sliderMin->setDoubleSingleStep((curr_max -curr_min) / 1000);
-	this->Ui->sliderMax->setDoubleSingleStep((curr_max-curr_min) / 1000);
-
-	this->Ui->sliderMin->setDoubleValue(curr_min);
-	this->Ui->sliderMax->setDoubleValue(curr_max);
-
-	this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
-
-	this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
-
-	/*
-	sliderMin->maximum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
-	sliderMin->minimum((3 * MT->Get_sc_min() - MT->Get_sc_max()) / 2);
-	sliderMax->minimum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
-	sliderMax->maximum((3 * MT->Get_sc_max() - MT->Get_sc_min()) / 2);
-	sliderMax->redraw();
-	sliderMax->redraw();
-	*/
-}
-
-void mqEditScalarsDialog::MoveSliders()
-{
-
-	//this->Ui->sliderMin->setDoubleValue(this->Ui->currentMin->value());
-	//this->Ui->sliderMax->setDoubleValue(this->Ui->currentMax->value());
-	cout << "Move Slider" << endl;
-	double curr_max = this->Ui->sliderMax->doubleValue();
-	double curr_min = this->Ui->sliderMin->doubleValue();
-
-	this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
-
-	this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
-
-	/*
-	sliderMin->maximum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
-	sliderMin->minimum((3 * MT->Get_sc_min() - MT->Get_sc_max()) / 2);
-	sliderMax->minimum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
-	sliderMax->maximum((3 * MT->Get_sc_max() - MT->Get_sc_min()) / 2);
-	sliderMax->redraw();
-	sliderMax->redraw();
-	*/
-}
 
 void mqEditScalarsDialog::RefreshRange() 
 {
@@ -595,45 +529,21 @@ void mqEditScalarsDialog::slotRemoveScalar()
 }
 void mqEditScalarsDialog::slotAcceptSuggestedMax()
 {
-	if (this->Ui->suggestedMax->value() > this->Ui->currentMin->value())
-	{
-		cout << "Slider Max futures value:" << this->Ui->suggestedMax->value() << endl;
-		if (this->Ui->suggestedMax->value() > this->Ui->sliderMax->getDoubleMaximum())
-		{
-			this->Ui->sliderMax->setDoubleMaximum(this->Ui->suggestedMax->value() + 1);
-		}
+	
+		cout << "Mapped Max futures value:" << this->Ui->suggestedMax->value() << endl;
+		this->mColorMap->SetCTFMax(this->Ui->suggestedMax->value());
 
-		if (this->Ui->suggestedMax->value() < this->Ui->sliderMax->getDoubleMinimum())
-		{
-			this->Ui->sliderMax->setDoubleMinimum(this->Ui->suggestedMax->value() - 1);
-		}
-
-
-		this->Ui->sliderMax->setDoubleValue(this->Ui->suggestedMax->value());
-		RefreshSliders();
-		this->UpdateLookupTables();
-	}
+		/*this->Ui->currentMax->setValue(this->Ui->suggestedMax->value());
+		this->ctfMax = this->Ui->suggestedMax->value();
+		this->UpdateLookupTables();*/
+	
 }
 
 void mqEditScalarsDialog::slotAcceptSuggestedMin()
 {
-	if (this->Ui->suggestedMin->value() < this->Ui->currentMax->value())
-	{
-		if (this->Ui->suggestedMin->value() > this->Ui->sliderMin->getDoubleMaximum())
-		{
-			this->Ui->sliderMin->setDoubleMaximum(this->Ui->suggestedMin->value() + 1);
-		}
 
-		if (this->Ui->suggestedMin->value() < this->Ui->sliderMin->getDoubleMinimum())
-		{
-			this->Ui->sliderMin->setDoubleMinimum(this->Ui->suggestedMin->value() - 1);
-		}
+	this->mColorMap->SetCTFMin(this->Ui->suggestedMin->value());
 
-
-		this->Ui->sliderMin->setDoubleValue(this->Ui->suggestedMin->value());
-		RefreshSliders();
-		this->UpdateLookupTables();
-	}
 }
 
 void mqEditScalarsDialog::slotRefreshComboScalars()
@@ -701,7 +611,7 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 			mqMorphoDigCore::instance()->Setmui_ActiveColorMapAndRender(NewActiveColorMap,
 				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap
 			);
-			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap, 1);
 		
 
 
@@ -711,162 +621,72 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 
 }
 
-/*
-
-comboActiveScalar :
-MT->Set_Active_Scalar(
-((Fl_Choice *)o)->value());
-suggestedMin->value(MT->scalars_get_max());
-suggestedMax->value(MT->scalars_get_min());
-MT->Update_RGB();
-MT->redraw();
-
-pushInitScalar:
-MT->Initialize_Scalar(comboActiveScalar->value());
-MT->redraw();
-
-pushRemoveScalar
-MT->Remove_Scalar(comboActiveScalar->value());
-MT->redraw()
-
-sliderMin:
-MT->Set_sc_min(((Fl_Slider *)o)->value());
-Refresh();
-MT->Update_RGB();
-MT->redraw();
-
-sliderMax:
-MT->Set_sc_max(((Fl_Slider *)o)->value());
-Refresh();
-MT->Update_RGB();
-MT->redraw();
-
-cbBelowMin:
-MT->SC_Show_Below_Min(((Fl_Check_Button *)o)->value());
-MT->redraw();
-
-cbBelowMax:
-MT->SC_Show_Above_Max(((Fl_Check_Button *)o)->value());
-MT->redraw();
-
-pushScalarSuggestedMin;
-currentMin->value(suggestedMin->value());
-
-pushScalarSuggestedMax;
-currentMax->value(suggestedMax->value());
-
-
-comboColorMap:
-MT->SetColorScaleId(
-((Fl_Choice *)o)->value());
-
-suggestedMax->value(MT->scalars_get_max());
-Min_sc->value(MT->scalars_get_min());
-MT->Update_RGB();
-MT->redraw();
-
-
-
-
-Refresh:
-
-
-update_2:
-suggestedMax->value(MT->scalars_get_max());
-suggestedMin->value(MT->scalars_get_min());
-
-
-*/
-void mqEditScalarsDialog::slotRefreshSliders()
-{
-	this->RefreshSliders();
-	this->UpdateLookupTables();
-}
-void mqEditScalarsDialog::slotMoveSliders()
-{
-	this->MoveSliders();
-	//this->UpdateLookupTables();
-}
-/*void mqEditScalarsDialog::slotSliderMinValueChanged(int value)
-{
-	cout << "Now slider Min = " << this->Ui->sliderMin->doubleValue() << endl;
-	this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
-	//this->RefreshSliders();
-
-}
-void mqEditScalarsDialog::slotSliderMaxValueChanged(int value)
-{
-	this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
-	//this->RefreshSliders();
-
-}*/
 
 void mqEditScalarsDialog::slotAccepted()
 {
 	
 
-	/*MT->Set_sc_max(currentMax->value());
-	MT->Set_sc_min(currentMin->value());
-	if (comboActiveScalar->value() >= 0)
-	{
-		MT->Set_Active_Scalar(comboActiveScalar->value());
-	}
-
-	if (comboColorMap->value() >= 0)
-	{
-
-		MT->SetColorScaleId(comboColorMap->value());
-	}
-	sliderMin->value(MT->Get_sc_min());
-	sliderMax->value(MT->Get_sc_max());
-	sliderMin->maximum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
-	sliderMin->minimum((3 * MT->Get_sc_min() - MT->Get_sc_max()) / 2);
-	sliderMax->minimum((MT->Get_sc_max() + MT->Get_sc_min()) / 2);
-	sliderMax->maximum((3 * MT->Get_sc_max() - MT->Get_sc_min()) / 2);
-	sliderMax->redraw();
-	sliderMin->redraw();
-	MT->Update_RGB();
-	MT->redraw();*/
-
 }
-void mqEditScalarsDialog::UpdateLookupTables()
+/*void mqEditScalarsDialog::UpdateLookupTables()
 {
-	mqMorphoDigCore::instance()->UpdateLookupTablesRanges(this->Ui->currentMin->value(), this->Ui->currentMax->value());
-}
-void mqEditScalarsDialog::slotCurrentMinMaxEdited()
+	mqMorphoDigCore::instance()->UpdateLookupTablesRanges(this->ctfMin, this->ctfMax);
+}*/
+
+/*void mqEditScalarsDialog::slotCurrentMinEdited()
 {
-	//cout << "Min max edited!" << endl;
-	double new_min = this->Ui->currentMin->value();
-	double new_max = this->Ui->currentMax->value();
-	if (new_min < new_max)
+	if (this->Ui->currentMin->value() < this->Ui->currentMax->value())
 	{
-		this->Ui->sliderMin->setDoubleValue(this->Ui->currentMin->value());
-		this->Ui->sliderMax->setDoubleValue(this->Ui->currentMax->value());
-		this->RefreshSliders();
-		this->UpdateLookupTables();
+		this->ctfMin = this->Ui->currentMin->value();
 	}
 	else
 	{
-		this->Ui->currentMin->setValue(this->Ui->sliderMin->doubleValue());
-		this->Ui->currentMax->setValue(this->Ui->sliderMax->doubleValue());
+		this->ctfMin = this->Ui->currentMax->value() - 10;
 	}
+
+
+
+
+	this->UpdateLookupTables();
+
 	
 }
+void mqEditScalarsDialog::slotCurrentMaxEdited()
+{
+	//cout << "Current max edited!" << endl;
+	if (this->Ui->currentMin->value() < this->Ui->currentMax->value())
+	{
+		this->ctfMax = this->Ui->currentMax->value();
+	}
+	else
+	{
+		this->ctfMax = this->Ui->currentMin->value() + 10;
+	}
+
+
+
+
+	this->UpdateLookupTables();
+
+}
+*/
 void mqEditScalarsDialog::slotRefreshDialog()
 {
 	cout << "Let's refresh dialog!"		<< endl;
 
 	//Dirty hack here! Replace "mqMorphoDigCore::instance()->GetScalarRangeMax()" by something which finds the bounds
 	// of the currently used lookup table
-	double min = mqMorphoDigCore::instance()->GetScalarRangeMin();
-	double max = mqMorphoDigCore::instance()->GetScalarRangeMax();
+	//double min = mqMorphoDigCore::instance()->GetScalarRangeMin();
+	//double max = mqMorphoDigCore::instance()->GetScalarRangeMax();
 	/*this->Ui->currentMin->setValue(min);
 	this->Ui->currentMax->setValue(max);*/
-	this->Ui->sliderMin->setDoubleValue(min);
-	this->Ui->sliderMax->setDoubleValue(max);
-	this->RefreshSliders();
+	/*this->Ui->currentMin->setValue(min);
+	this->Ui->currentMax->setValue(max);
+	this->ctfMin = min;
+	this->ctfMax = max;
+	*/
 	this->RefreshComboColorMaps();
 	//this->RefreshDialog();
+	//this->UpdateLookupTables();
 }
 
 
