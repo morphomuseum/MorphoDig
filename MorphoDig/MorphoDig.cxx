@@ -124,7 +124,7 @@ int MorphoDig::getTestInt()
 
 
 
-
+/*
 class vtkMyTextBoxCallback : public vtkCommand
 {
 public:
@@ -137,7 +137,7 @@ public:
 		widget->GetTransform(t);    widget->GetProp3D()->SetUserTransform(t);
 	}
 };
-
+*/
 
 //When node landmarks or handle landmarks are modified : do this!
 class vtkMyNodeHandleCallBack : public vtkCommand

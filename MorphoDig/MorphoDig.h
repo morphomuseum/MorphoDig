@@ -102,7 +102,7 @@ private:
 	
 	void saveSettings();
 	
-	vtkSmartPointer<vtkBoxWidget> _boxWidget;
+	//vtkSmartPointer<vtkBoxWidget> _boxWidget;
   vtkSmartPointer<vtkQtTableView>         TableView;
    //Ui_MorphoDig *ui;
 };
