@@ -191,8 +191,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	
 	connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
-
-
+	connect(this->mColorMap, SIGNAL(shiftOrSlideStopped()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
+	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
+	
 }
 
 
@@ -248,6 +249,30 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 	return something_has_changed;
 }
 
+
+void mqEditVolumeDialog::slotSaveActorMinMaxHaveBeenChangedInWidget()
+{
+	cout << "slotSaveActorMinMaxHaveBeenChangedInWidget" << endl;
+	if (this->Volume != NULL) {
+		double newMin = this->mColorMap->getSTCMin();
+		double newMax = this->mColorMap->getSTCMax();
+		double oldMin = this->Volume->GetScalarDisplayMin();
+		double oldMax = this->Volume->GetScalarDisplayMax();
+		if (oldMin != newMin || oldMax != newMax)
+		{
+			std::string action = "Update volume's display range";
+			int mCount = BEGIN_UNDO_SET(action);
+			this->Volume->SaveState(mCount);
+			double newMin = this->mColorMap->getSTCMin();
+			double newMax = this->mColorMap->getSTCMax();
+			this->Volume->SetScalarDisplayMin(newMin);
+			this->Volume->SetScalarDisplayMax(newMax);
+			this->Volume->Modified();
+			END_UNDO_SET();
+		}
+	}
+
+}
 void mqEditVolumeDialog::slotInterpolationToLinear(bool isChecked)
 {
 	if (this->Volume != NULL) {

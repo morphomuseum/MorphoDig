@@ -219,13 +219,16 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 
   QObject::connect(ui.sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMin(int)));
   QObject::connect(ui.sliderMin, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+  QObject::connect(ui.sliderMin, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
   
 
   QObject::connect(ui.sliderMax, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMax(int)));  
   QObject::connect(ui.sliderMax, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+  QObject::connect(ui.sliderMax, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
 
   QObject::connect(ui.sliderShift, SIGNAL(valueChanged(int)), this, SLOT(slotShiftSlider(int)));
   QObject::connect(ui.sliderShift, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
+  QObject::connect(ui.sliderShift, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
   
 
 
@@ -284,7 +287,9 @@ void mqColorOpacityEditorWidget::slotCurrentMinEdited()
 	{
 		this->ctfMin = this->Internals->Ui.currentMax->value() - 10;
 	}
+	
 	this->UpdateLookupTableRange();
+	emit minmaxChanged();
 }
 
 void mqColorOpacityEditorWidget::slotCurrentMaxEdited()
@@ -299,10 +304,11 @@ void mqColorOpacityEditorWidget::slotCurrentMaxEdited()
 		this->ctfMax = this->Internals->Ui.currentMin->value() + 10;
 	}
 
-
+	
 
 
 	this->UpdateLookupTableRange();
+	emit minmaxChanged();
 
 }
 
@@ -312,7 +318,7 @@ void mqColorOpacityEditorWidget::slotSliderStart()
 	this->slideMin = this->ctfMin;
 	this->slideMax = this->ctfMax;
 	this->maxShiftAmplitude = (this->slideMax - this->slideMin) / 2;
-
+	emit shiftOrSlideStarted();
 }
 
 void mqColorOpacityEditorWidget::slotSlideMin(int slideMin)
@@ -325,9 +331,16 @@ void mqColorOpacityEditorWidget::slotSlideMin(int slideMin)
 
 		cout << "Min:" << newMin << endl;
 		this->ctfMin = newMin;
+		
 		this->UpdateLookupTableRange();
+		
 	}
 
+	
+}
+void mqColorOpacityEditorWidget::slotSliderStop()
+{
+	emit shiftOrSlideStopped();
 
 }
 void mqColorOpacityEditorWidget::slotSlideMax(int slideMax)
@@ -341,7 +354,9 @@ void mqColorOpacityEditorWidget::slotSlideMax(int slideMax)
 		cout << "Max:" << newMax << endl;
 
 		this->ctfMax = newMax;
+		
 		this->UpdateLookupTableRange();
+		
 	}
 
 }
@@ -358,8 +373,9 @@ void mqColorOpacityEditorWidget::slotShiftSlider(int shift)
 		//cout << "Max:" << newMax << endl;
 		this->ctfMin = newMin;
 		this->ctfMax = newMax;
-
+		
 		this->UpdateLookupTableRange();
+		
 	}
 }
 
@@ -411,7 +427,7 @@ double mqColorOpacityEditorWidget::getSTCMin()
 		for (int j = 0; j < numnodes; j++)
 		{
 			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << endl;
 			if (curr < old_min) { old_min = curr; }
 
 		}
@@ -456,8 +472,10 @@ void mqColorOpacityEditorWidget::SetCTFMax(double newMax)
 }
 void mqColorOpacityEditorWidget::UpdateLookupTableRange()
 {
+	
 	if (this->STC != NULL)
 	{
+		cout << "UpdateLookupTableRange inside ColorOpacity widget" << endl;
 
 
 		double *pts = STC->GetDataPointer();
@@ -468,12 +486,12 @@ void mqColorOpacityEditorWidget::UpdateLookupTableRange()
 		for (int j = 0; j < numnodes; j++)
 		{
 			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << endl;
 			if (curr < old_min) { old_min = curr; }
 			if (curr > old_max) { old_max = curr; }
 
 		}
-		cout << "old max:" << old_max << ", old min:" << old_min << endl;
+		//cout << "old max:" << old_max << ", old min:" << old_min << endl;
 		if (old_max > old_min)
 		{
 			double old_range = old_max - old_min;
@@ -483,7 +501,7 @@ void mqColorOpacityEditorWidget::UpdateLookupTableRange()
 			for (int k = 0; k < numnodes; k++)
 			{
 				pts[4 * k] = pts[4 * k] * mult + c;
-				cout << "nx" << k << "=" << pts[4 * k] << endl;
+				//cout << "nx" << k << "=" << pts[4 * k] << endl;
 			}
 			STC->FillFromDataPointer(numnodes, pts);
 
@@ -595,7 +613,7 @@ void mqColorOpacityEditorWidget::updateCurrentData()
 
   if (ui.ColorEditor->currentPoint() >= 0 && stc)
   {
-	  cout << "Case 1" << endl;
+	 // cout << "Case 1" << endl;
     double xrgbms[6];
     stc->GetNodeValue(ui.ColorEditor->currentPoint(), xrgbms);
     ui.CurrentDataValue->setText(QString::number(xrgbms[0]));
@@ -611,7 +629,7 @@ void mqColorOpacityEditorWidget::updateCurrentData()
   }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
   {
-	  cout << "Case 2" << endl;
+	//  cout << "Case 2" << endl;
     double xvms[4];
     pwf->GetNodeValue(ui.OpacityEditor->currentPoint(), xvms);
     ui.CurrentDataValue->setText(QString::number(xvms[0]));
@@ -623,7 +641,7 @@ void mqColorOpacityEditorWidget::updateCurrentData()
   }
   else
   {
-	  cout << "Case 3" << endl;
+	//  cout << "Case 3" << endl;
     ui.CurrentDataValue->setEnabled(false);
   }
   

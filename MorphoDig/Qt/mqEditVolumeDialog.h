@@ -54,6 +54,7 @@ public:
   virtual void slotapplyMatrixToAllSelectedVolumes();
   virtual void slotInterpolationToLinear(bool isChecked);
   virtual void slotScalarOpacityUnitDistance(double SOUD);
+  virtual void slotSaveActorMinMaxHaveBeenChangedInWidget();
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();

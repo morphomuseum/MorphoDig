@@ -1499,7 +1499,7 @@ void MorphoDig::saveSettings()
 			for (int j = 0; j < nc; j++)
 			{
 				double curr = pts[4 * j];
-				cout << "x" << j << "=" << curr << endl;
+				//cout << "x" << j << "=" << curr << endl;
 				if (curr < cx_min) { cx_min = curr; }
 				if (curr > cx_max) { cx_max = curr; }
 

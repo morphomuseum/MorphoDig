@@ -374,7 +374,7 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti)"));
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti )"));
 
 	if (!filenames.isEmpty())
 	{
@@ -536,6 +536,7 @@ void mqOpenDataReaction::OpenData()
 			found2 = fileName.toStdString().find(VTIext2);
 			if (found != std::string::npos || found2 != std::string::npos)
 			{
+				cout << "MHD MHA or VTI" << endl;
 				type = 13; //MHA MHD VTI
 			}
 

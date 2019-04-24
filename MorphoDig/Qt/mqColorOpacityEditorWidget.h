@@ -74,6 +74,9 @@ public:
   
 signals:
   void changeFinished();
+  void minmaxChanged();
+  void shiftOrSlideStarted();
+  void shiftOrSlideStopped();
 public slots:
   /**
   * Sets the xvmsPoints that control the opacity transfer function.
@@ -139,6 +142,7 @@ protected slots:
   virtual void slotSliderStart();
   virtual void slotSlideMin(int slideMin);
   virtual void slotSlideMax(int slideMax);
+  virtual void slotSliderStop();
 
   /**
   * updates the panel to show/hide advanced settings

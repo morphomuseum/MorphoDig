@@ -88,12 +88,12 @@ void vtkMDVolume::SetColorAmbient(double ambient)
 void vtkMDVolume::SetScalarDisplayMax(double max)
 {
 	this->ScalarDisplayMax = max;
-	this->UpdateLookupTableRange();
+	//this->UpdateLookupTableRange();
 }
 void vtkMDVolume::SetScalarDisplayMin(double min)
 {
 	this->ScalarDisplayMin = min;
-	this->UpdateLookupTableRange();
+	//this->UpdateLookupTableRange();
 }
 void vtkMDVolume::SetScalarOpacityUnitDistance(double SOUD)
 {
@@ -153,7 +153,7 @@ double vtkMDVolume::GetLookupTableMin()
 	for (int j = 0; j < numnodes; j++)
 	{
 		double curr = pts[4 * j];
-		cout << "x" << j << "=" << curr << endl;
+		//cout << "x" << j << "=" << curr << endl;
 		if (curr < old_min) { old_min = curr; }
 
 	}
@@ -175,6 +175,7 @@ double vtkMDVolume::GetLookupTableMin()
 }
 void vtkMDVolume::UpdateLookupTableRange()
 {
+	cout << "UpdateLookupTableRange inside vtkMDVolume" << endl;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->GetCtf();
 
 	double *pts = CM->GetDataPointer();
@@ -185,12 +186,12 @@ void vtkMDVolume::UpdateLookupTableRange()
 	for (int j = 0; j < numnodes; j++)
 	{
 		double curr = pts[4 * j];
-		cout << "x" << j << "=" << curr << endl;
+		//cout << "x" << j << "=" << curr << endl;
 		if (curr < old_min) { old_min = curr; }
 		if (curr > old_max) { old_max = curr; }
 
 	}
-	cout << "old max:" << old_max << ", old min:" << old_min << endl;
+	//cout << "old max:" << old_max << ", old min:" << old_min << endl;
 	if (old_max > old_min)
 	{
 		double old_range = old_max - old_min;
@@ -200,7 +201,7 @@ void vtkMDVolume::UpdateLookupTableRange()
 		for (int k = 0; k < numnodes; k++)
 		{
 			pts[4 * k] = pts[4 * k] * mult + c;
-			cout << "nx" << k << "=" << pts[4 * k] << endl;
+			//cout << "nx" << k << "=" << pts[4 * k] << endl;
 		}
 		CM->FillFromDataPointer(numnodes, pts);
 
@@ -497,13 +498,16 @@ void vtkMDVolume::PopUndoStack()
 	cout << "PopUndoStack Set Selected: " << mCurrentSelected << endl;
 
 	
-
+	cout << "Old Min Max:" << this->ScalarDisplayMin << "," << this->ScalarDisplayMax << endl;
 	double mCurrentScalarDisplayMax = this->ScalarDisplayMax;
 	this->SetScalarDisplayMax(this->UndoRedo->UndoStack.back().ScalarDisplayMax);
-
+	
 	double mCurrentScalarDisplayMin = this->ScalarDisplayMin;
 	this->SetScalarDisplayMin(this->UndoRedo->UndoStack.back().ScalarDisplayMin);
 
+	cout << "New Min Max:" << this->ScalarDisplayMin << "," << this->ScalarDisplayMax << endl;
+
+	this->UpdateLookupTableRange();
 	double mCurrentScalarOpacityUnitDistance = this->ScalarOpacityUnitDistance;
 	this->SetScalarOpacityUnitDistance(this->UndoRedo->UndoStack.back().ScalarOpacityUnitDistance);
 
@@ -549,11 +553,13 @@ void vtkMDVolume::PopRedoStack()
 	
 
 	double mCurrentScalarDisplayMax = this->ScalarDisplayMax;
+	cout << "Old Min Max:" << this->ScalarDisplayMin << "," << this->ScalarDisplayMax << endl;
 	this->SetScalarDisplayMax(this->UndoRedo->RedoStack.back().ScalarDisplayMax);
-
 	double mCurrentScalarDisplayMin = this->ScalarDisplayMin;
+	
 	this->SetScalarDisplayMin(this->UndoRedo->RedoStack.back().ScalarDisplayMin);
-
+	this->UpdateLookupTableRange();
+	cout << "New Min Max:" << this->ScalarDisplayMin << "," << this->ScalarDisplayMax << endl;
 	double mCurrentScalarOpacityUnitDistance = this->ScalarOpacityUnitDistance;
 	this->SetScalarOpacityUnitDistance(this->UndoRedo->RedoStack.back().ScalarOpacityUnitDistance);
 

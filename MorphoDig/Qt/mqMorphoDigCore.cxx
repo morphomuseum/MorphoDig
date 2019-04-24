@@ -2378,6 +2378,7 @@ vtkDiscretizableColorTransferFunction* mqMorphoDigCore::GetOneColorMap()
 }
 void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 {
+	cout << "UpdateLookupTablesRanges inside MqMorphoDigCore" << endl;
 	for (int i = 0; i < this->mui_ExistingColorMaps->Stack.size(); i++)
 	{
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->mui_ExistingColorMaps->Stack.at(i).ColorMap;
@@ -2391,12 +2392,12 @@ void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 		for (int j = 0; j < numnodes; j++)
 		{
 			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << endl;
 			if (curr < old_min) { old_min = curr; }
 			if (curr > old_max) { old_max = curr; }
 
 		}
-		cout << "old max:" << old_max << ", old min:" << old_min << endl;
+		//cout << "old max:" << old_max << ", old min:" << old_min << endl;
 		if (old_max > old_min)
 		{
 			double old_range = old_max - old_min;
@@ -2406,7 +2407,7 @@ void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 			for (int k = 0; k < numnodes; k++)
 			{
 				pts[4 * k] = pts[4 * k] * mult + c;
-				cout << "nx" << k << "=" << pts[4 * k] << endl;
+				//cout << "nx" << k << "=" << pts[4 * k] << endl;
 			}
 			CM->FillFromDataPointer(numnodes, pts);
 
@@ -2517,18 +2518,18 @@ void mqMorphoDigCore::invertRGB(vtkDiscretizableColorTransferFunction *STC)
 		double *pts = STC->GetDataPointer();
 
 		int numnodes = STC->GetSize();
-		cout << ": num nodes = " << numnodes << endl;
+		//cout << ": num nodes = " << numnodes << endl;
 		double min = DBL_MAX;
 		double max = -DBL_MAX;
 		for (int j = 0; j < numnodes; j++)
 		{
 			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << endl;
 			if (curr < min) { min = curr; }
 			if (curr > max) { max = curr; }
 
 		}
-		cout << "max:" << max << ", old min:" << min << endl;
+		//cout << "max:" << max << ", old min:" << min << endl;
 		if (max > min)
 		{
 			double mult = -1;
@@ -2536,7 +2537,7 @@ void mqMorphoDigCore::invertRGB(vtkDiscretizableColorTransferFunction *STC)
 			for (int k = 0; k < numnodes; k++)
 			{
 				pts[4 * k] = pts[4 * k] * mult + c;
-				cout << "nx" << k << "=" << pts[4 * k] << endl;
+				//cout << "nx" << k << "=" << pts[4 * k] << endl;
 			}
 			STC->FillFromDataPointer(numnodes, pts);
 
@@ -4726,7 +4727,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 volume->SetScalarOpacityUnitDistance(SOUD);
 				 volume->SetScalarDisplayMin((double)first_point);
 				 volume->SetScalarDisplayMax((double)last_point);
-
+				 volume->UpdateLookupTableRange();
 
 				 QFileInfo fileInfo(fileName);
 				 QString onlyfilename(fileInfo.fileName());
@@ -5853,9 +5854,9 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 								QTextStream myteststream(&line);
 								myteststream >> Scalar_opacity >> Scalar_min >> Scalar_max;
 								volume->SetScalarOpacityUnitDistance(Scalar_opacity);
+								volume->SetScalarDisplayMin(Scalar_min);
 								volume->SetScalarDisplayMax(Scalar_max);
-								volume->SetScalarDisplayMax(Scalar_max);
-								
+								volume->UpdateLookupTableRange();
 							}
 						}
 						i++;
@@ -6263,6 +6264,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 	// mode 1: add map to Last Volume (for Volume objects)
 	// mode 2: add map to All selected Volumes (for Volume objects)
 	int nr, discretize, discretizenr, enableopacity, nc, no; 
+	cout << "Call open map in mode" << mode << endl;
 	double  cx, r, g, b, ox, ov;
 	QString ColorMapName;
 	QString SomeText;
@@ -6305,12 +6307,14 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 			{
 				type = 1;
 				//MAP
+				cout << "Open Map: Type 1!" << endl;
 			}
 			if (type == 1)
 			{
 				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
+				cout << "Open Map: Try open file!" << fileName.toStdString()<< endl;
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
@@ -6430,8 +6434,10 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 								//mode 1: sets the MAP to the last inserted volume
 								// can only add one STC to a gve
 								vtkMDVolume *myVolume = this->GetLastVolume();
+								cout << "Tried to get last volume for map i==" << i << endl;
 								if (myVolume != NULL)
 								{
+									cout << "Set Ctf!!!!" << i << endl;
 									myVolume->SetCtf(newSTC);
 								}
 							}
@@ -6439,6 +6445,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 							{
 								//mode 2: sets the MAP to the all selected volumes.
 								// can only add one STC to a gve
+								cout << "Tried to import map ==" << i << " to all selected volumes"<<endl;
 								this->getVolumeCollection()->InitTraversal();
 								for (vtkIdType i = 0; i < this->getVolumeCollection()->GetNumberOfItems(); i++)
 								{
@@ -6472,6 +6479,10 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 					}
 
 				}
+				else
+				{
+				cout << "Failed to open Map!" << endl;
+				 }
 					/**/
 
 					inputFile.close();
@@ -6492,8 +6503,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 	// save_surfaces_format 2 : ply
 
 	// save_volumes_format 0 : mhd
-	// save_surfaces_format 1 : mha
-	// save_surfaces_format 2 : vti
+	// save_volumes_format 1 : mha
+	// save_volumes_format 2 : vti
 	cout << "apply_position_to_surfaces=" << apply_position_to_surfaces << endl;
 	std::string NTWext = ".ntw";
 	std::string NTWext2 = ".NTW";
@@ -7006,7 +7017,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				{
 					
 					vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf = myVolume->GetCtf();
-					this->SaveMAP(_map_fullpath, myVolume->GetName().c_str(), ctf);
+					cout << "SaveNTW: call SaveMAP in volume mode" << endl;
+					this->SaveMAP(_map_fullpath, myVolume->GetName().c_str(), ctf, 1);
 					
 				}
 				stream << _vol_file.toStdString().c_str() << endl;
@@ -7824,12 +7836,16 @@ int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active)
 	return 1;
 
 }
-void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap)
+void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap, int volumeMode)
 {
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
 	{
 		QTextStream stream(&file);
+		if (volumeMode == 1)
+		{
+			stream << "nr: 1" << endl;
+		}
 		stream << "name: " << Name << endl;
 				
 		stream << "discretize: " << ColorMap->GetDiscretize() << endl;
@@ -7852,7 +7868,7 @@ void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vt
 		for (int j = 0; j < nc; j++)
 		{
 			double curr = pts[4 * j];
-			cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << endl;
 			if (curr < cx_min) { cx_min = curr; }
 			if (curr > cx_max) { cx_max = curr; }
 

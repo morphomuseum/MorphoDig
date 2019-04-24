@@ -9,6 +9,7 @@
 #define mqColorDialogReaction_h
 
 #include "mqReaction.h"
+#include "mqColorDialog.h"
 
 /**
 * @ingroup Reactions
@@ -26,16 +27,17 @@ public:
   /**
   * Shows the Color dialog for the application.
   */
-  static void showColorDialog();
+  static void showColorDialog(mqColorDialog *Color_dialog);
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { mqColorDialogReaction::showColorDialog(); }
+  virtual void onTriggered() { mqColorDialogReaction::showColorDialog(this->Color_dialog); }
 
 private:
   Q_DISABLE_COPY(mqColorDialogReaction)
+	  mqColorDialog *Color_dialog;
 };
 
 #endif
