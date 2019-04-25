@@ -65,6 +65,7 @@ public:
   virtual void slotRemoveScalar();
   virtual void slotRefreshColorMaps();
   
+  
  /* virtual void slotSliderMinValueChanged(int value);
   virtual void slotSliderMaxValueChanged(int value);*/
   

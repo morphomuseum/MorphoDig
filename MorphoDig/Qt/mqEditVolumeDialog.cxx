@@ -28,6 +28,7 @@
 #include <QRadioButton>
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QMessageBox>
 #include <QHeaderView>
 #include <QListWidgetItem>
 #include <QInputDialog>
@@ -212,7 +213,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->cutMaxPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->pushScalarSuggestedMax, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMax()));
 	connect(this->Ui->pushScalarSuggestedMin, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMin()));
-
+	connect(this->Ui->reinitializeColorMap, SIGNAL(pressed()), this, SLOT(slotReinitializeColorMap()));
+	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
+	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
 }
 
 
@@ -286,9 +289,10 @@ void mqEditVolumeDialog::RefreshSuggestedRange()
 	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMin(cutMin,1));
 }
 
-void mqEditVolumeDialog::slotLoadPreset(int idx)
+
+void mqEditVolumeDialog::LoadPreset()
 {
-	cout << "looks like we want to load a preset ! " << idx << endl;
+	//cout << "looks like we want to load a preset ! " << idx << endl;
 	if (this->Volume != NULL)
 	{
 
@@ -324,9 +328,111 @@ void mqEditVolumeDialog::slotLoadPreset(int idx)
 			}
 		}
 	}
+}
+void mqEditVolumeDialog::slotEditColorMapName()
+{
+	QString ActiveColorMap = this->Ui->comboColorMap->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom;
+		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+		if (ActiveColorMap == myExisingColorMapName && iscustom)
+		{
+			QInputDialog *giveNameDialog = new QInputDialog();
+			bool dialogResult;
+			QString newColormapName = giveNameDialog->getText(0, "Change color map name", "Name:", QLineEdit::Normal,
+				myExisingColorMapName, &dialogResult);
+			if (dialogResult)
+			{
+
+				cout << "new color map given:" << newColormapName.toStdString() << endl;
+				if (mqMorphoDigCore::instance()->colorMapNameAlreadyExists(newColormapName) == 1)
+				{
+					QMessageBox msgBox;
+					msgBox.setText("Can't change custom map name : name already exists.");
+					msgBox.exec();
+					return;
+				}
+				if (newColormapName.length() == 0)
+				{
+					QMessageBox msgBox;
+					msgBox.setText("Can't save custom map: name length =0.");
+					msgBox.exec();
+					return;
+				}
+				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name = newColormapName;
+				mqMorphoDigCore::instance()->Setmui_ActiveColorMap(newColormapName, mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+				this->RefreshComboColorMaps();
+				//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
+				//this->UpdateUI();
+			}
+			else
+			{
+				cout << "cancel " << endl;
+			}
+
+			//this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+
+
+		}
+	}
 
 }
+void mqEditVolumeDialog::slotDeleteColorMap()
+{
 
+	QString ActiveColorMap = this->Ui->comboColorMap->currentText();
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+	{
+		int iscustom = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom;
+		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+		if (ActiveColorMap == myExisingColorMapName && iscustom)
+		{
+
+			mqMorphoDigCore::instance()->deleteColorMap(i);
+			//mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.erase(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.begin() + i);
+			//mqMorphoDigCore::instance()->Setmui_ActiveColorMap(newColormapName, mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+			this->RefreshComboColorMaps();
+			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap, 1);
+			mqMorphoDigCore::instance()->Render();
+			//mqMorphoDigCore::instance()->createCustomColorMap(newColormapName, this->STC);				
+			//this->UpdateUI();
+
+
+		//this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+
+
+
+		}
+	}
+}
+void mqEditVolumeDialog::slotLoadPreset(int idx)
+{
+
+	this->LoadPreset();
+
+}
+void mqEditVolumeDialog::RefreshComboColorMaps()
+{
+	cout << "RefreshComboColorMaps" << endl;
+	this->Ui->comboColorMap->clear();
+	this->Ui->comboColorMap->addItem("");
+	ExistingColorMaps *MyCM = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps();
+	cout << "Found" << MyCM->Stack.size() << "color maps" << endl;
+	for (int i = 0; i < MyCM->Stack.size(); i++)
+	{
+
+		this->Ui->comboColorMap->addItem(MyCM->Stack.at(i).Name);
+
+
+	}
+	
+	
+		this->Ui->comboColorMap->setCurrentIndex(0);
+			
+}
 
 void mqEditVolumeDialog::slotAcceptSuggestedMax()
 {
@@ -530,10 +636,21 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->M32->setValue(Mat->GetElement(3, 2));
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
 		
+		this->RefreshComboColorMaps();
 		this->RefreshSuggestedRange();
 		
 	}
 	
+}
+void mqEditVolumeDialog::slotRefreshColorMaps()
+{
+	cout << "slotRefreshColorMaps" << endl;
+	this->RefreshComboColorMaps();
+}
+void mqEditVolumeDialog::slotReinitializeColorMap()
+{
+	this->LoadPreset();
+
 }
 void mqEditVolumeDialog::GetNextVolume()
 {

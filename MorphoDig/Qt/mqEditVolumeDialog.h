@@ -42,6 +42,8 @@ public:
   int CurrentVolumeInCollection();
   void RefreshDialog();
   void RefreshSuggestedRange();
+  void RefreshComboColorMaps();
+  void LoadPreset();
   /*double GetCTFMin();
   double GetCTFMax();
   void UpdateLookupTableRange();*/
@@ -60,6 +62,10 @@ public:
   virtual void slotAcceptSuggestedMax();
   virtual void slotRefreshUi();
   virtual void slotLoadPreset(int idx);
+  virtual void slotRefreshColorMaps();
+  virtual void slotReinitializeColorMap();
+  virtual void slotEditColorMapName();
+  virtual void slotDeleteColorMap();
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();
