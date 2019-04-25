@@ -303,6 +303,7 @@ void mqEditVolumeDialog::LoadPreset()
 			QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
 			if (NewActiveColorMap == myExisingColorMapName)
 			{
+				cout << "Found " << NewActiveColorMap.toStdString() << " in the list of Existing color maps" << endl;
 
 				if (mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom == 1)
 				{
@@ -317,11 +318,16 @@ void mqEditVolumeDialog::LoadPreset()
 					this->Ui->editColorMap->setDisabled(true);
 
 				}
+				cout << "^Copy CTF" <<  endl;
 				vtkSmartPointer<vtkDiscretizableColorTransferFunction> CTF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 				CTF->DeepCopy(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+				cout << "CTF copid" << endl;
 				this->Volume->SetCtf(CTF);
-				//this->Volume->UpdateLookupTableRange();
-				this->mColorMap->reInitialize(CTF, 0);
+				cout << "Volume set" << endl;
+				this->Volume->UpdateLookupTableRange();
+				cout << "Lookup table range updated" << endl;
+				this->mColorMap->reInitialize(CTF, 1);
+				cout << "Reinitialize color map" << endl;
 
 
 

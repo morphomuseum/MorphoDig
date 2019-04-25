@@ -126,6 +126,7 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 	{
 		if (keepMinMax == 0)
 		{
+			
 			this->ctfMin = this->getSTCMin();
 			this->ctfMax = this->getSTCMax();
 			this->Internals->Ui.currentMin->setValue(this->ctfMin);
