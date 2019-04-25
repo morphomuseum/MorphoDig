@@ -829,7 +829,7 @@ public:
 	double GetSuggestedScalarRangeMin(int cutMin= 5, int onlyselected=0);
 	double GetSuggestedScalarRangeMax(int cutMax=5, int onlyselected=0);
 	double GetSuggestedVolumeRangeMin(int cutMin = 15, int onlyselected = 0);
-	double GetSuggestedVolumeRangeMax(int cutMax = 5, int onlyselected = 0);
+	double GetSuggestedVolumeRangeMax(int cutMax = 30, int onlyselected = 0);
 	int GetTagRangeMin(QString TagArray = "");
 	int GetTagRangeMax(QString TagArray="");
 	double GetScalarRangeMin();
