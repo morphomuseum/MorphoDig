@@ -189,6 +189,10 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->UpdateUI();
 
 	
+	this->Ui->comboColorMap->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	
+	connect(this->Ui->comboColorMap, SIGNAL(activated(int)), this, SLOT(slotLoadPreset(int)));
+
 
 	this->Ui->scalarOpacityUnitDistance->setMaximum(DBL_MAX);
 
@@ -281,6 +285,49 @@ void mqEditVolumeDialog::RefreshSuggestedRange()
 	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMax(cutMax,1));
 	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMin(cutMin,1));
 }
+
+void mqEditVolumeDialog::slotLoadPreset(int idx)
+{
+	cout << "looks like we want to load a preset ! " << idx << endl;
+	if (this->Volume != NULL)
+	{
+
+
+		QString NewActiveColorMap = this->Ui->comboColorMap->currentText();
+		for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
+		{
+			QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
+			if (NewActiveColorMap == myExisingColorMapName)
+			{
+
+				if (mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom == 1)
+				{
+					this->Ui->reinitializeColorMap->setDisabled(true);
+					this->Ui->deleteColorMap->setDisabled(false);
+					this->Ui->editColorMap->setDisabled(false);
+				}
+				else
+				{
+					this->Ui->reinitializeColorMap->setDisabled(false);
+					this->Ui->deleteColorMap->setDisabled(true);
+					this->Ui->editColorMap->setDisabled(true);
+
+				}
+				vtkSmartPointer<vtkDiscretizableColorTransferFunction> CTF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+				CTF->DeepCopy(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+				this->Volume->SetCtf(CTF);
+				//this->Volume->UpdateLookupTableRange();
+				this->mColorMap->reInitialize(CTF, 0);
+
+
+
+			}
+		}
+	}
+
+}
+
+
 void mqEditVolumeDialog::slotAcceptSuggestedMax()
 {
 	

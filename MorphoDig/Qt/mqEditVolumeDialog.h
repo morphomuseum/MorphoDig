@@ -59,6 +59,7 @@ public:
   virtual void slotAcceptSuggestedMin();
   virtual void slotAcceptSuggestedMax();
   virtual void slotRefreshUi();
+  virtual void slotLoadPreset(int idx);
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();

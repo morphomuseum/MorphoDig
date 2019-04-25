@@ -7989,9 +7989,10 @@ void mqMorphoDigCore::SaveOneMAP(vtkSmartPointer<vtkDiscretizableColorTransferFu
 {
 	QInputDialog *giveNameDialog = new QInputDialog();
 	bool dialogResult;
+
 	QString Name = giveNameDialog->getText(0, "Color map name", "Name:", QLineEdit::Normal,
 		"Custom_color_map", &dialogResult);
-	if (dialogResult && Name.length>0)
+	if (dialogResult && Name.length()>0)
 	{
 
 		QString fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),

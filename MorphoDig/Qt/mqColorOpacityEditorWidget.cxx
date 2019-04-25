@@ -295,10 +295,7 @@ mqColorOpacityEditorWidget::~mqColorOpacityEditorWidget()
   delete this->Internals;
   this->Internals = NULL;
 }
-void mqColorOpacityEditorWidget::slotExportCTF()
-{
 
-}
 void mqColorOpacityEditorWidget::slotCurrentMinEdited()
 {
 	//cout << "Current Min edited!" << endl;
