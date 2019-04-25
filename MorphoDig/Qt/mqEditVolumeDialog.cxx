@@ -273,8 +273,8 @@ void mqEditVolumeDialog::RefreshSuggestedRange()
 	cout << "DIAL Edit Scalars dialog: refreshsuggestedRange" << endl;
 	int cutMin = this->Ui->cutMinPercent->value();
 	int cutMax = this->Ui->cutMaxPercent->value();
-	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMax(cutMin,1));
-	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMin(cutMax,1));
+	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMax(cutMax,1));
+	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMin(cutMin,1));
 }
 void mqEditVolumeDialog::slotAcceptSuggestedMax()
 {
@@ -478,6 +478,7 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->M32->setValue(Mat->GetElement(3, 2));
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
 		
+		this->RefreshSuggestedRange();
 		
 	}
 	
