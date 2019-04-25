@@ -1099,7 +1099,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 					for (vtkIdType i = 0; i < region_sizes->GetNumberOfTuples(); i++)
 					{
 						cout << "region_sizes->GetTuple((vtkIdType)"<<i<<")[0]" << region_sizes->GetTuple((vtkIdType)i)[0] << endl;
-						if (region_sizes->GetTuple((vtkIdType)i)[0] >= (vtkIdType)50) // no region smaller than 50... could be parameterized somewhere though
+						if (region_sizes->GetTuple((vtkIdType)i)[0] >= (vtkIdType)4) // no region smaller than 4... could be parameterized somewhere though
 						{
 
 							vtkSmartPointer<vtkThreshold> selector =
@@ -5986,6 +5986,10 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 								volume->SetScalarDisplayMin(Scalar_min);
 								volume->SetScalarDisplayMax(Scalar_max);
 								volume->UpdateLookupTableRange();
+								volume->SetSelected(0);
+								volume->SetChanged(1);
+
+								this->getVolumeCollection()->SetChanged(1);
 							}
 						}
 						i++;

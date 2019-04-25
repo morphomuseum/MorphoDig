@@ -227,6 +227,15 @@ IF (WIN32)
     "${VTK_DIR}/bin/Release/vtkgl2ps-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtklzma-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkdoubleconversion-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkImagingStatistics-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkRenderingVolumeOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkImagingMath-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkIOXML-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkIOXMLParser-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkexpat-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+
+
+
 
 
     "${qtcore}"
