@@ -170,15 +170,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	this->Ui->editColorMap->setDisabled(true);
 	this->Ui->deleteColorMap->setDisabled(true);
 
-	QAction* exportAction = new QAction(tr("&Export"), this);
-	exportAction->setToolTip(tr("Export color map"));
-	this->Ui->exportColorMap->addAction(exportAction);
-	this->Ui->exportColorMap->setDefaultAction(exportAction);
-	QIcon icon;
-	icon.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
-	//  exportColorMap->setIcon(icon);
-	exportAction->setIcon(icon);
-	new mqSaveMAPDialogReaction(exportAction);
+	
 	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
 	connect(this->Ui->reinitializeColorMap, SIGNAL(pressed()), this, SLOT(slotReinitializeColorMap()));

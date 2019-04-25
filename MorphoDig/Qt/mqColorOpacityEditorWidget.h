@@ -143,6 +143,7 @@ protected slots:
   virtual void slotSlideMin(int slideMin);
   virtual void slotSlideMax(int slideMax);
   virtual void slotSliderStop();
+  virtual void slotExportCTF();
 
   /**
   * updates the panel to show/hide advanced settings

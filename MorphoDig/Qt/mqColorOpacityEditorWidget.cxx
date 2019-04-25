@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mqMorphoDigCore.h"
 #include "mqTransferFunctionWidget.h"
+#include "mqSaveMAPDialogReaction.h"
 #include <vtkCommand.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkEventQtSlotConnect.h>
@@ -48,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QInputDialog>
 #include <QTimer>
+#include <QAction>
 #include <QVBoxLayout>
 #include <QtDebug>
 #include <QHeaderView>
@@ -106,6 +108,7 @@ public:
 	this->Ui.currentMax->setMaximum(DBL_MAX);
 	
 	cout << "mqInternals instantiation : done" << endl;
+
   }
 
   void render()
@@ -243,6 +246,22 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   QObject::connect(
     ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
 
+  if (mapSurfaces == 1)
+  {
+	  QAction* exportAction = new QAction(tr("&Export"), this);
+	  exportAction->setToolTip(tr("Export color map"));
+	  ui.exportColorMap->addAction(exportAction);
+	  ui.exportColorMap->setDefaultAction(exportAction);
+	  QIcon icon;
+	  icon.addFile(QStringLiteral(":/Icons/ExportMap22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	  exportAction->setIcon(icon);
+	  new mqSaveMAPDialogReaction(exportAction);
+  }
+  else
+  {
+	  // dans ce cas on n'exporte que celle active
+	  QObject::connect(ui.exportColorMap, SIGNAL(clicked()), this, SLOT(slotExportCTF()));
+  }
 
   //cout << "Will call updateCurrentData... " << endl;
   this->updateCurrentData();
@@ -275,6 +294,10 @@ mqColorOpacityEditorWidget::~mqColorOpacityEditorWidget()
 
   delete this->Internals;
   this->Internals = NULL;
+}
+void mqColorOpacityEditorWidget::slotExportCTF()
+{
+
 }
 void mqColorOpacityEditorWidget::slotCurrentMinEdited()
 {
@@ -1057,6 +1080,10 @@ void pqColorOpacityEditorWidget::presetApplied()
   this->Internals->OpacityTableModel.refresh();
 }
 */
+void mqColorOpacityEditorWidget::slotExportCTF()
+{
+	mqMorphoDigCore::instance()->SaveOneMAP(this->STC);
+}
 void mqColorOpacityEditorWidget::saveAsCustom()
 {
 	QInputDialog *giveNameDialog = new QInputDialog();

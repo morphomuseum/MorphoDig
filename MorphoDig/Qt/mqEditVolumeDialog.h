@@ -58,6 +58,7 @@ public:
   virtual void slotRefreshSuggestedRange();
   virtual void slotAcceptSuggestedMin();
   virtual void slotAcceptSuggestedMax();
+  virtual void slotRefreshUi();
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();

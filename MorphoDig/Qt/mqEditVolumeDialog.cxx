@@ -203,7 +203,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
 	connect(this->mColorMap, SIGNAL(shiftOrSlideStopped()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
 	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
-	connect(mqMorphoDigCore::instance(), SIGNAL(volumesMightHaveChanged()), this, SLOT(slotRefreshSuggestedRange()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(volumesMightHaveChanged()), this, SLOT(slotRefreshUi()));
 	connect(this->Ui->cutMinPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->cutMaxPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->pushScalarSuggestedMax, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMax()));
@@ -262,6 +262,11 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 	}
 
 	return something_has_changed;
+}
+void mqEditVolumeDialog::slotRefreshUi()
+{
+	this->GetFirstSelectedVolume();
+	this->UpdateUI();
 }
 
 void mqEditVolumeDialog::slotRefreshSuggestedRange()

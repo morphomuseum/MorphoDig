@@ -521,7 +521,7 @@ public:
 	int SaveNTWFile(QString fileName, int save_ori, int save_tag, int save_surfaces_format, int save_volumes_format, int compression, int apply_position_to_surfaces = 0);
 	int SaveSTVFile(QString fileName, int save_only_selected);
 	int SaveMAPFile(QString fileName, int save_only_active, QString Name = "", vtkMDVolume *volume =NULL);
-	
+	void SaveOneMAP(vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
 	int SaveTAGMAPFile(QString fileName, int save_only_active);
 	void SaveTAGMAP(QString fileName, int mapId, int mode);

@@ -112,6 +112,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QInputDialog>
+#include <QFileDialog>
 #include <QProgressDialog>
 #include <QProgressBar>
 #include <QStatusBar>
@@ -2255,7 +2256,7 @@ double mqMorphoDigCore::GetSuggestedVolumeRangeMax(int cutMax, int onlyselected)
 	double suggested_max = 1;
 	int totalVol = 0;
 	this->VolumeCollection->InitTraversal();
-
+	
 	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
@@ -2271,6 +2272,7 @@ double mqMorphoDigCore::GetSuggestedVolumeRangeMax(int cutMax, int onlyselected)
 			if (my_currmax > my_max) { my_max = my_currmax; }
 
 		}
+		
 	}
 
 
@@ -7981,6 +7983,106 @@ int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active, QString
 	
 	return 1;
 
+}
+
+void mqMorphoDigCore::SaveOneMAP(vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap)
+{
+	QInputDialog *giveNameDialog = new QInputDialog();
+	bool dialogResult;
+	QString Name = giveNameDialog->getText(0, "Color map name", "Name:", QLineEdit::Normal,
+		"Custom_color_map", &dialogResult);
+	if (dialogResult && Name.length>0)
+	{
+
+		QString fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+			tr("Save MAP files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + Name+".map",
+			tr("Map file (*.map)"), NULL
+			//, QFileDialog::DontConfirmOverwrite
+		);
+
+
+		cout << fileName.toStdString();
+		if (fileName.isEmpty()) return;
+		QFile file(fileName);
+		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+		{
+			QTextStream stream(&file);
+			stream << "nr: 1" << endl;
+			stream << "name: " << Name << endl;
+
+			stream << "discretize: " << ColorMap->GetDiscretize() << endl;
+			stream << "discretizenr: " << ColorMap->GetNumberOfValues() << endl;
+			stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << endl;
+
+			//3 set numer of colors
+
+			int nc = ColorMap->GetSize();
+			stream << "nc: " << nc << endl;
+
+			//4 set number of opacity nodes
+			int no = ColorMap->GetScalarOpacityFunction()->GetSize();
+			stream << "no: " << no << endl;
+
+			double *pts = ColorMap->GetDataPointer();
+			//first : find max and min cx to reset cx range between 0 and 1
+			double cx_min = DBL_MAX;
+			double cx_max = -DBL_MAX;
+			for (int j = 0; j < nc; j++)
+			{
+				double curr = pts[4 * j];
+				//cout << "x" << j << "=" << curr << endl;
+				if (curr < cx_min) { cx_min = curr; }
+				if (curr > cx_max) { cx_max = curr; }
+
+			}
+			double c = 0;
+			double mult = 1;
+			if (cx_max > cx_min)
+			{
+				double range = cx_max - cx_min;
+				mult = 1 / range;
+				c = -cx_min / range;
+			}
+
+			for (int j = 0; j < nc; j++)
+			{
+				double cx = mult * pts[4 * j] + c;
+				double r = pts[4 * j + 1];
+				double g = pts[4 * j + 2];
+				double b = pts[4 * j + 3];
+				stream << "c" << j << ": " << cx << " " << r << " " << g << " " << b << endl;
+			}
+			double *pts2 = ColorMap->GetScalarOpacityFunction()->GetDataPointer();
+
+			double ox_min = DBL_MAX;
+			double ox_max = -DBL_MAX;
+			for (int j = 0; j < no; j++)
+			{
+				double curr = pts2[2 * j];
+				if (curr < ox_min) { ox_min = curr; }
+				if (curr > ox_max) { ox_max = curr; }
+			}
+			c = 0;
+			mult = 1;
+			if (ox_max > ox_min)
+			{
+				double range = ox_max - ox_min;
+				mult = 1 / range;
+				c = -ox_min / range;
+			}
+
+			for (int j = 0; j < no; j++)
+			{
+				double ox = mult * pts2[2 * j] + c;
+				double ov = pts2[2 * j + 1];
+				stream << "op" << j << ": " << ox << " " << ov << endl;
+
+
+			}
+
+		}
+		file.close();
+	}
 }
 void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap)
 {

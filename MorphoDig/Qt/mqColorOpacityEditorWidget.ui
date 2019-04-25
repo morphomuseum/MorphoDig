@@ -137,6 +137,20 @@
         </spacer>
        </item>
        <item>
+        <widget class="QToolButton" name="exportColorMap">
+         <property name="toolTip">
+          <string>Export color map</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/ExportMap22.png</normaloff>:/Icons/ExportMap22.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="SaveAsCustom">
          <property name="toolTip">
           <string>Save to preset</string>

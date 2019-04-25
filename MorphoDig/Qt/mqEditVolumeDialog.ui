@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>495</width>
-    <height>713</height>
+    <width>505</width>
+    <height>753</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>174</x>
-     <y>680</y>
+     <y>720</y>
      <width>161</width>
      <height>30</height>
     </rect>
@@ -471,8 +471,8 @@
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>451</width>
-     <height>661</height>
+     <width>461</width>
+     <height>701</height>
     </rect>
    </property>
    <property name="title">
@@ -740,7 +740,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>190</y>
+      <y>230</y>
       <width>402</width>
       <height>398</height>
      </rect>
@@ -844,7 +844,7 @@
     <property name="geometry">
      <rect>
       <x>230</x>
-      <y>600</y>
+      <y>640</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -860,7 +860,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>600</y>
+      <y>640</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -873,7 +873,7 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>600</y>
+      <y>640</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -886,7 +886,7 @@
     <property name="geometry">
      <rect>
       <x>230</x>
-      <y>630</y>
+      <y>670</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -902,7 +902,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>600</y>
+      <y>640</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -915,7 +915,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>630</y>
+      <y>670</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -928,7 +928,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>630</y>
+      <y>670</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -941,7 +941,7 @@
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>600</y>
+      <y>640</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -957,7 +957,7 @@
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>630</y>
+      <y>670</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -973,7 +973,7 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>630</y>
+      <y>670</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -982,12 +982,98 @@
      <string>% cutMax</string>
     </property>
    </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>190</y>
+      <width>291</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QComboBox" name="comboColorMap"/>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="reinitializeColorMap">
+       <property name="toolTip">
+        <string>Reinitialize Color Map</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/Initialize24.png</normaloff>:/Icons/Initialize24.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="editColorMap">
+       <property name="toolTip">
+        <string>Edit color map name</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/edit.png</normaloff>:/Icons/edit.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="deleteColorMap">
+       <property name="toolTip">
+        <string>Delete color map</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../Icons/icons.qrc">
+         <normaloff>:/Icons/delete2.png</normaloff>:/Icons/delete2.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>200</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load preset</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
      <x>172</x>
-     <y>680</y>
+     <y>720</y>
      <width>161</width>
      <height>28</height>
     </rect>
