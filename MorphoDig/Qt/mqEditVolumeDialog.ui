@@ -1013,6 +1013,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="reinitializeColorMap">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Reinitialize Color Map</string>
        </property>
@@ -1027,6 +1030,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="editColorMap">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Edit color map name</string>
        </property>
@@ -1041,6 +1047,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="deleteColorMap">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Delete color map</string>
        </property>

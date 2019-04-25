@@ -177,9 +177,9 @@ void vtkMDVolume::UpdateLookupTableRange()
 {
 	cout << "UpdateLookupTableRange inside vtkMDVolume" << endl;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->GetCtf();
-	cout << "1" << endl;
+	//cout << "1" << endl;
 	double *pts = CM->GetDataPointer();
-	cout << "2" << endl;
+	//cout << "2" << endl;
 	int numnodes = CM->GetSize();
 	double old_min = DBL_MAX;
 	double old_max = -DBL_MAX;
@@ -192,7 +192,7 @@ void vtkMDVolume::UpdateLookupTableRange()
 
 
 	}
-	cout << "3" << endl;
+	//cout << "3" << endl;
 	//cout << "old max:" << old_max << ", old min:" << old_min << endl;
 	if (old_max > old_min)
 	{
@@ -208,12 +208,12 @@ void vtkMDVolume::UpdateLookupTableRange()
 		CM->FillFromDataPointer(numnodes, pts);
 
 	}
-	cout << "4" << endl;
+	//cout << "4" << endl;
 	vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
 	int numnodes2 = OF->GetSize();
-	cout << "5" << endl;
+	//cout << "5" << endl;
 	double *pts2 = OF->GetDataPointer();
-	cout << "6" << endl;
+	//cout << "6" << endl;
 	//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
 	double old_min2 = DBL_MAX;
 	double old_max2 = -DBL_MAX;
@@ -225,7 +225,7 @@ void vtkMDVolume::UpdateLookupTableRange()
 		if (curr > old_max2) { old_max2 = curr; }
 
 	}
-	cout << "7" << endl;
+	//cout << "7" << endl;
 	if (old_max2 > old_min2)
 	{
 		double old_range = old_max2 - old_min2;
@@ -240,7 +240,7 @@ void vtkMDVolume::UpdateLookupTableRange()
 		OF->FillFromDataPointer(numnodes2, pts2);
 
 	}
-	cout << "8" << endl;
+	//cout << "8" << endl;
 }
 void vtkMDVolume::UpdateLookupTableRange(double min, double max)
 {

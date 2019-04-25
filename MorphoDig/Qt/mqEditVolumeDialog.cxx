@@ -320,7 +320,11 @@ void mqEditVolumeDialog::LoadPreset()
 				}
 				cout << "^Copy CTF" <<  endl;
 				vtkSmartPointer<vtkDiscretizableColorTransferFunction> CTF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+				vtkSmartPointer<vtkPiecewiseFunction> NewOF = vtkSmartPointer<vtkPiecewiseFunction>::New();
 				CTF->DeepCopy(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap);
+				vtkPiecewiseFunction* OF = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap->GetScalarOpacityFunction();
+				NewOF->DeepCopy(OF);
+				CTF->SetScalarOpacityFunction(NewOF);
 				cout << "CTF copid" << endl;
 				this->Volume->SetCtf(CTF);
 				cout << "Volume set" << endl;
@@ -334,6 +338,7 @@ void mqEditVolumeDialog::LoadPreset()
 			}
 		}
 	}
+	mqMorphoDigCore::instance()->Render();
 }
 void mqEditVolumeDialog::slotEditColorMapName()
 {
@@ -423,6 +428,9 @@ void mqEditVolumeDialog::slotLoadPreset(int idx)
 void mqEditVolumeDialog::RefreshComboColorMaps()
 {
 	cout << "RefreshComboColorMaps" << endl;
+	this->Ui->deleteColorMap->setDisabled(true);
+	this->Ui->editColorMap->setDisabled(true);
+	this->Ui->reinitializeColorMap->setDisabled(true);
 	this->Ui->comboColorMap->clear();
 	this->Ui->comboColorMap->addItem("");
 	ExistingColorMaps *MyCM = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps();
@@ -644,6 +652,7 @@ void mqEditVolumeDialog::UpdateUI()
 		
 		this->RefreshComboColorMaps();
 		this->RefreshSuggestedRange();
+
 		
 	}
 	
