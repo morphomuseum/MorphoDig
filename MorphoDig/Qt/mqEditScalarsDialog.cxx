@@ -145,23 +145,14 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->comboColorMap, SIGNAL(activated(int)), this, SLOT(slotActiveColorMapChanged(int)));
 	
 	
-	//this->Ui->currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	//this->Ui->currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	
 	this->Ui->suggestedMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->suggestedMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	/*this->Ui->currentMin->setMinimum(-DBL_MAX);
-	this->Ui->currentMax->setMinimum(-DBL_MAX);
-	this->Ui->currentMax->setValue(1);
-	this->Ui->currentMin->setValue(0);
-	this->ctfMin = 0;
-	this->ctfMax = 1;
-	*/
+	
 	
 	this->Ui->suggestedMin->setMinimum(-DBL_MAX);
 	this->Ui->suggestedMax->setMinimum(-DBL_MAX);
 
-	/*this->Ui->currentMin->setMaximum(DBL_MAX);
-	this->Ui->currentMax->setMaximum(DBL_MAX);*/
 	this->Ui->suggestedMin->setMaximum(DBL_MAX);
 	this->Ui->suggestedMax->setMaximum(DBL_MAX);
 
@@ -172,22 +163,7 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	connect(this->Ui->pushScalarSuggestedMax, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMax()));
 	connect(this->Ui->pushScalarSuggestedMin, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMin()));
 	
-	/*connect(this->Ui->sliderMin, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMin(int)));
-	connect(this->Ui->sliderMin, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
-	connect(this->Ui->sliderMin, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
-
-	connect(this->Ui->sliderMax, SIGNAL(valueChanged(int)), this, SLOT(slotSlideMax(int)));
-	connect(this->Ui->sliderMax, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
-	connect(this->Ui->sliderMax, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
-
-	connect(this->Ui->sliderShift, SIGNAL(valueChanged(int)), this, SLOT(slotShiftSlider(int)));
-	connect(this->Ui->sliderShift, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
-	connect(this->Ui->sliderShift, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
-
 	
-	connect(this->Ui->currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinEdited()));
-	connect(this->Ui->currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMaxEdited()));
-	*/
 	connect(this->Ui->pushRemoveScalar, SIGNAL(pressed()), this, SLOT(slotRemoveScalar()));
 
 	this->Ui->reinitializeColorMap->setDisabled(false);
@@ -438,16 +414,12 @@ void mqEditScalarsDialog::slotRefreshSuggestedRange()
 
 void mqEditScalarsDialog::RefreshSuggestedRange() 
 {
-	cout << "DIAL refreshsuggestedRange" << endl;
+	cout << "DIAL Edit Scalars dialog: refreshsuggestedRange" << endl;
 	int removePercent = this->Ui->removePercent->value();
 	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMax(removePercent));
 	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedScalarRangeMin(removePercent));
 }
 
-
-void mqEditScalarsDialog::RefreshRange() 
-{
-}
 
 void mqEditScalarsDialog::RefreshComboScalars()
 {

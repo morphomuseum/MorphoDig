@@ -41,7 +41,7 @@ public:
   int SomeThingHasChanged();
   int CurrentVolumeInCollection();
   void RefreshDialog();
-
+  void RefreshSuggestedRange();
   /*double GetCTFMin();
   double GetCTFMax();
   void UpdateLookupTableRange();*/
@@ -55,6 +55,9 @@ public:
   virtual void slotInterpolationToLinear(bool isChecked);
   virtual void slotScalarOpacityUnitDistance(double SOUD);
   virtual void slotSaveActorMinMaxHaveBeenChangedInWidget();
+  virtual void slotRefreshSuggestedRange();
+  virtual void slotAcceptSuggestedMin();
+  virtual void slotAcceptSuggestedMax();
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();

@@ -176,6 +176,16 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 
 
+	this->Ui->suggestedMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->suggestedMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
+
+
+	this->Ui->suggestedMin->setMinimum(-DBL_MAX);
+	this->Ui->suggestedMax->setMinimum(-DBL_MAX);
+
+	this->Ui->suggestedMin->setMaximum(DBL_MAX);
+	this->Ui->suggestedMax->setMaximum(DBL_MAX);
+
 	this->UpdateUI();
 
 	
@@ -193,7 +203,12 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
 	connect(this->mColorMap, SIGNAL(shiftOrSlideStopped()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
 	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
-	
+	connect(mqMorphoDigCore::instance(), SIGNAL(volumesMightHaveChanged()), this, SLOT(slotRefreshSuggestedRange()));
+	connect(this->Ui->cutMinPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
+	connect(this->Ui->cutMaxPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
+	connect(this->Ui->pushScalarSuggestedMax, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMax()));
+	connect(this->Ui->pushScalarSuggestedMin, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMin()));
+
 }
 
 
@@ -249,6 +264,32 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 	return something_has_changed;
 }
 
+void mqEditVolumeDialog::slotRefreshSuggestedRange()
+{
+	this->RefreshSuggestedRange();
+}
+void mqEditVolumeDialog::RefreshSuggestedRange()
+{
+	cout << "DIAL Edit Scalars dialog: refreshsuggestedRange" << endl;
+	int cutMin = this->Ui->cutMinPercent->value();
+	int cutMax = this->Ui->cutMaxPercent->value();
+	this->Ui->suggestedMax->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMax(cutMin,1));
+	this->Ui->suggestedMin->setValue(mqMorphoDigCore::instance()->GetSuggestedVolumeRangeMin(cutMax,1));
+}
+void mqEditVolumeDialog::slotAcceptSuggestedMax()
+{
+	
+	this->mColorMap->SetCTFMax(this->Ui->suggestedMax->value());
+
+
+}
+
+void mqEditVolumeDialog::slotAcceptSuggestedMin()
+{
+
+	this->mColorMap->SetCTFMin(this->Ui->suggestedMin->value());
+
+}
 
 void mqEditVolumeDialog::slotSaveActorMinMaxHaveBeenChangedInWidget()
 {
@@ -291,6 +332,8 @@ void mqEditVolumeDialog::slotScalarOpacityUnitDistance(double SOUD)
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+
+
 
 // This dialog is non modal, and Volumes can have been removed from the collection in the meantime... so before saving Volumes, we should check whether they are still
 //inside the collection.

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>495</width>
-    <height>749</height>
+    <height>713</height>
    </rect>
   </property>
   <property name="palette">
@@ -458,9 +458,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>700</y>
-     <width>195</width>
+     <x>174</x>
+     <y>680</y>
+     <width>161</width>
      <height>30</height>
     </rect>
    </property>
@@ -472,7 +472,7 @@
      <x>20</x>
      <y>10</y>
      <width>451</width>
-     <height>681</height>
+     <height>661</height>
     </rect>
    </property>
    <property name="title">
@@ -481,9 +481,9 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>20</y>
-      <width>91</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -541,7 +541,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>60</y>
+      <y>50</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -550,8 +550,8 @@
    <widget class="QDoubleSpinBox" name="M10">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>60</y>
+      <x>180</x>
+      <y>50</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -560,8 +560,8 @@
    <widget class="QDoubleSpinBox" name="M20">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>60</y>
+      <x>240</x>
+      <y>50</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -570,8 +570,8 @@
    <widget class="QDoubleSpinBox" name="M30">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>60</y>
+      <x>300</x>
+      <y>50</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -581,7 +581,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>90</y>
+      <y>70</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -590,8 +590,8 @@
    <widget class="QDoubleSpinBox" name="M11">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>90</y>
+      <x>180</x>
+      <y>70</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -600,8 +600,8 @@
    <widget class="QDoubleSpinBox" name="M21">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>90</y>
+      <x>240</x>
+      <y>70</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -610,8 +610,8 @@
    <widget class="QDoubleSpinBox" name="M31">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>90</y>
+      <x>300</x>
+      <y>70</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -621,7 +621,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>120</y>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -630,8 +630,8 @@
    <widget class="QDoubleSpinBox" name="M12">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>120</y>
+      <x>180</x>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -640,8 +640,8 @@
    <widget class="QDoubleSpinBox" name="M22">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>120</y>
+      <x>240</x>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -650,8 +650,8 @@
    <widget class="QDoubleSpinBox" name="M32">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>120</y>
+      <x>300</x>
+      <y>90</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -661,7 +661,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>150</y>
+      <y>110</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -670,8 +670,8 @@
    <widget class="QDoubleSpinBox" name="M13">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>150</y>
+      <x>180</x>
+      <y>110</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -680,8 +680,8 @@
    <widget class="QDoubleSpinBox" name="M23">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>150</y>
+      <x>240</x>
+      <y>110</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -690,8 +690,8 @@
    <widget class="QDoubleSpinBox" name="M33">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>150</y>
+      <x>300</x>
+      <y>110</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -701,7 +701,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>50</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -714,7 +714,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>150</y>
+      <y>70</y>
       <width>91</width>
       <height>23</height>
      </rect>
@@ -726,10 +726,10 @@
    <widget class="QPushButton" name="ApplyMatrix">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>180</y>
-      <width>231</width>
-      <height>23</height>
+      <x>120</x>
+      <y>130</y>
+      <width>211</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -740,9 +740,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>290</y>
+      <y>190</y>
       <width>402</width>
-      <height>380</height>
+      <height>398</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -760,7 +760,7 @@
        <x>0</x>
        <y>0</y>
        <width>402</width>
-       <height>380</height>
+       <height>398</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
@@ -798,8 +798,8 @@
    <widget class="QCheckBox" name="interpolationToLinear">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>220</y>
+      <x>20</x>
+      <y>160</y>
       <width>161</width>
       <height>20</height>
      </rect>
@@ -814,8 +814,8 @@
    <widget class="QDoubleSpinBox" name="scalarOpacityUnitDistance">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>250</y>
+      <x>330</x>
+      <y>160</y>
       <width>101</width>
       <height>22</height>
      </rect>
@@ -830,8 +830,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>250</y>
+      <x>160</x>
+      <y>160</y>
       <width>171</width>
       <height>16</height>
      </rect>
@@ -840,13 +840,155 @@
      <string>Scalar opacity unit distance:</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushScalarSuggestedMin">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>600</y>
+      <width>31</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Apply suggested min</string>
+    </property>
+    <property name="text">
+     <string>-&gt;</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="suggestedMin">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>600</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>6</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>600</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>% cutMin</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushScalarSuggestedMax">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>630</y>
+      <width>31</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Apply suggested max</string>
+    </property>
+    <property name="text">
+     <string>-&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>600</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>suggested min:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>630</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>suggested max:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="suggestedMax">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>630</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>6</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="cutMinPercent">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>600</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>49</number>
+    </property>
+    <property name="value">
+     <number>15</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="cutMaxPercent">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>630</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>49</number>
+    </property>
+    <property name="value">
+     <number>5</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>630</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>% cutMax</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>700</y>
-     <width>193</width>
+     <x>172</x>
+     <y>680</y>
+     <width>161</width>
      <height>28</height>
     </rect>
    </property>

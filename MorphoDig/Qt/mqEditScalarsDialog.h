@@ -41,7 +41,6 @@ public:
  void RefreshComboColorMaps();
  void RefreshSuggestedRange();
  //void UpdateLookupTables();
- void RefreshRange();
   public slots:
   virtual void slotEditColorMapName();
   virtual void slotDeleteColorMap();

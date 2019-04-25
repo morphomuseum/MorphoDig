@@ -4801,11 +4801,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			}
 			//let's put first point a little bit further!
 			first_point = (int)(first_point + 0.2*(last_point - first_point));
-
+			cout << "Range based on peaks and lows :" << first_point << "," << last_point << endl;
 			//let's try something else
 			double width = input->GetScalarRange()[1] - input->GetScalarRange()[0];
 			first_point = input->GetScalarRange()[0] + 0.15*width;
 			last_point = input->GetScalarRange()[1] - 0.5*width;
+			cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
+			cout << "EH???" << endl;
 
 			int second_point = (int)(first_point + 0.2*(last_point - first_point));
 			int third_point = (int)(first_point + 0.4*(last_point - first_point));
