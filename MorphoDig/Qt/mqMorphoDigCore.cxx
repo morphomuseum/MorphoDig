@@ -2178,6 +2178,126 @@ double mqMorphoDigCore::GetScalarRangeMax()
 		return my_max;
 	}
 }
+double mqMorphoDigCore::GetSuggestedVolumeRangeMin(int cutMin, int onlyselected )
+{
+	// cutMin (is a percentage, between 0 and 50).
+		// get scalar range "cutMin"% smallest value 
+		// example1: cutMin = 0 => will return minimal scalar value (for all voxels of all opened volumes or for only selected volumes, depending on onlyselected 0,1)
+		// example2 : cutMin = 5 => will return rangeMin + 5% * (rangeMax - rangeMin)
+		// here we do not allow cutMin to exceed 50% because this function is usually used in association with GetSuggestedVolumeRangeMax, and we do not want the returned value to be greater than GetSuggestedVolumeRangeMax.
+	double my_min, my_max;
+	double my_currmin, my_currmax;
+
+	my_min = DBL_MAX;
+	my_max = -DBL_MAX;
+	my_currmin = DBL_MAX;
+	my_currmax = -DBL_MAX;
+	double suggested_min = 0;
+	int totalVol = 0;
+	this->VolumeCollection->InitTraversal();
+		
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		vtkSmartPointer<vtkImageData> data = myVolume->GetImageData();  
+
+
+		if (onlyselected == 0 || myVolume->GetSelected() == 1)
+		{
+			 totalVol++;
+			 my_currmin = data->GetScalarRange()[0];
+			 my_currmax = data->GetScalarRange()[1];
+			 if (my_currmin < my_min) { my_min = my_currmin; }
+			 if (my_currmax > my_max) { my_max = my_currmax; }
+
+		}
+	}
+	
+
+	if (totalVol > 0)
+	{
+		
+		double cut = 0;
+		if (cutMin >= 0 && cutMin < 50)
+		{
+			cut = (double)cutMin;
+			cut /= 100;
+		}
+
+		suggested_min = my_min + cut * (my_max - my_min);
+		
+	}
+	if (suggested_min == VTK_DOUBLE_MAX || suggested_min == VTK_FLOAT_MAX)
+	{
+		cout << "Strange!!!" << endl;
+		return 0;
+	}
+	else
+	{
+		return suggested_min;
+	}
+}
+
+double mqMorphoDigCore::GetSuggestedVolumeRangeMax(int cutMax, int onlyselected)
+{
+	// cutMax (is a percentage, between 0 and 50).
+		// get scalar range "cutMax"% highest value 
+		// example1: cutMax = 0 => will return maximal scalar value (for all voxels of all opened volumes or for only selected volumes, depending on onlyselected 0,1)
+		// example2 : cutMax = 5 => will return rangeMax - 5% * (rangeMax - rangeMin)
+		// here we do not allow cutMin to exceed 50% because this function is usually used in association with GetSuggestedVolumeRangeMin, and we do not want the returned value to be smaller than GetSuggestedVolumeRangeMin.
+	double my_min, my_max;
+	double my_currmin, my_currmax;
+
+	my_min = DBL_MAX;
+	my_max = -DBL_MAX;
+	my_currmin = DBL_MAX;
+	my_currmax = -DBL_MAX;
+	double suggested_max = 1;
+	int totalVol = 0;
+	this->VolumeCollection->InitTraversal();
+
+	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+		vtkSmartPointer<vtkImageData> data = myVolume->GetImageData();
+
+
+		if (onlyselected == 0 || myVolume->GetSelected() == 1)
+		{
+			totalVol++;
+			my_currmin = data->GetScalarRange()[0];
+			my_currmax = data->GetScalarRange()[1];
+			if (my_currmin < my_min) { my_min = my_currmin; }
+			if (my_currmax > my_max) { my_max = my_currmax; }
+
+		}
+	}
+
+
+	if (totalVol > 0)
+	{
+
+		double cut = 0;
+		if (cutMax >= 0 && cutMax < 50)
+		{
+			cut = (double)cutMax;
+			cut /= 100;
+		}
+
+		suggested_max = my_max - cut * (my_max - my_min);
+
+	}
+	if (suggested_max == VTK_DOUBLE_MIN || suggested_max == VTK_FLOAT_MIN)
+	{
+		cout << "Strange!!!" << endl;
+		return 1;
+	}
+	else
+	{
+		return suggested_max;
+	}
+}
+
 
 double mqMorphoDigCore::GetSuggestedScalarRangeMin(int cutMin, int onlyselected)
 {
@@ -4681,6 +4801,11 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			}
 			//let's put first point a little bit further!
 			first_point = (int)(first_point + 0.2*(last_point - first_point));
+
+			//let's try something else
+			double width = input->GetScalarRange()[1] - input->GetScalarRange()[0];
+			first_point = input->GetScalarRange()[0] + 0.15*width;
+			last_point = input->GetScalarRange()[1] - 0.5*width;
 
 			int second_point = (int)(first_point + 0.2*(last_point - first_point));
 			int third_point = (int)(first_point + 0.4*(last_point - first_point));

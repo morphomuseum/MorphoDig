@@ -662,6 +662,7 @@ public:
 	void Setmui_BackGroundColor2(double background[3]);
 	//static mqMorphoDigCore* New();
 	static mqMorphoDigCore* instance();
+	
 	void UpdateLandmarkSettings();
 	void UpdateLandmarkSettings(vtkLMActor *myActor);
 	void SetMainWindow(QMainWindow *_mainWindow);
@@ -827,6 +828,8 @@ public:
   void invertOpacity(vtkDiscretizableColorTransferFunction *STC);
 	double GetSuggestedScalarRangeMin(int cutMin= 5, int onlyselected=0);
 	double GetSuggestedScalarRangeMax(int cutMax=5, int onlyselected=0);
+	double GetSuggestedVolumeRangeMin(int cutMin = 15, int onlyselected = 0);
+	double GetSuggestedVolumeRangeMax(int cutMax = 10, int onlyselected = 0);
 	int GetTagRangeMin(QString TagArray = "");
 	int GetTagRangeMax(QString TagArray="");
 	double GetScalarRangeMin();
