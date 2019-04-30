@@ -216,6 +216,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->reinitializeColorMap, SIGNAL(pressed()), this, SLOT(slotReinitializeColorMap()));
 	connect(this->Ui->editColorMap, SIGNAL(pressed()), this, SLOT(slotEditColorMapName()));
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps()));
+	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 }
 
 
@@ -427,6 +429,7 @@ void mqEditVolumeDialog::slotLoadPreset(int idx)
 }
 void mqEditVolumeDialog::RefreshComboColorMaps()
 {
+
 	cout << "RefreshComboColorMaps" << endl;
 	this->Ui->deleteColorMap->setDisabled(true);
 	this->Ui->editColorMap->setDisabled(true);

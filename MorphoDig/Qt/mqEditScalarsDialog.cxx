@@ -280,6 +280,8 @@ void mqEditScalarsDialog::UpdateUI()
 	this->RefreshComboColorMaps();
 
 	this->RefreshSuggestedRange();
+
+	
 	
 	
 }

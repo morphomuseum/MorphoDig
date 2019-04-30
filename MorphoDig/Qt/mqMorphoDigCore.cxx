@@ -2602,7 +2602,7 @@ void mqMorphoDigCore::createCustomTagMap(QString name)
 	this->mui_ActiveTagMap->tagNames = tagNames;
 	this->mui_ActiveTagMap->Name = name;	
 
-	cout << "Add this map to !!" << endl;
+	cout << "Add this map to !! create custom tag map" << endl;
 	this->mui_ExistingTagMaps->Stack.push_back(ExistingTagMaps::Element(name, newTagMap, numTags, tagNames, 1));
 	emit this->tagMapsChanged();
 
@@ -2626,10 +2626,10 @@ void mqMorphoDigCore::createCustomColorMap(QString name, vtkDiscretizableColorTr
 	cout << "Active color map = newSTC!" << endl;
 	this->mui_ActiveColorMap->Name = name;
 
-	cout << "Add this map to !!" << endl;
+	cout << "Add this map to create custom colormap!!" << endl;
 	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));
 
-	
+	emit colorMapsChanged();
 
 }
 
@@ -3281,6 +3281,7 @@ void mqMorphoDigCore::reinitializeColorMap(int i)
 		cout << "Try to set existing color maps 3!!" << endl;
 
 	}
+	cout << "colorMapsChanged reinitializeColorMap" << endl;
 	emit this->colorMapsChanged();
 }
 void mqMorphoDigCore::deleteTagMap(int i)
@@ -6537,7 +6538,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 							newSTC->Build();
 
 
-							cout << "Add this map to !!" << endl;
+							cout << "Add this map to open map!!" << endl;
 							int num = 2;
 							if (this->colorMapNameAlreadyExists(ColorMapName) == 1)
 							{
@@ -20860,6 +20861,7 @@ void mqMorphoDigCore::signal_tagMapsChanged()
 void mqMorphoDigCore::signal_colorMapsChanged()
 {
 	//cout << "Emit projection Mode Changed" << endl;
+	cout << "colorMapsChanged signal_colorMapsChanged" << endl;
 	emit this->colorMapsChanged();
 }
 void mqMorphoDigCore::signal_zoomChanged()

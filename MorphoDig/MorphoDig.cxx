@@ -689,7 +689,7 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 			newSTC->Build();
 
 
-			cout << "Add this map to !!" << endl;
+			cout << "Add this map to !!(morphodig constructor)" << endl;
 			this->MorphoDigCore->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));
 
 		}

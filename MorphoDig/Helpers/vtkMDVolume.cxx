@@ -489,9 +489,14 @@ void vtkMDVolume::PopUndoStack()
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction>ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	ctf = this->GetCtf();
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	vtkSmartPointer<vtkPiecewiseFunction> OF = ctf->GetScalarOpacityFunction();
+	vtkSmartPointer<vtkPiecewiseFunction> SavedOF = vtkSmartPointer<vtkPiecewiseFunction>::New();
 	Savedctf->DeepCopy(ctf);
+	SavedOF->DeepCopy(OF);
+	Savedctf->SetScalarOpacityFunction(SavedOF);
 
 	ctf->DeepCopy(this->UndoRedo->UndoStack.back().Ctf);
+	OF->DeepCopy(ctf->GetScalarOpacityFunction());
 	this->SetCtf(ctf);
 
 	//maybe we need to Deep copy the opacity function as well????
@@ -547,8 +552,15 @@ void vtkMDVolume::PopRedoStack()
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction>ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	ctf = this->GetCtf();
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	vtkSmartPointer<vtkPiecewiseFunction> OF = ctf->GetScalarOpacityFunction();
+	vtkSmartPointer<vtkPiecewiseFunction> SavedOF = vtkSmartPointer<vtkPiecewiseFunction>::New();
 	Savedctf->DeepCopy(ctf);
+	SavedOF->DeepCopy(OF);
+	Savedctf->SetScalarOpacityFunction(SavedOF);
+
 	ctf->DeepCopy(this->UndoRedo->RedoStack.back().Ctf);
+	OF->DeepCopy(ctf->GetScalarOpacityFunction());
+	
 	this->SetCtf(ctf);
 	//maybe we need to Deep copy the opacity function as well????
 
@@ -604,8 +616,12 @@ void vtkMDVolume::SaveState(int mCount)
 	ctf = this->GetCtf();
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	Savedctf->DeepCopy(ctf);
+
+	vtkSmartPointer<vtkPiecewiseFunction> OF = ctf->GetScalarOpacityFunction();
+	vtkSmartPointer<vtkPiecewiseFunction> SavedOF = vtkSmartPointer<vtkPiecewiseFunction>::New();
+	SavedOF->DeepCopy(OF);
+	Savedctf->SetScalarOpacityFunction(SavedOF);
 	
-	//maybe we need to Deep copy the opacity function as well????
 
 
 	int mSelected = this->Selected;
