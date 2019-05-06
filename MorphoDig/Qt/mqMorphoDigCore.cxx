@@ -4881,6 +4881,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 //this->getRenderer()->AddVolume(volume);
 				 this->getVolumeCollection()->AddItem(volume);
 				 emit this->actorsMightHaveChanged();
+				 emit this->volumesMightHaveChanged();
 				 this->Initmui_ExistingArrays();
 				 std::string action = "Load volume";
 				 int mCount = BEGIN_UNDO_SET(action);
@@ -20585,6 +20586,7 @@ void mqMorphoDigCore::Undo()
 	//cout << "Root Undo!" << endl;
 	this->UndoStack->undo(); // removes the next undo set.. 
 	emit this->actorsMightHaveChanged();
+	emit this->volumesMightHaveChanged();
 
 }
 void mqMorphoDigCore::Undo(int Count)
@@ -20674,6 +20676,7 @@ void mqMorphoDigCore::Redo()
 	//cout << "Root Redo!" << endl;
 	this->UndoStack->redo(); // removes the next undo set.. 
 	emit this->actorsMightHaveChanged();
+	emit this->volumesMightHaveChanged();
 }
 
 void mqMorphoDigCore::Redo(int Count)
