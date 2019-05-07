@@ -86,6 +86,10 @@ public:
 	//vtkSetMacro(ScalarOpacityUnitDistance, double);
 
 	
+	void SetdisplayROI(int disp);
+	//	vtkSetMacro(displayROI, int);
+	vtkGetMacro(displayROI, int);
+	
 
 	vtkSetMacro(Changed, int);
 	vtkGetMacro(Changed, int);
@@ -142,6 +146,7 @@ protected:
 	~vtkMDVolume();
 	
 	int Selected;
+	int displayROI;
 	int Changed; // used by vtkMDVolumeCollectionUndoRedo class to recompute global center of mass and center of mass
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 	vtkSmartPointer<vtkImageData> ImageData;

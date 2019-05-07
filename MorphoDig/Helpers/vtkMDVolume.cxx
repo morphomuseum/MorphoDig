@@ -45,6 +45,7 @@ vtkMDVolume::vtkMDVolume()
 {
 	this->UndoRedo = new vtkMDVolumeUndoRedo;
 	this->Selected = 1;
+	this->displayROI = 0;
 	this->Outline = vtkSmartPointer<vtkOutlineFilter>::New();
 	this->OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->OutlineActor = vtkSmartPointer<vtkActor>::New();
@@ -77,6 +78,19 @@ vtkMDVolume::~vtkMDVolume()
 
 }
 
+void vtkMDVolume::SetdisplayROI(int disp)
+{
+	if (disp == 0) {
+		this->displayROI = 0;
+		this->Box->SetEnabled(false);
+	}
+	else
+	{ 
+		this->displayROI = 1;
+		this->Box->SetEnabled(true);
+	}
+
+}
 void vtkMDVolume::SetColorAmbient(double ambient)
 {
 	//cout << "Volume ambient property:" << ambient << endl;
@@ -371,6 +385,7 @@ void vtkMDVolume::SetSelected(int selected)
 		if (this->GetMapper() != NULL)
 		{
 			mqMorphoDigCore::instance()->getRenderer()->AddActor(this->OutlineActor);
+			if (this->displayROI == 1) { this->Box->SetEnabled(true); }
 		}
 		
 	}
@@ -378,7 +393,7 @@ void vtkMDVolume::SetSelected(int selected)
 	{
 		//enlever la box
 		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->OutlineActor);
-
+		this->Box->SetEnabled(false);
 	}
 }
 void vtkMDVolume::Undo(int mCount)

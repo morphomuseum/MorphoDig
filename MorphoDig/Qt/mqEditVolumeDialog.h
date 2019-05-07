@@ -66,6 +66,7 @@ public:
   virtual void slotReinitializeColorMap();
   virtual void slotEditColorMapName();
   virtual void slotDeleteColorMap();
+  virtual void slotdisplayROIPressed();
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();

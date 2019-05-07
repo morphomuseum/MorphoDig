@@ -2767,9 +2767,13 @@ void mqMorphoDigCore::InitLuts()
 	
     this->ScalarRedLut->SetColorSpaceToRGB();
 	this->ScalarRedLut->EnableOpacityMappingOn();
+	/*TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+			TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
+			TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
+			TF->AddRGBPoint(last_point, 1, 1, 1, .5, 0);*/
 	this->ScalarRedLut->AddRGBPoint(0.0, 0.0, 0.0, 0.0); //# black
-	this->ScalarRedLut->AddRGBPoint(0.4, 1.0, 0, 0.0); //# reddish
-	this->ScalarRedLut->AddRGBPoint(0.8, 1.0, 0.4900, 0.25);// # flesh
+	this->ScalarRedLut->AddRGBPoint(0.2, 0.73, 0, 0.0); //# reddish
+	this->ScalarRedLut->AddRGBPoint(0.4, 0.9, 0.82, 0.56);// # yellow
 	this->ScalarRedLut->AddRGBPoint(1.0, 1.0, 1.0, 1.0);// # white
 
 	// 	vtkPiecewiseFunction
@@ -2778,10 +2782,11 @@ void mqMorphoDigCore::InitLuts()
 	
 
 	vtkSmartPointer<vtkPiecewiseFunction> opacityfunction =  vtkSmartPointer<vtkPiecewiseFunction>::New();
+	
 
 	opacityfunction->AddPoint(0, 0);
-	opacityfunction->AddPoint(0.4, 0.4);
-	opacityfunction->AddPoint(0.8, 0.6);
+	opacityfunction->AddPoint(0.2, 0.5);
+	opacityfunction->AddPoint(0.4, 0.8);
 	opacityfunction->AddPoint(1, 1);
 	
 	this->ScalarRedLut->SetScalarOpacityFunction(opacityfunction);
@@ -3259,12 +3264,12 @@ void mqMorphoDigCore::reinitializeColorMap(int i)
 			STC->SetColorSpaceToRGB();
 			STC->EnableOpacityMappingOn();
 			STC->AddRGBPoint(0.0, 0.0, 0.0, 0.0); //# black
-			STC->AddRGBPoint(0.4, 1.0, 0, 0.0); //# reddish
-			STC->AddRGBPoint(0.8, 1.0, 0.4900, 0.25);// # flesh
-			STC->AddRGBPoint(1.0, 1.0, 1.0, 1.0);// # white			
+			STC->AddRGBPoint(0.2, 0.73, 0, 0.0); //# reddish
+			STC->AddRGBPoint(0.4, 0.9, 0.82, 0.56);// # yellow
+			STC->AddRGBPoint(1.0, 1.0, 1.0, 1.0);// # white
 			opacityRfunction->AddPoint(0, 0.3);
-			opacityRfunction->AddPoint(0.4, 0.4);
-			opacityRfunction->AddPoint(0.8, 0.6);
+			opacityRfunction->AddPoint(0.2, 0.5);
+			opacityRfunction->AddPoint(0.4, 0.8);
 			opacityRfunction->AddPoint(1, 1);
 			STC->SetScalarOpacityFunction(opacityRfunction);
 			STC->EnableOpacityMappingOn();
@@ -4567,7 +4572,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			
 			
 
-			/*
+			
 			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
 			box->SetPlaceFactor(1.01);
@@ -4581,26 +4586,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
 			callback->SetMapper(mapper);
-
-			//vtkSmartPointer<vtkMyNodeHandleCallBack> callback = vtkSmartPointer<vtkMyNodeHandleCallBack>::New();
-  //mqMorphoDigCore::instance()->getNodeLandmarkCollection()->AddObserver(vtkCommand::ModifiedEvent, callback);
-
-			//box->AddObserver(vtkCommand::InteractionEvent, callback);
-			//callback->Delete();
-			box->EnabledOn();
+			
+			box->AddObserver(vtkCommand::InteractionEvent, callback);
+			
+			box->EnabledOff();
+			box->RotationEnabledOff();
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
 			volume->SetBox(box);
-			*/
-			/*
-			  vtkSmartPointer<vtkPolyDataMapper> outlineMapper = 
-			  vtkSmartPointer<vtkPolyDataMapper>::New();
-			  outlineMapper->SetInputConnection(outline->GetOutputPort());
-			  vtkSmartPointer<vtkActor> outlineActor = 
-			  vtkSmartPointer<vtkActor>::New();
-			  outlineActor->SetMapper(outlineMapper);
-			  outlineActor->GetProperty()->SetColor(0,0,0);
 			
-			*/
+			
 			volume->GetOutline()->SetInputData(input);
 
 			histogram->SetInputData(input);
@@ -4831,7 +4825,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			opacityFun->AddPoint(first_point, 0, 0.5, 0);
 			opacityFun->AddPoint(second_point, 0.5, .5, 0);
 			opacityFun->AddPoint(third_point, 0.8, .5, 0);
-			opacityFun->AddPoint(last_point, 0.99, 0.5, 0);
+			opacityFun->AddPoint(last_point, 1, 0.5, 0);
 			TF->SetEnableOpacityMapping(true);
 			TF->SetScalarOpacityFunction(opacityFun);
 			TF->Build();

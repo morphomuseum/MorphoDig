@@ -24,6 +24,8 @@
  <file>MorphoDig.ico</file>
     <!-- Typical file operations. -->
    <file>rubber_mode.png</file>
+   <file>eye_opened.png</file>
+   <file>eye_closed.png</file>
    <file>rubber_mode_keepinside.png</file>
    <file>rubber_mode_keepoutside.png</file>
 <file>ScalarBar24.png</file>

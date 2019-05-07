@@ -27,6 +27,7 @@
 #include <QFile>
 #include <QRadioButton>
 #include <QFileDialog>
+#include <QAction>
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QHeaderView>
@@ -218,6 +219,24 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps()));
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
+
+
+
+	QAction* actiondisplayROIToggle = new QAction(tr("&displayROI"), this);
+	actiondisplayROIToggle->setCheckable(true);
+	actiondisplayROIToggle->setToolTip(tr("display clipping ROI."));
+	this->Ui->displayROI->addAction(actiondisplayROIToggle);
+	this->Ui->displayROI->setDefaultAction(actiondisplayROIToggle);
+	QIcon icon;
+	icon.addFile(QStringLiteral(":/Icons/eye_opened.png"), QSize(), QIcon::Normal, QIcon::Off);
+	icon.addFile(QStringLiteral(":/Icons/eye_closed.png"), QSize(), QIcon::Normal, QIcon::On);
+	//  exportColorMap->setIcon(icon);
+	actiondisplayROIToggle->setIcon(icon);
+	//new mqCameraReaction(actionCameraOrthoPerspectiveToggle, 7); //7 = camera OrthoPerspective toggle
+
+	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
+	this->Ui->displayROI->setChecked(true);
+
 }
 
 
@@ -278,6 +297,24 @@ void mqEditVolumeDialog::slotRefreshUi()
 	this->UpdateUI();
 }
 
+void mqEditVolumeDialog::slotdisplayROIPressed()
+{
+	if (this->Volume != NULL)
+	{
+		if (this->Ui->displayROI->isChecked())
+		//if (this->Volume->GetdisplayROI() == 0)
+		{
+			this->Volume->SetdisplayROI(1);
+		}
+		else
+		{
+			
+				this->Volume->SetdisplayROI(0);
+			
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotRefreshSuggestedRange()
 {
 	this->RefreshSuggestedRange();
@@ -622,6 +659,20 @@ void mqEditVolumeDialog::UpdateUI()
 {
 	if (this->Volume != NULL) {
 		
+		
+		if (this->Volume->GetdisplayROI() == 1)
+		{
+
+			this->Ui->displayROI->setChecked(false);
+		}
+		else
+		{
+			this->Ui->displayROI->setChecked(true);
+		}
+
+		
+		
+
 		QString mylabel(this->Volume->GetName().c_str());
 		this->Ui->VolumeName->setText(mylabel);
 		//this->mColorMap->setMinMax(this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());

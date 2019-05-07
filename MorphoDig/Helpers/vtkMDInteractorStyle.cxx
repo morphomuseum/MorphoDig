@@ -20,6 +20,7 @@
 #include "mqMorphoDigCore.h"
 #include "mqSaveNTWDialog.h"
 #include "mqCoreUtilities.h"
+#include <vtkBoxWidget.h>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
@@ -44,7 +45,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkPropPicker.h>
 #include <vtkCellPicker.h>
-
+#include <vtk3DWidget.h>
 #include <vtkPolyDataMapper.h>
 vtkStandardNewMacro(vtkMDInteractorStyle);
 
@@ -2533,6 +2534,7 @@ void vtkMDInteractorStyle::RotateActors()
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
 			vtkProp3D *myPropr2 = vtkProp3D::SafeDownCast(myVolume->GetOutlineActor());
+			//vtkProp3D *myPropr3 = vtkProp3D::SafeDownCast(myVolume->GetBox());
 			if (myVolume->GetSelected() == 1)
 			{
 				//cout << "Apply prop3Dtransform" << endl;
@@ -2558,6 +2560,11 @@ void vtkMDInteractorStyle::RotateActors()
 					2,
 					rotate,
 					scale);
+				/*this->Prop3DTransform(myPropr3,
+					rot_center,
+					2,
+					rotate,
+					scale);*/
 				myVolume->SetChanged(1);
 			}
 		}
@@ -2740,6 +2747,7 @@ void vtkMDInteractorStyle::SpinActors()
 		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 		vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
 		vtkProp3D *myPropr2 = vtkProp3D::SafeDownCast(myVolume->GetOutlineActor());
+		//vtkProp3D *myPropr3 = vtkProp3D::SafeDownCast(myVolume->GetBox());
 		if (myVolume->GetSelected() == 1)
 		{
 			this->Prop3DTransform(myPropr,
@@ -2752,6 +2760,11 @@ void vtkMDInteractorStyle::SpinActors()
 				1,
 				rotate,
 				scale);
+			/*this->Prop3DTransform(myPropr3,
+				spin_center,
+				1,
+				rotate,
+				scale);*/
 			myVolume->SetChanged(1);
 		}
 
@@ -2915,6 +2928,8 @@ void vtkMDInteractorStyle::PanActors()
 		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 		vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myVolume);
 		vtkProp3D *myPropr2 = vtkProp3D::SafeDownCast(myVolume->GetOutlineActor());
+		//vtk3DWidget *myPropr3 = vtk3DWidget::SafeDownCast(myVolume->GetBox());
+		
 		if (myVolume->GetSelected() == 1)
 		{
 			if (myPropr->GetUserMatrix() != NULL)
@@ -2947,6 +2962,18 @@ void vtkMDInteractorStyle::PanActors()
 					motion_vector[1],
 					motion_vector[2]);
 			}
+
+			if (myVolume->GetBox() != NULL)
+			{
+				myVolume->GetBox()->PlaceWidget();
+				
+				//cout << "myPropr3 box is not null" << endl;
+			}
+			else
+			{
+				//cout << "myPropr3 box is null (unfortunately)" << endl;
+			}
+			//myVolume->GetBox()->
 			myVolume->SetChanged(1);
 		}
 	}

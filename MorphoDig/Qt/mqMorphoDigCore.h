@@ -53,7 +53,7 @@
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
 
-/*class vtkBoxWidgetCallback : public vtkCommand
+class vtkBoxWidgetCallback : public vtkCommand
 {
 public:
 	static vtkBoxWidgetCallback *New()
@@ -86,7 +86,7 @@ protected:
 	}
 	vtkSmartPointer<vtkSmartVolumeMapper> Mapper;
 };
-*/
+
 class ExistingArrays
 {
 public:
