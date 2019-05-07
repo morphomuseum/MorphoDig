@@ -40,6 +40,7 @@ public:
  void RefreshComboScalars();
  void RefreshComboColorMaps();
  void RefreshSuggestedRange();
+ void ActiveColorMapChanged(int idx);
  //void UpdateLookupTables();
   public slots:
   virtual void slotEditColorMapName();

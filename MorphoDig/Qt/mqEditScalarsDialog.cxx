@@ -480,7 +480,8 @@ void mqEditScalarsDialog::RefreshComboColorMaps()
 	if (exists > -1) {
 		cout << "DIAL Now current index of combo box is " << exists << endl;
 		this->Ui->comboColorMap->setCurrentIndex(exists);
-		vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap;
+		this->ActiveColorMapChanged(exists);
+		//vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->Getmui_ActiveColorMap()->ColorMap;
 		//this->mColorMap
 
 	}
@@ -553,6 +554,14 @@ void mqEditScalarsDialog::slotActiveScalarChanged(int idx)
 
 void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 {
+	this->slotActiveColorMapChanged(idx);
+	
+
+
+}
+void mqEditScalarsDialog::ActiveColorMapChanged(int idx)
+{
+	
 	cout << "looks like active color map has changed!:: " << idx << endl;
 	QString NewActiveColorMap = this->Ui->comboColorMap->currentText();
 	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.size(); i++)
@@ -560,8 +569,8 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 		QString myExisingColorMapName = mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).Name;
 		if (NewActiveColorMap == myExisingColorMapName)
 		{
-			
-			if (mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom==1)
+
+			if (mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).isCustom == 1)
 			{
 				this->Ui->reinitializeColorMap->setDisabled(true);
 				this->Ui->deleteColorMap->setDisabled(false);
@@ -578,7 +587,7 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 				mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap
 			);
 			this->mColorMap->reInitialize(mqMorphoDigCore::instance()->Getmui_ExistingColorMaps()->Stack.at(i).ColorMap, 1);
-		
+
 
 
 		}
@@ -586,7 +595,6 @@ void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 
 
 }
-
 
 void mqEditScalarsDialog::slotAccepted()
 {

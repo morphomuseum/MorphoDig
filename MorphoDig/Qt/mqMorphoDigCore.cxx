@@ -2755,7 +2755,7 @@ void mqMorphoDigCore::InitLuts()
 	this->ScalarRainbowLut->GetNumberOfValues();
 	vtkSmartPointer<vtkPiecewiseFunction> opacityRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 	
-	opacityRfunction->AddPoint(0, 0.3);
+	opacityRfunction->AddPoint(0, 0);
 	opacityRfunction->AddPoint(0.2, 0.6);
 	opacityRfunction->AddPoint(0.8, 0.8);
 	opacityRfunction->AddPoint(1, 1);
@@ -2779,7 +2779,7 @@ void mqMorphoDigCore::InitLuts()
 
 	vtkSmartPointer<vtkPiecewiseFunction> opacityfunction =  vtkSmartPointer<vtkPiecewiseFunction>::New();
 
-	opacityfunction->AddPoint(0, 0.3);
+	opacityfunction->AddPoint(0, 0);
 	opacityfunction->AddPoint(0.4, 0.4);
 	opacityfunction->AddPoint(0.8, 0.6);
 	opacityfunction->AddPoint(1, 1);

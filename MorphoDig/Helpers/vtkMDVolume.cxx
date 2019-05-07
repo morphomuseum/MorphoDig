@@ -496,7 +496,9 @@ void vtkMDVolume::PopUndoStack()
 	Savedctf->SetScalarOpacityFunction(SavedOF);
 
 	ctf->DeepCopy(this->UndoRedo->UndoStack.back().Ctf);
-	OF->DeepCopy(ctf->GetScalarOpacityFunction());
+	OF->DeepCopy(this->UndoRedo->UndoStack.back().Ctf->GetScalarOpacityFunction());
+	ctf->SetScalarOpacityFunction(OF);
+	
 	this->SetCtf(ctf);
 
 	//maybe we need to Deep copy the opacity function as well????
@@ -554,13 +556,14 @@ void vtkMDVolume::PopRedoStack()
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction>Savedctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	vtkSmartPointer<vtkPiecewiseFunction> OF = ctf->GetScalarOpacityFunction();
 	vtkSmartPointer<vtkPiecewiseFunction> SavedOF = vtkSmartPointer<vtkPiecewiseFunction>::New();
-	Savedctf->DeepCopy(ctf);
 	SavedOF->DeepCopy(OF);
+	Savedctf->DeepCopy(ctf);
+	
 	Savedctf->SetScalarOpacityFunction(SavedOF);
 
 	ctf->DeepCopy(this->UndoRedo->RedoStack.back().Ctf);
-	OF->DeepCopy(ctf->GetScalarOpacityFunction());
-	
+	OF->DeepCopy(this->UndoRedo->RedoStack.back().Ctf->GetScalarOpacityFunction());
+	ctf->SetScalarOpacityFunction(OF);
 	this->SetCtf(ctf);
 	//maybe we need to Deep copy the opacity function as well????
 
