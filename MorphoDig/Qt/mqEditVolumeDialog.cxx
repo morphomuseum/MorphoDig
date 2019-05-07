@@ -299,7 +299,7 @@ void mqEditVolumeDialog::slotRefreshUi()
 
 void mqEditVolumeDialog::slotdisplayROIPressed()
 {
-	if (this->Volume != NULL)
+	if (this->Volume != NULL && this->Volume->GetSelected() == 1)
 	{
 		if (this->Ui->displayROI->isChecked())
 		//if (this->Volume->GetdisplayROI() == 0)
@@ -657,7 +657,7 @@ void mqEditVolumeDialog::GetFirstVolume()
 
 void mqEditVolumeDialog::UpdateUI()
 {
-	if (this->Volume != NULL) {
+	if (this->Volume != NULL && this->Volume->GetSelected()==1) {
 		
 		
 		if (this->Volume->GetdisplayROI() == 1)
