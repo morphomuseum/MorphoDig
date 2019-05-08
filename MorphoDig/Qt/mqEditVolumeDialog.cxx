@@ -252,7 +252,7 @@ mqEditVolumeDialog::~mqEditVolumeDialog()
 int mqEditVolumeDialog::SomeThingHasChanged()
 {
 	int something_has_changed = 0;
-	if (this->Volume != NULL)
+	if (this->Volume != NULL && this->CurrentVolumeInCollection())
 	{
 		
 		vtkSmartPointer<vtkMatrix4x4> Mat = this->Volume->GetMatrix();
@@ -299,7 +299,7 @@ void mqEditVolumeDialog::slotRefreshUi()
 
 void mqEditVolumeDialog::slotdisplayROIPressed()
 {
-	if (this->Volume != NULL && this->Volume->GetSelected() == 1)
+	if (this->Volume != NULL &&  this->CurrentVolumeInCollection()&&this->Volume->GetSelected() == 1)
 	{
 		if (this->Ui->displayROI->isChecked())
 		//if (this->Volume->GetdisplayROI() == 0)
@@ -332,7 +332,7 @@ void mqEditVolumeDialog::RefreshSuggestedRange()
 void mqEditVolumeDialog::LoadPreset()
 {
 	//cout << "looks like we want to load a preset ! " << idx << endl;
-	if (this->Volume != NULL)
+	if (this->Volume != NULL && this->CurrentVolumeInCollection())
 	{
 
 
@@ -506,7 +506,7 @@ void mqEditVolumeDialog::slotAcceptSuggestedMin()
 void mqEditVolumeDialog::slotSaveActorMinMaxHaveBeenChangedInWidget()
 {
 	cout << "slotSaveActorMinMaxHaveBeenChangedInWidget" << endl;
-	if (this->Volume != NULL) {
+	if (this->Volume != NULL && this->CurrentVolumeInCollection()) {
 		double newMin = this->mColorMap->getSTCMin();
 		double newMax = this->mColorMap->getSTCMax();
 		double oldMin = this->Volume->GetScalarDisplayMin();
@@ -528,7 +528,7 @@ void mqEditVolumeDialog::slotSaveActorMinMaxHaveBeenChangedInWidget()
 }
 void mqEditVolumeDialog::slotInterpolationToLinear(bool isChecked)
 {
-	if (this->Volume != NULL) {
+	if (this->Volume != NULL && this->CurrentVolumeInCollection()) {
 		this->Volume->SetInterpolationToLinear(isChecked);
 		mqMorphoDigCore::instance()->Render();
 	}
@@ -536,7 +536,7 @@ void mqEditVolumeDialog::slotInterpolationToLinear(bool isChecked)
  }
 void mqEditVolumeDialog::slotScalarOpacityUnitDistance(double SOUD)
 {
-	if (this->Volume != NULL && SOUD>0) {
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && SOUD>0) {
 		//cout << "ScalarOpacityUnitDistance:" << SOUD << endl;
 
 			this->Volume->SetScalarOpacityUnitDistance(SOUD);
@@ -657,7 +657,7 @@ void mqEditVolumeDialog::GetFirstVolume()
 
 void mqEditVolumeDialog::UpdateUI()
 {
-	if (this->Volume != NULL && this->Volume->GetSelected()==1) {
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
 		
 		
 		if (this->Volume->GetdisplayROI() == 1)
@@ -815,7 +815,7 @@ void mqEditVolumeDialog::slotsaveVolume()
 	
 
 	this->saveVolume();
-	if (this->Volume != NULL)
+	if (this->Volume != NULL && this->CurrentVolumeInCollection())
 	{
 		this->Volume->SetSelected(0);
 		this->Volume->Modified();
