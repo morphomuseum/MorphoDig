@@ -2965,9 +2965,33 @@ void vtkMDInteractorStyle::PanActors()
 
 			if (myVolume->GetBox() != NULL)
 			{
-				myVolume->GetBox()->PlaceWidget();
+				//cout << "Transform!" << endl;
+				vtkTransform *t = vtkTransform::New();
+				//myVolume->GetBox()->GetTransform(t);
+				// ici ça ne va pas: il faudrait faire : 1) place widget (remet à 0 tout, même les plans) 2) get transform (car c'est transformé par le place widget) 3) translation de la valeur 
+				//t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
+				//myVolume->GetBox()->SetTransform(t);
+				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
+				vtkSmartPointer<vtkMatrix4x4> translationMat = vtkSmartPointer<vtkMatrix4x4>::New();
+				double tx, ty, tz;
+				tx = Mat->GetElement(0, 3);
+				ty = Mat->GetElement(1, 3);
+				tz = Mat->GetElement(2, 3);
+				translationMat->SetElement(0, 3, tx);
+				translationMat->SetElement(1, 3, ty);
+				translationMat->SetElement(2, 3, tz);
+				cout << "tx" << tx << "ty" << ty << "tz" << tz << endl;
+				myVolume->GetBox()->GetTransform(t);
+				t->SetMatrix(translationMat);
+				myVolume->GetBox()->SetTransform(t);
+				//M03 M13 M23 = translation
+				//cout << "Box Matrix:" << endl;
+				//cout << t->GetMatrix() << endl;
+
+				//myVolume->GetBox()->PlaceWidget();
 				
 				//cout << "myPropr3 box is not null" << endl;
+				t->Delete();
 			}
 			else
 			{

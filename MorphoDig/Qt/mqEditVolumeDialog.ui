@@ -1091,7 +1091,11 @@
     </property>
     <property name="icon">
      <iconset resource="../Icons/icons.qrc">
-      <normaloff>:/Icons/eye_opened.png</normaloff>:/Icons/eye_opened.png</iconset>
+      <normaloff>:/Icons/eye_closed.png</normaloff>
+      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
@@ -1105,6 +1109,19 @@
     </property>
     <property name="text">
      <string>Display ROI</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="enableROI">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>60</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable ROI</string>
     </property>
    </widget>
   </widget>

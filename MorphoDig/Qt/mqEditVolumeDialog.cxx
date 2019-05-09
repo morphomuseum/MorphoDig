@@ -222,7 +222,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 
 
-	QAction* actiondisplayROIToggle = new QAction(tr("&displayROI"), this);
+	/*QAction* actiondisplayROIToggle = new QAction(tr("&displayROI"), this);
 	actiondisplayROIToggle->setCheckable(true);
 	actiondisplayROIToggle->setToolTip(tr("display clipping ROI."));
 	this->Ui->displayROI->addAction(actiondisplayROIToggle);
@@ -231,8 +231,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	icon.addFile(QStringLiteral(":/Icons/eye_opened.png"), QSize(), QIcon::Normal, QIcon::Off);
 	icon.addFile(QStringLiteral(":/Icons/eye_closed.png"), QSize(), QIcon::Normal, QIcon::On);
 	//  exportColorMap->setIcon(icon);
-	actiondisplayROIToggle->setIcon(icon);
-	//new mqCameraReaction(actionCameraOrthoPerspectiveToggle, 7); //7 = camera OrthoPerspective toggle
+	actiondisplayROIToggle->setIcon(icon);*/
+
+	
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
 	this->Ui->displayROI->setChecked(true);
@@ -304,12 +305,12 @@ void mqEditVolumeDialog::slotdisplayROIPressed()
 		if (this->Ui->displayROI->isChecked())
 		//if (this->Volume->GetdisplayROI() == 0)
 		{
-			this->Volume->SetdisplayROI(1);
+			this->Volume->SetdisplayROI(0);
 		}
 		else
 		{
 			
-				this->Volume->SetdisplayROI(0);
+				this->Volume->SetdisplayROI(1);
 			
 		}
 		mqMorphoDigCore::instance()->Render();
@@ -663,11 +664,11 @@ void mqEditVolumeDialog::UpdateUI()
 		if (this->Volume->GetdisplayROI() == 1)
 		{
 
-			this->Ui->displayROI->setChecked(false);
+			this->Ui->displayROI->setChecked(true);
 		}
 		else
 		{
-			this->Ui->displayROI->setChecked(true);
+			this->Ui->displayROI->setChecked(false);
 		}
 
 		
