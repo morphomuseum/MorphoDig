@@ -69,6 +69,8 @@ public:
 	void PrintSelf(ostream& os, vtkIndent indent);
 	
 	// Description:
+	void GetInitCenter(double center[3]);
+	void InitCenter();
 	void ShallowCopy(vtkProp *prop);
 	void CreateBox();
 	void RemoveBox();
@@ -163,6 +165,7 @@ protected:
 	double ScalarOpacityUnitDistance;
 
 private:
+	double init_center[3];
 	vtkMDVolume(const vtkMDVolume&);  // Not implemented.
 	void operator=(const vtkMDVolume&);  // Not implemented.
 

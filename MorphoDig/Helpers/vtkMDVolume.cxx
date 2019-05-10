@@ -64,7 +64,9 @@ vtkMDVolume::vtkMDVolume()
 	this->ScalarDisplayMax = (double)VTK_UNSIGNED_INT_MAX;
 	this->ScalarDisplayMin = (double) VTK_UNSIGNED_INT_MIN;
 	this->ScalarOpacityUnitDistance = 1;
-
+	this->init_center[0] = 0;
+	this->init_center[1] = 0;
+	this->init_center[2] = 0;
 
 }
 
@@ -434,6 +436,7 @@ void vtkMDVolume::CreateBox()
 	box->RotationEnabledOff();
 	box->GetSelectedFaceProperty()->SetOpacity(0.0);
 	this->SetBox(box);
+	
 	cout << "Create box 4... Now try to place it!" << endl;
 	vtkTransform *t = vtkTransform::New();
 	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
@@ -443,16 +446,41 @@ void vtkMDVolume::CreateBox()
 	tx = Mat->GetElement(0, 3);
 	ty = Mat->GetElement(1, 3);
 	tz = Mat->GetElement(2, 3);
-	translationMat->SetElement(0, 3, tx);
-	translationMat->SetElement(1, 3, ty);
-	translationMat->SetElement(2, 3, tz);
+	// Ok, but not the good stuff!!!
+	double center_init[3], center_final[3];
+	this->GetInitCenter(center_init);
+	mqMorphoDigCore::TransformPoint(Mat, center_init, center_final);
+	
+	/*double ve_init_pos[3];;
+							double ve_final_pos[3];
+							vtkSmartPointer<vtkMatrix4x4> Mat = myActor2->GetMatrix();
+
+
+							for (vtkIdType j = 0; j < toSave->GetNumberOfPoints(); j++) {
+								// for every triangle 
+								toSave->GetPoint(j, ve_init_pos);
+								mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);*/
+
+	cout << "center init" << center_init[0]<< "," << center_init[1] << "," << center_init[2] << endl;
+	cout << "center final" << center_final[0] << "," << center_final[1] << "," << center_final[2] << endl;
 	cout << "tx" << tx << "ty" << ty << "tz" << tz << endl;
+	tx = center_init[0] - center_final[0];
+	ty = center_init[1] - center_final[1];
+	tz = center_init[2] - center_final[2];
+	cout << "center init - final: tx" << tx << "ty" << ty << "tz" << tz << endl;
+
+	translationMat->SetElement(0, 3, -tx);
+	translationMat->SetElement(1, 3, -ty);
+	translationMat->SetElement(2, 3, -tz);
+	//New strategy: 
+
+
 	box->GetTransform(t);
-	vtkSmartPointer<vtkMatrix4x4> InitMat = t->GetMatrix();
-	tx = InitMat->GetElement(0, 3);
-	ty = InitMat->GetElement(1, 3);
-	tz = InitMat->GetElement(2, 3);
-	cout << "Init tx" << tx << "ty" << ty << "tz" << tz << endl;
+	/*vtkSmartPointer<vtkMatrix4x4> InitMat = t->GetMatrix();
+	tx = InitMat->GetElement(0, 3); 0
+	ty = InitMat->GetElement(1, 3); 0
+	tz = InitMat->GetElement(2, 3); 0*/
+	//cout << "Init tx" << tx << "ty" << ty << "tz" << tz << endl;
 
 	t->SetMatrix(translationMat);
 	box->SetTransform(t);
@@ -557,6 +585,22 @@ void vtkMDVolume::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat)
 	//cout << "Center:" << mCenter[0] << "," << mCenter[1] << "," << mCenter[2] << "," << endl;
 	this->SetChanged(1);
 
+}
+void vtkMDVolume::GetInitCenter(double center[3])
+{
+	center[0] = this->init_center[0];
+	center[1] = this->init_center[1];
+	center[2] = this->init_center[2];
+
+}
+void vtkMDVolume::InitCenter()
+{
+	double *mCenter = this->GetCenter();
+	this->init_center[0] = mCenter[0];
+	this->init_center[1] = mCenter[1];
+	this->init_center[2] = mCenter[2];
+	cout << "Volume center initialized at:" << this->init_center[0] << "," << this->init_center[1] << "," << this->init_center[2] << endl;
+	
 }
 void vtkMDVolume::GetMCenter(double center[3])
 {

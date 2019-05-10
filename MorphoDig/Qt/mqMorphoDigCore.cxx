@@ -4871,7 +4871,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 //volume->SetOrientation(0, 0, 180);
 				 volume->SetName(newname);
 				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
-
+				 volume->InitCenter();
 				 //this->getRenderer()->AddVolume(volume);
 				 this->getVolumeCollection()->AddItem(volume);
 				 emit this->actorsMightHaveChanged();
