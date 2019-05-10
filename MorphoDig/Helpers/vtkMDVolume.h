@@ -70,7 +70,8 @@ public:
 	
 	// Description:
 	void ShallowCopy(vtkProp *prop);
-
+	void CreateBox();
+	void RemoveBox();
 	//vtkSetMacro(Selected, int);
 	vtkGetMacro(Selected, int);
 	vtkBooleanMacro(Selected, int);

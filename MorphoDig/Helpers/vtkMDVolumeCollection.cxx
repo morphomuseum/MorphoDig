@@ -291,7 +291,10 @@ void vtkMDVolumeCollection::DeleteSelectedVolumes()
 							this->RemoveItem(myVolume);
 							this->Renderer->RemoveVolume(myVolume);
 							this->Renderer->RemoveActor(myVolume->GetOutlineActor());
-							myVolume->GetBox()->SetEnabled(false);
+							if (myVolume->GetBox() != NULL)
+							{
+								myVolume->GetBox()->SetEnabled(false);
+							}
 							found = 1;
 						}
 					}
@@ -386,7 +389,12 @@ void vtkMDVolumeCollection::PopUndoStack() {
 			if (myVolume->GetSelected())
 			{
 				this->Renderer->AddActor(myVolume->GetOutlineActor());
-				if (myVolume->GetdisplayROI() == 1) { myVolume->GetBox()->SetEnabled(true); }
+				if (myVolume->GetdisplayROI() == 1) {
+					if (myVolume->GetBox() != NULL)
+					{
+						myVolume->GetBox()->SetEnabled(true);
+					}
+				}
 			}
 			// if myVolume is a landmark => Add label to the renderer
 
@@ -440,7 +448,10 @@ void vtkMDVolumeCollection::PopRedoStack() {
 			this->RemoveItem(myVolume);
 			this->Renderer->RemoveVolume(myVolume);
 			this->Renderer->RemoveActor(myVolume->GetOutlineActor());
-			myVolume->GetBox()->SetEnabled(false);
+			if (myVolume->GetBox() != NULL)
+			{
+				myVolume->GetBox()->SetEnabled(false);
+			}
 			
 			this->Changed = 1;
 		}
@@ -466,7 +477,13 @@ void vtkMDVolumeCollection::PopRedoStack() {
 			if (myVolume->GetSelected())
 			{
 				this->Renderer->AddActor(myVolume->GetOutlineActor());
-				if (myVolume->GetdisplayROI() == 1) { myVolume->GetBox()->SetEnabled(true); }
+				if (myVolume->GetdisplayROI() == 1) { 
+					if (myVolume->GetBox() != NULL)
+					{
+						myVolume->GetBox()->SetEnabled(true);
+					}
+				
+				}
 			}
 			// if myVolume is a landmark => Add label to the renderer
 			

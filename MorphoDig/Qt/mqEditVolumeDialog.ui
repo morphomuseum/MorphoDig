@@ -1078,13 +1078,19 @@
     </property>
    </widget>
    <widget class="QToolButton" name="displayROI">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>100</y>
+      <y>110</y>
       <width>25</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display ROI</string>
     </property>
     <property name="text">
      <string>BoxWidget</string>

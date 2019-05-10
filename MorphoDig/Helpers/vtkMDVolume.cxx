@@ -45,6 +45,7 @@ vtkMDVolume::vtkMDVolume()
 {
 	this->UndoRedo = new vtkMDVolumeUndoRedo;
 	this->Selected = 1;
+	
 	this->displayROI = 0;
 	this->Outline = vtkSmartPointer<vtkOutlineFilter>::New();
 	this->OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -56,7 +57,8 @@ vtkMDVolume::vtkMDVolume()
 	this->OutlineActor->GetProperty()->SetColor(0.5, 0.5, 0.5);
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
-	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
+	this->Box = NULL;
+	//this->Box = vtkSmartPointer<vtkBoxWidget>::New();
 	this->Changed = 0;
 	this->Name = "New Volume";
 	this->ScalarDisplayMax = (double)VTK_UNSIGNED_INT_MAX;
@@ -80,16 +82,19 @@ vtkMDVolume::~vtkMDVolume()
 
 void vtkMDVolume::SetdisplayROI(int disp)
 {
-	if (disp == 0) {
-		this->displayROI = 0;
-		this->Box->SetEnabled(false);
-	}
-	else
-	{ 
-		this->displayROI = 1;
-		this->Box->SetEnabled(true);
-	}
+	if (this->Box != NULL)
+	{
+		if (disp == 0) {
 
+			this->displayROI = 0;
+			this->Box->SetEnabled(false);
+		}
+		else
+		{
+			this->displayROI = 1;
+			this->Box->SetEnabled(true);
+		}
+	}
 }
 void vtkMDVolume::SetColorAmbient(double ambient)
 {
@@ -255,6 +260,7 @@ void vtkMDVolume::UpdateLookupTableRange()
 
 	}
 	//cout << "8" << endl;
+	cout << "UpdateLookupTableRange inside vtkMDVolume done" << endl;
 }
 void vtkMDVolume::UpdateLookupTableRange(double min, double max)
 {
@@ -385,7 +391,7 @@ void vtkMDVolume::SetSelected(int selected)
 		if (this->GetMapper() != NULL)
 		{
 			mqMorphoDigCore::instance()->getRenderer()->AddActor(this->OutlineActor);
-			if (this->displayROI == 1) { this->Box->SetEnabled(true); }
+			if (this->displayROI == 1 && this->Box!=NULL) { this->Box->SetEnabled(true); }
 		}
 		
 	}
@@ -393,8 +399,90 @@ void vtkMDVolume::SetSelected(int selected)
 	{
 		//enlever la box
 		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->OutlineActor);
-		this->Box->SetEnabled(false);
+		if (this->Box != NULL) {
+			this->Box->SetEnabled(false);
+		}
 	}
+}
+
+void vtkMDVolume::CreateBox()
+{
+	//just in case a Clipping Box already exists.
+	cout << "Call remove box from Create Box" << endl;
+	this->RemoveBox();
+
+	cout << "Create box 1" << endl;
+	vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
+	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
+	box->SetPlaceFactor(1.01);
+
+	cout << "Create box 2" << endl;
+	box->SetInputData(this->GetImageData());
+
+	box->SetDefaultRenderer(mqMorphoDigCore::instance()->getRenderer());
+	box->InsideOutOn();
+	box->PlaceWidget();
+	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
+	cout << "Create box 3" << endl;
+	vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
+	
+	callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
+
+	box->AddObserver(vtkCommand::InteractionEvent, callback);
+
+	box->EnabledOff();
+	box->RotationEnabledOff();
+	box->GetSelectedFaceProperty()->SetOpacity(0.0);
+	this->SetBox(box);
+	cout << "Create box 4... Now try to place it!" << endl;
+	vtkTransform *t = vtkTransform::New();
+	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
+	vtkSmartPointer<vtkMatrix4x4> translationMat = vtkSmartPointer<vtkMatrix4x4>::New();
+	double tx, ty, tz;
+
+	tx = Mat->GetElement(0, 3);
+	ty = Mat->GetElement(1, 3);
+	tz = Mat->GetElement(2, 3);
+	translationMat->SetElement(0, 3, tx);
+	translationMat->SetElement(1, 3, ty);
+	translationMat->SetElement(2, 3, tz);
+	cout << "tx" << tx << "ty" << ty << "tz" << tz << endl;
+	box->GetTransform(t);
+	vtkSmartPointer<vtkMatrix4x4> InitMat = t->GetMatrix();
+	tx = InitMat->GetElement(0, 3);
+	ty = InitMat->GetElement(1, 3);
+	tz = InitMat->GetElement(2, 3);
+	cout << "Init tx" << tx << "ty" << ty << "tz" << tz << endl;
+
+	t->SetMatrix(translationMat);
+	box->SetTransform(t);
+	
+	t->Delete();
+	cout << "Box placed.... correctly?" << endl;
+
+
+
+}
+void vtkMDVolume::RemoveBox()
+{
+	if (this->Box != NULL)
+	{
+		cout << "Remove Box 1, disable" << endl;
+		this->Box->EnabledOff();
+		this->Box->RemoveAllObservers();
+		this->Box->SetInteractor(NULL);
+		this->Box->SetDefaultRenderer(NULL);
+		this->Box->Off();
+		this->Box->Modified();
+		this->GetMapper()->RemoveAllClippingPlanes();
+		
+		cout << "Remove Box 2, fast delete" << endl;
+		//this->Box->FastDelete();
+		cout << "Now this->Box is NULL pointer" << endl;
+		
+		this->Box = NULL;
+	}
+
 }
 void vtkMDVolume::Undo(int mCount)
 {

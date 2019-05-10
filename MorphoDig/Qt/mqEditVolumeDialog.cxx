@@ -236,6 +236,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
+	connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
+	//virtual void slotEnableROIPressed(bool isChecked);
 	this->Ui->displayROI->setChecked(true);
 
 }
@@ -296,6 +298,33 @@ void mqEditVolumeDialog::slotRefreshUi()
 {
 	this->GetFirstSelectedVolume();
 	this->UpdateUI();
+}
+
+
+void mqEditVolumeDialog::slotEnableROIClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		if (isChecked)
+			//if (this->Volume->GetdisplayROI() == 0)
+		{
+			cout << "Call volume create box function" << endl;
+			this->Volume->CreateBox();
+			this->Ui->displayROI->setEnabled(true);
+		}
+		else
+		{
+			cout << "Call volume remove box function" << endl;
+
+			this->Volume->RemoveBox();
+			this->Ui->displayROI->setEnabled(false);
+			this->Ui->displayROI->setChecked(false);
+
+
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+
 }
 
 void mqEditVolumeDialog::slotdisplayROIPressed()

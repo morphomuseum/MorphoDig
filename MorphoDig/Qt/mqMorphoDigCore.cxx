@@ -4571,8 +4571,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//mapper->SetRequestedRenderModeToDefault();
 			
 			
-
-			
+			// Now the box is NOT created by default: only when "enable ROI" is clicked 
+			/* 
 			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
 			box->SetPlaceFactor(1.01);
@@ -4593,7 +4593,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			box->RotationEnabledOff();
 			box->GetSelectedFaceProperty()->SetOpacity(0.0);
 			volume->SetBox(box);
-			
+			*/
 			
 			volume->GetOutline()->SetInputData(input);
 
@@ -5894,7 +5894,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						cout << "A volume file or related with volume" << endl;
 						if (i == 0)
 						{
-
+							cout << "i=" << i << endl;
 							//length=(int)strlen(oneline);						
 							//strncpy(param1, oneline, length-1);
 							std::string volname = line.toStdString();
@@ -5912,6 +5912,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 							cout << "Open volume!" << endl;
 							this->OpenVolume(volumefile);
+							cout << "Open volume done!" << endl;
 							vtkMDVolume* volume = this->GetLastVolume();
 
 							if (volume != NULL)
@@ -5926,6 +5927,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						}
 						if (i == 1)
 						{
+							cout << "i =1" << endl;
 							if (ok)
 							{
 
@@ -5949,6 +5951,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						}
 						if (i == 2)
 						{
+							cout << "i=" << i << endl;
 							if (ok)
 							{
 
@@ -5972,12 +5975,15 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						}
 						if (i == 3)
 						{
+							cout << "i=" << i << endl;
 							if (ok)
 							{
 								vtkMDVolume *volume = this->GetLastVolume();
 								double Scalar_opacity, Scalar_min, Scalar_max;
 								QTextStream myteststream(&line);
 								myteststream >> Scalar_opacity >> Scalar_min >> Scalar_max;
+								cout << "Scalar_opacity =" << Scalar_opacity << endl;
+								cout << "Min and Max:" << Scalar_min <<","<< Scalar_max<< endl;
 								volume->SetScalarOpacityUnitDistance(Scalar_opacity);
 								volume->SetScalarDisplayMin(Scalar_min);
 								volume->SetScalarDisplayMax(Scalar_max);
