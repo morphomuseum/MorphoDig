@@ -568,12 +568,14 @@ void mqOpenDataReaction::OpenData()
 			if (found != std::string::npos || found2 != std::string::npos)
 			{
 				type = 14; //PTS
+				cout << "PTS" << endl;
 			}
 
 			found = fileName.toStdString().find(TPSext);
 			found2 = fileName.toStdString().find(TPSext2);
 			if (found != std::string::npos || found2 != std::string::npos)
 			{
+				cout << "TPS" << endl;
 				type = 15; //TPS
 			}
 
@@ -620,6 +622,14 @@ void mqOpenDataReaction::OpenData()
 			else if (type == 13)
 			{
 				mqMorphoDigCore::instance()->OpenVolume(fileName);
+			}
+			else if (type == 14)
+			{
+				mqMorphoDigCore::instance()->OpenPTS(fileName, 0); 
+			}
+			else if (type == 15)
+			{
+				mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
 			}
 
 		}

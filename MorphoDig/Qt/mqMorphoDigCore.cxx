@@ -9037,7 +9037,7 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 				}
 				else if (file_type == 2)
 				{
-					stream << "S" << i << csi.c_str() << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					stream << "S" << csi.c_str() << i  << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
 				}
 				else if (file_type == 3)
 				{
