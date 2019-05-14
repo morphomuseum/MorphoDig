@@ -106,11 +106,27 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 		);
 
 	}
-	else
+	else if (this->Ui->LMK->isChecked())
 	{
 		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
 			tr("Export as LMK file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir()+proposedName,
 			tr("LMK file (*.lmk)"), NULL
+			//, QFileDialog::DontConfirmOverwrite
+		);
+	}
+	else if (this->Ui->PTS->isChecked())
+	{
+		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+			tr("Export as PTS file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
+			tr("PTS file (*.pts)"), NULL
+			//, QFileDialog::DontConfirmOverwrite
+		);
+	}
+	else if (this->Ui->TPS->isChecked())
+	{
+		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+			tr("Export as TPS file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
+			tr("TPS file (*.tps)"), NULL
 			//, QFileDialog::DontConfirmOverwrite
 		);
 	}
@@ -125,6 +141,8 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 
 	if (this->Ui->VER->isChecked()) { save_format = 0; }
 	else if (this->Ui->LMK->isChecked()) { save_format = 1; }
+	else if (this->Ui->PTS->isChecked()) { save_format = 2; }
+	else if (this->Ui->TPS->isChecked()) { save_format = 3; }
 	if (this->Ui->All->isChecked()) { save_other_lmks = 1; }
 	int decimation = this->Ui->Decimation->value();
 

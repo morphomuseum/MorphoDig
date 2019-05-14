@@ -31,7 +31,7 @@ void mqSaveCURasVERDialogReaction::onTriggered()
 		num_CURH = mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfItems();
 	
 	
-		if (num_CURN == 0) {
+		/*if (num_CURN == 0) {
 			QMessageBox msgBox;
 			msgBox.setText("No Curve Node exist...");
 			msgBox.exec();
@@ -42,7 +42,7 @@ void mqSaveCURasVERDialogReaction::onTriggered()
 			msgBox.setText("No Curve Handle exist...");
 			msgBox.exec();
 			return;
-		}
+		}*/
 		if (num_CURH != num_CURN) {
 			QMessageBox msgBox;
 			msgBox.setText("Number of curve nodes differs from number of curve handles... impossible to export curves as landmark file!");

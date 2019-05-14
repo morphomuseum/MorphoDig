@@ -8290,6 +8290,11 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 	std::string VERext2 = ".VER";
 	std::string LMKext = ".lmk";
 	std::string LMKext2 = ".LMK";
+	std::string TPSext = ".tps";
+	std::string TPSext2 = ".TPS";
+	std::string PTSext = ".pts";
+	std::string PTSext2 = ".PTS";
+
 	if (save_format == 0)
 	{
 		std::size_t found = fileName.toStdString().find(VERext);
@@ -8299,7 +8304,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 			fileName.append(".ver");
 		}
 	}
-	else
+	else if(save_format == 1)
 	{
 		std::size_t found = fileName.toStdString().find(LMKext);
 		std::size_t found2 = fileName.toStdString().find(LMKext2);
@@ -8308,12 +8313,140 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 			fileName.append(".lmk");
 		}
 	}
-
-
+	else if (save_format == 2)
+	{
+		std::size_t found = fileName.toStdString().find(PTSext);
+		std::size_t found2 = fileName.toStdString().find(PTSext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".pts");
+		}
+	}
+	else 
+	{
+		std::size_t found = fileName.toStdString().find(TPSext);
+		std::size_t found2 = fileName.toStdString().find(TPSext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".tps");
+		}
+	}
+	//Combien de landmarks au total (besoin pour les formats TPS et PTS) en comptant les curves!
+	// combien de segments:
+	int tot_num_seg = 0;		
+	vtkLMActor *Node;
+	Node = this->NodeLandmarkCollection->GetLandmarkAfter(0);
+	while(Node != NULL)
+	{
+		if (Node->GetLMNodeType() == STARTING_NODE|| Node->GetLMNodeType() == MILESTONE_NODE) { tot_num_seg++; }
+		int ind = Node->GetLMNumber();
+		Node = this->NodeLandmarkCollection->GetLandmarkAfter(ind);			
+	}
+	int tot_lm_number = tot_num_seg * decimation;
+	if (save_other_lmks == 1)
+	{
+		tot_lm_number += this->getNormalLandmarkCollection()->GetNumberOfItems() + this->getTargetLandmarkCollection()->GetNumberOfItems();
+	}
+	cout << "tot_lm_number=" << tot_lm_number << endl;
+	
+	vtkIdType ci = 0;
+	std::string csi = "00";
+	std::string lsi = "00";
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
 		QTextStream stream(&file);
+		if (save_format == 2)
+		{
+			stream << "Version 1.0" << endl;
+			stream << tot_lm_number << endl;
+		}
+		else if (save_format == 3)
+		{
+			stream << "LM=" << tot_lm_number<< endl;
+		}
+
+		if (save_other_lmks == 1)
+		{
+			vtkLMActor  * normal, *target;
+			int num_normal = this->getNormalLandmarkCollection()->GetNumberOfItems();
+			
+			if (num_normal > 0)
+			{
+				normal = this->getNormalLandmarkCollection()->GetLandmarkAfter(0);
+				
+
+				while (normal != NULL)
+				{
+					int ind = normal->GetLMNumber();				
+					double lmpos[3];
+					normal->GetLMOrigin(lmpos);
+					double ori[3];
+					normal->GetLMOrientation(ori);
+					double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
+										
+					if (save_format == 0)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+					}
+					else if (save_format ==1)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 2)
+					{
+						stream << "S"<< csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 3)
+					{
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					ci++;
+					if (ci < 10) { csi = "00"; }
+					else if (ci < 100) { csi = "0"; }
+					else { csi = ""; }
+					normal = this->getNormalLandmarkCollection()->GetLandmarkAfter(ind);
+				}				
+
+			}
+
+			int num_target = this->getTargetLandmarkCollection()->GetNumberOfItems();
+			if (num_target > 0)
+			{
+				target = this->getTargetLandmarkCollection()->GetLandmarkAfter(0);
+				while (target != NULL)
+				{
+					int ind = target->GetLMNumber();
+					double lmpos[3];
+					target->GetLMOrigin(lmpos);
+					double ori[3];
+					target->GetLMOrientation(ori);
+					double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
+
+					if (save_format == 0)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+					}
+					else if (save_format == 1)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 2)
+					{
+						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 3)
+					{
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					ci++;
+					if (ci < 10) { csi = "00"; }
+					else if (ci < 100) { csi = "0"; }
+					else { csi = ""; }
+					target = this->getTargetLandmarkCollection()->GetLandmarkAfter(ind);
+				}
+			}
+		}
 
 		vtkSmartPointer<vtkLMActorCollection> Nodes = vtkSmartPointer<vtkLMActorCollection>::New();
 		vtkSmartPointer<vtkLMActorCollection> Handles = vtkSmartPointer<vtkLMActorCollection>::New();
@@ -8368,6 +8501,8 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 		int print = 0;
 		num_seg = 0;
 		//if (num_landmark_T == num_landmark_N && num_landmark_T >0)
+		csi = "000";
+		lsi = "000";
 		if (decimation > 1 && decimation < nint)
 		{
 
@@ -8497,15 +8632,37 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 								slm[0] = (1 - t)*intvv[0] + t*intvv2[0];
 								slm[1] = (1 - t)*intvv[1] + t*intvv2[1];
 								slm[2] = (1 - t)*intvv[2] + t*intvv2[2];
+								int wnum_seg = num_seg - 1;
+								if (wnum_seg < 10) { csi = "00"; }
+								else if (wnum_seg < 100) { csi = "0"; }
+								else { csi = ""; }
+
+								if (decimation_index == 0) { lsi = "000"; }
+								else if (decimation_index < 10) { lsi = "00"; }
+								else if (decimation_index < 100) { lsi = "0"; }
+								else { lsi = ""; }
 								if (save_format ==0)
 								{
 									stream << "Curve_segment:" <<num_seg<<"-"<<decimation_index<<" " << slm[0] << " " << slm[1] << " " << slm[2] << " 0 0 1"<<	endl;
 									
 								}
-								else
+								else if (save_format ==1)
 								{
 									stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2]  << endl;
 								}
+								else if (save_format == 2)
+								{
+									stream << "C" << csi.c_str()<<wnum_seg<< "-" << lsi.c_str()<< decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+								}
+								else if (save_format == 3)
+								{
+									stream << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+								}
+						
+								
+								
+								
+
 								t2 = (double)(((double)decimation_index) / (((double)decimation - 1.0)));
 								length_to_reach = total_length*t2;
 
