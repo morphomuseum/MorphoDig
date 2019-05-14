@@ -4395,9 +4395,9 @@ void mqMorphoDigCore::OpenPTS(QString fileName, int mode)
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
-					QString line = in.readLine(); // nothing interested
-					QString line = in.readLine();
-					QTextStream numlmk(&line);
+					QString line0 = in.readLine(); // nothing interested
+					line0 = in.readLine();
+					QTextStream numlmk(&line0);
 					vtkIdType num_lmk;
 					numlmk >> num_lmk;
 					vtkIdType cpt_lmk=1;
@@ -4484,7 +4484,7 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
-					QString line = in.readLine(); // first line is not interesting
+					QString line0 = in.readLine(); // first line is not interesting
 					
 					while (!in.atEnd())
 					{
