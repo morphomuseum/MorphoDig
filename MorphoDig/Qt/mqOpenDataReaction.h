@@ -33,7 +33,7 @@ public:
    void OpenMesh();
    void OpenPOS(int mode);
    void OpenPOSTrans(int mode);
-   void OpenLMK_or_VER(int mode);
+   void OpenLandmark(int mode);
    
    void OpenFLG();
    void OpenCUR();
@@ -65,11 +65,11 @@ protected:
 	}
 	else if (this->Mode == 3)
 	{
-		this->OpenLMK_or_VER(0);
+		this->OpenLandmark(0);
 	}
 	else if (this->Mode == 4)
 	{
-		this->OpenLMK_or_VER(1);
+		this->OpenLandmark(1);
 	}
 	else if (this->Mode == 5)
 	{
@@ -109,11 +109,11 @@ protected:
 	}
 	else if (this->Mode == 14)
 	{
-		this->OpenLMK_or_VER(2);
+		this->OpenLandmark(2);
 	}
 	else if (this->Mode == 15)
 	{
-		this->OpenLMK_or_VER(3);
+		this->OpenLandmark(3);
 	}
 	else if (this->Mode == 16)
 	{

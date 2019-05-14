@@ -4345,6 +4345,178 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 	this->Render();
 
 }
+void mqMorphoDigCore::OpenPTS(QString fileName, int mode)
+{// mode : 0 for normal landmarks
+ // mode : 1 for target landmarks
+ // mode : 2 for curve node landmarks
+ // mode : 3 for curve handle landmarks
+	double  x, y, z;
+	QString LMKName;
+	//Open a landmark file!
+
+	cout << "Open a pts file" << endl;
+	size_t  length;
+
+
+	length = fileName.toStdString().length();
+
+	int done = 0;
+	if (length > 0)
+	{
+		int file_exists = 1;
+		ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
+			file.close();
+		}
+		else
+		{
+
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+
+		if (file_exists == 1)
+		{
+
+			std::string PTSext(".pts");
+			std::string PTSext2(".PTS");
+
+			std::size_t found = fileName.toStdString().find(PTSext);
+			std::size_t found2 = fileName.toStdString().find(PTSext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				QFile inputFile(fileName);
+				int ok = 0;
+
+				if (inputFile.open(QIODevice::ReadOnly))
+				{
+					QTextStream in(&inputFile);
+					QString line = in.readLine(); // nothing interested
+					QString line = in.readLine();
+					QTextStream numlmk(&line);
+					vtkIdType num_lmk;
+					numlmk >> num_lmk;
+					vtkIdType cpt_lmk=1;
+					//(two first lines are useless)
+					while (!in.atEnd() && cpt_lmk < num_lmk)
+					{
+
+						QString line = in.readLine();
+						QTextStream myteststream(&line);
+						myteststream >> LMKName >> x >> y >> z;
+						double coord[3] = { x,y,z };
+						double ori[3];
+
+
+						ori[0] = 0;
+						ori[1] = 0;
+						ori[2] = 1;
+
+						this->CreateLandmark(coord, ori, mode);
+						cpt_lmk++;
+					}
+					/**/
+
+					inputFile.close();
+
+
+				}
+
+			}//fin if																		
+
+		}//file exists...
+	}	//length
+	this->Render();
+
+}
+
+void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
+{// mode : 0 for normal landmarks
+ // mode : 1 for target landmarks
+ // mode : 2 for curve node landmarks
+ // mode : 3 for curve handle landmarks
+	double  x, y, z;
+	QString LMKName;
+	//Open a landmark file!
+
+	cout << "Open a tps file" << endl;
+	size_t  length;
+
+
+	length = fileName.toStdString().length();
+
+	int done = 0;
+	if (length > 0)
+	{
+		int file_exists = 1;
+		ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
+			file.close();
+		}
+		else
+		{
+
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+
+		if (file_exists == 1)
+		{
+
+			std::string TPSext(".tps");
+			std::string TPSext2(".TPS");
+
+			std::size_t found = fileName.toStdString().find(TPSext);
+			std::size_t found2 = fileName.toStdString().find(TPSext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				QFile inputFile(fileName);
+				int ok = 0;
+
+				if (inputFile.open(QIODevice::ReadOnly))
+				{
+					QTextStream in(&inputFile);
+					QString line = in.readLine(); // first line is not interesting
+					
+					while (!in.atEnd())
+					{
+
+						QString line = in.readLine();
+						QTextStream myteststream(&line);
+						myteststream >> x >> y >> z;
+						double coord[3] = { x,y,z };
+						double ori[3];
+
+						ori[0] = 0;
+						ori[1] = 0;
+						ori[2] = 1;
+
+						this->CreateLandmark(coord, ori, mode);
+						
+					}
+					/**/
+
+					inputFile.close();
+
+
+				}
+
+			}//fin if																		
+
+		}//file exists...
+	}	//length
+	this->Render();
+
+}
+
 void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 {// mode : 0 for normal landmarks
  // mode : 1 for target landmarks

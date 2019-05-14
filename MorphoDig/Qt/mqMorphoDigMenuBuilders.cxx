@@ -172,8 +172,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
 
 
   new mqOpenDataReaction(submenuLandmark->addAction("Open MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionOpenSTV"), 16);
-  new mqOpenDataReaction(submenuLandmark->addAction("Open Landmarks") << mqSetName("actionOpenNormalLMK"), 3);
-  new mqOpenDataReaction(submenuLandmark->addAction("Open Target Landmarks") << mqSetName("actionOpenNormalLMK"), 4);
+  new mqOpenDataReaction(submenuLandmark->addAction("Open Normal Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionOpenNormalLMK"), 3);
+  new mqOpenDataReaction(submenuLandmark->addAction("Open Target Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionOpenTargetLMK"), 4);
   new mqOpenDataReaction(submenuColorMaps->addAction("Import color maps (.MAP)") << mqSetName("actionOpenMAP"), 17);
   new mqSaveMAPDialogReaction(submenuColorMaps->addAction("Export color maps (.MAP)") << mqSetName("actionSaveMAP"));
   
@@ -183,20 +183,20 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
 
 
   new mqSaveSTVDialogReaction(submenuLandmark->addAction("Save MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionSaveSTV"));
-  new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks") << mqSetName("actionSaveNormalLMK"), 0);
-  new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Target Landmarks") << mqSetName("actionSaveTargetLMK"), 1);
+  new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveNormalLMK"), 0);
+  new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Target Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveTargetLMK"), 1);
   
   
   
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve (.CUR)") << mqSetName("actionOpenCUR"), 5);
   new mqOpenDataReaction(submenuCurves->addAction("Open MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionOpenSTV2"), 16);
-  new mqOpenDataReaction(submenuCurves->addAction("Open Curve Node Landmarks") << mqSetName("actionOpenNodeLMK"), 14);
-  new mqOpenDataReaction(submenuCurves->addAction("Open Curve Handle Landmarks") << mqSetName("actionOpenHandleLMK"), 15);
+  new mqOpenDataReaction(submenuCurves->addAction("Open Curve Node Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionOpenNodeLMK"), 14);
+  new mqOpenDataReaction(submenuCurves->addAction("Open Curve Handle Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionOpenHandleLMK"), 15);
   new mqSaveCURDialogReaction(submenuCurves->addAction("Save .CUR File ") << mqSetName("actionSaveCURLMK"));
   new mqSaveSTVDialogReaction(submenuCurves->addAction("Save MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionSaveSTV2"));
-  new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Node Landmarks") << mqSetName("actionSaveNodeLMK"), 2);
-  new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Handle Landmarks") << mqSetName("actionSaveHandleLMK"), 3);
-  new mqSaveCURasVERDialogReaction(submenuCurves->addAction("Export curve segments as landmark file") << mqSetName("actionExportCUR"));
+  new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Node Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveNodeLMK"), 2);
+  new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Handle Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveHandleLMK"), 3);
+  new mqSaveCURasVERDialogReaction(submenuCurves->addAction("Export Curve Segments (and optionally normal and target landmarks) as landmark file (VER, LMK, PTS, TPS)") << mqSetName("actionExportCUR"));
   new mqSaveDataReaction(submenuCurves->addAction("Save curve infos (length per curve segment)") << mqSetName("actionSaveCURInfos"), 17);
   
 

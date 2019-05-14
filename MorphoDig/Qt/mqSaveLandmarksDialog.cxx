@@ -115,17 +115,34 @@ void mqSaveLandmarksDialog::slotSaveLandmarkFile()
 			//, QFileDialog::DontConfirmOverwrite
 		);
 	}
-	
+	if (this->Ui->TPS->isChecked())
+	{
+		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+			tr("Save Landmark files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
+			tr("Landmark file (*.tps)"), NULL
+			//, QFileDialog::DontConfirmOverwrite
+		);
+	}
+	if (this->Ui->PTS->isChecked())
+	{
+		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+			tr("Save Landmark files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
+			tr("Landmark file (*.pts)"), NULL
+			//, QFileDialog::DontConfirmOverwrite
+		);
+	}
 	if (fileName.isEmpty()) return;
 	QFileInfo fileInfo(fileName);
 	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
 
 
-	int file_type = 0; // 0 VER 1 LMK, 2 => to implement!
+	int file_type = 0; // 0 VER 1 LMK 2 PTS 3 TPS 4 => to implement!
 	int save_only_selected = 0; //0 no= save all landmark, 1 yes, save only selected landmarks
 	
 	if (this->Ui->VER->isChecked()) { file_type = 0; }
 	else if (this->Ui->LMK->isChecked()) { file_type = 1; }
+	else if (this->Ui->PTS->isChecked()) { file_type = 2; }
+	else if (this->Ui->TPS->isChecked()) { file_type = 3; }
 	
 
 	if (this->Ui->SaveOnlySelected->isChecked()) { save_only_selected = 1; }

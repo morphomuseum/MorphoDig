@@ -76,18 +76,18 @@ void mqOpenDataReaction::OpenVolume()
 	mqMorphoDigCore::instance()->OpenVolume(fileName);
 }
 
-void mqOpenDataReaction::OpenLMK_or_VER(int mode)
+void mqOpenDataReaction::OpenLandmark(int mode)
 {
 	//mode 0=> inside normal landmarks
 	// 1 => inside target landmarks
 	//2 => inside node landmarks
 	//3 => inside handle landmarks
 	//mqMorphoDigCore::instance()->getUndoStack();
-	cout << "Open LMK or VER!" << endl;
+	cout << "Open LMK VER TPS PTS!" << endl;
 
 	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
 		tr("Load landmarks"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("landmark files(*.ver *.lmk)"));
+		tr("landmark files(*.ver *.lmk *.pts *.tps)"));
 
 	cout << fileName.toStdString();
 	if (fileName.isEmpty()) return;
@@ -98,6 +98,10 @@ void mqOpenDataReaction::OpenLMK_or_VER(int mode)
 	std::string VERext2(".VER");	
 	std::string LMKext(".lmk");
 	std::string LMKext2(".LMK");
+	std::string PTSext(".pts");
+	std::string PTSext2(".PTS");
+	std::string TPSext(".tps");
+	std::string TPSext2(".TPS");
 
 	int type = 0; //0 =  ver, 1 lmk
 	std::size_t found = fileName.toStdString().find(VERext);
@@ -105,26 +109,42 @@ void mqOpenDataReaction::OpenLMK_or_VER(int mode)
 	if (found != std::string::npos || found2 != std::string::npos)
 	{
 		type = 0; //VER
-	}
-
-	
+	}	
 	found = fileName.toStdString().find(LMKext);
 	found2 = fileName.toStdString().find(LMKext2);
 	if (found != std::string::npos || found2 != std::string::npos)
 	{
 		type = 1; //LMK
 	}
-
+	found = fileName.toStdString().find(PTSext);
+	found2 = fileName.toStdString().find(PTSext2);
+	if (found != std::string::npos || found2 != std::string::npos)
+	{
+		type = 2; //PTS
+	}
+	found = fileName.toStdString().find(TPSext);
+	found2 = fileName.toStdString().find(TPSext2);
+	if (found != std::string::npos || found2 != std::string::npos)
+	{
+		type = 3; //TPS
+	}
 	if (type == 0)
 	{
 		
 		mqMorphoDigCore::instance()->OpenVER(fileName, mode);
 	}
-	else 
+	else if (type == 1)
 	{
 		mqMorphoDigCore::instance()->OpenLMK(fileName, mode);
 	}
-
+	else if (type == 2)
+	{
+		mqMorphoDigCore::instance()->OpenPTS(fileName, mode);
+	}
+	else if (type == 3)
+	{
+		mqMorphoDigCore::instance()->OpenTPS(fileName, mode);
+	}
 }
 void mqOpenDataReaction::OpenSTV()
 {

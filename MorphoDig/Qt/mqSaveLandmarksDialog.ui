@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>370</width>
-    <height>295</height>
+    <height>343</height>
    </rect>
   </property>
   <property name="palette">
@@ -142,6 +142,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -285,6 +294,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </inactive>
     <disabled>
      <colorrole role="WindowText">
@@ -422,6 +440,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </disabled>
    </palette>
   </property>
@@ -431,24 +458,13 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>260</y>
+     <x>100</x>
+     <y>310</y>
      <width>161</width>
      <height>25</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QDialogButtonBox" name="buttonBox">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <layout class="QHBoxLayout" name="horizontalLayout_2"/>
   </widget>
   <widget class="QGroupBox" name="SaveLMKBox">
    <property name="geometry">
@@ -456,7 +472,7 @@
      <x>20</x>
      <y>20</y>
      <width>331</width>
-     <height>231</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="palette">
@@ -591,6 +607,15 @@
       <colorrole role="ToolTipText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="PlaceholderText">
+       <brush brushstyle="NoBrush">
+        <color alpha="128">
          <red>0</red>
          <green>0</green>
          <blue>0</blue>
@@ -734,6 +759,15 @@
         </color>
        </brush>
       </colorrole>
+      <colorrole role="PlaceholderText">
+       <brush brushstyle="NoBrush">
+        <color alpha="128">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
      </inactive>
      <disabled>
       <colorrole role="WindowText">
@@ -871,6 +905,15 @@
         </color>
        </brush>
       </colorrole>
+      <colorrole role="PlaceholderText">
+       <brush brushstyle="NoBrush">
+        <color alpha="128">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
      </disabled>
     </palette>
    </property>
@@ -883,7 +926,7 @@
       <x>20</x>
       <y>20</y>
       <width>301</width>
-      <height>91</height>
+      <height>131</height>
      </rect>
     </property>
     <property name="title">
@@ -895,7 +938,7 @@
        <x>20</x>
        <y>20</y>
        <width>270</width>
-       <height>65</height>
+       <height>88</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout1">
@@ -909,7 +952,21 @@
       <item>
        <widget class="QRadioButton" name="LMK">
         <property name="text">
-         <string>.LMK (xyz coordinates)</string>
+         <string>.LMK File (xyz coordinates)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="PTS">
+        <property name="text">
+         <string>.PTS  File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="TPS">
+        <property name="text">
+         <string>.TPS File</string>
         </property>
        </widget>
       </item>
@@ -920,7 +977,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>120</y>
+      <y>170</y>
       <width>301</width>
       <height>91</height>
      </rect>
@@ -955,6 +1012,22 @@
      </layout>
     </widget>
    </widget>
+  </widget>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>310</y>
+     <width>159</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
   </widget>
  </widget>
  <resources/>

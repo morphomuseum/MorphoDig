@@ -1193,7 +1193,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::string FLGext(".flg");
 		std::string FLGext2(".FLG");
 		std::string LMKext(".lmk");
-		std::string LMKext2(".LMK");
+		std::string LMKext2(".LMK");		
 		std::string TAGext(".tag");
 		std::string TAGext2(".TAG");
 		std::string TAGext3(".tgp");
@@ -1210,6 +1210,10 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::string MHDext2(".MHD");
 		std::string VTIext(".vti");
 		std::string VTIext2(".VTI");
+		std::string TPSext(".tps");
+		std::string TPSext2(".TPS");
+		std::string PTSext(".pts");
+		std::string PTSext2(".PTS");
 		int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
 		std::size_t found = fileName.toStdString().find(STLext);
 		std::size_t found2 = fileName.toStdString().find(STLext2);
@@ -1325,6 +1329,19 @@ void MorphoDig::dropEvent(QDropEvent *e)
 			type = 13; //MHA MHD VTI
 		}
 
+		found = fileName.toStdString().find(PTSext);
+		found2 = fileName.toStdString().find(PTSext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 14; //PTS
+		}
+		found = fileName.toStdString().find(TPSext);
+		found2 = fileName.toStdString().find(TPSext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 15; //TPS
+		}
+
 		if (type < 4)
 		{
 			mqMorphoDigCore::instance()->OpenMesh(fileName);
@@ -1369,6 +1386,15 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		{
 			mqMorphoDigCore::instance()->OpenVolume(fileName);
 		}
+		else if (type == 14)
+		{
+			mqMorphoDigCore::instance()->OpenPTS(fileName, 0);
+		}
+		else if (type == 15)
+		{
+			mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
+		}
+
 
 	}
 }

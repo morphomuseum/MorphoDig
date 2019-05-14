@@ -557,6 +557,8 @@ public:
 	void OpenCAM(QString fileName);
 	void OpenVER(QString fileName, int mode);
 	void OpenLMK(QString fileName, int mode);
+	void OpenTPS(QString fileName, int mode);
+	void OpenPTS(QString fileName, int mode);
 	void OpenMesh(QString fileName);
 	void OpenVolume(QString fileName);
 	void OpenPOS(QString fileName, int mode);
