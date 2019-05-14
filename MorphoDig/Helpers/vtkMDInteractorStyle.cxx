@@ -558,7 +558,7 @@ void vtkMDInteractorStyle::StartSelect()
 
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti)"));
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti)"));
 
 			if (!filenames.isEmpty())
 			{
@@ -584,6 +584,10 @@ void vtkMDInteractorStyle::StartSelect()
 					std::string NTWext2(".NTW");
 					std::string VERext(".ver");
 					std::string VERext2(".VER");
+					std::string TPSext(".tps");
+					std::string TPSext2(".TPS");
+					std::string PTSext(".pts");
+					std::string PTSext2(".PTS");
 					std::string CURext(".cur");
 					std::string CURext2(".CUR");
 					std::string FLGext(".flg");
@@ -723,6 +727,20 @@ void vtkMDInteractorStyle::StartSelect()
 						type = 13; //MHA MHD VTI
 					}
 
+					found = fileName.toStdString().find(PTSext);
+					found2 = fileName.toStdString().find(PTSext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 14; //PTS
+					}
+
+					found = fileName.toStdString().find(TPSext);
+					found2 = fileName.toStdString().find(TPSext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 15; //TPS
+					}
+
 					if (type < 4)
 					{
 						mqMorphoDigCore::instance()->OpenMesh(fileName);
@@ -766,6 +784,14 @@ void vtkMDInteractorStyle::StartSelect()
 					else if (type == 13)
 					{
 						mqMorphoDigCore::instance()->OpenVolume(fileName);
+					}
+					else if (type == 14)
+					{
+						mqMorphoDigCore::instance()->OpenPTS(fileName, 0);
+					}
+					else if (type == 15)
+					{
+						mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
 					}
 
 				}

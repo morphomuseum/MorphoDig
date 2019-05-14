@@ -394,7 +394,7 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti )"));
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti )"));
 
 	if (!filenames.isEmpty())
 	{
@@ -426,6 +426,10 @@ void mqOpenDataReaction::OpenData()
 			std::string FLGext2(".FLG");
 			std::string LMKext(".lmk");
 			std::string LMKext2(".LMK");
+			std::string TPSext(".tps");
+			std::string TPSext2(".TPS");
+			std::string PTSext(".pts");
+			std::string PTSext2(".PTS");
 			std::string TAGext(".tag");
 			std::string TAGext2(".TAG");
 			std::string TAGext3(".tgp");
@@ -559,6 +563,19 @@ void mqOpenDataReaction::OpenData()
 				cout << "MHD MHA or VTI" << endl;
 				type = 13; //MHA MHD VTI
 			}
+			found = fileName.toStdString().find(PTSext);
+			found2 = fileName.toStdString().find(PTSext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				type = 14; //PTS
+			}
+
+			found = fileName.toStdString().find(TPSext);
+			found2 = fileName.toStdString().find(TPSext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				type = 15; //TPS
+			}
 
 			if (type < 4)
 			{
@@ -609,9 +626,7 @@ void mqOpenDataReaction::OpenData()
 	}
 	
 
-	/*QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
-		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.pos *.ori *.flg *.lmk *.ply *.stl *.vtk *.obj *.vtp)"));*/
+
 
 	
 }
