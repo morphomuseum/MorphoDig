@@ -4400,7 +4400,7 @@ void mqMorphoDigCore::OpenPTS(QString fileName, int mode)
 					QTextStream numlmk(&line0);
 					vtkIdType num_lmk;
 					numlmk >> num_lmk;
-					vtkIdType cpt_lmk=1;
+					vtkIdType cpt_lmk=0;
 					//(two first lines are useless)
 					while (!in.atEnd() && cpt_lmk < num_lmk)
 					{
