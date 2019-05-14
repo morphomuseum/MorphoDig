@@ -8968,19 +8968,50 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 			fileName.append(".lmk");
 		}
 	}
-
+	if (file_type == 2)
+	{
+		std::string PTSext = ".pts";
+		std::string PTSext2 = ".PTS";
+		std::size_t found = fileName.toStdString().find(PTSext);
+		std::size_t found2 = fileName.toStdString().find(PTSext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".pts");
+		}
+	}
+	if (file_type == 3)
+	{
+		std::string TPSext = ".tps";
+		std::string TPSext2 = ".TPS";
+		std::size_t found = fileName.toStdString().find(TPSext);
+		std::size_t found2 = fileName.toStdString().find(TPSext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".tps");
+		}
+	}
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
 		QTextStream stream(&file);
-
+		
 		vtkSmartPointer<vtkLMActorCollection> myColl = vtkSmartPointer<vtkLMActorCollection>::New();
 		if (lm_type == 0) { myColl = this->NormalLandmarkCollection; }
 		else if (lm_type == 1) { myColl = this->TargetLandmarkCollection; }
 		else if (lm_type == 2) { myColl = this->NodeLandmarkCollection; }
 		else  { myColl = this->HandleLandmarkCollection; }
-		
+		int num_lmk = myColl->GetNumberOfItems();
+		if (file_type == 2)
+		{
+			stream << "Version 1.0" << endl;
+			stream << num_lmk << endl;
+		}
+		if (file_type == 3)
+		{
+			stream << "LM=" << num_lmk << endl;
+		}
 		myColl->InitTraversal();
+		std::string csi;
 		for (vtkIdType i = 0; i < myColl->GetNumberOfItems(); i++)
 		{
 			vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
@@ -8992,15 +9023,26 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 				double ori[3];
 				myActor->GetLMOrientation(ori);
 				double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
+				if (i < 10) { csi = "00"; }
+				else if (i < 100) { csi = "0"; }
+				else { csi = ""; }
+
 				if (file_type == 0)
 				{
 					stream << "Landmark" << i+1 << ": " << lmpos[0]<<" "<<lmpos[1]<<" "<<lmpos[2]<<" "<<lmori[0]<< " "<< lmori[1] << " " <<  lmori[2] << " " << endl;
 				}
-				else
+				else if (file_type ==1)
 				{
 					stream << "Landmark" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
 				}
-
+				else if (file_type == 2)
+				{
+					stream << "S" << i << csi.c_str() << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+				}
+				else if (file_type == 3)
+				{
+					stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+				}
 			}
 
 		}
