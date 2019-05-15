@@ -21,6 +21,7 @@ Module:    vtkMDActor.h
 #include <vtkSmartPointer.h>
 #include <vtkFloatArray.h>
 #include <vtkPolyDataConnectivityFilter.h>
+#include <vtkBoxWidget.h>
 #include <vector>
 #include <QString>
 class vtkMDActorUndoRedo
@@ -30,6 +31,7 @@ public:
 	{
 		vtkSmartPointer<vtkMatrix4x4> Matrix;
 		vtkSmartPointer<vtkDataArray> sauvArray;
+		vtkSmartPointer<vtkBoxWidget> Box;
 		QString arrayName;
 		int arrayType;// 0 double 1 int(tag) 2 char (RGB/RGBA)
 		double Color[4];
@@ -60,7 +62,8 @@ class  vtkMDActor : public vtkOpenGLActor
 {
 public:
 	static vtkMDActor *New();
-	
+	void CreateBox();
+	void RemoveBox();
 	vtkTypeMacro(vtkMDActor, vtkOpenGLActor);
 	void PrintSelf(ostream& os, vtkIndent indent);
 	void BuildKdTree();
@@ -89,6 +92,12 @@ public:
 
 	vtkGetMacro(Name, std::string);
 	vtkSetMacro(Name, std::string);
+
+	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
+	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
+	void SetdisplayROI(int disp);
+	//	vtkSetMacro(displayROI, int);
+	vtkGetMacro(displayROI, int);
 
 	//vtkSetVector4Macro(mColor, double);
 	vtkGetVector4Macro(mColor, double);
@@ -127,6 +136,8 @@ public:
 protected:
 	vtkMDActor();
 	~vtkMDActor();
+	vtkSmartPointer<vtkBoxWidget> Box;
+	int displayROI;
 	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> cFilter;
 	vtkSmartPointer<vtkIdList> cFilterCorrList;// for some reason vertice ids are not the same in cFilter input / output => so a corresponding list has to be built . Here: 1,2,3,4 = cFilter ids. GetId(i) returns original list id

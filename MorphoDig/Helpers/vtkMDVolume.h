@@ -10,8 +10,6 @@ Module:    vtkMDVolume.h
 
 #ifndef vtkMDVolume_h
 #define vtkMDVolume_h
-
-
 #include <vtkVolume.h>
 #include <vtkMatrix4x4.h>
 #include <vtkDataArray.h>

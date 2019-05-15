@@ -57,8 +57,8 @@ vtkMDVolume::vtkMDVolume()
 	this->OutlineActor->GetProperty()->SetColor(0.5, 0.5, 0.5);
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
-	this->Box = NULL;
-	//this->Box = vtkSmartPointer<vtkBoxWidget>::New();
+	//this->Box = NULL;
+	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
 	this->Changed = 0;
 	this->Name = "New Volume";
 	this->ScalarDisplayMax = (double)VTK_UNSIGNED_INT_MAX;
@@ -393,9 +393,8 @@ void vtkMDVolume::SetSelected(int selected)
 		if (this->GetMapper() != NULL)
 		{
 			mqMorphoDigCore::instance()->getRenderer()->AddActor(this->OutlineActor);
-			if (this->displayROI == 1 && this->Box!=NULL) { this->Box->SetEnabled(true); }
+			if (this->displayROI == 1 && this->Box!= NULL) { this->Box->SetEnabled(true); }
 		}
-		
 	}
 	else
 	{
@@ -412,24 +411,19 @@ void vtkMDVolume::CreateBox()
 	//just in case a Clipping Box already exists.
 	cout << "Call remove box from Create Box" << endl;
 	this->RemoveBox();
-
 	cout << "Create box 1" << endl;
 	vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
 	box->SetPlaceFactor(1.01);
-
 	cout << "Create box 2" << endl;
 	box->SetInputData(this->GetImageData());
-
 	box->SetDefaultRenderer(mqMorphoDigCore::instance()->getRenderer());
 	box->InsideOutOn();
 	box->PlaceWidget();
 	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
 	cout << "Create box 3" << endl;
 	vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
-	
 	callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
-
 	box->AddObserver(vtkCommand::InteractionEvent, callback);
 
 	box->EnabledOff();
@@ -508,7 +502,8 @@ void vtkMDVolume::RemoveBox()
 		//this->Box->FastDelete();
 		cout << "Now this->Box is NULL pointer" << endl;
 		
-		this->Box = NULL;
+		//this->Box = NULL;
+		this->Box = vtkSmartPointer<vtkBoxWidget>::New();
 	}
 
 }
