@@ -52,6 +52,8 @@ public:
   virtual void slotEditScalar();
   virtual void slotDuplicateScalar();
   virtual void slotDeleteScalar();
+  virtual void slotEnableROIClicked(bool isChecked);
+  virtual void slotdisplayROIPressed();
 
 protected:
 	

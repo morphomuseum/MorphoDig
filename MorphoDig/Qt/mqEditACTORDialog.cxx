@@ -217,6 +217,10 @@ connect(this->Ui->deleteScalar, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()
 connect(this->Ui->editScalar, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
 connect(this->Ui->duplicateScalar, SIGNAL(pressed()), this, SLOT(slotDuplicateScalar()));
 
+connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
+connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
+//virtual void slotEnableROIPressed(bool isChecked);
+this->Ui->displayROI->setChecked(true);
 }
 
 
@@ -413,11 +417,64 @@ void mqEditACTORDialog::GetFirstActor()
 	}
 
 }
+void mqEditACTORDialog::slotEnableROIClicked(bool isChecked)
+{
+	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
+	{
+		if (isChecked)
+			//if (this->Volume->GetdisplayROI() == 0)
+		{
+			cout << "Call volume create box function" << endl;
+			this->ACTOR->CreateBox();
+			this->Ui->displayROI->setEnabled(true);
+		}
+		else
+		{
+			cout << "Call volume remove box function" << endl;
 
+			this->ACTOR->RemoveBox();
+			this->Ui->displayROI->setEnabled(false);
+			this->Ui->displayROI->setChecked(false);
+
+
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+
+}
+
+void mqEditACTORDialog::slotdisplayROIPressed()
+{
+	if (this->ACTOR!= NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
+	{
+		if (this->Ui->displayROI->isChecked())
+			//if (this->Volume->GetdisplayROI() == 0)
+		{
+			this->ACTOR->SetdisplayROI(0);
+		}
+		else
+		{
+
+			this->ACTOR->SetdisplayROI(1);
+
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditACTORDialog::UpdateUI()
 {
 	if (this->ACTOR != NULL) {
 		
+		if (this->ACTOR->GetdisplayROI() == 1)
+		{
+
+			this->Ui->displayROI->setChecked(true);
+		}
+		else
+		{
+			this->Ui->displayROI->setChecked(false);
+		}
+
 		QString mylabel(this->ACTOR->GetName().c_str());
 		this->Ui->ActorName->setText(mylabel);
 
