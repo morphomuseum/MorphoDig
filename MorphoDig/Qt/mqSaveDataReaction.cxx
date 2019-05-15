@@ -42,7 +42,81 @@ mqSaveDataReaction::mqSaveDataReaction(QAction* parentObject,  int _mode)
 
 
 
+void mqSaveDataReaction::ExportAvizoLandmarks()
+{
+	/*ExportAvizoLandmarks
+	if (this->m_lmktype==0)// Normal landmarks
+	{
+		num_landmarks = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfItems();
+	}
+	else if (this->m_lmktype == 1) // Target landmarks
+	{
+		num_landmarks = mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfItems();
 
+	}
+	*/
+	QString proposedName = "";
+	vtkIdType num_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems();
+	vtkIdType num_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems();
+	if (num_meshes == 1 || num_volumes == 1)
+	{
+		if (num_meshes == 1)
+		{
+			mqMorphoDigCore::instance()->getActorCollection()->InitTraversal();
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(mqMorphoDigCore::instance()->getActorCollection()->GetNextActor());
+			proposedName += QDir::separator();
+			proposedName += myActor->GetName().c_str();
+		}
+		else
+		{
+			mqMorphoDigCore::instance()->getVolumeCollection()->InitTraversal();
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
+			proposedName += QDir::separator();
+			proposedName += myVolume->GetName().c_str();
+
+		}
+	}
+	else
+	{
+		vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+		if (num_selected_meshes == 1)
+		{
+			mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+			proposedName += QDir::separator();
+			proposedName += +mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str();
+		}
+		else
+		{
+			vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+			if (num_selected_volumes == 1)
+			{
+				mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+				proposedName += QDir::separator();
+				proposedName += +mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str();
+			}
+
+		}
+	}
+
+	QString fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+		tr("Export Avizo/Amira Landmark files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + proposedName,
+		tr("Avizo/Amira landmark file (*.lm *.landmarkAscii)"), NULL
+		//, QFileDialog::DontConfirmOverwrite
+	);
+
+
+	cout << fileName.toStdString();
+	if (fileName.isEmpty()) return;
+	QFileInfo fileInfo(fileName);
+	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+
+	cout << "Export Avizo File" << endl;
+
+	mqMorphoDigCore::instance()->ExportAvizoLandmarks(fileName);
+
+
+}
 void mqSaveDataReaction::SavePOS(int mode)
 {
 	//mode = 0 : for selected surfaces

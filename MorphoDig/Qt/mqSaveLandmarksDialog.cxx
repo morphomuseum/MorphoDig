@@ -82,12 +82,24 @@ void mqSaveLandmarksDialog::slotSaveLandmarkFile()
 	QString fileName;
 	QString proposedName = "";
 	vtkIdType num_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems();
-	if (num_meshes == 1)
+	vtkIdType num_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems();
+	if (num_meshes == 1 || num_volumes == 1)
 	{
-		mqMorphoDigCore::instance()->getActorCollection()->InitTraversal();
-		vtkMDActor *myActor = vtkMDActor::SafeDownCast(mqMorphoDigCore::instance()->getActorCollection()->GetNextActor());
-		proposedName += QDir::separator();
-		proposedName += myActor->GetName().c_str();
+		if (num_meshes == 1)
+		{
+			mqMorphoDigCore::instance()->getActorCollection()->InitTraversal();
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(mqMorphoDigCore::instance()->getActorCollection()->GetNextActor());
+			proposedName += QDir::separator();
+			proposedName += myActor->GetName().c_str();
+		}
+		else
+		{
+			mqMorphoDigCore::instance()->getVolumeCollection()->InitTraversal();
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(mqMorphoDigCore::instance()->getVolumeCollection()->GetNextVolume());
+			proposedName += QDir::separator();
+			proposedName += myVolume->GetName().c_str();
+
+		}
 	}
 	else
 	{
@@ -97,6 +109,16 @@ void mqSaveLandmarksDialog::slotSaveLandmarkFile()
 			mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
 			proposedName += QDir::separator();
 			proposedName += +mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str();
+		}
+		else
+		{
+			vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+			if (num_selected_volumes == 1)
+			{
+				mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
+				proposedName += QDir::separator();
+				proposedName += +mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str();
+			}
 		}
 	}
 	if (this->Ui->VER->isChecked())

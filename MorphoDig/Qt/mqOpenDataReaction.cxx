@@ -369,6 +369,23 @@ void mqOpenDataReaction::OpenCUR()
 	mqMorphoDigCore::instance()->OpenCUR(fileName);
 
 }
+void mqOpenDataReaction::ImportAvizoLandmarks()
+{
+
+	cout << "Import Avizo LM" << endl;
+
+	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
+		tr("Import Avizo/Amira Landmarks inside Normal and Target landmark lists"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("Avizo/Amira landmarks (*.lm *.landmarkAscii)"));
+
+	cout << fileName.toStdString() << endl;
+	if (fileName.isEmpty()) return;
+	QFileInfo fileInfo(fileName);
+	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+	mqMorphoDigCore::instance()->ImportAvizoLandmarks(fileName);
+
+}
+
 void mqOpenDataReaction::OpenTAGMAP()
 {
 

@@ -4262,7 +4262,234 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 	}	//length
 
 }
+void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
+{
+	double  x, y, z;
+	//QString OneLine;
+	QString Word1, Word2, Word3, Word4, Word5;
+	int num_lmk = 0;
+	int num_sets=1;
+	QString start1;
+	QString start2;
 
+	//Open a landmark file!
+
+	cout << "Import an Avizo/Amira file" << endl;
+	size_t  length;
+
+
+	length = fileName.toStdString().length();
+	int li = 1;
+
+	int done = 0;
+	if (length > 0)
+	{
+		int file_exists = 1;
+		ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
+			file.close();
+		}
+		else
+		{
+
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+		if (file_exists == 1)
+		{			
+
+			//filein = fopen(fileName.toLocal8Bit(), "rt");
+			QFile inputFile(fileName);
+			int ok = 0;
+
+			if (inputFile.open(QIODevice::ReadOnly))
+			{
+				QTextStream in(&inputFile);
+				QString line = in.readLine(); // # Avizo 3D ASCII 3.0
+				QTextStream mystream(&line);
+				mystream >> Word1;
+				cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+				
+				int ok = 0;
+				while (!in.atEnd() && ok==0)
+				{ 
+					li++;
+					QString line = in.readLine(); // Empty line?
+					QTextStream myteststream(&line);					
+					cout << "line_"<<li<<":"<< line.toStdString().c_str()<<endl;
+					if (line.length() > 0)
+					{
+						//define Markers 3
+						//QString::compare(ArrayName, newArrayName, Qt::CaseInsensitive) ==0
+						if (line.contains("define Markers", Qt::CaseInsensitive))
+						{
+							cout << "Contains define Markers" << endl;
+							myteststream >> Word1 >> Word2 >> num_lmk;
+						}
+						ok = 1;
+
+					}
+				}
+				cout << "line_" << li << ":num_lmk=" << num_lmk << endl;
+				// Now I want get NumSets 
+				ok = 0;
+				while (!in.atEnd() && ok == 0)
+				{
+					li++;
+					QString line = in.readLine();
+					QTextStream myteststream(&line);
+					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					if (line.length() > 0)
+					{
+						//define Markers 3
+						//QString::compare(ArrayName, newArrayName, Qt::CaseInsensitive) ==0
+						if (line.contains("NumSets",  Qt::CaseInsensitive))
+						{
+							cout << "Contains NumSets" << endl;
+							myteststream >> Word1 >> num_sets;
+							ok = 1;
+						}
+						
+
+					}
+				}
+				cout << "line_" << li << ":num_sets=" << num_sets << endl;
+				// Now make sure that this or these sets LandmarkSet.
+				ok = 0;
+				while (!in.atEnd() && ok == 0)
+				{
+					li++;
+					QString line = in.readLine(); 
+					QTextStream myteststream(&line);
+					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					if (line.length() > 0)
+					{					
+						if (line.contains("LandmarkSet", Qt::CaseInsensitive))
+						{							
+							ok = 1;
+						}
+					}
+				}
+				// if we are not at the end of the file, search for @1 @2 and place them in start1 start2
+				ok = 0;
+				int curr_set = 1;
+				while (!in.atEnd() && ok==0)
+				{
+					li++;
+					QString line = in.readLine();
+					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					QTextStream myteststream(&line);
+					if (line.length() > 0 && line.contains("Markers", Qt::CaseInsensitive) && curr_set ==1)
+					{
+						myteststream >> Word1 >> Word2 >> Word3 >> Word4 >> Word5 >> start1;
+						cout << "start1=" << start1.toStdString().c_str() << endl;
+						if (num_sets == curr_set)
+						{
+							ok = 1;
+						}
+						else
+						{
+							curr_set++;
+						}
+					}
+					else if (line.length() > 0 && line.contains("Markers", Qt::CaseInsensitive) && curr_set == 2)
+					{
+						myteststream >> Word1 >> Word2 >> Word3 >> Word4 >> Word5 >> start2;
+						cout << "start2=" << start2.toStdString().c_str() << endl;
+						ok = 1;
+					}
+					cout << "line_" << li << ":" << Word1.toStdString().c_str() << "|"<<Word2.toStdString().c_str() << "|" << Word3.toStdString().c_str() << endl;			
+
+				}
+				//at this stage we should have start1 (and optionnally start2)
+				// Now make sure that this or these sets LandmarkSet.
+				ok = 0;
+				while (!in.atEnd() && ok == 0)
+				{
+					li++;
+					QString line = in.readLine();
+					QTextStream myteststream(&line);
+					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					if (line.length() > 0 && line.contains(start1))
+					{
+							ok = 1;
+					}
+					
+				}
+				int cpt = 0;
+
+				ok = 0;
+				//first landmark set
+				while (!in.atEnd() && cpt < num_lmk)
+				{
+					li++;
+					QString line = in.readLine();
+					QTextStream myteststream(&line);
+					myteststream >>  x >> y >> z;
+					double coord[3] = { x,y,z };
+					double ori[3];
+
+					ori[0] = 0;
+					ori[1] = 0;
+					ori[2] = 1;
+
+					this->CreateLandmark(coord, ori, 0);
+					cpt++;
+				}
+				if (num_sets > 1)
+				{
+					ok = 0;
+					while (!in.atEnd() && ok == 0)
+					{
+						li++;
+						QString line = in.readLine();
+						QTextStream myteststream(&line);
+						cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+						if (line.length() > 0 && line.contains(start2))
+						{
+							ok = 1;
+						}
+
+					}
+					cpt = 0;
+					ok = 0;
+					//first landmark set
+					while (!in.atEnd() && cpt < num_lmk)
+					{
+						li++;
+						QString line = in.readLine();
+						QTextStream myteststream(&line);
+						myteststream >> x >> y >> z;
+						double coord[3] = { x,y,z };
+						double ori[3];
+
+						ori[0] = 0;
+						ori[1] = 0;
+						ori[2] = 1;
+
+						this->CreateLandmark(coord, ori, 1);
+						cpt++;
+					}
+
+				}
+
+				/**/
+
+				inputFile.close();
+
+
+			}
+
+																			
+
+		}//file exists...
+	}	//length
+	this->Render();
+
+
+}
 void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 {// mode : 0 for normal landmarks
  // mode : 1 for target landmarks
@@ -8939,6 +9166,80 @@ int mqMorphoDigCore::SaveCURFile(QString fileName, int save_only_selected)
 	}
 	file.close();
 	return 1;
+
+}
+void mqMorphoDigCore::ExportAvizoLandmarks(QString fileName)
+{
+
+	std::string AVext = ".landmarkAscii";
+	std::string AVext2 = ".lm";
+	std::string AVext3 = ".LM";
+	std::size_t found = fileName.toStdString().find(AVext);
+	std::size_t found2 = fileName.toStdString().find(AVext2);
+	std::size_t found3 = fileName.toStdString().find(AVext3);
+	if (found == std::string::npos && found2 == std::string::npos && found3 == std::string::npos)
+	{
+		fileName.append(".landmarkAscii");
+	}
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+
+		vtkSmartPointer<vtkLMActorCollection> myColl = vtkSmartPointer<vtkLMActorCollection>::New();
+		 myColl = this->NormalLandmarkCollection; 
+		 int num_lmk = this->NormalLandmarkCollection->GetNumberOfItems();
+		 if (num_lmk > 0)
+		 {
+			 int num_sets = 1;
+			 //if (num_lmk == this->TargetLandmarkCollection->GetNumberOfItems())
+			 if (this->TargetLandmarkCollection->GetNumberOfItems()>0)
+			 {
+				 num_sets = 2;
+			 }
+				 stream << "# Avizo 3D ASCII 3.0" << endl;
+			 stream << "" << endl;
+			 stream << "define Markers " << num_lmk << endl;
+			 stream << "Parameters {" << endl;
+			 stream << "    NumSets "<<num_sets<<"," << endl;
+			 stream << "    ContentType \"LandmarkSet\""<< endl;
+			 stream << "}" << endl;
+			 stream << "" << endl;
+			 stream << "Markers{ float[3] Coordinates } @1" << endl; 
+			 if (num_sets == 2)
+			 {
+				 stream << "Markers{ float[3] Coordinates2 } @2" << endl;
+			 }
+			 stream << "" << endl;
+			 stream << "# Data section follows" << endl;
+			 stream << "@1" << endl;			 
+			 myColl->InitTraversal();			 
+			 for (vtkIdType i = 0; i < myColl->GetNumberOfItems(); i++)
+			 {
+				 vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
+				 double lmpos[3];
+				 myActor->GetLMOrigin(lmpos);				 				 	
+				 stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+			 }
+			 stream << "" << endl;
+			 if (num_sets == 2)
+			 {
+				 myColl = this->TargetLandmarkCollection;
+				 stream << "@2" << endl;
+				 myColl->InitTraversal();
+				 for (vtkIdType i = 0; i < myColl->GetNumberOfItems(); i++)
+				 {
+					 vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
+					 double lmpos[3];
+					 myActor->GetLMOrigin(lmpos);
+					 stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+				 }
+			 }
+		 }
+		/*myColl = this->TargetLandmarkCollection; */
+
+	}
+	file.close();
 
 }
 

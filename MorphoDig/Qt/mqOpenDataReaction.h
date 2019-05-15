@@ -42,6 +42,8 @@ public:
    void OpenTAGMAP();
    void OpenORI();
    void OpenVolume();
+
+   void ImportAvizoLandmarks();
    
   
 protected:
@@ -127,7 +129,10 @@ protected:
 	{
 		this->OpenVolume();
 	}
-
+	else if (this->Mode == 19)
+	{
+		this->ImportAvizoLandmarks();
+	}
   }
 
 private:

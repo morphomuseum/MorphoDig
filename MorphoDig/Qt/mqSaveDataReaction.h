@@ -40,6 +40,7 @@ public:
    void SaveShapeMeasures(int mode);
    void SaveMeshSize();
    void SaveORI();
+   void ExportAvizoLandmarks();
    
    
    
@@ -53,6 +54,7 @@ protected:
   {
 	  if (this->Mode == 1)
 	  {
+		  this->ExportAvizoLandmarks();
 	  }
 	/*else if (this->Mode == 2)
 	{
@@ -131,6 +133,7 @@ protected:
 	{
 		this->SaveSelectedSurfaceScalars();
 	}
+	
   }
 
 private:

@@ -556,6 +556,8 @@ public:
 	void SetOpenGLVersion(int major, int minor);
 	void OpenCAM(QString fileName);
 	void OpenVER(QString fileName, int mode);
+	void ImportAvizoLandmarks(QString fileName);
+	void ExportAvizoLandmarks(QString fileName);
 	void OpenLMK(QString fileName, int mode);
 	void OpenTPS(QString fileName, int mode);
 	void OpenPTS(QString fileName, int mode);
