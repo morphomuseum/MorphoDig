@@ -704,8 +704,8 @@ void vtkMDActor::CreateBox()
 	box->PlaceWidget();
 	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
 	cout << "Create box 3" << endl;
-	vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
-	callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
+	vtkSmartPointer<vtkPDBoxWidgetCallback> callback = vtkSmartPointer<vtkPDBoxWidgetCallback>::New();
+	callback->SetMapper(vtkPolyDataMapper::SafeDownCast(this->GetMapper()));
 	box->AddObserver(vtkCommand::InteractionEvent, callback);
 
 	box->EnabledOff();

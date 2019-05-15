@@ -86,6 +86,40 @@ protected:
 	}
 	vtkSmartPointer<vtkSmartVolumeMapper> Mapper;
 };
+class vtkPDBoxWidgetCallback : public vtkCommand
+{
+public:
+	static vtkPDBoxWidgetCallback *New()
+	{
+		cout << "New box callback!!!" << endl;
+		return new vtkPDBoxWidgetCallback;
+	}
+	void Execute(vtkObject *caller, unsigned long, void*) override
+	{
+		//cout << "Execute!!!" << endl;
+		vtkBoxWidget *widget = reinterpret_cast<vtkBoxWidget*>(caller);
+		if (this->Mapper)
+		{
+			vtkPlanes *planes = vtkPlanes::New();
+			widget->GetPlanes(planes);
+			this->Mapper->SetClippingPlanes(planes);
+			planes->Delete();
+		}
+	}
+	void SetMapper(vtkSmartPointer<vtkPolyDataMapper> m)
+	{
+		cout << "Command: set Mapper!!!" << endl;
+
+		this->Mapper = m;
+	}
+protected:
+	vtkPDBoxWidgetCallback()
+	{
+		this->Mapper = NULL;
+	}
+	vtkSmartPointer<vtkPolyDataMapper> Mapper;
+};
+
 
 class ExistingArrays
 {
