@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>507</width>
+    <width>520</width>
     <height>753</height>
    </rect>
   </property>
@@ -471,7 +471,7 @@
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>461</width>
+     <width>491</width>
      <height>701</height>
     </rect>
    </property>
@@ -483,7 +483,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>71</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -530,7 +530,7 @@
    <widget class="QLineEdit" name="VolumeName">
     <property name="geometry">
      <rect>
-      <x>92</x>
+      <x>100</x>
       <y>20</y>
       <width>271</width>
       <height>20</height>
@@ -1109,7 +1109,7 @@
      <rect>
       <x>390</x>
       <y>80</y>
-      <width>61</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -1122,7 +1122,7 @@
      <rect>
       <x>380</x>
       <y>60</y>
-      <width>81</width>
+      <width>91</width>
       <height>17</height>
      </rect>
     </property>

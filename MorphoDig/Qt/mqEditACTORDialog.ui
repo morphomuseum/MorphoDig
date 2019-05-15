@@ -148,6 +148,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </active>
     <inactive>
      <colorrole role="WindowText">
@@ -279,6 +288,15 @@
      <colorrole role="ToolTipText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
         <red>0</red>
         <green>0</green>
         <blue>0</blue>
@@ -422,6 +440,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="PlaceholderText">
+      <brush brushstyle="NoBrush">
+       <color alpha="128">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </colorrole>
     </disabled>
    </palette>
   </property>
@@ -559,7 +586,7 @@
    <widget class="QDoubleSpinBox" name="M10">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>160</x>
       <y>100</y>
       <width>61</width>
       <height>20</height>
@@ -569,7 +596,7 @@
    <widget class="QDoubleSpinBox" name="M20">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>220</x>
       <y>100</y>
       <width>61</width>
       <height>20</height>
@@ -579,7 +606,7 @@
    <widget class="QDoubleSpinBox" name="M30">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>280</x>
       <y>100</y>
       <width>61</width>
       <height>20</height>
@@ -590,7 +617,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>130</y>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -599,8 +626,8 @@
    <widget class="QDoubleSpinBox" name="M11">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>130</y>
+      <x>160</x>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -609,8 +636,8 @@
    <widget class="QDoubleSpinBox" name="M21">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>130</y>
+      <x>220</x>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -619,8 +646,8 @@
    <widget class="QDoubleSpinBox" name="M31">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>130</y>
+      <x>280</x>
+      <y>120</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -630,7 +657,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>160</y>
+      <y>140</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -639,8 +666,8 @@
    <widget class="QDoubleSpinBox" name="M12">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>160</y>
+      <x>160</x>
+      <y>140</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -649,8 +676,8 @@
    <widget class="QDoubleSpinBox" name="M22">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>160</y>
+      <x>220</x>
+      <y>140</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -659,8 +686,8 @@
    <widget class="QDoubleSpinBox" name="M32">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>160</y>
+      <x>280</x>
+      <y>140</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -670,7 +697,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>190</y>
+      <y>160</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -679,8 +706,8 @@
    <widget class="QDoubleSpinBox" name="M13">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>190</y>
+      <x>160</x>
+      <y>160</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -689,8 +716,8 @@
    <widget class="QDoubleSpinBox" name="M23">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>190</y>
+      <x>220</x>
+      <y>160</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -699,8 +726,8 @@
    <widget class="QDoubleSpinBox" name="M33">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>190</y>
+      <x>280</x>
+      <y>160</y>
       <width>61</width>
       <height>20</height>
      </rect>
@@ -724,7 +751,7 @@
      <rect>
       <x>10</x>
       <y>190</y>
-      <width>75</width>
+      <width>81</width>
       <height>23</height>
      </rect>
     </property>
@@ -737,7 +764,7 @@
      <rect>
       <x>10</x>
       <y>230</y>
-      <width>191</width>
+      <width>221</width>
       <height>23</height>
      </rect>
     </property>
@@ -772,8 +799,8 @@
       <rect>
        <x>40</x>
        <y>90</y>
-       <width>261</width>
-       <height>25</height>
+       <width>304</width>
+       <height>30</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -851,6 +878,59 @@
     </property>
     <property name="text">
      <string>Num cells:</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="enableROI">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>190</y>
+      <width>91</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable ROI</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>210</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Display ROI</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="displayROI">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>240</y>
+      <width>25</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display ROI</string>
+    </property>
+    <property name="text">
+     <string>BoxWidget</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/eye_closed.png</normaloff>
+      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
