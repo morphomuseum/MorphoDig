@@ -9200,15 +9200,16 @@ void mqMorphoDigCore::ExportAvizoLandmarks(QString fileName)
 				 stream << "# Avizo 3D ASCII 3.0" << endl;
 			 stream << "" << endl;
 			 stream << "define Markers " << num_lmk << endl;
+			 stream << "" << endl;
 			 stream << "Parameters {" << endl;
 			 stream << "    NumSets "<<num_sets<<"," << endl;
 			 stream << "    ContentType \"LandmarkSet\""<< endl;
 			 stream << "}" << endl;
 			 stream << "" << endl;
-			 stream << "Markers{ float[3] Coordinates } @1" << endl; 
+			 stream << "Markers { float[3] Coordinates } @1" << endl; 
 			 if (num_sets == 2)
 			 {
-				 stream << "Markers{ float[3] Coordinates2 } @2" << endl;
+				 stream << "Markers { float[3] Coordinates2 } @2" << endl;
 			 }
 			 stream << "" << endl;
 			 stream << "# Data section follows" << endl;
