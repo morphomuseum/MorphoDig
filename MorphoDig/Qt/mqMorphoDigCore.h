@@ -844,6 +844,8 @@ public:
   void SetOrientationHelperLabels(std::string X1, std::string X2, std::string Y1, std::string Y2, std::string Z1, std::string Z2);
   void ResetOrientationHelperLabels();
   void CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type = -1);
+  void CreateLandmarkUndoSet(int lmk_type=-1);
+  
   void UpdateFirstSelectedLandmark(double coord[3], double ori[3]);
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
   static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);

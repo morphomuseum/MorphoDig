@@ -103,6 +103,8 @@ void mqCreateLMKDialog::slotCreateLMK()
 	else if (this->Ui->Node->isChecked()) { lmk_type = 2; }
 	else if (this->Ui->Handle->isChecked()) { lmk_type = 3; }
 	mqMorphoDigCore::instance()->CreateLandmark(coord, ori, lmk_type);
+	mqMorphoDigCore::instance()->CreateLandmarkUndoSet(lmk_type);
+	
 	mqMorphoDigCore::instance()->Render();
 }
 

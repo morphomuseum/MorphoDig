@@ -1358,7 +1358,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 				   // else
 				  //  {
 				   mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
-
+				   mqMorphoDigCore::instance()->CreateLandmarkUndoSet(mqMorphoDigCore::instance()->Getmui_LandmarkMode());				   
 				   mqMorphoDigCore::instance()->Render();
 				   //  }
 			   }

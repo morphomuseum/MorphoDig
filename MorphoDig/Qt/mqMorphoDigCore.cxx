@@ -3930,6 +3930,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 					/**/
 
 					inputFile.close();
+					this->CreateLandmarkUndoSet(4);
 					this->UpdateLandmarkSettings();
 
 				}
@@ -4439,6 +4440,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 					this->CreateLandmark(coord, ori, 0);
 					cpt++;
 				}
+				this->CreateLandmarkUndoSet(0);
 				if (num_sets > 1)
 				{
 					ok = 0;
@@ -4473,6 +4475,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 						this->CreateLandmark(coord, ori, 1);
 						cpt++;
 					}
+					this->CreateLandmarkUndoSet(1);
 
 				}
 
@@ -4559,6 +4562,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 						this->CreateLandmark(coord, ori, mode);
 
 					}
+					this->CreateLandmarkUndoSet(mode);
 					/**/
 
 					inputFile.close();
@@ -4647,6 +4651,7 @@ void mqMorphoDigCore::OpenPTS(QString fileName, int mode)
 						this->CreateLandmark(coord, ori, mode);
 						cpt_lmk++;
 					}
+					this->CreateLandmarkUndoSet(mode);
 					/**/
 
 					inputFile.close();
@@ -4730,6 +4735,7 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 						this->CreateLandmark(coord, ori, mode);
 						
 					}
+					this->CreateLandmarkUndoSet(mode);
 					/**/
 
 					inputFile.close();
@@ -4844,6 +4850,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 						this->CreateLandmark(coord, ori, mode);
 
 					}
+					this->CreateLandmarkUndoSet(mode);
 					/**/
 
 					inputFile.close();
@@ -6553,6 +6560,7 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 						this->CreateLandmark(coordh, ori, 3);
 
 					}
+					this->CreateLandmarkUndoSet(-1);
 					/**/
 
 					inputFile.close();
@@ -6677,6 +6685,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 
 						}
 					}
+					this->CreateLandmarkUndoSet(-1);
 					/**/
 
 					inputFile.close();
@@ -18748,6 +18757,60 @@ vtkSmartPointer<vtkLookupTable> mqMorphoDigCore::GetTagLut()
 {
 	return this->TagLut;
 }
+
+void mqMorphoDigCore::CreateLandmarkUndoSet(int lmk_type)
+{
+
+	vtkLMActorCollection *Collection =NULL;
+	std::string action;
+	if (lmk_type == NORMAL_LMK)
+	{
+		 action = "Create Normal landmark(s)";
+		 Collection = this->NormalLandmarkCollection;
+		
+	}
+	else if (lmk_type == TARGET_LMK)
+	{
+		action = "Create Target landmark(s)";
+		Collection = this->TargetLandmarkCollection;
+	}
+	else if (lmk_type == NODE_LMK)
+	{
+		action = "Create Node landmark(s)";
+		Collection = this->NodeLandmarkCollection;
+	}
+	else if (lmk_type == HANDLE_LMK)
+	{
+		action = "Create Handle landmark(s)";
+		Collection = this->HandleLandmarkCollection;
+		
+	}
+	else if (lmk_type == FLAG_LMK)
+	{
+		action = "Create Flag(s)";
+		Collection = this->FlagLandmarkCollection;
+		
+	}
+
+	if (Collection != NULL)
+	{
+		int mCount = BEGIN_UNDO_SET(action);
+		Collection->CreateLoadUndoSet(mCount, 1);
+		END_UNDO_SET();
+	}
+	else
+	{
+		// Create a landmark undo set for all!!!!
+		action = "Create Landmarks";
+		int mCount = BEGIN_UNDO_SET(action);
+		this->NormalLandmarkCollection->CreateLoadUndoSet(mCount, 1);
+		this->TargetLandmarkCollection->CreateLoadUndoSet(mCount, 1);
+		this->NodeLandmarkCollection->CreateLoadUndoSet(mCount, 1);
+		this->HandleLandmarkCollection->CreateLoadUndoSet(mCount, 1);
+		this->FlagLandmarkCollection->CreateLoadUndoSet(mCount, 1);
+		END_UNDO_SET();
+	}
+}
 void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type)
 {
 	
@@ -18902,10 +18965,10 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NormalLandmarkCollection->SetChanged(1);
-		std::string action = "Create Normal landmark";
-		int mCount = BEGIN_UNDO_SET(action);
-		this->getNormalLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
-		END_UNDO_SET();
+		//std::string action = "Create Normal landmark";
+		//int mCount = BEGIN_UNDO_SET(action);
+		//this->getNormalLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
+		//END_UNDO_SET();
 		
 	}
 	else if (lmk_type == TARGET_LMK)
@@ -18915,10 +18978,10 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		//emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->TargetLandmarkCollection->SetChanged(1);
-		std::string action = "Create Target landmark";
-		int mCount = BEGIN_UNDO_SET(action);
-		this->getTargetLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
-		END_UNDO_SET();
+		//std::string action = "Create Target landmark";
+		//int mCount = BEGIN_UNDO_SET(action);
+		//this->getTargetLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
+		//END_UNDO_SET();
 		
 	}
 	else if (lmk_type == NODE_LMK)
@@ -18927,10 +18990,10 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		//emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NodeLandmarkCollection->SetChanged(1);
-		std::string action = "Create Curve Node";
-		int mCount = BEGIN_UNDO_SET(action);
-		this->getNodeLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
-		END_UNDO_SET();
+		//std::string action = "Create Curve Node";
+		//int mCount = BEGIN_UNDO_SET(action);
+		//this->getNodeLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
+		//END_UNDO_SET();
 		
 	}
 	else if (lmk_type == HANDLE_LMK)
@@ -18939,20 +19002,20 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		//emit this->actorsMightHaveChanged();
 		this->HandleLandmarkCollection->ReorderLandmarks();
 		this->HandleLandmarkCollection->SetChanged(1);
-		std::string action = "Create Curve Handle";
-		int mCount = BEGIN_UNDO_SET(action);
-		this->getHandleLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
-		END_UNDO_SET();
+		//std::string action = "Create Curve Handle";
+		//int mCount = BEGIN_UNDO_SET(action);
+		//this->getHandleLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
+		//END_UNDO_SET();
 	}
 	else if (lmk_type == FLAG_LMK)
 	{
 		this->FlagLandmarkCollection->AddItem(myLM);	
 		//emit this->actorsMightHaveChanged();
 		this->FlagLandmarkCollection->SetChanged(1);
-		std::string action = "Create Flag Landmark";
-		int mCount = BEGIN_UNDO_SET(action);
-		this->getFlagLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
-		END_UNDO_SET();
+		//std::string action = "Create Flag Landmark";
+		//int mCount = BEGIN_UNDO_SET(action);
+		//this->getFlagLandmarkCollection()->CreateLoadUndoSet(mCount, 1);
+		//END_UNDO_SET();
 	}
 	
 	
