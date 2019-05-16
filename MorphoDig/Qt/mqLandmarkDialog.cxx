@@ -119,6 +119,8 @@ mqLandmarkDialog::mqLandmarkDialog(QWidget* Parent)
   connect(this->Ui->AdjustScaleFactor, SIGNAL(valueChanged(double)), this, SLOT(slotAdjustScaleFactorChanged()));
   connect(this->Ui->fontSize, SIGNAL(valueChanged(int)), this, SLOT(slotFontSizeChanged()));
   connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotRender()));
+  connect(this->Ui->displayLandmarkText, SIGNAL(clicked(bool)), this, SLOT(slotDisplayLandmarkTextChecked(bool)));
+  //virtual void slotDisplayLandmarkTextChecked(bool isChecked);
 }
 
 
@@ -144,7 +146,19 @@ void mqLandmarkDialog::slotFontSizeChanged()
 	mqMorphoDigCore::instance()->Setmui_FontSize(fontSize);
 
 }
+void mqLandmarkDialog::slotDisplayLandmarkTextChecked(bool isChecked)
+{
+	if (isChecked)
+	{
+		
+		mqMorphoDigCore::instance()->Setmui_DisplayLandmarkText(1);
+	}
+	else
+	{
+		mqMorphoDigCore::instance()->Setmui_DisplayLandmarkText(0);
+	}
 
+}
 void mqLandmarkDialog::slotAdjustScaleFactorChanged()
 {
 	double scale_factor = 1;

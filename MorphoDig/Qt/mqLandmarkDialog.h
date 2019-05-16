@@ -39,6 +39,7 @@ public:
   virtual void slotFlagRenderingSizeChanged();
   virtual void slotLandmarkBodyTypeChanged();
   virtual void slotReinitializeColors();
+  virtual void slotDisplayLandmarkTextChecked(bool isChecked);
   virtual void slotRender();
 protected:
 	

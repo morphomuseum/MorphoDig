@@ -121,6 +121,7 @@ public:
 	virtual void Undo(int mCount); // Try to undo (if exists) "mCount" event
 	virtual void PopUndoStack();
 	virtual void PopRedoStack();
+	
 	virtual void ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat); // can be overriden in LMActor!
 	vtkSmartPointer<vtkFloatArray> GetPointNormals();
 	vtkSmartPointer<vtkFloatArray> GetCellNormals();

@@ -158,7 +158,10 @@ void vtkLMActorCollection::AddItem(vtkActor *a)
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(a);
 		//this->Renderer->AddActor(a);
 		//this->CurrentRenderer->AddActor(myLM);
-		this->Renderer->AddActor(myActor->GetLMLabelActor3D());
+		if (mqMorphoDigCore::instance()->Getmui_DisplayLandmarkText() == 1)
+		{
+			this->Renderer->AddActor(myActor->GetLMLabelActor3D());
+		}
 
 	}
 

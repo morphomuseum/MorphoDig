@@ -162,7 +162,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_DefaultAmbient = this->mui_Ambient= 0;
 	this->mui_DefaultDiffuse = this->mui_Diffuse = 100;
 	this->mui_DefaultFontSize = this->mui_FontSize = 10;
-
+	this->mui_DefaultDisplayLandmarkText = 1;
 
 	this->mui_OpenGL_minor_version = 0;
 	this->mui_OpenGL_major_version = 0;
@@ -7616,6 +7616,21 @@ void mqMorphoDigCore::Setmui_Diffuse(int diffuse){
 	this->UpdateColorProperties();
 }
 
+int mqMorphoDigCore::Getmui_DisplayLandmarkText()
+{
+	// Display LM Actors text (LM number or flag text)
+	return this->mui_DisplayLandmarkText;
+}
+int mqMorphoDigCore::Getmui_DefaultDisplayLandmarkText() { 
+	// Display LM Actors text (LM number or flag text)
+	return this->mui_DefaultDisplayLandmarkText;
+}
+void mqMorphoDigCore::Setmui_DisplayLandmarkText(int display)
+{
+	// Display LM Actors text (LM number or flag text)
+	this->mui_DisplayLandmarkText = display;
+	this->UpdateLandmarkSettings();
+}
 
 int mqMorphoDigCore::Getmui_FontSize() {
 	return this->mui_FontSize;
@@ -21182,18 +21197,21 @@ double mqMorphoDigCore::AdjustedLandmarkSize()
 }
 void mqMorphoDigCore::UpdateLandmarkSettings(vtkLMActor *myActor)
 {
+	
 	myActor->SetLMBodyType(this->Getmui_LandmarkBodyType());
 	if (myActor->GetLMType() != FLAG_LMK)
 	{
-
+		
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
 			//myActor->SetLMSize(this->Getmui_LandmarkRenderingSize());
 			myActor->SetLMSize(this->AdjustedLandmarkSize());
+			
 		}
 		else
 		{
 			myActor->SetLMSize(this->Getmui_LandmarkRenderingSize());
+			
 			//Change landmark size for all landmarks but flags.
 
 		}
@@ -21210,6 +21228,7 @@ void mqMorphoDigCore::UpdateLandmarkSettings(vtkLMActor *myActor)
 	mapper->SetInputData(myActor->getLMBody());
 	mapper->Update();
 	myActor->SetMapper(mapper);
+	//myActor->SetDisplayText(this->mui_DisplayLandmarkText);
 
 }
 void mqMorphoDigCore::UpdateLandmarkSettings()

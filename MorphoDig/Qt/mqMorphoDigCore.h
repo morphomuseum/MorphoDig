@@ -466,6 +466,9 @@ public:
 	int Getmui_FontSize(); // LM Actors font size
 	int Getmui_DefaultFontSize(); // LM Actors font size
 	void Setmui_FontSize(int fontSize); // LM Actors font size
+	int Getmui_DisplayLandmarkText(); // Display LM Actors text (LM number or flag text)
+	int Getmui_DefaultDisplayLandmarkText(); // Display LM Actors text (LM number or flag text)
+	void Setmui_DisplayLandmarkText(int display); // Display LM Actors text (LM number or flag text)
 	
 	int Getmui_Ambient();
 	void Setmui_Ambient(int ambient);
@@ -1011,6 +1014,8 @@ protected:
 	int mui_Diffuse;
 	int mui_FontSize;
 	int mui_DefaultFontSize;
+	int mui_DisplayLandmarkText;
+	int mui_DefaultDisplayLandmarkText;
 	int mui_DefaultSpecular;
 	double mui_DefaultSpecularPower;
 	int mui_DefaultAmbient;

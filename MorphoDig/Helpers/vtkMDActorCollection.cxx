@@ -206,8 +206,11 @@ void vtkMDActorCollection::AddItem(vtkActor *a)
 	//cout << "Item added" << endl;
 	this->Renderer->AddActor(a);
 	//cout << "Actor added to renderer" << endl;
-
-	mqMorphoDigCore::instance()->Initmui_ExistingArrays();
+	std::string str1("vtkMDActor");
+	if (str1.compare(a->GetClassName()) == 0)
+	{
+		mqMorphoDigCore::instance()->Initmui_ExistingArrays();
+	}
 
 }
 void vtkMDActorCollection::AddTmpItem(vtkActor *a)
@@ -427,7 +430,10 @@ void vtkMDActorCollection::PopUndoStack() {
 			{
 				vtkLMActor *myLMActor;
 				myLMActor = vtkLMActor::SafeDownCast(myActor);
-				this->Renderer->AddActor(myLMActor->GetLMLabelActor3D());
+				if (mqMorphoDigCore::instance()->Getmui_DisplayLandmarkText() == 1)
+				{
+					this->Renderer->AddActor(myLMActor->GetLMLabelActor3D());
+				}
 			}
 			this->Changed = 1;
 		}
@@ -525,7 +531,10 @@ void vtkMDActorCollection::PopRedoStack() {
 			{
 				vtkLMActor *myLMActor;
 				myLMActor = vtkLMActor::SafeDownCast(myActor);
-				this->Renderer->AddActor(myLMActor->GetLMLabelActor3D());
+				if (mqMorphoDigCore::instance()->Getmui_DisplayLandmarkText() == 1)
+				{
+					this->Renderer->AddActor(myLMActor->GetLMLabelActor3D());
+				}
 			}
 			this->Changed = 1;
 

@@ -88,7 +88,7 @@ public:
 
 	vtkGetMacro(LMText, std::string);
 	void SetLMText(std::string lm_text);
-
+	void UpdateDisplayText();
 	vtkSetMacro(LMDrawLabel, int);
 	vtkGetMacro(LMDrawLabel, int);
 	vtkGetMacro(LMType, int);

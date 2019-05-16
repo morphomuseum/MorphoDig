@@ -280,6 +280,17 @@ void vtkLMActor::CreateLMLabelText()
 
 }
 
+void vtkLMActor::UpdateDisplayText()
+{
+//mqMorphoDigCore::instance()->Getmui_FontSize()
+	if (mqMorphoDigCore::instance()->Getmui_DisplayLandmarkText() == 1)
+	{
+		mqMorphoDigCore::instance()->getRenderer()->AddActor(this->GetLMLabelActor3D());
+	}
+	{
+		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->GetLMLabelActor3D());
+	}
+}
 void vtkLMActor::CreateLMBody()
 {
 
@@ -734,6 +745,7 @@ void vtkLMActor::UpdateProps()
 	//cout << "LM update props" << endl;
 	this->CreateLMBody();
 	this->CreateLMLabelText();
+	this->UpdateDisplayText();
 
 }
 
