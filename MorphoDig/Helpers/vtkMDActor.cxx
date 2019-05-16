@@ -691,19 +691,15 @@ void vtkMDActor::SetSelected(int selected)
 void vtkMDActor::CreateBox()
 {
 	//just in case a Clipping Box already exists.
-	cout << "Call remove box from Create Box" << endl;
 	this->RemoveBox();
-	cout << "Create box 1" << endl;
 	vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
 	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
 	box->SetPlaceFactor(1.01);
-	cout << "Create box 2" << endl;
 	box->SetInputData(this->GetMapper()->GetInput());
 	box->SetDefaultRenderer(mqMorphoDigCore::instance()->getRenderer());
 	box->InsideOutOn();
 	box->PlaceWidget();
 	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
-	cout << "Create box 3" << endl;
 	vtkSmartPointer<vtkPDBoxWidgetCallback> callback = vtkSmartPointer<vtkPDBoxWidgetCallback>::New();
 	callback->SetMapper(vtkPolyDataMapper::SafeDownCast(this->GetMapper()));
 	box->AddObserver(vtkCommand::InteractionEvent, callback);
@@ -713,23 +709,15 @@ void vtkMDActor::CreateBox()
 	box->GetSelectedFaceProperty()->SetOpacity(0.0);
 	this->SetBox(box);
 
-	cout << "Create box 4... Now try to place it!" << endl;
 	vtkTransform *t = vtkTransform::New();
 	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
 	vtkSmartPointer<vtkMatrix4x4> translationMat = vtkSmartPointer<vtkMatrix4x4>::New();
 	double tx, ty, tz;
 
-	tx = Mat->GetElement(0, 3);
-	ty = Mat->GetElement(1, 3);
-	tz = Mat->GetElement(2, 3);
-	// Ok, but not the good stuff!!!
+	
+
 	double center_init[3], center_final[3];
-	double *center;
-	center = this->GetCenter();
-	center_final[0] = center[0];
-	center_final[1] = center[1];
-	center_final[2] = center[2];
-	mqMorphoDigCore::TransformPoint(Mat, center_init, center_final);
+	
 
 	vtkSmartPointer<vtkCenterOfMass> centerOfMassFilter =
 		vtkSmartPointer<vtkCenterOfMass>::New();
@@ -738,33 +726,25 @@ void vtkMDActor::CreateBox()
 	centerOfMassFilter->SetUseScalarsAsWeights(false);
 	centerOfMassFilter->Update();
 	centerOfMassFilter->GetCenter(center_init);
+	   
+	mqMorphoDigCore::TransformPoint(Mat, center_init, center_final);
 
-	cout << "center init" << center_init[0] << "," << center_init[1] << "," << center_init[2] << endl;
-	cout << "center final" << center_final[0] << "," << center_final[1] << "," << center_final[2] << endl;
-	cout << "tx" << tx << "ty" << ty << "tz" << tz << endl;
 	tx = center_init[0] - center_final[0];
 	ty = center_init[1] - center_final[1];
 	tz = center_init[2] - center_final[2];
-	cout << "center init - final: tx" << tx << "ty" << ty << "tz" << tz << endl;
 
 	translationMat->SetElement(0, 3, -tx);
 	translationMat->SetElement(1, 3, -ty);
 	translationMat->SetElement(2, 3, -tz);
-	//New strategy: 
 
 
-	box->GetTransform(t);
-	/*vtkSmartPointer<vtkMatrix4x4> InitMat = t->GetMatrix();
-	tx = InitMat->GetElement(0, 3); 0
-	ty = InitMat->GetElement(1, 3); 0
-	tz = InitMat->GetElement(2, 3); 0*/
-	//cout << "Init tx" << tx << "ty" << ty << "tz" << tz << endl;
+
 
 	t->SetMatrix(translationMat);
 	box->SetTransform(t);
 
 	t->Delete();
-	cout << "Box placed.... correctly?" << endl;
+	//cout << "Box placed.... correctly?" << endl;
 
 
 

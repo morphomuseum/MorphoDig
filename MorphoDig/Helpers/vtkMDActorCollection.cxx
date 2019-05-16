@@ -305,6 +305,10 @@ void vtkMDActorCollection::DeleteSelectedActors()
 							undocoll->AddItem(myActor);
 							this->RemoveItem(myActor);
 							this->Renderer->RemoveActor(myActor);
+							if (myActor->GetBox() != NULL)
+							{
+								myActor->GetBox()->SetEnabled(false);
+							}
 							found = 1;
 						}
 					}
@@ -401,6 +405,20 @@ void vtkMDActorCollection::PopUndoStack() {
 			vtkActor *myActor = ActColl->GetNextActor();
 			this->AddItem(myActor);
 			this->Renderer->AddActor(myActor);
+			std::string str0("vtkMDActor");
+			if (str0.compare(myActor->GetClassName()) == 0)
+			{
+				vtkMDActor *myMDActor = vtkMDActor::SafeDownCast(myActor);
+				if (myMDActor->GetdisplayROI() == 1) {
+					if (myMDActor->GetBox() != NULL)
+					{
+						myMDActor->GetBox()->SetEnabled(true);
+					}
+				}
+			}
+
+
+			
 			// if myActor is a landmark => Add label to the renderer
 
 
@@ -462,12 +480,23 @@ void vtkMDActorCollection::PopRedoStack() {
 			vtkActor *myActor = ActColl->GetNextActor();
 			this->RemoveItem(myActor);
 			this->Renderer->RemoveActor(myActor);
+			std::string str0("vtkMDActor");
+			if (str0.compare(myActor->GetClassName()) == 0)
+			{
+				vtkMDActor *myMDActor = vtkMDActor::SafeDownCast(myActor);
+				if (myMDActor->GetBox() != NULL)
+				{
+					myMDActor->GetBox()->SetEnabled(false);
+				}
+			}
+			
 			std::string str1("vtkLMActor");
 			if (str1.compare(myActor->GetClassName()) == 0)
 			{
 				vtkLMActor *myLMActor;
 				myLMActor = vtkLMActor::SafeDownCast(myActor);
 				this->Renderer->RemoveActor(myLMActor->GetLMLabelActor3D());
+
 			}
 			this->Changed = 1;
 		}
