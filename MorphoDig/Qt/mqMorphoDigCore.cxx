@@ -3882,7 +3882,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
-
+				int cpt_created = 0;
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
@@ -3919,6 +3919,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 							//cout << "Set LM Size:" << flength << endl;
 							myLastFlag->SetLMSize(flength);
 							myLastFlag->SetChanged(1);
+							cpt_created ++;
 						}
 						else
 						{
@@ -3930,7 +3931,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 					/**/
 
 					inputFile.close();
-					this->CreateLandmarkUndoSet(4);
+					this->CreateLandmarkUndoSet(4, cpt_created);
 					this->UpdateLandmarkSettings();
 
 				}
@@ -4440,7 +4441,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 					this->CreateLandmark(coord, ori, 0);
 					cpt++;
 				}
-				this->CreateLandmarkUndoSet(0);
+				this->CreateLandmarkUndoSet(0, cpt);
 				if (num_sets > 1)
 				{
 					ok = 0;
@@ -4475,7 +4476,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 						this->CreateLandmark(coord, ori, 1);
 						cpt++;
 					}
-					this->CreateLandmarkUndoSet(1);
+					this->CreateLandmarkUndoSet(1, cpt);
 
 				}
 
@@ -4544,7 +4545,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
-
+					int cpt = 0;
 					while (!in.atEnd())
 					{
 
@@ -4560,9 +4561,9 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 						ori[2] = 1;
 
 						this->CreateLandmark(coord, ori, mode);
-
+						cpt++;
 					}
-					this->CreateLandmarkUndoSet(mode);
+					this->CreateLandmarkUndoSet(mode, cpt);
 					/**/
 
 					inputFile.close();
@@ -4651,7 +4652,7 @@ void mqMorphoDigCore::OpenPTS(QString fileName, int mode)
 						this->CreateLandmark(coord, ori, mode);
 						cpt_lmk++;
 					}
-					this->CreateLandmarkUndoSet(mode);
+					this->CreateLandmarkUndoSet(mode, cpt_lmk);
 					/**/
 
 					inputFile.close();
@@ -4718,7 +4719,7 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 				{
 					QTextStream in(&inputFile);
 					QString line0 = in.readLine(); // first line is not interesting
-					
+					int cpt = 0;
 					while (!in.atEnd())
 					{
 
@@ -4733,9 +4734,9 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 						ori[2] = 1;
 
 						this->CreateLandmark(coord, ori, mode);
-						
+						cpt++;
 					}
-					this->CreateLandmarkUndoSet(mode);
+					this->CreateLandmarkUndoSet(mode, cpt);
 					/**/
 
 					inputFile.close();
@@ -4824,7 +4825,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
-
+					int cpt = 0;
 					while (!in.atEnd())
 					{
 
@@ -4848,6 +4849,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 							vtkMath::Normalize(ori);
 						}
 						this->CreateLandmark(coord, ori, mode);
+						cpt++;
 
 					}
 					this->CreateLandmarkUndoSet(mode);
@@ -6540,7 +6542,8 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
-
+					int cpt_node = 0;
+					int cpt_handle = 0;
 					while (!in.atEnd())
 					{
 
@@ -6557,10 +6560,13 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 						ori[2] = 1;
 
 						this->CreateLandmark(coordn, ori, 2, node_type);
+						cpt_node++;
 						this->CreateLandmark(coordh, ori, 3);
+						cpt_handle++;
 
 					}
-					this->CreateLandmarkUndoSet(-1);
+					int cpt = cpt_node + cpt_handle;
+					this->CreateLandmarkUndoSet(-1, cpt, 0 , 0, cpt_node, cpt_handle);
 					/**/
 
 					inputFile.close();
@@ -6628,9 +6634,13 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
-					int landmark_mode = 0;
+					int lmk_type= 0;
 					int number = 0;
 					int cpt_line = 0;
+					int cpt_norm = 0;
+					int cpt_targ = 0;
+					int cpt_node = 0;
+					int cpt_handle = 0;
 					while (!in.atEnd())
 					{
 
@@ -6638,15 +6648,15 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 						QTextStream myteststream(&line);
 						if (cpt_line == 0)
 						{
-							myteststream >> landmark_mode >> number;
+							myteststream >> lmk_type >> number;
 						}
 						else
 						{
 							// To do : type = 2 => information 
-							int lmtype = -1;
-							if (landmark_mode == 2)// curve node!
+							int node_type = -1;
+							if (lmk_type == NODE_LMK)// curve node!
 							{
-								myteststream >> LMKName >> x >> y >> z >> nx >> ny >> nz >> lmtype;
+								myteststream >> LMKName >> x >> y >> z >> nx >> ny >> nz >> node_type;
 								//cout << "lmtype!" << lmtype << endl;
 								//lmtype: 1 curve starting point
 								//lmtype: 0 normal node
@@ -6677,7 +6687,24 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 							{
 							cout << "landmark_mode: " << landmark_mode << " lmtype: " << lmtype << endl;
 							}*/
-							this->CreateLandmark(coord, ori, landmark_mode, lmtype);
+							this->CreateLandmark(coord, ori, lmk_type, node_type);
+							if (lmk_type == NORMAL_LMK)
+							{
+								cpt_norm++;
+							}
+							else if (lmk_type == TARGET_LMK)
+							{
+								cpt_targ++;
+							}
+							else if (lmk_type == NODE_LMK)
+							{
+								cpt_node++;
+							}
+							else if (lmk_type == HANDLE_LMK)
+							{
+								cpt_handle++;
+							}
+								
 						}
 						cpt_line++;
 						if (cpt_line == number + 1) {
@@ -6685,7 +6712,8 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 
 						}
 					}
-					this->CreateLandmarkUndoSet(-1);
+					int cpt_tot = cpt_norm + cpt_targ + cpt_node + cpt_handle;
+					this->CreateLandmarkUndoSet(-1, cpt_tot, cpt_norm, cpt_targ, cpt_node, cpt_handle);
 					/**/
 
 					inputFile.close();
@@ -18758,7 +18786,7 @@ vtkSmartPointer<vtkLookupTable> mqMorphoDigCore::GetTagLut()
 	return this->TagLut;
 }
 
-void mqMorphoDigCore::CreateLandmarkUndoSet(int lmk_type)
+void mqMorphoDigCore::CreateLandmarkUndoSet(int lmk_type, int count_tot, int count_norm, int count_targ, int count_node, int count_handle)
 {
 
 	vtkLMActorCollection *Collection =NULL;
@@ -18795,7 +18823,7 @@ void mqMorphoDigCore::CreateLandmarkUndoSet(int lmk_type)
 	if (Collection != NULL)
 	{
 		int mCount = BEGIN_UNDO_SET(action);
-		Collection->CreateLoadUndoSet(mCount, 1);
+		Collection->CreateLoadUndoSet(mCount, count_tot);
 		END_UNDO_SET();
 	}
 	else
@@ -18803,11 +18831,11 @@ void mqMorphoDigCore::CreateLandmarkUndoSet(int lmk_type)
 		// Create a landmark undo set for all!!!!
 		action = "Create Landmarks";
 		int mCount = BEGIN_UNDO_SET(action);
-		this->NormalLandmarkCollection->CreateLoadUndoSet(mCount, 1);
-		this->TargetLandmarkCollection->CreateLoadUndoSet(mCount, 1);
-		this->NodeLandmarkCollection->CreateLoadUndoSet(mCount, 1);
-		this->HandleLandmarkCollection->CreateLoadUndoSet(mCount, 1);
-		this->FlagLandmarkCollection->CreateLoadUndoSet(mCount, 1);
+		this->NormalLandmarkCollection->CreateLoadUndoSet(mCount, count_norm);
+		this->TargetLandmarkCollection->CreateLoadUndoSet(mCount, count_targ);
+		this->NodeLandmarkCollection->CreateLoadUndoSet(mCount, count_node);
+		this->HandleLandmarkCollection->CreateLoadUndoSet(mCount, count_handle);
+		//this->FlagLandmarkCollection->CreateLoadUndoSet(mCount, 1);
 		END_UNDO_SET();
 	}
 }
