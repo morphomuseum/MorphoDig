@@ -163,6 +163,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_DefaultDiffuse = this->mui_Diffuse = 100;
 	this->mui_DefaultFontSize = this->mui_FontSize = 10;
 	this->mui_DefaultDisplayLandmarkText = 1;
+	this->mui_DisplayLandmarkText = 1;
 
 	this->mui_OpenGL_minor_version = 0;
 	this->mui_OpenGL_major_version = 0;
@@ -5273,7 +5274,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 volume->InitCenter();
 				 //this->getRenderer()->AddVolume(volume);
 				 this->getVolumeCollection()->AddItem(volume);
-				 emit this->actorsMightHaveChanged();
+				 //emit this->actorsMightHaveChanged();
 				 emit this->volumesMightHaveChanged();
 				 this->Initmui_ExistingArrays();
 				 std::string action = "Load volume";
@@ -5296,38 +5297,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 					 this->UpdateLandmarkSettings();
 				 }
 				 //this->getRenderer()->AddVolume(volume);
-			/*actor->SetSelected(1);
-			actor->SetName(newname);
-			actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
-			actor->SetDisplayMode(this->mui_DisplayMode);
-			//actor->GetProperty()->SetRepresentationToPoints();
-			this->getActorCollection()->AddItem(actor);
-			emit this->actorsMightHaveChanged(); 
-			this->Initmui_ExistingArrays();
-			std::string action = "Load surface file";
-			int mCount = BEGIN_UNDO_SET(action);
-			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
-			END_UNDO_SET();
-
-
-
-			this->getActorCollection()->SetChanged(1);
-
-			//double BoundingBoxLength = MyPolyData->GetLength();
-			this->AdjustCameraAndGrid();
-			//cout << "camera and grid adjusted" << endl;
-
-			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
-			{
-				this->UpdateLandmarkSettings();
-			}*/
-			/*vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
-			cout << "front light!" << endl;
 			
-			light->SetLightTypeToSceneLight();
-			light->SetPosition(0, 0,1);
-			this->getRenderer()->RemoveAllLights();
-			this->getRenderer()->AddLight(light);*/
 
 			
 			this->Render();
@@ -18928,7 +18898,8 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		
 		
 		this->NormalLandmarkCollection->AddItem(myLM);
-		emit this->actorsMightHaveChanged();
+		//emit this->actorsMightHaveChanged();
+		
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NormalLandmarkCollection->SetChanged(1);
 		std::string action = "Create Normal landmark";
@@ -18941,7 +18912,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	{
 
 		this->TargetLandmarkCollection->AddItem(myLM);
-		emit this->actorsMightHaveChanged();
+		//emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->TargetLandmarkCollection->SetChanged(1);
 		std::string action = "Create Target landmark";
@@ -18953,7 +18924,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	else if (lmk_type == NODE_LMK)
 	{
 		this->NodeLandmarkCollection->AddItem(myLM);
-		emit this->actorsMightHaveChanged();
+		//emit this->actorsMightHaveChanged();
 		this->NodeLandmarkCollection->ReorderLandmarks();
 		this->NodeLandmarkCollection->SetChanged(1);
 		std::string action = "Create Curve Node";
@@ -18965,7 +18936,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	else if (lmk_type == HANDLE_LMK)
 	{
 		this->HandleLandmarkCollection->AddItem(myLM);
-		emit this->actorsMightHaveChanged();
+		//emit this->actorsMightHaveChanged();
 		this->HandleLandmarkCollection->ReorderLandmarks();
 		this->HandleLandmarkCollection->SetChanged(1);
 		std::string action = "Create Curve Handle";
@@ -18976,7 +18947,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	else if (lmk_type == FLAG_LMK)
 	{
 		this->FlagLandmarkCollection->AddItem(myLM);	
-		emit this->actorsMightHaveChanged();
+		//emit this->actorsMightHaveChanged();
 		this->FlagLandmarkCollection->SetChanged(1);
 		std::string action = "Create Flag Landmark";
 		int mCount = BEGIN_UNDO_SET(action);

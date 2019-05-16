@@ -157,6 +157,7 @@ void mqLandmarkDialog::slotDisplayLandmarkTextChecked(bool isChecked)
 	{
 		mqMorphoDigCore::instance()->Setmui_DisplayLandmarkText(0);
 	}
+	mqMorphoDigCore::instance()->Render();
 
 }
 void mqLandmarkDialog::slotAdjustScaleFactorChanged()
