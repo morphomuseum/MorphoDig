@@ -5,9 +5,9 @@
 
 
 ========================================================================*/
-#include "mqSaveMHDMHADialogReaction.h"
+#include "mqSaveVTIDialogReaction.h"
 #include "mqCoreUtilities.h"
-#include "mqSaveMHDMHADialog.h"
+#include "mqSaveVTIDialog.h"
 #include "mqReaction.h"
 #include "mqMorphoDigCore.h"
 #include <vtkType.h>
@@ -15,12 +15,12 @@
 #include <QMessageBox>
 
 //-----------------------------------------------------------------------------
-mqSaveMHDMHADialogReaction::mqSaveMHDMHADialogReaction(QAction* parentObject)
+mqSaveVTIDialogReaction::mqSaveVTIDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
 }
 
-void mqSaveMHDMHADialogReaction::onTriggered()
+void mqSaveVTIDialogReaction::onTriggered()
 {
 	
 		vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
@@ -42,12 +42,12 @@ void mqSaveMHDMHADialogReaction::onTriggered()
 
 		
 		
-		cout << "Save MHDMHA Dialog Triggered!" << endl;
+		cout << "Save VTI Dialog Triggered!" << endl;
 		QString fileName;		
 			mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
 			 fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-				tr("Save MHD or MHA files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
-				tr("MHD or MHA file (*.mhd *.mha)"), NULL
+				tr("Save VTI file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
+				tr("VTI file (*.vti)"), NULL
 				//, QFileDialog::DontConfirmOverwrite
 			);
 		
@@ -59,15 +59,15 @@ void mqSaveMHDMHADialogReaction::onTriggered()
 
 		
 
-		mqSaveMHDMHADialogReaction::showSaveMHDMHADialog(fileName);
+		mqSaveVTIDialogReaction::showSaveVTIDialog(fileName);
 }
 
 //-----------------------------------------------------------------------------
-void mqSaveMHDMHADialogReaction::showSaveMHDMHADialog(QString fileName)
+void mqSaveVTIDialogReaction::showSaveVTIDialog(QString fileName)
 {
-	// fonction statique. C'est à dire que lorsqu'on clique sur SAVE MHDMHA, on crée un nouvel objet.
+	// fonction statique. C'est à dire que lorsqu'on clique sur SAVE VTI, on crée un nouvel objet.
 	// la réaction, elle, est bien instanciée à la création du menu, mais pas la fenêtre. 
 
-  mqSaveMHDMHADialog SaveMHDMHA_dialog(mqCoreUtilities::mainWidget(), fileName);
-  SaveMHDMHA_dialog.exec();
+  mqSaveVTIDialog SaveVTI_dialog(mqCoreUtilities::mainWidget(), fileName);
+  SaveVTI_dialog.exec();
 }

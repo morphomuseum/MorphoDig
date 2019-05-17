@@ -44,6 +44,8 @@
 #include "mqCubeDialogReaction.h"
 #include "mqIcosahedronDialogReaction.h"
 #include "mqCameraDialogReaction.h"
+#include "mqSaveMHDMHADialogReaction.h"
+#include "mqSaveVTIDialogReaction.h"
 #include "mqSaveSTLDialogReaction.h"
 #include "mqSaveOBJDialogReaction.h"
 #include "mqColorDialogReaction.h"
@@ -224,7 +226,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   
   QMenu* submenuVolume = menu.addMenu("Volume");
   new mqOpenDataReaction(submenuVolume->addAction("Open MHD/MHA/VTI Volume") << mqSetName("actionOpenVolume"), 18);
-
+  new mqSaveMHDMHADialogReaction(submenuVolume->addAction("Save first selected volume as .MHD or .MHA file") << mqSetName("actionSaveMHDMHA"));
+  new mqSaveVTIDialogReaction(submenuVolume->addAction("Save first selected volume as .VTI") << mqSetName("actionSaveVTI"));
   
 }
 

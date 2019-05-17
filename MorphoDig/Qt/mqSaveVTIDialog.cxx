@@ -6,8 +6,8 @@
  
 =========================================================================*/
 
-#include "mqSaveMHDMHADialog.h"
-#include "ui_mqSaveMHDMHADialog.h"
+#include "mqSaveVTIDialog.h"
+#include "ui_mqSaveVTIDialog.h"
 #include "MorphoDigVersion.h"
 #include "vtkMDVolume.h"
 #include "mqMorphoDigCore.h"
@@ -41,25 +41,25 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqSaveMHDMHADialog::mqSaveMHDMHADialog(QWidget* Parent, QString fileName)
+mqSaveVTIDialog::mqSaveVTIDialog(QWidget* Parent, QString fileName)
   : QDialog(Parent)
-  , Ui(new Ui::mqSaveMHDMHADialog())
+  , Ui(new Ui::mqSaveVTIDialog())
 {
 
 	this->Ui->setupUi(this);
-	this->setObjectName("mqSaveMHDMHADialog");
+	this->setObjectName("mqSaveVTIDialog");
 	this->m_fileName = fileName;
 	this->myVolume = NULL;
 	// This is where we 
   //
  
  
- this->Ui->MHD->setChecked(true);
- this->Ui->CompressionOn->setChecked(true);
+ this->Ui->BigEndian->setChecked(true);
+ this->Ui->CompressionZlib->setChecked(true);
  
   // Should connect...
   
- connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveMHDMHAFile()));
+ connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveVTIFile()));
 
 }
 
@@ -67,27 +67,37 @@ mqSaveMHDMHADialog::mqSaveMHDMHADialog(QWidget* Parent, QString fileName)
 
 
 //-----------------------------------------------------------------------------
-mqSaveMHDMHADialog::~mqSaveMHDMHADialog()
+mqSaveVTIDialog::~mqSaveVTIDialog()
 {
 
  //depending on what is 
 	
   delete this->Ui;
 }
-void mqSaveMHDMHADialog::slotSaveMHDMHAFile()
+void mqSaveVTIDialog::slotSaveVTIFile()
 {
-	cout << "MHDMHA File Saved!" << endl;
+	cout << "VTI File Saved!" << endl;
 	//int position_mode = 0; // 0 Original position , 1 Modified position
-	int file_type = 0; // 0 MHD 1 MHA
+	int file_type = 2; // VTI
+
 	int compressionOn = 1; //1comression, 0 non compression
+	int compressionType = 1; //1 Zlib 2 LZ4 3 ZMA
 	
+	int bigendian = 1;
+
 	if (this->Ui->MHA->isChecked()) {file_type = 1; }		
 	if (this->Ui->CompressionOff->isChecked()) { compressionOn = 0; }
 	
+	if (this->Ui->CompressionZlib->isChecked()) { compressionType = 1; }
+	if (this->Ui->CompressionLZ4->isChecked()) { compressionType = 2; }
+	if (this->Ui->CompressionZMA->isChecked()) { compressionType = 3; }
+
+	if (this->Ui->LittleEndian->isChecked()) { bigendian = 0; }
+
 	this->myVolume = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
 	if (this->myVolume != NULL)
 	{
-		mqMorphoDigCore::instance()->SaveVolume(this->m_fileName, file_type, compressionOn, this->myVolume);
+		mqMorphoDigCore::instance()->SaveVolume(this->m_fileName, file_type, compressionOn, this->myVolume, compressionType, bigendian);
 	}
 	
 

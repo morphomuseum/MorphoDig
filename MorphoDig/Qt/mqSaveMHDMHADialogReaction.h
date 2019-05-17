@@ -1,33 +1,33 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqSavePLYDialogReaction.h
+   Module:    mqSaveMHDMHADialogReaction.h
 
 
 ========================================================================*/
-#ifndef mqSavePLYDialogReaction_h
-#define mqSavePLYDialogReaction_h
+#ifndef mqSaveMHDMHADialogReaction_h
+#define mqSaveMHDMHADialogReaction_h
 
 
 #include "mqReaction.h"
 
 /**
 * @ingroup Reactions
-* mqSavePLYDialogReaction used to show the standard PLY Save dialog for the
+* mqSaveMHDMHADialogReaction used to show the standard MHDMHA Save dialog for the
 * application.
 */
-class  mqSavePLYDialogReaction : public mqReaction
+class  mqSaveMHDMHADialogReaction : public mqReaction
 {
   Q_OBJECT
   typedef mqReaction Superclass;
 
 public:
-  mqSavePLYDialogReaction(QAction* parent);
+  mqSaveMHDMHADialogReaction(QAction* parent);
 
   /**
-  * Shows the SavePLY dialog for the application.
+  * Shows the SaveMHDMHA dialog for the application.
   */
-  static void showSavePLYDialog(QString fileName);
+  static void showSaveMHDMHADialog(QString fileName);
 
 protected:
   /**
@@ -37,7 +37,7 @@ protected:
 
 
 private:
-  Q_DISABLE_COPY(mqSavePLYDialogReaction)
+  Q_DISABLE_COPY(mqSaveMHDMHADialogReaction)
 };
 
 #endif

@@ -193,6 +193,10 @@ mqSaveMAPDialog.cxx
 mqSaveMAPDialog.h
 mqSaveMAPDialogReaction.cxx
 mqSaveMAPDialogReaction.h
+mqSaveMHDMHADialog.h
+mqSaveMHDMHADialog.cxx
+mqSaveMHDMHADialogReaction.h
+mqSaveMHDMHADialogReaction.cxx
 mqSaveNTWDialog.cxx
 mqSaveNTWDialog.h
 mqSaveNTWDialogReaction.cxx
@@ -217,6 +221,10 @@ mqSaveTAGMAPDialog.cxx
 mqSaveTAGMAPDialog.h
 mqSaveTAGMAPDialogReaction.cxx
 mqSaveTAGMAPDialogReaction.h
+mqSaveVTIDialog.h
+mqSaveVTIDialog.cxx
+mqSaveVTIDialogReaction.h
+mqSaveVTIDialogReaction.cxx
 mqSaveVTKDialog.cxx
 mqSaveVTKDialog.h
 mqSaveVTKDialogReaction.cxx
@@ -345,12 +353,14 @@ mqSaveCURasVERDialog.ui
 mqSaveFlagsDialog.ui
 mqSaveLandmarksDialog.ui
 mqSaveMAPDialog.ui
+mqSaveMHDMHADialog.ui
 mqSaveNTWDialog.ui
 mqSaveOBJDialog.ui
 mqSavePLYDialog.ui
 mqSaveSTLDialog.ui
 mqSaveSTVDialog.ui
 mqSaveTAGMAPDialog.ui
+mqSaveVTIDialog.ui
 mqSaveVTKDialog.ui
 mqScalarsComplexityDialog.ui
 mqScalarsControlsWidget.ui

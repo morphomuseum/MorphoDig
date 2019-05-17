@@ -506,7 +506,7 @@ void mqMorphoDigCore::TestVolume()
 	cout << "Image type:" << input->GetScalarTypeAsString() << endl;
 	cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
 	cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
-
+	
 
 	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
 
@@ -17735,7 +17735,7 @@ void mqMorphoDigCore::groupSelectedActors()
 
 	}
 }
-void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compression, vtkMDVolume *myVolume)
+void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compression, vtkMDVolume *myVolume, int compression_type, int  bigendian)
 {
 	// File_type 0 : mhd
 	// File_type 1 : mha
@@ -17746,6 +17746,14 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compressio
 	std::string MHDext2(".MHD");
 	std::string VTIext(".vti");
 	std::string VTIext2(".VTI");
+
+	//compression_type = 1 : Zlib
+	//compression_type = 2 : LZ4
+	//compression_type = 2 : ZMA
+
+
+
+
 	int Ok = 1;
 	cout << "here am I" << endl;
 	vtkMDVolume *myVolume2 = myVolume;
@@ -17783,6 +17791,9 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compressio
 			mhWriter->SetFileName(fileName.toLocal8Bit());
 			if (compression == 0) { mhWriter->SetCompression(false); }
 			else{ mhWriter->SetCompression(true); } 
+
+			
+
 			mhWriter->SetInputData(output);
 			mhWriter->Write();
 			
@@ -17800,6 +17811,29 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compressio
 			vtkSmartPointer<vtkXMLImageDataWriter> xmlWriter = vtkSmartPointer<vtkXMLImageDataWriter>::New();
 			xmlWriter->SetFileName(fileName.toLocal8Bit());
 			xmlWriter->SetInputData(output);
+			if (compression == 0) { xmlWriter->SetCompressorTypeToNone(); }
+			else
+			{
+				if (compression_type == 1)
+				{
+					xmlWriter->SetCompressorTypeToZLib();
+				}
+				else if (compression_type == 2)
+				{
+					xmlWriter->SetCompressorTypeToLZ4();
+				}
+				else if (compression_type == 3)
+				{
+					xmlWriter->SetCompressorTypeToLZMA();
+				}
+				else
+				{
+					xmlWriter->SetCompressorTypeToZLib();
+				}
+				
+			}
+			if (bigendian == 1) { xmlWriter->SetByteOrderToBigEndian(); }
+			else { xmlWriter->SetByteOrderToLittleEndian(); }
 			
 			xmlWriter->Write();
 			

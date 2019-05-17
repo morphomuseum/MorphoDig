@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqSaveMHDMHADialog</class>
- <widget class="QDialog" name="mqSaveMHDMHADialog">
+ <class>mqSaveVTIDialog</class>
+ <widget class="QDialog" name="mqSaveVTIDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>268</height>
+    <height>341</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>230</y>
+     <y>300</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -483,7 +483,7 @@
      <x>20</x>
      <y>20</y>
      <width>281</width>
-     <height>191</height>
+     <height>271</height>
     </rect>
    </property>
    <property name="palette">
@@ -929,21 +929,21 @@
     </palette>
    </property>
    <property name="title">
-    <string>Save  selected volume as MHD/MHA</string>
+    <string>Save  selected volume as VTI</string>
    </property>
-   <widget class="QGroupBox" name="FileType">
+   <widget class="QGroupBox" name="Endianess">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
-      <width>251</width>
+      <y>170</y>
+      <width>241</width>
       <height>81</height>
      </rect>
     </property>
     <property name="title">
-     <string>File type:</string>
+     <string>Endianess:</string>
     </property>
-    <widget class="QWidget" name="verticalLayoutWidget_5">
+    <widget class="QWidget" name="verticalLayoutWidget_8">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -952,18 +952,18 @@
        <height>41</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout1">
+     <layout class="QVBoxLayout" name="verticalLayout1_4">
       <item>
-       <widget class="QRadioButton" name="MHD">
+       <widget class="QRadioButton" name="BigEndian">
         <property name="text">
-         <string>MHD</string>
+         <string>Big endian</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="MHA">
+       <widget class="QRadioButton" name="LittleEndian">
         <property name="text">
-         <string>MHA</string>
+         <string>Little endian</string>
         </property>
        </widget>
       </item>
@@ -974,35 +974,49 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>110</y>
+      <y>20</y>
       <width>251</width>
-      <height>71</height>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
      <string>Compression:</string>
     </property>
-    <widget class="QWidget" name="verticalLayoutWidget_8">
+    <widget class="QWidget" name="verticalLayoutWidget_9">
      <property name="geometry">
       <rect>
        <x>30</x>
        <y>20</y>
        <width>160</width>
-       <height>42</height>
+       <height>88</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout1_4">
+     <layout class="QVBoxLayout" name="verticalLayout1_5">
       <item>
-       <widget class="QRadioButton" name="CompressionOn">
+       <widget class="QRadioButton" name="CompressionZlib">
         <property name="text">
-         <string>Yes</string>
+         <string>ZLib</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="CompressionLZ4">
+        <property name="text">
+         <string>LZ4</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="CompressionZMA">
+        <property name="text">
+         <string>ZMA</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QRadioButton" name="CompressionOff">
         <property name="text">
-         <string>No</string>
+         <string>No compression</string>
         </property>
        </widget>
       </item>
@@ -1016,7 +1030,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>mqSaveMHDMHADialog</receiver>
+   <receiver>mqSaveVTIDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1032,7 +1046,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>mqSaveMHDMHADialog</receiver>
+   <receiver>mqSaveVTIDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
