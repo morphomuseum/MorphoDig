@@ -112,20 +112,22 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->dim0->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->dim1->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->dim2->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	/*int dim[3];
-		double spacing[3];
-		input->GetDimensions(dim);
-		input->GetSpacing(spacing);
-		int numcells = input->GetNumberOfCells();
-		input->GetScalarTypeAsString();
-		//input->Get
-		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< endl;
-		cout << "Dim0*Dim1*Dim2:" << dim[0]* dim[1]* dim[2] << endl;
-		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
-		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
-		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
-		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
-		*/
+	
+	this->Ui->dim0->setMinimum(0);
+	this->Ui->dim1->setMinimum(0);
+	this->Ui->dim2->setMinimum(0);
+	this->Ui->res0->setMinimum(-DBL_MAX);
+	this->Ui->res1->setMinimum(-DBL_MAX);
+	this->Ui->res2->setMinimum(-DBL_MAX);
+
+	this->Ui->dim0->setMaximum(INT_MAX);
+	this->Ui->dim1->setMaximum(INT_MAX);
+	this->Ui->dim2->setMaximum(INT_MAX);
+	this->Ui->res0->setMaximum(DBL_MAX);
+	this->Ui->res1->setMaximum(DBL_MAX);
+	this->Ui->res2->setMaximum(DBL_MAX);
+
+
 
 	this->Ui->M00->setMinimum(-DBL_MAX);
 	this->Ui->M01->setMinimum(-DBL_MAX);
@@ -720,6 +722,67 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->displayROI->setChecked(false);
 		}
 
+		
+		
+		int dim[3];
+		double res[3];
+		this->Volume->GetImageData()->GetDimensions(dim);
+		this->Ui->dim0->setValue(dim[0]);
+		this->Ui->dim1->setValue(dim[1]);
+		this->Ui->dim2->setValue(dim[2]);
+
+		this->Volume->GetImageData()->GetSpacing(res);
+		this->Ui->res0->setValue(res[0]);
+		this->Ui->res1->setValue(res[1]);
+		this->Ui->res2->setValue(res[2]);
+		int numcells = this->Volume->GetImageData()->GetNumberOfCells();
+		int dataType = this->Volume->GetImageData()->GetScalarType();
+		QString dataTypeAsString;
+		if (dataType == VTK_UNSIGNED_SHORT)
+		{
+			dataTypeAsString = "Unsigned shorts (16 bits)";
+		}
+		else if (dataType == VTK_SHORT)
+		{
+			dataTypeAsString = "Signed shorts (16 bits)";
+		}
+		else if (dataType == VTK_CHAR)
+		{
+			dataTypeAsString = "Char (8 bits)";
+		}
+		else if (dataType == VTK_UNSIGNED_CHAR)
+		{
+			dataTypeAsString = "Unsigned char (8 bits)";
+		}
+		else if (dataType == VTK_SIGNED_CHAR)
+		{
+			dataTypeAsString = "Signed char (8 bits)";
+		}
+		else if (dataType == VTK_FLOAT)
+		{
+			dataTypeAsString = "Float (32 bits)";
+		}
+		else if (dataType == VTK_DOUBLE)
+		{
+			dataTypeAsString = "Double (64 bits)";
+		}
+		else if (dataType == VTK_BIT)
+		{
+			dataTypeAsString = "Bit (1 bit)";
+		}
+		else
+		{
+			dataTypeAsString = "Unknown";
+		}
+		this->Ui->dataType->setText(dataTypeAsString);
+		//input->Get
+		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< endl;
+		cout << "Dim0*Dim1*Dim2:" << dim[0]* dim[1]* dim[2] << endl;
+		cout << "Spacing0*Spacing1*Spacing2:" << res[0] * res[1] * res[2] << endl;
+		cout << "Image type:" << this->Volume->GetImageData()->GetScalarTypeAsString() << endl;
+		cout << "Image type int:" << this->Volume->GetImageData()->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
+		cout << "Number of scalar components:" << this->Volume->GetImageData()->GetNumberOfScalarComponents() << endl;
+		
 		
 		
 

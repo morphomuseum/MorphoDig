@@ -1168,20 +1168,20 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dim1">
+   <widget class="QSpinBox" name="dim1">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>220</x>
       <y>50</y>
       <width>91</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dim0">
+   <widget class="QSpinBox" name="dim0">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -1194,13 +1194,13 @@
      </rect>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dim2">
+   <widget class="QSpinBox" name="dim2">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>320</x>
       <y>50</y>
       <width>91</width>
       <height>20</height>
@@ -1252,7 +1252,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>320</x>
       <y>71</y>
       <width>91</width>
       <height>20</height>
@@ -1265,7 +1265,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>220</x>
       <y>71</y>
       <width>91</width>
       <height>20</height>
@@ -1285,7 +1285,7 @@
      <string>Data type:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="dataTyoe">
+   <widget class="QLineEdit" name="dataType">
     <property name="enabled">
      <bool>false</bool>
     </property>
