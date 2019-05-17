@@ -85,7 +85,7 @@ void mqSaveVTIDialog::slotSaveVTIFile()
 	
 	int bigendian = 1;
 
-	if (this->Ui->MHA->isChecked()) {file_type = 1; }		
+	
 	if (this->Ui->CompressionOff->isChecked()) { compressionOn = 0; }
 	
 	if (this->Ui->CompressionZlib->isChecked()) { compressionType = 1; }
