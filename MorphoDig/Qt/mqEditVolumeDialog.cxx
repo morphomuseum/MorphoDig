@@ -127,6 +127,10 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->res1->setMaximum(DBL_MAX);
 	this->Ui->res2->setMaximum(DBL_MAX);
 
+	this->Ui->res0->setDecimals(7);
+	this->Ui->res1->setDecimals(7);
+	this->Ui->res2->setDecimals(7);
+
 
 
 	this->Ui->M00->setMinimum(-DBL_MAX);
@@ -256,6 +260,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	actiondisplayROIToggle->setIcon(icon);*/
 
 	
+	connect(this->Ui->isVisible, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleClicked(bool)));
+
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
 	connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
@@ -349,6 +355,23 @@ void mqEditVolumeDialog::slotEnableROIClicked(bool isChecked)
 
 }
 
+void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		mqMorphoDigCore::instance()->Render();
+		if (isChecked)
+		{
+			this->Volume->SetisVisible(1);
+		}
+		else
+		{
+			this->Volume->SetisVisible(0);
+		}
+
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotdisplayROIPressed()
 {
 	if (this->Volume != NULL &&  this->CurrentVolumeInCollection()&&this->Volume->GetSelected() == 1)
@@ -711,7 +734,15 @@ void mqEditVolumeDialog::UpdateUI()
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
 		
-		
+		if (this->Volume->GetisVisible() == 1)
+		{
+			this->Ui->isVisible->setChecked(true);
+		}
+		else
+		{ 
+			this->Ui->isVisible->setChecked(false);
+		}
+
 		if (this->Volume->GetdisplayROI() == 1)
 		{
 

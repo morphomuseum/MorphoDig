@@ -68,6 +68,7 @@ public:
   virtual void slotDeleteColorMap();
   virtual void slotdisplayROIPressed();
   virtual void slotEnableROIClicked(bool isChecked);
+  virtual void slotisVisibleClicked(bool isChecked);
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();

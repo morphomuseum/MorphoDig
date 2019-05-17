@@ -20146,6 +20146,7 @@ void mqMorphoDigCore::UnselectAll(int Count)
 		if (myActor->GetSelected() == 1)
 		{
 			myActor->SetSelected(0);
+			myActor->SetisVisible(1);
 			myActor->SetChanged(1);
 
 		}
@@ -20159,6 +20160,7 @@ void mqMorphoDigCore::UnselectAll(int Count)
 		if (myVolume->GetSelected() == 1)
 		{
 			myVolume->SetSelected(0);
+			myVolume->SetisVisible(1);
 			myVolume->SetChanged(1);
 
 		}

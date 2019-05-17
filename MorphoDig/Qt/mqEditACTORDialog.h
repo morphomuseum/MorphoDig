@@ -54,6 +54,7 @@ public:
   virtual void slotDeleteScalar();
   virtual void slotEnableROIClicked(bool isChecked);
   virtual void slotdisplayROIPressed();
+  virtual void slotisVisibleClicked(bool isChecked);
 
 protected:
 	

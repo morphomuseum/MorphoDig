@@ -36,6 +36,7 @@ public:
 		int arrayType;// 0 double 1 int(tag) 2 char (RGB/RGBA)
 		double Color[4];
 		int Selected;
+		int isVisible;
 		int UndoCount;
 		std::string Name;
 		Element(vtkSmartPointer<vtkMatrix4x4> m, double c[4], int selected, int Count, std::string name, QString marrayName, vtkSmartPointer<vtkDataArray> marray, int mArrayType=0)
@@ -81,6 +82,11 @@ public:
 	vtkIdType GetCorrPickedId(vtkIdType picked);
 	// Description:
 	void ShallowCopy(vtkProp *prop);
+
+	//isVisible
+	void SetisVisible(int visible);
+	//	vtkSetMacro(displayROI, int);
+	vtkGetMacro(isVisible, int);
 
 	//vtkSetMacro(Selected, int);
 	vtkGetMacro(Selected, int);
@@ -139,6 +145,7 @@ protected:
 	~vtkMDActor();
 	vtkSmartPointer<vtkBoxWidget> Box;
 	int displayROI;
+	int isVisible;
 	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> cFilter;
 	vtkSmartPointer<vtkIdList> cFilterCorrList;// for some reason vertice ids are not the same in cFilter input / output => so a corresponding list has to be built . Here: 1,2,3,4 = cFilter ids. GetId(i) returns original list id

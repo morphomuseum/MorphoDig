@@ -446,6 +446,7 @@ void vtkMDInteractorStyle::StartSelect()
 					if (myActor->GetSelected() == 0)
 					{
 						myActor->SetSelected(1);
+						myActor->SetisVisible(1);
 						myActor->SetChanged(1);
 						
 					}
@@ -459,6 +460,7 @@ void vtkMDInteractorStyle::StartSelect()
 					if (myVolume->GetSelected() == 0)
 					{
 						myVolume->SetSelected(1);
+						myVolume->SetisVisible(1);
 						myVolume->SetChanged(1);
 
 					}

@@ -44,7 +44,9 @@ vtkMDActor::vtkMDActor()
 		vtkSmartPointer<vtkProperty>::New();
 	//backFaces->SetDiffuseColor(.8, .8, .8);
 	backFaces->SetColor(.7, .7, .7);
+
 	backFaces->SetOpacity(0.5);
+	this->isVisible = 1;
 	this->pointNormals = nullptr;
 	this->cellNormals = nullptr;
 	this->SetBackfaceProperty(backFaces);
@@ -70,6 +72,33 @@ vtkMDActor::~vtkMDActor()
 	
 
 
+
+}
+
+void vtkMDActor::SetisVisible(int visible)
+{
+	int hasChanged = 0;
+	if (visible != this->isVisible) { hasChanged = 1; }
+	if (hasChanged = 0) { return; }
+	this->isVisible = visible;
+	if (visible == 1)
+	{
+		//ici, ajouter une box visible
+		if (this->GetMapper() != NULL)
+		{
+			mqMorphoDigCore::instance()->getRenderer()->AddActor(this);			
+			if (this->displayROI == 1 && this->Box != NULL) { this->Box->SetEnabled(true); }
+		}
+	}
+	else
+	{
+		//enlever la box
+		if (this->Box != NULL) {
+			this->Box->SetEnabled(false);
+		}
+		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this);
+
+	}
 
 }
 

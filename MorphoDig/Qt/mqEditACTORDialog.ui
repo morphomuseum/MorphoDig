@@ -494,7 +494,7 @@
    <widget class="QPushButton" name="next">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>370</x>
       <y>20</y>
       <width>21</width>
       <height>23</height>
@@ -512,7 +512,7 @@
    <widget class="QPushButton" name="prec">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>350</x>
       <y>20</y>
       <width>21</width>
       <height>23</height>
@@ -543,7 +543,7 @@
    <widget class="QLineEdit" name="ActorName">
     <property name="geometry">
      <rect>
-      <x>92</x>
+      <x>80</x>
       <y>20</y>
       <width>271</width>
       <height>20</height>
@@ -914,6 +914,33 @@
      <rect>
       <x>330</x>
       <y>240</y>
+      <width>25</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display ROI</string>
+    </property>
+    <property name="text">
+     <string>BoxWidget</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/eye_closed.png</normaloff>
+      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="isVisible">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>20</y>
       <width>25</width>
       <height>19</height>
      </rect>

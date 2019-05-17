@@ -219,6 +219,7 @@ connect(this->Ui->duplicateScalar, SIGNAL(pressed()), this, SLOT(slotDuplicateSc
 
 connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
 connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
+connect(this->Ui->isVisible, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleClicked(bool)));
 //virtual void slotEnableROIPressed(bool isChecked);
 this->Ui->displayROI->setChecked(true);
 }
@@ -417,6 +418,25 @@ void mqEditACTORDialog::GetFirstActor()
 	}
 
 }
+
+void mqEditACTORDialog::slotisVisibleClicked(bool isChecked)
+{
+	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
+	{
+		mqMorphoDigCore::instance()->Render();
+		if (isChecked)
+		{
+			this->ACTOR->SetisVisible(1);
+		}
+		else
+		{
+			this->ACTOR->SetisVisible(0);
+		}
+
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+
 void mqEditACTORDialog::slotEnableROIClicked(bool isChecked)
 {
 	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)

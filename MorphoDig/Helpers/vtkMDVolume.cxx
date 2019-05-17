@@ -47,6 +47,7 @@ vtkMDVolume::vtkMDVolume()
 	this->Selected = 1;
 	
 	this->displayROI = 0;
+	this->isVisible = 1;
 	this->Outline = vtkSmartPointer<vtkOutlineFilter>::New();
 	this->OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->OutlineActor = vtkSmartPointer<vtkActor>::New();
@@ -82,6 +83,37 @@ vtkMDVolume::~vtkMDVolume()
 
 }
 
+void vtkMDVolume::SetisVisible(int visible)
+{
+	int hasChanged = 0;
+	if (visible != this->isVisible) { hasChanged = 1; }
+	if (hasChanged = 0) { return; }
+	this->isVisible = visible;
+	if (visible == 1)
+	{
+		//ici, ajouter une box visible
+		if (this->GetMapper() != NULL)
+		{
+			mqMorphoDigCore::instance()->getRenderer()->AddVolume(this);
+			if (this->Selected == 1)
+			{
+				mqMorphoDigCore::instance()->getRenderer()->AddActor(this->OutlineActor);
+			}
+			if (this->displayROI == 1 && this->Box != NULL) { this->Box->SetEnabled(true); }
+		}
+	}
+	else
+	{
+		//enlever la box
+		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->OutlineActor);
+		if (this->Box != NULL) {
+			this->Box->SetEnabled(false);
+		}
+		mqMorphoDigCore::instance()->getRenderer()->RemoveVolume(this);
+
+	}
+
+}
 void vtkMDVolume::SetdisplayROI(int disp)
 {
 	if (this->Box != NULL)
