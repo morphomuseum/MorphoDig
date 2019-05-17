@@ -106,6 +106,26 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->M31->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->M32->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->M33->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->res0->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->res1->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->res2->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->dim0->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->dim1->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->dim2->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	/*int dim[3];
+		double spacing[3];
+		input->GetDimensions(dim);
+		input->GetSpacing(spacing);
+		int numcells = input->GetNumberOfCells();
+		input->GetScalarTypeAsString();
+		//input->Get
+		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< endl;
+		cout << "Dim0*Dim1*Dim2:" << dim[0]* dim[1]* dim[2] << endl;
+		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
+		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
+		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
+		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+		*/
 
 	this->Ui->M00->setMinimum(-DBL_MAX);
 	this->Ui->M01->setMinimum(-DBL_MAX);

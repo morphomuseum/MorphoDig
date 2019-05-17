@@ -4942,12 +4942,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		}
 
 		int dim[3];
+		double spacing[3];
 		input->GetDimensions(dim);
+		input->GetSpacing(spacing);
 		int numcells = input->GetNumberOfCells();
 		input->GetScalarTypeAsString();
 		//input->Get
 		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< endl;
 		cout << "Dim0*Dim1*Dim2:" << dim[0]* dim[1]* dim[2] << endl;
+		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
 		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
 		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
 		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
