@@ -485,6 +485,16 @@ void mqEditACTORDialog::UpdateUI()
 {
 	if (this->ACTOR != NULL) {
 		
+
+		if (this->ACTOR->GetisVisible() == 1)
+		{
+			this->Ui->isVisible->setChecked(true);
+		}
+		else
+		{
+			this->Ui->isVisible->setChecked(false);
+		}
+
 		if (this->ACTOR->GetdisplayROI() == 1)
 		{
 
