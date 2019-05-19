@@ -287,6 +287,7 @@ void vtkLMActor::UpdateDisplayText()
 	{
 		mqMorphoDigCore::instance()->getRenderer()->AddActor(this->GetLMLabelActor3D());
 	}
+	else
 	{
 		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->GetLMLabelActor3D());
 	}
@@ -745,6 +746,7 @@ void vtkLMActor::UpdateProps()
 	//cout << "LM update props" << endl;
 	this->CreateLMBody();
 	this->CreateLMLabelText();
+	//cout << "Call update display text!" << endl;
 	this->UpdateDisplayText();
 
 }

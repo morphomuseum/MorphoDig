@@ -7639,6 +7639,7 @@ void mqMorphoDigCore::Setmui_DisplayLandmarkText(int display)
 {
 	// Display LM Actors text (LM number or flag text)
 	this->mui_DisplayLandmarkText = display;
+	cout << "displayLM=" << display<<endl;
 	this->UpdateLandmarkSettings();
 }
 
