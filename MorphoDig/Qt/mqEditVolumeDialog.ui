@@ -460,7 +460,7 @@
     <rect>
      <x>170</x>
      <y>770</y>
-     <width>161</width>
+     <width>195</width>
      <height>30</height>
     </rect>
    </property>
@@ -1147,14 +1147,14 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>410</x>
+      <x>420</x>
       <y>20</y>
       <width>25</width>
       <height>19</height>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Display ROI</string>
+     <string>Display / Hide volume</string>
     </property>
     <property name="text">
      <string>BoxWidget</string>
