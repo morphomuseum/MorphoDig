@@ -578,16 +578,16 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout1_7">
      <item>
-      <widget class="QRadioButton" name="VTK">
+      <widget class="QRadioButton" name="VTP">
        <property name="text">
-        <string> VTK Polydata files  (.vtk)</string>
+        <string>VTK XML Polydata files (.vtp)</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="VTP">
+      <widget class="QRadioButton" name="VTK">
        <property name="text">
-        <string>VTK XML Polydata files (.vtp)</string>
+        <string> VTK Polydata files  (.vtk)</string>
        </property>
       </widget>
      </item>
