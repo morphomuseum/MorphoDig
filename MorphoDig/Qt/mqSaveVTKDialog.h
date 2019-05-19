@@ -31,7 +31,7 @@ public:
 
   public slots:
   virtual void slotSaveVTKFile();
-  
+  virtual void slotVTKVTPClicked();
   
 
 protected:

@@ -1225,13 +1225,16 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 		found = fileName.toStdString().find(VTKext);
 		found2 = fileName.toStdString().find(VTKext2);
-		std::size_t found3 = fileName.toStdString().find(VTKext3);
-		std::size_t found4 = fileName.toStdString().find(VTKext4);
-		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		if (found != std::string::npos || found2 != std::string::npos)
 		{
 			type = 1; //VTK
 		}
-
+		std::size_t found3 = fileName.toStdString().find(VTKext3);
+		std::size_t found4 = fileName.toStdString().find(VTKext4);
+		if (found3 != std::string::npos || found4 != std::string::npos)
+		{
+			type = 4; //VTP
+		}
 		//std::cout << "2Type= " <<type<< std::endl;
 		found = fileName.toStdString().find(PLYext);
 		found2 = fileName.toStdString().find(PLYext2);

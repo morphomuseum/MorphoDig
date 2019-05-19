@@ -72,6 +72,7 @@
 #include <vtkOBJWriter.h>
 #include <vtkPLYWriter.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkXMLPolyDataWriter.h>
 #include <vtkThinPlateSplineTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkSelectionNode.h>
@@ -80,6 +81,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataReader.h>
+#include <vtkXMLPolyDataReader.h>
 #include <vtkMetaImageReader.h>
 #include <vtkXMLImageDataReader.h>
 #include <vtkPolyDataNormals.h>
@@ -5350,7 +5352,7 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		std::string PLYext(".ply");
 		std::string PLYext2(".PLY");
 
-		int type = 0; //0 = stl, 1 = vtk, 2 = obj, 3 = ply
+		int type = 0; //0 = stl, 1 = vtk, 2 = obj, 3 = ply, 4: vtp (XML vtkPolyData)
 		std::size_t found = fileName.toStdString().find(STLext);
 		std::size_t found2 = fileName.toStdString().find(STLext2);
 		if (found != std::string::npos || found2 != std::string::npos)
@@ -5362,13 +5364,17 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		//std::cout << "0Type= " <<type<< std::endl;
 		found = fileName.toStdString().find(VTKext);
 		found2 = fileName.toStdString().find(VTKext2);
-		std::size_t found3 = fileName.toStdString().find(VTKext3);
-		std::size_t found4 = fileName.toStdString().find(VTKext4);
-		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		
+		if (found != std::string::npos || found2 != std::string::npos)
 		{
 			type = 1; //VTK
 		}
-
+		std::size_t found3 = fileName.toStdString().find(VTKext3);
+		std::size_t found4 = fileName.toStdString().find(VTKext4);
+		if (found3 != std::string::npos || found4 != std::string::npos)
+		{
+			type = 4; //VTP
+		}
 		//std::cout << "2Type= " <<type<< std::endl;
 		found = fileName.toStdString().find(PLYext);
 		found2 = fileName.toStdString().find(PLYext2);
@@ -5419,10 +5425,18 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
-		else
+		else if (type == 3)
 		{
 			vtkSmartPointer<vtkOBJReader> reader =
 				vtkSmartPointer<vtkOBJReader>::New();
+			reader->SetFileName(fileName.toLocal8Bit());
+			reader->Update();
+			MyPolyData = reader->GetOutput();
+		}
+		else if (type == 4)
+		{
+			vtkSmartPointer<vtkXMLPolyDataReader> reader =
+				vtkSmartPointer<vtkXMLPolyDataReader>::New();
 			reader->SetFileName(fileName.toLocal8Bit());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
@@ -7043,8 +7057,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 {
 	//save_surfaces_format: 0:VTK 1:PLY 2:STL
 	// save_surfaces_format 0 : stl
-	// save_surfaces_format 1 : vtk-vtp
+	// save_surfaces_format 1 : vtk
 	// save_surfaces_format 2 : ply
+	// save_surfaces_format 4  vtp
 
 	// save_volumes_format 0 : mhd
 	// save_volumes_format 1 : mha
@@ -7082,7 +7097,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		//}
 		//std::string path = fileName.toStdString().substr(0, (fileName.toStdString().length() - only_filename.length()));
 		QString posExt = ".pos";
-		//std::string vtpExt = ".vtp";
+		QString vtpExt = ".vtp";
 		QString vtkExt = ".vtk";
 		QString plyExt = ".ply";
 		QString stlExt = ".stl";
@@ -7146,6 +7161,10 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		if (save_surfaces_format == 1)//VTK
 		{
 			mesh_exists = this->selected_file_exists(onlypath, vtkExt, no_postfix);
+		}
+		else if (save_surfaces_format == 4)//VTP
+		{
+			mesh_exists = this->selected_file_exists(onlypath, vtpExt, no_postfix);
 		}
 		else if (save_surfaces_format == 2)//PLY
 		{
@@ -7384,6 +7403,10 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				{
 					_mesh_file.append(".vtk");
 				}
+				else if (save_surfaces_format == 4)
+				{
+					_mesh_file.append(".vtp");
+				}
 				else if (save_surfaces_format == 2)
 				{
 					_mesh_file.append(".ply");
@@ -7417,12 +7440,11 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				}
 				if (write == 1)
 				{
-					//int write_type = 0 : binary or binary LE;
-					int File_type = save_surfaces_format; 
+					
 
 					std::vector<std::string> mscalarsToBeRemoved; // no scalar to be removed here for the moment...
 					int RGBopt = 0; //now: keep current RGB color
-					this->SaveSurfaceFile(_mesh_fullpath ,0 , apply_position_to_surfaces, File_type, mscalarsToBeRemoved, RGBopt, 0, myActor);
+					this->SaveSurfaceFile(_mesh_fullpath ,0 , apply_position_to_surfaces, save_surfaces_format, mscalarsToBeRemoved, RGBopt, 0, myActor);
 				}
 
 				
@@ -17856,6 +17878,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	// Write_Type 2 : ASCII
 
 
+
 	// if length = 1 and contains "all" or length = 0 => save all scalars.
 	// else : remove the selected scalars
 
@@ -17863,9 +17886,10 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	// Position_mode 1 : moved position
 
 	// File_type 0 : stl
-	// File_type 1 : vtk-vtp
+	// File_type 1 : vtk
 	// File_type 2 : ply
 	// File_type 3 : obj
+	// File_type 4 : vtp
 
 	// If myActor is NULL : => what will be saved is an aggregation of all selected surface objects.
 	// If myActor is not NULL: => what will be saved is the underlying surface object.
@@ -18312,39 +18336,54 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		
 	}
 
-	if (file_type == 1)
+	if (file_type == 1 || file_type ==4 )
 	{
-		vtkSmartPointer<vtkPolyDataWriter> Writer =
-			vtkSmartPointer<vtkPolyDataWriter>::New();
-		if (write_type == 0)
+		if (file_type == 1)
 		{
-			Writer->SetFileTypeToBinary();
+			vtkSmartPointer<vtkPolyDataWriter> Writer =
+				vtkSmartPointer<vtkPolyDataWriter>::New();
+			if (write_type == 0)
+			{
+				Writer->SetFileTypeToBinary();
+
+			}
+			else
+			{
+				Writer->SetFileTypeToASCII();
+			}
+			std::size_t found = fileName.toStdString().find(VTKext);
+			std::size_t found2 = fileName.toStdString().find(VTKext2);
+
+			if (found == std::string::npos && found2 == std::string::npos)
+			{
+				fileName.append(".vtk");
+			}
 			
-		}
-		else
-		{
-			Writer->SetFileTypeToASCII();
-		}
-		std::size_t found = fileName.toStdString().find(VTKext);
-		std::size_t found2 = fileName.toStdString().find(VTKext2);
-		std::size_t found3 = fileName.toStdString().find(VTKext3);
-		std::size_t found4 = fileName.toStdString().find(VTKext4);
-		if (found == std::string::npos && found2 == std::string::npos && found3 == std::string::npos && found4 == std::string::npos)
-		{
-			fileName.append(".vtk");
-		}
-		//cout << "fileName utf8" << fileName.toUtf8().toStdString() << endl;
-		//cout << "fileName local 8bits" << fileName.toLocal8Bit().toStdString() << endl;
-		//cout << "fileName local 8bits raw" << fileName.toLocal8Bit().toStdString << endl;
-		//fileName = QString::fromUtf8(fileName.toLocal8Bit());
-		//fileName = QString::fromLocal8Bit(fileName.toLocal8Bit());
-		
-	//	cout << "fileName raw toSTD" << fileName.toStdString()<< endl;
-		
+
 			Writer->SetFileName(fileName.toLocal8Bit());
-		Writer->SetInputData(cleanPolyDataFilter->GetOutput());
-		//  stlWrite->Update();
-		Writer->Write();
+			Writer->SetInputData(cleanPolyDataFilter->GetOutput());
+			//  stlWrite->Update();
+			Writer->Write();
+		}
+		else if (file_type == 4)
+		{
+			vtkSmartPointer<vtkXMLPolyDataWriter> Writer =
+				vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+			
+			
+			std::size_t found3 = fileName.toStdString().find(VTKext3);
+			std::size_t found4 = fileName.toStdString().find(VTKext4);
+			if (found3 == std::string::npos && found4 == std::string::npos)
+			{
+				fileName.append(".vtp");
+			}
+			
+
+			Writer->SetFileName(fileName.toLocal8Bit());
+			Writer->SetInputData(cleanPolyDataFilter->GetOutput());
+			//  stlWrite->Update();
+			Writer->Write();
+		}
 		
 	}
 

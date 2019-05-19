@@ -56,6 +56,7 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
  
  this->Ui->Binary->setChecked(true);
  this->Ui->PositionOriginal->setChecked(true);
+ this->Ui->VTP->setChecked(true);
  this->Ui->scalarList->clear();
  ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ArraysOfSelectedObjects(0);
  QString none = QString("Solid color");
@@ -96,7 +97,9 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
   // Should connect...
   
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveVTKFile()));
-
+ //mqSaveVTKDialogslotVTKVTPClicked
+ connect(this->Ui->VTP, SIGNAL(clicked()), this, SLOT(slotVTKVTPClicked()));
+ connect(this->Ui->VTK, SIGNAL(clicked()), this, SLOT(slotVTKVTPClicked()));
 }
 
 
@@ -110,14 +113,26 @@ mqSaveVTKDialog::~mqSaveVTKDialog()
 	
   delete this->Ui;
 }
+void mqSaveVTKDialog::slotVTKVTPClicked()
+{
+	if (this->Ui->VTK->isChecked())
+	{
+		this->Ui->VTKEncoding->setEnabled(true);
+	}
+	else
+	{
+		this->Ui->VTKEncoding->setEnabled(false);
+	}
+}
 void mqSaveVTKDialog::slotSaveVTKFile()
 {
 	cout << "Save VTK File!" << endl;
 	int position_mode = 0; // 0 Original position , 1 Modified position
-	int file_type = 1; // 0 STL 1 VTK/VTP, 2 PLY
+	int file_type = 1; // 0 STL 1 VTK, 2 PLY, 3 OBJ, 4 VTP
 	int save_norms = 0; //0 no, 1 yes
 	int write_type = 0;//0 binary LE, 1 binary BE, 2 ASCII
 	if (this->Ui->Binary->isChecked()) { write_type = 0; }	
+	if (this->Ui->VTP->isChecked()) { file_type = 4; }
 	else if (this->Ui->ASCII->isChecked()) { write_type = 2; }
 
 	if (this->Ui->PositionModified->isChecked()) { position_mode = 1; }

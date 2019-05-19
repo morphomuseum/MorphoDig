@@ -481,7 +481,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>20</y>
+     <y>10</y>
      <width>411</width>
      <height>91</height>
     </rect>
@@ -520,7 +520,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>130</y>
+     <y>110</y>
      <width>411</width>
      <height>91</height>
     </rect>
@@ -559,9 +559,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>230</y>
+     <y>210</y>
      <width>411</width>
-     <height>101</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -573,7 +573,7 @@
       <x>20</x>
       <y>20</y>
       <width>290</width>
-      <height>76</height>
+      <height>103</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout1_7">
@@ -581,6 +581,13 @@
       <widget class="QRadioButton" name="VTK">
        <property name="text">
         <string> VTK Polydata files  (.vtk)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="VTP">
+       <property name="text">
+        <string>VTK XML Polydata files (.vtp)</string>
        </property>
       </widget>
      </item>
@@ -644,7 +651,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>340</y>
+     <y>350</y>
      <width>411</width>
      <height>131</height>
     </rect>

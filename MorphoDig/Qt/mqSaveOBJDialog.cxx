@@ -77,7 +77,7 @@ void mqSaveOBJDialog::slotSaveOBJFile()
 {
 	cout << "OBJ File Saved!" << endl;
 	int position_mode = 0; // 0 Original position , 1 Modified position
-	int file_type = 3; // 0 STL 1 VTK/VTP, 2 PLY, 3 OBJ
+	int file_type = 3; // 0 STL 1 VTK, 2 PLY, 3 OBJ, 4 VTP
 	int save_norms = 0; //0 no, 1 yes
 	int write_type = 2;//0 binary LE, 1 binary BE, 2 ASCII 
 

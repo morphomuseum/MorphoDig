@@ -56,7 +56,7 @@ mqSaveNTWDialog::mqSaveNTWDialog(QWidget* Parent)
  
  this->Ui->DoNotSaveORI->setChecked(true);
  this->Ui->DoNotSaveTAG->setChecked(true);
- this->Ui->VTK->setChecked(true);
+ this->Ui->VTP->setChecked(true);
  this->Ui->PositionInPosFile->setChecked(true);
   // Should connect...
   
@@ -167,8 +167,9 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 	int save_tag = 0;
 	int save_surfaces_format = 1;  // default, vtk
 								  // File_type 0 : stl
-								  // File_type 1 : vtk-vtp
+								  // File_type 1 : vtk
 								  // File_type 2 : ply
+								  // File_type 4 : vtp
 
 	int save_volumes_format = 0;
 	// save_volumes_format 0 : mhd
@@ -184,6 +185,8 @@ void mqSaveNTWDialog::slotSaveNTWFile()
 	if (this->Ui->SaveTAG->isChecked()) { save_tag = 1; }
 	if (this->Ui->PLY->isChecked()) { save_surfaces_format = 2; }
 	if (this->Ui->STL->isChecked()) { save_surfaces_format = 0; }
+	if (this->Ui->VTP->isChecked()) { save_surfaces_format = 4; }
+	if (this->Ui->VTK->isChecked()) { save_surfaces_format = 1; }
 	if (this->Ui->ApplyPositionToSurfaces->isChecked()) { apply_position_to_surfaces = 1; }
 	int compression = 1;
 	if (this->Ui->compressionOn->isChecked() == 0) { compression = 0; }
