@@ -1347,7 +1347,9 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 		if (type < 4)
 		{
-			mqMorphoDigCore::instance()->OpenMesh(fileName);
+			int ok = mqMorphoDigCore::instance()->OpenMesh(fileName);
+			if (ok ==1){ mqMorphoDigCore::instance()->CreateSurfaceUndoSet(1); }
+			
 		}
 		else if (type == 4)
 		{

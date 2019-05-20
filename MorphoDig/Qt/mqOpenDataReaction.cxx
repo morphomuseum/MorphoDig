@@ -52,7 +52,8 @@ void mqOpenDataReaction::OpenMesh()
 	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
 
 	
-	mqMorphoDigCore::instance()->OpenMesh(fileName);
+	int ok = mqMorphoDigCore::instance()->OpenMesh(fileName);
+	if (ok == 1) { mqMorphoDigCore::instance()->CreateSurfaceUndoSet(1); }
 }
 
 void mqOpenDataReaction::OpenVolume()
@@ -601,7 +602,8 @@ void mqOpenDataReaction::OpenData()
 
 			if (type < 4)
 			{
-				mqMorphoDigCore::instance()->OpenMesh(fileName);
+				int ok = mqMorphoDigCore::instance()->OpenMesh(fileName);
+				if (ok == 1) { mqMorphoDigCore::instance()->CreateSurfaceUndoSet(1); }
 			}
 			else if (type == 4)
 			{

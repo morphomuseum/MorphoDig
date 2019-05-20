@@ -5320,10 +5320,11 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 	}
 
 }
-void mqMorphoDigCore::OpenMesh(QString fileName)
+int mqMorphoDigCore::OpenMesh(QString fileName)
 {
 
 	int file_exists = 1;
+	int ok = 0;
 	QFile file(fileName);
 	QString name = "";
 	if (file.exists()) {
@@ -5707,25 +5708,27 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 			//actor->SetOrientation(0, 0, 180);
 			//actor->GetProperty()->SetRepresentationToPoints();
 			this->getActorCollection()->AddItem(actor);
-			emit this->actorsMightHaveChanged(); 
+			ok = 1;
+			
+			/*emit this->actorsMightHaveChanged(); 
 			this->Initmui_ExistingArrays();
 			std::string action = "Load surface file";
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
-			END_UNDO_SET();
+			END_UNDO_SET();*/
 
 
 
 			this->getActorCollection()->SetChanged(1);
 
 			//double BoundingBoxLength = MyPolyData->GetLength();
-			this->AdjustCameraAndGrid();
+			/*this->AdjustCameraAndGrid();
 			//cout << "camera and grid adjusted" << endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
 				this->UpdateLandmarkSettings();
-			}
+			}*/
 			/*
 			double bounds[6];
 			MyPolyData->GetBounds(bounds);
@@ -5887,14 +5890,19 @@ void mqMorphoDigCore::OpenMesh(QString fileName)
 		}
 
 	}
+	else
+	{
+		return 0;
+	}
 
 
 	
 	//this->MainWindow->vtkWidgetUpdate();
 	//cout << "call matchTagMapToActorCollection" << endl;
-	
-	this->Render();
-	this->matchTagMapToActorCollection();
+	return ok;
+
+	/*this->Render();
+	this->matchTagMapToActorCollection();*/
 
 }
 void mqMorphoDigCore::OpenNTW(QString fileName)
@@ -5902,6 +5910,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 
 	int file_exists = 1;
+	int cpt_surfaces = 0;
 	int i = 0;
 	QFile file(fileName);
 	QFileInfo fileInfo(fileName);
@@ -6207,13 +6216,15 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 							QString meshfile(meshname.c_str());
 
 
-							this->OpenMesh(meshfile);
+							int totoche = this->OpenMesh(meshfile);
+							//@@@
+							//if (totoche == 1) { cpt_surfaces++; }
 							vtkMDActor* actor = this->GetLastActor();
 
 							if (actor != NULL && actor->GetNumberOfPoints() > 10)
 							{
 
-								ok = 1;
+								ok = 1; cpt_surfaces++;
 								cout << "Object has more than 10 points <<" << endl;
 							}
 							else
@@ -6400,6 +6411,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 			}
 			inputFile.close();
 		}
+		if (cpt_surfaces > 0) { this->CreateSurfaceUndoSet(cpt_surfaces); }
 		this->Render();
 	}
 }
@@ -18862,7 +18874,25 @@ vtkSmartPointer<vtkLookupTable> mqMorphoDigCore::GetTagLut()
 {
 	return this->TagLut;
 }
+void mqMorphoDigCore::CreateSurfaceUndoSet(int count_tot)
+{
+	emit this->actorsMightHaveChanged();
+	this->Initmui_ExistingArrays();
+	std::string action = "Load surface file(s)";
+	int mCount = BEGIN_UNDO_SET(action);
+	this->getActorCollection()->CreateLoadUndoSet(mCount, count_tot);
+	END_UNDO_SET();
 
+	this->AdjustCameraAndGrid();
+	//cout << "camera and grid adjusted" << endl;
+
+	if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+	{
+		this->UpdateLandmarkSettings();
+	}
+	this->Render();
+	this->matchTagMapToActorCollection();
+}
 void mqMorphoDigCore::CreateLandmarkUndoSet(int lmk_type, int count_tot, int count_norm, int count_targ, int count_node, int count_handle)
 {
 

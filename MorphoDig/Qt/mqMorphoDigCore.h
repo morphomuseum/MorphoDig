@@ -598,7 +598,7 @@ public:
 	void OpenLMK(QString fileName, int mode);
 	void OpenTPS(QString fileName, int mode);
 	void OpenPTS(QString fileName, int mode);
-	void OpenMesh(QString fileName);
+	int OpenMesh(QString fileName);
 	void OpenVolume(QString fileName);
 	void OpenPOS(QString fileName, int mode);
 	void OpenPOSTrans(QString fileName, int mode);
@@ -845,7 +845,7 @@ public:
   void ResetOrientationHelperLabels();
   void CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type = -1);
   void CreateLandmarkUndoSet( int lmk_type=-1, int count_tot = 1, int count_norm=0, int count_targ = 0, int count_node = 0, int count_handle =0 );
-  
+  void CreateSurfaceUndoSet(int count_tot);
   void UpdateFirstSelectedLandmark(double coord[3], double ori[3]);
   static void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
   static void RotateNorm(vtkMatrix4x4* matrix, double normin[3], double normout[3]);
