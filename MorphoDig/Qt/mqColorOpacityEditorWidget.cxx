@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "mqSaveMAPDialogReaction.h"
 #include <vtkCommand.h>
 #include <vtkDiscretizableColorTransferFunction.h>
+#include <vtkImageAccumulate.h>
+
 #include <vtkEventQtSlotConnect.h>
 #include <vtkNew.h>
 #include "vtkPiecewiseFunction.h"
@@ -119,6 +121,14 @@ public:
   }
 };
 
+void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist)
+{
+	this->HIST = hist;
+	cout << "Histogram reinitialized!" << endl;
+	this->HIST->SetComponentExtent(this->ctfMin, this->ctfMax, 0, 0, 0, 0);
+	this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
+	this->HIST->Update();
+}
 void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunction *stc, int keepMinMax)
 {
 	this->STC = stc;
@@ -163,12 +173,16 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 	}
 	
 }
+
+//<mqColorOpacityEditorWidget(vtkDiscretizableColorTransferFunction* stc, vtkImageAccumulate *hist, QWidget* parent = 0, int mapSurfaces = 1);>
+
 //-----------------------------------------------------------------------------
 mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
 	vtkDiscretizableColorTransferFunction *stc, QWidget* parentObject, int mapSurfaces)
   : Superclass(parentObject)
   , Internals(new mqInternals(this, mapSurfaces))
 {
+	this->HIST = NULL;
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   this->STC = stc;
   this->_mapSurfaces = mapSurfaces;

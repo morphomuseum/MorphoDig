@@ -15,6 +15,7 @@ Module:    vtkMDVolume.h
 #include <vtkDataArray.h>
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
+#include <vtkImageAccumulate.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkOutlineFilter.h>
@@ -105,7 +106,9 @@ public:
 	//vtkSetMacro(Ctf, vtkSmartPointer<vtkDiscretizableColorTransferFunction>);
 	void SetCtf(vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf);
 	vtkGetMacro(Ctf, vtkSmartPointer<vtkDiscretizableColorTransferFunction>);
-
+	
+	vtkGetMacro(Hist, vtkSmartPointer<vtkImageAccumulate>);
+	vtkSetMacro(Hist, vtkSmartPointer<vtkImageAccumulate>);
 	vtkSetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 
@@ -155,6 +158,7 @@ protected:
 	int isVisible;
 	int Changed; // used by vtkMDVolumeCollectionUndoRedo class to recompute global center of mass and center of mass
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
+	vtkSmartPointer<vtkImageAccumulate> Hist;
 	vtkSmartPointer<vtkImageData> ImageData;
 	vtkSmartPointer<vtkBoxWidget> Box;
 	vtkSmartPointer<vtkOutlineFilter> Outline;

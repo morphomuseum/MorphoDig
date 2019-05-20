@@ -80,7 +80,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->VolumeName->setText(mylabel);
 
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
-
+	
 	cout << "Edit Volume Dialog: Create mqColorOpacityEditorWidget!" << endl;
 	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this->Ui->PropertiesFrame,0);
 	//cout << "Try that!" << endl;
@@ -444,7 +444,7 @@ void mqEditVolumeDialog::LoadPreset()
 				cout << "Volume set" << endl;
 				this->Volume->UpdateLookupTableRange();
 				cout << "Lookup table range updated" << endl;
-				this->mColorMap->reInitialize(CTF, 1);
+				this->mColorMap->reInitialize(CTF, 1);				
 				cout << "Reinitialize color map" << endl;
 
 
@@ -821,6 +821,7 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->VolumeName->setText(mylabel);
 		//this->mColorMap->setMinMax(this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());
 		this->mColorMap->reInitialize(this->Volume->GetCtf());
+		this->mColorMap->reInitializeHIST(this->Volume->GetHist());
 		if (this->Volume->GetProperty()->GetInterpolationType() == VTK_LINEAR_INTERPOLATION)
 		{
 			this->Ui->interpolationToLinear->setChecked(true);

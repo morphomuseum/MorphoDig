@@ -57,6 +57,8 @@ vtkMDVolume::vtkMDVolume()
 	this->OutlineActor->SetMapper(this->OutlineMapper);
 	this->OutlineActor->GetProperty()->SetColor(0.5, 0.5, 0.5);
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	this->Hist = vtkSmartPointer<vtkImageAccumulate>::New();
+
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
 	//this->Box = NULL;
 	this->Box = vtkSmartPointer<vtkBoxWidget>::New();

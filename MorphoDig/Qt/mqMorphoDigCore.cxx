@@ -4984,30 +4984,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  vtkSmartPointer<vtkImageAccumulate>::New();
 			//mapper->SetRequestedRenderModeToDefault();
 			
-			
-			// Now the box is NOT created by default: only when "enable ROI" is clicked 
-			/* 
-			vtkSmartPointer<vtkBoxWidget>box = vtkSmartPointer<vtkBoxWidget>::New();
-			box->SetInteractor(this->getRenderer()->GetRenderWindow()->GetInteractor());
-			box->SetPlaceFactor(1.01);
-
-			box->SetInputData(input);
-
-			box->SetDefaultRenderer(this->getRenderer());
-			box->InsideOutOn();
-			box->PlaceWidget();
-			box->SetInteractor(this->RenderWindow->GetInteractor());
-
-			vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
-			callback->SetMapper(mapper);
-			
-			box->AddObserver(vtkCommand::InteractionEvent, callback);
-			
-			box->EnabledOff();
-			box->RotationEnabledOff();
-			box->GetSelectedFaceProperty()->SetOpacity(0.0);
-			volume->SetBox(box);
-			*/
+						
 			
 			volume->GetOutline()->SetInputData(input);
 
@@ -5016,21 +4993,54 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			{
 				histogram->SetComponentExtent(VTK_UNSIGNED_SHORT_MIN, VTK_UNSIGNED_SHORT_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(0, 0, 0);
-			}
-			if (input->GetScalarType() == VTK_SHORT)
+			}else if (input->GetScalarType() == VTK_SHORT)
 			{
-				//cout << "signed shorts !" << endl;
-				//cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << endl;
+
 				histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
 			}
+			else if (input->GetScalarType() == VTK_CHAR)
+			{				
+				histogram->SetComponentExtent(VTK_CHAR_MIN, VTK_CHAR_MAX, 0, 0, 0, 0);
+				histogram->SetComponentOrigin(VTK_CHAR_MIN, 0, 0);
+			}
+			else if (input->GetScalarType() == VTK_UNSIGNED_CHAR)
+			{
+				
+				histogram->SetComponentExtent(VTK_UNSIGNED_CHAR_MIN, VTK_UNSIGNED_CHAR_MAX, 0, 0, 0, 0);
+				histogram->SetComponentOrigin(VTK_UNSIGNED_CHAR_MIN, 0, 0);
+			}
+			else if (input->GetScalarType() == VTK_SIGNED_CHAR)
+			{
+				
+				histogram->SetComponentExtent(VTK_SIGNED_CHAR_MIN, VTK_SIGNED_CHAR_MAX, 0, 0, 0, 0);
+				histogram->SetComponentOrigin(VTK_SIGNED_CHAR_MIN, 0, 0);
+			}
+			else if (input->GetScalarType() == VTK_FLOAT)
+			{
+				
+				//input->GetScalarRange()[0] input->GetScalarRange()[1]
+				histogram->SetComponentExtent(VTK_FLOAT_MIN, VTK_FLOAT_MAX, 0, 0, 0, 0);
+				histogram->SetComponentOrigin(VTK_FLOAT_MIN, 0, 0);
+			}
+			else if (input->GetScalarType() == VTK_FLOAT)
+			{
+				
+				histogram->SetComponentExtent(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 0, 0, 0, 0);
+				histogram->SetComponentOrigin(VTK_DOUBLE_MIN, 0, 0);
+			}
+			
+
+			
 		
-			int bin_spacing = 1000;
+			int bin_spacing = 100;
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
+			histogram->SetComponentExtent(input->GetScalarRange()[0], input->GetScalarRange()[1], 0, 0, 0, 0);
+			histogram->SetComponentOrigin(input->GetScalarRange()[0], 0, 0);
 			histogram->Update();
 			// faire plutôt une liste avec push.
 
-			std::vector<int> peaks;
+			/*std::vector<int> peaks;
 			std::vector<int> peaksT;
 			std::vector<int> peakVals;
 			std::vector<int> lows;
@@ -5115,7 +5125,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			{
 				//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
 			}
-		
+		*/
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
@@ -5129,18 +5139,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			volume->SetProperty(property);
 			volume->SetMapper(mapper);
 			volume->SetImageData(input);
-			//colorFun->AddRGBPoint()
-			/*colorFun->AddRGBPoint(1350, 0, 0, 0, 0.5, 0.0);
-			colorFun->AddRGBPoint(5000, 0.73, 0.25, 0.30, 0.49, .61);
-			colorFun->AddRGBPoint(8500, .90, .82, .56, .5, 0.0);
-			colorFun->AddRGBPoint(12232, 1, 1, 1, .5, 0.0);
-			opacityFun->AddPoint(1350, 0, 0.5, 0.0);
-			opacityFun->AddPoint(5000, 0.5, .49, .61);
-			opacityFun->AddPoint(8500, 0.75, .5, 0.0);
-			opacityFun->AddPoint(12232, 1, 0.5, 0.0);*/
-			int first_point = 0; // as first low... a
-			int last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+			volume->SetHist(histogram);
 
+			
+
+
+			double first_point = 0; // as first low... a
+			double last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+
+			/*
 			if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
 				first_point = VTK_UNSIGNED_SHORT_MIN;
 				last_point = VTK_UNSIGNED_SHORT_MAX;
@@ -5213,24 +5220,21 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//let's put first point a little bit further!
 			first_point = (int)(first_point + 0.2*(last_point - first_point));
 			cout << "Range based on peaks and lows :" << first_point << "," << last_point << endl;
+			*/
+			
 			//let's try something else
+
 			double width = input->GetScalarRange()[1] - input->GetScalarRange()[0];
+
+
 			first_point = input->GetScalarRange()[0] + 0.15*width;
 			last_point = input->GetScalarRange()[1] - 0.3*width;
 			cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
 			cout << "EH???" << endl;
 
-			int second_point = (int)(first_point + 0.2*(last_point - first_point));
-			int third_point = (int)(first_point + 0.4*(last_point - first_point));
-			//cout << "first_point=" << first_point << endl;
-			//cout << "second_point=" << second_point << endl;
-			//cout << "third_point=" << third_point << endl;
-			//cout << "last_point=" << last_point << endl;
-			/*colorFun->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
-			colorFun->AddRGBPoint(second_point, 0.73, 0, 0, 0.5,0);
-			colorFun->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
-			colorFun->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
-			*/
+			double second_point = first_point + 0.2*(last_point - first_point);
+			double third_point = first_point + 0.4*(last_point - first_point);
+		
 			TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
 			TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
 			TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);

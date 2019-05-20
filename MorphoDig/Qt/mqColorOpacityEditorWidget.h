@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDiscretizableColorTransferFunction.h>
 class vtkPiecewiseFunction;
 class mqColorMapModel;
-
+class vtkImageAccumulate;
 
 class  mqColorOpacityEditorWidget : public QWidget
 {
@@ -51,9 +51,11 @@ class  mqColorOpacityEditorWidget : public QWidget
 
 
 public:
-  mqColorOpacityEditorWidget(vtkDiscretizableColorTransferFunction* stc, QWidget* parent = 0, int mapSurfaces=1);
+  //mqColorOpacityEditorWidget(vtkDiscretizableColorTransferFunction* stc, QWidget* parent = 0, int mapSurfaces=1);
+  mqColorOpacityEditorWidget(vtkDiscretizableColorTransferFunction* stc, QWidget* parent = 0, int mapSurfaces = 1);
   ~mqColorOpacityEditorWidget() override;
   void reInitialize(vtkDiscretizableColorTransferFunction *stc, int keepMinMax=0);
+  void reInitializeHIST(vtkImageAccumulate *hist);
   /**
   * Returns the current list of control points for the color transfer
   * function. This a list of 4-tuples.
@@ -176,6 +178,7 @@ protected:
 private:
 	Q_DISABLE_COPY(mqColorOpacityEditorWidget)
 	vtkDiscretizableColorTransferFunction *STC;
+	vtkImageAccumulate *HIST;
 	int _mapSurfaces;
 	double maxShiftAmplitude;
 	double slideMin;
