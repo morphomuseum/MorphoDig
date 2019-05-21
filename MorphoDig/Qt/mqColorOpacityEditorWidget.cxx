@@ -128,6 +128,7 @@ void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist)
 	this->HIST->SetComponentExtent(this->ctfMin, this->ctfMax, 0, 0, 0, 0);
 	this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
 	this->HIST->Update();
+	this->Internals->Ui.Histogram->initialize(hist);
 }
 void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunction *stc, int keepMinMax)
 {

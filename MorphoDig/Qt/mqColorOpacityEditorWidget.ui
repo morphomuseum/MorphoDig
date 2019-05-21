@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>402</width>
-    <height>393</height>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -64,6 +64,16 @@
           <size>
            <width>16777215</width>
            <height>40</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="mqHistogramWidget" name="Histogram" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
           </size>
          </property>
         </widget>
@@ -344,6 +354,12 @@
    <class>mqLineEdit</class>
    <extends>QLineEdit</extends>
    <header>mqLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>mqHistogramWidget</class>
+   <extends>QWidget</extends>
+   <header>mqhistogramwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

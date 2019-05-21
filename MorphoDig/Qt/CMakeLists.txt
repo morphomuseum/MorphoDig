@@ -129,6 +129,8 @@ mqGridSizeDialog.cxx
 mqGridSizeDialog.h
 mqGridSizeDialogReaction.cxx
 mqGridSizeDialogReaction.h
+mqHistogramWidget.cxx
+mqHistogramWidget.h
 mqICPDialog.cxx
 mqICPDialog.h
 mqICPDialogReaction.cxx
