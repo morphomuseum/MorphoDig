@@ -548,7 +548,7 @@ void mqMorphoDigCore::TestVolume()
 			histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
 		}
 
-		int bin_spacing = 1000;
+		int bin_spacing = 100;
 		histogram->SetComponentSpacing(bin_spacing, 0, 0);
 		histogram->Update();
 		// faire plutôt une liste avec push.
@@ -759,6 +759,7 @@ void mqMorphoDigCore::TestVolume()
 
 		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
 		mapper->Update();
+		
 		volume->Update();
 
 	
@@ -5033,7 +5034,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			
 		
-			int bin_spacing = 100;
+			int bin_spacing = 1000;
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
 			histogram->SetComponentExtent(input->GetScalarRange()[0], input->GetScalarRange()[1], 0, 0, 0, 0);
 			histogram->SetComponentOrigin(input->GetScalarRange()[0], 0, 0);

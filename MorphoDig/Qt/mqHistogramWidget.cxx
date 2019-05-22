@@ -131,6 +131,9 @@ public:
 		  cout << "Histogram Widget being reinitialized" << endl;
 		  this->Hist = hist;
 		  this->Hist->Update();
+		  double numbins;
+		  numbins=this->Hist->GetComponentSpacing()[0];
+		  cout << "Retrieved numbins:" << numbins <<","<< this->Hist->GetComponentSpacing()[1]<<","<< this->Hist->GetComponentSpacing()[2]<< endl;
 		  vtkSmartPointer<vtkDoubleArray> bins =
 			  vtkSmartPointer<vtkDoubleArray>::New();
 		  bins->SetNumberOfComponents(1);
@@ -144,10 +147,15 @@ public:
 		  int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
 		  double spacing = this->Hist->GetComponentSpacing()[0];
 		  double bin = this->Hist->GetComponentOrigin()[0];
+		  cout << "Frequencies:" << endl;
 		  for (unsigned int j = 0; j < 1000; ++j)
 		  {
 			  bins->SetTuple1(j, bin);
 			  bin += spacing;
+			  if (*output != 0)
+			  {
+				  cout << *output << endl;
+			  }
 			  frequencies->SetTuple1(j, *output++);
 		  }
 
