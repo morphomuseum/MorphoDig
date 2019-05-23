@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCommand.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkImageAccumulate.h>
+//#include <vtkImageData.h>
 
 #include <vtkEventQtSlotConnect.h>
 #include <vtkNew.h>
@@ -121,12 +122,17 @@ public:
   }
 };
 
+//void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, vtkImageData *data)
 void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist)
 {
 	this->HIST = hist;
-	cout << "Histogram reinitialized!" << endl;
-	this->HIST->SetComponentExtent(this->ctfMin, this->ctfMax, 0, 0, 0, 0);
+	//this->IMGDATA = data;
+	cout << "Histogram reinitialized!" << endl;	
+	/*this->HIST->SetComponentExtent(this->ctfMin, this->ctfMax, 0, 0, 0, 0);
+	*/
 	this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
+	double bin_spacing = (double)(this->ctfMax - this->ctfMin) / 10;
+	this->HIST ->SetComponentSpacing(bin_spacing, 0, 0);
 	this->HIST->Update();
 	this->Internals->Ui.Histogram->initialize(hist);
 }
@@ -325,6 +331,7 @@ void mqColorOpacityEditorWidget::slotCurrentMinEdited()
 	}
 	
 	this->UpdateLookupTableRange();
+	this->UpdateHistogram();
 	emit minmaxChanged();
 }
 
@@ -344,6 +351,7 @@ void mqColorOpacityEditorWidget::slotCurrentMaxEdited()
 
 
 	this->UpdateLookupTableRange();
+	this->UpdateHistogram();
 	emit minmaxChanged();
 
 }
@@ -369,6 +377,7 @@ void mqColorOpacityEditorWidget::slotSlideMin(int slideMin)
 		this->ctfMin = newMin;
 		
 		this->UpdateLookupTableRange();
+		this->UpdateHistogram();
 		
 	}
 
@@ -392,6 +401,7 @@ void mqColorOpacityEditorWidget::slotSlideMax(int slideMax)
 		this->ctfMax = newMax;
 		
 		this->UpdateLookupTableRange();
+		this->UpdateHistogram();
 		
 	}
 
@@ -411,6 +421,7 @@ void mqColorOpacityEditorWidget::slotShiftSlider(int shift)
 		this->ctfMax = newMax;
 		
 		this->UpdateLookupTableRange();
+		this->UpdateHistogram();
 		
 	}
 }
@@ -494,6 +505,7 @@ void mqColorOpacityEditorWidget::SetCTFMin(double newMin)
 	{
 		this->ctfMin = newMin;
 		this->UpdateLookupTableRange();
+		this->UpdateHistogram();
 		this->Internals->Ui.currentMin->setValue(newMin);
 	}
 }
@@ -503,7 +515,19 @@ void mqColorOpacityEditorWidget::SetCTFMax(double newMax)
 	{
 		this->ctfMax = newMax;
 		this->UpdateLookupTableRange();
+		this->UpdateHistogram();
 		this->Internals->Ui.currentMax->setValue(newMax);
+	}
+}
+void mqColorOpacityEditorWidget::UpdateHistogram()
+{
+	if (this->HIST != NULL)
+	{
+		this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
+		double bin_spacing = (double)(this->ctfMax - this->ctfMin) / 10;
+		this->HIST->SetComponentSpacing(bin_spacing, 0, 0);
+		this->HIST->Update();
+		this->Internals->Ui.Histogram->initialize(this->HIST);
 	}
 }
 void mqColorOpacityEditorWidget::UpdateLookupTableRange()
@@ -941,6 +965,7 @@ void mqColorOpacityEditorWidget::resetRangeToData()
 		this->Internals->Ui.currentMin->setValue(min);
 		this->Internals->Ui.currentMax->setValue(max);
 		this->UpdateLookupTableRange();
+		this->UpdateHistogram();
 	}
 	
 

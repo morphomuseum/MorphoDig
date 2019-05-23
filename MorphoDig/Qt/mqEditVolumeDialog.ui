@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
-    <height>805</height>
+    <width>845</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="palette">
@@ -458,10 +458,10 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>770</y>
-     <width>195</width>
-     <height>30</height>
+     <x>320</x>
+     <y>510</y>
+     <width>151</width>
+     <height>31</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -480,10 +480,10 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>10</y>
-     <width>491</width>
-     <height>751</height>
+     <width>821</width>
+     <height>491</height>
     </rect>
    </property>
    <property name="title">
@@ -750,10 +750,10 @@
    <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>300</y>
-      <width>402</width>
-      <height>398</height>
+      <x>470</x>
+      <y>20</y>
+      <width>334</width>
+      <height>444</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -770,8 +770,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>402</width>
-       <height>398</height>
+       <width>334</width>
+       <height>444</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
@@ -854,8 +854,8 @@
    <widget class="QPushButton" name="pushScalarSuggestedMin">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>700</y>
+      <x>260</x>
+      <y>362</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -870,8 +870,8 @@
    <widget class="QDoubleSpinBox" name="suggestedMin">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>700</y>
+      <x>170</x>
+      <y>362</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -883,8 +883,8 @@
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>700</y>
+      <x>310</x>
+      <y>362</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -896,8 +896,8 @@
    <widget class="QPushButton" name="pushScalarSuggestedMax">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>720</y>
+      <x>260</x>
+      <y>400</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -912,8 +912,8 @@
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>700</y>
+      <x>70</x>
+      <y>362</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -925,8 +925,8 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>710</y>
+      <x>70</x>
+      <y>400</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -938,8 +938,8 @@
    <widget class="QDoubleSpinBox" name="suggestedMax">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>720</y>
+      <x>170</x>
+      <y>400</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -951,10 +951,10 @@
    <widget class="QSpinBox" name="cutMinPercent">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>700</y>
+      <x>360</x>
+      <y>362</y>
       <width>42</width>
-      <height>22</height>
+      <height>20</height>
      </rect>
     </property>
     <property name="maximum">
@@ -967,10 +967,10 @@
    <widget class="QSpinBox" name="cutMaxPercent">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>720</y>
+      <x>360</x>
+      <y>400</y>
       <width>42</width>
-      <height>22</height>
+      <height>20</height>
      </rect>
     </property>
     <property name="maximum">
@@ -983,8 +983,8 @@
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>720</y>
+      <x>310</x>
+      <y>400</y>
       <width>51</width>
       <height>16</height>
      </rect>

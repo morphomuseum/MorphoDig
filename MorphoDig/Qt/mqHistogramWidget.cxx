@@ -130,68 +130,101 @@ public:
 	  {
 		  cout << "Histogram Widget being reinitialized" << endl;
 		  this->Hist = hist;
-		  this->Hist->Update();
-		  double numbins;
-		  numbins=this->Hist->GetComponentSpacing()[0];
-		  cout << "Retrieved numbins:" << numbins <<","<< this->Hist->GetComponentSpacing()[1]<<","<< this->Hist->GetComponentSpacing()[2]<< endl;
+		 // this->Hist->Update();
+		  int numbins;
+		  double bin_spacing = 0;
+		  bin_spacing =this->Hist->GetComponentSpacing()[0];
+		  //cout << "Retrieved bin_spacing :" << bin_spacing <<","<< this->Hist->GetComponentSpacing()[1]<<","<< this->Hist->GetComponentSpacing()[2]<< endl;
+		  int dims[3];
+		  this->Hist->GetOutput()->GetDimensions(dims);
+		 // cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2] << endl;
+		  vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
+		  //cout << "used_bins = "<<used_bins << endl;
+
+		  numbins = (int)((this->Hist->GetComponentExtent()[1] - this->Hist->GetComponentExtent()[0]) / bin_spacing);
+		 // cout << "Num bins:" << numbins << endl;
 		  vtkSmartPointer<vtkDoubleArray> bins =
 			  vtkSmartPointer<vtkDoubleArray>::New();
 		  bins->SetNumberOfComponents(1);
-		  bins->SetNumberOfTuples(1000);
+		  bins->SetNumberOfTuples(numbins);
 		  bins->SetName("Bins");
 		  vtkSmartPointer<vtkIntArray> frequencies =
 			  vtkSmartPointer<vtkIntArray>::New();
 		  frequencies->SetNumberOfComponents(1);
-		  frequencies->SetNumberOfTuples(1000);
+		  frequencies->SetNumberOfTuples(numbins);
 		  frequencies->SetName("Frequency");
-		  int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
+		  vtkSmartPointer<vtkIntArray> logfrequencies =
+			  vtkSmartPointer<vtkIntArray>::New();
+		  logfrequencies->SetNumberOfComponents(1);
+		  logfrequencies->SetNumberOfTuples(numbins);
+		  logfrequencies->SetName("Log Frequencies");
+		  //*(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0)))
+		  //int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
+		  //int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
 		  double spacing = this->Hist->GetComponentSpacing()[0];
-		  double bin = this->Hist->GetComponentOrigin()[0];
+		  double mbin = this->Hist->GetComponentOrigin()[0];
 		  cout << "Frequencies:" << endl;
-		  for (unsigned int j = 0; j < 1000; ++j)
+		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
-			  bins->SetTuple1(j, bin);
-			  bin += spacing;
-			  if (*output != 0)
+			//  cout << "bin =" << bin <<","<<mbin<< endl;
+			  bins->SetTuple1(bin, mbin);
+			  mbin += spacing;
+			 // cout << "bin =" << bin << ", retrieving curbin"  << endl;
+			  int curbin = 0;
+			  //curbin =*output++;
+			  curbin= *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
+			  int logcurbin = 0;
+			  if (curbin > 0) { logcurbin = (int)log10(curbin); }
+			  
+
+			  cout << "logcurbin=" << logcurbin<< endl;
+			 // cout << "logcurbin=" << log10(curbin) << endl;
+				  //curbin *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
+			  
+			  if (curbin != 0)
 			  {
-				  cout << *output << endl;
+				  cout << curbin << endl;
 			  }
-			  frequencies->SetTuple1(j, *output++);
+			  frequencies->SetTuple1(bin, curbin);
+			  logfrequencies->SetTuple1(bin, logcurbin);
 		  }
 
 		  vtkSmartPointer<vtkTable> table =
 			  vtkSmartPointer<vtkTable>::New();
-		  table->AddColumn(bins);
+		  //table->AddColumn(bins);
 		  table->AddColumn(frequencies);
-		  vtkPlot * line = this->ChartXY->AddPlot(vtkChart::BAR);
+		 // table->AddColumn(logfrequencies);
 
-		  line->SetInputData(table, 0, 1);
+		  vtkSmartPointer<vtkTable> table2 =
+			  vtkSmartPointer<vtkTable>::New();
+		  table2->AddColumn(bins);
+		  table2->AddColumn(frequencies);
+
+		  //vtkPlot * line = this->ChartXY->AddPlot(vtkChart::BAR);
+		  vtkPlot * line2 = this->ChartXY->AddPlot(vtkChart::BAR);
+
+
+		 /* line->SetInputData(table, 0, 1);
 		  line->GetXAxis()->SetTitle("Bin");
+		  
 		  vtkTextProperty *textProp = line->GetXAxis()->GetLabelProperties();
-		  textProp->SetColor(1.0, 1.0, 1.0);
+		  textProp->SetColor(1.0, 0.0, 0.0);
 		  textProp = line->GetXAxis()->GetTitleProperties();
 		  textProp->SetColor(1.0, 1.0, 1.0);
 		  line->GetYAxis()->SetTitle("Count");
-		  line->SetColor(0.1, 0.3, 0.9);
-		  /*
+		  line->SetColor(0.1, 0.3, 0.9);*/
 
-   
+		  line2->SetInputData(table2, 0, 1);
+		  line2->GetXAxis()->SetTitle("LogBin");
+		  vtkTextProperty *textProp2 = line2->GetXAxis()->GetLabelProperties();
+		  textProp2->SetColor(0.0, 1.0, 0.0);
+		  textProp2= line2->GetXAxis()->GetTitleProperties();
+		  textProp2->SetColor(1.0, 0.0, 1.0);
+		  line2->GetYAxis()->SetTitle("Count2");
+		  line2->SetColor(0.1, 0.9, 0.3);
+		  
 
-   
-
-    vtkPlot * line = chart->AddPlot( vtkChart::BAR );
-#if VTK_MAJOR_VERSION < 6
-    line->SetInput( table, 0, 1 );
-#else
-    line->SetInputData( table, 0, 1 );
-#endif
-    line->GetXAxis()->SetTitle( "Bin" );
-    vtkTextProperty *textProp = line->GetXAxis()->GetLabelProperties();
-    textProp->SetColor( 1.0, 1.0, 1.0 );
-    textProp = line->GetXAxis()->GetTitleProperties();
-    textProp->SetColor( 1.0, 1.0, 1.0 );
-    line->GetYAxis()->SetTitle( "Count" );
-line->SetColor( 0.1, 0.3, 0.9 );*/
+	
 
 	  }
 

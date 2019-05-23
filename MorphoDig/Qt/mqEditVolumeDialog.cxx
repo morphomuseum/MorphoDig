@@ -821,6 +821,7 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->VolumeName->setText(mylabel);
 		//this->mColorMap->setMinMax(this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());
 		this->mColorMap->reInitialize(this->Volume->GetCtf());
+		//this->mColorMap->reInitializeHIST(this->Volume->GetHist(), this->Volume->GetImageData());
 		this->mColorMap->reInitializeHIST(this->Volume->GetHist());
 		if (this->Volume->GetProperty()->GetInterpolationType() == VTK_LINEAR_INTERPOLATION)
 		{

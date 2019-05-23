@@ -562,9 +562,9 @@ void mqMorphoDigCore::TestVolume()
 
 		int dims[3];
 		histogram->GetOutput()->GetDimensions(dims);
-		//cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
+		cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
 		vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
-		//cout << "Histogram (used) dims=" << used_bins  << endl;
+		cout << "Histogram (used) dims=" << used_bins  << endl;
 		int prevbin = 0;
 
 
@@ -4990,58 +4990,76 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			volume->GetOutline()->SetInputData(input);
 
 			histogram->SetInputData(input);
-			if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
+			double bin_spacing = 1;
+			
+			/*if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
 			{
 				histogram->SetComponentExtent(VTK_UNSIGNED_SHORT_MIN, VTK_UNSIGNED_SHORT_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(0, 0, 0);
+				
 			}else if (input->GetScalarType() == VTK_SHORT)
 			{
 
 				histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
+				
 			}
 			else if (input->GetScalarType() == VTK_CHAR)
 			{				
 				histogram->SetComponentExtent(VTK_CHAR_MIN, VTK_CHAR_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_CHAR_MIN, 0, 0);
+				
 			}
 			else if (input->GetScalarType() == VTK_UNSIGNED_CHAR)
 			{
 				
 				histogram->SetComponentExtent(VTK_UNSIGNED_CHAR_MIN, VTK_UNSIGNED_CHAR_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_UNSIGNED_CHAR_MIN, 0, 0);
+				
 			}
 			else if (input->GetScalarType() == VTK_SIGNED_CHAR)
 			{
 				
 				histogram->SetComponentExtent(VTK_SIGNED_CHAR_MIN, VTK_SIGNED_CHAR_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_SIGNED_CHAR_MIN, 0, 0);
+				
 			}
 			else if (input->GetScalarType() == VTK_FLOAT)
 			{
 				
 				//input->GetScalarRange()[0] input->GetScalarRange()[1]
-				histogram->SetComponentExtent(VTK_FLOAT_MIN, VTK_FLOAT_MAX, 0, 0, 0, 0);
+				//histogram->SetComponentExtent(VTK_FLOAT_MIN, VTK_FLOAT_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_FLOAT_MIN, 0, 0);
+				
 			}
-			else if (input->GetScalarType() == VTK_FLOAT)
+			else if (input->GetScalarType() == VTK_DOUBLE)
 			{
 				
-				histogram->SetComponentExtent(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 0, 0, 0, 0);
+				//histogram->SetComponentExtent(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 0, 0, 0, 0);
 				histogram->SetComponentOrigin(VTK_DOUBLE_MIN, 0, 0);
-			}
+				
+			}*/
+			
+
+			// bin_spacing :
 			
 
 			
-		
-			int bin_spacing = 1000;
-			histogram->SetComponentSpacing(bin_spacing, 0, 0);
 			histogram->SetComponentExtent(input->GetScalarRange()[0], input->GetScalarRange()[1], 0, 0, 0, 0);
 			histogram->SetComponentOrigin(input->GetScalarRange()[0], 0, 0);
+			bin_spacing = (double)(input->GetScalarRange()[1] - input->GetScalarRange()[0]) / 100;
+			//
+			//histogram->SetComponentExtent(6544, 30540, 0, 0, 0, 0);
+			//histogram->SetComponentOrigin(6544, 0, 0);
+			//bin_spacing = (double)(30540 - 6544) / 100;
+
+			//
+			histogram->SetComponentSpacing(bin_spacing, 0, 0);
+			cout << "Open volume: bin spacing = " << bin_spacing << endl;
 			histogram->Update();
 			// faire plutôt une liste avec push.
-
-			/*std::vector<int> peaks;
+			/*
+			std::vector<int> peaks;
 			std::vector<int> peaksT;
 			std::vector<int> peakVals;
 			std::vector<int> lows;
@@ -5050,9 +5068,9 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			
 			int dims[3];
 			histogram->GetOutput()->GetDimensions(dims);
-			//cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
+			cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
 			vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
-			//cout << "Histogram (used) dims=" << used_bins  << endl;
+			cout << "Histogram (used) bins=" << used_bins  << endl;
 			int prevbin = 0;
 		
 
@@ -5063,7 +5081,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			peaks.push_back(0);
 			peaksT.push_back(0);
 			peakVals.push_back(0);
-			for (vtkIdType bin = 0; bin < used_bins; ++bin)
+			for (vtkIdType bin = 0; bin < used_bins; bin++)
 			{
 				int binT;
 				if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
@@ -5072,6 +5090,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 					binT = VTK_SHORT_MIN + bin * bin_spacing;
 				}
 				int curbin = *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0)));
+				cout << "bin:" << bin << ", curbin=" << curbin << endl;
 					//histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin);
 				if (p_or_l == 1)//search peak
 				{
@@ -5126,6 +5145,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			{
 				//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
 			}
+		
 		*/
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
