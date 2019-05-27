@@ -21,6 +21,7 @@
 #include <vtkBoundingBox.h>
 #include <vtkChartXY.h>
 #include <vtkPlot.h>
+#include <vtkPlotBar.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkTextProperty.h>
@@ -99,7 +100,7 @@ public:
     this->ContextView->SetRenderWindow(this->Window.Get());
 
     this->ChartXY->SetAutoSize(true);
-    this->ChartXY->SetShowLegend(true);
+    //this->ChartXY->SetShowLegend(true);
     this->ChartXY->SetForceAxesToBounds(true);
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
     this->ContextView->SetInteractor(this->Widget->GetInteractor());
@@ -109,14 +110,16 @@ public:
     this->ChartXY->SetActionToButton(vtkChart::ZOOM, -1);
     this->ChartXY->SetActionToButton(vtkChart::SELECT, vtkContextMouseEvent::RIGHT_BUTTON);
     this->ChartXY->SetActionToButton(vtkChart::SELECT_POLYGON, -1);
-
+	this->ChartXY->SetZoomWithMouseWheel(false);
+	this->ChartXY->SetShowLegend(false);
+	
     this->Widget->setParent(editor);
     QVBoxLayout* layout = new QVBoxLayout(editor);
     layout->setMargin(0);
     layout->addWidget(this->Widget);
 
     this->ChartXY->SetAutoAxes(false);
-    this->ChartXY->SetHiddenAxisBorder(8);
+    this->ChartXY->SetHiddenAxisBorder(4);
     for (int cc = 0; cc < 4; cc++)
     {
       this->ChartXY->GetAxis(cc)->SetVisible(false);
@@ -139,7 +142,7 @@ public:
 		  this->Hist->GetOutput()->GetDimensions(dims);
 		 // cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2] << endl;
 		  vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
-		  //cout << "used_bins = "<<used_bins << endl;
+		  cout << "used_bins = "<<used_bins << endl;
 
 		  numbins = (int)((this->Hist->GetComponentExtent()[1] - this->Hist->GetComponentExtent()[0]) / bin_spacing);
 		 // cout << "Num bins:" << numbins << endl;
@@ -166,7 +169,7 @@ public:
 		  cout << "Frequencies:" << endl;
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
-			//  cout << "bin =" << bin <<","<<mbin<< endl;
+			
 			  bins->SetTuple1(bin, mbin);
 			  mbin += spacing;
 			 // cout << "bin =" << bin << ", retrieving curbin"  << endl;
@@ -174,7 +177,7 @@ public:
 			  //curbin =*output++;
 			  curbin= *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
 			  int logcurbin = 0;
-			  if (curbin > 0) { logcurbin = (int)log10(curbin); }
+			  if (curbin > 0) { logcurbin = 100*log10(curbin); }
 			  
 
 			  cout << "logcurbin=" << logcurbin<< endl;
@@ -191,20 +194,21 @@ public:
 
 		  vtkSmartPointer<vtkTable> table =
 			  vtkSmartPointer<vtkTable>::New();
-		  //table->AddColumn(bins);
+		 table->AddColumn(bins);
 		  table->AddColumn(frequencies);
 		 // table->AddColumn(logfrequencies);
 
 		  vtkSmartPointer<vtkTable> table2 =
 			  vtkSmartPointer<vtkTable>::New();
 		  table2->AddColumn(bins);
-		  table2->AddColumn(frequencies);
-
-		  //vtkPlot * line = this->ChartXY->AddPlot(vtkChart::BAR);
-		  vtkPlot * line2 = this->ChartXY->AddPlot(vtkChart::BAR);
-
-
-		 /* line->SetInputData(table, 0, 1);
+		  //table->AddColumn(frequencies);
+		  table2->AddColumn(logfrequencies);
+		  
+		  vtkPlot * line = this->ChartXY->AddPlot(vtkChart::BAR);
+		  vtkPlotBar * line2 = vtkPlotBar::SafeDownCast(this->ChartXY->AddPlot(vtkChart::BAR));
+		  
+		  cout << "line2: class name:" << line2->GetClassName() << endl;
+		  line->SetInputData(table, 0, 1);
 		  line->GetXAxis()->SetTitle("Bin");
 		  
 		  vtkTextProperty *textProp = line->GetXAxis()->GetLabelProperties();
@@ -212,12 +216,19 @@ public:
 		  textProp = line->GetXAxis()->GetTitleProperties();
 		  textProp->SetColor(1.0, 1.0, 1.0);
 		  line->GetYAxis()->SetTitle("Count");
-		  line->SetColor(0.1, 0.3, 0.9);*/
+		  line->SetColor(0.1, 0.3, 0.9);
+
 
 		  line2->SetInputData(table2, 0, 1);
+		  //line2->SetLegendVisibility(false);
+		  //line2->Set
 		  line2->GetXAxis()->SetTitle("LogBin");
 		  vtkTextProperty *textProp2 = line2->GetXAxis()->GetLabelProperties();
+		  
+		  textProp2->SetLineOffset(0);
 		  textProp2->SetColor(0.0, 1.0, 0.0);
+		  textProp2->BoldOff();
+		  textProp2->SetLineSpacing(0);
 		  textProp2= line2->GetXAxis()->GetTitleProperties();
 		  textProp2->SetColor(1.0, 0.0, 1.0);
 		  line2->GetYAxis()->SetTitle("Count2");
