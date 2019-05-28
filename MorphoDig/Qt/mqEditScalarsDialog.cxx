@@ -93,9 +93,10 @@ mqEditScalarsDialog::mqEditScalarsDialog(QWidget* Parent)
 	vbox->setSpacing(0);*/
 	cout << "Create mqColorOpacityEditorWidget!" << endl;
 	mqColorOpacityEditorWidget *someMap = new mqColorOpacityEditorWidget(STC, this->Ui->PropertiesFrame);
+	
 	//cout << "Try that!" << endl;
 	this->mColorMap = someMap;
-
+	
 	//cout << "And?" << endl;
 
 	//@@ Ca fout en l'air la fenêtre principale! (or je vois pas bien le rapport...) Il faudrait essayer de voi si on ne pourrait pas l'instancier autrement... 

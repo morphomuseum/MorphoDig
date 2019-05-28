@@ -197,6 +197,7 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   this->STC = stc;
   this->_mapSurfaces = mapSurfaces;
 
+  if (mapSurfaces == 1) { this->Internals->Ui.Histogram->setVisible(false); }
   if (stc!=NULL)
   {
 	  cout << "Initialize ColorEditor widget. " << endl;
