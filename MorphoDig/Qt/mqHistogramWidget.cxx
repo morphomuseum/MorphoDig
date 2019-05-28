@@ -22,6 +22,8 @@
 #include <vtkChartXY.h>
 #include <vtkPlot.h>
 #include <vtkPlotBar.h>
+#include <vtkColorSeries.h>
+#include <vtkPlotStacked.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkTextProperty.h>
@@ -111,6 +113,7 @@ public:
     this->ChartXY->SetActionToButton(vtkChart::SELECT, vtkContextMouseEvent::RIGHT_BUTTON);
     this->ChartXY->SetActionToButton(vtkChart::SELECT_POLYGON, -1);
 	this->ChartXY->SetZoomWithMouseWheel(false);
+	
 	this->ChartXY->SetShowLegend(false);
 	
     this->Widget->setParent(editor);
@@ -127,24 +130,34 @@ public:
     }
   }
   ~mqInternals() { this->cleanup(); }
-  void reinit(vtkImageAccumulate *hist)
+  void reinit(vtkImageAccumulate *hist, int numbins, double min, double max)
   {
+	  this->cleanup();	  
 	  if (hist !=NULL)
 	  {
 		  cout << "Histogram Widget being reinitialized" << endl;
 		  this->Hist = hist;
 		 // this->Hist->Update();
-		  int numbins;
+		  
 		  double bin_spacing = 0;
-		  bin_spacing =this->Hist->GetComponentSpacing()[0];
+		 // bin_spacing =this->Hist->GetComponentSpacing()[0];
 		  //cout << "Retrieved bin_spacing :" << bin_spacing <<","<< this->Hist->GetComponentSpacing()[1]<<","<< this->Hist->GetComponentSpacing()[2]<< endl;
-		  int dims[3];
-		  this->Hist->GetOutput()->GetDimensions(dims);
+		  //int dims[3];
+		  //this->Hist->GetOutput()->GetDimensions(dims);
 		 // cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2] << endl;
-		  vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
-		  cout << "used_bins = "<<used_bins << endl;
+		  //vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
+		  //cout << "used_bins = "<<used_bins << endl;
 
-		  numbins = (int)((this->Hist->GetComponentExtent()[1] - this->Hist->GetComponentExtent()[0]) / bin_spacing);
+		 // numbins = (int)((this->Hist->GetComponentExtent()[1] - this->Hist->GetComponentExtent()[0]) / bin_spacing);
+		  if (numbins > 0) {
+			  bin_spacing = (max - min) / numbins;
+		  }
+		 // cout << "numbins = " << numbins << endl;
+		 // cout << "min = " << min << endl;
+		 // cout << "bin_spacing = " << bin_spacing << endl;
+		  hist->SetComponentOrigin(min, 0, 0);		  
+		  hist->SetComponentSpacing(bin_spacing, 0, 0);
+		  hist->Update();
 		 // cout << "Num bins:" << numbins << endl;
 		  vtkSmartPointer<vtkDoubleArray> bins =
 			  vtkSmartPointer<vtkDoubleArray>::New();
@@ -155,18 +168,41 @@ public:
 			  vtkSmartPointer<vtkIntArray>::New();
 		  frequencies->SetNumberOfComponents(1);
 		  frequencies->SetNumberOfTuples(numbins);
-		  frequencies->SetName("Frequency");
+		  frequencies->SetName("Frequencies");
 		  vtkSmartPointer<vtkIntArray> logfrequencies =
 			  vtkSmartPointer<vtkIntArray>::New();
 		  logfrequencies->SetNumberOfComponents(1);
 		  logfrequencies->SetNumberOfTuples(numbins);
-		  logfrequencies->SetName("Log Frequencies");
+		  logfrequencies->SetName("Logs");
 		  //*(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0)))
 		  //int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
 		  //int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
 		  double spacing = this->Hist->GetComponentSpacing()[0];
 		  double mbin = this->Hist->GetComponentOrigin()[0];
-		  cout << "Frequencies:" << endl;
+		  //cout << "Frequencies:" << endl;
+
+		  int maxbin=0;
+		  double maxlogbin=0;
+		  for (vtkIdType bin = 0; bin < numbins; bin++)
+		  {
+
+			
+			  mbin += spacing;
+			  // cout << "bin =" << bin << ", retrieving curbin"  << endl;
+			  int curbin = 0;			
+			  curbin = *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
+			  if (curbin > maxbin) { maxbin = curbin; }
+			  double logcurbin = 0;
+			  if (curbin > 0) 
+			  {
+				  logcurbin = 100 * log10(curbin); 
+				  if (logcurbin > maxlogbin) { maxlogbin = logcurbin; }
+			  }
+
+		  }
+		  //cout << "maxbin=" << maxbin << endl;
+		  //cout << "maxlogbin=" << maxlogbin << endl;
+
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
 			
@@ -177,19 +213,32 @@ public:
 			  //curbin =*output++;
 			  curbin= *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
 			  int logcurbin = 0;
-			  if (curbin > 0) { logcurbin = 100*log10(curbin); }
+			  if (curbin > 0) {
+				  logcurbin = 100*log10(curbin); 
+				  if (maxlogbin > 0)
+				  {					  
+					  double mult = (double)logcurbin * (double)maxbin;					
+					  double multdiv = mult / maxlogbin;					  					 					  
+					  logcurbin = (int)(multdiv);
+				  }
+			  }
 			  
 
-			  cout << "logcurbin=" << logcurbin<< endl;
+			  //cout << "logcurbin=" << logcurbin<< "curbin"<<curbin<< endl;
 			 // cout << "logcurbin=" << log10(curbin) << endl;
 				  //curbin *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
 			  
 			  if (curbin != 0)
 			  {
-				  cout << curbin << endl;
+				  //cout << curbin << endl;
 			  }
 			  frequencies->SetTuple1(bin, curbin);
-			  logfrequencies->SetTuple1(bin, logcurbin);
+			  int reslogcurbin = 0;
+			  if ((logcurbin - curbin) > 0) {
+				  reslogcurbin = logcurbin - curbin;
+			  }
+			  //logfrequencies->SetTuple1(bin, logcurbin);
+			  logfrequencies->SetTuple1(bin, reslogcurbin);
 		  }
 
 		  vtkSmartPointer<vtkTable> table =
@@ -201,14 +250,29 @@ public:
 		  vtkSmartPointer<vtkTable> table2 =
 			  vtkSmartPointer<vtkTable>::New();
 		  table2->AddColumn(bins);
-		  //table->AddColumn(frequencies);
+		  table2->AddColumn(frequencies);
 		  table2->AddColumn(logfrequencies);
 		  
-		  vtkPlot * line = this->ChartXY->AddPlot(vtkChart::BAR);
-		  vtkPlotBar * line2 = vtkPlotBar::SafeDownCast(this->ChartXY->AddPlot(vtkChart::BAR));
-		  
-		  cout << "line2: class name:" << line2->GetClassName() << endl;
-		  line->SetInputData(table, 0, 1);
+		  //vtkPlot * line = this->ChartXY->AddPlot(vtkChart::BAR);
+		  //vtkPlotBar * line2 = vtkPlotBar::SafeDownCast(this->ChartXY->AddPlot(vtkChart::BAR));
+		  //vtkPlot * line2 = this->ChartXY->AddPlot(vtkChart::BAR);
+		  //vtkPlot * line2 = this->ChartXY->AddPlot(vtkChart::STACKED);
+		  vtkPlotStacked * line2 = vtkPlotStacked::SafeDownCast(this->ChartXY->AddPlot(vtkChart::STACKED));
+		  //vtkPlot * line2 = this->ChartXY->AddPlot(vtkChart::LINE);
+		  this->ChartXY->GetAxis(0)->SetRange(min, max);
+		  //this->ChartXY->GetAxis(0)->SetBehavior(vtkAxis::FIXED);
+		  //cout << "line2: class name:" << line2->GetClassName() << endl;
+		  line2->SetInputArray(1, "Frequencies");
+		  line2->SetInputArray(2, "Logs");
+
+		  vtkSmartPointer<vtkColorSeries> colorSeries =
+			  vtkSmartPointer<vtkColorSeries>::New();
+		  //colorSeries->
+		  colorSeries->SetColorScheme(vtkColorSeries::BREWER_QUALITATIVE_PASTEL1);
+		  line2->SetColorSeries(colorSeries);
+
+
+		 /* line->SetInputData(table, 0, 1);
 		  line->GetXAxis()->SetTitle("Bin");
 		  
 		  vtkTextProperty *textProp = line->GetXAxis()->GetLabelProperties();
@@ -216,8 +280,8 @@ public:
 		  textProp = line->GetXAxis()->GetTitleProperties();
 		  textProp->SetColor(1.0, 1.0, 1.0);
 		  line->GetYAxis()->SetTitle("Count");
-		  line->SetColor(0.1, 0.3, 0.9);
-
+		  line->SetColor(0.1, 0.3, 0.9);*/
+		  line2->SetUseIndexForXSeries(true);
 
 		  line2->SetInputData(table2, 0, 1);
 		  //line2->SetLegendVisibility(false);
@@ -225,14 +289,14 @@ public:
 		  line2->GetXAxis()->SetTitle("LogBin");
 		  vtkTextProperty *textProp2 = line2->GetXAxis()->GetLabelProperties();
 		  
-		  textProp2->SetLineOffset(0);
-		  textProp2->SetColor(0.0, 1.0, 0.0);
-		  textProp2->BoldOff();
+		  //textProp2->SetLineOffset(0);
+		  //textProp2->SetColor(0.0, 1.0, 0.0);
+		  //textProp2->BoldOff();
 		  textProp2->SetLineSpacing(0);
 		  textProp2= line2->GetXAxis()->GetTitleProperties();
-		  textProp2->SetColor(1.0, 0.0, 1.0);
+		  //textProp2->SetColor(1.0, 0.0, 1.0);
 		  line2->GetYAxis()->SetTitle("Count2");
-		  line2->SetColor(0.1, 0.9, 0.3);
+		  //line2->SetColor(0.1, 0.9, 0.3);
 		  
 
 	
@@ -255,7 +319,10 @@ mqHistogramWidget::mqHistogramWidget(QWidget* parentObject)
   , Internals(new mqInternals(this))
 {
 //	cout << "mqHistogramWidget Widget constructor" << endl;
-  
+	this->numBins = 50;
+	this->min = 0;
+	this->max = 1;
+	this->mHist = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -265,13 +332,42 @@ mqHistogramWidget::~mqHistogramWidget()
   this->Internals = NULL;
 }
 
+int mqHistogramWidget::GetNumBins() { return this->numBins; }
+void mqHistogramWidget::SetNumBins(int num_bins) { this->numBins = num_bins; this->Internals->reinit( this->mHist, this->numBins, this->min, this->max);};
+double mqHistogramWidget::GetMin() { return this->min; }
+void mqHistogramWidget::SetMin(double newmin) 
+{ 
+	if (newmin < this->max) 
+	{ this->min = newmin; this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+	}
+
+}
+double mqHistogramWidget::GetMax() { 
+	return this->max;
+
+}
+void mqHistogramWidget::SetMax(double newmax)
+{
+	if (newmax > this->min)
+	{
+		this->max = newmax; this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+	}
+}
+void mqHistogramWidget::SetMinMax(double newmin, double newmax)
+{
+	if (newmin<newmax)
+	{
+		this->max = newmax; this->min = newmin; this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+	}
+}
 //-----------------------------------------------------------------------------
 void mqHistogramWidget::initialize(
 	vtkImageAccumulate* hist)
 {
 	cout << "mqHistogramWidget Initialize " << endl;
-  this->Internals->cleanup();
-  this->Internals->reinit(hist);
+  //this->Internals->cleanup();
+  this->mHist = hist;
+  this->Internals->reinit(hist, this->numBins, this->min, this->max);
 
   
 

@@ -35,11 +35,19 @@ public:
   */
   void initialize(
     vtkImageAccumulate* hist);
-
-  
+  int GetNumBins();
+  void SetNumBins(int num_bins);
+  double GetMin();
+  void SetMin(double newmin);
+  void SetMinMax(double newmin, double newmax);
+  double GetMax();
+  void SetMax(double newmax);
   void SetLogScaleXAxis(bool logScale);
   bool GetLogScaleXAxis() const;
-
+  int numBins;
+  double min;
+  double max;
+  vtkImageAccumulate* mHist;
 public slots:
   
   void render();

@@ -126,15 +126,18 @@ public:
 void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist)
 {
 	this->HIST = hist;
+	this->Internals->Ui.Histogram->initialize(hist);
+	this->UpdateHistogram();
 	//this->IMGDATA = data;
 	cout << "Histogram reinitialized!" << endl;	
 	/*this->HIST->SetComponentExtent(this->ctfMin, this->ctfMax, 0, 0, 0, 0);
 	*/
-	this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
+	/*this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
 	double bin_spacing = (double)(this->ctfMax - this->ctfMin) / 10;
 	this->HIST ->SetComponentSpacing(bin_spacing, 0, 0);
-	this->HIST->Update();
-	this->Internals->Ui.Histogram->initialize(hist);
+	this->HIST->Update();*/
+	/*this->Internals->Ui.Histogram->SetMinMax(this->ctfMin , this->ctfMax);
+	this->Internals->Ui.Histogram->initialize(hist);*/
 }
 void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunction *stc, int keepMinMax)
 {
@@ -523,13 +526,19 @@ void mqColorOpacityEditorWidget::UpdateHistogram()
 {
 	if (this->HIST != NULL)
 	{
-		this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
+		/*this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
 		double bin_spacing = (double)(this->ctfMax - this->ctfMin) / 10;
 		this->HIST->SetComponentSpacing(bin_spacing, 0, 0);
 		this->HIST->Update();
-		this->Internals->Ui.Histogram->initialize(this->HIST);
+		this->Internals->Ui.Histogram->initialize(this->HIST);*/
+		this->Internals->Ui.Histogram->SetMinMax(this->ctfMin, this->ctfMax);
+	}
+	else
+	{
+		cout << "This HIST is NULL!" << endl;
 	}
 }
+
 void mqColorOpacityEditorWidget::UpdateLookupTableRange()
 {
 	
