@@ -152,13 +152,14 @@ public:
 		  if (numbins > 0) {
 			  bin_spacing = (max - min) / numbins;
 		  }
-		 // cout << "numbins = " << numbins << endl;
-		 // cout << "min = " << min << endl;
-		 // cout << "bin_spacing = " << bin_spacing << endl;
+		 cout << "numbins = " << numbins << endl;
+		  cout << "min = " << min << endl;
+		  cout << "max = " << max << endl;
+		  cout << "bin_spacing = " << bin_spacing << endl;
 		  hist->SetComponentOrigin(min, 0, 0);		  
 		  hist->SetComponentSpacing(bin_spacing, 0, 0);
 		  hist->Update();
-		 // cout << "Num bins:" << numbins << endl;
+		  cout << "Update ok... " << numbins << endl;
 		  vtkSmartPointer<vtkDoubleArray> bins =
 			  vtkSmartPointer<vtkDoubleArray>::New();
 		  bins->SetNumberOfComponents(1);
@@ -179,7 +180,7 @@ public:
 		  //int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
 		  double spacing = this->Hist->GetComponentSpacing()[0];
 		  double mbin = this->Hist->GetComponentOrigin()[0];
-		  //cout << "Frequencies:" << endl;
+		 cout << "Frequencies:" << endl;
 
 		  int maxbin=0;
 		  double maxlogbin=0;
@@ -188,20 +189,29 @@ public:
 
 			
 			  mbin += spacing;
-			  // cout << "bin =" << bin << ", retrieving curbin"  << endl;
+			   cout << "bin =" << bin << ", retrieving curbin"  << endl;
 			  int curbin = 0;			
-			  curbin = *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
-			  if (curbin > maxbin) { maxbin = curbin; }
-			  double logcurbin = 0;
-			  if (curbin > 0) 
+			  if (this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0) !=NULL)
 			  {
-				  logcurbin = 100 * log10(curbin); 
-				  if (logcurbin > maxlogbin) { maxlogbin = logcurbin; }
+				  cout << "output not null" << endl;
+				  curbin = *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
+				  if (curbin > maxbin) { maxbin = curbin; }
+				  double logcurbin = 0;
+				  if (curbin > 0)
+				  {
+					  logcurbin = 100 * log10(curbin);
+					  if (logcurbin > maxlogbin) { maxlogbin = logcurbin; }
+				  }
 			  }
+			  else
+			  {
+				  cout << "null output" << endl;
+			  }
+			  
 
 		  }
-		  //cout << "maxbin=" << maxbin << endl;
-		  //cout << "maxlogbin=" << maxlogbin << endl;
+		  cout << "maxbin=" << maxbin << endl;
+		  cout << "maxlogbin=" << maxlogbin << endl;
 
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
@@ -210,30 +220,38 @@ public:
 			  mbin += spacing;
 			 // cout << "bin =" << bin << ", retrieving curbin"  << endl;
 			  int curbin = 0;
-			  //curbin =*output++;
-			  curbin= *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
 			  int logcurbin = 0;
-			  if (curbin > 0) {
-				  logcurbin = 100*log10(curbin); 
-				  if (maxlogbin > 0)
-				  {					  
-					  double mult = (double)logcurbin * (double)maxbin;					
-					  double multdiv = mult / maxlogbin;					  					 					  
-					  logcurbin = (int)(multdiv);
+			  int reslogcurbin = 0;
+			  //curbin =*output++;
+			  if (this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0) != NULL)
+			  {
+				  curbin = *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
+				  
+				  if (curbin > 0) {
+					  logcurbin = 100 * log10(curbin);
+					  if (maxlogbin > 0)
+					  {
+						  double mult = (double)logcurbin * (double)maxbin;
+						  double multdiv = mult / maxlogbin;
+						  logcurbin = (int)(multdiv);
+					  }
 				  }
+				  cout << "logcurbin=" << logcurbin << "curbin" << curbin << endl;
 			  }
+
+			  
 			  
 
-			  //cout << "logcurbin=" << logcurbin<< "curbin"<<curbin<< endl;
+			
 			 // cout << "logcurbin=" << log10(curbin) << endl;
-				  //curbin *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
+				//curbin *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
 			  
 			  if (curbin != 0)
 			  {
 				  //cout << curbin << endl;
 			  }
 			  frequencies->SetTuple1(bin, curbin);
-			  int reslogcurbin = 0;
+			 
 			  if ((logcurbin - curbin) > 0) {
 				  reslogcurbin = logcurbin - curbin;
 			  }
