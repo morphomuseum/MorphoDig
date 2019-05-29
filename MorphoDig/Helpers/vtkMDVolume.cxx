@@ -116,6 +116,15 @@ void vtkMDVolume::SetisVisible(int visible)
 	}
 
 }
+double vtkMDVolume::GetRangeMin()
+{
+	return this->GetImageData()->GetScalarRange()[0];
+}
+
+double vtkMDVolume::GetRangeMax()
+{
+	return this->GetImageData()->GetScalarRange()[1];
+}
 void vtkMDVolume::SetdisplayROI(int disp)
 {
 	if (this->Box != NULL)

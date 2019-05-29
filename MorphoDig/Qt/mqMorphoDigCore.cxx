@@ -14,6 +14,7 @@
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
 #include <vtkXMLImageDataWriter.h>
+#include <vtkFlyingEdges3D.h>
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
 #include <time.h>
@@ -12699,6 +12700,141 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 //void addIsosurface(int flyingEdges, double threshold);
 void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 {
+	int modified = 0;
+	cout << "Add iso surface" << endl;
+	vtkMDVolume *myVolume = this->GetFirstSelectedVolume();
+	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+	if (myVolume != NULL) // from menu => then unselect first selected volume!
+	{
+
+		VTK_CREATE(vtkMDActor, newactor);
+		if (this->mui_BackfaceCulling == 0)
+		{
+			newactor->GetProperty()->BackfaceCullingOff();
+		}
+		else
+		{
+			newactor->GetProperty()->BackfaceCullingOn();
+		}
+		VTK_CREATE(vtkPolyDataMapper, newmapper);		
+		newmapper->SetColorModeToDefault();
+
+		if (
+			(this->mui_ActiveArray->DataType == VTK_INT || this->mui_ActiveArray->DataType == VTK_UNSIGNED_INT)
+			&& this->mui_ActiveArray->NumComp == 1
+			)
+		{
+			newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+			newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+		}
+		else
+		{
+			newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+		}
+
+		newmapper->ScalarVisibilityOn();
+		
+		cout << "threshold =" << threshold << endl;
+		vtkSmartPointer<vtkFlyingEdges3D > isoFilter =
+			vtkSmartPointer<vtkFlyingEdges3D >::New();
+		isoFilter->SetInputData(vtkImageData::SafeDownCast(myVolume->GetImageData()));
+		isoFilter->SetComputeNormals(true);
+		isoFilter->SetNumberOfContours(1);
+		isoFilter->SetValue(0, threshold);		
+		
+		isoFilter->Update();
+		
+
+		vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+		//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+		
+			cleanPolyDataFilter->SetInputData(isoFilter->GetOutput());
+
+		
+		cleanPolyDataFilter->PieceInvariantOff();
+		cleanPolyDataFilter->ConvertLinesToPointsOff();
+		cleanPolyDataFilter->ConvertPolysToLinesOff();
+		cleanPolyDataFilter->ConvertStripsToPolysOff();
+		cleanPolyDataFilter->PointMergingOn();
+		cleanPolyDataFilter->Update();
+		VTK_CREATE(vtkPolyData, myData);
+
+		myData = cleanPolyDataFilter->GetOutput();
+
+		cout << "decimate: nv=" << myData->GetNumberOfPoints() << endl;
+		//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
+
+		newmapper->SetInputData(myData);
+
+		vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+		Mat = myVolume->GetMatrix();
+
+
+
+		vtkTransform *newTransform = vtkTransform::New();
+		newTransform->PostMultiply();
+
+		newTransform->SetMatrix(Mat);
+		newactor->SetPosition(newTransform->GetPosition());
+		newactor->SetScale(newTransform->GetScale());
+		newactor->SetOrientation(newTransform->GetOrientation());
+		newTransform->Delete();
+
+
+		double color[4] = { 0.5, 0.5, 0.5, 1 };
+		this->Getmui_DefaultMeshColor(color);
+		newactor->SetmColor(color);
+
+		newactor->SetMapper(newmapper);
+		newactor->SetSelected(0);
+
+
+		newactor->SetName(myVolume->GetName() + "_iso");
+		cout << "try to add new actor=" << endl;
+		if (myData->GetNumberOfPoints() > 50)
+		{
+			newcoll->AddTmpItem(newactor);
+			modified = 1;
+		}
+
+		if (modified == 1)
+		{
+			newcoll->InitTraversal();
+			vtkIdType num = newcoll->GetNumberOfItems();
+			for (vtkIdType i = 0; i < num; i++)
+			{
+				cout << "try to get next actor from newcoll:" << i << endl;
+				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+				myActor->SetDisplayMode(this->mui_DisplayMode);
+				this->getActorCollection()->AddItem(myActor);
+				emit this->actorsMightHaveChanged();
+				std::string action = "Isosurface object added: " + myActor->GetName();
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+
+			}
+			//cout << "camera and grid adjusted" << endl;
+			cout << "new actor added" << endl;
+			this->Initmui_ExistingArrays();
+
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			this->Render();
+		}
+
+	}
 
 }
 void  mqMorphoDigCore::addDecimate(int quadric, double factor)

@@ -11,6 +11,7 @@
 #include "mqReaction.h"
 #include "mqIsosurfaceDialog.h"
 #include "mqMorphoDigCore.h"
+#include "vtkMDVolume.h"
 #include <QMessageBox>
 
 /**
@@ -28,7 +29,7 @@ public:
   /**
   * Shows the FLG dialog for the application.
   */
-  static void showIsosurfaceDialog(mqIsosurfaceDialog *Isosurface_dialog);
+  static void showIsosurfaceDialog(vtkMDVolume *vol);
 
 protected:
   /**
@@ -37,18 +38,21 @@ protected:
   virtual void onTriggered() {
 	  vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
 	  if (num_selected_volumes != 1) {
+		  
 		  QMessageBox msgBox;
 		  msgBox.setText("Please select a single volume to use this option.");
 		  msgBox.exec();
 		  return;
 	  }
-	  mqIsosurfaceDialogReaction::showIsosurfaceDialog(this->Isosurface_dialog); 
+	  vtkMDVolume *vol = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
+	  mqIsosurfaceDialogReaction::showIsosurfaceDialog(vol); 
   
   }
 
 private:
 	Q_DISABLE_COPY(mqIsosurfaceDialogReaction)
-		mqIsosurfaceDialog *Isosurface_dialog;
+		//mqIsosurfaceDialog *Isosurface_dialog;
+	
 };
 
 #endif

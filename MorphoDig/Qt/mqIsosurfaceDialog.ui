@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
-    <height>213</height>
+    <width>408</width>
+    <height>244</height>
    </rect>
   </property>
   <property name="palette">
@@ -458,8 +458,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>170</y>
+     <x>120</x>
+     <y>210</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -482,8 +482,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>271</width>
-     <height>151</height>
+     <width>391</width>
+     <height>191</height>
     </rect>
    </property>
    <property name="title">
@@ -492,8 +492,8 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>110</y>
+      <x>50</x>
+      <y>130</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -505,8 +505,8 @@
    <widget class="QDoubleSpinBox" name="threshold">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>120</y>
+      <x>130</x>
+      <y>130</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -530,10 +530,10 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>30</y>
-      <width>220</width>
-      <height>80</height>
+      <x>30</x>
+      <y>60</y>
+      <width>311</width>
+      <height>61</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -556,6 +556,32 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Volume Name:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="VolumeName">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>30</y>
+     <width>271</width>
+     <height>20</height>
+    </rect>
+   </property>
   </widget>
  </widget>
  <resources>

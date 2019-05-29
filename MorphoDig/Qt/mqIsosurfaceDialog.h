@@ -7,7 +7,7 @@
 #ifndef _mqIsosurfaceDialog_h
 #define _mqIsosurfaceDialog_h
 
-
+#include "vtkMDVolume.h"
 #include <QDialog>
 
 namespace Ui
@@ -30,7 +30,7 @@ public:
   
   ~mqIsosurfaceDialog();
   void Isosurface();
-  
+  void setVolume(vtkMDVolume *vol);
   public slots:
   
   
@@ -45,7 +45,7 @@ private:
 
   Q_DISABLE_COPY(mqIsosurfaceDialog)
   Ui::mqIsosurfaceDialog* const Ui;
- 
+  vtkMDVolume *myVolume;
   // Here we should have the file name, no ?
 };
 

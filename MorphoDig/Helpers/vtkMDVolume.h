@@ -143,6 +143,9 @@ public:
 	virtual void ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat); 
 	void SetColorAmbient(double ambient);
 	void GetMCenter(double center[3]);
+	double GetRangeMin();
+	double GetRangeMax();
+
 	void SetColorSpecular(double specular);
 	void SetColorSpecularPower(double specularPower);
 	void SetColorDiffuse(double diffuse);

@@ -21,6 +21,8 @@
 #include <QRadioButton>
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QString>
+
 #include <QHeaderView>
 
 
@@ -58,8 +60,8 @@ mqIsosurfaceDialog::mqIsosurfaceDialog(QWidget* Parent)
 	this->Ui->setupUi(this);
 	this->setObjectName("mqIsosurfaceDialog");	
 	
-	
-  
+	this->myVolume = NULL;
+  this->Ui->threshold->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotIsosurface()));
 
 }
@@ -79,9 +81,9 @@ void mqIsosurfaceDialog::Isosurface()
 {
 	cout << "Isosurface dialog" << endl;
 	
-	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors() > 0)
+	if (mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes() ==1)
 	{
-		std::string action = "Isosurface selected actors";
+		std::string action = "Isosurface";
 		
 		mqMorphoDigCore::instance()->addIsosurface(this->Ui->flyingEdges->isChecked(), this->Ui->threshold->value());
 		
@@ -90,7 +92,18 @@ void mqIsosurfaceDialog::Isosurface()
 
 
 
-
+void mqIsosurfaceDialog::setVolume (vtkMDVolume *vol)
+{
+	this->myVolume = vol;
+	QString myLabel(this->myVolume->GetName().c_str());
+	this->Ui->VolumeName->setText(myLabel);
+	double min = this->myVolume->GetRangeMin();
+	double max = this->myVolume->GetRangeMax();
+	double avg = (max + min) / 2;
+	this->Ui->threshold->setMinimum(min);
+	this->Ui->threshold->setMaximum(max);
+	this->Ui->threshold->setValue(avg);
+}
 
 
 

@@ -14,16 +14,18 @@
 mqIsosurfaceDialogReaction::mqIsosurfaceDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-	this->Isosurface_dialog = new mqIsosurfaceDialog(mqCoreUtilities::mainWidget());
-
+	/* mqAboutDialog about_dialog(mqCoreUtilities::mainWidget());
+  about_dialog.exec();*/
+	//this->Isosurface_dialog = new mqIsosurfaceDialog(mqCoreUtilities::mainWidget());
+	
 	
 }
 
 
 //-----------------------------------------------------------------------------
-void mqIsosurfaceDialogReaction::showIsosurfaceDialog(mqIsosurfaceDialog *Isosurface_dialog)
+void mqIsosurfaceDialogReaction::showIsosurfaceDialog(vtkMDVolume *vol)
 {
-	
-  
- Isosurface_dialog->show();
+	mqIsosurfaceDialog Isosurface_dialog(mqCoreUtilities::mainWidget());
+	Isosurface_dialog.setVolume(vol);
+ Isosurface_dialog.exec();
 }
