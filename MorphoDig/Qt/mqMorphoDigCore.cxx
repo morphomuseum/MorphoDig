@@ -372,6 +372,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->FlagLandmarkCollection->SetRenderer(this->Renderer);
 
 	this->Renderer->SetUseDepthPeeling(1);
+	this->Renderer->UseDepthPeelingForVolumesOn();
 	this->Renderer->SetMaximumNumberOfPeels(100);
 	this->Renderer->SetOcclusionRatio(0.1);
 	this->Camera = this->Renderer->GetActiveCamera();
