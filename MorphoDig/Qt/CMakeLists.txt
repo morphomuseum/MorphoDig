@@ -141,6 +141,10 @@ mqIcosahedronDialogReaction.cxx
 mqIcosahedronDialogReaction.h
 mqInteractionControlsWidget.cxx
 mqInteractionControlsWidget.h
+mqIsosurfaceDialog.cxx
+mqIsosurfaceDialog.h
+mqIsosurfaceDialogReaction.cxx
+mqIsosurfaceDialogReaction.h
 mqLandmarkDialog.cxx
 mqLandmarkDialog.h
 mqLandmarkDialogReaction.cxx
@@ -342,6 +346,7 @@ mqFillHolesDialog.ui
 mqGridSizeDialog.ui
 mqICPDialog.ui
 mqIcosahedronDialog.ui
+mqIsosurfaceDialog.ui
 mqInteractionControlsWidget.ui
 mqLandmarkDialog.ui
 mqLightControlsWidget.ui

@@ -12696,6 +12696,11 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 	}
 
 }
+//void addIsosurface(int flyingEdges, double threshold);
+void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
+{
+
+}
 void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
