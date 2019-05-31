@@ -1151,6 +1151,7 @@ void vtkMDInteractorStyle::Tag(int mode)
 
 		vtkIdType pickid = picker->GetPointId();
 
+
 		if (picker->GetActor() == NULL) {
 			cout << "Picked Null actor" << endl;
 		}
@@ -1214,9 +1215,11 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 			//	<< " " << norm[2] << std::endl;
 
 			//std::cout << "Picked actor: " << picker->GetActor() << std::endl;
-			if (picker->GetActor() == NULL) {
-				cout << "Picked Null actor" << endl;
-			}
+			if (picker->GetActor() == NULL && picker->GetVolume() == NULL)
+			{
+				cout << "No actor nor volume was picked" << endl;
+
+			}			
 			else
 			{
 				mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
