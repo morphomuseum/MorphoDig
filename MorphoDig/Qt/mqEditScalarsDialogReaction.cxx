@@ -24,7 +24,9 @@ mqEditScalarsDialogReaction::mqEditScalarsDialogReaction(QAction* parentObject)
 //-----------------------------------------------------------------------------
 void mqEditScalarsDialogReaction::showEditScalarsDialog(mqEditScalarsDialog *Scalars_dialog)
 {
-	
+	cout << "Scalar Dialog: Try update UI" << endl;
   Scalars_dialog->UpdateUI();
+  cout << "Scalar Dialog: Try show" << endl;
   Scalars_dialog->show();
+  cout << "Scalar Dialog: shown" << endl;
 }

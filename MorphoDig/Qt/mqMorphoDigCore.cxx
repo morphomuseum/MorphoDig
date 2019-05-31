@@ -508,10 +508,8 @@ void mqMorphoDigCore::TestVolume()
 	cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
 	cout << "Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
 	cout << "Image type:" << input->GetScalarTypeAsString() << endl;
-	cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
-	cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
-	
-
+	//cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
+	cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;	
 	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
 
 	if (dim[0] < 2 ||
@@ -522,7 +520,7 @@ void mqMorphoDigCore::TestVolume()
 	}
 	else
 	{
-		cout << "Try visualize!!!" << endl;
+		//cout << "Try visualize!!!" << endl;
 
 		vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
 		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
@@ -4974,7 +4972,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		}
 		else 
 		{
-			cout << "Try visualize!!!" << endl;
+			//cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
@@ -5057,7 +5055,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			//
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
-			cout << "Open volume: bin spacing = " << bin_spacing << endl;
+			cout << "Bin spacing = " << bin_spacing << endl;
 			histogram->Update();
 			// faire plutôt une liste avec push.
 			/*
@@ -5252,8 +5250,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			first_point = input->GetScalarRange()[0] + 0.15*width;
 			last_point = input->GetScalarRange()[1] - 0.3*width;
-			cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
-			cout << "EH???" << endl;
+			//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
+			//cout << "EH???" << endl;
 
 			double second_point = first_point + 0.2*(last_point - first_point);
 			double third_point = first_point + 0.4*(last_point - first_point);
@@ -5282,17 +5280,17 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				  property->ShadeOn();
 				  double bblength = volume->GetBoundingBoxLength();
 				  double SOUD = bblength / 500;
-				  cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+				  //cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
 				  if (SOUD == 0) { SOUD = 0.89; }
 				 
 			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
-				 mapper->Update();
-				 volume->Update();
+				 //mapper->Update();
+				 //volume->Update();
 				 volume->SetSelected(1);
 				 volume->SetScalarOpacityUnitDistance(SOUD);
 				 volume->SetScalarDisplayMin((double)first_point);
 				 volume->SetScalarDisplayMax((double)last_point);
-				 volume->UpdateLookupTableRange();
+				 //volume->UpdateLookupTableRange();
 
 				 QFileInfo fileInfo(fileName);
 				 QString onlyfilename(fileInfo.fileName());
@@ -5317,7 +5315,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 this->getVolumeCollection()->AddItem(volume);
 				 //emit this->actorsMightHaveChanged();
 				 emit this->volumesMightHaveChanged();
-				 this->Initmui_ExistingArrays();
+				 cout << "init arrays... needed?" << endl;
+				 //this->Initmui_ExistingArrays();
 				 std::string action = "Load volume";
 				 int mCount = BEGIN_UNDO_SET(action);
 				 this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);

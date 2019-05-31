@@ -123,10 +123,11 @@ public:
 };
 
 //void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, vtkImageData *data)
-void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist)
+void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, int numbins, double rangeMin, double rangeMax)
 {
 	this->HIST = hist;
-	this->Internals->Ui.Histogram->initialize(hist);
+	this->Internals->Ui.Histogram->initialize(hist, numbins, rangeMin, rangeMax);
+
 	this->UpdateHistogram();
 	//this->IMGDATA = data;
 	cout << "Histogram reinitialized!" << endl;	
@@ -532,6 +533,7 @@ void mqColorOpacityEditorWidget::UpdateHistogram()
 		this->HIST->SetComponentSpacing(bin_spacing, 0, 0);
 		this->HIST->Update();
 		this->Internals->Ui.Histogram->initialize(this->HIST);*/
+
 		this->Internals->Ui.Histogram->SetMinMax(this->ctfMin, this->ctfMax);
 	}
 	else

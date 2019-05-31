@@ -130,12 +130,20 @@ public:
     }
   }
   ~mqInternals() { this->cleanup(); }
+  void reinitMinMax(double min, double max)
+  {
+	  cout << "Reinit min and max to " << min << " and " << max << endl;
+	  this->ChartXY->GetAxis(0)->SetRange(min, max);
+  }
   void reinit(vtkImageAccumulate *hist, int numbins, double min, double max)
   {
+	  //cette fonction prend beaucoup trop de temps... On ne va pas refaire l'histogramme à chaque fois qu'on clique sur shift.
+	  //on va plutôt le calculer 1 fois (à l'ouverture du volume), avec un nombre de bins "suffisant" ( 255?)
+	  // ensuite on va juste décaler l'affichage de l'histogramme calculé quand les bornes min et max changent.
 	  this->cleanup();	  
 	  if (hist !=NULL)
 	  {
-		  cout << "Histogram Widget being reinitialized" << endl;
+		  cout << "Start Histogram reinit" << endl;
 		  this->Hist = hist;
 		 // this->Hist->Update();
 		  
@@ -152,14 +160,16 @@ public:
 		  if (numbins > 0) {
 			  bin_spacing = (max - min) / numbins;
 		  }
-		 cout << "numbins = " << numbins << endl;
-		  cout << "min = " << min << endl;
-		  cout << "max = " << max << endl;
-		  cout << "bin_spacing = " << bin_spacing << endl;
+		 //cout << "numbins = " << numbins << endl;
+		 // cout << "min = " << min << endl;
+		 // cout << "max = " << max << endl;
+		//  cout << "bin_spacing = " << bin_spacing << endl;
 		  hist->SetComponentOrigin(min, 0, 0);		  
 		  hist->SetComponentSpacing(bin_spacing, 0, 0);
+		 // cout << "I guess this is mostly the update call..." << endl;
 		  hist->Update();
-		  cout << "Update ok... " << numbins << endl;
+		  //cout << "Was it?" << endl;
+		//  cout << "Update ok... " << numbins << endl;
 		  vtkSmartPointer<vtkDoubleArray> bins =
 			  vtkSmartPointer<vtkDoubleArray>::New();
 		  bins->SetNumberOfComponents(1);
@@ -180,20 +190,21 @@ public:
 		  //int* output = static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer());
 		  double spacing = this->Hist->GetComponentSpacing()[0];
 		  double mbin = this->Hist->GetComponentOrigin()[0];
-		 cout << "Frequencies:" << endl;
+		 //cout << "Frequencies:" << endl;
 
 		  int maxbin=0;
 		  double maxlogbin=0;
+		  //First pass to have extent.
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
 
 			
 			  mbin += spacing;
-			   cout << "bin =" << bin << ", retrieving curbin"  << endl;
+			   //cout << "bin =" << bin << ", retrieving curbin"  << endl;
 			  int curbin = 0;			
 			  if (this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0) !=NULL)
 			  {
-				  cout << "output not null" << endl;
+				  //cout << "output not null" << endl;
 				  curbin = *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
 				  if (curbin > maxbin) { maxbin = curbin; }
 				  double logcurbin = 0;
@@ -205,14 +216,14 @@ public:
 			  }
 			  else
 			  {
-				  cout << "null output" << endl;
+				 // cout << "null output" << endl;
 			  }
 			  
 
 		  }
-		  cout << "maxbin=" << maxbin << endl;
-		  cout << "maxlogbin=" << maxlogbin << endl;
-
+		  //cout << "maxbin=" << maxbin << endl;
+		  //cout << "maxlogbin=" << maxlogbin << endl;
+		  //Second pass to "normalize".
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
 			
@@ -236,7 +247,7 @@ public:
 						  logcurbin = (int)(multdiv);
 					  }
 				  }
-				  cout << "logcurbin=" << logcurbin << "curbin" << curbin << endl;
+				  //cout << "logcurbin=" << logcurbin << "curbin" << curbin << endl;
 			  }
 
 			  
@@ -317,7 +328,7 @@ public:
 		  //line2->SetColor(0.1, 0.9, 0.3);
 		  
 
-	
+		  cout << "End Histogram reinit" << endl;
 
 	  }
 
@@ -337,7 +348,7 @@ mqHistogramWidget::mqHistogramWidget(QWidget* parentObject)
   , Internals(new mqInternals(this))
 {
 //	cout << "mqHistogramWidget Widget constructor" << endl;
-	this->numBins = 50;
+	//this->numBins = 50;
 	this->min = 0;
 	this->max = 1;
 	this->mHist = NULL;
@@ -350,13 +361,19 @@ mqHistogramWidget::~mqHistogramWidget()
   this->Internals = NULL;
 }
 
-int mqHistogramWidget::GetNumBins() { return this->numBins; }
-void mqHistogramWidget::SetNumBins(int num_bins) { this->numBins = num_bins; this->Internals->reinit( this->mHist, this->numBins, this->min, this->max);};
+//int mqHistogramWidget::GetNumBins() { return this->numBins; }
+/*void mqHistogramWidget::SetNumBins(int num_bins) { this->numBins = num_bins; 
+this->Internals->reinit( this->mHist, this->numBins, this->min, this->max);
+
+};*/
 double mqHistogramWidget::GetMin() { return this->min; }
 void mqHistogramWidget::SetMin(double newmin) 
 { 
 	if (newmin < this->max) 
-	{ this->min = newmin; this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+	{ 
+		this->min = newmin; 
+	//this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+	this->Internals->reinitMinMax(this->min, this->max);
 	}
 
 }
@@ -368,24 +385,31 @@ void mqHistogramWidget::SetMax(double newmax)
 {
 	if (newmax > this->min)
 	{
-		this->max = newmax; this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+		this->max = newmax; 
+		//this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+		this->Internals->reinitMinMax(this->min, this->max);
 	}
 }
 void mqHistogramWidget::SetMinMax(double newmin, double newmax)
 {
 	if (newmin<newmax)
 	{
-		this->max = newmax; this->min = newmin; this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+		this->max = newmax; this->min = newmin; 
+		//this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+		this->Internals->reinitMinMax(this->min, this->max);
 	}
 }
 //-----------------------------------------------------------------------------
 void mqHistogramWidget::initialize(
-	vtkImageAccumulate* hist)
+	vtkImageAccumulate* hist, int numbins, double rangeMin, double rangeMax)
 {
 	cout << "mqHistogramWidget Initialize " << endl;
   //this->Internals->cleanup();
   this->mHist = hist;
-  this->Internals->reinit(hist, this->numBins, this->min, this->max);
+  this->min = rangeMin;
+  this->max = rangeMax;
+
+  this->Internals->reinit(hist, numbins, rangeMin, rangeMax);
 
   
 

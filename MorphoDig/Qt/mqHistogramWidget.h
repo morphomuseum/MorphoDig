@@ -34,9 +34,9 @@ public:
   * allowed to edit/change the particular transfer function.
   */
   void initialize(
-    vtkImageAccumulate* hist);
-  int GetNumBins();
-  void SetNumBins(int num_bins);
+    vtkImageAccumulate* hist, int numbins, double rangeMin, double rangeMax);
+  //int GetNumBins();
+  //void SetNumBins(int num_bins);
   double GetMin();
   void SetMin(double newmin);
   void SetMinMax(double newmin, double newmax);
@@ -44,9 +44,11 @@ public:
   void SetMax(double newmax);
   void SetLogScaleXAxis(bool logScale);
   bool GetLogScaleXAxis() const;
-  int numBins;
+  //int numBins;
   double min;
+
   double max;
+
   vtkImageAccumulate* mHist;
 public slots:
   
