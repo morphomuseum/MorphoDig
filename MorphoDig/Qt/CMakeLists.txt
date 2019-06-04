@@ -159,6 +159,10 @@ mqMergeTagsDialog.cxx
 mqMergeTagsDialog.h
 mqMergeTagsDialogReaction.cxx
 mqMergeTagsDialogReaction.h
+mqMinimalDialog.cxx
+mqMinimalDialog.h
+mqMinimalDialogReaction.cxx
+mqMinimalDialogReaction.h
 mqMinimalWidget.cxx
 mqMinimalWidget.h
 mqMorphoDigCore.cxx
@@ -352,6 +356,7 @@ mqLandmarkDialog.ui
 mqLightControlsWidget.ui
 mqMainControlsWidget.ui
 mqMergeTagsDialog.ui
+mqMinimalDialog.ui
 mqMoveCurveHandlesDialog.ui
 mqObjectsControlsWidget.ui
 mqOrientationLabelsDialog.ui

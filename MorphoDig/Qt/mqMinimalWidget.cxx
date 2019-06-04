@@ -198,6 +198,7 @@ public:
 		layout->addWidget(this->Widget);
 		//this->Widget->setLayout(layout);
 		editor->setLayout(layout);
+		editor->repaint();
 		cout << "mqMinimalWidget Widget constructor 13" << endl;
 	}
 	~pqInternals() { this->cleanup(); }
@@ -252,9 +253,9 @@ mqMinimalWidget::~mqMinimalWidget()
 //-----------------------------------------------------------------------------
 void mqMinimalWidget::renderInternal()
 {
-	/*cout << "mqMinimalWidget renderInternal" << endl;
+	cout << "mqMinimalWidget renderInternal" << endl;
   if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
   {
     this->Internals->ContextView->GetRenderWindow()->Render();
-  }*/
+  }
 }
