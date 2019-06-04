@@ -110,13 +110,13 @@ mqMinimalDialog::~mqMinimalDialog()
 {
 
  //depending on what is 
-	
+	cout << "Deleted????" << endl;
   delete this->Ui;
 }
 void mqMinimalDialog::Minimal()
 {
 	cout << "Minimal dialog" << endl;
-	
+	this->hide();
 	
 }
 
