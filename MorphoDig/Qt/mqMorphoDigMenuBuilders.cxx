@@ -230,7 +230,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqOpenDataReaction(submenuVolume->addAction("Open MHD/MHA/VTI Volume") << mqSetName("actionOpenVolume"), 18);
   new mqSaveMHDMHADialogReaction(submenuVolume->addAction("Save first selected volume as .MHD or .MHA file") << mqSetName("actionSaveMHDMHA"));
   new mqSaveVTIDialogReaction(submenuVolume->addAction("Save first selected volume as .VTI") << mqSetName("actionSaveVTI"));
-  new mqMinimalDialogReaction(menu.addAction("Minimal Window") << mqSetName("actionOpenMinimal"));
+  //new mqMinimalDialogReaction(menu.addAction("Minimal Window") << mqSetName("actionOpenMinimal"));
   
 }
 

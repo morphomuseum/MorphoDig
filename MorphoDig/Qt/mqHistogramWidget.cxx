@@ -101,9 +101,9 @@ public:
     this->Widget->SetRenderWindow(this->Window.Get());
     this->ContextView->SetRenderWindow(this->Window.Get());
 
-    this->ChartXY->SetAutoSize(true);
+    
     //this->ChartXY->SetShowLegend(true);
-    this->ChartXY->SetForceAxesToBounds(true);
+    
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
     this->ContextView->SetInteractor(this->Widget->GetInteractor());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
@@ -112,8 +112,9 @@ public:
     this->ChartXY->SetActionToButton(vtkChart::ZOOM, -1);
     this->ChartXY->SetActionToButton(vtkChart::SELECT, vtkContextMouseEvent::RIGHT_BUTTON);
     this->ChartXY->SetActionToButton(vtkChart::SELECT_POLYGON, -1);
-	this->ChartXY->SetZoomWithMouseWheel(false);
-	
+	//this->ChartXY->SetZoomWithMouseWheel(false);	
+	//this->ChartXY->SetAutoSize(true);
+	this->ChartXY->SetForceAxesToBounds(true);
 	this->ChartXY->SetShowLegend(false);
 	
     this->Widget->setParent(editor);
@@ -130,16 +131,28 @@ public:
     }
   }
   ~mqInternals() { this->cleanup(); }
+  
   void reinitMinMax(double min, double max)
   {
 	  cout << "Reinit min and max to " << min << " and " << max << endl;
-	  this->ChartXY->GetAxis(0)->SetRange(min, max);
+	  //this->ChartXY->GetAxis(0)->SetRange(min, max);
+	  
+	  // Remove Min from Plot
+	  // Remove Max from Plot
+	  // Draw Min
+	  // Draw Max
   }
-  void reinit(vtkImageAccumulate *hist, int numbins, double min, double max)
+  void reinit(vtkImageAccumulate *hist, int numbins, double min, double max, double displayMin, double displayMax)
   {
 	  //cette fonction prend beaucoup trop de temps... On ne va pas refaire l'histogramme à chaque fois qu'on clique sur shift.
 	  //on va plutôt le calculer 1 fois (à l'ouverture du volume), avec un nombre de bins "suffisant" ( 255?)
 	  // ensuite on va juste décaler l'affichage de l'histogramme calculé quand les bornes min et max changent.
+
+	  double dMin = displayMin;
+	  double dMax = displayMax;
+	  if (displayMin <min || displayMin >max) { dMin = 0.33*(max - min); }
+	  if (displayMax <max || displayMax <min) { dMax = 0.66*(max - min); }
+
 	  this->cleanup();	  
 	  if (hist !=NULL)
 	  {
@@ -175,8 +188,18 @@ public:
 		  bins->SetNumberOfComponents(1);
 		  bins->SetNumberOfTuples(numbins);
 		  bins->SetName("Bins");
+		 
+		  vtkSmartPointer<vtkIntArray> displayMinA =
+			  vtkSmartPointer<vtkIntArray>::New();
+		  displayMinA->SetNumberOfTuples(numbins);
+
+		  vtkSmartPointer<vtkIntArray> displayMaxA =
+			  vtkSmartPointer<vtkIntArray>::New();
+		  displayMaxA->SetNumberOfTuples(numbins);
+
 		  vtkSmartPointer<vtkIntArray> frequencies =
 			  vtkSmartPointer<vtkIntArray>::New();
+
 		  frequencies->SetNumberOfComponents(1);
 		  frequencies->SetNumberOfTuples(numbins);
 		  frequencies->SetName("Frequencies");
@@ -194,12 +217,14 @@ public:
 
 		  int maxbin=0;
 		  double maxlogbin=0;
+		  int aboveDMin = 0;
+		  int aboveDMax = 0;
 		  //First pass to have extent.
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
 
-			
-			  mbin += spacing;
+			  
+			  
 			   //cout << "bin =" << bin << ", retrieving curbin"  << endl;
 			  int curbin = 0;			
 			  if (this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0) !=NULL)
@@ -228,6 +253,10 @@ public:
 		  {
 			
 			  bins->SetTuple1(bin, mbin);
+			  if (mbin >= dMin && aboveDMin == 0) { aboveDMin = 1;   displayMinA->SetTuple1(bin, maxbin); }else{ displayMinA->SetTuple1(bin, 0); }
+			  if (mbin >= dMax && aboveDMax == 0) { aboveDMax = 1;   displayMaxA->SetTuple1(bin, maxbin); }else { displayMaxA->SetTuple1(bin, 0); }
+			  
+
 			  mbin += spacing;
 			 // cout << "bin =" << bin << ", retrieving curbin"  << endl;
 			  int curbin = 0;
@@ -401,7 +430,7 @@ void mqHistogramWidget::SetMinMax(double newmin, double newmax)
 }
 //-----------------------------------------------------------------------------
 void mqHistogramWidget::initialize(
-	vtkImageAccumulate* hist, int numbins, double rangeMin, double rangeMax)
+	vtkImageAccumulate* hist, int numbins, double rangeMin, double rangeMax, double displayMin, double displayMax)
 {
 	cout << "mqHistogramWidget Initialize " << endl;
   //this->Internals->cleanup();
@@ -409,7 +438,7 @@ void mqHistogramWidget::initialize(
   this->min = rangeMin;
   this->max = rangeMax;
 
-  this->Internals->reinit(hist, numbins, rangeMin, rangeMax);
+  this->Internals->reinit(hist, numbins, rangeMin, rangeMax, displayMin, displayMax);
 
   
 

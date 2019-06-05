@@ -34,7 +34,7 @@ public:
   * allowed to edit/change the particular transfer function.
   */
   void initialize(
-    vtkImageAccumulate* hist, int numbins, double rangeMin, double rangeMax);
+    vtkImageAccumulate* hist, int numbins, double rangeMin, double rangeMax, double displayMin, double displayMax);
   //int GetNumBins();
   //void SetNumBins(int num_bins);
   double GetMin();

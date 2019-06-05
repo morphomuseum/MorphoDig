@@ -123,10 +123,10 @@ public:
 };
 
 //void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, vtkImageData *data)
-void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, int numbins, double rangeMin, double rangeMax)
+void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, int numbins, double rangeMin, double rangeMax, double displayMin, double displayMax)
 {
 	this->HIST = hist;
-	this->Internals->Ui.Histogram->initialize(hist, numbins, rangeMin, rangeMax);
+	this->Internals->Ui.Histogram->initialize(hist, numbins, rangeMin, rangeMax, displayMin, displayMax);
 
 	this->UpdateHistogram();
 	//this->IMGDATA = data;

@@ -57,7 +57,7 @@ public:
   ~mqColorOpacityEditorWidget() override;
   void reInitialize(vtkDiscretizableColorTransferFunction *stc, int keepMinMax=0);
   //void reInitializeHIST(vtkImageAccumulate *hist, vtkImageData *data);
-  void reInitializeHIST(vtkImageAccumulate *hist, int numbins, double rangeMin, double rangeMax);
+  void reInitializeHIST(vtkImageAccumulate *hist, int numbins, double rangeMin, double rangeMax, double displayMin, double displayMax);
   /**
   * Returns the current list of control points for the color transfer
   * function. This a list of 4-tuples.
