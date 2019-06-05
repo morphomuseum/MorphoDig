@@ -27,7 +27,7 @@
 #include <QFileDialog>
 #include <QCheckBox>
 #include <QHeaderView>
-
+#include <QCloseEvent>
 
 #include <sstream>
 
@@ -101,8 +101,32 @@ mqMinimalDialog::mqMinimalDialog(QWidget* Parent)
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotMinimal()));
 
 }
+void mqMinimalDialog::reject()
+{
+	//cout << "reject!!!" << endl;
+	//this->hide();
+	this->accept();
+}
+/*void mqMinimalDialog::closeEvent()
+{
 
 
+}*/
+/*
+void mqMinimalDialog::reject()
+{
+	QMessageBox::StandardButton resBtn = QMessageBox::Yes;
+	if (changes) {
+		resBtn = QMessageBox::question(this, APP_NAME,
+			tr("Are you sure?\n"),
+			QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+			QMessageBox::Yes);
+	}
+	if (resBtn == QMessageBox::Yes) {
+		QDialog::reject();
+	}
+}
+*/
 
 
 //-----------------------------------------------------------------------------
@@ -113,10 +137,19 @@ mqMinimalDialog::~mqMinimalDialog()
 	cout << "Deleted????" << endl;
   delete this->Ui;
 }
+void mqMinimalDialog::disconnect()
+{
+	cout << "disconnect" << endl;
+}
+void mqMinimalDialog::reconnect()
+{
+	cout << "reconnect" << endl;
+}
 void mqMinimalDialog::Minimal()
 {
-	cout << "Minimal dialog" << endl;
+	cout << "Close Minimal dialog" << endl;
 	this->hide();
+	this->disconnect();
 	
 }
 

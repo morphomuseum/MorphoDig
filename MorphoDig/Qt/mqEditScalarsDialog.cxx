@@ -194,7 +194,10 @@ mqEditScalarsDialog::~mqEditScalarsDialog()
 	
   delete this->Ui;
 }
-
+void mqEditScalarsDialog::reject()
+{
+	//this->hide();//bugs sometimes!!!!
+}
 int mqEditScalarsDialog::SomeThingHasChanged()
 {
 	int something_has_changed = 0;
@@ -555,7 +558,7 @@ void mqEditScalarsDialog::slotActiveScalarChanged(int idx)
 
 void mqEditScalarsDialog::slotActiveColorMapChanged(int idx)
 {
-	this->slotActiveColorMapChanged(idx);
+	this->ActiveColorMapChanged(idx);
 	
 
 

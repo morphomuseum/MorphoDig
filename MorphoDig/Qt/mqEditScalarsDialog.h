@@ -41,6 +41,7 @@ public:
  void RefreshComboColorMaps();
  void RefreshSuggestedRange();
  void ActiveColorMapChanged(int idx);
+ void reject();
  //void UpdateLookupTables();
   public slots:
   virtual void slotEditColorMapName();

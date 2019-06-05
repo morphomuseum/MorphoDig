@@ -31,7 +31,9 @@ public:
   
   ~mqMinimalDialog();
   void Minimal();
-  
+  void disconnect();
+  void reconnect();
+  void reject();
   public slots:
   
   

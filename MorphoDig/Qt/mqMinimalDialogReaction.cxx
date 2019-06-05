@@ -25,6 +25,6 @@ mqMinimalDialogReaction::mqMinimalDialogReaction(QAction* parentObject)
 void mqMinimalDialogReaction::showMinimalDialog(mqMinimalDialog *Minimal_dialog)
 {
 	
-  
+	Minimal_dialog->reconnect();
  Minimal_dialog->show();
 }

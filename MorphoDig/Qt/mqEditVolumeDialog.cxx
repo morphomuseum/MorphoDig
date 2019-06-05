@@ -25,6 +25,7 @@
 //#include <GL/glew.h>
 #include <QApplication>
 #include <QFile>
+#include <QDialog>
 #include <QRadioButton>
 #include <QFileDialog>
 #include <QAction>
@@ -279,7 +280,17 @@ mqEditVolumeDialog::~mqEditVolumeDialog()
 	
   delete this->Ui;
 }
-
+void mqEditVolumeDialog::reject()
+{
+	/*cout << "reject!!!"<< endl;
+	this->accept();
+	this->hide();*/
+	/*setResult(QDialog::Accepted);//modification de la valeur de result
+	emit accepted();//signal accepted()
+	emit finished(result());//signal finished() avec le résultat en paramètre
+	hide();*///cache la fenêtre
+	//this->done(QDialog::Accepted);
+}
 int mqEditVolumeDialog::SomeThingHasChanged()
 {
 	int something_has_changed = 0;
