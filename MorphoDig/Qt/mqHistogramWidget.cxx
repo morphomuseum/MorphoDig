@@ -157,6 +157,9 @@ public:
 	  if (hist !=NULL)
 	  {
 		  cout << "Start Histogram reinit" << endl;
+		  cout << "dMin = " << dMin << endl;
+		  cout << "dMax = " << dMax << endl;
+
 		  this->Hist = hist;
 		 // this->Hist->Update();
 		  
@@ -176,7 +179,7 @@ public:
 		 //cout << "numbins = " << numbins << endl;
 		 // cout << "min = " << min << endl;
 		 // cout << "max = " << max << endl;
-		//  cout << "bin_spacing = " << bin_spacing << endl;
+		  cout << "bin_spacing = " << bin_spacing << endl;
 		  hist->SetComponentOrigin(min, 0, 0);		  
 		  hist->SetComponentSpacing(bin_spacing, 0, 0);
 		 // cout << "I guess this is mostly the update call..." << endl;
@@ -189,14 +192,18 @@ public:
 		  bins->SetNumberOfTuples(numbins);
 		  bins->SetName("Bins");
 		 
+		  cout << "Start Display MinA" << endl;
 		  vtkSmartPointer<vtkIntArray> displayMinA =
 			  vtkSmartPointer<vtkIntArray>::New();
+		  displayMinA->SetNumberOfComponents(1);
 		  displayMinA->SetNumberOfTuples(numbins);
-
+		  displayMinA->SetName("DisplayMin");
 		  vtkSmartPointer<vtkIntArray> displayMaxA =
 			  vtkSmartPointer<vtkIntArray>::New();
 		  displayMaxA->SetNumberOfTuples(numbins);
-
+		  displayMaxA->SetNumberOfComponents(1);
+		  displayMaxA->SetName("DisplayMax");
+		  
 		  vtkSmartPointer<vtkIntArray> frequencies =
 			  vtkSmartPointer<vtkIntArray>::New();
 
@@ -220,6 +227,7 @@ public:
 		  int aboveDMin = 0;
 		  int aboveDMax = 0;
 		  //First pass to have extent.
+		  cout << "Start loop to find maxlogbin and maxbin" << endl;
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
 
@@ -246,16 +254,20 @@ public:
 			  
 
 		  }
-		  //cout << "maxbin=" << maxbin << endl;
-		  //cout << "maxlogbin=" << maxlogbin << endl;
+		  cout << "maxbin=" << maxbin << endl;
+		  cout << "maxlogbin=" << maxlogbin << endl;
 		  //Second pass to "normalize".
+		  cout << "Start second loop to populate int arrays" << endl;
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
 			
 			  bins->SetTuple1(bin, mbin);
-			  if (mbin >= dMin && aboveDMin == 0) { aboveDMin = 1;   displayMinA->SetTuple1(bin, maxbin); }else{ displayMinA->SetTuple1(bin, 0); }
-			  if (mbin >= dMax && aboveDMax == 0) { aboveDMax = 1;   displayMaxA->SetTuple1(bin, maxbin); }else { displayMaxA->SetTuple1(bin, 0); }
+			  if (mbin >= dMin && aboveDMin == 0) { aboveDMin = 1;   displayMinA->SetTuple1(bin, maxlogbin); }
+			  else{ displayMinA->SetTuple1(bin, 0); }
+			  if (mbin >= dMax && aboveDMax == 0) { aboveDMax = 1;   displayMaxA->SetTuple1(bin, maxlogbin); }
+			  else { displayMaxA->SetTuple1(bin, 0); }
 			  
+
 
 			  mbin += spacing;
 			 // cout << "bin =" << bin << ", retrieving curbin"  << endl;
@@ -299,6 +311,7 @@ public:
 			  logfrequencies->SetTuple1(bin, reslogcurbin);
 		  }
 
+		  cout << "Instantiate tables" << endl;
 		  vtkSmartPointer<vtkTable> table =
 			  vtkSmartPointer<vtkTable>::New();
 		 table->AddColumn(bins);
@@ -308,9 +321,21 @@ public:
 		  vtkSmartPointer<vtkTable> table2 =
 			  vtkSmartPointer<vtkTable>::New();
 		  table2->AddColumn(bins);
-		  table2->AddColumn(frequencies);
+		  table2->AddColumn(frequencies);		 
 		  table2->AddColumn(logfrequencies);
+		  table2->AddColumn(displayMinA);
+		  table2->AddColumn(displayMaxA);
 		  
+		  /*vtkSmartPointer<vtkTable> table3 =
+			  vtkSmartPointer<vtkTable>::New();
+		  table3->AddColumn(bins);
+		  table3->AddColumn(displayMinA);
+		  vtkSmartPointer<vtkTable> table4 =
+			  vtkSmartPointer<vtkTable>::New();
+		  table4->AddColumn(bins);
+		  table4->AddColumn(displayMaxA);*/
+
+
 		  //vtkPlot * line = this->ChartXY->AddPlot(vtkChart::BAR);
 		  //vtkPlotBar * line2 = vtkPlotBar::SafeDownCast(this->ChartXY->AddPlot(vtkChart::BAR));
 		  //vtkPlot * line2 = this->ChartXY->AddPlot(vtkChart::BAR);
@@ -322,12 +347,41 @@ public:
 		  //cout << "line2: class name:" << line2->GetClassName() << endl;
 		  line2->SetInputArray(1, "Frequencies");
 		  line2->SetInputArray(2, "Logs");
+		  line2->SetInputArray(3, "Min");
+		  line2->SetInputArray(4, "Max");
+
+		  
 
 		  vtkSmartPointer<vtkColorSeries> colorSeries =
 			  vtkSmartPointer<vtkColorSeries>::New();
 		  //colorSeries->
 		  colorSeries->SetColorScheme(vtkColorSeries::BREWER_QUALITATIVE_PASTEL1);
 		  line2->SetColorSeries(colorSeries);
+		  /*vtkPlotStacked * lineMin = vtkPlotStacked::SafeDownCast(this->ChartXY->AddPlot(vtkChart::STACKED));
+		  lineMin->SetInputArray(1, "Min");
+		  lineMin->SetInputData(table3, 0, 1);
+		  lineMin->GetXAxis()->SetTitle("Bin");
+
+		  vtkTextProperty *textPropMin = lineMin->GetXAxis()->GetLabelProperties();
+		  //textPropMin->SetColor(0.0, 0.0, 1.0);
+		  textPropMin = lineMin->GetXAxis()->GetTitleProperties();
+		  
+		  lineMin->GetYAxis()->SetTitle("Count");
+		  lineMin->SetColor(1.0, 0.0, 0.0);
+
+
+		  vtkPlotStacked * lineMax = vtkPlotStacked::SafeDownCast(this->ChartXY->AddPlot(vtkChart::STACKED));
+		  lineMin->SetInputArray(1, "Max");
+		  lineMin->SetInputData(table4, 0, 1);
+		  lineMin->GetXAxis()->SetTitle("Bin");
+
+		  vtkTextProperty *textPropMax = lineMin->GetXAxis()->GetLabelProperties();
+		  //textPropMin->SetColor(0.0, 0.0, 1.0);
+		  textPropMax = lineMax->GetXAxis()->GetTitleProperties();
+
+		  lineMax->GetYAxis()->SetTitle("Count");
+		  lineMax->SetColor(0.0, 1.0, 0.0);
+		  */
 
 
 		 /* line->SetInputData(table, 0, 1);
