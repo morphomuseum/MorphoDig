@@ -534,7 +534,7 @@ void mqColorOpacityEditorWidget::UpdateHistogram()
 		this->HIST->Update();
 		this->Internals->Ui.Histogram->initialize(this->HIST);*/
 
-		this->Internals->Ui.Histogram->SetMinMax(this->ctfMin, this->ctfMax);
+		this->Internals->Ui.Histogram->SetDisplayMinMax(this->ctfMin, this->ctfMax);
 	}
 	else
 	{
