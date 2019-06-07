@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>444</height>
+    <width>393</width>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -335,6 +335,45 @@
         <widget class="QDoubleSpinBox" name="currentMax">
          <property name="decimals">
           <number>6</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="HLayoutHistogram">
+       <item>
+        <widget class="QLabel" name="labPlotMin">
+         <property name="text">
+          <string>Plotted min:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="plottedMin">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labPlotMax">
+         <property name="text">
+          <string>Plotted max:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="plottedMax">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="resetHisto">
+         <property name="text">
+          <string>reset</string>
          </property>
         </widget>
        </item>

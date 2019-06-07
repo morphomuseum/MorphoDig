@@ -123,6 +123,7 @@ public:
     this->ChartXY->SetActionToButton(vtkChart::SELECT_POLYGON, -1);
 	this->ChartXY->SetZoomWithMouseWheel(false);	
 	this->ChartXY->SetAutoSize(true);
+
 	this->ChartXY->SetForceAxesToBounds(true);
 	this->ChartXY->SetShowLegend(false);
 	
@@ -184,7 +185,13 @@ public:
 
 	  lineMinMax->GetYAxis()->SetTitle("MinMax");
 	  lineMinMax->SetColor(1.0, 0.0, 0.0);
+	  //cout << "New Y range:" << 0 << "; " << this->maxbin << endl;
+	  this->ChartXY->GetAxis(1)->SetRange(0, this->maxbin);
+	  //this->ChartXY->SetAutoAxes(true);
+	  this->ChartXY->SetAutoSize(true);
+	  this->ChartXY->ForceAxesToBoundsOn();
 
+	  
   }
 
   void reinitDisplayMinMax(double min, double max)
@@ -192,7 +199,7 @@ public:
 	  this->cleanup();
 	  double dMin = min;
 	  double dMax = max;
-	  cout << "Reinit min and max to " << min << " and " << max << endl;
+	  //cout << "Reinit min and max to " << min << " and " << max << endl;
 	  int numbins = bins->GetNumberOfTuples();
 	  double spacing = this->Hist->GetComponentSpacing()[0];
 	  double mbin = this->Hist->GetComponentOrigin()[0];
@@ -201,9 +208,15 @@ public:
 	  for (vtkIdType bin = 0; bin < numbins; bin++)
 	  {
 		  int ok = 1;		 
-		  if (mbin >= dMin && aboveDMin < 1) { aboveDMin++;   this->displayMinMax->SetTuple1(bin, maxbin); }
+		  if (mbin >= dMin && aboveDMin < 1) { aboveDMin++;   
+		  //this->displayMinMax->SetTuple1(bin, this->maxbin); 
+		  this->displayMinMax->SetTuple1(bin, 1000);
+		  
+		  }
 		  else if (mbin >= dMax && aboveDMax < 1) {
-			  aboveDMax++;   this->displayMinMax->SetTuple1(bin, maxbin);
+			  aboveDMax++;   
+			  //this->displayMinMax->SetTuple1(bin, this->maxbin);
+			  this->displayMinMax->SetTuple1(bin, 1000);
 		  }
 		  else { this->displayMinMax->SetTuple1(bin, 0); }
 		  mbin += spacing;
@@ -230,14 +243,15 @@ public:
 	  if (displayMax <max || displayMax <min) { dMax = 0.66*(max - min); }
 
 	  this->cleanup();	  
+	  
 	  if (hist !=NULL)
 	  {
-		  cout << "Start Histogram reinit" << endl;
-		  cout << "dMin = " << dMin << endl;
-		  cout << "dMax = " << dMax << endl;
+		 // cout << "Start Histogram reinit" << endl;
+		//  cout << "dMin = " << dMin << endl;
+		//  cout << "dMax = " << dMax << endl;
 
 		  this->Hist = hist;
-		 // this->Hist->Update();
+		  this->Hist->Update();
 		  
 		  double bin_spacing = 0;
 		 // bin_spacing =this->Hist->GetComponentSpacing()[0];
@@ -255,7 +269,7 @@ public:
 		 //cout << "numbins = " << numbins << endl;
 		 // cout << "min = " << min << endl;
 		 // cout << "max = " << max << endl;
-		  cout << "bin_spacing = " << bin_spacing << endl;
+		  //cout << "bin_spacing = " << bin_spacing << endl;
 		  hist->SetComponentOrigin(min, 0, 0);		  
 		  hist->SetComponentSpacing(bin_spacing, 0, 0);
 		 // cout << "I guess this is mostly the update call..." << endl;
@@ -267,7 +281,7 @@ public:
 		  this->bins->SetNumberOfTuples(numbins);
 		  this->bins->SetName("Bins");
 		 
-		  cout << "Start Display MinA" << endl;
+		//  cout << "Start Display MinA" << endl;
 		  //this->displayMinMax->remove =  vtkSmartPointer<vtkIntArray>::New();
 		  this->displayMinMax->SetNumberOfComponents(1);
 		  this->displayMinMax->SetNumberOfTuples(numbins);
@@ -295,7 +309,7 @@ public:
 		  int aboveDMin = 0;
 		  int aboveDMax = 0;
 		  //First pass to have extent.
-		  cout << "Start loop to find maxlogbin and maxbin" << endl;
+		 // cout << "Start loop to find maxlogbin and maxbin" << endl;
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {			  			  
 			   //cout << "bin =" << bin << ", retrieving curbin"  << endl;
@@ -319,16 +333,24 @@ public:
 			  
 
 		  }
-		  cout << "this->maxbin=" << this->maxbin << endl;
-		  cout << "maxlogbin=" << maxlogbin << endl;
+		 // cout << "this->maxbin=" << this->maxbin << endl;
+		//  cout << "maxlogbin=" << maxlogbin << endl;
 		  //Second pass to "normalize".
-		  cout << "Start second loop to populate int arrays" << endl;
+		 // cout << "Start second loop to populate int arrays" << endl;
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {
 			  int ok = 1;
 			  bins->SetTuple1(bin, bin);//bins->SetTuple1(bin, mbin);
-			  if (mbin >= dMin && aboveDMin < 1) { aboveDMin++;   this->displayMinMax->SetTuple1(bin, this->maxbin);  }
-			  else if (mbin >= dMax && aboveDMax < 1) { aboveDMax++;   this->displayMinMax->SetTuple1(bin, this->maxbin );
+			  if (mbin >= dMin && aboveDMin < 1) { 
+				  aboveDMin++;   
+				  //this->displayMinMax->SetTuple1(bin, this->maxbin); 
+				  this->displayMinMax->SetTuple1(bin, 1000);
+				//  cout << "Display Min (" << bin << "):" << this->maxbin<< endl;
+			  }
+			  else if (mbin >= dMax && aboveDMax < 1) { aboveDMax++;   
+			  //this->displayMinMax->SetTuple1(bin, this->maxbin );
+			  this->displayMinMax->SetTuple1(bin, 1000);
+		//	  cout << "Display Max (" << bin << "):" << this->maxbin << endl;
 			  }
 			  else { this->displayMinMax->SetTuple1(bin, 0); }
 			  
@@ -337,20 +359,26 @@ public:
 			  mbin += spacing;
 			 // cout << "bin =" << bin << ", retrieving curbin"  << endl;
 			  int curbin = 0;
+			  int frequency = 0; // 0... 1000
 			  int logcurbin = 0;
+			  int logfrequency = 0;
 			  int reslogcurbin = 0;
+			  int reslogfrequency = 0; //0 ... 1000
 			  //curbin =*output++;
 			  if (this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0) != NULL)
 			  {
 				  curbin = *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
-				  
+				  frequency =(int)( 1000 * (double)curbin / (double)this->maxbin);
 				  if (curbin > 0) {
 					  logcurbin = 100 * log10(curbin);
 					  if (maxlogbin > 0)
 					  {
 						  double mult = (double)logcurbin * (double)this->maxbin;
 						  double multdiv = mult / maxlogbin;
-						  logcurbin = (int)(multdiv);
+						  //logcurbin = (int)(multdiv);
+						  
+						  logfrequency = (int)((double)1000 *(double)logcurbin/(double)maxlogbin);
+						  
 					  }
 				  }
 				  //cout << "logcurbin=" << logcurbin << "curbin" << curbin << endl;
@@ -369,20 +397,35 @@ public:
 			  }
 			  if (ok == 1)
 			  {
-				  this->frequencies->SetTuple1(bin, curbin);
+				  this->frequencies->SetTuple1(bin, frequency);
+				  //this->frequencies->SetTuple1(bin, curbin);
+				 // cout << "Frequency " << bin << ":" << curbin << endl;
 			  }
 			  else
 			  {
 				  this->frequencies->SetTuple1(bin, 0);
 			  }
-			 
+			 if (logfrequency>frequency)
+			 {
+				 reslogfrequency = logfrequency - frequency;
+			 }
+			  
+
 			  if ((logcurbin - curbin) > 0) {
 				  reslogcurbin = logcurbin - curbin;
+				  
+			
+				  
 			  }
 			  //logfrequencies->SetTuple1(bin, logcurbin);
 			  if (ok == 1)
 			  {
-				  this->logfrequencies->SetTuple1(bin, reslogcurbin);
+				  //this->logfrequencies->SetTuple1(bin, reslogcurbin);
+				  this->logfrequencies->SetTuple1(bin, reslogfrequency);
+				  //cout << "Frequency(" << bin << "):" << curbin << "ResLog(" << bin << "):" << reslogcurbin << endl;
+				  //cout << "Frequency(" << bin << "):" << curbin+ reslogcurbin  << endl;
+				  //cout << "Frequency(" << bin << "):" << curbin + reslogcurbin << endl;
+				  //cout << "frequency("<<bin<<")=" << frequency << ", logfrequency = " << logfrequency << ", reslogfrequency =" << reslogfrequency << endl;
 			  }
 			  else
 			  {
@@ -390,14 +433,14 @@ public:
 			  }
 		  }
 
-		
+		 this->ChartXY->GetAxis(1)->SetRange(0, this->maxbin);
 		this->drawAgain();
 		  
 
-
+		
 		  		 		  
 		
-		  cout << "End Histogram reinit" << endl;
+		 // cout << "End Histogram reinit" << endl;
 
 	  }
 
@@ -430,18 +473,13 @@ mqHistogramWidget::~mqHistogramWidget()
   this->Internals = NULL;
 }
 
-//int mqHistogramWidget::GetNumBins() { return this->numBins; }
-/*void mqHistogramWidget::SetNumBins(int num_bins) { this->numBins = num_bins; 
-this->Internals->reinit( this->mHist, this->numBins, this->min, this->max);
 
-};*/
 double mqHistogramWidget::GetDisplayMin() { return this->displayMin; }
 void mqHistogramWidget::SetDisplayMin(double newmin) 
 { 
 	if (newmin < this->displayMax) 
 	{ 
-		this->displayMin = newmin; 
-	//this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+		this->displayMin = newmin; 	
 	this->Internals->reinitDisplayMinMax(this->displayMin, this->displayMax);
 	}
 
@@ -454,8 +492,7 @@ void mqHistogramWidget::SetDisplayMax(double newmax)
 {
 	if (newmax > this->displayMin)
 	{
-		this->displayMax = newmax; 
-		//this->Internals->reinit(this->mHist, this->numBins, this->min, this->max);
+		this->displayMax = newmax; 		
 		this->Internals->reinitDisplayMinMax(this->displayMin, this->displayMax);
 	}
 }
@@ -472,7 +509,7 @@ void mqHistogramWidget::SetDisplayMinMax(double newmin, double newmax)
 void mqHistogramWidget::initialize(
 	vtkImageAccumulate* hist, int numbins, double rangeMin, double rangeMax, double displayMin, double displayMax)
 {
-	cout << "mqHistogramWidget Initialize " << endl;
+	//cout << "mqHistogramWidget Initialize " << endl;
   //this->Internals->cleanup();
   this->mHist = hist;
   this->displayMin = displayMin;

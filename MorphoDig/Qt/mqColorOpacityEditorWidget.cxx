@@ -102,6 +102,8 @@ public:
 	
 	this->Ui.currentMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui.currentMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui.plottedMin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui.plottedMax->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
 	this->Ui.currentMin->setMinimum(-DBL_MAX);
 	this->Ui.currentMax->setMinimum(-DBL_MAX);
@@ -110,6 +112,13 @@ public:
 	this->Ui.currentMin->setMaximum(DBL_MAX);
 	this->Ui.currentMax->setMaximum(DBL_MAX);
 	
+	this->Ui.plottedMin->setMinimum(-DBL_MAX);
+	this->Ui.plottedMax->setMinimum(-DBL_MAX);
+	this->Ui.plottedMax->setValue(1);
+	this->Ui.plottedMin->setValue(0);
+	this->Ui.plottedMin->setMaximum(DBL_MAX);
+	this->Ui.plottedMax->setMaximum(DBL_MAX);
+
 	cout << "mqInternals instantiation : done" << endl;
 
   }
@@ -122,10 +131,47 @@ public:
   }
 };
 
+void mqColorOpacityEditorWidget::slotResetHistogram()
+{
+	if (this->HIST != NULL)
+	{
+		this->reInitializeHIST(this->HIST, 255,  this->initRangeMin, this->initRangeMax, this->ctfMin, this->ctfMax);
+		cout << "reInitializeHIST" << ", 255, " << this->initRangeMin << ", " << this->initRangeMax << ", " << this->ctfMin<< ", " << this->ctfMax << endl;
+	}
+}
+void mqColorOpacityEditorWidget::slotPlottedMinEdited()
+{
+	if (this->HIST != NULL && this->Internals->Ui.plottedMin->value() < this->Internals->Ui.plottedMax->value())
+	{
+
+		this->reInitializeHIST(this->HIST, 255, this->Internals->Ui.plottedMin->value(), this->Internals->Ui.plottedMax->value(), this->ctfMin, this->ctfMax);
+		cout << "reInitializeHIST" << ", 255, " << this->Internals->Ui.plottedMin->value() << ", " << this->Internals->Ui.plottedMax->value() << ", " << this->ctfMin << ", " << this->ctfMax << endl;
+	}
+}
+void mqColorOpacityEditorWidget::slotPlottedMaxEdited()
+{
+	if (this->HIST != NULL && this->Internals->Ui.plottedMin->value() < this->Internals->Ui.plottedMax->value())
+	{
+
+		this->reInitializeHIST(this->HIST, 255, this->Internals->Ui.plottedMin->value(), this->Internals->Ui.plottedMax->value(), this->ctfMin, this->ctfMax);
+		cout << "reInitializeHIST" << ", 255, " << this->Internals->Ui.plottedMin->value() << ", " << this->Internals->Ui.plottedMax->value() << ", " << this->ctfMin << ", " << this->ctfMax << endl;
+	}
+}
 //void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, vtkImageData *data)
+void mqColorOpacityEditorWidget::setInitHistRangeMinMax(double RangeMin, double RangeMax)
+{
+	this->initRangeMin = RangeMin;
+	this->initRangeMax = RangeMax;
+}
+
 void mqColorOpacityEditorWidget::reInitializeHIST(vtkImageAccumulate *hist, int numbins, double rangeMin, double rangeMax, double displayMin, double displayMax)
 {
 	this->HIST = hist;
+	if (rangeMin< rangeMax)
+	{
+		this->Internals->Ui.plottedMin->setValue(rangeMin);
+		this->Internals->Ui.plottedMax->setValue(rangeMax);
+	}
 	this->Internals->Ui.Histogram->initialize(hist, numbins, rangeMin, rangeMax, displayMin, displayMax);
 
 	this->UpdateHistogram();
@@ -157,6 +203,13 @@ void mqColorOpacityEditorWidget::reInitialize(vtkDiscretizableColorTransferFunct
 		{
 			this->UpdateLookupTableRange();
 		}
+
+		/*if (this->_mapSurfaces == 0 && this->HIST!=NULL)
+		{
+			this->Internals->Ui.plottedMin->setValue(this->HIST->GetComponentExtent()[0]);
+			this->Internals->Ui.plottedMax->setValue(this-> this->HIST->GetComponentExtent()[1]);
+		}
+		*/
 		cout << "reinitialize: min=" << this->ctfMin << endl;
 		cout << "reinitialize: max=" << this->ctfMax << endl;
 		
@@ -198,7 +251,14 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   this->STC = stc;
   this->_mapSurfaces = mapSurfaces;
 
-  if (mapSurfaces == 1) { this->Internals->Ui.Histogram->setVisible(false); }
+  if (mapSurfaces == 1) { 
+	  this->Internals->Ui.Histogram->setVisible(false); 
+	  this->Internals->Ui.plottedMin->setVisible(false);
+	  this->Internals->Ui.plottedMax->setVisible(false);
+	  this->Internals->Ui.resetHisto->setVisible(false);
+	  this->Internals->Ui.labPlotMax->setVisible(false);
+	  this->Internals->Ui.labPlotMin->setVisible(false);
+  }
   if (stc!=NULL)
   {
 	  cout << "Initialize ColorEditor widget. " << endl;
@@ -259,11 +319,14 @@ mqColorOpacityEditorWidget::mqColorOpacityEditorWidget(
   QObject::connect(ui.sliderShift, SIGNAL(valueChanged(int)), this, SLOT(slotShiftSlider(int)));
   QObject::connect(ui.sliderShift, SIGNAL(sliderPressed()), this, SLOT(slotSliderStart()));
   QObject::connect(ui.sliderShift, SIGNAL(sliderReleased()), this, SLOT(slotSliderStop()));
-  
+  QObject::connect(ui.resetHisto, SIGNAL(pressed()), this, SLOT(slotResetHistogram()));
 
 
   QObject::connect(ui.currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinEdited()));
   QObject::connect(ui.currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMaxEdited()));
+  QObject::connect(ui.plottedMin, SIGNAL(editingFinished()), this, SLOT(slotPlottedMinEdited()));
+  QObject::connect(ui.plottedMax, SIGNAL(editingFinished()), this, SLOT(slotPlottedMaxEdited()));
+
   
   
 
@@ -528,11 +591,7 @@ void mqColorOpacityEditorWidget::UpdateHistogram()
 {
 	if (this->HIST != NULL)
 	{
-		/*this->HIST->SetComponentOrigin(this->ctfMin, 0, 0);
-		double bin_spacing = (double)(this->ctfMax - this->ctfMin) / 10;
-		this->HIST->SetComponentSpacing(bin_spacing, 0, 0);
-		this->HIST->Update();
-		this->Internals->Ui.Histogram->initialize(this->HIST);*/
+		
 
 		this->Internals->Ui.Histogram->SetDisplayMinMax(this->ctfMin, this->ctfMax);
 	}

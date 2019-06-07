@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
+    <width>868</width>
     <height>544</height>
    </rect>
   </property>
@@ -460,7 +460,7 @@
     <rect>
      <x>320</x>
      <y>510</y>
-     <width>151</width>
+     <width>158</width>
      <height>31</height>
     </rect>
    </property>
@@ -482,7 +482,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>821</width>
+     <width>851</width>
      <height>491</height>
     </rect>
    </property>
@@ -750,10 +750,10 @@
    <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>20</y>
-      <width>334</width>
-      <height>444</height>
+      <x>450</x>
+      <y>10</y>
+      <width>393</width>
+      <height>471</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -770,8 +770,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>334</width>
-       <height>444</height>
+       <width>393</width>
+       <height>471</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
@@ -1094,7 +1094,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>400</x>
+      <x>390</x>
       <y>180</y>
       <width>25</width>
       <height>19</height>
@@ -1118,7 +1118,7 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>380</x>
       <y>150</y>
       <width>71</width>
       <height>16</height>
@@ -1131,7 +1131,7 @@
    <widget class="QCheckBox" name="enableROI">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>370</x>
       <y>130</y>
       <width>91</width>
       <height>17</height>

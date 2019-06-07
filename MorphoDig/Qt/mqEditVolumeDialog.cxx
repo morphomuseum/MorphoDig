@@ -834,8 +834,9 @@ void mqEditVolumeDialog::UpdateUI()
 		//this->mColorMap->setMinMax(this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());
 		this->mColorMap->reInitialize(this->Volume->GetCtf());
 		//this->mColorMap->reInitializeHIST(this->Volume->GetHist(), this->Volume->GetImageData());
-		
+		this->mColorMap->setInitHistRangeMinMax(this->Volume->GetRangeMin(), this->Volume->GetRangeMax());
 		this->mColorMap->reInitializeHIST(this->Volume->GetHist(), 255, this->Volume->GetRangeMin(), this->Volume->GetRangeMax(), this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());
+		cout << "reInitializeHIST" << ", 255, " << this->Volume->GetRangeMin() << ", " << this->Volume->GetRangeMax() << ", " << this->Volume->GetScalarDisplayMin() << ", " << this->Volume->GetScalarDisplayMax() << endl;
 		if (this->Volume->GetProperty()->GetInterpolationType() == VTK_LINEAR_INTERPOLATION)
 		{
 			this->Ui->interpolationToLinear->setChecked(true);

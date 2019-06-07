@@ -58,6 +58,7 @@ public:
   void reInitialize(vtkDiscretizableColorTransferFunction *stc, int keepMinMax=0);
   //void reInitializeHIST(vtkImageAccumulate *hist, vtkImageData *data);
   void reInitializeHIST(vtkImageAccumulate *hist, int numbins, double rangeMin, double rangeMax, double displayMin, double displayMax);
+  void setInitHistRangeMinMax(double RangeMin, double RangeMax);
   /**
   * Returns the current list of control points for the color transfer
   * function. This a list of 4-tuples.
@@ -91,7 +92,7 @@ public slots:
   * Sets the xrgbPoints that control the color transfer function.
   */
   void setXrgbPoints(const QList<QVariant>&);
-
+  
   
   /**
   * Reset the transfer function ranges to active data source.
@@ -149,6 +150,9 @@ protected slots:
   virtual void slotSlideMax(int slideMax);
   virtual void slotSliderStop();
   virtual void slotExportCTF();
+  virtual void slotResetHistogram();
+  virtual void slotPlottedMinEdited();
+  virtual void slotPlottedMaxEdited();
 
   /**
   * updates the panel to show/hide advanced settings
@@ -189,6 +193,9 @@ private:
 	double slideMax;
 	double ctfMin;
 	double ctfMax;
+	double initRangeMin;
+	double initRangeMax;
+
   class mqInternals;
   mqInternals* Internals;
 };
