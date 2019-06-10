@@ -102,22 +102,6 @@ void vtkMDActor::SetisVisible(int visible)
 
 }
 
-void vtkMDActor::SetdisplayROI(int disp)
-{
-	if (this->Box != NULL)
-	{
-		if (disp == 0) {
-
-			this->displayROI = 0;
-			this->Box->SetEnabled(false);
-		}
-		else
-		{
-			this->displayROI = 1;
-			this->Box->SetEnabled(true);
-		}
-	}
-}
 vtkSmartPointer<vtkFloatArray> vtkMDActor::GetCellNormals()
 {
 	return this->cellNormals;
@@ -715,6 +699,58 @@ void vtkMDActor::SetSelected(int selected)
 		//this->SetBackfaceProperty
 		//this->GetBackfaceProperty()->SetColor(0.0, 0.0, 1.0);
 		//this->GetBackfaceProperty()->SetOpacity(1);
+	}
+}
+
+void vtkMDActor::SetdisplayROI(int disp)
+{
+	if (this->Box != NULL)
+	{
+		if (disp == 0) {
+
+			this->displayROI = 0;
+			this->Box->SetEnabled(false);
+		}
+		else
+		{
+			this->displayROI = 1;
+			this->Box->SetEnabled(true);
+		}
+		double mBoxCenter[3] = { 0,0,0 };
+
+		this->GetBoxCenter(mBoxCenter);
+		cout << "Box center:" << mBoxCenter[0] << "," << mBoxCenter[1] << "," << mBoxCenter[2] << endl;
+		double mBoxPlanes[6] = { 0,0,0,0,0,0 };
+
+		this->GetBoxPlanes(mBoxPlanes);
+		cout << "Box planes:" << mBoxPlanes[0] << "," << mBoxPlanes[1] << "," << mBoxPlanes[2] << "," << mBoxPlanes[3] << "," << mBoxPlanes[4] << "," << mBoxPlanes[5] << endl;
+	}
+}
+void vtkMDActor::GetBoxCenter(double boxCenter[3])
+{
+	vtkTransform *t = vtkTransform::New();
+	
+	this->Box->GetTransform(t);
+	vtkSmartPointer<vtkMatrix4x4> Mat = t->GetMatrix();
+	double cx = Mat->GetElement(0, 3);
+	double cy = Mat->GetElement(1, 3);
+	double cz = Mat->GetElement(2, 3);
+	boxCenter[0] = cx;
+	boxCenter[1] = cy;
+	boxCenter[2] = cz;
+}
+void vtkMDActor::GetBoxPlanes(double boxPlanes[6])
+{
+	double boxCenter[3] = { 0,0,0 };
+	this->GetBoxCenter(boxCenter);
+	vtkPlanes *p = vtkPlanes::New();
+	this->Box->GetPlanes(p);
+	for (vtkIdType i = 0; i < p->GetNumberOfPlanes(); i++)
+	{
+
+		vtkPlane *plane = p->GetPlane(i);
+		double origin[3] = { 0,0,0 };
+		plane->GetOrigin(origin);
 	}
 }
 void vtkMDActor::CreateBox()
