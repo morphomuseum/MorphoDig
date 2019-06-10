@@ -751,7 +751,7 @@ void vtkMDActor::GetBoxPlanes(double boxPlanes[6])
 		vtkPlane *plane = p->GetPlane(i);
 		double origin[3] = { 0,0,0 };
 		plane->GetOrigin(origin);
-		cout << "Plane " << i << ":";
+		cout << "Plane " << i << ":" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
 	}
 }
 void vtkMDActor::CreateBox()
