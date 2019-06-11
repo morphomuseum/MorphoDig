@@ -340,7 +340,24 @@ void mqEditVolumeDialog::slotRefreshUi()
 	this->UpdateUI();
 }
 
+void mqEditVolumeDialog::slotdisplayROIPressed()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		if (this->Ui->displayROI->isChecked())
+			//if (this->Volume->GetdisplayROI() == 0)
+		{
+			this->Volume->SetdisplayROI(0);
+		}
+		else
+		{
 
+			this->Volume->SetdisplayROI(1);
+
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotEnableROIClicked(bool isChecked)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
@@ -349,14 +366,14 @@ void mqEditVolumeDialog::slotEnableROIClicked(bool isChecked)
 			//if (this->Volume->GetdisplayROI() == 0)
 		{
 			cout << "Call volume create box function" << endl;
-			this->Volume->CreateBox();
+			this->Volume->SetenableROI(true);			
 			this->Ui->displayROI->setEnabled(true);
 		}
 		else
 		{
 			cout << "Call volume remove box function" << endl;
 
-			this->Volume->RemoveBox();
+			this->Volume->SetenableROI(false);
 			this->Ui->displayROI->setEnabled(false);
 			this->Ui->displayROI->setChecked(false);
 
@@ -384,24 +401,7 @@ void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 		mqMorphoDigCore::instance()->Render();
 	}
 }
-void mqEditVolumeDialog::slotdisplayROIPressed()
-{
-	if (this->Volume != NULL &&  this->CurrentVolumeInCollection()&&this->Volume->GetSelected() == 1)
-	{
-		if (this->Ui->displayROI->isChecked())
-		//if (this->Volume->GetdisplayROI() == 0)
-		{
-			this->Volume->SetdisplayROI(0);
-		}
-		else
-		{
-			
-				this->Volume->SetdisplayROI(1);
-			
-		}
-		mqMorphoDigCore::instance()->Render();
-	}
-}
+
 void mqEditVolumeDialog::slotRefreshSuggestedRange()
 {
 	this->RefreshSuggestedRange();
@@ -757,12 +757,20 @@ void mqEditVolumeDialog::UpdateUI()
 
 		if (this->Volume->GetdisplayROI() == 1)
 		{
-
+			
 			this->Ui->displayROI->setChecked(true);
 		}
 		else
 		{
 			this->Ui->displayROI->setChecked(false);
+		}
+		if (this->Volume->GetenableROI() == 1)
+		{
+			this->Ui->enableROI->setChecked(true);
+		}
+		else
+		{
+			this->Ui->enableROI->setChecked(false);
 		}
 
 		

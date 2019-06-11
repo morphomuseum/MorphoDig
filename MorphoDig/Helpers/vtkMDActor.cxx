@@ -44,7 +44,8 @@ vtkMDActor::vtkMDActor()
 		vtkSmartPointer<vtkProperty>::New();
 	//backFaces->SetDiffuseColor(.8, .8, .8);
 	backFaces->SetColor(.7, .7, .7);
-
+	this->displayROI = 0;
+	this->enableROI = 0;
 	backFaces->SetOpacity(0.5);
 	this->isVisible = 1;
 	this->pointNormals = nullptr;
@@ -87,7 +88,10 @@ void vtkMDActor::SetisVisible(int visible)
 		if (this->GetMapper() != NULL)
 		{
 			mqMorphoDigCore::instance()->getRenderer()->AddActor(this);			
-			if (this->displayROI == 1 && this->Box != NULL) { this->Box->SetEnabled(true); }
+			if (this->displayROI == 1 && this->Box != NULL) { 
+				//cout << "Make box visible anyway!" << endl;
+				this->Box->SetEnabled(true); 
+			}
 		}
 	}
 	else
@@ -646,7 +650,10 @@ void vtkMDActor::SetSelected(int selected)
 		if (this->GetMapper() != NULL)
 		{
 			vtkPolyDataMapper::SafeDownCast(this->GetMapper())->ScalarVisibilityOff();
-			if (this->displayROI == 1 && this->Box != NULL) { this->Box->SetEnabled(true); }
+			if (this->displayROI == 1 && this->Box != NULL) { 
+				this->Box->SetEnabled(true); 
+				//cout << "Make box visible from setSelected!" << endl;
+			}
 		}
 		//vtkPolyDataMapper::SafeDownCast(this->GetMapper())->ScalarVisibilityOff();
 		/*double opac = 0.75;
@@ -673,7 +680,9 @@ void vtkMDActor::SetSelected(int selected)
 	else
 	{
 		if (this->Box != NULL) {
-			this->Box->SetEnabled(false);
+			cout << "Try to disable the box" << endl;
+			//this->displayROI = 0;
+			this->Box->SetEnabled(false);			
 		}
 		if (this->GetMapper() != NULL && mqMorphoDigCore::instance()->Getmui_ArrayVisibility() == 1)
 		{
@@ -701,7 +710,22 @@ void vtkMDActor::SetSelected(int selected)
 		//this->GetBackfaceProperty()->SetOpacity(1);
 	}
 }
+void vtkMDActor::SetenableROI(int enable)
+{
+	if (this->Box != NULL)
+	{
+		if (enable == 0) {
 
+			this->enableROI = 0;
+			this->RemoveBox();
+		}
+		else
+		{
+			this->enableROI = 1;
+			this->CreateBox();
+		}
+	}
+}
 void vtkMDActor::SetdisplayROI(int disp)
 {
 	if (this->Box != NULL)
@@ -715,6 +739,7 @@ void vtkMDActor::SetdisplayROI(int disp)
 		{
 			this->displayROI = 1;
 			this->Box->SetEnabled(true);
+			//cout << "Make box visible from SetdisplayROI!" << endl;
 		}
 		double mBoxCenter[3] = { 0,0,0 };
 		

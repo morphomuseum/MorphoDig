@@ -105,6 +105,10 @@ public:
 	//	vtkSetMacro(displayROI, int);
 	vtkGetMacro(displayROI, int);
 
+	void SetenableROI(int enable);
+	//	vtkSetMacro(displayROI, int);
+	vtkGetMacro(enableROI, int);
+
 	//vtkSetVector4Macro(mColor, double);
 	vtkGetVector4Macro(mColor, double);
 	void SetmColor(double r, double g, double b, double a);
@@ -147,6 +151,7 @@ protected:
 	~vtkMDActor();
 	vtkSmartPointer<vtkBoxWidget> Box;
 	int displayROI;
+	int enableROI;
 	int isVisible;
 	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> cFilter;

@@ -96,6 +96,9 @@ public:
 	//	vtkSetMacro(displayROI, int);
 	vtkGetMacro(displayROI, int);
 	
+	void SetenableROI(int enable);
+	//	vtkSetMacro(displayROI, int);
+	vtkGetMacro(enableROI, int);
 
 	vtkSetMacro(Changed, int);
 	vtkGetMacro(Changed, int);
@@ -161,6 +164,7 @@ protected:
 	
 	int Selected;
 	int displayROI;
+	int enableROI;
 	int isVisible;
 	int Changed; // used by vtkMDVolumeCollectionUndoRedo class to recompute global center of mass and center of mass
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;

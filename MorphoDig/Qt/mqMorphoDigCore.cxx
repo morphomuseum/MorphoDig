@@ -20242,7 +20242,7 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 		vtkMDActor *actor = this->GetLastActor();
 		if (actor != NULL)
 		{
-			//actor->ApplyMatrix(Mat);
+			actor->SetdisplayROI(1);
 			actor->CreateBox();
 			actor->PlaceBox(BoxBounds);
 
@@ -20253,6 +20253,7 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 		vtkMDVolume *volume = this->GetLastVolume();
 		if (volume != NULL)
 		{
+			volume->SetdisplayROI(1);
 			volume->CreateBox();
 			volume->PlaceBox(BoxBounds);
 			
@@ -20268,6 +20269,7 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
+				myActor->SetdisplayROI(1);
 				myActor->CreateBox();
 				myActor->PlaceBox(BoxBounds);
 				
@@ -20279,6 +20281,7 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			if (myVolume->GetSelected() == 1)
 			{
+				myVolume->SetdisplayROI(1);
 				myVolume->CreateBox();
 				myVolume->PlaceBox(BoxBounds);
 			}
@@ -20482,8 +20485,8 @@ void mqMorphoDigCore::UnselectAll(int Count)
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
-			myActor->SetSelected(0);
-			myActor->SetisVisible(1);
+			myActor->SetisVisible(1);//make box visible
+			myActor->SetSelected(0);// now hide box!			
 			myActor->SetChanged(1);
 
 		}
@@ -20496,8 +20499,8 @@ void mqMorphoDigCore::UnselectAll(int Count)
 		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 		if (myVolume->GetSelected() == 1)
 		{
-			myVolume->SetSelected(0);
-			myVolume->SetisVisible(1);
+			myVolume->SetisVisible(1);//make box visible
+			myVolume->SetSelected(0);// hide box (what we want!)			
 			myVolume->SetChanged(1);
 
 		}
@@ -20574,6 +20577,8 @@ void mqMorphoDigCore::UnselectAll(int Count)
 		this->NodeLandmarkCollection->Modified();
 		this->HandleLandmarkCollection->Modified();
 	}
+	this->signal_actorSelectionChanged();
+	this->signal_volumeSelectionChanged();
 }
 
 void mqMorphoDigCore::Render()

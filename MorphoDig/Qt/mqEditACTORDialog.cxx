@@ -504,6 +504,14 @@ void mqEditACTORDialog::UpdateUI()
 		{
 			this->Ui->displayROI->setChecked(false);
 		}
+		if (this->ACTOR->GetenableROI() == 1)
+		{
+			this->Ui->enableROI->setChecked(true);
+		}
+		else
+		{
+			this->Ui->enableROI->setChecked(false);
+		}
 
 		QString mylabel(this->ACTOR->GetName().c_str());
 		this->Ui->ActorName->setText(mylabel);

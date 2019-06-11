@@ -47,6 +47,7 @@ vtkMDVolume::vtkMDVolume()
 	this->Selected = 1;
 	
 	this->displayROI = 0;
+	this->enableROI = 0;
 	this->isVisible = 1;
 	this->Outline = vtkSmartPointer<vtkOutlineFilter>::New();
 	this->OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -124,6 +125,22 @@ double vtkMDVolume::GetRangeMin()
 double vtkMDVolume::GetRangeMax()
 {
 	return this->GetImageData()->GetScalarRange()[1];
+}
+void vtkMDVolume::SetenableROI(int enable)
+{
+	if (this->Box != NULL)
+	{
+		if (enable == 0) {
+
+			this->enableROI = 0;
+			this->RemoveBox();
+		}
+		else
+		{
+			this->enableROI = 1;
+			this->CreateBox();
+		}
+	}
 }
 void vtkMDVolume::SetdisplayROI(int disp)
 {
