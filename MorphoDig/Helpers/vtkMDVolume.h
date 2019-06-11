@@ -145,6 +145,8 @@ public:
 	void GetMCenter(double center[3]);
 	double GetRangeMin();
 	double GetRangeMax();
+	void GetBoxCenter(double boxCenter[3]);
+	void GetBoxBounds(double boxBounds[6]);
 
 	void SetColorSpecular(double specular);
 	void SetColorSpecularPower(double specularPower);

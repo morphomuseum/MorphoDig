@@ -7501,16 +7501,21 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 				if (write == 1)
 				{
+					double BoxBounds[6] = { 0,0,0,0,0,0 };
 					if (apply_position_to_surfaces == 0)
 					{
 						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
-						this->SavePOS(Mat, _pos_fullpath);
+						if (myActor->GetdisplayROI() == 1)
+						{
+							myActor->GetBoxBounds(BoxBounds);
+						}
+						this->SavePOS(Mat, _pos_fullpath, BoxBounds);
 					}
 					else
 					{
 						vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 						Mat->Identity();
-						this->SavePOS(Mat,_pos_fullpath);
+						this->SavePOS(Mat,_pos_fullpath, BoxBounds);
 
 					}
 				}
@@ -7609,9 +7614,13 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 				if (write == 1)
 				{
-					
+						double BoxBounds[6] = { 0,0,0,0,0,0 };
 						vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
-						this->SavePOS(Mat, _pos_fullpath);					
+						if (myVolume->GetdisplayROI() == 1)
+						{
+							myVolume->GetBoxBounds(BoxBounds);
+						}
+						this->SavePOS(Mat, _pos_fullpath, BoxBounds);					
 				}
 				write = 1;
 				if (overwrite_map == 0)
@@ -7899,7 +7908,7 @@ void mqMorphoDigCore::SaveCAM(QString fileName, double cNear, double cFar, doubl
 
 
 }
-void mqMorphoDigCore::SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName)
+void mqMorphoDigCore::SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName, double BoxBounds[6])
 {
 
 	std::string POSext = ".pos";

@@ -548,7 +548,7 @@ public:
 	QString Getmui_Z2Label();
 
 	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
-	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName);
+	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName, double BoxBounds[6]);
 	void SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ);
 	void SaveCAM(QString fileName, double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ);
 	void SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ, double parallel);

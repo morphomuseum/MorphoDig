@@ -161,8 +161,12 @@ void mqSaveDataReaction::SavePOS(int mode)
 			//Save and applies position 
 			//mqMorphoDigCore::instance()->getUndoStack();
 			cout << "Save POS" << endl;
-
-			mqMorphoDigCore::instance()->SavePOS(Mat, fileName);
+			double BoxBounds[6] = { 0,0,0,0,0,0 };
+			if (FirstSelectedActor->GetdisplayROI() == 1)
+			{
+				FirstSelectedActor->GetBoxBounds(BoxBounds);
+			}
+			mqMorphoDigCore::instance()->SavePOS(Mat, fileName, BoxBounds);
 		}
 	}
 	else
@@ -212,8 +216,12 @@ void mqSaveDataReaction::SavePOS(int mode)
 			//Save and applies position 
 			//mqMorphoDigCore::instance()->getUndoStack();
 			cout << "Save POS" << endl;
-
-			mqMorphoDigCore::instance()->SavePOS(Mat, fileName);
+			double BoxBounds[6] = { 0,0,0,0,0,0 };
+			if (FirstSelectedVolume->GetdisplayROI() == 1)
+			{
+				FirstSelectedVolume->GetBoxBounds(BoxBounds);
+			}
+			mqMorphoDigCore::instance()->SavePOS(Mat, fileName, BoxBounds);
 		}
 	}
 	

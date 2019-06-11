@@ -717,13 +717,16 @@ void vtkMDActor::SetdisplayROI(int disp)
 			this->Box->SetEnabled(true);
 		}
 		double mBoxCenter[3] = { 0,0,0 };
-
+		
 		this->GetBoxCenter(mBoxCenter);
 		cout << "Box center:" << mBoxCenter[0] << "," << mBoxCenter[1] << "," << mBoxCenter[2] << endl;
-		double mBoxPlanes[6] = { 0,0,0,0,0,0 };
+		double mBoxBounds[6] = { 0,0,0,0,0,0 };
 
-		this->GetBoxPlanes(mBoxPlanes);
-		cout << "Box planes:" << mBoxPlanes[0] << "," << mBoxPlanes[1] << "," << mBoxPlanes[2] << "," << mBoxPlanes[3] << "," << mBoxPlanes[4] << "," << mBoxPlanes[5] << endl;
+		this->GetBoxBounds(mBoxBounds);
+		
+
+		//cout << "Box planes:" << mBoxPlanes[0] << "," << mBoxPlanes[1] << "," << mBoxPlanes[2] << "," << mBoxPlanes[3] << "," << mBoxPlanes[4] << "," << mBoxPlanes[5] << endl;
+		cout << "Box bounds:" << mBoxBounds[0] << "," << mBoxBounds[1] << "," << mBoxBounds[2] << "," << mBoxBounds[3] << "," << mBoxBounds[4] << "," << mBoxBounds[5] << endl;
 	}
 }
 void vtkMDActor::GetBoxCenter(double boxCenter[3])
@@ -739,10 +742,18 @@ void vtkMDActor::GetBoxCenter(double boxCenter[3])
 	boxCenter[1] = cy;
 	boxCenter[2] = cz;
 }
-void vtkMDActor::GetBoxPlanes(double boxPlanes[6])
+void vtkMDActor::GetBoxBounds(double boxBounds[6])
 {
-	double boxCenter[3] = { 0,0,0 };
-	this->GetBoxCenter(boxCenter);
+	double xmin, xmax, ymin, ymax, zmin, zmax;
+	xmin = DBL_MAX;
+	ymin = DBL_MAX;
+	zmin = DBL_MAX;
+	xmax = -DBL_MAX;
+	ymax = -DBL_MAX;
+	zmax = -DBL_MAX;
+	double mBoxCenter[3] = { 0,0,0 };
+	double mBoxDiff[3] = { 0,0,0 };
+	this->GetBoxCenter(mBoxCenter);
 	vtkPlanes *p = vtkPlanes::New();
 	this->Box->GetPlanes(p);
 	for (vtkIdType i = 0; i < p->GetNumberOfPlanes(); i++)
@@ -751,8 +762,24 @@ void vtkMDActor::GetBoxPlanes(double boxPlanes[6])
 		vtkPlane *plane = p->GetPlane(i);
 		double origin[3] = { 0,0,0 };
 		plane->GetOrigin(origin);
+		mBoxDiff[0] = origin[0] - mBoxCenter[0];
+		mBoxDiff[1] = origin[1] - mBoxCenter[1];
+		mBoxDiff[2] = origin[2] - mBoxCenter[2];
+		if (origin[0] < xmin) { xmin = origin[0]; }
+		if (origin[0] > xmax) { xmax = origin[0]; }
+		if (origin[1] < ymin) { ymin = origin[1]; }
+		if (origin[1] > ymax) { ymax = origin[1]; }
+		if (origin[2] < zmin) { zmin = origin[2]; }
+		if (origin[2] > zmax) { zmax = origin[2]; }
 		cout << "Plane " << i << ":" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
+		//cout << "Plane " << i << ":" << mBoxDiff[0] << "," << mBoxDiff[1] << "," << mBoxDiff[2] << endl;
 	}
+	boxBounds[0] = xmin;
+	boxBounds[1] = xmax;
+	boxBounds[2] = ymin;
+	boxBounds[3] = ymax;
+	boxBounds[4] = zmin;
+	boxBounds[5] = zmax;
 }
 void vtkMDActor::CreateBox()
 {

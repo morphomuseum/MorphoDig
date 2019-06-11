@@ -448,7 +448,58 @@ void vtkMDVolume::SetSelected(int selected)
 		}
 	}
 }
+void vtkMDVolume::GetBoxCenter(double boxCenter[3])
+{
+	vtkTransform *t = vtkTransform::New();
 
+	this->Box->GetTransform(t);
+	vtkSmartPointer<vtkMatrix4x4> Mat = t->GetMatrix();
+	double cx = Mat->GetElement(0, 3);
+	double cy = Mat->GetElement(1, 3);
+	double cz = Mat->GetElement(2, 3);
+	boxCenter[0] = cx;
+	boxCenter[1] = cy;
+	boxCenter[2] = cz;
+}
+void vtkMDVolume::GetBoxBounds(double boxBounds[6])
+{
+	double xmin, xmax, ymin, ymax, zmin, zmax;
+	xmin = DBL_MAX;
+	ymin = DBL_MAX;
+	zmin = DBL_MAX;
+	xmax = -DBL_MAX;
+	ymax = -DBL_MAX;
+	zmax = -DBL_MAX;
+	double mBoxCenter[3] = { 0,0,0 };
+	double mBoxDiff[3] = { 0,0,0 };
+	this->GetBoxCenter(mBoxCenter);
+	vtkPlanes *p = vtkPlanes::New();
+	this->Box->GetPlanes(p);
+	for (vtkIdType i = 0; i < p->GetNumberOfPlanes(); i++)
+	{
+
+		vtkPlane *plane = p->GetPlane(i);
+		double origin[3] = { 0,0,0 };
+		plane->GetOrigin(origin);
+		mBoxDiff[0] = origin[0] - mBoxCenter[0];
+		mBoxDiff[1] = origin[1] - mBoxCenter[1];
+		mBoxDiff[2] = origin[2] - mBoxCenter[2];
+		if (origin[0] < xmin) { xmin = origin[0]; }
+		if (origin[0] > xmax) { xmax = origin[0]; }
+		if (origin[1] < ymin) { ymin = origin[1]; }
+		if (origin[1] > ymax) { ymax = origin[1]; }
+		if (origin[2] < zmin) { zmin = origin[2]; }
+		if (origin[2] > zmax) { zmax = origin[2]; }
+		cout << "Plane " << i << ":" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
+		//cout << "Plane " << i << ":" << mBoxDiff[0] << "," << mBoxDiff[1] << "," << mBoxDiff[2] << endl;
+	}
+	boxBounds[0] = xmin;
+	boxBounds[1] = xmax;
+	boxBounds[2] = ymin;
+	boxBounds[3] = ymax;
+	boxBounds[4] = zmin;
+	boxBounds[5] = zmax;
+}
 void vtkMDVolume::CreateBox()
 {
 	//just in case a Clipping Box already exists.
