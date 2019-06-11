@@ -141,6 +141,7 @@ public:
 	void SetColorProperties(int ambient, int diffuse, int specular, double specularPower);
 	void GetBoxCenter(double boxCenter[3]);
 	void GetBoxBounds(double boxBounds[6]);
+	void PlaceBox(double boxBounds[6]);
 protected:
 	vtkMDActor();
 	~vtkMDActor();

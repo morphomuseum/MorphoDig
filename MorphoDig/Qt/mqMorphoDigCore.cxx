@@ -3957,7 +3957,9 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 
 	int i, j, l;
 	int  length;
-
+	int doBox = 0;
+	double xmin, xmax, ymin, ymax, zmin, zmax; //box stuff
+	xmin = xmax = ymin = ymax = zmin = zmax = 0; 
 
 	length = fileName.length();
 
@@ -4078,6 +4080,20 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 
 
 					}
+					// now try to read last line if exists!
+					//
+					
+					if (!in.atEnd())
+					{ 
+						QString line = in.readLine();
+						
+						QTextStream myteststream(&line);
+						myteststream >> xmin >> xmax >> ymin >> ymax >> zmin >> zmax;						
+						if (!(xmin==0 && xmax ==0 && ymin == 0 &&ymax == 0 && zmin == 0 && zmax == 0))
+						{doBox=1;}
+						//cout << "xmin ... " << xmin << "," << xmin << "," << ymin << "," << ymin << "," << zmin << "," << zmax << endl;
+					}
+					//cout << "line was at end!" << endl;
 					inputFile.close();
 
 				}
@@ -4086,7 +4102,21 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 
 
 			 //cout << "call MorphoDig apply mat" << &Mat << endl;
-			this->ApplyMatrix(Mat, mode);
+			if (doBox == 0)
+			{
+				this->ApplyMatrix(Mat, mode);
+			}
+			else
+			{
+				double BoxBounds[6];
+				BoxBounds[0] = xmin;
+				BoxBounds[1] = xmax;
+				BoxBounds[2] = ymin;
+				BoxBounds[3] = ymax;
+				BoxBounds[4] = zmin;
+				BoxBounds[5] = zmax;
+				this->ApplyMatrix(Mat, mode, BoxBounds);
+			}
 			this->AdjustCameraAndGrid();
 
 		}//file exists...
@@ -7935,7 +7965,7 @@ void mqMorphoDigCore::SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileNam
 		stream << Mat->GetElement(0, 1) << " " << Mat->GetElement(1, 1) << " " << Mat->GetElement(2, 1) << " " << Mat->GetElement(3, 1) << endl;
 		stream << Mat->GetElement(0, 2) << " " << Mat->GetElement(1, 2) << " " << Mat->GetElement(2, 2) << " " << Mat->GetElement(3, 2) << endl;
 		stream << Mat->GetElement(0, 3) << " " << Mat->GetElement(1, 3) << " " << Mat->GetElement(2, 3) << " " << Mat->GetElement(3, 3) << endl;
-
+		stream << BoxBounds[0] << " " << BoxBounds[1] << " " << BoxBounds[2] << " " << BoxBounds[3] << " " << BoxBounds[4] << " " << BoxBounds[5] << " " << endl;
 
 	}
 	file.close();
@@ -20201,7 +20231,69 @@ vtkLMActor* mqMorphoDigCore::GetLastLandmark(int mode)
 	}
 	
 }
+void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, double BoxBounds[6])
+{
+	// mode : 0 for last inserted surface
+	// mode : 1 for all selected surfaces AND volumes
+	// mode : 3 for last inserted volume	
 
+	if (mode == 0)
+	{
+		vtkMDActor *actor = this->GetLastActor();
+		if (actor != NULL)
+		{
+			//actor->ApplyMatrix(Mat);
+			actor->CreateBox();
+			actor->PlaceBox(BoxBounds);
+
+		}
+	}
+	if (mode == 3)
+	{
+		vtkMDVolume *volume = this->GetLastVolume();
+		if (volume != NULL)
+		{
+			volume->CreateBox();
+			volume->PlaceBox(BoxBounds);
+			
+
+
+		}
+	}
+	else if (mode == 1)
+	{
+		this->ActorCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+				myActor->CreateBox();
+				myActor->PlaceBox(BoxBounds);
+				
+			}
+		}
+		this->VolumeCollection->InitTraversal();
+		for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+			if (myVolume->GetSelected() == 1)
+			{
+				myVolume->CreateBox();
+				myVolume->PlaceBox(BoxBounds);
+			}
+		}
+
+	}
+	else if (mode == 2)
+	{
+
+		// do nothing!
+
+	}
+	
+	this->ApplyMatrix(Mat, mode);
+}
 void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 {
 	

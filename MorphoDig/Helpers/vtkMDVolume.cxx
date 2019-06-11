@@ -575,9 +575,10 @@ void vtkMDVolume::CreateBox()
 	
 	t->Delete();
 	cout << "Box placed.... correctly?" << endl;
-
-
-
+}
+void vtkMDVolume::PlaceBox(double BoxBounds[6])
+{
+	this->Box->PlaceWidget(BoxBounds);
 }
 void vtkMDVolume::RemoveBox()
 {

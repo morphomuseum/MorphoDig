@@ -842,6 +842,10 @@ void vtkMDActor::CreateBox()
 
 
 }
+void vtkMDActor::PlaceBox(double BoxBounds[6])
+{
+	this->Box->PlaceWidget(BoxBounds);
+}
 void vtkMDActor::RemoveBox()
 {
 	if (this->Box != NULL)

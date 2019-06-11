@@ -1173,7 +1173,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 	foreach(const QUrl &url, e->mimeData()->urls()) {
 		QString fileName = url.toLocalFile();
 		//this->MorphoDigCore->Open
-		cout << "Dropped file:" << fileName.toStdString();
+		cout << "Dropped file:" << fileName.toStdString() << endl;
 		std::string STLext(".stl");
 		std::string STLext2(".STL");
 		std::string VTKext(".vtk");
