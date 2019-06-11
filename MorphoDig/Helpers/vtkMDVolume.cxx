@@ -596,6 +596,7 @@ void vtkMDVolume::CreateBox()
 void vtkMDVolume::PlaceBox(double BoxBounds[6])
 {
 	this->Box->PlaceWidget(BoxBounds);
+	this->Box->Modified();
 }
 void vtkMDVolume::RemoveBox()
 {
