@@ -210,6 +210,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="pointNormals">
+         <property name="toolTip">
+          <string>Phong shading (point normales)</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -226,18 +229,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="pointNormals2">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/point_normals2.png</normaloff>:/Icons/point_normals2.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QToolButton" name="cellNormals">
+         <property name="toolTip">
+          <string>Flat faces (cell normales)</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -251,18 +246,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="cellNormals2">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../Icons/icons.qrc">
-           <normaloff>:/Icons/cell_normals2.png</normaloff>:/Icons/cell_normals2.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QToolButton" name="wireframe">
+         <property name="toolTip">
+          <string>Wireframe</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -277,6 +264,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="points">
+         <property name="toolTip">
+          <string>Point cloud rendering</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -286,6 +276,34 @@
          </property>
          <property name="checkable">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="pointNormals2">
+         <property name="toolTip">
+          <string>Phong shading + wireframe outline</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/point_normals2.png</normaloff>:/Icons/point_normals2.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="cellNormals2">
+         <property name="toolTip">
+          <string>Flat faces + wireframe outline</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/cell_normals2.png</normaloff>:/Icons/cell_normals2.png</iconset>
          </property>
         </widget>
        </item>
