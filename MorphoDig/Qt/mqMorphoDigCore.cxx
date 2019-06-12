@@ -15,6 +15,7 @@
 #include <vtkMetaImageWriter.h>
 #include <vtkXMLImageDataWriter.h>
 #include <vtkFlyingEdges3D.h>
+#include <vtkMarchingCubes.h>
 #include "vtkOrientationHelperWidget.h"
 #include "vtkBezierCurveSource.h"
 #include <time.h>
@@ -12774,22 +12775,43 @@ void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 		newmapper->ScalarVisibilityOn();
 		
 		cout << "threshold =" << threshold << endl;
-		vtkSmartPointer<vtkFlyingEdges3D > isoFilter =
+		vtkSmartPointer<vtkFlyingEdges3D > isoFFilter =
 			vtkSmartPointer<vtkFlyingEdges3D >::New();
-		isoFilter->SetInputData(vtkImageData::SafeDownCast(myVolume->GetImageData()));
-		isoFilter->SetComputeNormals(true);
-		isoFilter->SetNumberOfContours(1);
-		isoFilter->SetValue(0, threshold);		
+		vtkSmartPointer<vtkMarchingCubes > isoMCFilter =
+			vtkSmartPointer<vtkMarchingCubes >::New();
 		
-		isoFilter->Update();
-		
+		if (flyingEdges == 1)
+		{
+			isoFFilter->SetInputData(vtkImageData::SafeDownCast(myVolume->GetImageData()));
+			isoFFilter->SetComputeNormals(true);
+			isoFFilter->SetNumberOfContours(1);
+			isoFFilter->SetValue(0, threshold);
+
+			isoFFilter->Update();
+		}
+		else
+		{
+			isoMCFilter->SetInputData(vtkImageData::SafeDownCast(myVolume->GetImageData()));
+			isoMCFilter->SetComputeNormals(true);
+			isoMCFilter->SetNumberOfContours(1);
+			isoMCFilter->SetValue(0, threshold);
+
+			isoMCFilter->Update();
+
+		}
 
 		vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 		//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
 		
-			cleanPolyDataFilter->SetInputData(isoFilter->GetOutput());
+		if (flyingEdges == 1)
+		{
+			cleanPolyDataFilter->SetInputData(isoFFilter->GetOutput());
 
-		
+		}
+		else
+		{
+			cleanPolyDataFilter->SetInputData(isoMCFilter->GetOutput());
+		}
 		cleanPolyDataFilter->PieceInvariantOff();
 		cleanPolyDataFilter->ConvertLinesToPointsOff();
 		cleanPolyDataFilter->ConvertPolysToLinesOff();

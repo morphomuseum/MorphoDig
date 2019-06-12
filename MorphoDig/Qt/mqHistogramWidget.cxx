@@ -246,7 +246,7 @@ public:
 	  
 	  if (hist !=NULL)
 	  {
-		 // cout << "Start Histogram reinit" << endl;
+		//  cout << "Start Histogram reinit" << endl;
 		//  cout << "dMin = " << dMin << endl;
 		//  cout << "dMax = " << dMax << endl;
 
@@ -256,21 +256,22 @@ public:
 		  double bin_spacing = 0;
 		 // bin_spacing =this->Hist->GetComponentSpacing()[0];
 		  //cout << "Retrieved bin_spacing :" << bin_spacing <<","<< this->Hist->GetComponentSpacing()[1]<<","<< this->Hist->GetComponentSpacing()[2]<< endl;
-		  //int dims[3];
-		  //this->Hist->GetOutput()->GetDimensions(dims);
-		 // cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2] << endl;
-		  //vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
+		  int dims[3];
+		  this->Hist->GetOutput()->GetDimensions(dims);
+		//  cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2] << endl;
+		 // vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
 		  //cout << "used_bins = "<<used_bins << endl;
 
-		 // numbins = (int)((this->Hist->GetComponentExtent()[1] - this->Hist->GetComponentExtent()[0]) / bin_spacing);
+		  
 		  if (numbins > 0) {
 			  bin_spacing = (max - min) / numbins;
 		  }
 		 //cout << "numbins = " << numbins << endl;
-		 // cout << "min = " << min << endl;
-		 // cout << "max = " << max << endl;
-		  //cout << "bin_spacing = " << bin_spacing << endl;
+		//  cout << "min = " << min << endl;
+		//  cout << "max = " << max << endl;
+		// cout << "computed bin_spacing = " << bin_spacing << endl;
 		  hist->SetComponentOrigin(min, 0, 0);		  
+		  hist->SetComponentExtent(0, numbins, 0,0,0,0);
 		  hist->SetComponentSpacing(bin_spacing, 0, 0);
 		 // cout << "I guess this is mostly the update call..." << endl;
 		  hist->Update();
@@ -310,20 +311,29 @@ public:
 		  int aboveDMax = 0;
 		  //First pass to have extent.
 		 // cout << "Start loop to find maxlogbin and maxbin" << endl;
+		  vtkIdType binMax=0;
+		  vtkIdType logbinMax = 0;
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
 		  {			  			  
-			   //cout << "bin =" << bin << ", retrieving curbin"  << endl;
+			  // cout << "bin =" << bin << ", retrieving curbin"  << endl;
 			  int curbin = 0;			
 			  if (this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0) !=NULL)
 			  {
 				  //cout << "output not null" << endl;
 				  curbin = *(static_cast<int*>(this->Hist->GetOutput()->GetScalarPointer(bin, 0, 0)));
-				  if (curbin > this->maxbin) { this->maxbin = curbin; }
+				  if (curbin > this->maxbin) {
+					  this->maxbin = curbin; binMax = 0;
+				  }
 				  double logcurbin = 0;
 				  if (curbin > 0)
 				  {
 					  logcurbin = 100 * log10(curbin);
-					  if (logcurbin > maxlogbin) { maxlogbin = logcurbin; }
+					  if (logcurbin > maxlogbin) { maxlogbin = logcurbin; logbinMax = bin; }
+
+				  }
+				  if (bin < 30)
+				  {
+					//  cout << "bin=" << bin << ", logcurbin=" << logcurbin << "curbin" << curbin << endl;
 				  }
 			  }
 			  else
@@ -333,8 +343,8 @@ public:
 			  
 
 		  }
-		 // cout << "this->maxbin=" << this->maxbin << endl;
-		//  cout << "maxlogbin=" << maxlogbin << endl;
+		  //cout << "this->maxbin=" << this->maxbin << " at bin=" <<binMax<< endl;
+		 // cout << "maxlogbin=" << maxlogbin <<  " at bin=" << logbinMax << endl;
 		  //Second pass to "normalize".
 		 // cout << "Start second loop to populate int arrays" << endl;
 		  for (vtkIdType bin = 0; bin < numbins; bin++)
