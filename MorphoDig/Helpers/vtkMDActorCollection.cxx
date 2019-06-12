@@ -178,6 +178,8 @@ void vtkMDActorCollection::SetDisplayMode(int mode)
 	//mode 1 : point normals
 	//mode 2 : wireframe
 	//mode 3 : points
+	//mode 4 : cell normals with outline
+	//mode 5 : point normals with outline
 	this->InitTraversal();
 	for (vtkIdType i = 0; i < this->GetNumberOfItems(); i++)
 	{

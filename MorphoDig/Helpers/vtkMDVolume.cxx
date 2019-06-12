@@ -597,6 +597,10 @@ void vtkMDVolume::PlaceBox(double BoxBounds[6])
 {
 	this->Box->PlaceWidget(BoxBounds);
 	this->Box->Modified();
+	vtkPlanes *planes = vtkPlanes::New();
+	this->Box->GetPlanes(planes);
+	this->Mapper->SetClippingPlanes(planes);
+	planes->Delete();
 }
 void vtkMDVolume::RemoveBox()
 {

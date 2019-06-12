@@ -767,11 +767,15 @@ void mqEditVolumeDialog::UpdateUI()
 		if (this->Volume->GetenableROI() == 1)
 		{
 			this->Ui->enableROI->setChecked(true);
+			this->Ui->displayROI->setEnabled(true);
 		}
 		else
 		{
 			this->Ui->enableROI->setChecked(false);
+			this->Ui->displayROI->setChecked(false);
+			this->Ui->displayROI->setEnabled(false);
 		}
+		
 
 		
 		

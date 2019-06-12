@@ -33,7 +33,9 @@ public:
   virtual void slotClippingPlaneOnOff();
   virtual void slotBackfaceCullingOnOff();
   virtual void slotDisplayCellNormals();
+  virtual void slotDisplayCellNormals2();
   virtual void slotDisplayPointNormals();
+  virtual void slotDisplayPointNormals2();
   virtual void slotDisplayWireframe();
   virtual void slotDisplayPoints();
 private:

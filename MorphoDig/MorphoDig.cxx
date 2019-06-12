@@ -1233,7 +1233,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::size_t found4 = fileName.toStdString().find(VTKext4);
 		if (found3 != std::string::npos || found4 != std::string::npos)
 		{
-			type = 4; //VTP
+			type = 1; //VTP
 		}
 		//std::cout << "2Type= " <<type<< std::endl;
 		found = fileName.toStdString().find(PLYext);

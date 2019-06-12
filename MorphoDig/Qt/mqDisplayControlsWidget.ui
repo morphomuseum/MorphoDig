@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>223</width>
+    <width>269</width>
     <height>26</height>
    </rect>
   </property>
@@ -226,6 +226,17 @@
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="pointNormals2">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/point_normals2.png</normaloff>:/Icons/point_normals2.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="cellNormals">
          <property name="text">
           <string>...</string>
@@ -236,6 +247,17 @@
          </property>
          <property name="checkable">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="cellNormals2">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/cell_normals2.png</normaloff>:/Icons/cell_normals2.png</iconset>
          </property>
         </widget>
        </item>

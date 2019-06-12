@@ -20242,8 +20242,9 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 		vtkMDActor *actor = this->GetLastActor();
 		if (actor != NULL)
 		{
+			
+			actor->SetenableROI(1);			
 			actor->SetdisplayROI(1);
-			actor->CreateBox();
 			actor->PlaceBox(BoxBounds);
 
 		}
@@ -20253,8 +20254,8 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 		vtkMDVolume *volume = this->GetLastVolume();
 		if (volume != NULL)
 		{
-			volume->SetdisplayROI(1);
-			volume->CreateBox();
+			volume->SetenableROI(1);
+			volume->SetdisplayROI(1);			
 			volume->PlaceBox(BoxBounds);
 			
 
@@ -20269,8 +20270,8 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
-				myActor->SetdisplayROI(1);
-				myActor->CreateBox();
+				myActor->SetenableROI(1);
+				myActor->SetdisplayROI(1);				
 				myActor->PlaceBox(BoxBounds);
 				
 			}
@@ -20281,8 +20282,8 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			if (myVolume->GetSelected() == 1)
 			{
-				myVolume->SetdisplayROI(1);
-				myVolume->CreateBox();
+				myVolume->SetenableROI(1);
+				myVolume->SetdisplayROI(1);				
 				myVolume->PlaceBox(BoxBounds);
 			}
 		}

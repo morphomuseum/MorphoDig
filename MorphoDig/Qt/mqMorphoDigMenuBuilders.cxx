@@ -606,7 +606,7 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 	
 
 	//cout << "create scalars tool bar" << endl;
-	auto dock6 = new QDockWidget("Scalars", &projectWindow);
+	auto dock6 = new QDockWidget("Arrays (Scalars, Tags, Colors)", &projectWindow);
 
 	dock6->setAllowedAreas(Qt::AllDockWidgetAreas);
 	QWidget* titleBarWidget6 = new QWidget;
@@ -641,7 +641,7 @@ void mqMorphoDigMenuBuilders::buildProjectDocks(QMainWindow& projectWindow)
 
 	//projectWindow.tabifyDockWidget(dock7, dock5);
 
-	auto dock8 = new QDockWidget("Line", &projectWindow);
+	auto dock8 = new QDockWidget("", &projectWindow);
 
 	dock8->setAllowedAreas(Qt::TopDockWidgetArea);
 	QWidget* titleBarWidget8 = new QWidget;

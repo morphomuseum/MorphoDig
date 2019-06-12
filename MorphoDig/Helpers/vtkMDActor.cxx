@@ -148,6 +148,13 @@ void vtkMDActor::SetColorProperties(double ambient, double diffuse, double specu
 }
 void vtkMDActor::SetDisplayMode(int mode)
 {
+	//mode 0 : cell normals
+	//mode 1 : point normals
+	//mode 2 : wireframe
+	//mode 3 : points
+	//mode 4 : cell normals with outline
+	//mode 5 : point normals with outline
+	
 	vtkPolyData* mPD= vtkPolyData::SafeDownCast(this->GetMapper()->GetInput());
 	if (mPD!=NULL && (this->pointNormals == nullptr || this->cellNormals == nullptr))
 	{
@@ -177,12 +184,12 @@ void vtkMDActor::SetDisplayMode(int mode)
 
 	}
 
-	if (mode == 0 || mode == 1)
+	if (mode == 0 || mode == 1 || mode ==4 || mode == 5)
 	{
 		this->GetProperty()->SetRepresentationToSurface();
 		if (mPD != NULL)
 		{
-			if (mode == 0)
+			if (mode == 0 || mode ==4)
 			{
 				
 				//mPD->GetCellData()->SetNormals(this->cellNormals);
@@ -203,6 +210,15 @@ void vtkMDActor::SetDisplayMode(int mode)
 				//mPD->GetPointData()->SetNormals(this->pointNormals);			
 				//cout << "Try to interpolate to phong..." << endl;
 				this->GetProperty()->SetInterpolationToPhong();
+			}
+			if (mode == 0 || mode == 1)
+			{
+				//actor->GetProperty()->SetEdgeVisibility(1); actor->GetProperty()->SetEdgeColor(0.9,0.9,0.4);
+				this->GetProperty()->SetEdgeVisibility(0);
+			}
+			else
+			{
+				this->GetProperty()->SetEdgeVisibility(1); this->GetProperty()->SetEdgeColor(0.2, 0.2, 0.2);
 			}
 			
 
@@ -871,6 +887,10 @@ void vtkMDActor::PlaceBox(double BoxBounds[6])
 {
 	this->Box->PlaceWidget(BoxBounds);
 	this->Box->Modified();
+	vtkPlanes *planes = vtkPlanes::New();
+	this->Box->GetPlanes(planes);
+	this->Mapper->SetClippingPlanes(planes);
+	planes->Delete();
 }
 void vtkMDActor::RemoveBox()
 {
