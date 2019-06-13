@@ -29,6 +29,7 @@
 
 #include "mqEditACTORDialogReaction.h"
 #include "mqEditVolumeDialogReaction.h"
+#include "mqOpenRawDialogReaction.h"
 #include "mqEditFLGDialogReaction.h"
 #include "mqEditLMKDialogReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
@@ -228,6 +229,9 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   
   QMenu* submenuVolume = menu.addMenu("Volume");
   new mqOpenDataReaction(submenuVolume->addAction("Open MHD/MHA/VTI Volume") << mqSetName("actionOpenVolume"), 18);
+  new mqOpenRawDialogReaction(submenuVolume->addAction("Open Raw Volume") << mqSetName("actionOpenRawVolume"));
+
+//#include "mqOpenRawDialogReaction.h"
   new mqSaveMHDMHADialogReaction(submenuVolume->addAction("Save first selected volume as .MHD or .MHA file") << mqSetName("actionSaveMHDMHA"));
   new mqSaveVTIDialogReaction(submenuVolume->addAction("Save first selected volume as .VTI") << mqSetName("actionSaveVTI"));
   //new mqMinimalDialogReaction(menu.addAction("Minimal Window") << mqSetName("actionOpenMinimal"));

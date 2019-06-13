@@ -1,31 +1,31 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqIsosurfaceDialogReaction.cxx
+   Module:    mqOpenRawDialogReaction.cxx
 
 
 ========================================================================*/
-#include "mqIsosurfaceDialogReaction.h"
+#include "mqOpenRawDialogReaction.h"
 #include "mqCoreUtilities.h"
-#include "mqIsosurfaceDialog.h"
+#include "mqOpenRawDialog.h"
 #include "mqReaction.h"
 
 //-----------------------------------------------------------------------------
-mqIsosurfaceDialogReaction::mqIsosurfaceDialogReaction(QAction* parentObject)
+mqOpenRawDialogReaction::mqOpenRawDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-	/* mqAboutDialog about_dialog(mqCoreUtilities::mainWidget());
-  about_dialog.exec();*/
-	//this->Isosurface_dialog = new mqIsosurfaceDialog(mqCoreUtilities::mainWidget());
+	/* mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
+  OpenRaw_dialog.exec();*/
+	//this->OpenRaw_dialog = new mqOpenRawDialog(mqCoreUtilities::mainWidget());
 	
 	
 }
 
 
 //-----------------------------------------------------------------------------
-void mqIsosurfaceDialogReaction::showIsosurfaceDialog(vtkMDVolume *vol)
+void mqOpenRawDialogReaction::showOpenRawDialog(QString fileName)
 {
-	mqIsosurfaceDialog Isosurface_dialog(mqCoreUtilities::mainWidget());
-	Isosurface_dialog.setVolume(vol);
- Isosurface_dialog.exec();
+	mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
+	OpenRaw_dialog.setFileName(fileName);
+ OpenRaw_dialog.exec();
 }

@@ -1,57 +1,56 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqIsosurfaceDialogReaction.h
+   Module:    mqOpenRawDialogReaction.h
 
 
 ========================================================================*/
-#ifndef mqIsosurfaceDialogReaction_h
-#define mqIsosurfaceDialogReaction_h
+#ifndef mqOpenRawDialogReaction_h
+#define mqOpenRawDialogReaction_h
 
 #include "mqReaction.h"
-#include "mqIsosurfaceDialog.h"
+#include "mqOpenRawDialog.h"
 #include "mqMorphoDigCore.h"
+
 #include "vtkMDVolume.h"
 #include <QMessageBox>
-
+#include <QFileDialog>
 /**
 * @ingroup Reactions
-* mqIsosurfaceDialogReaction used to create an Isosurface from the 1st selected volume 
+* mqOpenRawDialogReaction used ton open a raw data volume 
 */
-class  mqIsosurfaceDialogReaction : public mqReaction
+class  mqOpenRawDialogReaction : public mqReaction
 {
   Q_OBJECT
   typedef mqReaction Superclass;
 
 public:
-  mqIsosurfaceDialogReaction(QAction* parent);
+  mqOpenRawDialogReaction(QAction* parent);
 
   /**
   * Shows the FLG dialog for the application.
   */
-  static void showIsosurfaceDialog(vtkMDVolume *vol);
+  static void showOpenRawDialog(QString  fileName);
 
 protected:
   /**
   * Called when the action is triggered.
   */
   virtual void onTriggered() {
-	  vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
-	  if (num_selected_volumes != 1) {
-		  
-		  QMessageBox msgBox;
-		  msgBox.setText("Please select a single volume to use this option.");
-		  msgBox.exec();
-		  return;
-	  }
-	  vtkMDVolume *vol = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
-	  mqIsosurfaceDialogReaction::showIsosurfaceDialog(vol); 
+	  QString fileName = QFileDialog::getOpenFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+		  tr("Open raw data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		  tr("raw data (*.raw);; other (*.*)"));
+
+	  cout << fileName.toStdString();
+	  if (fileName.isEmpty()) return;
+	 
+	  mqOpenRawDialogReaction::showOpenRawDialog(fileName); 
   
   }
 
 private:
-	Q_DISABLE_COPY(mqIsosurfaceDialogReaction)
-		//mqIsosurfaceDialog *Isosurface_dialog;
+	Q_DISABLE_COPY(mqOpenRawDialogReaction)
+		//mqOpenRawDialog *OpenRaw_dialog;
 	
 };
 

@@ -6,8 +6,8 @@
  
 =========================================================================*/
 
-#include "mqIsosurfaceDialog.h"
-#include "ui_mqIsosurfaceDialog.h"
+#include "mqOpenRawDialog.h"
+#include "ui_mqOpenRawDialog.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
@@ -53,16 +53,18 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqIsosurfaceDialog::mqIsosurfaceDialog(QWidget* Parent)
+mqOpenRawDialog::mqOpenRawDialog(QWidget* Parent)
   : QDialog(Parent)
-  , Ui(new Ui::mqIsosurfaceDialog())
+  , Ui(new Ui::mqOpenRawDialog())
 {
 	this->Ui->setupUi(this);
-	this->setObjectName("mqIsosurfaceDialog");	
+	this->setObjectName("mqOpenRawDialog");	
 	
-	this->myVolume = NULL;
-  this->Ui->threshold->setButtonSymbols(QAbstractSpinBox::NoButtons);
-	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotIsosurface()));
+	this->myFileName = "";
+  this->Ui->voxelSizeX->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->voxelSizeY->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->voxelSizeZ->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotOpenRaw()));
 
 }
 
@@ -70,46 +72,45 @@ mqIsosurfaceDialog::mqIsosurfaceDialog(QWidget* Parent)
 
 
 //-----------------------------------------------------------------------------
-mqIsosurfaceDialog::~mqIsosurfaceDialog()
+mqOpenRawDialog::~mqOpenRawDialog()
 {
 
  //depending on what is 
 	
   delete this->Ui;
 }
-void mqIsosurfaceDialog::Isosurface()
+void mqOpenRawDialog::OpenRaw()
 {
-	cout << "Isosurface dialog" << endl;
+	cout << "OpenRaw dialog" << endl;
 	
 	if (mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes() ==1)
 	{
-		std::string action = "Isosurface";
+		std::string action = "OpenRaw";
 		
-		mqMorphoDigCore::instance()->addIsosurface(this->Ui->flyingEdges->isChecked(), this->Ui->threshold->value());
+		//mqMorphoDigCore::instance()->OpenRawVolume(this->myFileName);
 		
 	}
 }
 
 
 
-void mqIsosurfaceDialog::setVolume (vtkMDVolume *vol)
+void mqOpenRawDialog::setFileName(QString fileName)
 {
-	this->myVolume = vol;
-	QString myLabel(this->myVolume->GetName().c_str());
-	this->Ui->VolumeName->setText(myLabel);
-	double min = this->myVolume->GetRangeMin();
-	double max = this->myVolume->GetRangeMax();
-	double avg = (max + min) / 2;
-	this->Ui->threshold->setMinimum(min);
-	this->Ui->threshold->setMaximum(max);
-	this->Ui->threshold->setValue(avg);
+	this->myFileName = fileName;
+	QFileInfo fileInfo(fileName);
+	QString onlyfilename(fileInfo.fileName());
+
+	this->Ui->FileName->setText(onlyfilename);
+	
+		
+	
 }
 
 
 
-void mqIsosurfaceDialog::slotIsosurface()
+void mqOpenRawDialog::slotOpenRaw()
 {
-	this->Isosurface();
+	this->OpenRaw();
 }
 
 

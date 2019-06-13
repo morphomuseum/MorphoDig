@@ -4,38 +4,38 @@
    
 
 =========================================================================*/
-#ifndef _mqIsosurfaceDialog_h
-#define _mqIsosurfaceDialog_h
+#ifndef _mqOpenRawDialog_h
+#define _mqOpenRawDialog_h
 
 #include "vtkMDVolume.h"
 #include <QDialog>
 
 namespace Ui
 {
-class mqIsosurfaceDialog;
+class mqOpenRawDialog;
 }
 
 
 
 
 /**
-* mqIsosurfaceDialog is the dialog used by MorphoDig to create an Isosurface from the 1st selected volume
+* mqOpenRawDialog is the dialog used by MorphoDig to create an OpenRaw from the 1st selected volume
 */
-class  mqIsosurfaceDialog : public QDialog
+class  mqOpenRawDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  mqIsosurfaceDialog(QWidget* Parent);
+  mqOpenRawDialog(QWidget* Parent);
   
-  ~mqIsosurfaceDialog();
-  void Isosurface();
-  void setVolume(vtkMDVolume *vol);
+  ~mqOpenRawDialog();
+  void OpenRaw();
+  void setFileName(QString fileName);
   public slots:
   
   
   
-  virtual void slotIsosurface();
+  virtual void slotOpenRaw();
   
 
 protected:
@@ -43,9 +43,9 @@ protected:
 private:
 	
 
-  Q_DISABLE_COPY(mqIsosurfaceDialog)
-  Ui::mqIsosurfaceDialog* const Ui;
-  vtkMDVolume *myVolume;
+  Q_DISABLE_COPY(mqOpenRawDialog)
+  Ui::mqOpenRawDialog* const Ui;
+  QString myFileName;
   // Here we should have the file name, no ?
 };
 
