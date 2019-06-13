@@ -64,6 +64,26 @@ mqOpenRawDialog::mqOpenRawDialog(QWidget* Parent)
   this->Ui->voxelSizeX->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->Ui->voxelSizeY->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->Ui->voxelSizeZ->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->headerSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->requestedSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->fileSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  
+  this->Ui->comboDataType->addItem("8 bits unsigned");
+  
+  this->Ui->comboDataType->addItem("16 bits signed");
+  this->Ui->comboDataType->addItem("16 bits unsigned");
+  this->Ui->comboDataType->addItem("32 bits float");
+  this->Ui->comboDataType->addItem("64 bits float");
+  this->Ui->comboDataType->setCurrentIndex(0);
+  /*
+  QObject::connect(ui.currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinEdited()));
+  QObject::connect(ui.currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMaxEdited()));
+  QObject::connect(ui.plottedMin, SIGNAL(editingFinished()), this, SLOT(slotPlottedMinEdited()));
+  QObject::connect(ui.plottedMax, SIGNAL(editingFinished()), this, SLOT(slotPlottedMaxEdited()));*/
+  connect(this->Ui->dimX, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
+  connect(this->Ui->dimY, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
+  connect(this->Ui->dimZ, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
+  connect(this->Ui->comboDataType, SIGNAL(activated(int)), this, SLOT(slotDataTypeChanged(int)));
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotOpenRaw()));
 
 }
@@ -93,13 +113,35 @@ void mqOpenRawDialog::OpenRaw()
 }
 
 
+void mqOpenRawDialog::slotDataTypeChanged(int newDataType)
+{
+	this->RecomputeRequested(newDataType, this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value());
+}
+void mqOpenRawDialog::slotRecomputeRequested()
+{
+	this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value());
+}
+void mqOpenRawDialog::RecomputeRequested(int dataType, int dimX, int dimY, int dimZ)
+{
+	int mult = 1;
+	if (dataType == 0) { mult = 1; }
+	if (dataType == 1) { mult = 2; }
+	if (dataType == 2) { mult = 2; }
+	if (dataType == 3) { mult = 4; }
+	if (dataType == 4) { mult = 8; }
 
+	long int requested = mult * dimX *dimY *dimZ;
+	this->Ui->requestedSize->setValue(requested);
+	
+
+
+}
 void mqOpenRawDialog::setFileName(QString fileName)
 {
 	this->myFileName = fileName;
 	QFileInfo fileInfo(fileName);
 	QString onlyfilename(fileInfo.fileName());
-
+	this->Ui->fileSize->setValue(fileInfo.size());
 	this->Ui->FileName->setText(onlyfilename);
 	
 		

@@ -574,7 +574,7 @@
           <bool>true</bool>
          </property>
          <property name="maximum">
-          <number>100000</number>
+          <number>999999999</number>
          </property>
         </widget>
        </item>
@@ -609,7 +609,7 @@
           <bool>false</bool>
          </property>
          <property name="maximum">
-          <number>1000000000</number>
+          <number>999999999</number>
          </property>
         </widget>
        </item>
@@ -644,7 +644,7 @@
           <bool>false</bool>
          </property>
          <property name="maximum">
-          <number>1000000000</number>
+          <number>999999999</number>
          </property>
         </widget>
        </item>
@@ -767,7 +767,7 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>353</width>
+       <width>407</width>
        <height>31</height>
       </rect>
      </property>
@@ -778,7 +778,7 @@
          <number>10</number>
         </property>
         <property name="maximum">
-         <double>1000.000000000000000</double>
+         <double>999999999.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.010000000000000</double>
@@ -791,7 +791,7 @@
          <number>10</number>
         </property>
         <property name="maximum">
-         <double>1000.000000000000000</double>
+         <double>999999999.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.010000000000000</double>
@@ -804,7 +804,7 @@
          <number>10</number>
         </property>
         <property name="maximum">
-         <double>1000.000000000000000</double>
+         <double>999999999.000000000000000</double>
         </property>
         <property name="singleStep">
          <double>0.010000000000000</double>

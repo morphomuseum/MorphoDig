@@ -7,7 +7,7 @@
 #ifndef _mqOpenRawDialog_h
 #define _mqOpenRawDialog_h
 
-#include "vtkMDVolume.h"
+
 #include <QDialog>
 
 namespace Ui
@@ -31,11 +31,14 @@ public:
   ~mqOpenRawDialog();
   void OpenRaw();
   void setFileName(QString fileName);
+  void RecomputeRequested(int dataType, int dimX, int dimY, int dimZ);
+  
   public slots:
   
   
-  
+	  virtual void slotRecomputeRequested();
   virtual void slotOpenRaw();
+  virtual void slotDataTypeChanged(int newDataType);
   
 
 protected:
