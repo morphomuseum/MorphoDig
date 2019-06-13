@@ -4968,7 +4968,15 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, int dataType, int dimX, in
 			rawReader->SetHeaderSize((unsigned long)headerSize);
 
 			rawReader->SetDataSpacing(voxelSizeX, voxelSizeY, voxelSizeZ);
-			rawReader->SetDataExtent(0, dimX-1, 0, dimY-1, 0, dimZ -1);
+			cout << "Dimx = " << dimX << endl;
+			cout << "Dimy = " << dimY << endl;
+			cout << "Dimz = " << dimZ << endl;
+			rawReader->SetDataExtent(0, dimX-1, 0, dimY-1, 0, dimZ-1);
+			rawReader->SetNumberOfScalarComponents(1);
+			if (dimZ > 1)
+			{
+				rawReader->SetFileDimensionality(3);
+			}
 			rawReader->SetDataScalarType(dataType);
 			rawReader->SetFileLowerLeft(frontToBack);
 			rawReader->Update();
