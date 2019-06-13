@@ -115,13 +115,13 @@ void mqOpenRawDialog::OpenRaw()
 
 void mqOpenRawDialog::slotDataTypeChanged(int newDataType)
 {
-	this->RecomputeRequested(newDataType, this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value());
+	this->RecomputeRequested(newDataType, this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(), this->Ui->headerSize->value());
 }
 void mqOpenRawDialog::slotRecomputeRequested()
 {
-	this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value());
+	this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(), this->Ui->headerSize->value());
 }
-void mqOpenRawDialog::RecomputeRequested(int dataType, int dimX, int dimY, int dimZ)
+void mqOpenRawDialog::RecomputeRequested(int dataType, int dimX, int dimY, int dimZ, int headerSize)
 {
 	int mult = 1;
 	if (dataType == 0) { mult = 1; }
@@ -130,7 +130,7 @@ void mqOpenRawDialog::RecomputeRequested(int dataType, int dimX, int dimY, int d
 	if (dataType == 3) { mult = 4; }
 	if (dataType == 4) { mult = 8; }
 
-	long int requested = mult * dimX *dimY *dimZ;
+	long int requested = mult * dimX *dimY *dimZ + headerSize;
 	this->Ui->requestedSize->setValue(requested);
 	
 

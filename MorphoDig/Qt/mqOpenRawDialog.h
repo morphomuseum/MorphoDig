@@ -31,7 +31,7 @@ public:
   ~mqOpenRawDialog();
   void OpenRaw();
   void setFileName(QString fileName);
-  void RecomputeRequested(int dataType, int dimX, int dimY, int dimZ);
+  void RecomputeRequested(int dataType, int dimX, int dimY, int dimZ, int headerSize);
   
   public slots:
   
