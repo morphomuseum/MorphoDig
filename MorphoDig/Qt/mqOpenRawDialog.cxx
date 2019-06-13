@@ -144,8 +144,15 @@ void mqOpenRawDialog::OpenRaw()
 
 		mqMorphoDigCore::instance()->OpenRawVolume(this->myFileName,
 			dataType,
-			this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(),
-			this->Ui->headerSize->value(), this->Ui->voxelSizeX->value(), this->Ui->voxelSizeY->value(), this->Ui->voxelSizeZ->value(), this->Ui->bigEndian->isChecked(), this->Ui->frontToBack->isChecked());
+			this->Ui->dimX->value(),
+			this->Ui->dimY->value(), 
+			this->Ui->dimZ->value(),
+			this->Ui->headerSize->value(),
+			this->Ui->voxelSizeX->value(), 
+			this->Ui->voxelSizeY->value(), 
+			this->Ui->voxelSizeZ->value(), 
+			this->Ui->bigEndian->isChecked(),
+			this->Ui->frontToBack->isChecked());
 		
 		
 		
