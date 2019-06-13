@@ -22,7 +22,7 @@
 #include <QFileDialog>
 #include <QCheckBox>
 #include <QString>
-
+#include <QMessageBox>
 #include <QHeaderView>
 
 
@@ -113,13 +113,43 @@ void mqOpenRawDialog::OpenRaw()
 {
 	cout << "OpenRaw dialog" << endl;
 	
-	if (mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes() ==1)
-	{
 		std::string action = "OpenRaw";
+		if (this->Ui->fileSize->value()>0 && this->Ui->requestedSize->value()!= this->Ui->fileSize->value())
+		{
+		QMessageBox msgBox;
+		msgBox.setText("Requested size differs from file size. Proceed anyway ?");
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::No);
+			int ret = msgBox.exec();
+			if (ret == QMessageBox::No) { return; }
+		}
+		if (this->Ui->voxelSizeX->value() == 0 || this->Ui->voxelSizeY->value() == 0|| this->Ui->voxelSizeZ->value() == 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Voxel size is 0 in x,y or z. Proceed anyway ?");
+			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+			msgBox.setDefaultButton(QMessageBox::No);
+			int ret = msgBox.exec();
+			if (ret == QMessageBox::No) { return; }
+		}
+		int cType = this->Ui->comboDataType->currentIndex();
+		int dataType = VTK_CHAR;
+		if (cType == 0) { dataType = VTK_CHAR; }
+		else if (cType == 1) { dataType = VTK_SHORT; }
+		else if (cType == 2) { dataType = VTK_UNSIGNED_SHORT; }
+		else if (cType == 3) { dataType = VTK_FLOAT; }
+		else if (cType == 4) { dataType = VTK_DOUBLE; }
+
+
+
+		mqMorphoDigCore::instance()->OpenRawVolume(this->myFileName,
+			dataType,
+			this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(),
+			this->Ui->headerSize->value(), this->Ui->voxelSizeX->value(), this->Ui->voxelSizeY->value(), this->Ui->voxelSizeZ->value(), this->Ui->bigEndian->isChecked(), this->Ui->frontToBack->isChecked());
 		
-		//mqMorphoDigCore::instance()->OpenRawVolume(this->myFileName);
 		
-	}
+		
+	
 }
 
 void mqOpenRawDialog::slotVoxelSizeXChanged(double newsVoxelSizeX)
