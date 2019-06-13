@@ -68,6 +68,10 @@ mqOpenRawDialog::mqOpenRawDialog(QWidget* Parent)
   this->Ui->requestedSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->Ui->fileSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
   
+  this->Ui->headerSize->setMaximum(DBL_MAX);
+  this->Ui->requestedSize->setMaximum(DBL_MAX);
+  this->Ui->fileSize->setMaximum(DBL_MAX);
+
   this->Ui->comboDataType->addItem("8 bits unsigned");
   
   this->Ui->comboDataType->addItem("16 bits signed");
@@ -80,9 +84,13 @@ mqOpenRawDialog::mqOpenRawDialog(QWidget* Parent)
   QObject::connect(ui.currentMax, SIGNAL(editingFinished()), this, SLOT(slotCurrentMaxEdited()));
   QObject::connect(ui.plottedMin, SIGNAL(editingFinished()), this, SLOT(slotPlottedMinEdited()));
   QObject::connect(ui.plottedMax, SIGNAL(editingFinished()), this, SLOT(slotPlottedMaxEdited()));*/
-  connect(this->Ui->dimX, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
-  connect(this->Ui->dimY, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
-  connect(this->Ui->dimZ, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
+  //connect(this->Ui->dimX, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
+  connect(this->Ui->dimX, SIGNAL(valueChanged(int)), this, SLOT(slotDimXChanged(int)));
+  connect(this->Ui->dimY, SIGNAL(valueChanged(int)), this, SLOT(slotDimYChanged(int)));
+  connect(this->Ui->dimZ, SIGNAL(valueChanged(int)), this, SLOT(slotDimZChanged(int)));
+  connect(this->Ui->headerSize, SIGNAL(valueChanged(double)), this, SLOT(slotHeaderSizeChanged(double)));
+  //connect(this->Ui->dimY, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
+  //connect(this->Ui->dimZ, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
   connect(this->Ui->comboDataType, SIGNAL(activated(int)), this, SLOT(slotDataTypeChanged(int)));
   connect(this->Ui->voxelSizeX, SIGNAL(valueChanged(double)), this, SLOT(slotVoxelSizeXChanged(double)));
   
@@ -123,20 +131,36 @@ void mqOpenRawDialog::slotDataTypeChanged(int newDataType)
 {
 	this->RecomputeRequested(newDataType, this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(), this->Ui->headerSize->value());
 }
-void mqOpenRawDialog::slotRecomputeRequested()
+void mqOpenRawDialog::slotDimXChanged(int newDimX)
 {
-	this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(), this->Ui->headerSize->value());
+	this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), newDimX, this->Ui->dimY->value(), this->Ui->dimZ->value(), this->Ui->headerSize->value());
 }
-void mqOpenRawDialog::RecomputeRequested(int dataType, int dimX, int dimY, int dimZ, int headerSize)
+ void mqOpenRawDialog::slotDimYChanged(int newDimY)
+ {
+	 this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), this->Ui->dimX->value(), newDimY, this->Ui->dimZ->value(), this->Ui->headerSize->value());
+ }
+ void mqOpenRawDialog::slotDimZChanged(int newDimZ)
+ {
+	 this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), this->Ui->dimX->value(), this->Ui->dimY->value(), newDimZ, this->Ui->headerSize->value());
+ }
+ void mqOpenRawDialog::slotHeaderSizeChanged(double newHeaderSize)
+ {
+	 this->RecomputeRequested(this->Ui->comboDataType->currentIndex(), this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(), newHeaderSize);
+ }
+
+void mqOpenRawDialog::RecomputeRequested(int dataType, int dimX, int dimY, int dimZ, double headerSize)
 {
-	int mult = 1;
+	double mult = 1;
 	if (dataType == 0) { mult = 1; }
 	if (dataType == 1) { mult = 2; }
 	if (dataType == 2) { mult = 2; }
 	if (dataType == 3) { mult = 4; }
 	if (dataType == 4) { mult = 8; }
 
-	long int requested = mult * dimX *dimY *dimZ + headerSize;
+	double dimx = (double)dimX;
+	double dimy = (double)dimY;
+	double dimz = (double)dimZ;
+	double requested = mult * dimx *dimy *dimz + headerSize;
 	this->Ui->requestedSize->setValue(requested);
 	
 
@@ -147,7 +171,8 @@ void mqOpenRawDialog::setFileName(QString fileName)
 	this->myFileName = fileName;
 	QFileInfo fileInfo(fileName);
 	QString onlyfilename(fileInfo.fileName());
-	this->Ui->fileSize->setValue(fileInfo.size());
+	double fileSize = (double)fileInfo.size();
+	this->Ui->fileSize->setValue(fileSize);
 	this->Ui->FileName->setText(onlyfilename);
 	
 		

@@ -31,12 +31,15 @@ public:
   ~mqOpenRawDialog();
   void OpenRaw();
   void setFileName(QString fileName);
-  void RecomputeRequested(int dataType, int dimX, int dimY, int dimZ, int headerSize);
+  void RecomputeRequested(int dataType, int dimX, int dimY, int dimZ, double headerSize);
   
   public slots:
   
   
-	  virtual void slotRecomputeRequested();
+	  virtual void slotDimXChanged(int newDimX);
+	  virtual void slotDimYChanged(int newDimY);
+	  virtual void slotDimZChanged(int newDimZ);
+	  virtual void slotHeaderSizeChanged(double newHeaderSize);
 	  virtual void slotVoxelSizeXChanged(double newsVoxelSizeX);
   virtual void slotOpenRaw();
   virtual void slotDataTypeChanged(int newDataType);
