@@ -37,6 +37,7 @@ public:
   
   
 	  virtual void slotRecomputeRequested();
+	  virtual void slotVoxelSizeXChanged(double newsVoxelSizeX);
   virtual void slotOpenRaw();
   virtual void slotDataTypeChanged(int newDataType);
   

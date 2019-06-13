@@ -84,6 +84,8 @@ mqOpenRawDialog::mqOpenRawDialog(QWidget* Parent)
   connect(this->Ui->dimY, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
   connect(this->Ui->dimZ, SIGNAL(editingFinished()), this, SLOT(slotRecomputeRequested()));
   connect(this->Ui->comboDataType, SIGNAL(activated(int)), this, SLOT(slotDataTypeChanged(int)));
+  connect(this->Ui->voxelSizeX, SIGNAL(valueChanged(double)), this, SLOT(slotVoxelSizeXChanged(double)));
+  
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotOpenRaw()));
 
 }
@@ -112,7 +114,11 @@ void mqOpenRawDialog::OpenRaw()
 	}
 }
 
-
+void mqOpenRawDialog::slotVoxelSizeXChanged(double newsVoxelSizeX)
+{
+	this->Ui->voxelSizeY->setValue(newsVoxelSizeX);
+	this->Ui->voxelSizeZ->setValue(newsVoxelSizeX);
+}
 void mqOpenRawDialog::slotDataTypeChanged(int newDataType)
 {
 	this->RecomputeRequested(newDataType, this->Ui->dimX->value(), this->Ui->dimY->value(), this->Ui->dimZ->value(), this->Ui->headerSize->value());
