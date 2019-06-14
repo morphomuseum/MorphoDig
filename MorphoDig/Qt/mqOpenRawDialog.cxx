@@ -134,7 +134,7 @@ void mqOpenRawDialog::OpenRaw()
 		}
 		int cType = this->Ui->comboDataType->currentIndex();
 		int dataType = VTK_CHAR;
-		if (cType == 0) { dataType = VTK_CHAR; }
+		if (cType == 0) { dataType = VTK_UNSIGNED_CHAR; }
 		else if (cType == 1) { dataType = VTK_SHORT; }
 		else if (cType == 2) { dataType = VTK_UNSIGNED_SHORT; }
 		else if (cType == 3) { dataType = VTK_FLOAT; }
