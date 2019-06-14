@@ -5,7 +5,8 @@
 
 ========================================================================*/
 #include "mqOpenDataReaction.h"
-
+#include "mqOpenRawDialog.h"
+#include "mqCoreUtilities.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 
@@ -404,6 +405,18 @@ void mqOpenDataReaction::OpenTAGMAP()
 	mqMorphoDigCore::instance()->OpenTAGMAP(fileName);
 
 }
+void mqOpenDataReaction::OpenRAW()
+{
+	QString fileName = QFileDialog::getOpenFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+		tr("Open raw data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("raw data (*.raw);; other (*.*)"));
+
+	cout << fileName.toStdString();
+	if (fileName.isEmpty()) return;
+	mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
+	OpenRaw_dialog.setFileName(fileName);
+	OpenRaw_dialog.exec();
+}
 void mqOpenDataReaction::OpenData()
 {
 	//mqMorphoDigCore::instance()->getUndoStack();
@@ -412,7 +425,7 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti )"));
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw )"));
 
 	if (!filenames.isEmpty())
 	{
@@ -464,7 +477,8 @@ void mqOpenDataReaction::OpenData()
 			std::string MHDext2(".MHD");
 			std::string VTIext(".vti");
 			std::string VTIext2(".VTI");
-
+			std::string RAWext(".raw");
+			std::string RAWext2(".RAW");
 
 			int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos 13 mhd mha vti
 			std::size_t found = fileName.toStdString().find(STLext);
@@ -600,6 +614,14 @@ void mqOpenDataReaction::OpenData()
 				type = 15; //TPS
 			}
 
+			found = fileName.toStdString().find(RAWext);
+			found2 = fileName.toStdString().find(RAWext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				cout << "RAW" << endl;
+				type = 16; //RAW
+			}
+
 			if (type < 4)
 			{
 				int ok = mqMorphoDigCore::instance()->OpenMesh(fileName);
@@ -653,7 +675,13 @@ void mqOpenDataReaction::OpenData()
 			{
 				mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
 			}
-
+			else if (type == 16)
+			{
+				//mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
+				mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
+				OpenRaw_dialog.setFileName(fileName);
+				OpenRaw_dialog.exec();
+			}
 		}
 	}
 	

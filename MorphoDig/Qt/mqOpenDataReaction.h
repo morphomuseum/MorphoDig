@@ -34,7 +34,7 @@ public:
    void OpenPOS(int mode);
    void OpenPOSTrans(int mode);
    void OpenLandmark(int mode);
-   
+   void OpenRAW();
    void OpenFLG();
    void OpenCUR();
    void OpenSTV();
@@ -132,6 +132,10 @@ protected:
 	else if (this->Mode == 19)
 	{
 		this->ImportAvizoLandmarks();
+	}
+	else if (this->Mode == 20)
+	{
+		this->OpenRAW();
 	}
   }
 

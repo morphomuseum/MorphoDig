@@ -9,6 +9,8 @@
 
 
 #include "mqMorphoDigMenuBuilders.h"
+#include "mqOpenRawDialog.h"
+#include "mqCoreUtilities.h"
 #include "mqOpenDataReaction.h"
 #include "vtkBezierSurfaceWidget.h"
 #include "vtkBezierSurfaceSource.h"
@@ -1214,6 +1216,9 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::string TPSext2(".TPS");
 		std::string PTSext(".pts");
 		std::string PTSext2(".PTS");
+		std::string RAWext(".raw");
+		std::string RAWext2(".RAW");
+
 		int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
 		std::size_t found = fileName.toStdString().find(STLext);
 		std::size_t found2 = fileName.toStdString().find(STLext2);
@@ -1344,6 +1349,13 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		{
 			type = 15; //TPS
 		}
+		found = fileName.toStdString().find(RAWext);
+		found2 = fileName.toStdString().find(RAWext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			cout << "RAW" << endl;
+			type = 16; //RAW
+		}
 
 		if (type < 4)
 		{
@@ -1398,6 +1410,12 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		else if (type == 15)
 		{
 			mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
+		}
+		else if (type == 16)
+		{
+			mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
+			OpenRaw_dialog.setFileName(fileName);
+			OpenRaw_dialog.exec(); 
 		}
 
 

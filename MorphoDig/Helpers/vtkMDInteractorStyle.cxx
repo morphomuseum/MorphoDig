@@ -18,6 +18,7 @@
 #include "vtkMDVolume.h"
 #include "mqUndoStack.h"
 #include "mqMorphoDigCore.h"
+#include "mqOpenRawDialog.h"
 #include "mqSaveNTWDialog.h"
 #include "mqCoreUtilities.h"
 #include <vtkBoxWidget.h>
@@ -560,7 +561,7 @@ void vtkMDInteractorStyle::StartSelect()
 
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti)"));
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw )"));
 
 			if (!filenames.isEmpty())
 			{
@@ -612,6 +613,9 @@ void vtkMDInteractorStyle::StartSelect()
 					std::string MHDext2(".MHD");
 					std::string VTIext(".vti");
 					std::string VTIext2(".VTI");
+					std::string RAWext(".raw");
+					std::string RAWext2(".RAW");
+
 
 					int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos 13 MHA MHD VTI
 					std::size_t found = fileName.toStdString().find(STLext);
@@ -745,7 +749,13 @@ void vtkMDInteractorStyle::StartSelect()
 					{
 						type = 15; //TPS
 					}
-
+					found = fileName.toStdString().find(RAWext);
+					found2 = fileName.toStdString().find(RAWext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						cout << "RAW" << endl;
+						type = 16; //RAW
+					}
 					if (type < 4)
 					{
 						int ok=mqMorphoDigCore::instance()->OpenMesh(fileName);
@@ -799,6 +809,14 @@ void vtkMDInteractorStyle::StartSelect()
 					{
 						mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
 					}
+					else if (type == 16)
+					{
+						//mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
+						mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
+						OpenRaw_dialog.setFileName(fileName);
+						OpenRaw_dialog.exec();
+					}
+
 
 				}
 			}

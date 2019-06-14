@@ -177,8 +177,6 @@ mqOpenDataReaction.cxx
 mqOpenDataReaction.h
 mqOpenRawDialog.cxx
 mqOpenRawDialog.h
-mqOpenRawDialogReaction.cxx
-mqOpenRawDialogReaction.h
 mqOrientationLabelsDialog.cxx
 mqOrientationLabelsDialog.h
 mqOrientationLabelsDialogReaction.cxx
