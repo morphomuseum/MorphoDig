@@ -42,6 +42,7 @@ public:
    void OpenTAGMAP();
    void OpenORI();
    void OpenVolume();
+   void OpenTIFF3D();
 
    void ImportAvizoLandmarks();
    
@@ -136,6 +137,10 @@ protected:
 	else if (this->Mode == 20)
 	{
 		this->OpenRAW();
+	}
+	else if (this->Mode == 21)
+	{
+		this->OpenTIFF3D();
 	}
   }
 

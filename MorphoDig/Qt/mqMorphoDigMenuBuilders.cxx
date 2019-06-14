@@ -229,6 +229,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   QMenu* submenuVolume = menu.addMenu("Volume");
   new mqOpenDataReaction(submenuVolume->addAction("Open MHD/MHA/VTI Volume") << mqSetName("actionOpenVolume"), 18);
   new mqOpenDataReaction(submenuVolume->addAction("Open Raw Volume") << mqSetName("actionOpenRawVolume"), 20);
+  new mqOpenDataReaction(submenuVolume->addAction("Open 3D Tiff file") << mqSetName("actionOpenTiffVolume"), 21);
   //new mqOpenRawDialogReaction(submenuVolume->addAction("Open Raw Volume") << mqSetName("actionOpenRawVolume"));
 
 //#include "mqOpenRawDialogReaction.h"

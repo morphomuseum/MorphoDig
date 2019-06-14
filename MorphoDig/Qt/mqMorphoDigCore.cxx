@@ -21,6 +21,7 @@
 #include <time.h>
 #include <vtkAlgorithm.h>
 #include <vtkImageReader.h>
+#include <vtkTIFFReader.h>
 #include<vtkBoxWidget.h>
 
 #include <vtkLight.h>
@@ -4920,37 +4921,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, int dataType, int dimX, in
 
 	if (file_exists == 1)
 	{
-		std::string MHDext(".mhd");
-		std::string MHDext2(".MHD");
-		std::string MHAext(".mha");
-		std::string MHAext2(".MHA");
-		std::string VTIext(".vti");
-		std::string VTIext2(".VTI");
-
-		int type = 0; //0 = mhd, 1 = mha, 2 = vti,
-		std::size_t found = fileName.toStdString().find(MHDext);
-		std::size_t found2 = fileName.toStdString().find(MHDext2);
-		if (found != std::string::npos || found2 != std::string::npos)
-		{
-			type = 0;
-			//MHD
-		}
-
-
-		found = fileName.toStdString().find(MHAext);
-		found2 = fileName.toStdString().find(MHAext2);
-		if (found != std::string::npos || found2 != std::string::npos)
-		{
-			type = 1; //MHA
-		}
-
-
-		found = fileName.toStdString().find(VTIext);
-		found2 = fileName.toStdString().find(VTIext2);
-		if (found != std::string::npos || found2 != std::string::npos)
-		{
-			type = 2; //VTI
-		}
+		
 		vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
 		vtkSmartPointer<vtkAlgorithm> reader = vtkSmartPointer <vtkAlgorithm>::New();
 
@@ -5167,7 +5138,240 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, int dataType, int dimX, in
 	}
 
 }
+void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, double voxelSizeX, double voxelSizeY, double voxelSizeZ)
+{
+	int file_exists = 1;
+	QFile file(fileName);
+	QString name = "";
+	if (file.exists()) {
+		// Message
+		name = file.fileName(); // Return only a file name		
+		file.close();
+	}
+	else
+	{
+		file_exists = 0;
 
+
+	}
+
+
+	if (file_exists == 1)
+	{
+		std::string TIFext(".tif");
+		std::string TIFext2(".TIF");
+		std::string TIFext3(".tiff");
+		std::string TIFext4(".TIFF");
+		
+		int type = 0; //0 = mhd, 1 = mha, 2 = vti,
+		std::size_t found = fileName.toStdString().find(TIFext);
+		std::size_t found2 = fileName.toStdString().find(TIFext2);
+		std::size_t found3 = fileName.toStdString().find(TIFext3);
+		std::size_t found4 = fileName.toStdString().find(TIFext4);
+		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		{
+			type = 0;
+			//Tif TIFF
+		}
+		//maybe we extend this funtion to "png stacks" "jpg stacks" or somthing else?
+		
+		vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+		vtkSmartPointer<vtkAlgorithm> reader = vtkSmartPointer <vtkAlgorithm>::New();
+
+		
+		vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
+		tiffReader->SetFileName(fileName.toLocal8Bit());
+		//tiffReader->GetF
+		tiffReader->Update();
+			input = tiffReader->GetOutput();
+			reader = tiffReader;
+		
+
+		int dim[3];
+		double spacing[3];
+		input->GetDimensions(dim);
+		input->SetSpacing(voxelSizeX, voxelSizeY, voxelSizeZ);
+		input->GetSpacing(spacing);
+		int numcells = input->GetNumberOfCells();
+		input->GetScalarTypeAsString();
+		//input->Get
+		cout << "Tiff Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
+		cout << "Tiff Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
+		cout << "Tiff Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
+		cout << "Tiff Image type:" << input->GetScalarTypeAsString() << endl;
+		cout << "Tiff Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
+		cout << "Tiff Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+
+
+		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+
+
+
+
+		if (dim[0] < 2 ||
+			dim[1] < 2 ||
+			dim[2] < 2)
+		{
+			return;
+		}
+		else
+		{
+			//cout << "Try visualize!!!" << endl;
+
+			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
+			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
+			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
+			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
+			vtkSmartPointer<vtkImageAccumulate> histogram =
+				vtkSmartPointer<vtkImageAccumulate>::New();
+			//mapper->SetRequestedRenderModeToDefault();
+
+
+
+			volume->GetOutline()->SetInputData(input);
+
+			histogram->SetInputData(input);
+			double bin_spacing = 1;
+
+
+
+
+			// bin_spacing :
+
+
+
+			histogram->SetComponentExtent(input->GetScalarRange()[0], input->GetScalarRange()[1], 0, 0, 0, 0);
+			histogram->SetComponentOrigin(input->GetScalarRange()[0], 0, 0);
+			bin_spacing = (double)(input->GetScalarRange()[1] - input->GetScalarRange()[0]) / 100;
+			//
+			//histogram->SetComponentExtent(6544, 30540, 0, 0, 0, 0);
+			//histogram->SetComponentOrigin(6544, 0, 0);
+			//bin_spacing = (double)(30540 - 6544) / 100;
+
+			//
+			histogram->SetComponentSpacing(bin_spacing, 0, 0);
+			cout << "Bin spacing = " << bin_spacing << endl;
+			histogram->Update();
+			// faire plutôt une liste avec push.			
+			  // Create the property and attach the transfer functions
+			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
+			property->SetIndependentComponents(true);
+			volume->SetCtf(TF);
+			property->SetColor(TF);
+			property->SetScalarOpacity(opacityFun);
+			property->SetInterpolationTypeToLinear();
+			//mapper->SetInputData(input);
+			mapper->SetInputConnection(reader->GetOutputPort());
+			// connect up the volume to the property and the mapper
+			volume->SetProperty(property);
+			volume->SetMapper(mapper);
+			volume->SetImageData(input);
+			volume->SetHist(histogram);
+
+
+
+
+			double first_point = 0; // as first low... a
+			double last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+
+			double width = input->GetScalarRange()[1] - input->GetScalarRange()[0];
+
+
+			first_point = input->GetScalarRange()[0] + 0.15*width;
+			last_point = input->GetScalarRange()[1] - 0.3*width;
+			//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
+			//cout << "EH???" << endl;
+
+			double second_point = first_point + 0.2*(last_point - first_point);
+			double third_point = first_point + 0.4*(last_point - first_point);
+
+			TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+			TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
+			TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
+			TF->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
+
+			opacityFun->AddPoint(first_point, 0, 0.5, 0);
+			opacityFun->AddPoint(second_point, 0.5, .5, 0);
+			opacityFun->AddPoint(third_point, 0.8, .5, 0);
+			opacityFun->AddPoint(last_point, 1, 0.5, 0);
+			TF->SetEnableOpacityMapping(true);
+			TF->SetScalarOpacityFunction(opacityFun);
+			TF->Build();
+			mapper->SetBlendModeToComposite();
+
+
+			//property->set
+			property->SetAmbient(this->mui_Ambient);
+			property->SetDiffuse(this->mui_Diffuse);
+			property->SetSpecular(this->mui_Specular);
+			property->SetSpecularPower(this->mui_SpecularPower);
+			property->SetInterpolationTypeToLinear();
+			property->ShadeOn();
+			double bblength = volume->GetBoundingBoxLength();
+			double SOUD = bblength / 500;
+			//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+			if (SOUD == 0) { SOUD = 0.89; }
+
+			property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+			//mapper->Update();
+			//volume->Update();
+			volume->SetSelected(1);
+			volume->SetScalarOpacityUnitDistance(SOUD);
+			volume->SetScalarDisplayMin((double)first_point);
+			volume->SetScalarDisplayMax((double)last_point);
+			//volume->UpdateLookupTableRange();
+
+			QFileInfo fileInfo(fileName);
+			QString onlyfilename(fileInfo.fileName());
+			std::string only_filename = onlyfilename.toStdString();
+			std::string newname = only_filename.c_str();
+			size_t nPos = newname.find_last_of(".");
+			if (nPos > 0)
+			{
+
+				newname = newname.substr(0, nPos);
+			}
+
+			//@@TODO! 
+
+			newname = this->CheckingName(newname);
+			cout << "Volume Name= " << newname << endl;
+			//volume->SetOrientation(0, 0, 180);
+			volume->SetName(newname);
+			volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+			volume->InitCenter();
+			//this->getRenderer()->AddVolume(volume);
+			this->getVolumeCollection()->AddItem(volume);
+			//emit this->actorsMightHaveChanged();
+			emit this->volumesMightHaveChanged();
+			cout << "init arrays... needed?" << endl;
+			//this->Initmui_ExistingArrays();
+			std::string action = "Load volume";
+			int mCount = BEGIN_UNDO_SET(action);
+			this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
+			END_UNDO_SET();
+
+
+
+			this->getVolumeCollection()->SetChanged(1);
+
+			cout << "try adjust camera grid" << endl;
+			this->AdjustCameraAndGrid();
+			cout << "camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+
+			this->Render();
+
+		}
+	}
+}
 void mqMorphoDigCore::OpenVolume(QString fileName)
 {
 	int file_exists = 1;
@@ -5290,53 +5494,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			histogram->SetInputData(input);
 			double bin_spacing = 1;
 			
-			/*if (input->GetScalarType() ==  VTK_UNSIGNED_SHORT)
-			{
-				histogram->SetComponentExtent(VTK_UNSIGNED_SHORT_MIN, VTK_UNSIGNED_SHORT_MAX, 0, 0, 0, 0);
-				histogram->SetComponentOrigin(0, 0, 0);
-				
-			}else if (input->GetScalarType() == VTK_SHORT)
-			{
-
-				histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
-				histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
-				
-			}
-			else if (input->GetScalarType() == VTK_CHAR)
-			{				
-				histogram->SetComponentExtent(VTK_CHAR_MIN, VTK_CHAR_MAX, 0, 0, 0, 0);
-				histogram->SetComponentOrigin(VTK_CHAR_MIN, 0, 0);
-				
-			}
-			else if (input->GetScalarType() == VTK_UNSIGNED_CHAR)
-			{
-				
-				histogram->SetComponentExtent(VTK_UNSIGNED_CHAR_MIN, VTK_UNSIGNED_CHAR_MAX, 0, 0, 0, 0);
-				histogram->SetComponentOrigin(VTK_UNSIGNED_CHAR_MIN, 0, 0);
-				
-			}
-			else if (input->GetScalarType() == VTK_SIGNED_CHAR)
-			{
-				
-				histogram->SetComponentExtent(VTK_SIGNED_CHAR_MIN, VTK_SIGNED_CHAR_MAX, 0, 0, 0, 0);
-				histogram->SetComponentOrigin(VTK_SIGNED_CHAR_MIN, 0, 0);
-				
-			}
-			else if (input->GetScalarType() == VTK_FLOAT)
-			{
-				
-				//input->GetScalarRange()[0] input->GetScalarRange()[1]
-				//histogram->SetComponentExtent(VTK_FLOAT_MIN, VTK_FLOAT_MAX, 0, 0, 0, 0);
-				histogram->SetComponentOrigin(VTK_FLOAT_MIN, 0, 0);
-				
-			}
-			else if (input->GetScalarType() == VTK_DOUBLE)
-			{
-				
-				//histogram->SetComponentExtent(VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 0, 0, 0, 0);
-				histogram->SetComponentOrigin(VTK_DOUBLE_MIN, 0, 0);
-				
-			}*/
+		
 			
 
 			// bin_spacing :
@@ -5355,96 +5513,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
 			cout << "Bin spacing = " << bin_spacing << endl;
 			histogram->Update();
-			// faire plutôt une liste avec push.
-			/*
-			std::vector<int> peaks;
-			std::vector<int> peaksT;
-			std::vector<int> peakVals;
-			std::vector<int> lows;
-			std::vector<int> lowsT;
-			std::vector<int> lowVals;
-			
-			int dims[3];
-			histogram->GetOutput()->GetDimensions(dims);
-			cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
-			vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
-			cout << "Histogram (used) bins=" << used_bins  << endl;
-			int prevbin = 0;
-		
-
-			int p_or_l=1; //1 search peak //2 search low
-			int p_i = 0;
-			int l_i = -1;
-
-			peaks.push_back(0);
-			peaksT.push_back(0);
-			peakVals.push_back(0);
-			for (vtkIdType bin = 0; bin < used_bins; bin++)
-			{
-				int binT;
-				if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
-					binT = VTK_UNSIGNED_SHORT_MIN + bin * bin_spacing;}
-				if (input->GetScalarType() == VTK_SHORT) {
-					binT = VTK_SHORT_MIN + bin * bin_spacing;
-				}
-				int curbin = *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0)));
-				cout << "bin:" << bin << ", curbin=" << curbin << endl;
-					//histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin);
-				if (p_or_l == 1)//search peak
-				{
-					if (curbin >= prevbin)
-					{
-						if (curbin > 0)
-						{
-							peaks.at(p_i) = bin;
-							peaksT.at(p_i) = binT;
-							peakVals.at(p_i) = curbin;
-						}
-					}
-					else
-					{
-						// starts do decrease: 
-						p_or_l = 0;
-						lows.push_back(bin);
-						lowsT.push_back(binT);
-						lowVals.push_back(curbin);
-						l_i++; //cout << "l_i" << l_i << endl;
-					}
-				}
-				if (p_or_l == 0)//search low
-				{
-					if (curbin < prevbin)
-					{
-						lows.at(l_i) = bin;
-						lowsT.at(l_i) = binT;
-						lowVals.at(l_i) = curbin;
-					}
-					else
-					{
-						// starts do re-increase: 
-						p_or_l = 1;
-						peaks.push_back(bin);
-						peaksT.push_back(binT);
-						peakVals.push_back(curbin);
-						p_i++;
-					}
-				}
-				
-					//cout <<"bin="<<bin<<"|"<< *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0))) << " ";
-				//	cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << endl;				
-				prevbin = curbin;
-			}
-			
-			for (int i = 0; i <= p_i;  i++)
-			{
-				//cout << "p" << i <<":"<< peaksT.at(i) << ", val=" << peakVals.at(i) << endl;
-			}
-			for (int i = 0; i <= l_i; i++)
-			{
-				//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
-			}
-		
-		*/
+			// faire plutôt une liste avec push.			
 			  // Create the property and attach the transfer functions
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
@@ -5465,84 +5534,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			double first_point = 0; // as first low... a
 			double last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
-
-			/*
-			if (input->GetScalarType() == VTK_UNSIGNED_SHORT) {
-				first_point = VTK_UNSIGNED_SHORT_MIN;
-				last_point = VTK_UNSIGNED_SHORT_MAX;
-			}
-			else
-			{
-				first_point = VTK_SHORT_MIN;
-				last_point = VTK_SHORT_MAX;
-				
-			}
-			if (l_i >= 0) 
-			{ 
-				first_point = lowsT.at(0); 
-				if (p_i > 0) {
-					first_point = (int)(0.5*(lowsT.at(0) + peaksT.at(1)));
-				}
-			}
-
-			//now search last point
-			int avg_peaks= 0;
-
-			int low_after_avgpeaks = 0;
-			if (p_i>0)
-			{ 
-				double sum_peaks=0;
-				double sum_peakVals=0;
-				for (int i = 1; i <= p_i; i++)
-				{
-					//peaksT.at(i) peakVals.at(i) ;
-					//cout << "peaksT.at(i)="<<peaksT.at(i) << endl;
-					//cout << "peakVals.at(i)=" << peakVals.at(i) << endl;
-					double mult = (double)peaksT.at(i)*(double)peakVals.at(i);
-					//cout << "mult=" << mult << endl;
-					sum_peakVals += (double)peakVals.at(i);
-					sum_peaks += mult;
-					//cout << "sum_peaks=" << sum_peaks << endl;
-					//cout << "sum_peakVals=" << sum_peakVals << endl;
-
-				}
-				if (sum_peakVals>0)
-				{
-					avg_peaks = (int)(sum_peaks / sum_peakVals);
-					//cout << "avg_peaks="<<avg_peaks << endl;
-					// search if a low exists after avg_peaks
-					int exists = 0;
-					int i_low=0;
-					if (l_i>=0)
-					{ 
-						for (int i = 0; i <= l_i; i++)
-						{
-							if (lowsT.at(i) > avg_peaks)
-							{
-								if (exists==0){ i_low = i; }
-								exists = 1;
 								
-							}
-						}
-						if (exists == 1)
-						{
-							low_after_avgpeaks = lowsT.at(i_low);
-							last_point = (int)((low_after_avgpeaks + avg_peaks) / 2);
-						}
-					}
-					else
-					{
-						last_point = avg_peaks;
-					}
-				}
-			}
-			//let's put first point a little bit further!
-			first_point = (int)(first_point + 0.2*(last_point - first_point));
-			cout << "Range based on peaks and lows :" << first_point << "," << last_point << endl;
-			*/
-			
-			//let's try something else
-
 			double width = input->GetScalarRange()[1] - input->GetScalarRange()[0];
 
 
@@ -5628,15 +5620,10 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 this->AdjustCameraAndGrid();
 				 cout << "camera and grid adjusted" << endl;
 				 
-				 //cout << "camera and grid adjusted" << endl;
-
 				 if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 				 {
 					 this->UpdateLandmarkSettings();
-				 }
-				 //this->getRenderer()->AddVolume(volume);
-			
-
+				 }				
 			
 			this->Render();
 

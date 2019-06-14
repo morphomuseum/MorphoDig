@@ -177,6 +177,8 @@ mqOpenDataReaction.cxx
 mqOpenDataReaction.h
 mqOpenRawDialog.cxx
 mqOpenRawDialog.h
+mqOpenTiff3DDialog.cxx
+mqOpenTiff3DDialog.h
 mqOrientationLabelsDialog.cxx
 mqOrientationLabelsDialog.h
 mqOrientationLabelsDialogReaction.cxx
@@ -362,6 +364,7 @@ mqMinimalDialog.ui
 mqMoveCurveHandlesDialog.ui
 mqObjectsControlsWidget.ui
 mqOpenRawDialog.ui
+mqOpenTiff3DDialog.ui
 mqOrientationLabelsDialog.ui
 mqSaveCURDialog.ui
 mqSaveCURasVERDialog.ui

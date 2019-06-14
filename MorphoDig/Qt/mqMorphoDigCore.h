@@ -600,6 +600,7 @@ public:
 	void OpenPTS(QString fileName, int mode);
 	int OpenMesh(QString fileName);
 	void OpenVolume(QString fileName);
+	void OpenTiff3DVolume(QString fileName, double voxelSizeX, double voxelSizeY, double voxelSizeZ);
 	void OpenRawVolume(QString fileName, int dataType, int dimX, int dimY, int dimZ, double headerSize, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool bigEndian, bool frontToBack);
 	void OpenPOS(QString fileName, int mode);
 	void OpenPOSTrans(QString fileName, int mode);

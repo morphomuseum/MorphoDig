@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqEditScalarsDialog</class>
- <widget class="QDialog" name="mqEditScalarsDialog">
+ <class>mqOpenTiff3DDialog</class>
+ <widget class="QDialog" name="mqOpenTiff3DDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
-    <height>751</height>
+    <width>531</width>
+    <height>198</height>
    </rect>
   </property>
   <property name="palette">
@@ -25,17 +25,17 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Light">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>60</red>
-        <green>180</green>
+        <red>255</red>
+        <green>255</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -43,27 +43,27 @@
      <colorrole role="Midlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>50</red>
-        <green>150</green>
-        <blue>212</blue>
+        <red>238</red>
+        <green>238</green>
+        <blue>238</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Dark">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>20</red>
-        <green>60</green>
-        <blue>85</blue>
+        <red>110</red>
+        <green>110</green>
+        <blue>110</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Mid">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>26</red>
-        <green>80</green>
-        <blue>113</blue>
+        <red>147</red>
+        <green>147</green>
+        <blue>147</blue>
        </color>
       </brush>
      </colorrole>
@@ -106,9 +106,9 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
@@ -124,9 +124,9 @@
      <colorrole role="AlternateBase">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>147</red>
-        <green>187</green>
-        <blue>212</blue>
+        <red>238</red>
+        <green>238</green>
+        <blue>238</blue>
        </color>
       </brush>
      </colorrole>
@@ -171,17 +171,17 @@
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Light">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>60</red>
-        <green>180</green>
+        <red>255</red>
+        <green>255</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -189,27 +189,27 @@
      <colorrole role="Midlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>50</red>
-        <green>150</green>
-        <blue>212</blue>
+        <red>238</red>
+        <green>238</green>
+        <blue>238</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Dark">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>20</red>
-        <green>60</green>
-        <blue>85</blue>
+        <red>110</red>
+        <green>110</green>
+        <blue>110</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Mid">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>26</red>
-        <green>80</green>
-        <blue>113</blue>
+        <red>147</red>
+        <green>147</green>
+        <blue>147</blue>
        </color>
       </brush>
      </colorrole>
@@ -252,9 +252,9 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
@@ -270,9 +270,9 @@
      <colorrole role="AlternateBase">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>147</red>
-        <green>187</green>
-        <blue>212</blue>
+        <red>238</red>
+        <green>238</green>
+        <blue>238</blue>
        </color>
       </brush>
      </colorrole>
@@ -308,26 +308,26 @@
      <colorrole role="WindowText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>20</red>
-        <green>60</green>
-        <blue>85</blue>
+        <red>110</red>
+        <green>110</green>
+        <blue>110</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Button">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Light">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>60</red>
-        <green>180</green>
+        <red>255</red>
+        <green>255</green>
         <blue>255</blue>
        </color>
       </brush>
@@ -335,36 +335,36 @@
      <colorrole role="Midlight">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>50</red>
-        <green>150</green>
-        <blue>212</blue>
+        <red>238</red>
+        <green>238</green>
+        <blue>238</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Dark">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>20</red>
-        <green>60</green>
-        <blue>85</blue>
+        <red>110</red>
+        <green>110</green>
+        <blue>110</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Mid">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>26</red>
-        <green>80</green>
-        <blue>113</blue>
+        <red>147</red>
+        <green>147</green>
+        <blue>147</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Text">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>20</red>
-        <green>60</green>
-        <blue>85</blue>
+        <red>110</red>
+        <green>110</green>
+        <blue>110</blue>
        </color>
       </brush>
      </colorrole>
@@ -380,27 +380,27 @@
      <colorrole role="ButtonText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>20</red>
-        <green>60</green>
-        <blue>85</blue>
+        <red>110</red>
+        <green>110</green>
+        <blue>110</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
@@ -416,9 +416,9 @@
      <colorrole role="AlternateBase">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>40</red>
-        <green>120</green>
-        <blue>170</blue>
+        <red>221</red>
+        <green>221</green>
+        <blue>221</blue>
        </color>
       </brush>
      </colorrole>
@@ -453,15 +453,15 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalars</string>
+   <string>Open Tiff 3D file</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>719</y>
-     <width>158</width>
-     <height>25</height>
+     <x>184</x>
+     <y>160</y>
+     <width>161</width>
+     <height>30</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -482,337 +482,104 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>441</width>
-     <height>701</height>
+     <width>511</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="title">
-    <string>Scalar arrays and color maps:</string>
+    <string>Open Tiff 3D file</string>
    </property>
-   <widget class="QLabel" name="label_2">
+   <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>630</y>
-      <width>91</width>
-      <height>16</height>
+      <x>10</x>
+      <y>40</y>
+      <width>491</width>
+      <height>80</height>
      </rect>
     </property>
-    <property name="text">
-     <string>suggested min:</string>
+    <property name="title">
+     <string>Voxel size (size unit, most often in mm):</string>
     </property>
-   </widget>
-   <widget class="QPushButton" name="pushRemoveScalar">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>50</y>
-      <width>161</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Remove selected scalar array</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboActiveScalar">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>17</y>
-      <width>69</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>17</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active scalar array:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>91</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Active color map:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="suggestedMin">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>630</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>6</number>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="suggestedMax">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>660</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>6</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>660</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>suggested max:</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushScalarSuggestedMin">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>630</y>
-      <width>31</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Apply suggested min</string>
-    </property>
-    <property name="text">
-     <string>-&gt;</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushScalarSuggestedMax">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>660</y>
-      <width>31</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Apply suggested max</string>
-    </property>
-    <property name="text">
-     <string>-&gt;</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="selectedObjects">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>50</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>only for selected surfaces</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QScrollArea" name="scrollArea">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>130</y>
-      <width>402</width>
-      <height>461</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="widgetResizable">
-     <bool>true</bool>
-    </property>
-    <widget class="QWidget" name="scrollAreaWidgetContents">
+    <widget class="QWidget" name="horizontalLayoutWidget_4">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>402</width>
-       <height>461</height>
+       <x>10</x>
+       <y>30</y>
+       <width>463</width>
+       <height>31</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
       <item>
-       <widget class="QFrame" name="PropertiesFrame">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QDoubleSpinBox" name="voxelSizeX">
+        <property name="decimals">
+         <number>10</number>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
         </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="voxelSizeY">
+        <property name="decimals">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="voxelSizeZ">
+        <property name="decimals">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>90</y>
-      <width>291</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QComboBox" name="comboColorMap"/>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="reinitializeColorMap">
-       <property name="toolTip">
-        <string>Reinitialize Color Map</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../Icons/icons.qrc">
-         <normaloff>:/Icons/Initialize24.png</normaloff>:/Icons/Initialize24.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="editColorMap">
-       <property name="toolTip">
-        <string>Edit color map name</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../Icons/icons.qrc">
-         <normaloff>:/Icons/edit.png</normaloff>:/Icons/edit.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="deleteColorMap">
-       <property name="toolTip">
-        <string>Delete color map</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../Icons/icons.qrc">
-         <normaloff>:/Icons/delete2.png</normaloff>:/Icons/delete2.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QSpinBox" name="removePercent">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>600</y>
-      <width>42</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>49</number>
-    </property>
-    <property name="value">
-     <number>5</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>600</y>
-      <width>331</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>% of extreme values removed to compute suggested Min and Max:</string>
-    </property>
-   </widget>
   </widget>
-  <action name="actionExportColorMaps">
-   <property name="icon">
-    <iconset resource="../Icons/icons.qrc">
-     <normaloff>:/Icons/ExportMap22.png</normaloff>
-     <normalon>:/Icons/ExportMap22.png</normalon>:/Icons/ExportMap22.png</iconset>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
    </property>
    <property name="text">
-    <string>Export color map(s)</string>
+    <string>File name</string>
    </property>
-   <property name="toolTip">
-    <string>Export color maps</string>
+  </widget>
+  <widget class="QLineEdit" name="FileName">
+   <property name="enabled">
+    <bool>false</bool>
    </property>
-  </action>
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>30</y>
+     <width>381</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="../Icons/icons.qrc"/>
@@ -822,7 +589,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>mqEditScalarsDialog</receiver>
+   <receiver>mqOpenTiff3DDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -838,7 +605,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>mqEditScalarsDialog</receiver>
+   <receiver>mqOpenTiff3DDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

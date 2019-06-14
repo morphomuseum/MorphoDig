@@ -6,6 +6,7 @@
 ========================================================================*/
 #include "mqOpenDataReaction.h"
 #include "mqOpenRawDialog.h"
+#include "mqOpenTiff3DDialog.h"
 #include "mqCoreUtilities.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
@@ -417,6 +418,18 @@ void mqOpenDataReaction::OpenRAW()
 	OpenRaw_dialog.setFileName(fileName);
 	OpenRaw_dialog.exec();
 }
+void mqOpenDataReaction::OpenTIFF3D()
+{
+	QString fileName = QFileDialog::getOpenFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+		tr("Open tiff 3D file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("tiff 3D files (*.tiff *.tif )"));
+
+	cout << fileName.toStdString();
+	if (fileName.isEmpty()) return;
+	mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+	OpenTiff3D_dialog.setFileName(fileName);
+	OpenTiff3D_dialog.exec();
+}
 void mqOpenDataReaction::OpenData()
 {
 	//mqMorphoDigCore::instance()->getUndoStack();
@@ -425,7 +438,7 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw )"));
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff )"));
 
 	if (!filenames.isEmpty())
 	{
@@ -479,6 +492,11 @@ void mqOpenDataReaction::OpenData()
 			std::string VTIext2(".VTI");
 			std::string RAWext(".raw");
 			std::string RAWext2(".RAW");
+			std::string TIFext(".tif");
+			std::string TIFext2(".TIF");
+			std::string TIFext3(".tiff");
+			std::string TIFext4(".TIFF");
+
 
 			int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos 13 mhd mha vti
 			std::size_t found = fileName.toStdString().find(STLext);
@@ -621,7 +639,24 @@ void mqOpenDataReaction::OpenData()
 				cout << "RAW" << endl;
 				type = 16; //RAW
 			}
-
+			found = fileName.toStdString().find(RAWext);
+			found2 = fileName.toStdString().find(RAWext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				cout << "RAW" << endl;
+				type = 16; //RAW
+			}
+			
+			found = fileName.toStdString().find(TIFext);
+			found2 = fileName.toStdString().find(TIFext2);
+			found3 = fileName.toStdString().find(TIFext3);
+			found4 = fileName.toStdString().find(TIFext4);
+			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+			{
+				type = 17;
+				//Tif TIFF
+			}
+		
 			if (type < 4)
 			{
 				int ok = mqMorphoDigCore::instance()->OpenMesh(fileName);
@@ -677,11 +712,18 @@ void mqOpenDataReaction::OpenData()
 			}
 			else if (type == 16)
 			{
-				//mqMorphoDigCore::instance()->OpenTPS(fileName, 0);
 				mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
 				OpenRaw_dialog.setFileName(fileName);
 				OpenRaw_dialog.exec();
 			}
+			else if (type == 17)
+			{
+				
+				mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+				OpenTiff3D_dialog.setFileName(fileName);
+				OpenTiff3D_dialog.exec();
+			}
+			
 		}
 	}
 	
