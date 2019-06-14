@@ -438,8 +438,8 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff )"));
-
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw )")); // no tiff!
+	int tiff_warningmsg = 0;
 	if (!filenames.isEmpty())
 	{
 		for (int i = 0; i < filenames.count(); i++)
@@ -646,6 +646,7 @@ void mqOpenDataReaction::OpenData()
 				cout << "RAW" << endl;
 				type = 16; //RAW
 			}
+
 			
 			found = fileName.toStdString().find(TIFext);
 			found2 = fileName.toStdString().find(TIFext2);
@@ -654,6 +655,14 @@ void mqOpenDataReaction::OpenData()
 			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
 			{
 				type = 17;
+				if (tiff_warningmsg == 0)
+				{
+					QMessageBox msgBox;
+					msgBox.setText("2D and 3D tiff volume files can not be opened from here, they must be opened from the menu \"File->Volume\".");
+					msgBox.exec();
+					tiff_warningmsg = 1;
+
+				}
 				//Tif TIFF
 			}
 		
@@ -718,10 +727,8 @@ void mqOpenDataReaction::OpenData()
 			}
 			else if (type == 17)
 			{
-				
-				mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
-				OpenTiff3D_dialog.setFileName(fileName);
-				OpenTiff3D_dialog.exec();
+								
+				// do nothing, 2D tiff stacks and 3D tiff files should be opened from the menus.
 			}
 			
 		}

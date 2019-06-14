@@ -1172,6 +1172,7 @@ void MorphoDig::dragEnterEvent(QDragEnterEvent *e)
 }
 void MorphoDig::dropEvent(QDropEvent *e)
 {
+	int tiff_warningmsg = 0;
 	foreach(const QUrl &url, e->mimeData()->urls()) {
 		QString fileName = url.toLocalFile();
 		//this->MorphoDigCore->Open
@@ -1218,6 +1219,10 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::string PTSext2(".PTS");
 		std::string RAWext(".raw");
 		std::string RAWext2(".RAW");
+		std::string TIFext(".tif");
+		std::string TIFext2(".TIF");
+		std::string TIFext3(".tiff");
+		std::string TIFext4(".TIFF");
 
 		int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
 		std::size_t found = fileName.toStdString().find(STLext);
@@ -1355,6 +1360,23 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		{
 			cout << "RAW" << endl;
 			type = 16; //RAW
+		}
+		found = fileName.toStdString().find(TIFext);
+		found2 = fileName.toStdString().find(TIFext2);
+		found3 = fileName.toStdString().find(TIFext3);
+		found4 = fileName.toStdString().find(TIFext4);
+		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		{
+			type = 17;
+			//Tif TIFF
+			if (tiff_warningmsg==0)
+			{
+				QMessageBox msgBox;
+				msgBox.setText("2D and 3D tiff volume files can not be dragged and dropped, they must be opened from the menu \"File->Volume\".");
+				msgBox.exec();
+				tiff_warningmsg = 1;
+				
+			}
 		}
 
 		if (type < 4)
