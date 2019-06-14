@@ -134,6 +134,7 @@ void mqDisplayControlsWidget::constructor()
   connect(this->ui->pointNormals, SIGNAL(pressed()), this, SLOT(slotDisplayPointNormals())); 
   connect(this->ui->cellNormals2, SIGNAL(pressed()), this, SLOT(slotDisplayCellNormals2()));
   connect(this->ui->pointNormals2, SIGNAL(pressed()), this, SLOT(slotDisplayPointNormals2()));
+  this->ui->pointNormals2->hide();
   connect(this->ui->wireframe, SIGNAL(pressed()), this, SLOT(slotDisplayWireframe()));
   connect(this->ui->points, SIGNAL(pressed()), this, SLOT(slotDisplayPoints()));
   /*virtual void slotDisplayCellNormals();

@@ -291,6 +291,9 @@
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/point_normals2.png</normaloff>:/Icons/point_normals2.png</iconset>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -304,6 +307,9 @@
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/cell_normals2.png</normaloff>:/Icons/cell_normals2.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
