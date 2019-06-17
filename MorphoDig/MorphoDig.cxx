@@ -1,7 +1,7 @@
 #include "MorphoDig.h"
 
 
-#include <vtkImageStack.h>
+//#include <vtkImageStack.h>
 #include <vtkImageAppend.h>
 #include <vtkImageData.h>
 #include <vtkTIFFReader.h>
@@ -1195,6 +1195,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 	if (cpt_tiff > 0)
 	{
 		tiff_3D = 0;
+		cout << "Should not open 3D tiff!" << endl;
 
 
 	}
@@ -1406,9 +1407,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 				tiff_warningmsg = 1;
 				
 			}*/
-			mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
-			OpenTiff3D_dialog.setFileName(fileName);
-			OpenTiff3D_dialog.exec();
+			
 		}
 
 		if (type < 4)
@@ -1471,7 +1470,12 @@ void MorphoDig::dropEvent(QDropEvent *e)
 			OpenRaw_dialog.setFileName(fileName);
 			OpenRaw_dialog.exec(); 
 		}
-
+		else if (type == 17)
+		{
+			mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+			OpenTiff3D_dialog.setFileName(fileName);
+			OpenTiff3D_dialog.exec();
+		}
 
 	}
 	// now the 2D tiff case
