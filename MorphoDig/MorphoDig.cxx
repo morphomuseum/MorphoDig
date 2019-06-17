@@ -1393,10 +1393,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		found4 = fileName.toStdString().find(TIFext4);
 		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
 		{
-			if (tiff_3D == 1)
-			{
-				type = 17;
-			}
+			type = 17;
 			
 			//Tif TIFF
 			/*if (tiff_warningmsg==0)
@@ -1472,9 +1469,17 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		}
 		else if (type == 17)
 		{
-			mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
-			OpenTiff3D_dialog.setFileName(fileName);
-			OpenTiff3D_dialog.exec();
+			if (tiff_3D == 1)
+			{
+
+				mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+				OpenTiff3D_dialog.setFileName(fileName);
+				OpenTiff3D_dialog.exec();
+			}
+			else
+			{
+				//do nothing!
+			}
 		}
 
 	}
