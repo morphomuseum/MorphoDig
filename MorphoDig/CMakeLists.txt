@@ -69,6 +69,7 @@ set( required_vtk_modules
   vtkRenderingContextOpenGL2
   vtkRenderingCore
   vtkRenderingGL2PSOpenGL2
+  vtkRenderingImage
   vtkViewsContext2D
   vtkViewsCore
   vtkRenderingVolumeOpenGL2

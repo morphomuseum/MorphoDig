@@ -558,10 +558,10 @@ void vtkMDInteractorStyle::StartSelect()
 			//mqMorphoDigCore::instance()->getUndoStack();
 			cout << "Open Data!" << endl;
 
-
+			int tiff_warningmsg = 0;
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw )"));
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw )"));// no tiff yet
 
 			if (!filenames.isEmpty())
 			{
@@ -615,6 +615,10 @@ void vtkMDInteractorStyle::StartSelect()
 					std::string VTIext2(".VTI");
 					std::string RAWext(".raw");
 					std::string RAWext2(".RAW");
+					std::string TIFext(".tif");
+					std::string TIFext2(".TIF");
+					std::string TIFext3(".tiff");
+					std::string TIFext4(".TIFF");
 
 
 					int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos 13 MHA MHD VTI
@@ -756,6 +760,23 @@ void vtkMDInteractorStyle::StartSelect()
 						cout << "RAW" << endl;
 						type = 16; //RAW
 					}
+					found = fileName.toStdString().find(TIFext);
+					found2 = fileName.toStdString().find(TIFext2);
+					found3 = fileName.toStdString().find(TIFext3);
+					found4 = fileName.toStdString().find(TIFext4);
+					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+					{
+						type = 17;
+						//Tif TIFF
+						if (tiff_warningmsg == 0)
+						{
+							QMessageBox msgBox;
+							msgBox.setText("2D and 3D tiff volume files can not opened yet via CTRL+O, they must be opened from the menu \"File->Volume\".");
+							msgBox.exec();
+							tiff_warningmsg = 1;
+
+						}
+					}
 					if (type < 4)
 					{
 						int ok=mqMorphoDigCore::instance()->OpenMesh(fileName);
@@ -816,6 +837,11 @@ void vtkMDInteractorStyle::StartSelect()
 						OpenRaw_dialog.setFileName(fileName);
 						OpenRaw_dialog.exec();
 					}
+					else if (type == 17)
+					{
+						// do nothing until the 2D 3D tiff dichotomy has not been fully implemented.
+					}
+
 
 
 				}
