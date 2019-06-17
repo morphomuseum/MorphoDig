@@ -1192,7 +1192,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		}
 
 	}
-	if (cpt_tiff > 0)
+	if (cpt_tiff > 1)
 	{
 		tiff_3D = 0;
 		cout << "Should not open 3D tiff!" << endl;
