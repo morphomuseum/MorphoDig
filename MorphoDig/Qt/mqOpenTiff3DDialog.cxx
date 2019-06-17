@@ -13,7 +13,7 @@
 #include "mqUndoStack.h"
 #include "vtkLMActor.h"
 #include "vtkLMActorCollection.h"
-
+#include <vtkTIFFReader.h>
 // we actually do not need glew...
 //#include <GL/glew.h>
 #include <QApplication>
@@ -61,9 +61,16 @@ mqOpenTiff3DDialog::mqOpenTiff3DDialog(QWidget* Parent)
 	this->setObjectName("mqOpenTiff3DDialog");	
 	
 	this->myFileName = "";
+	this->inputAsStack = 0;
+	this->myDimX = 0;
+	this->myDimX = 0;
+	this->myInput = vtkSmartPointer<vtkImageData>::New();
   this->Ui->voxelSizeX->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->Ui->voxelSizeY->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->Ui->voxelSizeZ->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->dimX->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->dimY->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->Ui->dimZ->setButtonSymbols(QAbstractSpinBox::NoButtons);
  /*this->Ui->headerSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->Ui->requestedSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
  this->Ui->fileSize->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -105,6 +112,14 @@ mqOpenTiff3DDialog::~mqOpenTiff3DDialog()
 	
   delete this->Ui;
 }
+void mqOpenTiff3DDialog::setInputAsStack()
+{
+	this->inputAsStack = 1;
+}
+void mqOpenTiff3DDialog::setInputAs3DFile()
+{
+	this->inputAsStack = 0;
+}
 void mqOpenTiff3DDialog::OpenTiff3D()
 {
 	cout << "OpenTiff3D dialog" << endl;
@@ -137,22 +152,40 @@ void mqOpenTiff3DDialog::OpenTiff3D()
 		else if (cType == 4) { dataType = VTK_DOUBLE; }*/
 
 
+		if (this->inputAsStack == 0)
+		{
 
-		mqMorphoDigCore::instance()->OpenTiff3DVolume(this->myFileName,
-			/*dataType,
-			this->Ui->dimX->value(),
-			this->Ui->dimY->value(), 
-			this->Ui->dimZ->value(),
-			this->Ui->headerSize->value(),*/
-			this->Ui->voxelSizeX->value(), 
-			this->Ui->voxelSizeY->value(), 
-			this->Ui->voxelSizeZ->value() 
-			/*this->Ui->bigEndian->isChecked(),
-			this->Ui->frontToBack->isChecked()*/);
-		
-		
+			mqMorphoDigCore::instance()->OpenTiff3DVolume(this->myFileName,
+				this->Ui->ObjectName->text(),
+				/*dataType,
+				this->Ui->dimX->value(),
+				this->Ui->dimY->value(),
+				this->Ui->dimZ->value(),
+				this->Ui->headerSize->value(),*/
+				this->Ui->voxelSizeX->value(),
+				this->Ui->voxelSizeY->value(),
+				this->Ui->voxelSizeZ->value(),
+				this->Ui->frontToBack->isChecked()
+				/*this->Ui->bigEndian->isChecked(),
+				this->Ui->frontToBack->isChecked()*/);
+		}
+		else
+		{
+			mqMorphoDigCore::instance()->OpenTiff2DStack(this->myInput,
+				this->Ui->ObjectName->text(),				
+				this->Ui->voxelSizeX->value(),
+				this->Ui->voxelSizeY->value(),
+				this->Ui->voxelSizeZ->value(),
+				this->Ui->frontToBack->isChecked()
+				);
+		}
 		
 	
+}
+
+void mqOpenTiff3DDialog::set2DStackInput(vtkSmartPointer<vtkImageData> input)
+{
+	this->myInput = input;
 }
 
 void mqOpenTiff3DDialog::slotVoxelSizeXChanged(double newsVoxelSizeX)
@@ -205,15 +238,57 @@ void mqOpenTiff3DDialog::setFileName(QString fileName)
 	this->myFileName = fileName;
 	QFileInfo fileInfo(fileName);
 	QString onlyfilename(fileInfo.fileName());
-	double fileSize = (double)fileInfo.size();
+	std::string only_filename = onlyfilename.toStdString();
+	std::string newname = only_filename.c_str();
+	size_t nPos = newname.find_last_of(".");
+	if (nPos > 0)
+	{
+
+		newname = newname.substr(0, nPos);
+	}
+	QString objectName = "";
+	objectName = objectName+ newname.c_str();
+//	double fileSize = (double)fileInfo.size();
 //	this->Ui->fileSize->setValue(fileSize);
-	this->Ui->FileName->setText(onlyfilename);
+	this->Ui->ObjectName->setText(objectName);
 	
+	if (this->inputAsStack == 0)
+	{
+		//int that case, there is only 1 file and Data Type and Dimensions must be searched within "fileName".
+		vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
+		tiffReader->SetFileName(fileName.toLocal8Bit());
+		//tiffReader->GetF
+		tiffReader->Update();
+		this->myInput = tiffReader->GetOutput();				
+		int dim[3];
+		this->myInput->GetDimensions(dim);
+		this->setDimensions(dim[0], dim[1], dim[2]);
+		this->setDataType(this->myInput->GetScalarType());
 		
+	}
 	
 }
 
+void mqOpenTiff3DDialog::setDimensions(int dimX, int dimY, int dimZ)
+{
+	this->myDimX = dimX;
+	this->myDimY = dimY;
+	this->myDimZ = dimZ;
+	this->Ui->dimX->setValue(dimX);
+	this->Ui->dimY->setValue(dimY);
+	this->Ui->dimZ->setValue(dimZ);
+}
 
+void mqOpenTiff3DDialog::setDataType(int dataType)
+{
+	this->myDataType = dataType;
+	
+	if (dataType == VTK_UNSIGNED_CHAR) { this->Ui->DataType->setText("8 bits unsigned");  }
+	else if (dataType  == VTK_SHORT) { this->Ui->DataType->setText("16 bits signed"); }
+	else if (dataType == VTK_UNSIGNED_SHORT) { this->Ui->DataType->setText("16 bits UNsigned"); }
+	else if (dataType == VTK_FLOAT) { this->Ui->DataType->setText("32 bits float"); }
+	else if (dataType == VTK_DOUBLE) { this->Ui->DataType->setText("64 bits double"); }
+}
 
 void mqOpenTiff3DDialog::slotOpenTiff3D()
 {

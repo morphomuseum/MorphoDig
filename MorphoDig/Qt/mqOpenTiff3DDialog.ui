@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>531</width>
-    <height>198</height>
+    <height>329</height>
    </rect>
   </property>
   <property name="palette">
@@ -453,13 +453,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Open Tiff 3D file</string>
+   <string>Open 3D Tiff file or 2D Tiff stack</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>184</x>
-     <y>160</y>
+     <x>170</x>
+     <y>290</y>
      <width>161</width>
      <height>30</height>
     </rect>
@@ -483,23 +483,23 @@
      <x>10</x>
      <y>10</y>
      <width>511</width>
-     <height>141</height>
+     <height>261</height>
     </rect>
    </property>
    <property name="title">
-    <string>Open Tiff 3D file</string>
+    <string>Open 3D Tiff file or 2D Tiff stack</string>
    </property>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>170</y>
       <width>491</width>
-      <height>80</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="title">
-     <string>Voxel size (size unit, most often in mm):</string>
+     <string>Voxel size (size unit, most often expressed in mm):</string>
     </property>
     <widget class="QWidget" name="horizontalLayoutWidget_4">
      <property name="geometry">
@@ -553,6 +553,122 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>481</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Index order</string>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>277</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <item>
+       <widget class="QRadioButton" name="frontToBack">
+        <property name="text">
+         <string>front to back</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="backToFront">
+        <property name="text">
+         <string>back to front</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QSpinBox" name="dimY">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>80</y>
+      <width>112</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100000</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="dimX">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>80</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100000</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="dimZ">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>80</y>
+      <width>112</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100000</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Dimensions:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Data type:</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -564,18 +680,31 @@
     </rect>
    </property>
    <property name="text">
-    <string>File name</string>
+    <string>Object name:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="FileName">
+  <widget class="QLineEdit" name="ObjectName">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
      <x>110</x>
      <y>30</y>
      <width>381</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="DataType">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>60</y>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>

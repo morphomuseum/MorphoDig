@@ -77,7 +77,7 @@ mqOpenRawDialog::mqOpenRawDialog(QWidget* Parent)
   this->Ui->comboDataType->addItem("16 bits signed");
   this->Ui->comboDataType->addItem("16 bits unsigned");
   this->Ui->comboDataType->addItem("32 bits float");
-  this->Ui->comboDataType->addItem("64 bits float");
+  this->Ui->comboDataType->addItem("64 bits double");
   this->Ui->comboDataType->setCurrentIndex(0);
   /*
   QObject::connect(ui.currentMin, SIGNAL(editingFinished()), this, SLOT(slotCurrentMinEdited()));
@@ -143,6 +143,7 @@ void mqOpenRawDialog::OpenRaw()
 
 
 		mqMorphoDigCore::instance()->OpenRawVolume(this->myFileName,
+			this->Ui->ObjectName->text(),
 			dataType,
 			this->Ui->dimX->value(),
 			this->Ui->dimY->value(), 
@@ -210,7 +211,22 @@ void mqOpenRawDialog::setFileName(QString fileName)
 	QString onlyfilename(fileInfo.fileName());
 	double fileSize = (double)fileInfo.size();
 	this->Ui->fileSize->setValue(fileSize);
-	this->Ui->FileName->setText(onlyfilename);
+		
+	std::string only_filename = onlyfilename.toStdString();
+	std::string newname = only_filename.c_str();
+	size_t nPos = newname.find_last_of(".");
+	if (nPos > 0)
+	{
+
+		newname = newname.substr(0, nPos);
+	}
+	QString objectName = "";
+	objectName = objectName + newname.c_str();
+	//	double fileSize = (double)fileInfo.size();
+	//	this->Ui->fileSize->setValue(fileSize);
+	this->Ui->ObjectName->setText(objectName);
+
+	
 	
 		
 	

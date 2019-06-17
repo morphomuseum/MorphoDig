@@ -1493,7 +1493,8 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		int dimX = 0;
 		int dimY = 0;
 		int dimZ = 0;
-		QString stackName = "";
+		//QString stackName = "";
+		QString firstFileName = "";
 		vtkSmartPointer<vtkImageAppend> imageAppend = vtkSmartPointer<vtkImageAppend>::New();
 		imageAppend->SetAppendAxis(2);
 
@@ -1537,7 +1538,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 					}
 					if (first_image == 1)
 					{
-						stackName = name;
+						firstFileName = fileName;
 						// now try to set dimX and dimY based on the first image.																							
 						cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] << endl;
 
@@ -1573,7 +1574,17 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 			}
 
-		}
+		}// end foreach
+		imageAppend->Update();
+		mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+		OpenTiff3D_dialog.setInputAsStack();
+		OpenTiff3D_dialog.set2DStackInput(imageAppend->GetOutput());
+		int dim[3];		
+		imageAppend->GetOutput()->GetDimensions(dim);		
+		OpenTiff3D_dialog.setDimensions(dim[0], dim[1], dim[2]);
+		OpenTiff3D_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
+		OpenTiff3D_dialog.setFileName(firstFileName);
+		OpenTiff3D_dialog.exec();
 	}
 }
 

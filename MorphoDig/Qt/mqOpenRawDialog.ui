@@ -460,7 +460,7 @@
     <rect>
      <x>170</x>
      <y>450</y>
-     <width>195</width>
+     <width>161</width>
      <height>30</height>
     </rect>
    </property>
@@ -825,12 +825,12 @@
     </rect>
    </property>
    <property name="text">
-    <string>File name</string>
+    <string>Object Name:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="FileName">
+  <widget class="QLineEdit" name="ObjectName">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
