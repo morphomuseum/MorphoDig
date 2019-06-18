@@ -173,7 +173,7 @@ void mqOpenTiff3DDialog::OpenTiff3D()
 		}
 		else
 		{
-			mqMorphoDigCore::instance()->OpenTiff2DStack(this->myInput,
+			mqMorphoDigCore::instance()->Open2DStack(this->myInput,
 				this->Ui->ObjectName->text(),				
 				this->Ui->voxelSizeX->value(),
 				this->Ui->voxelSizeY->value(),

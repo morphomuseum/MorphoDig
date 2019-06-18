@@ -231,6 +231,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqOpenDataReaction(submenuVolume->addAction("Open Raw Volume") << mqSetName("actionOpenRawVolume"), 20);
   new mqOpenDataReaction(submenuVolume->addAction("Open 3D TIFF file") << mqSetName("actionOpenTiffVolume"), 21);
   new mqOpenDataReaction(submenuVolume->addAction("Open stack of 2D TIFF files") << mqSetName("actionOpenTiffStack"), 22);
+  new mqOpenDataReaction(submenuVolume->addAction("Open DICOM folder") << mqSetName("actionOpenDicomFolder"), 23);
   //new mqOpenRawDialogReaction(submenuVolume->addAction("Open Raw Volume") << mqSetName("actionOpenRawVolume"));
 
 //#include "mqOpenRawDialogReaction.h"

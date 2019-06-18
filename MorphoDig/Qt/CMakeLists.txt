@@ -175,6 +175,8 @@ mqObjectsControlsWidget.cxx
 mqObjectsControlsWidget.h
 mqOpenDataReaction.cxx
 mqOpenDataReaction.h
+mqOpenDicomStackDialog.cxx
+mqOpenDicomStackDialog.h
 mqOpenRawDialog.cxx
 mqOpenRawDialog.h
 mqOpenTiff3DDialog.cxx
@@ -363,6 +365,7 @@ mqMergeTagsDialog.ui
 mqMinimalDialog.ui
 mqMoveCurveHandlesDialog.ui
 mqObjectsControlsWidget.ui
+mqOpenDicomStackDialog.ui
 mqOpenRawDialog.ui
 mqOpenTiff3DDialog.ui
 mqOrientationLabelsDialog.ui

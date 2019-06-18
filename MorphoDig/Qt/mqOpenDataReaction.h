@@ -44,7 +44,7 @@ public:
    void OpenVolume();
    void OpenTIFF3D();
    void OpenTIFF2DStack();
-
+   void OpenDicomFolder();
    void ImportAvizoLandmarks();
    
   
@@ -146,6 +146,10 @@ protected:
 	else if (this->Mode == 22)
 	{
 		this->OpenTIFF2DStack();
+	}
+	else if (this->Mode == 23)
+	{
+		this->OpenDicomFolder();
 	}
   }
 

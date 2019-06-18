@@ -12,6 +12,7 @@
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include <vtkImageAppend.h>
+
 #include <vtkTIFFReader.h>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -579,6 +580,17 @@ void mqOpenDataReaction::OpenTIFF2DStack()
 			OpenTiff3D_dialog.exec();
 		}
 	}
+
+}
+void mqOpenDataReaction::OpenDicomFolder()
+{
+	cout << "Open Data!" << endl;
+	QString dcmDir = QFileDialog::getExistingDirectory(this->MainWindow, tr("Select DICOM Folder"), mqMorphoDigCore::instance()->Getmui_LastUsedDir());
+	if (dcmDir.isEmpty()) return;
+
+	mqMorphoDigCore::instance()->OpenDicomFolder(dcmDir);
+
+	
 
 }
 void mqOpenDataReaction::OpenData()

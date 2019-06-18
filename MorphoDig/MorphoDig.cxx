@@ -5,7 +5,8 @@
 #include <vtkImageAppend.h>
 #include <vtkImageData.h>
 #include <vtkTIFFReader.h>
-
+#include <vtkDICOMImageReader.h>
+#include "mqOpenDicomStackDialog.h"
 #include "mqOpenTiff3DDialog.h"
 #include "mqMorphoDigMenuBuilders.h"
 #include "mqOpenRawDialog.h"
@@ -1198,6 +1199,26 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 
 	}
+	int cpt_dcm = 0;
+	foreach(const QUrl &url, e->mimeData()->urls()) {
+		QString fileName = url.toLocalFile();
+		std::string DCMext(".dcm");
+		std::string DCMext2(".DCM");
+		std::string DCMext3(".ima");
+		std::string DCMext4(".IMA");
+		std::size_t found = fileName.toStdString().find(DCMext);
+		std::size_t found2 = fileName.toStdString().find(DCMext2);
+		std::size_t found3 = fileName.toStdString().find(DCMext3);
+		std::size_t found4 = fileName.toStdString().find(DCMext4);
+		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		{
+			cpt_dcm++;
+			//dcm
+
+		}
+
+	}
+	
 	foreach(const QUrl &url, e->mimeData()->urls()) {
 		QString fileName = url.toLocalFile();
 		//this->MorphoDigCore->Open
@@ -1248,6 +1269,10 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::string TIFext2(".TIF");
 		std::string TIFext3(".tiff");
 		std::string TIFext4(".TIFF");
+		std::string DCMext(".dcm");
+		std::string DCMext2(".DCM");
+		std::string DCMext3(".ima");
+		std::string DCMext4(".IMA");
 
 		int type = 0; //0 = stl, 1 = vtk,  2 = ply, 3 = ntw, 4 ver, 5 cur, 6 flg, 7 lmk, 8 tag, 9 stv, 10 ori, 11 pos
 		std::size_t found = fileName.toStdString().find(STLext);
@@ -1396,7 +1421,16 @@ void MorphoDig::dropEvent(QDropEvent *e)
 			
 			
 		}
+		found = fileName.toStdString().find(DCMext);
+		found2 = fileName.toStdString().find(DCMext2);
+		found3 = fileName.toStdString().find(DCMext3);
+		found4 = fileName.toStdString().find(DCMext4);
+		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		{
+			type = 18;
 
+
+		}
 		if (type < 4)
 		{
 			int ok = mqMorphoDigCore::instance()->OpenMesh(fileName);
@@ -1471,6 +1505,12 @@ void MorphoDig::dropEvent(QDropEvent *e)
 				//do nothing!
 			}
 		}
+		else if (type == 18)
+		{
+			
+				//do nothing!
+			
+		}
 
 	}
 	// now the 2D tiff case
@@ -1535,18 +1575,138 @@ void MorphoDig::dropEvent(QDropEvent *e)
 						dimX = dim[0];
 						dimY = dim[1];
 						imageAppend->AddInputData(input);
+first_image = 0;
+					}
+					else
+					{
+					if (dimX != dim[0] || dimY != dim[1])
+					{
+						cout << "found an image of wrong dimensions" << endl;
+						if (wrong_dims_msg == 0)
+						{
+							wrong_dims_msg = 1;
+							QMessageBox msgBox;
+							QString msg = "At lease one 2D image differs in dimensions from those of the first opened tiff image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+							msgBox.setText(msg);
+							msgBox.exec();
+						}
+
+					}
+					else
+					{
+						imageAppend->AddInputData(input);
+					}
+
+					}
+					file.close();
+				}
+				//Tif TIFF
+
+			}
+
+		}// end foreach
+		imageAppend->Update();
+		mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+		OpenTiff3D_dialog.setInputAsStack();
+		OpenTiff3D_dialog.set2DStackInput(imageAppend->GetOutput());
+		int dim[3];
+		imageAppend->GetOutput()->GetDimensions(dim);
+		OpenTiff3D_dialog.setDimensions(dim[0], dim[1], dim[2]);
+		OpenTiff3D_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
+		OpenTiff3D_dialog.setFileName(firstFileName);
+		OpenTiff3D_dialog.exec();
+	}
+
+	// now the DICOM case
+
+	if (cpt_dcm > 1)
+	{
+		int first_image = 1;
+		int found_3DDCM = 0;
+		int wrong_dims_msg = 0;
+		int dimX = 0;
+		int dimY = 0;
+		int dimZ = 0;
+		double spacingX = 1;
+		int spacingY = 1;
+		int spacingZ = 1;
+		//QString stackName = "";
+		QString firstFileName = "";
+		vtkSmartPointer<vtkImageAppend> imageAppend = vtkSmartPointer<vtkImageAppend>::New();
+		imageAppend->SetAppendAxis(2);
+
+		foreach(const QUrl &url, e->mimeData()->urls()) {
+			QString fileName = url.toLocalFile();
+			std::string DCMext(".dcm");
+			std::string DCMext2(".DCM");
+			std::string DCMext3(".ima");
+			std::string DCMext4(".IMA");
+
+			std::size_t found = fileName.toStdString().find(DCMext);
+			std::size_t found2 = fileName.toStdString().find(DCMext2);
+			std::size_t found3 = fileName.toStdString().find(DCMext3);
+			std::size_t found4 = fileName.toStdString().find(DCMext4);
+
+			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+			{
+
+				QFile file(fileName);
+				QString name = "";
+				if (file.exists()) {
+					dimZ++;
+
+					name = file.fileName(); // Return only a file name		
+					vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+					vtkSmartPointer <vtkDICOMImageReader> dcmReader = vtkSmartPointer<vtkDICOMImageReader>::New();
+					dcmReader->SetFileName(fileName.toLocal8Bit());
+					//tiffReader->GetF
+					dcmReader->Update();
+					input = dcmReader->GetOutput();
+					int dim[3];
+					double spacing[3];
+					input->GetDimensions(dim);
+					input->GetSpacing(spacing);
+
+					if (dim[2] != 1 && dimZ > 1)
+					{
+						found_3DDCM = 1;
+						//mettre un message : pas possible de mettre un 3D tiff 
+						QMessageBox msgBox;
+						msgBox.setText("Error: please only drag and drop several 2D DICOM files or one single 3D DICOM volume. Do not mix 2D and 3D DICOM files.");
+						msgBox.exec();
+						return;
+					}
+					else if (dim[2] == 1 && found_3DDCM == 1)
+					{
+						QMessageBox msgBox;
+						msgBox.setText("Error: please only drag and drop several 2D DICOM files or one single 3D DICOM volume. Do not mix 2D and 3D DICOM files.");
+						msgBox.exec();
+						return;
+					}
+					if (first_image == 1)
+					{
+						firstFileName = fileName;
+						// now try to set dimX and dimY based on the first image.																							
+						cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] << endl;
+
+						dimX = dim[0];
+						dimY = dim[1];
+						spacingX = spacing[0];
+						spacingY = spacing[1];
+						spacingZ = spacing[2];
+						imageAppend->AddInputData(input);
 						first_image = 0;
 					}
 					else
 					{
-						if (dimX != dim[0] || dimY != dim[1])
+						if (dimX != dim[0] || dimY != dim[1] || spacingX != spacing[0] || spacingY != spacing[1] || spacingZ != spacing[2])
 						{
 							cout << "found an image of wrong dimensions" << endl;
 							if (wrong_dims_msg == 0)
 							{
 								wrong_dims_msg = 1;
 								QMessageBox msgBox;
-								QString msg = "At lease one 2D image differs in dimensions from those of the first opened tiff image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+								QString msg = "At lease one DICOM image differs in dimensions or voxel size from those of the first opened DICOM image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 								msgBox.setText(msg);
 								msgBox.exec();
 							}
@@ -1566,15 +1726,18 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 		}// end foreach
 		imageAppend->Update();
-		mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
-		OpenTiff3D_dialog.setInputAsStack();
-		OpenTiff3D_dialog.set2DStackInput(imageAppend->GetOutput());
-		int dim[3];		
-		imageAppend->GetOutput()->GetDimensions(dim);		
-		OpenTiff3D_dialog.setDimensions(dim[0], dim[1], dim[2]);
-		OpenTiff3D_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
-		OpenTiff3D_dialog.setFileName(firstFileName);
-		OpenTiff3D_dialog.exec();
+		mqOpenDicomStackDialog OpenDicomStack_dialog(mqCoreUtilities::mainWidget());
+		OpenDicomStack_dialog.setInputAsStack();
+		OpenDicomStack_dialog.set2DStackInput(imageAppend->GetOutput());
+		int dim[3];
+		imageAppend->GetOutput()->GetDimensions(dim);
+		
+		OpenDicomStack_dialog.setDimensions(dim[0], dim[1], dim[2]);
+		OpenDicomStack_dialog.setSpacing(spacingX, spacingY, spacingZ);
+
+		OpenDicomStack_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
+		OpenDicomStack_dialog.setFileName(firstFileName);
+		OpenDicomStack_dialog.exec();
 	}
 }
 

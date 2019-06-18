@@ -600,7 +600,9 @@ public:
 	void OpenPTS(QString fileName, int mode);
 	int OpenMesh(QString fileName);
 	void OpenVolume(QString fileName);
-	void OpenTiff2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack);
+	void OpenDicomFolder(QString folderName);
+	
+	void Open2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack);
 	void OpenTiff3DVolume(QString fileName, QString objectName, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack);
 	void OpenRawVolume(QString fileName, QString objectName, int dataType, int dimX, int dimY, int dimZ, double headerSize, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool bigEndian, bool frontToBack);
 	void OpenPOS(QString fileName, int mode);
