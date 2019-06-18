@@ -1171,7 +1171,6 @@ void MorphoDig::dragEnterEvent(QDragEnterEvent *e)
 }
 void MorphoDig::dropEvent(QDropEvent *e)
 {
-	int tiff_warningmsg = 0;
 	int cpt_tiff = 0;
 	int tiff_3D = 1;
 	foreach(const QUrl &url, e->mimeData()->urls()) {
@@ -1395,15 +1394,6 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		{
 			type = 17;
 			
-			//Tif TIFF
-			/*if (tiff_warningmsg==0)
-			{
-				QMessageBox msgBox;
-				msgBox.setText("2D and 3D tiff volume files can not be dragged and dropped, they must be opened from the menu \"File->Volume\".");
-				msgBox.exec();
-				tiff_warningmsg = 1;
-				
-			}*/
 			
 		}
 

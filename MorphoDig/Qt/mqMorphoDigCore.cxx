@@ -11,6 +11,7 @@
 #include "vtkLMActor.h"
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
+#include <vtkImageFlip.h>
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
 #include <vtkXMLImageDataWriter.h>
@@ -5138,8 +5139,18 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 	}
 
 }
-void mqMorphoDigCore::OpenTiff2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack)
+void mqMorphoDigCore::OpenTiff2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, 
+	double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack)
 {
+	if (frontToBack == false)
+	{
+		cout << "Flip Z used" << endl;
+		vtkSmartPointer<vtkImageFlip> flipZ = vtkSmartPointer<vtkImageFlip>::New();
+		flipZ->SetInputData(input);
+		flipZ->SetFilteredAxis(2);
+		flipZ->Update();
+		input = flipZ->GetOutput();
+	}
 	int dim[3];
 	double spacing[3];
 	input->GetDimensions(dim);

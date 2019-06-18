@@ -21,10 +21,13 @@
 #include "mqOpenRawDialog.h"
 #include "mqSaveNTWDialog.h"
 #include "mqCoreUtilities.h"
+#include "mqOpenTiff3DDialog.h"
 #include <vtkBoxWidget.h>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <vtkImageAppend.h>
+#include <vtkTIFFReader.h>
 #include <vtkBillboardTextActor3D.h>
 #include <vtkIndent.h>
 #include <vtkProperty.h>
@@ -558,13 +561,41 @@ void vtkMDInteractorStyle::StartSelect()
 			//mqMorphoDigCore::instance()->getUndoStack();
 			cout << "Open Data!" << endl;
 
-			int tiff_warningmsg = 0;
+			
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw )"));// no tiff yet
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff )"));
+			int cpt_tiff = 0;
+			int tiff_3D = 1;
 
 			if (!filenames.isEmpty())
 			{
+				for (int i = 0; i < filenames.count(); i++)
+				{
+					QString fileName = filenames.at(i);
+					std::string TIFext(".tif");
+					std::string TIFext2(".TIF");
+					std::string TIFext3(".tiff");
+					std::string TIFext4(".TIFF");
+					std::size_t found = fileName.toStdString().find(TIFext);
+					std::size_t found2 = fileName.toStdString().find(TIFext2);
+					std::size_t found3 = fileName.toStdString().find(TIFext3);
+					std::size_t found4 = fileName.toStdString().find(TIFext4);
+					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+					{
+						cpt_tiff++;
+						//Tif TIFF
+
+					}
+
+				}
+				if (cpt_tiff > 1)
+				{
+					tiff_3D = 0;
+					cout << "Should not open 3D tiff!" << endl;
+
+
+				}
 				for (int i = 0; i < filenames.count(); i++)
 				{
 					QString fileName = filenames.at(i);
@@ -767,15 +798,7 @@ void vtkMDInteractorStyle::StartSelect()
 					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
 					{
 						type = 17;
-						//Tif TIFF
-						if (tiff_warningmsg == 0)
-						{
-							QMessageBox msgBox;
-							msgBox.setText("2D and 3D tiff volume files can not opened yet via CTRL+O, they must be opened from the menu \"File->Volume\".");
-							msgBox.exec();
-							tiff_warningmsg = 1;
-
-						}
+						
 					}
 					if (type < 4)
 					{
@@ -839,11 +862,123 @@ void vtkMDInteractorStyle::StartSelect()
 					}
 					else if (type == 17)
 					{
-						// do nothing until the 2D 3D tiff dichotomy has not been fully implemented.
+						if (tiff_3D == 1)
+						{
+
+							mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+							OpenTiff3D_dialog.setFileName(fileName);
+							OpenTiff3D_dialog.exec();
+						}
+						else
+						{
+							//do nothing!
+						}
 					}
 
 
 
+				}
+				if (cpt_tiff > 1)
+				{
+					int first_image = 1;
+					int found_3Dtiff = 0;
+					int wrong_dims_msg = 0;
+					int dimX = 0;
+					int dimY = 0;
+					int dimZ = 0;
+					//QString stackName = "";
+					QString firstFileName = "";
+					vtkSmartPointer<vtkImageAppend> imageAppend = vtkSmartPointer<vtkImageAppend>::New();
+					imageAppend->SetAppendAxis(2);
+
+					for (int i = 0; i < filenames.count(); i++)
+					{
+						QString fileName = filenames.at(i);
+						std::string TIFext(".tif");
+						std::string TIFext2(".TIF");
+						std::string TIFext3(".tiff");
+						std::string TIFext4(".TIFF");
+						std::size_t found = fileName.toStdString().find(TIFext);
+						std::size_t found2 = fileName.toStdString().find(TIFext2);
+						std::size_t found3 = fileName.toStdString().find(TIFext3);
+						std::size_t found4 = fileName.toStdString().find(TIFext4);
+
+						if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+						{
+
+							QFile file(fileName);
+							QString name = "";
+							if (file.exists()) {
+								dimZ++;
+
+								name = file.fileName(); // Return only a file name		
+								vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+								vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
+								tiffReader->SetFileName(fileName.toLocal8Bit());
+								//tiffReader->GetF
+								tiffReader->Update();
+								input = tiffReader->GetOutput();
+								int dim[3];
+								input->GetDimensions(dim);
+
+								if (dim[2] != 1)
+								{
+									found_3Dtiff = 1;
+									//mettre un message : pas possible de mettre un 3D tiff 
+									QMessageBox msgBox;
+									msgBox.setText("Error: 3D tiff file found among the differnt tiff files. Please only drag and drop several 2D .tiff files or one single 3D .tiff volume.");
+									msgBox.exec();
+									return;
+								}
+								if (first_image == 1)
+								{
+									firstFileName = fileName;
+									// now try to set dimX and dimY based on the first image.																							
+									cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] << endl;
+
+									dimX = dim[0];
+									dimY = dim[1];
+									imageAppend->AddInputData(input);
+									first_image = 0;
+								}
+								else
+								{
+									if (dimX != dim[0] || dimY != dim[1])
+									{
+										cout << "found an image of wrong dimensions" << endl;
+										if (wrong_dims_msg == 0)
+										{
+											wrong_dims_msg = 1;
+											QMessageBox msgBox;
+											QString msg = "At lease one 2D image differs in dimensions from those of the first opened tiff image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+											msgBox.setText(msg);
+											msgBox.exec();
+										}
+
+									}
+									else
+									{
+										imageAppend->AddInputData(input);
+									}
+
+								}
+								file.close();
+							}
+							//Tif TIFF
+
+						}
+
+					}// end foreach
+					imageAppend->Update();
+					mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+					OpenTiff3D_dialog.setInputAsStack();
+					OpenTiff3D_dialog.set2DStackInput(imageAppend->GetOutput());
+					int dim[3];
+					imageAppend->GetOutput()->GetDimensions(dim);
+					OpenTiff3D_dialog.setDimensions(dim[0], dim[1], dim[2]);
+					OpenTiff3D_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
+					OpenTiff3D_dialog.setFileName(firstFileName);
+					OpenTiff3D_dialog.exec();
 				}
 			}
 
