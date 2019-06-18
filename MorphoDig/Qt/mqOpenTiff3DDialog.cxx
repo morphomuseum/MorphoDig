@@ -86,7 +86,9 @@ mqOpenTiff3DDialog::mqOpenTiff3DDialog(QWidget* Parent)
   this->Ui->comboDataType->addItem("32 bits float");
   this->Ui->comboDataType->addItem("64 bits float");
   this->Ui->comboDataType->setCurrentIndex(0);*/
-
+  this->Ui->voxelSizeX->setValue(1);
+  this->Ui->voxelSizeY->setValue(1);
+  this->Ui->voxelSizeZ->setValue(1);
  
   /*  connect(this->Ui->dimX, SIGNAL(valueChanged(int)), this, SLOT(slotDimXChanged(int)));
   connect(this->Ui->dimY, SIGNAL(valueChanged(int)), this, SLOT(slotDimYChanged(int)));

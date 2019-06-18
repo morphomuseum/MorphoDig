@@ -71,7 +71,9 @@ mqOpenRawDialog::mqOpenRawDialog(QWidget* Parent)
   this->Ui->headerSize->setMaximum(DBL_MAX);
   this->Ui->requestedSize->setMaximum(DBL_MAX);
   this->Ui->fileSize->setMaximum(DBL_MAX);
-
+  this->Ui->voxelSizeX->setValue(1);
+  this->Ui->voxelSizeY->setValue(1);
+  this->Ui->voxelSizeZ->setValue(1);
   this->Ui->comboDataType->addItem("8 bits unsigned");
   
   this->Ui->comboDataType->addItem("16 bits signed");
