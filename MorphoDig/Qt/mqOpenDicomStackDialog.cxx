@@ -81,8 +81,7 @@ mqOpenDicomStackDialog::mqOpenDicomStackDialog(QWidget* Parent)
   this->Ui->voxelSizeZ->setValue(1);
  
   
-  connect(this->Ui->voxelSizeX, SIGNAL(valueChanged(double)), this, SLOT(slotVoxelSizeXChanged(double))); 
-	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotOpenDicomStack()));
+ 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotOpenDicomStack()));
 
 }
 
@@ -186,8 +185,8 @@ void mqOpenDicomStackDialog::setSpacing(double spacingX, double spacingY, double
 	this->mySpacingY = spacingY;
 	this->mySpacingZ = spacingZ;
 	this->Ui->voxelSizeX->setValue(spacingX);
-	this->Ui->voxelSizeX->setValue(spacingY);
-	this->Ui->voxelSizeX->setValue(spacingZ);
+	this->Ui->voxelSizeY->setValue(spacingY);
+	this->Ui->voxelSizeZ->setValue(spacingZ);
 	
 }
 

@@ -1575,7 +1575,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 						dimX = dim[0];
 						dimY = dim[1];
 						imageAppend->AddInputData(input);
-first_image = 0;
+						first_image = 0;
 					}
 					else
 					{
@@ -1628,8 +1628,8 @@ first_image = 0;
 		int dimY = 0;
 		int dimZ = 0;
 		double spacingX = 1;
-		int spacingY = 1;
-		int spacingZ = 1;
+		double spacingY = 1;
+		double spacingZ = 1;
 		//QString stackName = "";
 		QString firstFileName = "";
 		vtkSmartPointer<vtkImageAppend> imageAppend = vtkSmartPointer<vtkImageAppend>::New();
@@ -1687,19 +1687,22 @@ first_image = 0;
 					{
 						firstFileName = fileName;
 						// now try to set dimX and dimY based on the first image.																							
-						cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] << endl;
+						cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] <<","<<spacing[0]<<","<<spacing[1]<<","<<spacing[2]<< endl;
 
 						dimX = dim[0];
 						dimY = dim[1];
 						spacingX = spacing[0];
 						spacingY = spacing[1];
 						spacingZ = spacing[2];
+						
 						imageAppend->AddInputData(input);
 						first_image = 0;
 					}
 					else
 					{
-						if (dimX != dim[0] || dimY != dim[1] || spacingX != spacing[0] || spacingY != spacing[1] || spacingZ != spacing[2])
+						if (dimX != dim[0] || dimY != dim[1] 
+							//||spacingX != spacing[0] || spacingY != spacing[1] || spacingZ != spacing[2]
+							)
 						{
 							cout << "found an image of wrong dimensions" << endl;
 							if (wrong_dims_msg == 0)
