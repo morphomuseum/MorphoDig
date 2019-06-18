@@ -53,8 +53,49 @@ mqSaveMHDMHADialog::mqSaveMHDMHADialog(QWidget* Parent, QString fileName)
 	// This is where we 
   //
  
+	std::string MHAext(".mha");
+	std::string MHAext2(".MHA");
+	std::string MHDext(".mhd");
+	std::string MHDext2(".MHD");
+
+	int extension_found = 0;
+	std::size_t found = fileName.toStdString().find(MHAext);
+	std::size_t found2 = fileName.toStdString().find(MHAext2);
+	if (found != std::string::npos || found2 != std::string::npos)
+	{
+		//VTK
+		this->Ui->MHD->setChecked(false);
+		this->Ui->MHA->setChecked(true);
+		this->Ui->MHD->setEnabled(false);
+		this->Ui->MHA->setEnabled(false);
+				
+		cout << "extension MHA found!" << endl;
+		extension_found = 1;
+	}
+	std::size_t found3 = fileName.toStdString().find(MHDext);
+	std::size_t found4 = fileName.toStdString().find(MHDext2);
+	if (found3 != std::string::npos || found4 != std::string::npos)
+	{
+
+		//VTP
+		this->Ui->MHD->setChecked(true);
+		this->Ui->MHA->setChecked(false);
+		this->Ui->MHD->setEnabled(false);
+		this->Ui->MHA->setEnabled(false);				
+		cout << "extension MHD found!" << endl;
+		extension_found = 1;
+	}
+
+	if (extension_found == 0)
+	{
+		cout << "extension not found!" << endl;
+		this->Ui->MHD->setChecked(true);
+		this->Ui->MHD->setEnabled(true);
+		this->Ui->MHA->setEnabled(true);
+	}
+
  
- this->Ui->MHD->setChecked(true);
+ 
  this->Ui->CompressionOn->setChecked(true);
  
   // Should connect...

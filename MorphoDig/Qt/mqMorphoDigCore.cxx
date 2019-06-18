@@ -4955,6 +4955,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			input = rawReader->GetOutput();
 			reader = rawReader;
 
+
 		
 
 		int dim[3];
@@ -5142,7 +5143,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 void mqMorphoDigCore::OpenTiff2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, 
 	double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack)
 {
-	if (frontToBack == false)
+	if (frontToBack == true)
 	{
 		cout << "Flip Z used" << endl;
 		vtkSmartPointer<vtkImageFlip> flipZ = vtkSmartPointer<vtkImageFlip>::New();
@@ -5369,10 +5370,22 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 		
 		vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
 		tiffReader->SetFileName(fileName.toLocal8Bit());
-		//tiffReader->GetF
+		//tiffReader->SetFileLowerLeft(frontToBack);
+		
+		
 		tiffReader->Update();
-			input = tiffReader->GetOutput();
-			reader = tiffReader;
+		input = tiffReader->GetOutput();
+		reader = tiffReader;
+		if (frontToBack ==true)
+		{
+				cout << "Flip Z used" << endl;
+				vtkSmartPointer<vtkImageFlip> flipZ = vtkSmartPointer<vtkImageFlip>::New();
+				flipZ->SetInputData(input);
+				flipZ->SetFilteredAxis(2);
+				flipZ->SetOutputSpacing(voxelSizeX, voxelSizeY, voxelSizeZ);
+				flipZ->Update();
+				input = flipZ->GetOutput();
+		}
 		
 
 		int dim[3];
@@ -5385,7 +5398,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 		//input->Get
 		cout << "Tiff Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
 		cout << "Tiff Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
-		cout << "Tiff Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
+		cout << "Tiff Spacing0 Spacing1 Spacing2:" << spacing[0] <<","<< spacing[1]<<","<< spacing[2] << endl;
 		cout << "Tiff Image type:" << input->GetScalarTypeAsString() << endl;
 		cout << "Tiff Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
 		cout << "Tiff Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
@@ -5451,8 +5464,8 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			property->SetColor(TF);
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
-			//mapper->SetInputData(input);
-			mapper->SetInputConnection(reader->GetOutputPort());
+			
+			mapper->SetInputData(input);
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
 			volume->SetMapper(mapper);

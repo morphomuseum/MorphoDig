@@ -41,6 +41,9 @@ void mqSaveVTKDialogReaction::onTriggered()
 
 		}
 		cout << "Save VTK Dialog Triggered!" << endl;
+		
+		
+		
 		QString fileName;
 		if (num_selected_meshes == 1)
 		{
@@ -48,7 +51,7 @@ void mqSaveVTKDialogReaction::onTriggered()
 			//+QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
 			 fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
 				tr("Save VTK PolyData files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str(),
-				tr("VTK PolyData file (*.vtk *.vtp)"), NULL
+				tr("VTK XML PolyData file (*.vtp);; VTK PolyData file (*.vtk);; (*.*)"), NULL
 				//, QFileDialog::DontConfirmOverwrite
 			);
 		}
@@ -56,13 +59,13 @@ void mqSaveVTKDialogReaction::onTriggered()
 		{
 			 fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
 				tr("Save VTK PolyData files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				tr("VTK PolyData file (*.vtk *.vtp)"), NULL
+				tr("VTK XML PolyData file (*.vtp);; VTK PolyData file (*.vtk);; (*.*)"), NULL
 				//, QFileDialog::DontConfirmOverwrite
 			);
 
 		}
 
-		cout << fileName.toStdString();
+		cout << "Filename chosen:"<< fileName.toStdString()<<endl;
 		if (fileName.isEmpty()) return;
 		QFileInfo fileInfo(fileName);
 		mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());

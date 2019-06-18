@@ -53,10 +53,52 @@ mqSaveVTKDialog::mqSaveVTKDialog(QWidget* Parent, QString fileName)
 	// This is where we 
   //
  
- 
+	this->Ui->VTP->setChecked(true);
+	std::string VTKext(".vtk");
+	std::string VTKext2(".VTK");
+	std::string VTKext3(".vtp");
+	std::string VTKext4(".VTP");
+
+	int extension_found = 0;
+	std::size_t found = fileName.toStdString().find(VTKext);
+	std::size_t found2 = fileName.toStdString().find(VTKext2);
+	if (found != std::string::npos || found2 != std::string::npos)
+	{
+		 //VTK
+		this->Ui->VTP->setChecked(false);
+		this->Ui->VTK->setChecked(true);
+		this->Ui->VTK->setEnabled(false);
+		this->Ui->VTP->setEnabled(false);
+		this->Ui->Binary->setEnabled(true);
+		this->Ui->ASCII->setEnabled(true);
+		cout << "extension VTK found!" << endl;
+		extension_found = 1;
+	}
+	std::size_t found3 = fileName.toStdString().find(VTKext3);
+	std::size_t found4 = fileName.toStdString().find(VTKext4);
+	if (found3 != std::string::npos || found4 != std::string::npos)
+	{
+		
+		//VTP
+		this->Ui->VTP->setChecked(true);
+		this->Ui->VTK->setChecked(false);
+		this->Ui->VTK->setEnabled(false);
+		this->Ui->VTP->setEnabled(false);
+		this->Ui->Binary->setEnabled(false);
+		this->Ui->ASCII->setEnabled(false);
+		cout << "extension VTP found!" << endl;
+		extension_found = 1;
+	}
+
+	if (extension_found == 0)
+	{
+		cout << "extension not found!" << endl;
+		this->Ui->VTK->setEnabled(true);
+		this->Ui->VTP->setEnabled(true);
+	}
  this->Ui->Binary->setChecked(true);
  this->Ui->PositionOriginal->setChecked(true);
- this->Ui->VTP->setChecked(true);
+ 
  this->Ui->scalarList->clear();
  ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ArraysOfSelectedObjects(0);
  QString none = QString("Solid color");
@@ -117,11 +159,15 @@ void mqSaveVTKDialog::slotVTKVTPClicked()
 {
 	if (this->Ui->VTK->isChecked())
 	{
-		this->Ui->VTKEncoding->setEnabled(true);
+		//this->Ui->VTKEncoding->setEnabled(true);
+		this->Ui->Binary->setEnabled(true);
+		this->Ui->ASCII->setEnabled(true);
 	}
 	else
 	{
-		this->Ui->VTKEncoding->setEnabled(false);
+		//this->Ui->VTKEncoding->setEnabled(false);
+		this->Ui->Binary->setEnabled(false);
+		this->Ui->ASCII->setEnabled(false);
 	}
 }
 void mqSaveVTKDialog::slotSaveVTKFile()
