@@ -1621,6 +1621,11 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 	if (cpt_dcm > 1)
 	{
+		//spacingZ est obtenu en ouvrant au moins 2 coupes. Soit ça marche avec getOrigin... sinon il faut arriver à ouvrir 2 coupes d'un coup!
+		int first_image = 1;
+		int second_image = 0;
+		double pos_first_image;
+		double pos_second_image;
 		int first_image = 1;
 		int found_3DDCM = 0;
 		int wrong_dims_msg = 0;
@@ -1665,6 +1670,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 					int dim[3];
 					double spacing[3];
 					input->GetDimensions(dim);
+					
 					input->GetSpacing(spacing);
 
 					if (dim[2] != 1 && dimZ > 1)
