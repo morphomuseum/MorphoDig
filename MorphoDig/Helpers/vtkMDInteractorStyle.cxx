@@ -926,7 +926,7 @@ void vtkMDInteractorStyle::StartSelect()
 									found_3Dtiff = 1;
 									//mettre un message : pas possible de mettre un 3D tiff 
 									QMessageBox msgBox;
-									msgBox.setText("Error: 3D tiff file found among the differnt tiff files. Please only drag and drop several 2D .tiff files or one single 3D .tiff volume.");
+									msgBox.setText("Error: please do not mix 2D and 3D TIFF files nor open several 3D TIFF files at once.");
 									msgBox.exec();
 									return;
 								}
@@ -950,7 +950,7 @@ void vtkMDInteractorStyle::StartSelect()
 										{
 											wrong_dims_msg = 1;
 											QMessageBox msgBox;
-											QString msg = "At lease one 2D image differs in dimensions from those of the first opened tiff image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+											QString msg = "At lease one 2D image differs in dimensions from those of the first opened TIFF image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 											msgBox.setText(msg);
 											msgBox.exec();
 										}

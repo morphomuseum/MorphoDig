@@ -43,6 +43,7 @@ public:
    void OpenORI();
    void OpenVolume();
    void OpenTIFF3D();
+   void OpenTIFF2DStack();
 
    void ImportAvizoLandmarks();
    
@@ -141,6 +142,10 @@ protected:
 	else if (this->Mode == 21)
 	{
 		this->OpenTIFF3D();
+	}
+	else if (this->Mode == 22)
+	{
+		this->OpenTIFF2DStack();
 	}
   }
 

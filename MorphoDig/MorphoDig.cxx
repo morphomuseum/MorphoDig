@@ -1522,7 +1522,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 						found_3Dtiff = 1;
 						//mettre un message : pas possible de mettre un 3D tiff 
 						QMessageBox msgBox;
-						msgBox.setText("Error: 3D tiff file found among the differnt tiff files. Please only drag and drop several 2D .tiff files or one single 3D .tiff volume.");
+						msgBox.setText("Error: please only drag and drop several 2D TIFF files or one single 3D TIFF volume. Do not mix 2D and 3D TIFF files.");
 						msgBox.exec();
 						return;
 					}
