@@ -5484,30 +5484,10 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 
 	
 		std::string newname = "New_specimen";
-		QInputDialog *specimeNameDialog = new QInputDialog();
-		bool dialogResult;
-		QString newSpecimenName = specimeNameDialog->getText(0, "Name", "New name:", QLineEdit::Normal,
-			"DicomVolume", &dialogResult);
-		if (dialogResult)
-		{
-			cout << "newly opened volume name:" << newSpecimenName.toStdString() << endl;
-			
-		}
-		else
-		{
-			newSpecimenName = "New_Sample";
-			
-		}
-		newname = newSpecimenName.toStdString();
-		size_t nPos = newname.find_last_of(".");
-		if (nPos > 0)
-		{
-
-			newname = newname.substr(0, nPos);
-		}
+		QString patientName = reader->GetPatientName();
 
 		//@@TODO! 
-		newname = this->CheckingName(newname);
+		newname = this->CheckingName(patientName.toStdString());
 		//newname = this->CheckingName(newname);
 		cout << "Volume Name= " << newname << endl;
 		//volume->SetOrientation(0, 0, 180);
