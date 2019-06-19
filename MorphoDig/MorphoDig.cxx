@@ -1637,6 +1637,8 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		double spacingZ = 1;
 		//QString stackName = "";
 		QString firstFileName = "";
+		QString patientName = "";
+		int frontToBack = 1;
 		vtkSmartPointer<vtkImageAppend> imageAppend = vtkSmartPointer<vtkImageAppend>::New();
 		imageAppend->SetAppendAxis(2);
 
@@ -1691,6 +1693,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 					}
 					if (first_image == 1)
 					{
+						patientName = dcmReader->GetPatientName();
 						firstFileName = fileName;
 						// now try to set dimX and dimY based on the first image.																							
 						cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] <<","<<spacing[0]<<","<<spacing[1]<<","<<spacing[2]<< endl;
@@ -1721,6 +1724,8 @@ void MorphoDig::dropEvent(QDropEvent *e)
 							origin_second[2] = pos[2];
 							cout << "Second image origin" << origin_second[0] << "," << origin_second[1] << "," << origin_second[2] << endl;
 							double diff = (double)(origin_first[2] - origin_second[2]);
+							if (diff < 0) { frontToBack = 1; }
+							else { frontToBack = 0; }
 							spacingZ = abs(diff);
 
 
@@ -1762,9 +1767,11 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		
 		OpenDicomStack_dialog.setDimensions(dim[0], dim[1], dim[2]);
 		OpenDicomStack_dialog.setSpacing(spacingX, spacingY, spacingZ);
-
+		cout << "frontToBack=" << frontToBack << endl;
+		OpenDicomStack_dialog.setFrontToBack(frontToBack);
 		OpenDicomStack_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
 		OpenDicomStack_dialog.setFileName(firstFileName);
+		OpenDicomStack_dialog.setPatientName(patientName);
 		OpenDicomStack_dialog.exec();
 	}
 }

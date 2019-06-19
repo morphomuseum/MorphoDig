@@ -140,7 +140,15 @@ void mqOpenDicomStackDialog::set2DStackInput(vtkSmartPointer<vtkImageData> input
 	this->myInput = input;
 }
 
-
+void mqOpenDicomStackDialog::setPatientName(QString patientName)
+{
+	this->Ui->ObjectName->setText(patientName.toStdString().c_str());
+}
+void mqOpenDicomStackDialog::setFrontToBack(int frontToBack)
+{
+	if (frontToBack == 0) { this->Ui->backToFront->setChecked(true); }
+	else{ this->Ui->frontToBack->setChecked(true); }
+}
 void mqOpenDicomStackDialog::setFileName(QString fileName)
 {
 	this->myFileName = fileName;
@@ -158,7 +166,7 @@ void mqOpenDicomStackDialog::setFileName(QString fileName)
 	objectName = objectName+ newname.c_str();
 //	double fileSize = (double)fileInfo.size();
 //	this->Ui->fileSize->setValue(fileSize);
-	this->Ui->ObjectName->setText(objectName);
+	//this->Ui->ObjectName->setText(objectName);
 	
 	if (this->inputAsStack == 0)
 	{

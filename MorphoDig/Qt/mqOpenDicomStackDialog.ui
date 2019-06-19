@@ -689,7 +689,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Object name:</string>
+    <string>Sample name:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="ObjectName">

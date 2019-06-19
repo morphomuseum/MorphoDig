@@ -32,6 +32,8 @@ public:
   ~mqOpenDicomStackDialog();
   void OpenDicomStack();
   void setFileName(QString fileName);
+  void setPatientName(QString patientName);
+  void setFrontToBack(int frontToBack);
   void setDimensions(int dimX, int dimY, int dimZ);
   void setSpacing(double spacingX, double spacingY, double spacingZ);
   void setDataType(int dataType);
