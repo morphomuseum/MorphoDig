@@ -1623,10 +1623,10 @@ void MorphoDig::dropEvent(QDropEvent *e)
 	{
 		//spacingZ est obtenu en ouvrant au moins 2 coupes. Soit ça marche avec getOrigin... sinon il faut arriver à ouvrir 2 coupes d'un coup!
 		int first_image = 1;
-		int second_image = 0;
-		double pos_first_image;
-		double pos_second_image;
-		int first_image = 1;
+		int second_image = 1;
+		float origin_first[3];
+		float origin_second[3];
+			
 		int found_3DDCM = 0;
 		int wrong_dims_msg = 0;
 		int dimX = 0;
@@ -1694,18 +1694,37 @@ void MorphoDig::dropEvent(QDropEvent *e)
 						firstFileName = fileName;
 						// now try to set dimX and dimY based on the first image.																							
 						cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] <<","<<spacing[0]<<","<<spacing[1]<<","<<spacing[2]<< endl;
-
+						float *pos;
+						pos = dcmReader->GetImagePositionPatient();
+						origin_first[0] = pos[0];
+						origin_first[1] = pos[1];
+						origin_first[2] = pos[2];
+						cout << "First image origin" << origin_first[0] << "," << origin_first[1] << "," << origin_first[2] << endl;
 						dimX = dim[0];
 						dimY = dim[1];
 						spacingX = spacing[0];
 						spacingY = spacing[1];
-						spacingZ = spacing[2];
+						//spacingZ = spacing[2];
 						
 						imageAppend->AddInputData(input);
 						first_image = 0;
-					}
+					}					
 					else
 					{
+						if (first_image ==0&& second_image ==1){
+							second_image = 0;
+							//input->GetOrigin(origin_second);
+							float *pos;
+							pos = dcmReader->GetImagePositionPatient();
+							origin_second[0] = pos[0];
+							origin_second[1] = pos[1];
+							origin_second[2] = pos[2];
+							cout << "Second image origin" << origin_second[0] << "," << origin_second[1] << "," << origin_second[2] << endl;
+							double diff = (double)(origin_first[2] - origin_second[2]);
+							spacingZ = abs(diff);
+
+
+						}
 						if (dimX != dim[0] || dimY != dim[1] 
 							//||spacingX != spacing[0] || spacingY != spacing[1] || spacingZ != spacing[2]
 							)
