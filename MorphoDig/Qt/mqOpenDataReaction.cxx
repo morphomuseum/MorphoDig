@@ -230,15 +230,16 @@ void mqOpenDataReaction::OpenMAP()
 void mqOpenDataReaction::OpenPOS(int mode)
 {
 	if (mode < 1) { mode = 1; }
-	// mode : 1 for all selected meshes
+	// mode : 1 for all selected meshes and volumes
 	// mode : 2 for all selected landmarks/flags
 	
 	if (mode == 1)
 	{
 		vtkIdType num_selected_meshes = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
-		if (num_selected_meshes == 0) {
+		vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+		if (num_selected_meshes == 0 && num_selected_volumes == 0) {
 			QMessageBox msgBox;
-			msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+			msgBox.setText("No surface nor volume selected. Please select at least one surface or one volume to use this option.");
 			msgBox.exec();
 			return;
 		}
