@@ -905,6 +905,7 @@ public:
  
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarGreyScaleLut();
   void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyleDrawPolygon> mLassoStyle);
   void SetRubberInteractorStyle(vtkSmartPointer<vtkInteractorStyleRubberBand3D> mRubbertyle);
@@ -966,7 +967,7 @@ protected:
 	vtkSmartPointer<vtkScalarBarActor> TagScalarBarActor;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRedLut;
-
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarGreyScaleLut;
 	vtkSmartPointer<vtkBezierCurveSource> BezierCurveSource;
 	vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation;
 	vtkSmartPointer<vtkPolyDataMapper> BezierMapper;
