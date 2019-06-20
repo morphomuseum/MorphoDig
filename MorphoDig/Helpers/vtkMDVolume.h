@@ -15,7 +15,9 @@ Module:    vtkMDVolume.h
 #include <vtkDataArray.h>
 #include <vtkPlanes.h>
 #include <vtkSmartPointer.h>
+#include <vtkImageSlice.h>
 #include <vtkImageAccumulate.h>
+#include <vtkImageResliceMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkOutlineFilter.h>
@@ -88,6 +90,10 @@ public:
 	//vtkSetMacro(ScalarOpacityUnitDistance, double);
 
 	//isVisible
+	void SetisVisibleXY(int visible);
+	void SetisVisibleXZ(int visible);
+	void SetisVisibleYZ(int visible);
+
 	void SetisVisible(int visible);
 	//	vtkSetMacro(displayROI, int);
 	vtkGetMacro(isVisible, int);
@@ -112,8 +118,28 @@ public:
 	
 	vtkGetMacro(Hist, vtkSmartPointer<vtkImageAccumulate>);
 	vtkSetMacro(Hist, vtkSmartPointer<vtkImageAccumulate>);
-	vtkSetMacro(ImageData, vtkSmartPointer<vtkImageData>);
+	//vtkSetMacro(ImageData, vtkSmartPointer<vtkImageData>);
+	void SetImageData(vtkSmartPointer<vtkImageData> imgData);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
+	
+	vtkGetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
+	vtkSetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
+	
+	vtkGetMacro(SliceXZ, vtkSmartPointer<vtkImageSlice>);
+	vtkSetMacro(SliceXZ, vtkSmartPointer<vtkImageSlice>);
+	
+	vtkGetMacro(SliceYZ, vtkSmartPointer<vtkImageSlice>);
+	vtkSetMacro(SliceYZ, vtkSmartPointer<vtkImageSlice>);
+
+	vtkGetMacro(SliceXYMapper, vtkSmartPointer<vtkImageResliceMapper>);
+	vtkSetMacro(SliceXYMapper, vtkSmartPointer<vtkImageResliceMapper>);
+
+
+	vtkGetMacro(SliceXZMapper, vtkSmartPointer<vtkImageResliceMapper>);
+	vtkSetMacro(SliceXZMapper, vtkSmartPointer<vtkImageResliceMapper>);
+
+	vtkGetMacro(SliceYZMapper, vtkSmartPointer<vtkImageResliceMapper>);
+	vtkSetMacro(SliceYZMapper, vtkSmartPointer<vtkImageResliceMapper>);
 
 	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
@@ -166,10 +192,25 @@ protected:
 	int displayROI;
 	int enableROI;
 	int isVisible;
+	int isVisibleXY;
+	int isVisibleXZ;
+	int isVisibleYZ;
+
+	/*imageMapper
+	 vtkSmartPointer<vtkImageSlice> image =
+      vtkSmartPointer<vtkImageSlice>::New();
+image->SetMapper(imageMapper);
+*/
 	int Changed; // used by vtkMDVolumeCollectionUndoRedo class to recompute global center of mass and center of mass
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 	vtkSmartPointer<vtkImageAccumulate> Hist;
 	vtkSmartPointer<vtkImageData> ImageData;
+	vtkSmartPointer<vtkImageResliceMapper> SliceXYMapper;
+	vtkSmartPointer<vtkImageResliceMapper> SliceYZMapper;
+	vtkSmartPointer<vtkImageResliceMapper> SliceXZMapper;
+	vtkSmartPointer<vtkImageSlice> SliceXY;
+	vtkSmartPointer<vtkImageSlice> SliceXZ;
+	vtkSmartPointer<vtkImageSlice> SliceYZ;
 	vtkSmartPointer<vtkBoxWidget> Box;
 	vtkSmartPointer<vtkOutlineFilter> Outline;
 	vtkSmartPointer<vtkPolyDataMapper> OutlineMapper;

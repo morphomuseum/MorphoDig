@@ -15,6 +15,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkVolumeProperty.h>
+#include <vtkImageProperty.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkTable.h>
 #include <vtkPCAStatistics.h>
@@ -49,6 +50,17 @@ vtkMDVolume::vtkMDVolume()
 	this->displayROI = 0;
 	this->enableROI = 0;
 	this->isVisible = 1;
+	this->isVisibleXY = 0;
+	this->isVisibleXZ = 0;
+	this->isVisibleYZ = 0;
+
+	/*this->SliceXY->GetProperty()->SetColorWindow(range[1] - range[0]);
+    this->SliceXY->GetProperty()->SetColorLevel(0.5*(range[0] + range[1]));
+    this->SliceXY->GetProperty()->SetInterpolationTypeToNearest();
+
+    vtkSmartPointer<vtkRenderer> renderer =
+      vtkSmartPointer<vtkRenderer>::New();
+renderer->AddViewProp(image);*/
 	this->Outline = vtkSmartPointer<vtkOutlineFilter>::New();
 	this->OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	this->OutlineActor = vtkSmartPointer<vtkActor>::New();
@@ -61,6 +73,17 @@ vtkMDVolume::vtkMDVolume()
 	this->Hist = vtkSmartPointer<vtkImageAccumulate>::New();
 
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
+	this->SliceXY = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceYZ = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceXZ = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceXYMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+	this->SliceYZMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+	this->SliceXZMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+
+	SliceXY->SetMapper(this->SliceXYMapper);
+	SliceYZ->SetMapper(this->SliceYZMapper);
+	SliceXZ->SetMapper(this->SliceXZMapper);
+	
 	//this->Box = NULL;
 	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
 	this->Changed = 0;
@@ -116,6 +139,69 @@ void vtkMDVolume::SetisVisible(int visible)
 
 	}
 
+}
+void vtkMDVolume::SetisVisibleXY(int visible)
+{
+	int hasChanged = 0;
+	if (visible != this->isVisible) { hasChanged = 1; }
+	if (hasChanged = 0) { return; }
+	this->isVisibleXY = visible;
+	if (visible == 1)
+	{
+		
+		if (this->GetMapper() != NULL)
+		{
+			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXY);			
+		}
+	}
+	else
+	{
+		
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXY);				
+
+	}
+}
+void vtkMDVolume::SetisVisibleXZ(int visible)
+{
+	int hasChanged = 0;
+	if (visible != this->isVisible) { hasChanged = 1; }
+	if (hasChanged = 0) { return; }
+	this->isVisibleXY = visible;
+	if (visible == 1)
+	{
+
+		if (this->GetMapper() != NULL)
+		{
+			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXZ);
+		}
+	}
+	else
+	{
+
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXZ);
+
+	}
+}
+void vtkMDVolume::SetisVisibleYZ(int visible)
+{
+	int hasChanged = 0;
+	if (visible != this->isVisible) { hasChanged = 1; }
+	if (hasChanged = 0) { return; }
+	this->isVisibleXY = visible;
+	if (visible == 1)
+	{
+
+		if (this->GetMapper() != NULL)
+		{
+			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceYZ);
+		}
+	}
+	else
+	{
+
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceYZ);
+
+	}
 }
 double vtkMDVolume::GetRangeMin()
 {
@@ -350,6 +436,9 @@ void vtkMDVolume::SetCtf(vtkSmartPointer<vtkDiscretizableColorTransferFunction> 
 	this->Ctf = ctf;
 	this->GetProperty()->SetColor(ctf);
 	this->GetProperty()->SetScalarOpacity(ctf->GetScalarOpacityFunction());
+	this->SliceXY->GetProperty()->SetLookupTable(ctf);
+	this->SliceXZ->GetProperty()->SetLookupTable(ctf);
+	this->SliceYZ->GetProperty()->SetLookupTable(ctf);
 
 }
 
@@ -516,6 +605,14 @@ void vtkMDVolume::GetBoxBounds(double boxBounds[6])
 	boxBounds[3] = ymax;
 	boxBounds[4] = zmin;
 	boxBounds[5] = zmax;
+}
+void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
+{
+	this->ImageData = imgData;
+	// now add a few things related to SliceXYMapper etc... 
+	this->SliceXYMapper->SetInputData(imgData);
+	this->SliceXZMapper->SetInputData(imgData);
+	this->SliceYZMapper->SetInputData(imgData);
 }
 void vtkMDVolume::CreateBox()
 {
