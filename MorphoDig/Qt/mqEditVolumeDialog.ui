@@ -1311,6 +1311,13 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>xy</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QSlider" name="sliderXY">
          <property name="enabled">
           <bool>false</bool>
@@ -1346,6 +1353,13 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>xz</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QSlider" name="sliderXZ">
          <property name="enabled">
           <bool>false</bool>
@@ -1380,6 +1394,13 @@
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>yz</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QSlider" name="sliderYZ">
          <property name="enabled">
