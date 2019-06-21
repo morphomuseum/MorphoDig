@@ -53,7 +53,9 @@ vtkMDVolume::vtkMDVolume()
 	this->isVisibleXY = 0;
 	this->isVisibleXZ = 0;
 	this->isVisibleYZ = 0;
-
+	this->myDim[0] = 0;
+	this->myDim[1] = 0;
+	this->myDim[2] = 0;
 	/*this->SliceXY->GetProperty()->SetColorWindow(range[1] - range[0]);
     this->SliceXY->GetProperty()->SetColorLevel(0.5*(range[0] + range[1]));
     this->SliceXY->GetProperty()->SetInterpolationTypeToNearest();
@@ -76,19 +78,39 @@ renderer->AddViewProp(image);*/
 	this->SliceXY = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceXZ = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceYZ = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceXY2 = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceXZ2 = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceYZ2 = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceXY->GetProperty()->SetInterpolationTypeToNearest();
 	this->SliceXZ->GetProperty()->SetInterpolationTypeToNearest();
 	this->SliceYZ->GetProperty()->SetInterpolationTypeToNearest();
 	this->SliceXYMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+	this->SliceXYMapper2 = vtkSmartPointer<vtkImageSliceMapper>::New();
 	this->SliceYZMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+	this->SliceYZMapper2 = vtkSmartPointer<vtkImageSliceMapper>::New();
 	this->SliceXZMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+	this->SliceXZMapper2 = vtkSmartPointer<vtkImageSliceMapper>::New();
 	this->SliceXYMapper->SliceFacesCameraOff();
 	this->SliceXZMapper->SliceFacesCameraOff();
 	this->SliceYZMapper->SliceFacesCameraOff();
+
+	this->SliceXYMapper2->SliceFacesCameraOff();
+	this->SliceXYMapper2->SetOrientationToZ();
+	this->SliceXZMapper2->SliceFacesCameraOff();
+	this->SliceXZMapper2->SetOrientationToY();
+	this->SliceYZMapper2->SliceFacesCameraOff();
+	this->SliceYZMapper2->SetOrientationToX();
 	this->SliceXYMapper->ResampleToScreenPixelsOff();
+	/*this->SliceXYMapper2->SetSliceNumber(10);
+	this->SliceXZMapper2->SetSliceNumber(10);
+	this->SliceYZMapper2->SetSliceNumber(10);*/
+
 	SliceXY->SetMapper(this->SliceXYMapper);
 	SliceYZ->SetMapper(this->SliceYZMapper);
 	SliceXZ->SetMapper(this->SliceXZMapper);
+	SliceXY2->SetMapper(this->SliceXYMapper2);
+	SliceYZ2->SetMapper(this->SliceYZMapper2);
+	SliceXZ2->SetMapper(this->SliceXZMapper2);
 	
 	//this->Box = NULL;
 	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
@@ -157,13 +179,13 @@ void vtkMDVolume::SetisVisibleXY(int visible)
 		
 		if (this->GetMapper() != NULL)
 		{
-			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXY);			
+			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXY2);			
 		}
 	}
 	else
 	{
 		
-		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXY);				
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXY2);				
 
 	}
 }
@@ -178,13 +200,13 @@ void vtkMDVolume::SetisVisibleXZ(int visible)
 
 		if (this->GetMapper() != NULL)
 		{
-			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXZ);
+			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXZ2);
 		}
 	}
 	else
 	{
 
-		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXZ);
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXZ2);
 
 	}
 }
@@ -199,13 +221,13 @@ void vtkMDVolume::SetisVisibleYZ(int visible)
 
 		if (this->GetMapper() != NULL)
 		{
-			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceYZ);
+			mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceYZ2);
 		}
 	}
 	else
 	{
 
-		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceYZ);
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceYZ2);
 
 	}
 }
@@ -273,6 +295,15 @@ void vtkMDVolume::UpdateSlices()
 	this->SliceXZ->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
 	this->SliceYZ->GetProperty()->SetColorWindow(this->ScalarDisplayMax - this->ScalarDisplayMin);
 	this->SliceYZ->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
+
+
+	this->SliceXY2->GetProperty()->SetColorWindow(this->ScalarDisplayMax - this->ScalarDisplayMin);
+	this->SliceXY2->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
+	this->SliceXZ2->GetProperty()->SetColorWindow(this->ScalarDisplayMax - this->ScalarDisplayMin);
+	this->SliceXZ2->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
+	this->SliceYZ2->GetProperty()->SetColorWindow(this->ScalarDisplayMax - this->ScalarDisplayMin);
+	this->SliceYZ2->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
+
 	
 }
 void vtkMDVolume::SetScalarDisplayMin(double min)
@@ -635,6 +666,40 @@ void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 	this->SliceXYMapper->SetInputData(imgData);
 	this->SliceXZMapper->SetInputData(imgData);
 	this->SliceYZMapper->SetInputData(imgData);
+	this->SliceXYMapper2->SetInputData(imgData);
+	this->SliceXZMapper2->SetInputData(imgData);
+	this->SliceYZMapper2->SetInputData(imgData);
+
+	
+	
+	imgData->GetDimensions(this->myDim);
+
+	this->SliceXYMapper2->SetSliceNumber((int)(this->myDim[2]/2));
+	this->SliceXZMapper2->SetSliceNumber((int)(this->myDim[1] / 2));
+	this->SliceYZMapper2->SetSliceNumber((int)(this->myDim[0] / 2));
+
+}
+
+void vtkMDVolume::SetSliceNumberXY(int slice)
+{
+	if (slice >= 0 && slice <= this->myDim[2])
+	{
+		this->SliceXYMapper2->SetSliceNumber(slice);
+	}
+}
+void vtkMDVolume::SetSliceNumberXZ(int slice)
+{
+	if (slice >= 0 && slice <= this->myDim[1])
+	{
+		this->SliceXZMapper2->SetSliceNumber(slice);
+	}
+}
+void vtkMDVolume::SetSliceNumberYZ(int slice)
+{
+	if (slice >= 0 && slice <= this->myDim[0])
+	{
+		this->SliceYZMapper2->SetSliceNumber(slice);
+	}
 }
 void vtkMDVolume::CreateBox()
 {
@@ -801,6 +866,9 @@ void vtkMDVolume::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat)
 	//cout << "Center:" << mCenter[0] << "," << mCenter[1] << "," << mCenter[2] << "," << endl;
 	vtkProp3D *prop3D = vtkProp3D::SafeDownCast(this);
 	vtkProp3D *prop3D2 = vtkProp3D::SafeDownCast(this->GetOutlineActor());
+	vtkProp3D *myPropr3 = vtkProp3D::SafeDownCast(this->GetSliceXY2());
+	vtkProp3D *myPropr4 = vtkProp3D::SafeDownCast(this->GetSliceXZ2());
+	vtkProp3D *myPropr5 = vtkProp3D::SafeDownCast(this->GetSliceYZ2());
 	vtkTransform *newTransform = vtkTransform::New();
 	newTransform->PostMultiply();
 	newTransform->SetMatrix(Mat);
@@ -810,6 +878,19 @@ void vtkMDVolume::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat)
 	prop3D2->SetPosition(newTransform->GetPosition());
 	prop3D2->SetScale(newTransform->GetScale());
 	prop3D2->SetOrientation(newTransform->GetOrientation());
+
+	myPropr3->SetPosition(newTransform->GetPosition());
+	myPropr3->SetScale(newTransform->GetScale());
+	myPropr3->SetOrientation(newTransform->GetOrientation());
+
+	myPropr4->SetPosition(newTransform->GetPosition());
+	myPropr4->SetScale(newTransform->GetScale());
+	myPropr4->SetOrientation(newTransform->GetOrientation());
+
+	myPropr5->SetPosition(newTransform->GetPosition());
+	myPropr5->SetScale(newTransform->GetScale());
+	myPropr5->SetOrientation(newTransform->GetOrientation());
+
 	newTransform->Delete();
 	
 

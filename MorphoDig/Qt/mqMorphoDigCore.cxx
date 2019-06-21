@@ -770,6 +770,8 @@ void mqMorphoDigCore::TestVolume()
 
 	
 		this->getRenderer()->AddVolume(volume);
+		
+
 	}
 }
 void mqMorphoDigCore::SetOpenGLVersion(int major, int minor)

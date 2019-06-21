@@ -239,6 +239,12 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(mqMorphoDigCore::instance(), SIGNAL(volumesMightHaveChanged()), this, SLOT(slotRefreshUi()));
 	connect(this->Ui->cutMinPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->cutMaxPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
+	connect(this->Ui->sliderXY, SIGNAL(valueChanged(int)), this, SLOT(slotSliderXYChanged(int)));
+	connect(this->Ui->sliderXZ, SIGNAL(valueChanged(int)), this, SLOT(slotSliderXZChanged(int)));
+	connect(this->Ui->sliderYZ, SIGNAL(valueChanged(int)), this, SLOT(slotSliderYZChanged(int)));
+	
+
+
 	connect(this->Ui->pushScalarSuggestedMax, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMax()));
 	connect(this->Ui->pushScalarSuggestedMin, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMin()));
 	connect(this->Ui->reinitializeColorMap, SIGNAL(pressed()), this, SLOT(slotReinitializeColorMap()));
@@ -391,7 +397,7 @@ void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
-		mqMorphoDigCore::instance()->Render();
+		
 		if (isChecked)
 		{
 			this->Volume->SetisVisible(1);
@@ -404,20 +410,51 @@ void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+/*virtual void slotSliderXYChanged(int val);
+  virtual void slotSliderXZChanged(int val);
+  virtual void slotSliderYZChanged(int val);*/
+
+void mqEditVolumeDialog::slotSliderXYChanged(int val)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		this->Volume->SetSliceNumberXY(val);
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+
+void mqEditVolumeDialog::slotSliderXZChanged(int val)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		this->Volume->SetSliceNumberXZ(val);
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotSliderYZChanged(int val)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		this->Volume->SetSliceNumberYZ(val);
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+
 void mqEditVolumeDialog::slotisVisibleXYClicked(bool isChecked)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
-		mqMorphoDigCore::instance()->Render();
+		
 		if (isChecked)
 		{
 			this->Volume->SetisVisibleXY(1);
+			
 		}
 		else
 		{
 			this->Volume->SetisVisibleXY(0);
 		}
-
+		this->Ui->sliderXY->setEnabled(isChecked);
 		mqMorphoDigCore::instance()->Render();
 	}
 }
@@ -425,7 +462,7 @@ void mqEditVolumeDialog::slotisVisibleXZClicked(bool isChecked)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
-		mqMorphoDigCore::instance()->Render();
+		
 		if (isChecked)
 		{
 			this->Volume->SetisVisibleXZ(1);
@@ -434,7 +471,7 @@ void mqEditVolumeDialog::slotisVisibleXZClicked(bool isChecked)
 		{
 			this->Volume->SetisVisibleXZ(0);
 		}
-
+		this->Ui->sliderXZ->setEnabled(isChecked);
 		mqMorphoDigCore::instance()->Render();
 	}
 }
@@ -443,7 +480,7 @@ void mqEditVolumeDialog::slotisVisibleYZClicked(bool isChecked)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
-		mqMorphoDigCore::instance()->Render();
+		
 		if (isChecked)
 		{
 			this->Volume->SetisVisibleYZ(1);
@@ -452,6 +489,7 @@ void mqEditVolumeDialog::slotisVisibleYZClicked(bool isChecked)
 		{
 			this->Volume->SetisVisibleYZ(0);
 		}
+		this->Ui->sliderYZ->setEnabled(isChecked);
 
 		mqMorphoDigCore::instance()->Render();
 	}
@@ -813,28 +851,35 @@ void mqEditVolumeDialog::UpdateUI()
 		if (this->Volume->GetisVisibleXY() == 1)
 		{
 			this->Ui->isVisibleXY->setChecked(true);
+			this->Ui->sliderXY->setEnabled(true);
 		}
 		else
 		{
 			this->Ui->isVisibleXY->setChecked(false);
+			this->Ui->sliderXY->setEnabled(false);
 		}
 
 		if (this->Volume->GetisVisibleXZ() == 1)
 		{
 			this->Ui->isVisibleXZ->setChecked(true);
+			this->Ui->sliderXZ->setEnabled(true);
 		}
 		else
 		{
 			this->Ui->isVisibleXZ->setChecked(false);
+			this->Ui->sliderXZ->setEnabled(false);
 		}
 
 		if (this->Volume->GetisVisibleYZ() == 1)
 		{
 			this->Ui->isVisibleYZ->setChecked(true);
+			this->Ui->sliderYZ->setEnabled(true);
+
 		}
 		else
 		{
 			this->Ui->isVisibleYZ->setChecked(false);
+			this->Ui->sliderYZ->setEnabled(false);
 		}
 
 
@@ -868,6 +913,13 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->dim0->setValue(dim[0]);
 		this->Ui->dim1->setValue(dim[1]);
 		this->Ui->dim2->setValue(dim[2]);
+		this->Ui->sliderXY->setMaximum(dim[2]);
+		this->Ui->sliderXY->setValue((int) (dim[2]/2));
+		this->Ui->sliderXZ->setMaximum(dim[1]);
+		this->Ui->sliderXZ->setValue((int)(dim[1] / 2));
+		this->Ui->sliderYZ->setMaximum(dim[0]);
+		this->Ui->sliderYZ->setValue((int)(dim[0] / 2));
+
 
 		this->Volume->GetImageData()->GetSpacing(res);
 		this->Ui->res0->setValue(res[0]);

@@ -18,6 +18,7 @@ Module:    vtkMDVolume.h
 #include <vtkImageSlice.h>
 #include <vtkImageAccumulate.h>
 #include <vtkImageResliceMapper.h>
+#include <vtkImageSliceMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkOutlineFilter.h>
@@ -134,6 +135,16 @@ public:
 	vtkGetMacro(SliceYZ, vtkSmartPointer<vtkImageSlice>);
 	vtkSetMacro(SliceYZ, vtkSmartPointer<vtkImageSlice>);
 
+	vtkGetMacro(SliceXY2, vtkSmartPointer<vtkImageSlice>);
+	vtkSetMacro(SliceXY2, vtkSmartPointer<vtkImageSlice>);
+
+	vtkGetMacro(SliceXZ2, vtkSmartPointer<vtkImageSlice>);
+	vtkSetMacro(SliceXZ2, vtkSmartPointer<vtkImageSlice>);
+
+	vtkGetMacro(SliceYZ2, vtkSmartPointer<vtkImageSlice>);
+	vtkSetMacro(SliceYZ2, vtkSmartPointer<vtkImageSlice>);
+
+
 	vtkGetMacro(SliceXYMapper, vtkSmartPointer<vtkImageResliceMapper>);
 	vtkSetMacro(SliceXYMapper, vtkSmartPointer<vtkImageResliceMapper>);
 
@@ -143,6 +154,18 @@ public:
 
 	vtkGetMacro(SliceYZMapper, vtkSmartPointer<vtkImageResliceMapper>);
 	vtkSetMacro(SliceYZMapper, vtkSmartPointer<vtkImageResliceMapper>);
+
+
+	vtkGetMacro(SliceXYMapper2, vtkSmartPointer<vtkImageSliceMapper>);
+	vtkSetMacro(SliceXYMapper2, vtkSmartPointer<vtkImageSliceMapper>);
+
+
+	vtkGetMacro(SliceXZMapper2, vtkSmartPointer<vtkImageSliceMapper>);
+	vtkSetMacro(SliceXZMapper2, vtkSmartPointer<vtkImageSliceMapper>);
+
+	vtkGetMacro(SliceYZMapper2, vtkSmartPointer<vtkImageSliceMapper>);
+	vtkSetMacro(SliceYZMapper2, vtkSmartPointer<vtkImageSliceMapper>);
+
 
 	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
@@ -154,6 +177,10 @@ public:
 	vtkSetMacro(OutlineActor, vtkSmartPointer<vtkActor>);
 	vtkGetMacro(OutlineActor, vtkSmartPointer<vtkActor>);
 	
+	void SetSliceNumberXY(int slice);
+	void SetSliceNumberXZ(int slice);
+	void SetSliceNumberYZ(int slice);
+
 	double GetBoundingBoxLength();
 	double GetLookupTableMin();
 	double GetLookupTableMax();
@@ -199,6 +226,7 @@ protected:
 	int isVisibleXY;
 	int isVisibleXZ;
 	int isVisibleYZ;
+	int myDim[3];
 
 	/*imageMapper
 	 vtkSmartPointer<vtkImageSlice> image =
@@ -212,9 +240,17 @@ image->SetMapper(imageMapper);
 	vtkSmartPointer<vtkImageResliceMapper> SliceXYMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceYZMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXZMapper;
+
+	vtkSmartPointer <vtkImageSliceMapper> SliceXYMapper2;
+	vtkSmartPointer <vtkImageSliceMapper> SliceXZMapper2;
+	vtkSmartPointer <vtkImageSliceMapper> SliceYZMapper2;
+
 	vtkSmartPointer<vtkImageSlice> SliceXY;
 	vtkSmartPointer<vtkImageSlice> SliceXZ;
 	vtkSmartPointer<vtkImageSlice> SliceYZ;
+	vtkSmartPointer<vtkImageSlice> SliceXY2;
+	vtkSmartPointer<vtkImageSlice> SliceXZ2;
+	vtkSmartPointer<vtkImageSlice> SliceYZ2;
 	vtkSmartPointer<vtkBoxWidget> Box;
 	vtkSmartPointer<vtkOutlineFilter> Outline;
 	vtkSmartPointer<vtkPolyDataMapper> OutlineMapper;

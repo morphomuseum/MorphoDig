@@ -855,7 +855,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>362</y>
+      <y>440</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -871,7 +871,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>362</y>
+      <y>440</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -884,7 +884,7 @@
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>362</y>
+      <y>440</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -897,7 +897,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>400</y>
+      <y>460</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -913,7 +913,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>362</y>
+      <y>440</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -926,7 +926,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>400</y>
+      <y>460</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -939,7 +939,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>400</y>
+      <y>460</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -951,8 +951,8 @@
    <widget class="QSpinBox" name="cutMinPercent">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>362</y>
+      <x>370</x>
+      <y>440</y>
       <width>42</width>
       <height>20</height>
      </rect>
@@ -967,8 +967,8 @@
    <widget class="QSpinBox" name="cutMaxPercent">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>400</y>
+      <x>370</x>
+      <y>460</y>
       <width>42</width>
       <height>20</height>
      </rect>
@@ -984,7 +984,7 @@
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>400</y>
+      <y>460</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -1298,86 +1298,122 @@
      </rect>
     </property>
    </widget>
-   <widget class="QToolButton" name="isVisibleXY">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>50</x>
       <y>300</y>
-      <width>25</width>
-      <height>19</height>
+      <width>311</width>
+      <height>111</height>
      </rect>
     </property>
-    <property name="toolTip">
-     <string>Display / Hide volume</string>
-    </property>
-    <property name="text">
-     <string>BoxWidget</string>
-    </property>
-    <property name="icon">
-     <iconset resource="../Icons/icons.qrc">
-      <normaloff>:/Icons/eye_closed.png</normaloff>
-      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QToolButton" name="isVisibleXZ">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>320</y>
-      <width>25</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Display / Hide volume</string>
-    </property>
-    <property name="text">
-     <string>BoxWidget</string>
-    </property>
-    <property name="icon">
-     <iconset resource="../Icons/icons.qrc">
-      <normaloff>:/Icons/eye_closed.png</normaloff>
-      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QToolButton" name="isVisibleYZ">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>340</y>
-      <width>25</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Display / Hide volume</string>
-    </property>
-    <property name="text">
-     <string>BoxWidget</string>
-    </property>
-    <property name="icon">
-     <iconset resource="../Icons/icons.qrc">
-      <normaloff>:/Icons/eye_closed.png</normaloff>
-      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QSlider" name="sliderXY">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="isVisibleXY">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Display / Hide volume</string>
+         </property>
+         <property name="text">
+          <string>BoxWidget</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/eye_closed.png</normaloff>
+           <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QSlider" name="sliderXZ">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="isVisibleXZ">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Display / Hide volume</string>
+         </property>
+         <property name="text">
+          <string>BoxWidget</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/eye_closed.png</normaloff>
+           <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QSlider" name="sliderYZ">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="isVisibleYZ">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Display / Hide volume</string>
+         </property>
+         <property name="text">
+          <string>BoxWidget</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/eye_closed.png</normaloff>
+           <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>

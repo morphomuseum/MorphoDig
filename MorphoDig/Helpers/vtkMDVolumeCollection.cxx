@@ -295,6 +295,9 @@ void vtkMDVolumeCollection::DeleteSelectedVolumes()
 							{
 								myVolume->GetBox()->SetEnabled(false);
 							}
+							this->Renderer->RemoveViewProp(myVolume->GetSliceXY2());
+							this->Renderer->RemoveViewProp(myVolume->GetSliceXZ2());
+							this->Renderer->RemoveViewProp(myVolume->GetSliceYZ2());
 							found = 1;
 						}
 					}
@@ -396,6 +399,10 @@ void vtkMDVolumeCollection::PopUndoStack() {
 					}
 				}
 			}
+			if (myVolume->GetisVisibleXY()) { this->Renderer->AddViewProp(myVolume->GetSliceXY2()); }
+			if (myVolume->GetisVisibleXZ()) { this->Renderer->AddViewProp(myVolume->GetSliceXZ2()); }
+			if (myVolume->GetisVisibleYZ()) { this->Renderer->AddViewProp(myVolume->GetSliceYZ2()); }
+				
 			// if myVolume is a landmark => Add label to the renderer
 
 			
@@ -452,6 +459,9 @@ void vtkMDVolumeCollection::PopRedoStack() {
 			{
 				myVolume->GetBox()->SetEnabled(false);
 			}
+			this->Renderer->RemoveViewProp(myVolume->GetSliceXY2());
+			this->Renderer->RemoveViewProp(myVolume->GetSliceXZ2());
+			this->Renderer->RemoveViewProp(myVolume->GetSliceYZ2());
 			
 			this->Changed = 1;
 		}
@@ -484,7 +494,12 @@ void vtkMDVolumeCollection::PopRedoStack() {
 					}
 				
 				}
+				
 			}
+			if (myVolume->GetisVisibleXY()) { this->Renderer->AddViewProp(myVolume->GetSliceXY2()); }
+			if (myVolume->GetisVisibleXZ()) { this->Renderer->AddViewProp(myVolume->GetSliceXZ2()); }
+			if (myVolume->GetisVisibleYZ()) { this->Renderer->AddViewProp(myVolume->GetSliceYZ2()); }
+
 			// if myVolume is a landmark => Add label to the renderer
 			
 			this->Changed = 1;
