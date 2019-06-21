@@ -70,6 +70,10 @@ public:
   virtual void slotdisplayROIPressed();
   virtual void slotEnableROIClicked(bool isChecked);
   virtual void slotisVisibleClicked(bool isChecked);
+  virtual void slotisVisibleXYClicked(bool isChecked);
+  virtual void slotisVisibleXZClicked(bool isChecked);
+  virtual void slotisVisibleYZClicked(bool isChecked);
+  
  /* 
  virtual void slotCurrentMinEdited();
  virtual void slotCurrentMaxEdited();

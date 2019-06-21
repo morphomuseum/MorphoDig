@@ -74,12 +74,18 @@ renderer->AddViewProp(image);*/
 
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
 	this->SliceXY = vtkSmartPointer<vtkImageSlice>::New();
-	this->SliceYZ = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceXZ = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceYZ = vtkSmartPointer<vtkImageSlice>::New();
+	this->SliceXY->GetProperty()->SetInterpolationTypeToNearest();
+	this->SliceXZ->GetProperty()->SetInterpolationTypeToNearest();
+	this->SliceYZ->GetProperty()->SetInterpolationTypeToNearest();
 	this->SliceXYMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
 	this->SliceYZMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
 	this->SliceXZMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
-
+	this->SliceXYMapper->SliceFacesCameraOff();
+	this->SliceXZMapper->SliceFacesCameraOff();
+	this->SliceYZMapper->SliceFacesCameraOff();
+	this->SliceXYMapper->ResampleToScreenPixelsOff();
 	SliceXY->SetMapper(this->SliceXYMapper);
 	SliceYZ->SetMapper(this->SliceYZMapper);
 	SliceXZ->SetMapper(this->SliceXZMapper);
@@ -255,11 +261,24 @@ void vtkMDVolume::SetColorAmbient(double ambient)
 void vtkMDVolume::SetScalarDisplayMax(double max)
 {
 	this->ScalarDisplayMax = max;
+	this->UpdateSlices();
+	
 	//this->UpdateLookupTableRange();
+}
+void vtkMDVolume::UpdateSlices()
+{
+	this->SliceXY->GetProperty()->SetColorWindow(this->ScalarDisplayMax - this->ScalarDisplayMin);
+	this->SliceXY->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
+	this->SliceXZ->GetProperty()->SetColorWindow(this->ScalarDisplayMax - this->ScalarDisplayMin);
+	this->SliceXZ->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
+	this->SliceYZ->GetProperty()->SetColorWindow(this->ScalarDisplayMax - this->ScalarDisplayMin);
+	this->SliceYZ->GetProperty()->SetColorLevel(0.5*(this->ScalarDisplayMin + this->ScalarDisplayMax));
+	
 }
 void vtkMDVolume::SetScalarDisplayMin(double min)
 {
 	this->ScalarDisplayMin = min;
+	this->UpdateSlices();
 	//this->UpdateLookupTableRange();
 }
 void vtkMDVolume::SetScalarOpacityUnitDistance(double SOUD)
@@ -414,6 +433,7 @@ void vtkMDVolume::UpdateLookupTableRange(double min, double max)
 {
 	this->ScalarDisplayMax = max;
 	this->ScalarDisplayMin = min;
+	this->UpdateSlices();
 	this->UpdateLookupTableRange();
 	
 
@@ -436,9 +456,10 @@ void vtkMDVolume::SetCtf(vtkSmartPointer<vtkDiscretizableColorTransferFunction> 
 	this->Ctf = ctf;
 	this->GetProperty()->SetColor(ctf);
 	this->GetProperty()->SetScalarOpacity(ctf->GetScalarOpacityFunction());
-	this->SliceXY->GetProperty()->SetLookupTable(ctf);
+	//NOT SURE!
+	/*this->SliceXY->GetProperty()->SetLookupTable(ctf);
 	this->SliceXZ->GetProperty()->SetLookupTable(ctf);
-	this->SliceYZ->GetProperty()->SetLookupTable(ctf);
+	this->SliceYZ->GetProperty()->SetLookupTable(ctf);*/
 
 }
 
@@ -610,6 +631,7 @@ void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->ImageData = imgData;
 	// now add a few things related to SliceXYMapper etc... 
+	
 	this->SliceXYMapper->SetInputData(imgData);
 	this->SliceXZMapper->SetInputData(imgData);
 	this->SliceYZMapper->SetInputData(imgData);

@@ -262,6 +262,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 	
 	connect(this->Ui->isVisible, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleClicked(bool)));
+	connect(this->Ui->isVisibleXY, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleXYClicked(bool)));
+	connect(this->Ui->isVisibleYZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleYZClicked(bool)));
+	connect(this->Ui->isVisibleXZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleXZClicked(bool)));
 
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
@@ -396,6 +399,58 @@ void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 		else
 		{
 			this->Volume->SetisVisible(0);
+		}
+
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotisVisibleXYClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		mqMorphoDigCore::instance()->Render();
+		if (isChecked)
+		{
+			this->Volume->SetisVisibleXY(1);
+		}
+		else
+		{
+			this->Volume->SetisVisibleXY(0);
+		}
+
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotisVisibleXZClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		mqMorphoDigCore::instance()->Render();
+		if (isChecked)
+		{
+			this->Volume->SetisVisibleXZ(1);
+		}
+		else
+		{
+			this->Volume->SetisVisibleXZ(0);
+		}
+
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+
+void mqEditVolumeDialog::slotisVisibleYZClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		mqMorphoDigCore::instance()->Render();
+		if (isChecked)
+		{
+			this->Volume->SetisVisibleYZ(1);
+		}
+		else
+		{
+			this->Volume->SetisVisibleYZ(0);
 		}
 
 		mqMorphoDigCore::instance()->Render();
@@ -754,6 +809,34 @@ void mqEditVolumeDialog::UpdateUI()
 		{ 
 			this->Ui->isVisible->setChecked(false);
 		}
+
+		if (this->Volume->GetisVisibleXY() == 1)
+		{
+			this->Ui->isVisibleXY->setChecked(true);
+		}
+		else
+		{
+			this->Ui->isVisibleXY->setChecked(false);
+		}
+
+		if (this->Volume->GetisVisibleXZ() == 1)
+		{
+			this->Ui->isVisibleXZ->setChecked(true);
+		}
+		else
+		{
+			this->Ui->isVisibleXZ->setChecked(false);
+		}
+
+		if (this->Volume->GetisVisibleYZ() == 1)
+		{
+			this->Ui->isVisibleYZ->setChecked(true);
+		}
+		else
+		{
+			this->Ui->isVisibleYZ->setChecked(false);
+		}
+
 
 		if (this->Volume->GetdisplayROI() == 1)
 		{

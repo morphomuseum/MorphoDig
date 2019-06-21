@@ -91,8 +91,11 @@ public:
 
 	//isVisible
 	void SetisVisibleXY(int visible);
+	vtkGetMacro(isVisibleXY, int);
 	void SetisVisibleXZ(int visible);
+	vtkGetMacro(isVisibleXZ, int);
 	void SetisVisibleYZ(int visible);
+	vtkGetMacro(isVisibleYZ, int);
 
 	void SetisVisible(int visible);
 	//	vtkSetMacro(displayROI, int);
@@ -160,6 +163,7 @@ public:
 	void SetScalarDisplayMin(double min);
 	void UpdateLookupTableRange(double min, double max);
 	void UpdateLookupTableRange();
+	void UpdateSlices();
 	int IsInsideFrustum(vtkSmartPointer<vtkPlanes>myPlanes);
 	// Actual Volume render method.
 	virtual void SetSelected(int selected);

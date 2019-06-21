@@ -1298,6 +1298,87 @@
      </rect>
     </property>
    </widget>
+   <widget class="QToolButton" name="isVisibleXY">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>300</y>
+      <width>25</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display / Hide volume</string>
+    </property>
+    <property name="text">
+     <string>BoxWidget</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/eye_closed.png</normaloff>
+      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="isVisibleXZ">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>320</y>
+      <width>25</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display / Hide volume</string>
+    </property>
+    <property name="text">
+     <string>BoxWidget</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/eye_closed.png</normaloff>
+      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="isVisibleYZ">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>340</y>
+      <width>25</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Display / Hide volume</string>
+    </property>
+    <property name="text">
+     <string>BoxWidget</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/eye_closed.png</normaloff>
+      <normalon>:/Icons/eye_opened.png</normalon>:/Icons/eye_closed.png</iconset>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources>
