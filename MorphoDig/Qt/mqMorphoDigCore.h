@@ -451,6 +451,13 @@ public:
 	void UnselectAll(int Count);
 	void SelectAll(int Count);
 	void Setmui_DisplayMode(int mode);
+
+	long long int Getmui_DefaultVolumeOutOfCoreThreshold();
+	long long int Getmui_VolumeOutOfCoreThreshold();
+	void Setmui_VolumeOutOfCoreThreshold(long long int newVolumeOutOfCoreThreshold);
+	int Getmui_VolumeDisplaySlice();
+	int Getmui_DefaultVolumeDisplaySlice();
+	void Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice);
 	int Getmui_DisplayMode();
 	int Getmui_DefaultDisplayMode();
 	void Setmui_Anaglyph(int anaglyph);
@@ -912,6 +919,7 @@ public:
   //void SetCurrentInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void InitLuts();
   void ComputeSelectedNamesLists();
+
   int colorMapNameAlreadyExists(QString proposed_name);
   int tagMapNameAlreadyExists(QString proposed_name);
   int tagAlreadyExists(int tagnr);
@@ -1038,6 +1046,10 @@ protected:
 	QString mui_SizeUnit;
 	double mui_DefaultGridSpacing;
 	QString mui_DefaultSizeUnit;
+	long long int mui_VolumeOutOfCoreThreshold;
+	long long int mui_DefaultVolumeOutOfCoreThreshold;
+	int mui_VolumeDisplaySlice;
+	int mui_DefaultVolumeDisplaySlice;//0: no, display volume rendering instead by default //1: xy slice //2: xz slice //3: yz slice
 
 	int mui_OpenGL_minor_version;
 	int mui_OpenGL_major_version;

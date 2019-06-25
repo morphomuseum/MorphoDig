@@ -719,6 +719,7 @@ void vtkMDVolume::CreateBox()
 	cout << "Create box 3" << endl;
 	vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
 	callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
+	
 	box->AddObserver(vtkCommand::InteractionEvent, callback);
 
 	box->EnabledOff();

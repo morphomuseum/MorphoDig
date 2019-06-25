@@ -616,6 +616,17 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	//	).toDouble() << endl;
 	settings.endGroup();
 	
+	settings.beginGroup("volumes");
+	//settings.setValue("VolumeOutOfCoreThreshold", this->MorphoDigCore->Getmui_VolumeOutOfCoreThreshold());
+	long long int defaultVolumeOutOfCoreThreshold = this->MorphoDigCore->Getmui_DefaultVolumeOutOfCoreThreshold();
+	this->MorphoDigCore->Setmui_VolumeDisplaySlice(settings.value("VolumeOutOfCoreThreshold", defaultVolumeOutOfCoreThreshold).toLongLong());
+
+	int defaultVolumeDisplaySlice = this->MorphoDigCore->Getmui_DefaultVolumeDisplaySlice();
+	this->MorphoDigCore->Setmui_VolumeDisplaySlice(settings.value("VolumeDisplaySlice", defaultVolumeDisplaySlice).toInt());
+	
+	//settings.setValue("VolumeDisplaySlice", this->MorphoDigCore->Getmui_VolumeDisplaySlice());
+	settings.endGroup();
+
 	settings.beginGroup("colormaps");
 	cout<<"Number of custom colormaps:"<<settings.value("nr", 0).toInt()<<endl;
 	int nr = settings.value("nr", 0).toInt();
@@ -1172,6 +1183,7 @@ void MorphoDig::dragEnterEvent(QDragEnterEvent *e)
 }
 void MorphoDig::dropEvent(QDropEvent *e)
 {
+	cout << "drop event" << endl;
 	int cpt_tiff = 0;
 	int tiff_3D = 1;
 	foreach(const QUrl &url, e->mimeData()->urls()) {
@@ -1404,6 +1416,8 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		{
 			type = 15; //TPS
 		}
+		cout << "Test if raw:"  << endl;
+
 		found = fileName.toStdString().find(RAWext);
 		found2 = fileName.toStdString().find(RAWext2);
 		if (found != std::string::npos || found2 != std::string::npos)
@@ -1487,6 +1501,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		}
 		else if (type == 16)
 		{
+			cout << "Drag and drop raw" << endl;
 			mqOpenRawDialog OpenRaw_dialog(mqCoreUtilities::mainWidget());
 			OpenRaw_dialog.setFileName(fileName);
 			OpenRaw_dialog.exec(); 
@@ -1514,7 +1529,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 	}
 	// now the 2D tiff case
-
+	cout << "here!!!!" << endl;
 	if (cpt_tiff > 1)
 	{
 		int first_image = 1;
@@ -1852,8 +1867,15 @@ void MorphoDig::saveSettings()
 	settings.setValue("Anaglyph", this->MorphoDigCore->Getmui_Anaglyph());	
 	settings.setValue("DisplayMode", this->MorphoDigCore->Getmui_DisplayMode());
 	settings.endGroup();
+
+	settings.beginGroup("volumes");
+	settings.setValue("VolumeOutOfCoreThreshold", this->MorphoDigCore->Getmui_VolumeOutOfCoreThreshold());
+	settings.setValue("VolumeDisplaySlice", this->MorphoDigCore->Getmui_VolumeDisplaySlice());
+	settings.endGroup();
+
 	settings.beginGroup("colormaps");
 
+	
 	ExistingColorMaps *colorMaps = this->MorphoDigCore->Getmui_ExistingColorMaps();
 	size_t size = colorMaps->Stack.size();
 	int cpt = 0;

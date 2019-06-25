@@ -172,6 +172,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_DefaultFontSize = this->mui_FontSize = 10;
 	this->mui_DefaultDisplayLandmarkText = 1;
 	this->mui_DisplayLandmarkText = 1;
+	this->mui_DefaultVolumeDisplaySlice = this->mui_VolumeDisplaySlice = 0; //by default, construct a volume rendering;
+	this->mui_DefaultVolumeOutOfCoreThreshold= this->mui_VolumeOutOfCoreThreshold=500*500*500; // by default 500 * 500 * 500 pixels
 
 	this->mui_OpenGL_minor_version = 0;
 	this->mui_OpenGL_major_version = 0;
@@ -530,6 +532,7 @@ void mqMorphoDigCore::TestVolume()
 
 		vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
 		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		
 		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -824,6 +827,43 @@ void mqMorphoDigCore::ChangeBackfaceCulling() {
 	if (this->mui_BackfaceCulling == 0) { this->mui_BackfaceCulling = 1; }
 	else { this->mui_BackfaceCulling = 0; }
 	this->ActivateBackfaceCulling();
+}
+
+/*long long int Getmui_DefaultVolumeOutOfCoreThreshold();
+	long long int Getmui_VolumeOutOfCoreThreshold();
+	void Setmui_VolumeOutOfCoreThreshold(long long int newVolumeOutOfCoreThreshold);
+	int Getmui_VolumeDisplaySlice();
+	int Getmui_DefaultVolumeDisplaySlice();
+	void Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice);*/
+long long int mqMorphoDigCore::Getmui_DefaultVolumeOutOfCoreThreshold()
+{
+	return this->mui_DefaultVolumeOutOfCoreThreshold;
+}
+long long int mqMorphoDigCore::Getmui_VolumeOutOfCoreThreshold()
+{
+	return this->mui_VolumeOutOfCoreThreshold;
+}
+void mqMorphoDigCore::Setmui_VolumeOutOfCoreThreshold(long long int newVolumeOutOfCoreThreshold)
+{
+	if (newVolumeOutOfCoreThreshold > 0)
+	{
+		this->mui_VolumeOutOfCoreThreshold = newVolumeOutOfCoreThreshold;
+	}
+}
+int mqMorphoDigCore::Getmui_VolumeDisplaySlice()
+{
+	return this->mui_VolumeDisplaySlice;
+}
+int mqMorphoDigCore::Getmui_DefaultVolumeDisplaySlice()
+{
+	return this->mui_DefaultVolumeDisplaySlice;
+}
+void mqMorphoDigCore::Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice)
+{
+	if (newVolumeDisplaySlice >= 0 && newVolumeDisplaySlice < 4)
+	{
+		this->mui_DefaultVolumeDisplaySlice = newVolumeDisplaySlice;
+	}
 }
 
 int mqMorphoDigCore::Getmui_BackfaceCulling() { return this->mui_BackfaceCulling; }
@@ -5028,6 +5068,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			mapper->SetRequestedRenderModeToGPU();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -5223,6 +5264,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		mapper->SetRequestedRenderModeToGPU();
 		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -5414,6 +5456,8 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		mapper->SetRequestedRenderModeToGPU();
+
 		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -5653,6 +5697,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			mapper->SetRequestedRenderModeToGPU();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -5912,6 +5957,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			mapper->SetRequestedRenderModeToGPU();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
