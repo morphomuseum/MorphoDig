@@ -863,7 +863,7 @@ void mqMorphoDigCore::Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice)
 {
 	if (newVolumeDisplaySlice >= 0 && newVolumeDisplaySlice < 4)
 	{
-		this->mui_DefaultVolumeDisplaySlice = newVolumeDisplaySlice;
+		this->mui_VolumeDisplaySlice = newVolumeDisplaySlice;
 	}
 }
 
@@ -6082,6 +6082,11 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 volume->SetName(newname);
 				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				 volume->InitCenter();
+				 if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisible(0); }
+				 if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
+				 if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
+				 if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1); }
+				 
 				 //this->getRenderer()->AddVolume(volume);
 				 this->getVolumeCollection()->AddItem(volume);
 				 //emit this->actorsMightHaveChanged();

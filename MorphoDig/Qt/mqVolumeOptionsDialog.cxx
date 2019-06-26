@@ -96,7 +96,9 @@ void mqVolumeOptionsDialog::editVolumeOptions()
 	if (this->Ui->VR->isChecked()) { mqMorphoDigCore::instance()->Setmui_VolumeDisplaySlice(0); }
 	else if (this->Ui->XY->isChecked()) { mqMorphoDigCore::instance()->Setmui_VolumeDisplaySlice(1); }
 	else if (this->Ui->XZ->isChecked()) { mqMorphoDigCore::instance()->Setmui_VolumeDisplaySlice(2); }
-	else if (this->Ui->YZ->isChecked()) { mqMorphoDigCore::instance()->Setmui_VolumeDisplaySlice(3);}
+	else if (this->Ui->YZ->isChecked()) { mqMorphoDigCore::instance()->Setmui_VolumeDisplaySlice(3);
+	cout << "YZ checked!!!" << endl;
+	}
 	
 	mqMorphoDigCore::instance()->Setmui_VolumeOutOfCoreThreshold(this->Ui->outOfCoreThreshold->value());
 	
