@@ -6082,10 +6082,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 volume->SetName(newname);
 				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				 volume->InitCenter();
-				 if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisible(0); }
-				 if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
-				 if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
-				 if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1); }
+				
 				 
 				 //this->getRenderer()->AddVolume(volume);
 				 this->getVolumeCollection()->AddItem(volume);
@@ -6110,7 +6107,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 {
 					 this->UpdateLandmarkSettings();
 				 }				
-			
+				 if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisible(0); }
+				 if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
+				 if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
+				 if (this->Getmui_VolumeDisplaySlice() == 3) { 
+					 cout << "YZ slice should be visible!" << endl;
+					 volume->SetisVisibleYZ(1); 
+				 }
 			this->Render();
 
 		}
@@ -18296,6 +18299,7 @@ void mqMorphoDigCore::DeleteSelectedActors()
 	this->HandleLandmarkCollection->DeleteSelectedActors();
 	this->FlagLandmarkCollection->DeleteSelectedActors();
 	emit this->actorsMightHaveChanged();
+	emit this->volumesMightHaveChanged();
 	
 }
 void mqMorphoDigCore::addInvert()

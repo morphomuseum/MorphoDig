@@ -194,7 +194,7 @@ void vtkMDVolume::SetisVisibleXZ(int visible)
 	int hasChanged = 0;
 	if (visible != this->isVisible) { hasChanged = 1; }
 	if (hasChanged = 0) { return; }
-	this->isVisibleXY = visible;
+	this->isVisibleXZ = visible;
 	if (visible == 1)
 	{
 
@@ -215,7 +215,7 @@ void vtkMDVolume::SetisVisibleYZ(int visible)
 	int hasChanged = 0;
 	if (visible != this->isVisible) { hasChanged = 1; }
 	if (hasChanged = 0) { return; }
-	this->isVisibleXY = visible;
+	this->isVisibleYZ = visible;
 	if (visible == 1)
 	{
 
@@ -587,6 +587,7 @@ double vtkMDVolume::GetBoundingBoxLength()
 }
 void vtkMDVolume::SetSelected(int selected)
 {
+	cout << "Volume selected:" << selected << endl;
 	this->Selected = selected;
 	if (selected == 1)
 	{

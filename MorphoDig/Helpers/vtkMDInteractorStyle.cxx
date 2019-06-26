@@ -465,8 +465,8 @@ void vtkMDInteractorStyle::StartSelect()
 					vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 					if (myVolume->GetSelected() == 0)
 					{
-						myVolume->SetSelected(1);
 						myVolume->SetisVisible(1);
+						myVolume->SetSelected(1);						
 						myVolume->SetChanged(1);
 
 					}
@@ -529,6 +529,8 @@ void vtkMDInteractorStyle::StartSelect()
 					this->NodeLandmarkCollection->Modified();
 					this->HandleLandmarkCollection->Modified();
 				}
+				mqMorphoDigCore::instance()->signal_actorSelectionChanged();
+				mqMorphoDigCore::instance()->signal_volumeSelectionChanged();
 				rwi->Render();
 			}
 			

@@ -237,6 +237,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->mColorMap, SIGNAL(shiftOrSlideStopped()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
 	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(volumesMightHaveChanged()), this, SLOT(slotRefreshUi()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(volumesSelectionChanged()), this, SLOT(slotRefreshUi()));
 	connect(this->Ui->cutMinPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->cutMaxPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->sliderXY, SIGNAL(valueChanged(int)), this, SLOT(slotSliderXYChanged(int)));
@@ -269,8 +270,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	
 	connect(this->Ui->isVisible, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleClicked(bool)));
 	connect(this->Ui->isVisibleXY, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleXYClicked(bool)));
-	connect(this->Ui->isVisibleYZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleYZClicked(bool)));
 	connect(this->Ui->isVisibleXZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleXZClicked(bool)));
+	connect(this->Ui->isVisibleYZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleYZClicked(bool)));
+	
 
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
