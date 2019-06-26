@@ -319,6 +319,10 @@ mqUndoStack.cxx
 mqUndoStack.h
 mqViewMenuManager.cxx
 mqViewMenuManager.h
+mqVolumeOptionsDialog.cxx
+mqVolumeOptionsDialog.h
+mqVolumeOptionsDialogReaction.cxx
+mqVolumeOptionsDialogReaction.h
 
 )
 
@@ -397,8 +401,9 @@ mqShrinkWrapDialog.ui
 mqShrinkWrapIterativeDialog.ui
 mqSmoothDialog.ui
 mqSurfaceTagInfosDialog.ui
-mqTPSDialog.ui
 mqTagFromRGBDialog.ui
+mqTPSDialog.ui
+mqVolumeOptionsDialog.ui
 )
 
 set( Qt_RCs ../Icons/icons.qrc )

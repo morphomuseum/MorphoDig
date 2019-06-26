@@ -172,9 +172,10 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_DefaultFontSize = this->mui_FontSize = 10;
 	this->mui_DefaultDisplayLandmarkText = 1;
 	this->mui_DisplayLandmarkText = 1;
+	
 	this->mui_DefaultVolumeDisplaySlice = this->mui_VolumeDisplaySlice = 0; //by default, construct a volume rendering;
 	this->mui_DefaultVolumeOutOfCoreThreshold= this->mui_VolumeOutOfCoreThreshold=500*500*500; // by default 500 * 500 * 500 pixels
-
+	//cout << "now instancitate this->mui_VolumeOutOfCoreThreshold" << endl;
 	this->mui_OpenGL_minor_version = 0;
 	this->mui_OpenGL_major_version = 0;
 	this->mui_DisplayMode = 1; // point normals by defaults

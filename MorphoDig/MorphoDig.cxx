@@ -617,11 +617,16 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	settings.endGroup();
 	
 	settings.beginGroup("volumes");
+	long long int iniVolumeOutOfCoreThreshold = settings.value("VolumeOutOfCoreThreshold", 10).toLongLong();
+	//cout << "iniVolumeOutOfCoreThreshold" << iniVolumeOutOfCoreThreshold << endl;
 	//settings.setValue("VolumeOutOfCoreThreshold", this->MorphoDigCore->Getmui_VolumeOutOfCoreThreshold());
 	long long int defaultVolumeOutOfCoreThreshold = this->MorphoDigCore->Getmui_DefaultVolumeOutOfCoreThreshold();
-	this->MorphoDigCore->Setmui_VolumeDisplaySlice(settings.value("VolumeOutOfCoreThreshold", defaultVolumeOutOfCoreThreshold).toLongLong());
+	this->MorphoDigCore->Setmui_VolumeOutOfCoreThreshold(settings.value("VolumeOutOfCoreThreshold", defaultVolumeOutOfCoreThreshold).toLongLong());
+	
+	
+		
+		int defaultVolumeDisplaySlice = this->MorphoDigCore->Getmui_DefaultVolumeDisplaySlice();
 
-	int defaultVolumeDisplaySlice = this->MorphoDigCore->Getmui_DefaultVolumeDisplaySlice();
 	this->MorphoDigCore->Setmui_VolumeDisplaySlice(settings.value("VolumeDisplaySlice", defaultVolumeDisplaySlice).toInt());
 	
 	//settings.setValue("VolumeDisplaySlice", this->MorphoDigCore->Getmui_VolumeDisplaySlice());
