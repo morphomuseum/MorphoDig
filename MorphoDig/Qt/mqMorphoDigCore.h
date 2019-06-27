@@ -948,7 +948,7 @@ signals:
   void zoomChanged();
   void lmSelectionChanged();
   void actorSelectionChanged();
-  void volumeSelectionChanged();
+  void volumeSelectionChanged();  
   void existingArraysChanged();
   void activeArrayChanged();
   void actorsMightHaveChanged();

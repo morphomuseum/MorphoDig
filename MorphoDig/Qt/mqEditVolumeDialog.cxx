@@ -274,6 +274,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->isVisibleYZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleYZClicked(bool)));
 	connect(this->Ui->isVisibleVR, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleVRClicked(bool)));
 
+	connect(this->Ui->useImageDataBinForVR, SIGNAL(clicked(bool)), this, SLOT(slotuseImageDataBinForVRClicked(bool)));
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
 	connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
@@ -395,6 +396,24 @@ void mqEditVolumeDialog::slotEnableROIClicked(bool isChecked)
 
 }
 
+void mqEditVolumeDialog::slotuseImageDataBinForVRClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		if (isChecked)
+		{
+			int res = this->Volume->SetuseImageDataBinForVR(1);
+			if (res == 0) {
+				this->Ui->useImageDataBinForVR->setChecked(false);
+			}
+		}
+		else
+		{
+			this->Volume->SetuseImageDataBinForVR(0);
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
@@ -869,6 +888,14 @@ void mqEditVolumeDialog::UpdateUI()
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
 		
+		if (this->Volume->GetuseImageDataBinForVR() == 1)
+		{
+			this->Ui->useImageDataBinForVR->setChecked(true);
+		}
+		else
+		{
+			this->Ui->useImageDataBinForVR->setChecked(false);
+		}
 		if (this->Volume->GetisVisible() == 1)
 		{
 			this->Ui->isVisible->setChecked(true);

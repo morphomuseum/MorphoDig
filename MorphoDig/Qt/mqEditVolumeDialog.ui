@@ -552,7 +552,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>10</y>
+      <y>20</y>
       <width>393</width>
       <height>471</height>
      </rect>
@@ -1018,6 +1018,19 @@
      </property>
      <property name="text">
       <string>Display ROI:</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="useImageDataBinForVR">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>77</y>
+       <width>130</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Downsampled volume</string>
      </property>
     </widget>
    </widget>

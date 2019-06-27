@@ -76,6 +76,7 @@ public:
 	void ShallowCopy(vtkProp *prop);
 	void CreateBox();
 	void RemoveBox();
+	void ComputeImageDataBin();
 	//vtkSetMacro(Selected, int);
 	vtkGetMacro(Selected, int);
 	vtkBooleanMacro(Selected, int);
@@ -98,8 +99,17 @@ public:
 	void SetisVisibleYZ(int visible);
 	vtkGetMacro(isVisibleYZ, int);
 
+
+
 	void SetisVisibleVR(int visible);
 	vtkGetMacro(isVisibleVR, int);
+
+
+	vtkGetMacro(useImageDataBinForVR, int);
+	int SetuseImageDataBinForVR(int use);
+	
+	
+
 
 	void SetisVisible(int visible);
 	//	vtkSetMacro(displayROI, int);
@@ -128,6 +138,8 @@ public:
 	//vtkSetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	void SetImageData(vtkSmartPointer<vtkImageData> imgData);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
+	void SetImageDataBin(vtkSmartPointer<vtkImageData> imgDataBin);
+	vtkSmartPointer<vtkImageData> GetImageDataBin();
 	
 	vtkGetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
 	vtkSetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
@@ -211,7 +223,7 @@ public:
 	void GetBoxCenter(double boxCenter[3]);
 	void GetBoxBounds(double boxBounds[6]);
 	void PlaceBox(double boxBounds[6]);
-
+	void SetDesiredMappedImageData(); //associate the input or inputbin to the mapper depending on the dims of input.
 	void SetColorSpecular(double specular);
 	void SetColorSpecularPower(double specularPower);
 	void SetColorDiffuse(double diffuse);
@@ -241,6 +253,9 @@ image->SetMapper(imageMapper);
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> Ctf;
 	vtkSmartPointer<vtkImageAccumulate> Hist;
 	vtkSmartPointer<vtkImageData> ImageData;
+	vtkSmartPointer<vtkImageData> ImageDataBin;
+	int useImageDataBinForVR;
+	int ImageDataBinComputed;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXYMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceYZMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXZMapper;

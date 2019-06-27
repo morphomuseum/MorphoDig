@@ -5069,6 +5069,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			
 			mapper->SetRequestedRenderModeToGPU();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
@@ -5079,7 +5080,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 				vtkSmartPointer<vtkImageAccumulate>::New();
 			//mapper->SetRequestedRenderModeToDefault();
 
-
+			
 
 			volume->GetOutline()->SetInputData(input);
 
@@ -5107,12 +5108,13 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			property->SetColor(TF);
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
-			//mapper->SetInputData(input);
-			mapper->SetInputConnection(reader->GetOutputPort());
+			
+			//mapper->SetInputConnection(reader->GetOutputPort());
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
-			volume->SetMapper(mapper);
+			volume->SetMapper(mapper);			
 			volume->SetImageData(input);
+			volume->SetDesiredMappedImageData();
 			volume->SetHist(histogram);
 
 
@@ -5315,11 +5317,12 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		property->SetScalarOpacity(opacityFun);
 		property->SetInterpolationTypeToLinear();
 		//mapper->SetInputData(input);
-		mapper->SetInputData(input);
+		//mapper->SetInputData(input);
 		// connect up the volume to the property and the mapper
 		volume->SetProperty(property);
-		volume->SetMapper(mapper);
+		volume->SetMapper(mapper);		
 		volume->SetImageData(input);
+		volume->SetDesiredMappedImageData();
 		volume->SetHist(histogram);
 
 
@@ -5513,11 +5516,12 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		property->SetScalarOpacity(opacityFun);
 		property->SetInterpolationTypeToLinear();
 			
-		mapper->SetInputData(input);
+		//mapper->SetInputData(input);
 		// connect up the volume to the property and the mapper
 		volume->SetProperty(property);
-		volume->SetMapper(mapper);
+		volume->SetMapper(mapper);		
 		volume->SetImageData(input);
+		volume->SetDesiredMappedImageData();
 		volume->SetHist(histogram);
 
 
@@ -5758,11 +5762,13 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
 			
-			mapper->SetInputData(input);
+			//mapper->SetInputData(input);
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
 			volume->SetMapper(mapper);
+			
 			volume->SetImageData(input);
+			volume->SetDesiredMappedImageData();
 			volume->SetHist(histogram);
 
 
@@ -6023,11 +6029,12 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			property->SetScalarOpacity(opacityFun);
 			property->SetInterpolationTypeToLinear();
 			//mapper->SetInputData(input);
-			mapper->SetInputConnection(reader->GetOutputPort());
+			//mapper->SetInputConnection(reader->GetOutputPort());
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
 			volume->SetMapper(mapper);
 			volume->SetImageData(input);
+			volume->SetDesiredMappedImageData();
 			volume->SetHist(histogram);
 
 			

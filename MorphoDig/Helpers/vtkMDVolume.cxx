@@ -13,6 +13,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkMath.h>
 #include <vtkDataArray.h>
 #include <vtkSmartPointer.h>
+#include <vtkImageResample.h>
 #include <vtkRenderer.h>
 #include <vtkVolumeProperty.h>
 #include <vtkImageProperty.h>
@@ -37,6 +38,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkUnsignedCharArray.h>
 #include <vtkPlane.h>
 #include <QString>
+#include <QMessageBox>
 vtkStandardNewMacro(vtkMDVolume);
 
 
@@ -73,8 +75,9 @@ renderer->AddViewProp(image);*/
 	this->OutlineActor->GetProperty()->SetColor(0.5, 0.5, 0.5);
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->Hist = vtkSmartPointer<vtkImageAccumulate>::New();
-
+	this->ImageDataBinComputed = 0;
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
+	this->ImageDataBin = vtkSmartPointer<vtkImageData>::New();
 	this->SliceXY = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceXZ = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceYZ = vtkSmartPointer<vtkImageSlice>::New();
@@ -136,6 +139,7 @@ vtkMDVolume::~vtkMDVolume()
 
 
 }
+
 
 void vtkMDVolume::SetisVisible(int visible)
 {
@@ -688,9 +692,57 @@ void vtkMDVolume::GetBoxBounds(double boxBounds[6])
 	boxBounds[4] = zmin;
 	boxBounds[5] = zmax;
 }
+void vtkMDVolume::ComputeImageDataBin()
+{
+	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
+	resample->SetInputData(this->ImageData);
+	double magnification = 0.5;
+	long long int numVox = (long long int ) (this->myDim[0] * this->myDim[1] * this->myDim[2]/8);
+	if (numVox > mqMorphoDigCore::instance()->Getmui_VolumeOutOfCoreThreshold())
+	{
+		int num_bin_needed = 2;// at least 2!
+		int ratio = (int) (numVox / mqMorphoDigCore::instance()->Getmui_VolumeOutOfCoreThreshold());
+		if (ratio > 4096)
+		{
+			num_bin_needed = 6;// could it happen????
+		}
+		else if (ratio > 512)
+		{
+			num_bin_needed = 5;
+		}
+		else if (ratio > 64)
+		{
+			num_bin_needed = 4;
+		}
+		else if (ratio > 8)
+		{
+			num_bin_needed = 3;
+		}
+		else
+		{
+			num_bin_needed = 2;
+		}
+		magnification = 1;
+		for (int i = 0; i < num_bin_needed; i++)
+		{
+			magnification /= 2;
+		}
+		
+	}
+	cout << "binning magnification:" << endl;
+	resample->SetAutoCropOutput(true);
+	resample->SetAxisMagnificationFactor(0, magnification);
+	resample->SetAxisMagnificationFactor(1, magnification);
+	resample->SetAxisMagnificationFactor(2, magnification);
+	resample->Update();
+	this->ImageDataBin = resample->GetOutput();
+
+	this->ImageDataBinComputed = 1;
+}
 void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->ImageData = imgData;
+	this->ImageDataBinComputed = 0;
 	// now add a few things related to SliceXYMapper etc... 
 	
 	this->SliceXYMapper->SetInputData(imgData);
@@ -707,6 +759,78 @@ void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 	this->SliceXYMapper2->SetSliceNumber((int)(this->myDim[2]/2));
 	this->SliceXZMapper2->SetSliceNumber((int)(this->myDim[1] / 2));
 	this->SliceYZMapper2->SetSliceNumber((int)(this->myDim[0] / 2));
+
+}
+void vtkMDVolume::SetDesiredMappedImageData()
+{
+	long long int numVox = this->myDim[0] * this->myDim[1]*this->myDim[2];
+	if (numVox > mqMorphoDigCore::instance()->Getmui_VolumeOutOfCoreThreshold())
+	{
+		//
+		QMessageBox msgBox;
+		msgBox.setText("Number of voxels > Out of core threshold value (adjustable in Edit->Volume options). Volume rendering will be achieved on a subsampled version.");
+		msgBox.exec();
+		vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+	}
+	else
+	{
+
+		vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->ImageData);
+	}
+	//
+	//
+}
+int vtkMDVolume::SetuseImageDataBinForVR(int use)
+{
+	int changed = 0;
+	if (use != this->useImageDataBinForVR)
+	{
+		changed = 1;
+	}
+	if (changed == 1)
+	{
+		long long int numVox = this->myDim[0] * this->myDim[1] * this->myDim[2];
+		if (use == 1)
+		{
+			this->useImageDataBinForVR = 1;
+			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+			this->GetMapper()->Update();
+		}
+		else
+		{
+			if (numVox > mqMorphoDigCore::instance()->Getmui_VolumeOutOfCoreThreshold())
+			{
+				QMessageBox msgBox;
+				msgBox.setText("Number of voxels > Out of core threshold value (adjustable in Edit->Volume options). MorphoDig may crash if your graphic ressources are too low. Continue ?");
+				msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+				msgBox.setDefaultButton(QMessageBox::No);
+				int ret = msgBox.exec();
+				if (ret == QMessageBox::No) { 
+					cout << "no!!!" << endl;
+					return 0; }
+			}
+			cout << "change input data" << endl;
+			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->ImageData);
+			this->GetMapper()->Update();
+			this->useImageDataBinForVR = 1;
+		}
+	}
+	return 1;
+
+}
+vtkSmartPointer<vtkImageData> vtkMDVolume::GetImageDataBin()
+{
+	if (this->ImageDataBinComputed ==0)
+	{
+		cout << "ComputeImageDataBin" << endl;
+		this->ComputeImageDataBin();
+	}
+	return this->ImageDataBin;
+}
+void vtkMDVolume::SetImageDataBin(vtkSmartPointer<vtkImageData> imgDataBin)
+{
+	this->ImageDataBin = imgDataBin;
+	
 
 }
 
