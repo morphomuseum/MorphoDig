@@ -795,6 +795,7 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 		long long int numVox = this->myDim[0] * this->myDim[1] * this->myDim[2];
 		if (use == 1)
 		{
+			cout << "change input data binned image" << endl;
 			this->useImageDataBinForVR = 1;
 			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
 			this->GetMapper()->Update();
@@ -812,10 +813,10 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 					cout << "no!!!" << endl;
 					return 0; }
 			}
-			cout << "change input data" << endl;
+			cout << "change input data normal image!" << endl;
 			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->ImageData);
 			this->GetMapper()->Update();
-			this->useImageDataBinForVR = 1;
+			this->useImageDataBinForVR = 0;
 		}
 	}
 	return 1;
