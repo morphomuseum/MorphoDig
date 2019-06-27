@@ -76,6 +76,7 @@ renderer->AddViewProp(image);*/
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->Hist = vtkSmartPointer<vtkImageAccumulate>::New();
 	this->ImageDataBinComputed = 0;
+	this->useImageDataBinForVR = 0;
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
 	this->ImageDataBin = vtkSmartPointer<vtkImageData>::New();
 	this->SliceXY = vtkSmartPointer<vtkImageSlice>::New();
@@ -770,23 +771,25 @@ void vtkMDVolume::SetDesiredMappedImageData()
 		QMessageBox msgBox;
 		msgBox.setText("Number of voxels > Out of core threshold value (adjustable in Edit->Volume options). Volume rendering will be achieved on a subsampled version.");
 		msgBox.exec();
-		vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+		//vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+		this->SetuseImageDataBinForVR(1);
 	}
 	else
 	{
 
-		vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->ImageData);
+		//vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->ImageData);
+		this->SetuseImageDataBinForVR(0);
 	}
 	//
 	//
 }
 int vtkMDVolume::SetuseImageDataBinForVR(int use)
 {
-	int changed = 0;
-	if (use != this->useImageDataBinForVR)
+	int changed = 1;
+	/*if (use != this->useImageDataBinForVR)
 	{
 		changed = 1;
-	}
+	}*/
 	if (changed == 1)
 	{
 		long long int numVox = this->myDim[0] * this->myDim[1] * this->myDim[2];
