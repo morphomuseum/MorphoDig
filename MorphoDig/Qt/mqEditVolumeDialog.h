@@ -73,6 +73,7 @@ public:
   virtual void slotisVisibleXYClicked(bool isChecked);
   virtual void slotisVisibleXZClicked(bool isChecked);
   virtual void slotisVisibleYZClicked(bool isChecked);
+  virtual void slotisVisibleVRClicked(bool isChecked);
   virtual void slotSliderXYChanged(int val);
   virtual void slotSliderXZChanged(int val);
   virtual void slotSliderYZChanged(int val);

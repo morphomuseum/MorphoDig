@@ -5213,7 +5213,12 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			{
 				this->UpdateLandmarkSettings();
 			}
-
+			volume->SetisVisible(1);
+			if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisibleVR(0); }
+			else { volume->SetisVisibleVR(1); }
+			if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
+			if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
+			if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1); }
 			this->Render();
 
 		}
@@ -5403,7 +5408,12 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		{
 			this->UpdateLandmarkSettings();
 		}
-
+		volume->SetisVisible(1);
+		if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisibleVR(0); }
+		else{ volume->SetisVisibleVR(1); }
+		if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
+		if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
+		if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1); }
 		this->Render();
 
 	}
@@ -5598,7 +5608,12 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		{
 			this->UpdateLandmarkSettings();
 		}
-
+		volume->SetisVisible(1);
+		if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisibleVR(0); }
+		else { volume->SetisVisibleVR(1); }
+		if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
+		if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
+		if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1); }
 		this->Render();
 
 	}
@@ -5845,7 +5860,12 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			{
 				this->UpdateLandmarkSettings();
 			}
-
+			volume->SetisVisible(1);
+			if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisibleVR(0); }
+			else { volume->SetisVisibleVR(1); }			
+			if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
+			if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
+			if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1); }
 			this->Render();
 
 		}
@@ -6107,13 +6127,13 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 				 {
 					 this->UpdateLandmarkSettings();
 				 }				
-				 if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisible(0); }
+				 volume->SetisVisible(1);
+				 if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisibleVR(0); }
+				 else { volume->SetisVisibleVR(1); }
+
 				 if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
 				 if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
-				 if (this->Getmui_VolumeDisplaySlice() == 3) { 
-					 cout << "YZ slice should be visible!" << endl;
-					 volume->SetisVisibleYZ(1); 
-				 }
+				 if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1);  }
 			this->Render();
 
 		}

@@ -139,6 +139,8 @@ vtkMDVolume::~vtkMDVolume()
 
 void vtkMDVolume::SetisVisible(int visible)
 {
+	
+	cout << "is visible:" << visible << endl;
 	int hasChanged = 0;
 	if (visible != this->isVisible) { hasChanged = 1; }
 	if (hasChanged = 0) { return; }
@@ -147,19 +149,45 @@ void vtkMDVolume::SetisVisible(int visible)
 	{
 		//ici, ajouter une box visible
 		if (this->GetMapper() != NULL)
+		{						
+
+			if (this->displayROI == 1 && this->Box != NULL) { this->Box->SetEnabled(true); }
+			if (this->isVisibleVR== 1 ) { mqMorphoDigCore::instance()->getRenderer()->AddVolume(this);  }
+			if (this->isVisibleXY == 1) { mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXY2); }
+			if (this->isVisibleXZ == 1) { mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXZ2); }
+			if (this->isVisibleYZ == 1) { mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceYZ2); }
+		}
+	}
+	else
+	{		
+		if (this->Box != NULL) {
+			this->Box->SetEnabled(false);
+		}
+		mqMorphoDigCore::instance()->getRenderer()->RemoveVolume(this);
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXY2);
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceXZ2);
+		mqMorphoDigCore::instance()->getRenderer()->RemoveViewProp(this->SliceYZ2);
+	}
+
+}
+
+void vtkMDVolume::SetisVisibleVR(int visible)
+{
+	cout << "is visible VR:" << visible << endl;
+	int hasChanged = 0;
+	if (visible != this->isVisibleVR) { hasChanged = 1; }
+	if (hasChanged = 0) { return; }
+	this->isVisibleVR = visible;
+	if (visible == 1)
+	{		
+		if (this->GetMapper() != NULL)
 		{
-			mqMorphoDigCore::instance()->getRenderer()->AddVolume(this);
-			if (this->Selected == 1)
-			{
-				mqMorphoDigCore::instance()->getRenderer()->AddActor(this->OutlineActor);
-			}
+			mqMorphoDigCore::instance()->getRenderer()->AddVolume(this);			
 			if (this->displayROI == 1 && this->Box != NULL) { this->Box->SetEnabled(true); }
 		}
 	}
 	else
-	{
-		//enlever la box
-		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->OutlineActor);
+	{		
 		if (this->Box != NULL) {
 			this->Box->SetEnabled(false);
 		}
@@ -168,6 +196,7 @@ void vtkMDVolume::SetisVisible(int visible)
 	}
 
 }
+
 void vtkMDVolume::SetisVisibleXY(int visible)
 {
 	int hasChanged = 0;

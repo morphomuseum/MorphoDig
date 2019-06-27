@@ -272,7 +272,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->isVisibleXY, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleXYClicked(bool)));
 	connect(this->Ui->isVisibleXZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleXZClicked(bool)));
 	connect(this->Ui->isVisibleYZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleYZClicked(bool)));
-	
+	connect(this->Ui->isVisibleVR, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleVRClicked(bool)));
 
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
@@ -407,11 +407,39 @@ void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 		else
 		{
 			this->Volume->SetisVisible(0);
+
+		}
+		this->UpdateUI();
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotisVisibleVRClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+
+		if (isChecked)
+		{
+			this->Volume->SetisVisibleVR(1);
+			this->Ui->enableROI->setEnabled(true);
+			if (this->Ui->enableROI->isChecked())
+			{
+				this->Ui->displayROI->setEnabled(true);
+			}
+		}
+		else
+		{
+			this->Volume->SetisVisibleVR(0);
+			this->Ui->enableROI->setEnabled(false);
+			this->Ui->displayROI->setEnabled(false);
+			
 		}
 
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+
+/*slotisVisibleVRClicked*/
 /*virtual void slotSliderXYChanged(int val);
   virtual void slotSliderXZChanged(int val);
   virtual void slotSliderYZChanged(int val);*/
@@ -844,11 +872,77 @@ void mqEditVolumeDialog::UpdateUI()
 		if (this->Volume->GetisVisible() == 1)
 		{
 			this->Ui->isVisible->setChecked(true);
+			
+			this->Ui->isVisibleXY->setEnabled(true);
+			this->Ui->isVisibleXZ->setEnabled(true);
+			this->Ui->isVisibleYZ->setEnabled(true);
+			this->Ui->isVisibleVR->setEnabled(true);
+			this->Ui->enableROI->setEnabled(true);
+			if (this->Ui->enableROI->isChecked())
+			{
+				this->Ui->displayROI->setEnabled(true);
+			}
 		}
 		else
 		{ 
 			this->Ui->isVisible->setChecked(false);
+			this->Ui->isVisibleXY->setEnabled(false);
+			this->Ui->isVisibleXZ->setEnabled(false);
+			this->Ui->isVisibleYZ->setEnabled(false);
+			this->Ui->isVisibleVR->setEnabled(false);
+			this->Ui->enableROI->setEnabled(false);
+			this->Ui->displayROI->setEnabled(false);
 		}
+
+		if (this->Volume->GetisVisibleVR() == 1)
+		{
+			this->Ui->isVisibleVR->setChecked(true);
+			if (this->Ui->isVisibleVR->isEnabled() && this->Volume->GetenableROI()==1)
+			{
+				//
+				this->Ui->displayROI->setEnabled(true);
+				if (this->Volume->GetdisplayROI() == 1)
+				{
+					this->Ui->displayROI->setChecked(true);
+				}
+				else
+				{
+					this->Ui->displayROI->setChecked(false);
+				}
+			}
+
+
+		}
+		else
+		{
+			this->Ui->isVisibleVR->setChecked(false);
+			this->Ui->enableROI->setEnabled(false);
+			this->Ui->displayROI->setEnabled(false);
+			this->Ui->displayROI->setChecked(false);
+			
+		}
+		/*if (this->Volume->GetdisplayROI() == 1)
+		{
+			
+			this->Ui->displayROI->setChecked(true);
+		}
+		else
+		{
+			this->Ui->displayROI->setChecked(false);
+		}
+		if (this->Volume->GetenableROI() == 1)
+		{
+			this->Ui->enableROI->setChecked(true);
+			this->Ui->displayROI->setEnabled(true);
+		}
+		else
+		{
+			this->Ui->enableROI->setChecked(false);
+			this->Ui->displayROI->setChecked(false);
+			this->Ui->displayROI->setEnabled(false);
+		}
+		*/
+
 
 		if (this->Volume->GetisVisibleXY() == 1)
 		{
@@ -885,26 +979,6 @@ void mqEditVolumeDialog::UpdateUI()
 		}
 
 
-		if (this->Volume->GetdisplayROI() == 1)
-		{
-			
-			this->Ui->displayROI->setChecked(true);
-		}
-		else
-		{
-			this->Ui->displayROI->setChecked(false);
-		}
-		if (this->Volume->GetenableROI() == 1)
-		{
-			this->Ui->enableROI->setChecked(true);
-			this->Ui->displayROI->setEnabled(true);
-		}
-		else
-		{
-			this->Ui->enableROI->setChecked(false);
-			this->Ui->displayROI->setChecked(false);
-			this->Ui->displayROI->setEnabled(false);
-		}
 		
 
 		

@@ -98,6 +98,9 @@ public:
 	void SetisVisibleYZ(int visible);
 	vtkGetMacro(isVisibleYZ, int);
 
+	void SetisVisibleVR(int visible);
+	vtkGetMacro(isVisibleVR, int);
+
 	void SetisVisible(int visible);
 	//	vtkSetMacro(displayROI, int);
 	vtkGetMacro(isVisible, int);
@@ -223,6 +226,7 @@ protected:
 	int displayROI;
 	int enableROI;
 	int isVisible;
+	int isVisibleVR;
 	int isVisibleXY;
 	int isVisibleXZ;
 	int isVisibleYZ;
