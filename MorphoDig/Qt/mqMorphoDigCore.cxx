@@ -5068,9 +5068,8 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			//cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			
-			mapper->SetRequestedRenderModeToGPU();
+			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			//mapper->SetRequestedRenderModeToGPU();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -5112,7 +5111,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			//mapper->SetInputConnection(reader->GetOutputPort());
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
-			volume->SetMapper(mapper);			
+			//volume->SetMapper(mapper);			
 			volume->SetImageData(input);
 			volume->SetDesiredMappedImageData();
 			volume->SetHist(histogram);
@@ -5147,7 +5146,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			TF->SetEnableOpacityMapping(true);
 			TF->SetScalarOpacityFunction(opacityFun);
 			TF->Build();
-			mapper->SetBlendModeToComposite();
+			//mapper->SetBlendModeToComposite();
 
 
 			//property->set
@@ -5271,8 +5270,8 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		//cout << "Try visualize!!!" << endl;
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-		mapper->SetRequestedRenderModeToGPU();
+		//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		//mapper->SetRequestedRenderModeToGPU();
 		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -5320,7 +5319,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		//mapper->SetInputData(input);
 		// connect up the volume to the property and the mapper
 		volume->SetProperty(property);
-		volume->SetMapper(mapper);		
+		//volume->SetMapper(mapper);		
 		volume->SetImageData(input);
 		volume->SetDesiredMappedImageData();
 		volume->SetHist(histogram);
@@ -5354,7 +5353,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		TF->SetEnableOpacityMapping(true);
 		TF->SetScalarOpacityFunction(opacityFun);
 		TF->Build();
-		mapper->SetBlendModeToComposite();
+		//mapper->SetBlendModeToComposite();
 
 
 		//property->set
@@ -5469,8 +5468,8 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		//cout << "Try visualize!!!" << endl;
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-		mapper->SetRequestedRenderModeToGPU();
+		//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		//mapper->SetRequestedRenderModeToGPU();
 
 		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
@@ -5519,7 +5518,7 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		//mapper->SetInputData(input);
 		// connect up the volume to the property and the mapper
 		volume->SetProperty(property);
-		volume->SetMapper(mapper);		
+		//volume->SetMapper(mapper);		
 		volume->SetImageData(input);
 		volume->SetDesiredMappedImageData();
 		volume->SetHist(histogram);
@@ -5553,7 +5552,7 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		TF->SetEnableOpacityMapping(true);
 		TF->SetScalarOpacityFunction(opacityFun);
 		TF->Build();
-		mapper->SetBlendModeToComposite();
+		//mapper->SetBlendModeToComposite();
 
 
 		//property->set
@@ -5716,8 +5715,8 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			//cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			mapper->SetRequestedRenderModeToGPU();
+			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			//mapper->SetRequestedRenderModeToGPU();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -5765,7 +5764,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			//mapper->SetInputData(input);
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
-			volume->SetMapper(mapper);
+			//volume->SetMapper(mapper);
 			
 			volume->SetImageData(input);
 			volume->SetDesiredMappedImageData();
@@ -5800,7 +5799,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			TF->SetEnableOpacityMapping(true);
 			TF->SetScalarOpacityFunction(opacityFun);
 			TF->Build();
-			mapper->SetBlendModeToComposite();
+			//mapper->SetBlendModeToComposite();
 
 
 			//property->set
@@ -5983,8 +5982,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			mapper->SetRequestedRenderModeToGPU();
+			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			//mapper->SetRequestedRenderModeToGPU();
 			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
 			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -6032,7 +6031,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//mapper->SetInputConnection(reader->GetOutputPort());
 			// connect up the volume to the property and the mapper
 			volume->SetProperty(property);
-			volume->SetMapper(mapper);
+			//volume->SetMapper(mapper);
 			volume->SetImageData(input);
 			volume->SetDesiredMappedImageData();
 			volume->SetHist(histogram);
@@ -6066,7 +6065,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			TF->SetEnableOpacityMapping(true);
 			TF->SetScalarOpacityFunction(opacityFun);
 			TF->Build();
-				mapper->SetBlendModeToComposite();
+			//	mapper->SetBlendModeToComposite();
 				  
 				  
 				  //property->set

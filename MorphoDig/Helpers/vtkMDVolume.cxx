@@ -797,8 +797,10 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 		{
 			cout << "change input data binned image" << endl;
 			this->useImageDataBinForVR = 1;
-			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
-			this->GetMapper()->Update();
+			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			this->SetMapper(mapper);
+			mapper->SetInputData(this->GetImageDataBin());
+			
 		}
 		else
 		{
@@ -814,8 +816,10 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 					return 0; }
 			}
 			cout << "change input data normal image!" << endl;
-			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->ImageData);
-			this->GetMapper()->Update();
+			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			this->SetMapper(mapper);
+			mapper->SetInputData(this->GetImageData());
+			
 			this->useImageDataBinForVR = 0;
 		}
 	}
