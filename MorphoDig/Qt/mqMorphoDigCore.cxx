@@ -2855,17 +2855,17 @@ void mqMorphoDigCore::InitLuts()
 
 
 	this->ScalarGreyScaleLut->AddRGBPoint(0.0, 0.0, 0.0, 0.0); //# black
-	this->ScalarGreyScaleLut->AddRGBPoint(0.2, 0.2, 0.2, 0.2); //# dark grey
+	/*this->ScalarGreyScaleLut->AddRGBPoint(0.2, 0.2, 0.2, 0.2); //# dark grey
 	this->ScalarGreyScaleLut->AddRGBPoint(0.4, 0.4, 0.4, 0.4); //# light-dark grey
 	this->ScalarGreyScaleLut->AddRGBPoint(0.6, 0.6, 0.6, 0.6); //# greyish
-	this->ScalarGreyScaleLut->AddRGBPoint(0.8, 0.8, 0.8, 0.8); //# light grey
+	this->ScalarGreyScaleLut->AddRGBPoint(0.8, 0.8, 0.8, 0.8); //# light grey*/
 	this->ScalarGreyScaleLut->AddRGBPoint(1.0, 1.0, 1.0, 1.0); //# white
 	this->ScalarGreyScaleLut->GetNumberOfValues();
 	vtkSmartPointer<vtkPiecewiseFunction> opacityGSfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 
 	opacityGSfunction->AddPoint(0, 0);
-	opacityGSfunction->AddPoint(0.2, 0.6);
-	opacityGSfunction->AddPoint(0.8, 0.8);
+	//opacityGSfunction->AddPoint(0.2, 0.6);
+	//opacityGSfunction->AddPoint(0.8, 0.8);
 	opacityGSfunction->AddPoint(1, 1);
 	//opacityRfunction->AddPoint(1.0001, 0);
 	cout << "Rainbow scalar has opacity function!!!" << endl;

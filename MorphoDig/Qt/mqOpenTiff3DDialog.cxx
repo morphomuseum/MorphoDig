@@ -89,6 +89,9 @@ mqOpenTiff3DDialog::mqOpenTiff3DDialog(QWidget* Parent)
   this->Ui->voxelSizeX->setValue(1);
   this->Ui->voxelSizeY->setValue(1);
   this->Ui->voxelSizeZ->setValue(1);
+  this->mySpacingX = 1;
+  this->mySpacingY = 1;
+  this->mySpacingZ = 1;
  
   /*  connect(this->Ui->dimX, SIGNAL(valueChanged(int)), this, SLOT(slotDimXChanged(int)));
   connect(this->Ui->dimY, SIGNAL(valueChanged(int)), this, SLOT(slotDimYChanged(int)));
@@ -259,11 +262,19 @@ void mqOpenTiff3DDialog::setFileName(QString fileName)
 		//int that case, there is only 1 file and Data Type and Dimensions must be searched within "fileName".
 		vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
 		tiffReader->SetFileName(fileName.toLocal8Bit());
+		cout << "Spacing Flag!" << endl;
+		
+		tiffReader->SetSpacingSpecifiedFlag(true);
+
 		//tiffReader->GetF
 		tiffReader->Update();
 		this->myInput = tiffReader->GetOutput();				
 		int dim[3];
+		double spacing[3];
 		this->myInput->GetDimensions(dim);
+		this->myInput->GetSpacing(spacing);
+		cout << "found spacing:" << spacing[0] << "," << spacing[1] << "," << spacing[2] << endl;
+		this->setSpacing(spacing[0], spacing[1], spacing[2]);
 		this->setDimensions(dim[0], dim[1], dim[2]);
 		this->setDataType(this->myInput->GetScalarType());
 		
@@ -280,7 +291,16 @@ void mqOpenTiff3DDialog::setDimensions(int dimX, int dimY, int dimZ)
 	this->Ui->dimY->setValue(dimY);
 	this->Ui->dimZ->setValue(dimZ);
 }
+void mqOpenTiff3DDialog::setSpacing(double spacingX, double spacingY, double spacingZ)
+{
+	this->mySpacingX = spacingX;
+	this->mySpacingY = spacingY;
+	this->mySpacingZ = spacingZ;
+	this->Ui->voxelSizeX->setValue(spacingX);
+	this->Ui->voxelSizeY->setValue(spacingY);
+	this->Ui->voxelSizeZ->setValue(spacingZ);
 
+}
 void mqOpenTiff3DDialog::setDataType(int dataType)
 {
 	this->myDataType = dataType;

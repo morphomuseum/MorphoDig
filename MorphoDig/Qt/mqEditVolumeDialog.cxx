@@ -235,6 +235,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
 	connect(this->mColorMap, SIGNAL(shiftOrSlideStopped()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
+	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotRefreshSliceXY()));
+	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotRefreshSliceXZ()));
+	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotRefreshSliceYZ()));
 	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(volumesMightHaveChanged()), this, SLOT(slotRefreshUi()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(volumeSelectionChanged()), this, SLOT(slotRefreshUi()));
@@ -471,7 +474,31 @@ void mqEditVolumeDialog::slotSliderXYChanged(int val)
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+void mqEditVolumeDialog::slotRefreshSliceXY()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1 && this->Volume->GetisVisibleXY() == 1)
+	{
+		this->Volume->GetSliceXY2()->Update();
+	}
 
+}
+void mqEditVolumeDialog::slotRefreshSliceXZ()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1 && this->Volume->GetisVisibleXZ() == 1)
+	{
+		this->Volume->GetSliceXZ2()->Update();
+	}
+
+}
+void mqEditVolumeDialog::slotRefreshSliceYZ()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1 && this->Volume->GetisVisibleYZ()==1)
+	{
+
+		this->Volume->GetSliceYZ2()->Update();
+	}
+
+}
 void mqEditVolumeDialog::slotSliderXZChanged(int val)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)

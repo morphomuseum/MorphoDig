@@ -446,7 +446,7 @@ void mqColorOpacityEditorWidget::slotSlideMin(int slideMin)
 		
 		this->UpdateLookupTableRange();
 		this->UpdateHistogram();
-		
+		emit minmaxChanged();
 	}
 
 	
@@ -470,7 +470,7 @@ void mqColorOpacityEditorWidget::slotSlideMax(int slideMax)
 		
 		this->UpdateLookupTableRange();
 		this->UpdateHistogram();
-		
+		emit minmaxChanged();
 	}
 
 }
@@ -490,7 +490,7 @@ void mqColorOpacityEditorWidget::slotShiftSlider(int shift)
 		
 		this->UpdateLookupTableRange();
 		this->UpdateHistogram();
-		
+		emit minmaxChanged();
 	}
 }
 

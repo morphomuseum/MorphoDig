@@ -33,6 +33,7 @@ public:
   void OpenTiff3D();
   void setFileName(QString fileName);
   void setDimensions(int dimX, int dimY, int dimZ);
+  void setSpacing(double spacingX, double spacingY, double spacingZ);
   void setDataType(int dataType);
   void setInputAsStack();
   void setInputAs3DFile();
@@ -63,6 +64,7 @@ private:
   int myDimX;
   int myDimY;
   int myDimZ;
+  double mySpacingX, mySpacingY, mySpacingZ;
   int myDataType;
   vtkSmartPointer<vtkImageData> myInput; //only for 2D stack!
   // Here we should have the file name, no ?

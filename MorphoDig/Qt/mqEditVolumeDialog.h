@@ -49,6 +49,10 @@ public:
   double GetCTFMax();
   void UpdateLookupTableRange();*/
   public slots:
+	  virtual void slotRefreshSliceXY();
+	  virtual void slotRefreshSliceXZ();
+	  virtual void slotRefreshSliceYZ();
+
   virtual void slotRefreshDialog();
   virtual void slotGetPrecedingVolume();
   virtual void slotGetNextVolume();

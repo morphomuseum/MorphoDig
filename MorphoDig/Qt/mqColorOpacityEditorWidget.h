@@ -82,6 +82,7 @@ signals:
   void minmaxChanged();
   void shiftOrSlideStarted();
   void shiftOrSlideStopped();
+  
 public slots:
   /**
   * Sets the xvmsPoints that control the opacity transfer function.
