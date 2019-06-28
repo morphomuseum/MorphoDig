@@ -137,6 +137,17 @@ public:
 	vtkSetMacro(Hist, vtkSmartPointer<vtkImageAccumulate>);
 	//vtkSetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	void SetImageData(vtkSmartPointer<vtkImageData> imgData);
+	void SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData);
+
+	void SwapXY();	
+	void SwapXZ();	
+	void SwapYZ();	
+	void SwapXYZ();
+	
+	void FlipZ();
+	void FlipX();
+	void FlipY();
+	
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	void SetImageDataBin(vtkSmartPointer<vtkImageData> imgDataBin);
 	vtkSmartPointer<vtkImageData> GetImageDataBin();

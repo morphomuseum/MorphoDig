@@ -8,6 +8,7 @@ Module:    vtkMDVolume.cxx
 
 #include <vtkProperty.h>
 #include <vtkObjectFactory.h>
+#include <vtkImageFlip.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkBoundingBox.h>
 #include <vtkMath.h>
@@ -544,6 +545,7 @@ void vtkMDVolume::SetColorProperties(double ambient, double diffuse, double spec
 }
 int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {
+	//on ne selectionne ici que les points!!!!
 	cout << "Is inside frustum!" << endl;
 	int is_inside = 0;
 	int is_insideALL[6] = { 0,0,0,0,0,0 };
@@ -739,6 +741,42 @@ void vtkMDVolume::ComputeImageDataBin()
 	this->ImageDataBin = resample->GetOutput();
 
 	this->ImageDataBinComputed = 1;
+}
+
+// used to modify the input!!!
+
+void vtkMDVolume::SwapXY()
+{}
+void vtkMDVolume::SwapXZ()
+{}
+void vtkMDVolume::SwapYZ()
+{}
+void vtkMDVolume::SwapXYZ()
+{}
+void vtkMDVolume::FlipZ()
+{}
+void vtkMDVolume::FlipX()
+{
+	vtkSmartPointer<vtkImageFlip> flip = vtkSmartPointer<vtkImageFlip>::New();
+	flip->SetInputData(this->ImageData);
+	flip->SetFilteredAxis(0);
+}
+void vtkMDVolume::FlipY()
+{}
+void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
+{
+	this->SetImageData(imgData);
+	vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+	this->SetMapper(mapper);
+	if (this->useImageDataBinForVR == 1)
+	{
+		
+		mapper->SetInputData(this->GetImageDataBin());
+	}
+	else
+	{
+		mapper->SetInputData(this->GetImageData());
+	}
 }
 void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 {

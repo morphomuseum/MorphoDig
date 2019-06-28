@@ -36,6 +36,7 @@
 #include "mqEditTagsDialogReaction.h"
 #include "mqICPDialogReaction.h"
 #include "mqIsosurfaceDialogReaction.h"
+#include "mqFlipSwapDialogReaction.h"
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqShrinkWrapDialogReaction.h"
 #include "mqShrinkWrapIterativeDialogReaction.h"
@@ -324,7 +325,8 @@ void mqMorphoDigMenuBuilders::buildRGBMenu(QMenu& menu)
 void mqMorphoDigMenuBuilders::buildEditVolumesMenu(QMenu& menu)
 {
 	new mqEditVolumeDialogReaction(menu.addAction("Edit first selected volume") << mqSetName("actionEditVolume"));
-	new mqIsosurfaceDialogReaction(menu.addAction("Extract isosurface from first selelected volume") << mqSetName("actionIsosurfaceVolume"));
+	new mqIsosurfaceDialogReaction(menu.addAction("Extract isosurface from first selected volume") << mqSetName("actionIsosurfaceVolume"));
+	new mqFlipSwapDialogReaction(menu.addAction("Flip or Swap first selected volume") << mqSetName("actionFlipSwapVolume"));
 	
 }
 

@@ -125,6 +125,10 @@ mqFillHolesDialog.cxx
 mqFillHolesDialog.h
 mqFillHolesDialogReaction.cxx
 mqFillHolesDialogReaction.h
+mqFlipSwapDialog.cxx
+mqFlipSwapDialog.h
+mqFlipSwapDialogReaction.cxx
+mqFlipSwapDialogReaction.h
 mqGridSizeDialog.cxx
 mqGridSizeDialog.h
 mqGridSizeDialogReaction.cxx
@@ -357,6 +361,7 @@ mqEditVolumeDialog.ui
 mqExtractScalarRangeDialog.ui
 mqExtractTagRangeDialog.ui
 mqFillHolesDialog.ui
+mqFlipSwapDialog.ui
 mqGridSizeDialog.ui
 mqICPDialog.ui
 mqIcosahedronDialog.ui

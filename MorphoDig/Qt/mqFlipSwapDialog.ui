@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqIsosurfaceDialog</class>
- <widget class="QDialog" name="mqIsosurfaceDialog">
+ <class>mqFlipSwapDialog</class>
+ <widget class="QDialog" name="mqFlipSwapDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>210</y>
+     <y>200</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -480,81 +480,105 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
+     <x>20</x>
+     <y>20</y>
      <width>391</width>
-     <height>191</height>
+     <height>171</height>
     </rect>
    </property>
    <property name="title">
-    <string>Extract isosurface from first selected volume</string>
+    <string>Flip/Swap axes of first selected volume</string>
    </property>
-   <widget class="QLabel" name="label_6">
+   <widget class="QToolButton" name="flipX">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>130</y>
-      <width>111</width>
-      <height>31</height>
+      <x>80</x>
+      <y>70</y>
+      <width>61</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Threshold:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>Flip X</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="threshold">
+   <widget class="QToolButton" name="flipY">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>150</x>
+      <y>70</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Flip Y</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="flipZ">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>70</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Flip Z</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="swapXY">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>100</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Swap XY</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="swapXZ">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>100</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Swap XZ</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="swapYZ">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>100</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Swap YZ</string>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="swapXYZ">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
       <y>130</y>
-      <width>62</width>
-      <height>22</height>
+      <width>201</width>
+      <height>21</height>
      </rect>
     </property>
-    <property name="decimals">
-     <number>1</number>
+    <property name="text">
+     <string>Swap X-&gt;Y Y-&gt;Z Z-&gt;X</string>
     </property>
-    <property name="minimum">
-     <double>0.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>65535.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.100000000000000</double>
-    </property>
-    <property name="value">
-     <double>20.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>60</y>
-      <width>311</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QRadioButton" name="flyingEdges">
-       <property name="text">
-        <string>Flying Edges algorithm</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="marchingCubes">
-       <property name="text">
-        <string>Marching cube algorithm</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
   </widget>
   <widget class="QLabel" name="label">
@@ -592,7 +616,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>mqIsosurfaceDialog</receiver>
+   <receiver>mqFlipSwapDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -608,7 +632,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>mqIsosurfaceDialog</receiver>
+   <receiver>mqFlipSwapDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
