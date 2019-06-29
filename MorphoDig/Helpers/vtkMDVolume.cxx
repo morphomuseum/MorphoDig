@@ -9,6 +9,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkProperty.h>
 #include <vtkObjectFactory.h>
 #include <vtkImageFlip.h>
+#include <vtkImagePermute.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkBoundingBox.h>
 #include <vtkMath.h>
@@ -746,23 +747,70 @@ void vtkMDVolume::ComputeImageDataBin()
 // used to modify the input!!!
 
 void vtkMDVolume::SwapXY()
-{}
+{
+	vtkSmartPointer<vtkImagePermute> permute = vtkSmartPointer<vtkImagePermute>::New();
+	permute->SetInputData(this->ImageData);
+	permute->SetFilteredAxes(1, 0, 2);
+	permute->Update();
+	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
+	this->SetImageDataAndMap(permutedData);
+}
 void vtkMDVolume::SwapXZ()
-{}
+{
+	vtkSmartPointer<vtkImagePermute> permute = vtkSmartPointer<vtkImagePermute>::New();
+	permute->SetInputData(this->ImageData);
+	permute->SetFilteredAxes(2, 1, 0);
+	permute->Update();
+	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
+	this->SetImageDataAndMap(permutedData);
+
+}
 void vtkMDVolume::SwapYZ()
-{}
+{
+	vtkSmartPointer<vtkImagePermute> permute = vtkSmartPointer<vtkImagePermute>::New();
+	permute->SetInputData(this->ImageData);
+	permute->SetFilteredAxes(0, 2, 1);
+	permute->Update();
+	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
+	this->SetImageDataAndMap(permutedData);
+}
 void vtkMDVolume::SwapXYZ()
-{}
+{
+	vtkSmartPointer<vtkImagePermute> permute = vtkSmartPointer<vtkImagePermute>::New();
+	permute->SetInputData(this->ImageData);
+	permute->SetFilteredAxes(1, 2, 0);
+	permute->Update();
+	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
+	this->SetImageDataAndMap(permutedData);
+}
 void vtkMDVolume::FlipZ()
-{}
-void vtkMDVolume::FlipX()
 {
 	vtkSmartPointer<vtkImageFlip> flip = vtkSmartPointer<vtkImageFlip>::New();
 	flip->SetInputData(this->ImageData);
+	flip->SetFilteredAxis(2);
+	flip->Update();
+	vtkSmartPointer<vtkImageData> flippedData = flip->GetOutput();
+	this->SetImageDataAndMap(flippedData);
+}
+void vtkMDVolume::FlipX()
+{
+	cout << "flip X!" << endl;
+	vtkSmartPointer<vtkImageFlip> flip = vtkSmartPointer<vtkImageFlip>::New();
+	flip->SetInputData(this->ImageData);
 	flip->SetFilteredAxis(0);
+	flip->Update();
+	vtkSmartPointer<vtkImageData> flippedData = flip->GetOutput();
+	this->SetImageDataAndMap(flippedData);
 }
 void vtkMDVolume::FlipY()
-{}
+{
+	vtkSmartPointer<vtkImageFlip> flip = vtkSmartPointer<vtkImageFlip>::New();
+	flip->SetInputData(this->ImageData);
+	flip->SetFilteredAxis(1);
+	flip->Update();
+	vtkSmartPointer<vtkImageData> flippedData = flip->GetOutput();
+	this->SetImageDataAndMap(flippedData);
+}
 void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->SetImageData(imgData);

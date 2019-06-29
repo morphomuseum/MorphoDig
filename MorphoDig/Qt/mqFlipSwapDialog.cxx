@@ -98,9 +98,11 @@ void mqFlipSwapDialog::setVolume (vtkMDVolume *vol)
 
 void mqFlipSwapDialog::slotFlipX()
 {
+	cout << "Slot Flip X" << endl;
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->FlipX();
+		mqMorphoDigCore::instance()->Render();
 	}
 	
 }
@@ -108,7 +110,8 @@ void mqFlipSwapDialog::slotFlipY()
 {
 	if (this->myVolume != NULL)
 	{
-		this->myVolume->FlipX();
+		this->myVolume->FlipY();
+		mqMorphoDigCore::instance()->Render();
 	}
 
 }
@@ -116,7 +119,8 @@ void mqFlipSwapDialog::slotFlipZ()
 {
 	if (this->myVolume != NULL)
 	{
-		this->myVolume->FlipX();
+		this->myVolume->FlipZ();
+		mqMorphoDigCore::instance()->Render();
 	}
 
 }
@@ -125,6 +129,7 @@ void mqFlipSwapDialog::slotSwapXY()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapXY();
+		mqMorphoDigCore::instance()->Render();
 	}
 
 }
@@ -133,6 +138,7 @@ void mqFlipSwapDialog::slotSwapXZ()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapXZ();
+		mqMorphoDigCore::instance()->Render();
 	}
 
 }
@@ -141,6 +147,7 @@ void mqFlipSwapDialog::slotSwapYZ()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapYZ();
+		mqMorphoDigCore::instance()->Render();
 	}
 
 }
@@ -149,6 +156,7 @@ void mqFlipSwapDialog::slotSwapXYZ()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapXYZ();
+		mqMorphoDigCore::instance()->Render();
 	}
 
 }
