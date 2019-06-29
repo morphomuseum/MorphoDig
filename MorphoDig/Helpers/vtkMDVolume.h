@@ -140,6 +140,7 @@ public:
 	void SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData);
 
 	void ChangeSpacing(double newSpacingX, double newSpacingY, double newSpacingZ);
+	void Resample(double newSpacingX, double newSpacingY, double newSpacingZ);
 	void SwapXY();	
 	void SwapXZ();	
 	void SwapYZ();	

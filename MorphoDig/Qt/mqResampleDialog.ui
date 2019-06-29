@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqSpacingDialog</class>
- <widget class="QDialog" name="mqSpacingDialog">
+ <class>mqResampleDialog</class>
+ <widget class="QDialog" name="mqResampleDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>230</y>
+     <y>240</y>
      <width>195</width>
      <height>30</height>
     </rect>
@@ -483,17 +483,17 @@
      <x>10</x>
      <y>10</y>
      <width>541</width>
-     <height>191</height>
+     <height>221</height>
     </rect>
    </property>
    <property name="title">
-    <string>Edit voxel size of currently selected volume (not a resample!)</string>
+    <string>Resample currently selected volume (dimensions will be affected)</string>
    </property>
    <widget class="QToolButton" name="mult10">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>140</y>
+      <y>190</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -506,7 +506,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>140</y>
+      <y>190</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -519,7 +519,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>140</y>
+      <y>190</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -532,7 +532,7 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>140</y>
+      <y>190</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -545,7 +545,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>140</y>
+      <y>190</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -558,7 +558,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>140</y>
+      <y>190</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -577,7 +577,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Voxel size (size unit, most often expressed in mm):</string>
+     <string>Desired voxel size or dimensions :</string>
     </property>
     <widget class="QWidget" name="horizontalLayoutWidget_4">
      <property name="geometry">
@@ -649,6 +649,58 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QSpinBox" name="dim1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>140</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="dim2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>140</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="dim0">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>140</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>140</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Dims (x,y,z):</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -685,7 +737,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>mqSpacingDialog</receiver>
+   <receiver>mqResampleDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -701,7 +753,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>mqSpacingDialog</receiver>
+   <receiver>mqResampleDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

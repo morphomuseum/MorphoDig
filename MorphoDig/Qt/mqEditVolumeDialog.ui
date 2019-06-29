@@ -460,7 +460,7 @@
     <rect>
      <x>330</x>
      <y>530</y>
-     <width>158</width>
+     <width>195</width>
      <height>31</height>
     </rect>
    </property>
@@ -652,7 +652,7 @@
        <x>10</x>
        <y>10</y>
        <width>381</width>
-       <height>90</height>
+       <height>104</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -1449,7 +1449,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Res (x,y,z):</string>
+      <string>Res(x,y,z):</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_8">

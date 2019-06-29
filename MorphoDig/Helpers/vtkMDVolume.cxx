@@ -817,6 +817,11 @@ void vtkMDVolume::ChangeSpacing(double newSpacingX, double newSpacingY, double n
 	this->ImageData->SetSpacing(newSpacingX, newSpacingY, newSpacingZ);
 	this->SetImageDataAndMap(this->ImageData);
 }
+
+void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpacingZ)
+{
+	//to implement
+}
 void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->SetImageData(imgData);
