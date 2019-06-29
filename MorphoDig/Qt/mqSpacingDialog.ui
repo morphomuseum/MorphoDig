@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mqFlipSwapDialog</class>
- <widget class="QDialog" name="mqFlipSwapDialog">
+ <class>mqSpacingDialog</class>
+ <widget class="QDialog" name="mqSpacingDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
-    <height>244</height>
+    <width>563</width>
+    <height>280</height>
    </rect>
   </property>
   <property name="palette">
@@ -453,13 +453,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Flip or Swap axes</string>
+   <string>Edit voxel size of </string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>200</y>
+     <x>170</x>
+     <y>230</y>
      <width>195</width>
      <height>30</height>
     </rect>
@@ -480,111 +480,180 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>391</width>
-     <height>171</height>
+     <x>10</x>
+     <y>10</y>
+     <width>541</width>
+     <height>191</height>
     </rect>
    </property>
    <property name="title">
-    <string>Flip/Swap axes of first selected volume</string>
+    <string>Change voxel size of currently selected volume</string>
    </property>
-   <widget class="QToolButton" name="flipX">
+   <widget class="QToolButton" name="mult10">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>70</y>
+      <x>30</x>
+      <y>140</y>
       <width>61</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Flip X</string>
+     <string>*10</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="flipY">
+   <widget class="QToolButton" name="div10">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>70</y>
+      <x>110</x>
+      <y>140</y>
       <width>61</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Flip Y</string>
+     <string>/10</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="flipZ">
+   <widget class="QToolButton" name="mult5">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>70</y>
+      <x>190</x>
+      <y>140</y>
       <width>61</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Flip Z</string>
+     <string>*5</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="swapXY">
+   <widget class="QToolButton" name="div5">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>100</y>
+      <x>270</x>
+      <y>140</y>
       <width>61</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Swap XY</string>
+     <string>/5</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="swapXZ">
+   <widget class="QToolButton" name="mult2">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>100</y>
+      <x>350</x>
+      <y>140</y>
       <width>61</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Swap XZ</string>
+     <string>*2</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="swapYZ">
+   <widget class="QToolButton" name="div2">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>100</y>
+      <x>430</x>
+      <y>140</y>
       <width>61</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Swap YZ</string>
+     <string>/2</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="swapXYZ">
+   <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>130</y>
-      <width>201</width>
-      <height>21</height>
+      <x>20</x>
+      <y>60</y>
+      <width>491</width>
+      <height>71</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Swap X-&gt;Y Y-&gt;Z Z-&gt;X</string>
+    <property name="title">
+     <string>Voxel size (size unit, most often expressed in mm):</string>
     </property>
+    <widget class="QWidget" name="horizontalLayoutWidget_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>463</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QDoubleSpinBox" name="voxelSizeX">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="decimals">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="voxelSizeY">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="decimals">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="voxelSizeZ">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="decimals">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>30</x>
      <y>40</y>
      <width>91</width>
      <height>16</height>
@@ -600,7 +669,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>120</x>
      <y>40</y>
      <width>271</width>
      <height>20</height>
@@ -616,7 +685,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>mqFlipSwapDialog</receiver>
+   <receiver>mqSpacingDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -632,7 +701,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>mqFlipSwapDialog</receiver>
+   <receiver>mqSpacingDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

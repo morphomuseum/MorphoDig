@@ -301,6 +301,10 @@ mqSmoothDialog.cxx
 mqSmoothDialog.h
 mqSmoothDialogReaction.cxx
 mqSmoothDialogReaction.h
+mqSpacingDialog.cxx
+mqSpacingDialog.h
+mqSpacingDialogReaction.cxx
+mqSpacingDialogReaction.h
 mqSurfaceTagInfosDialog.cxx
 mqSurfaceTagInfosDialog.h
 mqSurfaceTagInfosDialogReaction.cxx
@@ -405,6 +409,7 @@ mqSelectLandmarkRangeDialog.ui
 mqShrinkWrapDialog.ui
 mqShrinkWrapIterativeDialog.ui
 mqSmoothDialog.ui
+mqSpacingDialog.ui
 mqSurfaceTagInfosDialog.ui
 mqTagFromRGBDialog.ui
 mqTPSDialog.ui

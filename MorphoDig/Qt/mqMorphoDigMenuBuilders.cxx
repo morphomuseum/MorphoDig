@@ -37,6 +37,8 @@
 #include "mqICPDialogReaction.h"
 #include "mqIsosurfaceDialogReaction.h"
 #include "mqFlipSwapDialogReaction.h"
+#include "mqSpacingDialogReaction.h"
+
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqShrinkWrapDialogReaction.h"
 #include "mqShrinkWrapIterativeDialogReaction.h"
@@ -327,7 +329,7 @@ void mqMorphoDigMenuBuilders::buildEditVolumesMenu(QMenu& menu)
 	new mqEditVolumeDialogReaction(menu.addAction("Edit first selected volume") << mqSetName("actionEditVolume"));
 	new mqIsosurfaceDialogReaction(menu.addAction("Extract isosurface from first selected volume") << mqSetName("actionIsosurfaceVolume"));
 	new mqFlipSwapDialogReaction(menu.addAction("Flip or Swap first selected volume") << mqSetName("actionFlipSwapVolume"));
-	
+	new mqSpacingDialogReaction(menu.addAction("Change voxel size of first selected volume (keep dimensions)") << mqSetName("actionFlipSwapVolume"));
 }
 
 void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)

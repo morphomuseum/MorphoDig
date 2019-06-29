@@ -811,6 +811,12 @@ void vtkMDVolume::FlipY()
 	vtkSmartPointer<vtkImageData> flippedData = flip->GetOutput();
 	this->SetImageDataAndMap(flippedData);
 }
+
+void vtkMDVolume::ChangeSpacing(double newSpacingX, double newSpacingY, double newSpacingZ)
+{
+	this->ImageData->SetSpacing(newSpacingX, newSpacingY, newSpacingZ);
+	this->SetImageDataAndMap(this->ImageData);
+}
 void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->SetImageData(imgData);
