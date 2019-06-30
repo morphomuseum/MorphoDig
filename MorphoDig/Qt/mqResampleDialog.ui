@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>687</width>
-    <height>298</height>
+    <height>343</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>270</y>
+     <y>310</y>
      <width>195</width>
      <height>30</height>
     </rect>
@@ -483,7 +483,7 @@
      <x>10</x>
      <y>10</y>
      <width>671</width>
-     <height>251</height>
+     <height>291</height>
     </rect>
    </property>
    <property name="title">
@@ -493,7 +493,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>220</y>
+      <y>260</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -506,7 +506,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>220</y>
+      <y>260</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -519,7 +519,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>220</y>
+      <y>260</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -532,7 +532,7 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>220</y>
+      <y>260</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -545,7 +545,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>220</y>
+      <y>260</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -558,7 +558,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>220</y>
+      <y>260</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -573,7 +573,7 @@
       <x>20</x>
       <y>60</y>
       <width>601</width>
-      <height>151</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="title">
@@ -697,6 +697,42 @@
          </widget>
         </item>
        </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>225</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="linear">
+        <property name="text">
+         <string>Linear interpolation</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="neighbor">
+        <property name="text">
+         <string>Nearest neighbor interpolation</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="cubic">
+        <property name="text">
+         <string>Cubic interpolation</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

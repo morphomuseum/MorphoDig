@@ -171,9 +171,12 @@ void mqResampleDialog::Resample()
 			int ret = msgBox.exec();
 			if (ret == QMessageBox::No) { return; }
 		}
-
-
-		this->myVolume->Resample(this->Ui->voxelSizeX->value() ,this->Ui->voxelSizeY->value() ,this->Ui->voxelSizeZ->value());
+		int method = 0;
+		if (this->Ui->linear->isChecked()) { method = 1; }
+		if (this->Ui->neighbor->isChecked()) { method = 1; }
+		if (this->Ui->cubic->isChecked()) { method = 2; }
+		this->myVolume->Resample(this->Ui->voxelSizeX->value() ,this->Ui->voxelSizeY->value() ,this->Ui->voxelSizeZ->value(), method);
+		mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
 		mqMorphoDigCore::instance()->Render();
 	}
 

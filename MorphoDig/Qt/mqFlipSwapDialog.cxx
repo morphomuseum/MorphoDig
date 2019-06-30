@@ -129,6 +129,7 @@ void mqFlipSwapDialog::slotSwapXY()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapXY();
+		mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
 		mqMorphoDigCore::instance()->Render();
 	}
 
@@ -138,6 +139,7 @@ void mqFlipSwapDialog::slotSwapXZ()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapXZ();
+		mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
 		mqMorphoDigCore::instance()->Render();
 	}
 
@@ -147,6 +149,7 @@ void mqFlipSwapDialog::slotSwapYZ()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapYZ();
+		mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
 		mqMorphoDigCore::instance()->Render();
 	}
 
@@ -156,6 +159,7 @@ void mqFlipSwapDialog::slotSwapXYZ()
 	if (this->myVolume != NULL)
 	{
 		this->myVolume->SwapXYZ();
+		mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
 		mqMorphoDigCore::instance()->Render();
 	}
 

@@ -755,6 +755,7 @@ void vtkMDVolume::SwapXY()
 	permute->Update();
 	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
 	this->SetImageDataAndMap(permutedData);
+	this->Outline->SetInputData(permutedData);
 }
 void vtkMDVolume::SwapXZ()
 {
@@ -764,6 +765,7 @@ void vtkMDVolume::SwapXZ()
 	permute->Update();
 	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
 	this->SetImageDataAndMap(permutedData);
+	this->Outline->SetInputData(permutedData);
 
 }
 void vtkMDVolume::SwapYZ()
@@ -774,6 +776,7 @@ void vtkMDVolume::SwapYZ()
 	permute->Update();
 	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
 	this->SetImageDataAndMap(permutedData);
+	this->Outline->SetInputData(permutedData);
 }
 void vtkMDVolume::SwapXYZ()
 {
@@ -783,6 +786,7 @@ void vtkMDVolume::SwapXYZ()
 	permute->Update();
 	vtkSmartPointer<vtkImageData> permutedData = permute->GetOutput();
 	this->SetImageDataAndMap(permutedData);
+	this->Outline->SetInputData(permutedData);
 }
 void vtkMDVolume::FlipZ()
 {
@@ -819,7 +823,7 @@ void vtkMDVolume::ChangeSpacing(double newSpacingX, double newSpacingY, double n
 	this->SetImageDataAndMap(this->ImageData);
 }
 
-void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpacingZ)
+void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpacingZ, int interpolationMethod)
 {
 	cout << "Resample image!!" << endl;
 	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
@@ -829,6 +833,19 @@ void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpa
 	resample->SetAxisOutputSpacing(1, newSpacingY);
 	resample->SetAxisOutputSpacing(2, newSpacingZ);
 	//resample->Set
+	if (interpolationMethod == 0)
+	{
+		resample->SetInterpolationModeToLinear();
+	}
+	else if (interpolationMethod == 1)
+	{
+		resample->SetInterpolationModeToNearestNeighbor();
+
+	}
+	else
+	{
+		resample->SetInterpolationModeToCubic();
+	}
 	resample->Update();
 	vtkSmartPointer<vtkImageData> resampledData = resample->GetOutput();
 	this->SetImageDataAndMap(resampledData);

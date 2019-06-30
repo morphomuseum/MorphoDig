@@ -127,6 +127,7 @@ void mqSpacingDialog::Spacing()
 
 
 		this->myVolume->ChangeSpacing(this->Ui->voxelSizeX->value() ,this->Ui->voxelSizeY->value() ,this->Ui->voxelSizeZ->value());
+		mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
 		mqMorphoDigCore::instance()->Render();
 	}
 

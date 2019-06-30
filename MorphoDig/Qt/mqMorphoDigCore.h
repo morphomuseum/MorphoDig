@@ -940,6 +940,7 @@ public:
   double ComputeActiveScalarsMean(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int cutMinMax, double cutMin, double cutMax);
   double ComputeActiveScalarsMedian(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int cutMinMax, double cutMin, double cutMax);
   void TestVolume();
+  void sendSignalVolumesMightHaveChanged();
 signals:
   void pencilSizeChanged(int pencilSize);
   void projectionModeChanged();

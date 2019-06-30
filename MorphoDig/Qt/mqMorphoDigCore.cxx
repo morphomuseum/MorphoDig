@@ -18328,6 +18328,10 @@ void mqMorphoDigCore::DeleteSelectedActors()
 	emit this->volumesMightHaveChanged();
 	
 }
+void mqMorphoDigCore::sendSignalVolumesMightHaveChanged()
+{
+	emit this->volumesMightHaveChanged();
+}
 void mqMorphoDigCore::addInvert()
 {
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
