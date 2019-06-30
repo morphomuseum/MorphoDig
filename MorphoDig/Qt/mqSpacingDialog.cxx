@@ -113,7 +113,7 @@ void mqSpacingDialog::Spacing()
 	{
 		cout << "Spacing dialog" << endl;
 
-		std::string action = "OpenTiff3D";
+		std::string action = "Spacing";
 
 		if (this->Ui->voxelSizeX->value() == 0 || this->Ui->voxelSizeY->value() == 0 || this->Ui->voxelSizeZ->value() == 0)
 		{

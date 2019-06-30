@@ -19,6 +19,7 @@ Module:    vtkMDVolume.h
 #include <vtkImageAccumulate.h>
 #include <vtkImageResliceMapper.h>
 #include <vtkImageSliceMapper.h>
+
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkOutlineFilter.h>

@@ -4,32 +4,37 @@
    
 
 =========================================================================*/
-#ifndef _mqSpacingDialog_h
-#define _mqSpacingDialog_h
+#ifndef _mqResampleDialog_h
+#define _mqResampleDialog_h
 
 #include "vtkMDVolume.h"
 #include <QDialog>
 
 namespace Ui
 {
-class mqSpacingDialog;
+class mqResampleDialog;
 }
 
 
 
 
 /**
-* mqSpacingDialog is the dialog used by MorphoDig to flip or swap the 1st selected volume
+* mqResampleDialog is the dialog used by MorphoDig to resample the 1st selected volume
 */
-class  mqSpacingDialog : public QDialog
+class  mqResampleDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  mqSpacingDialog(QWidget* Parent);
+  mqResampleDialog(QWidget* Parent);
   
-  ~mqSpacingDialog();
-  void Spacing();
+  ~mqResampleDialog();
+  void Resample();
+  void disconnectDims();
+  void reconnectDims();
+  void disconnectRes();
+  void reconnectRes();
+
   void setVolume(vtkMDVolume *vol);
   public slots:
   
@@ -39,17 +44,24 @@ public:
   virtual void slotMult10();
   virtual void slotMult5();
   virtual void slotMult2();
-  virtual void slotVoxelSizeXChanged(double newsVoxelSizeX);
-  virtual void slotSpacing();
+  virtual void slotVoxelSizeXChanged(double newVoxelSizeX);
+  virtual void slotVoxelSizeYChanged(double newVoxelSizeY);
+  virtual void slotVoxelSizeZChanged(double newVoxelSizeZ);
+  virtual void slotDimXChanged(int newDimX);
+  virtual void slotDimYChanged(int newDimY);
+  virtual void slotDimZChanged(int newDimZ);
+  virtual void slotResample();
   
 
 protected:
 	
 private:
 	double mySpacingX, mySpacingY, mySpacingZ;
+	int myDimX, myDimY, myDimZ;
+	double mySizeX, mySizeY, mySizeZ;
 
-  Q_DISABLE_COPY(mqSpacingDialog)
-  Ui::mqSpacingDialog* const Ui;
+  Q_DISABLE_COPY(mqResampleDialog)
+  Ui::mqResampleDialog* const Ui;
   vtkMDVolume *myVolume;
   // Here we should have the file name, no ?
 };

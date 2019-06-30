@@ -41,6 +41,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkPlane.h>
 #include <QString>
 #include <QMessageBox>
+#include <vtkImageResample.h>
 vtkStandardNewMacro(vtkMDVolume);
 
 
@@ -820,6 +821,17 @@ void vtkMDVolume::ChangeSpacing(double newSpacingX, double newSpacingY, double n
 
 void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpacingZ)
 {
+	cout << "Resample image!!" << endl;
+	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
+	resample->SetInputData(this->ImageData);
+	resample->SetAxisOutputSpacing(0, newSpacingX);
+	resample->SetAxisOutputSpacing(1, newSpacingY);
+	resample->SetAxisOutputSpacing(2, newSpacingZ);
+	//resample->Set
+	resample->Update();
+	vtkSmartPointer<vtkImageData> resampledData = resample->GetOutput();
+	this->SetImageDataAndMap(resampledData);
+
 	//to implement
 }
 void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)

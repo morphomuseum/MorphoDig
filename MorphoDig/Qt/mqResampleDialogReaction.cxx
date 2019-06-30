@@ -1,31 +1,31 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqSpacingDialogReaction.cxx
+   Module:    mqResampleDialogReaction.cxx
 
 
 ========================================================================*/
-#include "mqSpacingDialogReaction.h"
+#include "mqResampleDialogReaction.h"
 #include "mqCoreUtilities.h"
-#include "mqSpacingDialog.h"
+#include "mqResampleDialog.h"
 #include "mqReaction.h"
 
 //-----------------------------------------------------------------------------
-mqSpacingDialogReaction::mqSpacingDialogReaction(QAction* parentObject)
+mqResampleDialogReaction::mqResampleDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
 	/* mqAboutDialog about_dialog(mqCoreUtilities::mainWidget());
   about_dialog.exec();*/
-	//this->Spacing_dialog = new mqSpacingDialog(mqCoreUtilities::mainWidget());
+	//this->Resample_dialog = new mqResampleDialog(mqCoreUtilities::mainWidget());
 	
 	
 }
 
 
 //-----------------------------------------------------------------------------
-void mqSpacingDialogReaction::showSpacingDialog(vtkMDVolume *vol)
+void mqResampleDialogReaction::showResampleDialog(vtkMDVolume *vol)
 {
-	mqSpacingDialog Spacing_dialog(mqCoreUtilities::mainWidget());
-	Spacing_dialog.setVolume(vol);
- Spacing_dialog.exec();
+	mqResampleDialog Resample_dialog(mqCoreUtilities::mainWidget());
+	Resample_dialog.setVolume(vol);
+ Resample_dialog.exec();
 }

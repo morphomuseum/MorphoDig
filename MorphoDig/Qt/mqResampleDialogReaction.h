@@ -1,35 +1,35 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqSpacingDialogReaction.h
+   Module:    mqResampleDialogReaction.h
 
 
 ========================================================================*/
-#ifndef mqSpacingDialogReaction_h
-#define mqSpacingDialogReaction_h
+#ifndef mqResampleDialogReaction_h
+#define mqResampleDialogReaction_h
 
 #include "mqReaction.h"
-#include "mqSpacingDialog.h"
+#include "mqResampleDialog.h"
 #include "mqMorphoDigCore.h"
 #include "vtkMDVolume.h"
 #include <QMessageBox>
 
 /**
 * @ingroup Reactions
-* mqSpacingDialogReaction used to change the voxel size of the 1st selected volume 
+* mqResampleDialogReaction used to resample the 1st selected volume 
 */
-class  mqSpacingDialogReaction : public mqReaction
+class  mqResampleDialogReaction : public mqReaction
 {
   Q_OBJECT
   typedef mqReaction Superclass;
 
 public:
-  mqSpacingDialogReaction(QAction* parent);
+  mqResampleDialogReaction(QAction* parent);
 
   /**
   * Shows the FLG dialog for the application.
   */
-  static void showSpacingDialog(vtkMDVolume *vol);
+  static void showResampleDialog(vtkMDVolume *vol);
 
 protected:
   /**
@@ -45,13 +45,13 @@ protected:
 		  return;
 	  }
 	  vtkMDVolume *vol = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
-	  mqSpacingDialogReaction::showSpacingDialog(vol); 
+	  mqResampleDialogReaction::showResampleDialog(vol); 
   
   }
 
 private:
-	Q_DISABLE_COPY(mqSpacingDialogReaction)
-		//mqSpacingDialog *Spacing_dialog;
+	Q_DISABLE_COPY(mqResampleDialogReaction)
+		//mqResampleDialog *Resample_dialog;
 	
 };
 
