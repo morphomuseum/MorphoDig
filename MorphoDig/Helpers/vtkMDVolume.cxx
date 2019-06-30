@@ -824,6 +824,7 @@ void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpa
 	cout << "Resample image!!" << endl;
 	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
 	resample->SetInputData(this->ImageData);
+	
 	resample->SetAxisOutputSpacing(0, newSpacingX);
 	resample->SetAxisOutputSpacing(1, newSpacingY);
 	resample->SetAxisOutputSpacing(2, newSpacingZ);
