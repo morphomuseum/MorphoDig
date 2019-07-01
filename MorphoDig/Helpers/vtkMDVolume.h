@@ -142,6 +142,7 @@ public:
 
 	void ChangeSpacing(double newSpacingX, double newSpacingY, double newSpacingZ);
 	void Resample(double newSpacingX, double newSpacingY, double newSpacingZ, int interpolationMethod);
+	void Reslice(int extended, int interpolationMethod);
 	void SwapXY();	
 	void SwapXZ();	
 	void SwapYZ();	

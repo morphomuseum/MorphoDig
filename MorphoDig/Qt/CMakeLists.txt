@@ -195,6 +195,10 @@ mqResampleDialog.cxx
 mqResampleDialog.h
 mqResampleDialogReaction.cxx
 mqResampleDialogReaction.h
+mqResliceDialog.cxx
+mqResliceDialog.h
+mqResliceDialogReaction.cxx
+mqResliceDialogReaction.h
 mqSaveCURDialog.cxx
 mqSaveCURDialog.h
 mqSaveCURDialogReaction.cxx
@@ -387,6 +391,7 @@ mqOpenRawDialog.ui
 mqOpenTiff3DDialog.ui
 mqOrientationLabelsDialog.ui
 mqResampleDialog.ui
+mqResliceDialog.ui
 mqSaveCURDialog.ui
 mqSaveCURasVERDialog.ui
 mqSaveFlagsDialog.ui

@@ -16,6 +16,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkDataArray.h>
 #include <vtkSmartPointer.h>
 #include <vtkImageResample.h>
+#include <vtkImageReslice.h>
 #include <vtkRenderer.h>
 #include <vtkVolumeProperty.h>
 #include <vtkImageProperty.h>
@@ -821,6 +822,28 @@ void vtkMDVolume::ChangeSpacing(double newSpacingX, double newSpacingY, double n
 {
 	this->ImageData->SetSpacing(newSpacingX, newSpacingY, newSpacingZ);
 	this->SetImageDataAndMap(this->ImageData);
+}
+void vtkMDVolume::Reslice(int extended, int interpolationMethod)
+{
+	vtkSmartPointer<vtkImageReslice> reslice = vtkSmartPointer<vtkImageReslice>::New();
+	reslice->SetInputData(this->ImageData);
+	reslice->SetResliceAxes(this->GetMatrix());
+	if (interpolationMethod == 0)
+	{
+		reslice->SetInterpolationModeToLinear();
+	}
+	else if (interpolationMethod == 1)
+	{
+		reslice->SetInterpolationModeToNearestNeighbor();
+
+	}
+	else
+	{
+		reslice->SetInterpolationModeToCubic();
+	}
+	reslice->Update();
+	vtkSmartPointer<vtkImageData> reslicedData = reslice->GetOutput();
+	this->SetImageDataAndMap(reslicedData);
 }
 
 void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpacingZ, int interpolationMethod)
