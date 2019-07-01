@@ -80,7 +80,7 @@ mqResliceDialog::~mqResliceDialog()
   delete this->Ui;
 }
 
-void mqResampleDialog::setVolume (vtkMDVolume *vol)
+void mqResliceDialog::setVolume (vtkMDVolume *vol)
 {
 	this->myVolume = vol;
 	QString myLabel(this->myVolume->GetName().c_str());
