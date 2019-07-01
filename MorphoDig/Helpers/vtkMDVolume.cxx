@@ -841,6 +841,14 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 	{
 		reslice->SetInterpolationModeToCubic();
 	}
+	if (extended == 1)
+	{
+		reslice->SetAutoCropOutput(true);
+	}
+	else
+	{
+		reslice->SetAutoCropOutput(false);
+	}
 	reslice->Update();
 	vtkSmartPointer<vtkImageData> reslicedData = reslice->GetOutput();
 	this->SetImageDataAndMap(reslicedData);

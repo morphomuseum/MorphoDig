@@ -1,35 +1,35 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqResampleDialogReaction.h
+   Module:    mqResliceDialogReaction.h
 
 
 ========================================================================*/
-#ifndef mqResampleDialogReaction_h
-#define mqResampleDialogReaction_h
+#ifndef mqResliceDialogReaction_h
+#define mqResliceDialogReaction_h
 
 #include "mqReaction.h"
-#include "mqResampleDialog.h"
+#include "mqResliceDialog.h"
 #include "mqMorphoDigCore.h"
 #include "vtkMDVolume.h"
 #include <QMessageBox>
 
 /**
 * @ingroup Reactions
-* mqResampleDialogReaction used to resample the 1st selected volume 
+* mqResliceDialogReaction used to Reslice the 1st selected volume 
 */
-class  mqResampleDialogReaction : public mqReaction
+class  mqResliceDialogReaction : public mqReaction
 {
   Q_OBJECT
   typedef mqReaction Superclass;
 
 public:
-  mqResampleDialogReaction(QAction* parent);
+  mqResliceDialogReaction(QAction* parent);
 
   /**
   * Shows the FLG dialog for the application.
   */
-  static void showResampleDialog(vtkMDVolume *vol);
+  static void showResliceDialog(vtkMDVolume *vol);
 
 protected:
   /**
@@ -45,13 +45,13 @@ protected:
 		  return;
 	  }
 	  vtkMDVolume *vol = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
-	  mqResampleDialogReaction::showResampleDialog(vol); 
+	  mqResliceDialogReaction::showResliceDialog(vol); 
   
   }
 
 private:
-	Q_DISABLE_COPY(mqResampleDialogReaction)
-		//mqResampleDialog *Resample_dialog;
+	Q_DISABLE_COPY(mqResliceDialogReaction)
+		//mqResliceDialog *Reslice_dialog;
 	
 };
 

@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Edit voxel size of </string>
+   <string>Resample dialog</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">

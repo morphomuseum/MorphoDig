@@ -1,31 +1,31 @@
 /*=========================================================================
 
    Program: MorphoDig
-   Module:    mqResampleDialogReaction.cxx
+   Module:    mqResliceDialogReaction.cxx
 
 
 ========================================================================*/
-#include "mqResampleDialogReaction.h"
+#include "mqResliceDialogReaction.h"
 #include "mqCoreUtilities.h"
-#include "mqResampleDialog.h"
+#include "mqResliceDialog.h"
 #include "mqReaction.h"
 
 //-----------------------------------------------------------------------------
-mqResampleDialogReaction::mqResampleDialogReaction(QAction* parentObject)
+mqResliceDialogReaction::mqResliceDialogReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
 	/* mqAboutDialog about_dialog(mqCoreUtilities::mainWidget());
   about_dialog.exec();*/
-	//this->Resample_dialog = new mqResampleDialog(mqCoreUtilities::mainWidget());
+	//this->Reslice_dialog = new mqResliceDialog(mqCoreUtilities::mainWidget());
 	
 	
 }
 
 
 //-----------------------------------------------------------------------------
-void mqResampleDialogReaction::showResampleDialog(vtkMDVolume *vol)
+void mqResliceDialogReaction::showResliceDialog(vtkMDVolume *vol)
 {
-	mqResampleDialog Resample_dialog(mqCoreUtilities::mainWidget());
-	Resample_dialog.setVolume(vol);
- Resample_dialog.exec();
+	mqResliceDialog Reslice_dialog(mqCoreUtilities::mainWidget());
+	Reslice_dialog.setVolume(vol);
+ Reslice_dialog.exec();
 }

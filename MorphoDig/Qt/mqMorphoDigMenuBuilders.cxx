@@ -30,6 +30,7 @@
 #include "mqVolumeOptionsDialogReaction.h"
 #include "mqEditACTORDialogReaction.h"
 #include "mqEditVolumeDialogReaction.h"
+#include "mqResliceDialogReaction.h"
 #include "mqEditFLGDialogReaction.h"
 #include "mqEditLMKDialogReaction.h"
 #include "mqEditAllFLGLengthDialogReaction.h"
@@ -330,8 +331,9 @@ void mqMorphoDigMenuBuilders::buildEditVolumesMenu(QMenu& menu)
 	new mqEditVolumeDialogReaction(menu.addAction("Edit first selected volume") << mqSetName("actionEditVolume"));
 	new mqIsosurfaceDialogReaction(menu.addAction("Extract isosurface from first selected volume") << mqSetName("actionIsosurfaceVolume"));
 	new mqFlipSwapDialogReaction(menu.addAction("Flip or Swap first selected volume") << mqSetName("actionFlipSwapVolume"));
-	new mqSpacingDialogReaction(menu.addAction("Change voxel size of first selected volume (keep dimensions, no resampling)") << mqSetName("actionFlipSwapVolume"));
-	new mqResampleDialogReaction(menu.addAction("Resample first selected volume (dimensions will be changed and voxel size as well)") << mqSetName("actionFlipSwapVolume"));
+	new mqSpacingDialogReaction(menu.addAction("Change voxel size of first selected volume (keep dimensions, no resampling)") << mqSetName("actionSpacingVolume"));
+	new mqResampleDialogReaction(menu.addAction("Resample first selected volume (dimensions will be changed and voxel size as well)") << mqSetName("actionResampleVolume"));
+	new mqResliceDialogReaction(menu.addAction("Reslice first selected volume") << mqSetName("actionResliceVolume"));
 
 }
 
