@@ -827,7 +827,20 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 {
 	vtkSmartPointer<vtkImageReslice> reslice = vtkSmartPointer<vtkImageReslice>::New();
 	reslice->SetInputData(this->ImageData);
+
+	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
+	vtkSmartPointer<vtkMatrix4x4> MatCpy = vtkSmartPointer<vtkMatrix4x4>::New();
+	//MatCpy->DeepCopy(Mat);
+	//MatCpy->Transpose();
+	vtkSmartPointer<vtkMatrix4x4> MatTrans = vtkSmartPointer<vtkMatrix4x4>::New();
+	//vtkMatrix4x4::Transpose(Mat, MatTrans);
+	
+
+
 	reslice->SetResliceAxes(this->GetMatrix());
+	//reslice->SetRSetResliceAxes(this->GetMatrix());
+	//reslice->SetResliceAxes(MatCpy);
+	//reslice->SetResliceAxes(MatTrans);
 	if (interpolationMethod == 0)
 	{
 		reslice->SetInterpolationModeToLinear();
@@ -851,7 +864,12 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 	}
 	reslice->Update();
 	vtkSmartPointer<vtkImageData> reslicedData = reslice->GetOutput();
+	vtkSmartPointer<vtkMatrix4x4> MatIdentity = vtkSmartPointer<vtkMatrix4x4>::New();
+
+	this->ApplyMatrix(MatIdentity);
+	this->Modified();
 	this->SetImageDataAndMap(reslicedData);
+	this->Outline->SetInputData(reslicedData);
 }
 
 void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpacingZ, int interpolationMethod)
@@ -879,8 +897,11 @@ void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpa
 	}
 	resample->Update();
 	vtkSmartPointer<vtkImageData> resampledData = resample->GetOutput();
+
+	
 	this->SetImageDataAndMap(resampledData);
 
+	
 	//to implement
 }
 void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
