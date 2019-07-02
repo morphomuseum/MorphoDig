@@ -1081,10 +1081,10 @@ void vtkMDVolume::CreateCropBox()
 	cropbox->PlaceWidget();
 	cropbox->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
 	cout << "Create box 3" << endl;
-	vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
-	callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
+	//vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
+	//callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
 
-	cropbox->AddObserver(vtkCommand::InteractionEvent, callback);
+	//cropbox->AddObserver(vtkCommand::InteractionEvent, callback);
 
 	cropbox->EnabledOn();
 	cropbox->RotationEnabledOff();
@@ -1094,7 +1094,7 @@ void vtkMDVolume::CreateCropBox()
 	cout << "Create cropbox 4... Now try to place it!" << endl;
 
 
-	/*
+	
 
 	vtkTransform *t = vtkTransform::New();
 	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
@@ -1131,7 +1131,7 @@ void vtkMDVolume::CreateCropBox()
 
 	t->Delete();
 	cout << "CropBox placed.... correctly?" << endl;
-	*/
+	
 }
 void vtkMDVolume::CreateBox()
 {

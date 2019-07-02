@@ -230,7 +230,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveVolume()));
 	connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
 	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
-
+	connect(this->Ui->cropVolume, SIGNAL(pressed()), this, SLOT(slotcropVolumeClicked()));
+	//
 	
 	connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
