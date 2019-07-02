@@ -711,9 +711,9 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QRadioButton" name="linear">
+       <widget class="QRadioButton" name="cubic">
         <property name="text">
-         <string>Linear interpolation</string>
+         <string>Cubic interpolation (usually better)</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -721,16 +721,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="neighbor">
+       <widget class="QRadioButton" name="linear">
         <property name="text">
-         <string>Nearest neighbor interpolation</string>
+         <string>Linear interpolation</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="cubic">
+       <widget class="QRadioButton" name="neighbor">
         <property name="text">
-         <string>Cubic interpolation</string>
+         <string>Nearest neighbor interpolation</string>
         </property>
        </widget>
       </item>

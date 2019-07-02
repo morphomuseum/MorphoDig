@@ -45,6 +45,7 @@ public:
   void RefreshSuggestedRange();
   void RefreshComboColorMaps();
   void LoadPreset();
+  void CropVolume();
   /*double GetCTFMin();
   double GetCTFMax();
   void UpdateLookupTableRange();*/
@@ -79,6 +80,8 @@ public:
   virtual void slotisVisibleXZClicked(bool isChecked);
   virtual void slotisVisibleYZClicked(bool isChecked);
   virtual void slotisVisibleVRClicked(bool isChecked);
+  virtual void slotisVisibleCropBoxClicked(bool isChecked);
+  virtual void slotcropVolumeClicked();
   virtual void slotuseImageDataBinForVRClicked(bool isChecked);
   virtual void slotSliderXYChanged(int val);
   virtual void slotSliderXZChanged(int val);

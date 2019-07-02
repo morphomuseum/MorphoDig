@@ -276,6 +276,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->isVisibleXZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleXZClicked(bool)));
 	connect(this->Ui->isVisibleYZ, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleYZClicked(bool)));
 	connect(this->Ui->isVisibleVR, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleVRClicked(bool)));
+	connect(this->Ui->isVisibleCropBox, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleCropBoxClicked(bool)));
 
 	connect(this->Ui->useImageDataBinForVR, SIGNAL(clicked(bool)), this, SLOT(slotuseImageDataBinForVRClicked(bool)));
 
@@ -432,6 +433,37 @@ void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 
 		}
 		this->UpdateUI();
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::CropVolume()
+{
+	cout << "Crop volume inside EditVolumeDialog" << endl;
+}
+void mqEditVolumeDialog::slotcropVolumeClicked()
+{
+	this->CropVolume();
+}
+void mqEditVolumeDialog::slotisVisibleCropBoxClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+
+		if (isChecked)
+		{
+			
+			this->Volume->CreateCropBox();
+			this->Ui->cropVolume->setEnabled(true);
+			
+		}
+		else
+		{
+			this->Volume->RemoveCropBox();
+			this->Ui->cropVolume->setEnabled(false);
+			
+
+		}
+
 		mqMorphoDigCore::instance()->Render();
 	}
 }

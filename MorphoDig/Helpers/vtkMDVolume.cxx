@@ -122,6 +122,7 @@ renderer->AddViewProp(image);*/
 	
 	//this->Box = NULL;
 	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
+	this->CropBox = vtkSmartPointer<vtkBoxWidget>::New();
 	this->Changed = 0;
 	this->Name = "New Volume";
 	this->ScalarDisplayMax = (double)VTK_UNSIGNED_INT_MAX;
@@ -829,17 +830,36 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 	reslice->SetInputData(this->ImageData);
 
 	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
+	Mat->PrintSelf(std::cout, vtkIndent(1));
 	vtkSmartPointer<vtkMatrix4x4> MatCpy = vtkSmartPointer<vtkMatrix4x4>::New();
-	//MatCpy->DeepCopy(Mat);
+	MatCpy->DeepCopy(Mat);
+	MatCpy->SetElement(0,0, Mat->GetElement(0, 0));
+	MatCpy->SetElement(0, 1, Mat->GetElement(1, 0));
+	MatCpy->SetElement(0, 2, Mat->GetElement(2, 0));	
+	MatCpy->SetElement(1, 0, Mat->GetElement(0, 1));
+	MatCpy->SetElement(1, 1, Mat->GetElement(1, 1));
+	MatCpy->SetElement(1, 2, Mat->GetElement(2, 1));
+	MatCpy->SetElement(2, 0, Mat->GetElement(0, 2));
+	MatCpy->SetElement(2, 1, Mat->GetElement(1, 2));
+	MatCpy->SetElement(2, 2, Mat->GetElement(2, 2));
+
+
+	MatCpy->SetElement(0, 3, 0);
+	MatCpy->SetElement(1, 3, 0);
+	MatCpy->SetElement(2, 3, 0);
+
+	MatCpy->PrintSelf(std::cout, vtkIndent(1));
+	
+
 	//MatCpy->Transpose();
 	vtkSmartPointer<vtkMatrix4x4> MatTrans = vtkSmartPointer<vtkMatrix4x4>::New();
 	//vtkMatrix4x4::Transpose(Mat, MatTrans);
 	
 
 
-	reslice->SetResliceAxes(this->GetMatrix());
+	//reslice->SetResliceAxes(this->GetMatrix());
 	//reslice->SetRSetResliceAxes(this->GetMatrix());
-	//reslice->SetResliceAxes(MatCpy);
+	reslice->SetResliceAxes(MatCpy);
 	//reslice->SetResliceAxes(MatTrans);
 	if (interpolationMethod == 0)
 	{
@@ -864,9 +884,11 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 	}
 	reslice->Update();
 	vtkSmartPointer<vtkImageData> reslicedData = reslice->GetOutput();
-	vtkSmartPointer<vtkMatrix4x4> MatIdentity = vtkSmartPointer<vtkMatrix4x4>::New();
-
-	this->ApplyMatrix(MatIdentity);
+	vtkSmartPointer<vtkMatrix4x4> MatRetranslated = vtkSmartPointer<vtkMatrix4x4>::New();
+	MatRetranslated->SetElement(0, 3, Mat->GetElement(0, 3));
+	MatRetranslated->SetElement(1, 3, Mat->GetElement(1, 3));
+	MatRetranslated->SetElement(2, 3, Mat->GetElement(2, 3));
+	this->ApplyMatrix(MatRetranslated);
 	this->Modified();
 	this->SetImageDataAndMap(reslicedData);
 	this->Outline->SetInputData(reslicedData);
@@ -1042,6 +1064,75 @@ void vtkMDVolume::SetSliceNumberYZ(int slice)
 		this->SliceYZMapper2->SetSliceNumber(slice);
 	}
 }
+
+void vtkMDVolume::CreateCropBox()
+{
+	//just in case a Clipping Box already exists.
+	cout << "Call remove cropbox from CreateCropBox" << endl;
+	this->RemoveCropBox();
+	cout << "Create cropbox 1" << endl;
+	vtkSmartPointer<vtkBoxWidget>cropbox = vtkSmartPointer<vtkBoxWidget>::New();
+	cropbox->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
+	cropbox->SetPlaceFactor(1.01);
+	cout << "Create box 2" << endl;
+	cropbox->SetInputData(this->GetImageData());
+	cropbox->SetDefaultRenderer(mqMorphoDigCore::instance()->getRenderer());
+	cropbox->InsideOutOn();
+	cropbox->PlaceWidget();
+	cropbox->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
+	cout << "Create box 3" << endl;
+	vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
+	callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
+
+	cropbox->AddObserver(vtkCommand::InteractionEvent, callback);
+
+	cropbox->EnabledOn();
+	cropbox->RotationEnabledOff();
+	cropbox->GetSelectedFaceProperty()->SetOpacity(0.0);
+	this->SetCropBox(cropbox);
+
+	cout << "Create cropbox 4... Now try to place it!" << endl;
+
+
+	/*
+
+	vtkTransform *t = vtkTransform::New();
+	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
+	vtkSmartPointer<vtkMatrix4x4> translationMat = vtkSmartPointer<vtkMatrix4x4>::New();
+	double tx, ty, tz;
+
+	tx = Mat->GetElement(0, 3);
+	ty = Mat->GetElement(1, 3);
+	tz = Mat->GetElement(2, 3);
+	// Ok, but not the good stuff!!!
+	double center_init[3], center_final[3];
+	this->GetInitCenter(center_init);
+	mqMorphoDigCore::TransformPoint(Mat, center_init, center_final);
+	
+
+	cout << "center init" << center_init[0] << "," << center_init[1] << "," << center_init[2] << endl;
+	cout << "center final" << center_final[0] << "," << center_final[1] << "," << center_final[2] << endl;
+	cout << "tx" << tx << "ty" << ty << "tz" << tz << endl;
+	tx = center_init[0] - center_final[0];
+	ty = center_init[1] - center_final[1];
+	tz = center_init[2] - center_final[2];
+	cout << "center init - final: tx" << tx << "ty" << ty << "tz" << tz << endl;
+
+	translationMat->SetElement(0, 3, -tx);
+	translationMat->SetElement(1, 3, -ty);
+	translationMat->SetElement(2, 3, -tz);	
+
+
+	cropbox->GetTransform(t);
+	
+
+	t->SetMatrix(translationMat);
+	cropbox->SetTransform(t);
+
+	t->Delete();
+	cout << "CropBox placed.... correctly?" << endl;
+	*/
+}
 void vtkMDVolume::CreateBox()
 {
 	//just in case a Clipping Box already exists.
@@ -1147,6 +1238,23 @@ void vtkMDVolume::RemoveBox()
 		
 		//this->Box = NULL;
 		this->Box = vtkSmartPointer<vtkBoxWidget>::New();
+	}
+
+}
+void vtkMDVolume::RemoveCropBox()
+{
+	if (this->CropBox != NULL)
+	{
+		cout << "Remove CropBox 1, disable" << endl;
+		this->CropBox->EnabledOff();
+		this->CropBox->RemoveAllObservers();
+		this->CropBox->SetInteractor(NULL);
+		this->CropBox->SetDefaultRenderer(NULL);
+		this->CropBox->Off();
+		this->CropBox->Modified();
+		//this->GetMapper()->RemoveAllClippingPlanes();		
+		
+		this->CropBox = vtkSmartPointer<vtkBoxWidget>::New();
 	}
 
 }

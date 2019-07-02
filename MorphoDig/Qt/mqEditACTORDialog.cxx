@@ -15,6 +15,7 @@
 #include "vtkMDActor.h"
 #include "vtkMDActorCollection.h"
 #include <vtkMatrix4x4.h>
+#include <vtkMatrix3x3.h>
 
 // we actually do not need glew...
 //#include <GL/glew.h>
@@ -837,6 +838,9 @@ void mqEditACTORDialog::slotReinitMatrix()
 void mqEditACTORDialog::slotRefreshMatrix()
 {
 	vtkSmartPointer<vtkMatrix4x4> Mat = this->ACTOR->GetMatrix();
+	//vtkSmartPointer<vtkMatrix3x3> Mat3 = vtkMatrix3x3::SafeDownCast(this->ACTOR->GetMatrix());
+	//Mat->PrintSelf(std::cout, vtkIndent(1));
+	
 	this->Ui->M00->setValue(Mat->GetElement(0, 0));
 	this->Ui->M01->setValue(Mat->GetElement(0, 1));
 	this->Ui->M02->setValue(Mat->GetElement(0, 2));

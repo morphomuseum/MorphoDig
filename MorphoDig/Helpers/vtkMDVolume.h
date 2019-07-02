@@ -77,6 +77,8 @@ public:
 	void ShallowCopy(vtkProp *prop);
 	void CreateBox();
 	void RemoveBox();
+	void CreateCropBox();
+	void RemoveCropBox();
 	void ComputeImageDataBin();
 	//vtkSetMacro(Selected, int);
 	vtkGetMacro(Selected, int);
@@ -200,6 +202,9 @@ public:
 	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	
+	vtkSetMacro(CropBox, vtkSmartPointer<vtkBoxWidget>);
+	vtkGetMacro(CropBox, vtkSmartPointer<vtkBoxWidget>);
+
 	vtkSetMacro(Outline, vtkSmartPointer<vtkOutlineFilter>);
 	vtkGetMacro(Outline, vtkSmartPointer<vtkOutlineFilter>);
 	vtkSetMacro(OutlineMapper, vtkSmartPointer<vtkPolyDataMapper>);
@@ -286,6 +291,7 @@ image->SetMapper(imageMapper);
 	vtkSmartPointer<vtkImageSlice> SliceXZ2;
 	vtkSmartPointer<vtkImageSlice> SliceYZ2;
 	vtkSmartPointer<vtkBoxWidget> Box;
+	vtkSmartPointer<vtkBoxWidget> CropBox;
 	vtkSmartPointer<vtkOutlineFilter> Outline;
 	vtkSmartPointer<vtkPolyDataMapper> OutlineMapper;
 	vtkSmartPointer<vtkActor> OutlineActor;
