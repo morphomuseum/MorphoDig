@@ -530,9 +530,9 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>20</y>
+      <y>10</y>
       <width>393</width>
-      <height>411</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -550,7 +550,7 @@
        <x>0</x>
        <y>0</y>
        <width>393</width>
-       <height>411</height>
+       <height>461</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
@@ -616,7 +616,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>410</y>
+      <y>440</y>
       <width>421</width>
       <height>101</height>
      </rect>
@@ -770,7 +770,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>280</y>
+      <y>300</y>
       <width>421</width>
       <height>111</height>
      </rect>
@@ -1016,7 +1016,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>440</y>
+      <y>480</y>
       <width>331</width>
       <height>71</height>
      </rect>
@@ -1171,7 +1171,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>160</y>
+      <y>180</y>
       <width>421</width>
       <height>101</height>
      </rect>
@@ -1395,7 +1395,7 @@
       <x>10</x>
       <y>40</y>
       <width>421</width>
-      <height>111</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="title">
@@ -1598,10 +1598,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>540</y>
-      <width>195</width>
-      <height>31</height>
+      <x>354</x>
+      <y>560</y>
+      <width>151</width>
+      <height>21</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
