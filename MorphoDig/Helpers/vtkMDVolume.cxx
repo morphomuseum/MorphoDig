@@ -549,7 +549,14 @@ void vtkMDVolume::SetColorProperties(double ambient, double diffuse, double spec
 }
 int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {
-	//on ne selectionne ici que les points!!!!
+	//appelé depuis une sélection
+	//on ne selectionne ici que les 8 points de la box!!!!
+	// changer en faisant une liste de 1000 points
+	// on prend les 4 points d'un premier plan, les 4 points d'un deuxième plan
+	// 1 3 5 7 => calculer les 100 points
+	// 0 2 4 6 => calculer les 100 points
+	// puis calculer les 800 points restants 
+	// Une fois les 1000 calculés, les tester tous!
 	cout << "Is inside frustum!" << endl;
 	int is_inside = 0;
 	int is_insideALL[6] = { 0,0,0,0,0,0 };
