@@ -41,6 +41,7 @@ public:
   int SomeThingHasChanged();
   int CurrentActorInCollection();
   void RefreshDialog();
+  void ShowAndRefresh();
   public slots:
   
   virtual void slotRefreshDialog();

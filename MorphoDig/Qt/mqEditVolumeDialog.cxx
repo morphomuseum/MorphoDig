@@ -1311,12 +1311,16 @@ void mqEditVolumeDialog::slotGetNextVolume()
 	this->UpdateUI();
 	mqMorphoDigCore::instance()->Render();
 }
-
+void mqEditVolumeDialog::ShowAndRefresh()
+{
+	this->GetFirstSelectedVolume();
+	if (this->Volume == NULL || (this->Volume != NULL && this->Volume->GetSelected() == 0)) { this->GetFirstVolume(); }
+	this->RefreshDialog();
+}
 void mqEditVolumeDialog::RefreshDialog()
 {
 	
 	this->GetFirstSelectedVolume();
-	if (this->Volume == NULL ||(this->Volume != NULL && this->Volume->GetSelected()==0)) { this->GetFirstVolume(); }
 	this->UpdateUI();
 	
 	mqMorphoDigCore::instance()->Render();

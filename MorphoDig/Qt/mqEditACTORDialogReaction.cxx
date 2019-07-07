@@ -25,6 +25,6 @@ mqEditACTORDialogReaction::mqEditACTORDialogReaction(QAction* parentObject)
 void mqEditACTORDialogReaction::showEditACTORDialog(mqEditACTORDialog *ACTOR_dialog)
 {
 	
-	ACTOR_dialog->RefreshDialog();
+	ACTOR_dialog->ShowAndRefresh();
   ACTOR_dialog->show();
 }

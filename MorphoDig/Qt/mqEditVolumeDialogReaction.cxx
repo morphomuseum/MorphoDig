@@ -25,6 +25,6 @@ mqEditVolumeDialogReaction::mqEditVolumeDialogReaction(QAction* parentObject)
 void mqEditVolumeDialogReaction::showEditVolumeDialog(mqEditVolumeDialog *Volume_dialog)
 {
 	
-	Volume_dialog->RefreshDialog();
+	Volume_dialog->ShowAndRefresh();
   Volume_dialog->show();
 }

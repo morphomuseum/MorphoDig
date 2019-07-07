@@ -33,6 +33,7 @@ public:
   
   ~mqEditVolumeDialog();
   void saveVolume();
+  void ShowAndRefresh();
   void reject(); // override the close window event function!
  void GetFirstSelectedVolume();
   void GetFirstVolume();

@@ -789,12 +789,19 @@ void mqEditACTORDialog::slotGetNextActor()
 	this->UpdateUI();
 	mqMorphoDigCore::instance()->Render();
 }
+void mqEditACTORDialog::ShowAndRefresh()
+{
+	this->GetFirstSelectedActor();
 
+	if (this->ACTOR == NULL || (this->ACTOR != NULL && this->ACTOR->GetSelected() == 0)) { this->GetFirstActor(); }
+
+	this->RefreshDialog();
+
+}
 void mqEditACTORDialog::RefreshDialog()
 {
 	
 	this->GetFirstSelectedActor();
-	if (this->ACTOR == NULL || (this->ACTOR != NULL && this->ACTOR->GetSelected() == 0)) { this->GetFirstActor(); }
 	
 	this->UpdateUI();
 	
