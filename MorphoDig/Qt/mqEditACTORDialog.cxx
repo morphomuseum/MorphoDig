@@ -794,6 +794,7 @@ void mqEditACTORDialog::RefreshDialog()
 {
 	
 	this->GetFirstSelectedActor();
+	if (this->ACTOR == NULL || (this->ACTOR != NULL && this->ACTOR->GetSelected() == 0)) { this->GetFirstActor(); }
 	
 	this->UpdateUI();
 	
