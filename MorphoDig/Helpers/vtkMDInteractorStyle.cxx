@@ -1205,6 +1205,7 @@ void vtkMDInteractorStyle::StartSelect()
 			this->Ctrl = CTRL_RELEASED;
 			//  @@ to do!
 			vtkIdType num_sel_Actors = 0;
+			vtkIdType num_sel_Volumes = 0;
 			vtkIdType num_sel_Fags = 0;
 			vtkIdType num_sel_Normal_Landmarks = 0;
 			vtkIdType num_sel_Target_Landmarks = 0;
@@ -1212,6 +1213,8 @@ void vtkMDInteractorStyle::StartSelect()
 			vtkIdType num_sel_Handle_Landmarks = 0;
 
 			vtkIdType num_Actors = 0;
+			vtkIdType num_Volumes = 0;
+
 			vtkIdType num_Fags = 0;
 			vtkIdType num_Normal_Landmarks = 0;
 			vtkIdType num_Target_Landmarks = 0;
@@ -1220,6 +1223,7 @@ void vtkMDInteractorStyle::StartSelect()
 
 
 			num_sel_Actors = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+			num_sel_Volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
 			num_sel_Fags = mqMorphoDigCore::instance()->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
 			num_sel_Normal_Landmarks = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfSelectedActors();
 			num_sel_Target_Landmarks = mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
@@ -1227,6 +1231,7 @@ void vtkMDInteractorStyle::StartSelect()
 			num_sel_Handle_Landmarks = mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
 
 			num_Actors = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems();
+			num_Volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfItems();
 			num_Fags = mqMorphoDigCore::instance()->getFlagLandmarkCollection()->GetNumberOfItems();
 			num_Normal_Landmarks = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfItems();
 			num_Target_Landmarks = mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfItems();
@@ -1235,6 +1240,7 @@ void vtkMDInteractorStyle::StartSelect()
 
 
 			if (num_sel_Actors == 0
+				&& num_sel_Volumes == 0
 				&& num_sel_Fags == 0
 				&& num_sel_Normal_Landmarks == 0
 				&& num_sel_Target_Landmarks == 0
@@ -1243,12 +1249,13 @@ void vtkMDInteractorStyle::StartSelect()
 
 				) {
 				QMessageBox msgBox;
-				msgBox.setText("Select at least one surface/flag/landmark/curve element to use this function!");
+				msgBox.setText("Select at least one surface/flag/landmark/curve/volume element to use this function!");
 				msgBox.exec();
 				return;
 			}
 
 			if (num_sel_Actors != num_Actors
+				|| num_sel_Volumes != num_Volumes
 				|| num_sel_Fags != num_Fags
 				|| num_sel_Normal_Landmarks != num_Normal_Landmarks
 				|| num_sel_Target_Landmarks != num_Target_Landmarks
