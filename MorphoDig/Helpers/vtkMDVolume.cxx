@@ -931,6 +931,7 @@ void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 	this->SetImageData(imgData);
 	vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 	this->SetMapper(mapper);
+	
 	if (this->useImageDataBinForVR == 1)
 	{
 		
@@ -940,6 +941,7 @@ void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 	{
 		mapper->SetInputData(this->GetImageData());
 	}
+	
 }
 void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 {
@@ -993,12 +995,13 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 	}*/
 	if (changed == 1)
 	{
+		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+
 		long long int numVox = this->myDim[0] * this->myDim[1] * this->myDim[2];
 		if (use == 1)
 		{
 			cout << "change input data binned image" << endl;
 			this->useImageDataBinForVR = 1;
-			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 			this->SetMapper(mapper);
 			mapper->SetInputData(this->GetImageDataBin());
 			
@@ -1017,11 +1020,20 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 					return 0; }
 			}
 			cout << "change input data normal image!" << endl;
-			vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 			this->SetMapper(mapper);
 			mapper->SetInputData(this->GetImageData());
 			
 			this->useImageDataBinForVR = 0;
+		}
+		if (this->enableROI == 1
+			)
+		{
+			cout << "Try to use clipping planes!" << endl;
+			/*volume->PlaceBox(BoxBounds);*/
+			vtkPlanes *planes = vtkPlanes::New();
+			this->Box->GetPlanes(planes);
+			mapper->SetClippingPlanes(planes);
+			planes->Delete();
 		}
 	}
 	return 1;
@@ -1212,6 +1224,7 @@ void vtkMDVolume::CreateBox()
 }
 void vtkMDVolume::PlaceBox(double BoxBounds[6])
 {
+	
 	this->Box->PlaceWidget(BoxBounds);
 	this->Box->Modified();
 	vtkPlanes *planes = vtkPlanes::New();

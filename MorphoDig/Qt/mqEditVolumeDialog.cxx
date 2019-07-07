@@ -948,6 +948,8 @@ void mqEditVolumeDialog::UpdateUI()
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
 		
+		this->Ui->enableROI->setChecked(this->Volume->GetenableROI());
+		this->Ui->displayROI->setChecked(this->Volume->GetdisplayROI());
 		if (this->Volume->GetuseImageDataBinForVR() == 1)
 		{
 			this->Ui->useImageDataBinForVR->setChecked(true);

@@ -21054,6 +21054,8 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode, d
 			volume->SetdisplayROI(1);			
 			volume->PlaceBox(BoxBounds);
 			
+			
+			
 
 
 		}

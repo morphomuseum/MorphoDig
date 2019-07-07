@@ -487,7 +487,8 @@ void mqEditACTORDialog::UpdateUI()
 {
 	if (this->ACTOR != NULL) {
 		
-
+		this->Ui->enableROI->setChecked(this->ACTOR->GetenableROI());
+		this->Ui->displayROI->setChecked(this->ACTOR->GetdisplayROI());
 		if (this->ACTOR->GetisVisible() == 1)
 		{
 			this->Ui->isVisible->setChecked(true);
@@ -497,24 +498,15 @@ void mqEditACTORDialog::UpdateUI()
 			this->Ui->isVisible->setChecked(false);
 		}
 
-		if (this->ACTOR->GetdisplayROI() == 1)
-		{
-
-			this->Ui->displayROI->setChecked(true);
-		}
-		else
-		{
-			this->Ui->displayROI->setChecked(false);
-		}
+		
 		if (this->ACTOR->GetenableROI() == 1)
 		{
-			this->Ui->enableROI->setChecked(true);
+			
 			this->Ui->displayROI->setEnabled(true);
 		}
 		else
 		{
-			this->Ui->enableROI->setChecked(false);
-			this->Ui->displayROI->setChecked(false);
+			
 			this->Ui->displayROI->setEnabled(false);
 		}
 
