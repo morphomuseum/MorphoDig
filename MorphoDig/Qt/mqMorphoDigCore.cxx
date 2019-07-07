@@ -4027,7 +4027,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 	}
 
 }
-void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
+void mqMorphoDigCore::OpenPOS(QString fileName, int mode, int doROI)
 {
 	// mode : 0 for last inserted surface
 	// mode : 1 for all selected surfaces AND volumes
@@ -4165,7 +4165,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode)
 					// now try to read last line if exists!
 					//
 					
-					if (!in.atEnd())
+					if (!in.atEnd() && doROI==1)
 					{ 
 						QString line = in.readLine();
 						
@@ -7082,7 +7082,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 								}
 								std::cout << "Try to load position :<<" << posfile.c_str() << std::endl;
 								QString qposfile(posfile.c_str());
-								this->OpenPOS(qposfile, 0);
+								this->OpenPOS(qposfile, 0, 1);
 								//@@TODO!
 								//this->Open_POS_File(posfile, My_Obj);
 								//std::cout <<"Object <<"<<My_Obj->name.c_str()<<">> position loaded"<< std::endl;
@@ -7178,7 +7178,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 								}
 								std::cout << "Try to load position vor a volume <<" << posfile.c_str() << std::endl;
 								QString qposfile(posfile.c_str());
-								this->OpenPOS(qposfile, 3);								
+								this->OpenPOS(qposfile, 3, 1);								
 							}
 						}
 						if (i == 2)

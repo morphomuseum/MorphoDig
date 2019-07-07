@@ -612,7 +612,7 @@ public:
 	void Open2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack);
 	void OpenTiff3DVolume(QString fileName, QString objectName, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack);
 	void OpenRawVolume(QString fileName, QString objectName, int dataType, int dimX, int dimY, int dimZ, double headerSize, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool bigEndian, bool frontToBack);
-	void OpenPOS(QString fileName, int mode);
+	void OpenPOS(QString fileName, int mode, int doROI=0);
 	void OpenPOSTrans(QString fileName, int mode);
 	void GetVertexColor(vtkMDActor *myActor, vtkIdType ve, int color[4]);
 	double* Getmui_MeshColor();
