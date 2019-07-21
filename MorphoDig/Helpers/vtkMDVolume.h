@@ -77,6 +77,7 @@ public:
 	void ShallowCopy(vtkProp *prop);
 	void CreateBox();
 	void RemoveBox();
+	void CropVolume();
 	void CreateCropBox();
 	void RemoveCropBox();
 	void ComputeImageDataBin();

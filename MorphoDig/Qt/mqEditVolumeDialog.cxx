@@ -440,6 +440,9 @@ void mqEditVolumeDialog::slotisVisibleClicked(bool isChecked)
 void mqEditVolumeDialog::CropVolume()
 {
 	cout << "Crop volume inside EditVolumeDialog" << endl;
+	// 1 trouver les bornes
+	this->Volume->CropVolume();
+	// 2 
 }
 void mqEditVolumeDialog::slotcropVolumeClicked()
 {

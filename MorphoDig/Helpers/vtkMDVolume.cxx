@@ -1131,7 +1131,10 @@ void vtkMDVolume::SetSliceNumberYZ(int slice)
 		this->SliceYZMapper2->SetSliceNumber(slice);
 	}
 }
-
+void vtkMDVolume::CropVolume()
+{
+	cout <<"crop volume" <<endl; 
+}
 void vtkMDVolume::CreateCropBox()
 {
 	//just in case a Clipping Box already exists.
