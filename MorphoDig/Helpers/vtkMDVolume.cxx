@@ -549,9 +549,55 @@ void vtkMDVolume::SetColorProperties(double ambient, double diffuse, double spec
 }
 int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {
+	vtkBoundingBox bbox(this->GetBounds());
 	//appelé depuis une sélection
 	//on ne selectionne ici que les 8 points de la box!!!!
 	// changer en faisant une liste de 1000 points
+	vtkSmartPointer<vtkPoints> pts =vtkSmartPointer<vtkPoints>::New();
+	pts->SetNumberOfPoints(1000);
+	vtkIdType ip = 0;
+	double x, y, z;
+	double ptA[3], ptB[3], ptD[3];
+
+	double ptA2[3];
+
+	bbox.GetCorner(0, ptA);
+	bbox.GetCorner(1, ptB);
+	//bbox.GetCorner(4, ptC);
+	bbox.GetCorner(2, ptD);
+
+	bbox.GetCorner(4, ptA2);
+	//bbox.GetCorner(3, ptB2);
+	//bbox.GetCorner(5, ptC2);
+	//bbox.GetCorner(7, ptD2);
+
+	for (vtkIdType i = 0; i < 10; i++) // i is 
+	{
+
+		// A-> D
+		for (vtkIdType j = 0; j < 10; j++)
+		{
+		
+			for (vtkIdType k = 0; k < 10; k++)
+			{// A -> B
+
+				x = ptA[0] + (ptB[0] - ptA[0])*k / 9;
+				y = ptA[1] + (ptB[1] - ptA[1])*k / 9;
+				z = ptA[2] + (ptB[2] - ptA[2])*k / 9;
+				x += (ptD[0] - ptA[0])*j / 9;
+				y += (ptD[1] - ptA[1])*j / 9;
+				z += (ptD[2] - ptA[2])*j / 9;
+				x+= (ptA2[0] - ptA[0])*i/ 9;
+				y += (ptA2[1] - ptA[1])*i / 9;
+				z += (ptA2[2] - ptA[2])*i / 9;
+				if (ip < 1000)
+				{
+					pts->InsertPoint(ip, x, y, z);
+					ip++;
+				}
+			}
+		}
+	}
 	// on prend les 4 points d'un premier plan, les 4 points d'un deuxième plan
 	// 1 3 5 7 => calculer les 100 points
 	// 0 2 4 6 => calculer les 100 points
@@ -563,14 +609,15 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);
 	vtkSmartVolumeMapper *mapper = vtkSmartVolumeMapper::SafeDownCast(this->GetMapper());
-	vtkBoundingBox bbox (this->GetBounds());
+	
 	//this->GetB
 	if (mapper != NULL)
 	{
 		
 
 		//we have six planes
-		for (vtkIdType j = 0; j < 8; j++)
+		for (vtkIdType j = 0; j < pts->GetNumberOfPoints(); j++)
+		//for (vtkIdType j = 0; j < 8; j++)
 		{
 			is_insideALL[0] = 0;
 			is_insideALL[1] = 0;
@@ -586,7 +633,8 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 				
 				vtkPlane *plane = myPlanes->GetPlane(i);
 			
-					bbox.GetCorner(j, pt);
+				//bbox.GetCorner(j, pt);
+				pts->GetPoint(j, pt);
 					mqMorphoDigCore::TransformPoint(Mat, pt, ptwc);
 					 dist = plane->EvaluateFunction(pt);
 					 if (dist < 0) {						
