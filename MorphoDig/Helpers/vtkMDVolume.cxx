@@ -5,7 +5,7 @@ Module:    vtkMDVolume.cxx
 =========================================================================*/
 #include "mqMorphoDigCore.h"
 #include "vtkMDVolume.h"
-
+#include <vtkExtractVOI.h>
 #include <vtkProperty.h>
 #include <vtkObjectFactory.h>
 #include <vtkImageFlip.h>
@@ -1131,9 +1131,99 @@ void vtkMDVolume::SetSliceNumberYZ(int slice)
 		this->SliceYZMapper2->SetSliceNumber(slice);
 	}
 }
+void vtkMDVolume::GetCropCenter(double cropCenter[3])
+{
+	vtkTransform *t = vtkTransform::New();
+
+	this->Box->GetTransform(t);
+	vtkSmartPointer<vtkMatrix4x4> Mat = t->GetMatrix();
+	double cx = Mat->GetElement(0, 3);
+	double cy = Mat->GetElement(1, 3);
+	double cz = Mat->GetElement(2, 3);
+	cropCenter[0] = cx;
+	cropCenter[1] = cy;
+	cropCenter[2] = cz;
+}
+void vtkMDVolume::GetCropBounds(double cropBounds[6])
+{
+	double xmin, xmax, ymin, ymax, zmin, zmax;
+	xmin = DBL_MAX;
+	ymin = DBL_MAX;
+	zmin = DBL_MAX;
+	xmax = -DBL_MAX;
+	ymax = -DBL_MAX;
+	zmax = -DBL_MAX;
+	double mCropCenter[3] = { 0,0,0 };
+	double mCropDiff[3] = { 0,0,0 };
+	this->GetCropCenter(mCropCenter);
+	vtkPlanes *p = vtkPlanes::New();
+	this->CropBox->GetPlanes(p);
+	for (vtkIdType i = 0; i < p->GetNumberOfPlanes(); i++)
+	{
+
+		vtkPlane *plane = p->GetPlane(i);
+		double origin[3] = { 0,0,0 };
+		plane->GetOrigin(origin);
+		mCropDiff[0] = origin[0] - mCropCenter[0];
+		mCropDiff[1] = origin[1] - mCropCenter[1];
+		mCropDiff[2] = origin[2] - mCropCenter[2];
+		if (origin[0] < xmin) { xmin = origin[0]; }
+		if (origin[0] > xmax) { xmax = origin[0]; }
+		if (origin[1] < ymin) { ymin = origin[1]; }
+		if (origin[1] > ymax) { ymax = origin[1]; }
+		if (origin[2] < zmin) { zmin = origin[2]; }
+		if (origin[2] > zmax) { zmax = origin[2]; }
+		cout << "Plane " << i << ":" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
+		//cout << "Plane " << i << ":" << mBoxDiff[0] << "," << mBoxDiff[1] << "," << mBoxDiff[2] << endl;
+	}
+	cropBounds[0] = xmin;
+	cropBounds[1] = xmax;
+	cropBounds[2] = ymin;
+	cropBounds[3] = ymax;
+	cropBounds[4] = zmin;
+	cropBounds[5] = zmax;
+
+
+}
 void vtkMDVolume::CropVolume()
 {
 	cout <<"crop volume" <<endl; 
+	double  CropBounds[6];
+	this->GetCropBounds(CropBounds);
+	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	int dim[3];
+	double res[3];
+	int dim2[3];
+	double res2[3];
+	this->GetImageData()->GetDimensions(dim);
+	this->GetImageData()->GetSpacing(res);
+	int xMin, xMax, yMin, yMax, zMin, zMax;
+	
+	xMin = (int) (CropBounds[0] / res[0]);
+	xMax = (int)(CropBounds[1] / res[0]);
+	yMin = (int)(CropBounds[2] / res[1]);
+	yMax = (int)(CropBounds[3] / res[1]);
+	zMin = (int)(CropBounds[4] / res[2]);
+	zMax = (int)(CropBounds[5] / res[2]);
+	if (xMin < 0) { xMin = 0; }
+	if (xMax > dim[0]) { xMax = dim[0]; }
+	if (yMin < 0) { yMin = 0; }
+	if (yMax > dim[0]) { yMax = dim[1]; }
+	if (zMin < 0) { zMin = 0; }
+	if (zMax > dim[0]) { zMax = dim[2]; }
+	voi->SetInputData(this->GetImageData());
+	cout << "Crop bounds:" << CropBounds[0] << "," << CropBounds[1] << "," << CropBounds[2] << "," << CropBounds[3] << "," << CropBounds[4] << "," << CropBounds[5]  << endl;
+
+	cout << "Crop dims:" << xMin << "," << xMax << "," << yMin << "," << yMax << "," << zMin << "," << zMax  << endl;
+	voi->SetVOI(xMin, xMax, yMin, yMax, zMin, zMax);
+	voi->Update();
+	vtkSmartPointer<vtkImageData> croppedData = voi->GetOutput();
+	croppedData->GetDimensions(dim2);
+	croppedData->GetSpacing(res2);
+	cout << "Cropped dims:" << dim2[0] << "," << dim2[1] << "," << dim2[2] <<endl;
+
+	this->SetImageDataAndMap(croppedData);
+	
 }
 void vtkMDVolume::CreateCropBox()
 {

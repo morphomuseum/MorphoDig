@@ -78,6 +78,8 @@ public:
 	void CreateBox();
 	void RemoveBox();
 	void CropVolume();
+	void GetCropBounds(double cropBounds[6]);
+	void GetCropCenter(double cropCenter[3]);
 	void CreateCropBox();
 	void RemoveCropBox();
 	void ComputeImageDataBin();
