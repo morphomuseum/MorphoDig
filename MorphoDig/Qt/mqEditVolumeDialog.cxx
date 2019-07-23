@@ -442,11 +442,15 @@ void mqEditVolumeDialog::CropVolume()
 	cout << "Crop volume inside EditVolumeDialog" << endl;
 	// 1 trouver les bornes
 	this->Volume->CropVolume();
+	this->UpdateUI();
 	// 2 
 }
 void mqEditVolumeDialog::slotcropVolumeClicked()
 {
 	this->CropVolume();
+	this->Volume->RemoveCropBox();
+	this->Ui->isVisibleCropBox->setChecked(false);
+	this->Ui->cropVolume->setEnabled(false);
 }
 void mqEditVolumeDialog::slotisVisibleCropBoxClicked(bool isChecked)
 {

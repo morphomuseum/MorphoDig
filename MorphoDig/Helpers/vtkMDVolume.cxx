@@ -1014,7 +1014,7 @@ void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 	
 	
 	imgData->GetDimensions(this->myDim);
-
+	cout << "New dims:" << this->myDim[0] << "," << this->myDim[1] << "," << this->myDim[2] << endl;
 	this->SliceXYMapper2->SetSliceNumber((int)(this->myDim[2]/2));
 	this->SliceXZMapper2->SetSliceNumber((int)(this->myDim[1] / 2));
 	this->SliceYZMapper2->SetSliceNumber((int)(this->myDim[0] / 2));
@@ -1222,7 +1222,10 @@ void vtkMDVolume::CropVolume()
 	croppedData->GetSpacing(res2);
 	cout << "Cropped dims:" << dim2[0] << "," << dim2[1] << "," << dim2[2] <<endl;
 
+	this->Modified();
 	this->SetImageDataAndMap(croppedData);
+	this->Outline->SetInputData(croppedData);
+	
 	
 }
 void vtkMDVolume::CreateCropBox()
