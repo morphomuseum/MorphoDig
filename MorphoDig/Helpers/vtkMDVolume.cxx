@@ -1185,21 +1185,41 @@ void vtkMDVolume::GetCropBounds(double cropBounds[6])
 
 
 }
-void vtkMDVolume::CropVolume()
+void vtkMDVolume::GetCropDimensions(int cropDimentions[6])
 {
-	cout <<"crop volume" <<endl; 
-	double  CropBounds[6];
-	this->GetCropBounds(CropBounds);
-	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-	int dim[3];
-	double res[3];
-	int dim2[3];
-	double res2[3];
-	this->GetImageData()->GetDimensions(dim);
-	this->GetImageData()->GetSpacing(res);
 	int xMin, xMax, yMin, yMax, zMin, zMax;
+	double CropBounds[6];
+	this->GetCropBounds(CropBounds);
+	int dim[3];
+	this->GetImageData()->GetDimensions(dim);
+	double res[3];
+	this->GetImageData()->GetSpacing(res);
+
+	xMin = 0;
+	xMax = dim[0];
+	yMin = 0;
+	yMax = dim[1];
+	zMin = 0;
+	zMax = dim[2];
 	
-	xMin = (int) (CropBounds[0] / res[0]);
+	if (xMin < 0) { xMin = 0; }
+	if (xMax > dim[0]) { xMax = dim[0]; }
+	if (yMin < 0) { yMin = 0; }
+	if (yMax > dim[0]) { yMax = dim[1]; }
+	if (zMin < 0) { zMin = 0; }
+	if (zMax > dim[0]) { zMax = dim[2];}
+	cout <<"Num cells = "<<this->GetImageData()->GetNumberOfCells()<<endl;
+
+	cout << "Num points = " << this->GetImageData()->GetNumberOfPoints() << endl;
+	
+	for (vtkIdType i = 0; i < this->GetImageData()->GetNumberOfPoints() ; i++)
+	{
+		double pt[3];
+		this->GetImageData()->GetPoint(i, pt);
+		if (i < 10) { cout << "Pt" << i << ":" << pt[0] << "," << pt[1] << "," << pt[2] <<  endl; }
+	}
+
+	xMin = (int)(CropBounds[0] / res[0]);
 	xMax = (int)(CropBounds[1] / res[0]);
 	yMin = (int)(CropBounds[2] / res[1]);
 	yMax = (int)(CropBounds[3] / res[1]);
@@ -1211,9 +1231,43 @@ void vtkMDVolume::CropVolume()
 	if (yMax > dim[0]) { yMax = dim[1]; }
 	if (zMin < 0) { zMin = 0; }
 	if (zMax > dim[0]) { zMax = dim[2]; }
-	voi->SetInputData(this->GetImageData());
-	cout << "Crop bounds:" << CropBounds[0] << "," << CropBounds[1] << "," << CropBounds[2] << "," << CropBounds[3] << "," << CropBounds[4] << "," << CropBounds[5]  << endl;
+	
+	cropDimentions[0] = xMin;
+	cropDimentions[1] = xMax;
+	cropDimentions[2] = yMin;
+	cropDimentions[3] = yMax;
+	cropDimentions[4] = zMin;
+	cropDimentions[5] = zMax;
 
+}
+void vtkMDVolume::CropVolume()
+{
+	cout <<"crop volume" <<endl; 
+	int CropDimensions[6];
+	//int isRotated = this->IsRotated();
+	// if (isRotated)
+	//{
+	// warning message!
+	//this->reslice();}
+
+	this->GetCropDimensions(CropDimensions);
+	vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+	int dim[3];
+	double res[3];
+	int dim2[3];
+	double res2[3];
+	this->GetImageData()->GetDimensions(dim);
+	this->GetImageData()->GetSpacing(res);
+	int xMin, xMax, yMin, yMax, zMin, zMax;
+	xMin = CropDimensions[0];
+	xMax = CropDimensions[1];
+	yMin = CropDimensions[2];
+	yMax = CropDimensions[3];
+	zMin = CropDimensions[4];
+	zMax = CropDimensions[5];
+
+	voi->SetInputData(this->GetImageData());
+	
 	cout << "Crop dims:" << xMin << "," << xMax << "," << yMin << "," << yMax << "," << zMin << "," << zMax  << endl;
 	voi->SetVOI(xMin, xMax, yMin, yMax, zMin, zMax);
 	voi->Update();
