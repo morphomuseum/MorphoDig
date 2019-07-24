@@ -1394,19 +1394,21 @@ void vtkMDVolume::CropVolume()
 	voi->SetVOI(xMin, xMax, yMin, yMax, zMin, zMax);
 	voi->Update();
 	vtkSmartPointer<vtkImageData> croppedData = voi->GetOutput();
-	vtkSmartPointer<vtkImageCast> extractedCastFilter =	vtkSmartPointer<vtkImageCast>::New();
-	extractedCastFilter->SetInputData(croppedData);
-
+	
 	//extractedCastFilter->SetOutputScalarTypeToUnsignedChar();
-	extractedCastFilter->Update();
+	
 
 	croppedData->GetDimensions(dim2);
 	croppedData->GetSpacing(res2);
+	
+	//si on veut faire ça, il faut aussi mettre à jour la matrice de position pour maintenir la même position!
+	//croppedData->SetExtent(0, dim2[0] - 1, 0, dim2[1] - 1, 0, dim2[2] - 1);
+	
 	cout << "Cropped dims:" << dim2[0] << "," << dim2[1] << "," << dim2[2] <<endl;
 
 	this->Modified();
-	this->SetImageDataAndMap(extractedCastFilter->GetOutput());
-	this->Outline->SetInputData(extractedCastFilter->GetOutput());
+	this->SetImageDataAndMap(croppedData);
+	this->Outline->SetInputData(croppedData);
 	
 	
 }
