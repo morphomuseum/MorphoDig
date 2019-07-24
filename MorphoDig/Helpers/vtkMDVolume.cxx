@@ -6,6 +6,7 @@ Module:    vtkMDVolume.cxx
 #include "mqMorphoDigCore.h"
 #include "vtkMDVolume.h"
 #include <vtkExtractVOI.h>
+#include <vtkImageCast.h>
 #include <vtkProperty.h>
 #include <vtkObjectFactory.h>
 #include <vtkImageFlip.h>
@@ -549,7 +550,10 @@ void vtkMDVolume::SetColorProperties(double ambient, double diffuse, double spec
 }
 int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {
-	vtkBoundingBox bbox(this->GetBounds());
+	// ne doit pas fonctionner à la rotation!
+	vtkBoundingBox bbox(this->GetBounds()); // Expressed in WC, so after a rotation it gets larger than the actual bounding box... but this does not really matter... 
+	//vtkSmartPointer<vtkBoundingBox> bbox = vtkSmartPointer<vtkBoundingBox>::New();
+	//bbox.SetBounds(this->GetBounds());
 	//appelé depuis une sélection
 	//on ne selectionne ici que les 8 points de la box!!!!
 	// changer en faisant une liste de 1000 points
@@ -567,6 +571,7 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 	bbox.GetCorner(2, ptD);
 
 	bbox.GetCorner(4, ptA2);
+	
 	//bbox.GetCorner(3, ptB2);
 	//bbox.GetCorner(5, ptC2);
 	//bbox.GetCorner(7, ptD2);
@@ -633,7 +638,7 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 				
 				vtkPlane *plane = myPlanes->GetPlane(i);
 			
-				//bbox.GetCorner(j, pt);
+				//bbox->GetCorner(j, pt);
 				pts->GetPoint(j, pt);
 					mqMorphoDigCore::TransformPoint(Mat, pt, ptwc);
 					 dist = plane->EvaluateFunction(pt);
@@ -1190,13 +1195,14 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 	int xMin, xMax, yMin, yMax, zMin, zMax;
 	double cropXMin, cropXMax, cropYMin, cropYMax, cropZMin, cropZMax;
 	double CropBounds[6];
-
+	double CorrectedCropBounds[6];
+	
 	this->GetCropBounds(CropBounds); // are expressed in world coordinates
 	cropXMin = CropBounds[0];
-	cropXMax = CropBounds[1]; 
-	cropYMin = CropBounds[2]; 
-	cropYMax = CropBounds[3]; 
-	cropZMin = CropBounds[4]; 
+	cropXMax = CropBounds[1];
+	cropYMin = CropBounds[2];
+	cropYMax = CropBounds[3];
+	cropZMin = CropBounds[4];
 	cropZMax = CropBounds[5];
 	int dim[3];
 	this->GetImageData()->GetDimensions(dim);
@@ -1209,12 +1215,12 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 	yMax = 0;
 	zMin = dim[2];
 	zMax = 0;
-	
-	
-	cout <<"Num cells = "<<this->GetImageData()->GetNumberOfCells()<<endl;
+
+
+	cout << "Num cells = " << this->GetImageData()->GetNumberOfCells() << endl;
 
 	cout << "Num points = " << this->GetImageData()->GetNumberOfPoints() << endl;
-	
+
 	/*for (vtkIdType i = 0; i < this->GetImageData()->GetNumberOfPoints() ; i++)
 	{
 		double pt[3];
@@ -1224,6 +1230,7 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 	int ijk[3] = { 0, 0, 0 };
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);
+	/* ... we probably can achieve the same thing with the 8 bounding box points in much less time!
 	for (vtkIdType i = 0; i < dim[0]; i++)
 	{
 		ijk[0] = i;
@@ -1234,7 +1241,7 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 			{
 				ijk[2] = k;
 				vtkIdType ptId = this->GetImageData()->ComputePointId(ijk);
-				
+
 				double pt[3];
 				this->GetImageData()->GetPoint(ptId, pt);
 				double ptwc[3];
@@ -1250,6 +1257,61 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 			}
 		}
 	}
+	*/
+
+	//vtkSmartPointer<vtkBoundingBox>bbox = vtkSmartPointer<vtkBoundingBox>::New();
+	vtkBoundingBox bbox(this->GetBounds()); // already in WC...
+	double Bounds[6];
+	this->GetBounds(Bounds);
+	cout << "Bounds:" << Bounds[0] << "," << Bounds[1] << "," << Bounds[2] << "," << Bounds[3] << "," << Bounds[4] << "," << Bounds[5] << endl;
+	//bbox->SetBounds(this->GetBounds());
+	
+	cout << "CropBounds:" << CropBounds[0] << "," << CropBounds[1] << "," << CropBounds[2] << "," << CropBounds[3] << "," << CropBounds[4] << "," << CropBounds[5] << endl;
+	//translate to cropbounds in doubles
+	CorrectedCropBounds[0] = Bounds[0];
+	CorrectedCropBounds[1] = Bounds[1];
+	CorrectedCropBounds[2] = Bounds[2];
+	CorrectedCropBounds[3] = Bounds[3];
+	CorrectedCropBounds[4] = Bounds[4];
+	CorrectedCropBounds[5] = Bounds[5];
+	if (CropBounds[0] > Bounds[0] && CropBounds[0] < Bounds[1]) { CorrectedCropBounds[0] = CropBounds[0]; }
+	if (CropBounds[1] < Bounds[1] && CropBounds[1] > Bounds[0]) { CorrectedCropBounds[1] = CropBounds[1]; }
+	if (CropBounds[2] > Bounds[2] && CropBounds[2] < Bounds[3]) { CorrectedCropBounds[2] = CropBounds[2]; }
+	if (CropBounds[3] < Bounds[3] && CropBounds[3] > Bounds[2]) { CorrectedCropBounds[3] = CropBounds[3]; }
+	if (CropBounds[4] > Bounds[4] && CropBounds[4] < Bounds[5]) { CorrectedCropBounds[4] = CropBounds[4]; }
+	if (CropBounds[5] < Bounds[5] && CropBounds[5] > Bounds[4]) { CorrectedCropBounds[5] = CropBounds[5]; }
+	cout << "CorrectedCropBounds:" << CorrectedCropBounds[0] << "," << CorrectedCropBounds[1] << "," << CorrectedCropBounds[2] << "," << CorrectedCropBounds[3] << "," << CorrectedCropBounds[4] << "," << CorrectedCropBounds[5] << endl;
+	double lengthX = Bounds[1] - Bounds[0];
+	double lengthY = Bounds[3] - Bounds[2];
+	double lengthZ = Bounds[5] - Bounds[4];
+	cout << "Length:" << lengthX << "," << lengthY << "," << lengthZ << endl;
+
+	double xMinPercent, xMaxPercent, yMinPercent, yMaxPercent, zMinPercent, zMaxPercent ;
+	xMinPercent = (CorrectedCropBounds[0] - Bounds[0]) / lengthX;
+	xMaxPercent = (CorrectedCropBounds[1] - Bounds[0]) / lengthX;
+	yMinPercent = (CorrectedCropBounds[2] - Bounds[2]) / lengthY;
+	yMaxPercent = (CorrectedCropBounds[3] - Bounds[2]) / lengthY;
+	zMinPercent = (CorrectedCropBounds[4] - Bounds[4]) / lengthZ;
+	zMaxPercent = (CorrectedCropBounds[5] - Bounds[4]) / lengthZ;
+	cout << "Percentages:" << xMinPercent << "," << xMaxPercent << "," << yMinPercent << "," << xMaxPercent << "," << zMinPercent << "," << zMaxPercent << endl;
+
+	xMin = (int)(xMinPercent *dim[0]);
+	xMax = (int)(xMaxPercent *dim[0]);
+	yMin = (int)(yMinPercent *dim[1]);
+	yMax = (int)(yMaxPercent *dim[1]);
+	zMin = (int)(zMinPercent *dim[2]); 
+	zMax = (int)(zMaxPercent *dim[2]);
+	/*xMin = (int)(CropBounds[0] / res[0]);
+	xMax = (int)(CropBounds[1] / res[0]);
+	yMin = (int)(CropBounds[2] / res[1]);
+	yMax = (int)(CropBounds[3] / res[1]);
+	zMin = (int)(CropBounds[4] / res[2]);
+	zMax = (int)(CropBounds[5] / res[2]);*/
+
+
+	
+	
+
 	cout << "Found crop xm xM ym yM zm zM" << xMin << "," << xMax << "," << yMin << "," << yMax << "," << zMin << "," << zMax << endl;
 
 
@@ -1280,12 +1342,15 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 		zMax = dim[2];
 	}
 	cout << "Adjusted crop dimensions : xm xM ym yM zm zM" << xMin << "," << xMax << "," << yMin << "," << yMax << "," << zMin << "," << zMax << endl;
-	cropDimensions[0] = xMin;
-	cropDimensions[1] = xMax;
-	cropDimensions[2] = yMin;
-	cropDimensions[3] = yMax;
-	cropDimensions[4] = zMin;
-	cropDimensions[5] = zMax;
+	int extent[6];
+	this->GetImageData()->GetExtent(extent);
+	cout << "Image extent:" << extent[0] << "," << extent[1] << "," << extent[2] << "," << extent[3] << "," << extent[4] << "," << extent[5] << endl;
+	cropDimensions[0] = xMin+extent[0];
+	cropDimensions[1] = xMax + extent[0];
+	cropDimensions[2] = yMin+extent[2];
+	cropDimensions[3] = yMax + extent[2];
+	cropDimensions[4] = zMin+extent[4];
+	cropDimensions[5] = zMax + extent[4];
 
 }
 void vtkMDVolume::CropVolume()
@@ -1315,18 +1380,33 @@ void vtkMDVolume::CropVolume()
 	zMax = CropDimensions[5];
 
 	voi->SetInputData(this->GetImageData());
+	voi->SetIncludeBoundary(true);
 	
 	cout << "Crop dims:" << xMin << "," << xMax << "," << yMin << "," << yMax << "," << zMin << "," << zMax  << endl;
+	
+	
+	
+	/*for (vtkIdType i = 0; i < this->GetImageData()->GetNumberOfPoints(); i++)
+	{
+		
+		this->GetImageData()->SetAxi
+	}*/
 	voi->SetVOI(xMin, xMax, yMin, yMax, zMin, zMax);
 	voi->Update();
 	vtkSmartPointer<vtkImageData> croppedData = voi->GetOutput();
+	vtkSmartPointer<vtkImageCast> extractedCastFilter =	vtkSmartPointer<vtkImageCast>::New();
+	extractedCastFilter->SetInputData(croppedData);
+
+	//extractedCastFilter->SetOutputScalarTypeToUnsignedChar();
+	extractedCastFilter->Update();
+
 	croppedData->GetDimensions(dim2);
 	croppedData->GetSpacing(res2);
 	cout << "Cropped dims:" << dim2[0] << "," << dim2[1] << "," << dim2[2] <<endl;
 
 	this->Modified();
-	this->SetImageDataAndMap(croppedData);
-	this->Outline->SetInputData(croppedData);
+	this->SetImageDataAndMap(extractedCastFilter->GetOutput());
+	this->Outline->SetInputData(extractedCastFilter->GetOutput());
 	
 	
 }

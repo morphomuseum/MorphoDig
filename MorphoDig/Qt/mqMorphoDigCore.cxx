@@ -383,7 +383,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->Renderer->SetUseDepthPeeling(1);
 	this->Renderer->UseDepthPeelingForVolumesOn();
 	this->Renderer->SetMaximumNumberOfPeels(100);
-	this->Renderer->SetOcclusionRatio(0.1);
+	this->Renderer->SetOcclusionRatio(0.05);
 	this->Camera = this->Renderer->GetActiveCamera();
 	this->GridActor = vtkSmartPointer<vtkGridActor>::New();
 	this->GridActor->SetGridSpacing(this->Getmui_GridSpacing());
