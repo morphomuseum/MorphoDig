@@ -1327,9 +1327,9 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 	if (xMin < 0) { xMin = 0; }
 	if (xMax > dim[0]) { xMax = dim[0]; }
 	if (yMin < 0) { yMin = 0; }
-	if (yMax > dim[0]) { yMax = dim[1]; }
+	if (yMax > dim[1]) { yMax = dim[1]; }
 	if (zMin < 0) { zMin = 0; }
-	if (zMax > dim[0]) { zMax = dim[2]; }
+	if (zMax > dim[2]) { zMax = dim[2]; }
 
 	// in case crop volume would be empty, just to not crop... 
 	if (xMin > xMax || yMin > yMax || zMin > zMax)
