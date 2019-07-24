@@ -1353,6 +1353,24 @@ void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 	cropDimensions[5] = zMax + extent[4];
 
 }
+int vtkMDVolume::isRotated()
+{
+	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+	this->GetMatrix(Mat);
+	if (
+		Mat->GetElement(0, 0) != 1 ||
+		Mat->GetElement(0, 1) != 0 ||
+		Mat->GetElement(0, 2) != 0 ||
+		Mat->GetElement(1, 0) != 0 ||
+		Mat->GetElement(1, 1) != 1 ||
+		Mat->GetElement(1, 2) != 0 ||
+		Mat->GetElement(2, 0) != 0 ||
+		Mat->GetElement(2, 1) != 0 ||
+		Mat->GetElement(2, 2) != 1
+		)	{return 1; }
+	else { return 0; }
+
+}
 void vtkMDVolume::CropVolume()
 {
 	cout <<"crop volume" <<endl; 

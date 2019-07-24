@@ -77,6 +77,7 @@ public:
 	void ShallowCopy(vtkProp *prop);
 	void CreateBox();
 	void RemoveBox();
+	int isRotated();
 	void CropVolume();
 	void GetCropBounds(double cropBounds[6]);
 	void GetCropDimensions(int cropDimensions[6]);
