@@ -5935,8 +5935,10 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		{
 			vtkSmartPointer <vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
 			 metaReader->SetFileName(fileName.toLocal8Bit());
+			 
 		     metaReader->Update();
 		     input = metaReader->GetOutput();
+			 
 		     reader = metaReader;		
 
 		}

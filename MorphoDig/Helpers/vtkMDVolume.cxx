@@ -1185,59 +1185,107 @@ void vtkMDVolume::GetCropBounds(double cropBounds[6])
 
 
 }
-void vtkMDVolume::GetCropDimensions(int cropDimentions[6])
+void vtkMDVolume::GetCropDimensions(int cropDimensions[6])
 {
 	int xMin, xMax, yMin, yMax, zMin, zMax;
+	double cropXMin, cropXMax, cropYMin, cropYMax, cropZMin, cropZMax;
 	double CropBounds[6];
-	this->GetCropBounds(CropBounds);
+
+	this->GetCropBounds(CropBounds); // are expressed in world coordinates
+	cropXMin = CropBounds[0];
+	cropXMax = CropBounds[1]; 
+	cropYMin = CropBounds[2]; 
+	cropYMax = CropBounds[3]; 
+	cropZMin = CropBounds[4]; 
+	cropZMax = CropBounds[5];
 	int dim[3];
 	this->GetImageData()->GetDimensions(dim);
 	double res[3];
 	this->GetImageData()->GetSpacing(res);
 
-	xMin = 0;
-	xMax = dim[0];
-	yMin = 0;
-	yMax = dim[1];
-	zMin = 0;
-	zMax = dim[2];
+	xMin = dim[0];
+	xMax = 0;
+	yMin = dim[1];
+	yMax = 0;
+	zMin = dim[2];
+	zMax = 0;
 	
-	if (xMin < 0) { xMin = 0; }
-	if (xMax > dim[0]) { xMax = dim[0]; }
-	if (yMin < 0) { yMin = 0; }
-	if (yMax > dim[0]) { yMax = dim[1]; }
-	if (zMin < 0) { zMin = 0; }
-	if (zMax > dim[0]) { zMax = dim[2];}
+	
 	cout <<"Num cells = "<<this->GetImageData()->GetNumberOfCells()<<endl;
 
 	cout << "Num points = " << this->GetImageData()->GetNumberOfPoints() << endl;
 	
-	for (vtkIdType i = 0; i < this->GetImageData()->GetNumberOfPoints() ; i++)
+	/*for (vtkIdType i = 0; i < this->GetImageData()->GetNumberOfPoints() ; i++)
 	{
 		double pt[3];
 		this->GetImageData()->GetPoint(i, pt);
 		if (i < 10) { cout << "Pt" << i << ":" << pt[0] << "," << pt[1] << "," << pt[2] <<  endl; }
-	}
+	}*/
+	int ijk[3] = { 0, 0, 0 };
+	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+	this->GetMatrix(Mat);
+	for (vtkIdType i = 0; i < dim[0]; i++)
+	{
+		ijk[0] = i;
+		for (vtkIdType j = 0; j < dim[1]; j++)
+		{
+			ijk[1] = j;
+			for (vtkIdType k = 0; k < dim[2]; k++)
+			{
+				ijk[2] = k;
+				vtkIdType ptId = this->GetImageData()->ComputePointId(ijk);
+				
+				double pt[3];
+				this->GetImageData()->GetPoint(ptId, pt);
+				double ptwc[3];
+				mqMorphoDigCore::TransformPoint(Mat, pt, ptwc);
+				//if (i < 5 && j<5 && k<5) { cout <<"i"<<i<<"j"<<j<<"k"<<k<< ", Pt" << ptId << ":" << pt[0] << "," << pt[1] << "," << pt[2] << endl; }
+				if (i < xMin && cropXMin < ptwc[0]) { xMin = i; }
+				if (i > xMax && cropXMax > ptwc[0]) { xMax = i; }
+				if (j < yMin && cropYMin < ptwc[1]) { yMin = j; }
+				if (j > yMax && cropYMax > ptwc[1]) { yMax = j; }
+				if (k < zMin && cropZMin < ptwc[2]) { zMin = k; }
+				if (k > zMax && cropZMax > ptwc[2]) { zMax = k; }
 
-	xMin = (int)(CropBounds[0] / res[0]);
+			}
+		}
+	}
+	cout << "Found crop xm xM ym yM zm zM" << xMin << "," << xMax << "," << yMin << "," << yMax << "," << zMin << "," << zMax << endl;
+
+
+	
+	/*xMin = (int)(CropBounds[0] / res[0]);
 	xMax = (int)(CropBounds[1] / res[0]);
 	yMin = (int)(CropBounds[2] / res[1]);
 	yMax = (int)(CropBounds[3] / res[1]);
 	zMin = (int)(CropBounds[4] / res[2]);
-	zMax = (int)(CropBounds[5] / res[2]);
+	zMax = (int)(CropBounds[5] / res[2]);*/
+	
+	// just in case the crop region would extend the actal volume dimensions... 
 	if (xMin < 0) { xMin = 0; }
 	if (xMax > dim[0]) { xMax = dim[0]; }
 	if (yMin < 0) { yMin = 0; }
 	if (yMax > dim[0]) { yMax = dim[1]; }
 	if (zMin < 0) { zMin = 0; }
 	if (zMax > dim[0]) { zMax = dim[2]; }
-	
-	cropDimentions[0] = xMin;
-	cropDimentions[1] = xMax;
-	cropDimentions[2] = yMin;
-	cropDimentions[3] = yMax;
-	cropDimentions[4] = zMin;
-	cropDimentions[5] = zMax;
+
+	// in case crop volume would be empty, just to not crop... 
+	if (xMin > xMax || yMin > yMax || zMin > zMax)
+	{
+		xMin = 0;
+		xMax = dim[0];
+		yMin = 0;
+		yMax = dim[1];
+		zMin = 0;
+		zMax = dim[2];
+	}
+	cout << "Adjusted crop dimensions : xm xM ym yM zm zM" << xMin << "," << xMax << "," << yMin << "," << yMax << "," << zMin << "," << zMax << endl;
+	cropDimensions[0] = xMin;
+	cropDimensions[1] = xMax;
+	cropDimensions[2] = yMin;
+	cropDimensions[3] = yMax;
+	cropDimensions[4] = zMin;
+	cropDimensions[5] = zMax;
 
 }
 void vtkMDVolume::CropVolume()
