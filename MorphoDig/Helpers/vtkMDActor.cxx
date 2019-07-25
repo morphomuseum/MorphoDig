@@ -696,7 +696,7 @@ void vtkMDActor::SetSelected(int selected)
 	else
 	{
 		if (this->Box != NULL) {
-			cout << "Try to disable the box" << endl;
+			//cout << "Try to disable the box" << endl;
 			//this->displayROI = 0;
 			this->Box->SetEnabled(false);			
 		}

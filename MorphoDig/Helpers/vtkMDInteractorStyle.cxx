@@ -1752,9 +1752,9 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 			  //  std::cout << "Picked actor: " << picker->GetActor() << std::endl;
 			   
-			   if (picker->GetActor() != NULL || picker->GetVolume() != NULL)
+			   if (picker->GetActor() != NULL || picker->GetVolume() != NULL || picker->GetViewProp() !=NULL)
 			   {
-				   cout << "An actor or a volume was picked" << endl;
+				   cout << "An actor, a ViewProp or a volume was picked" << endl;
 			   
 				   // else
 				  //  {

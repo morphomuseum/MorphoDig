@@ -85,6 +85,7 @@ public:
 	void CreateCropBox();
 	void RemoveCropBox();
 	void ComputeImageDataBin();
+	void ComputeMaskBin();
 	//vtkSetMacro(Selected, int);
 	vtkGetMacro(Selected, int);
 	vtkBooleanMacro(Selected, int);
@@ -147,6 +148,10 @@ public:
 	void SetImageData(vtkSmartPointer<vtkImageData> imgData);
 	void SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData);
 
+	void SetMaskData(vtkSmartPointer<vtkImageData> mskData);
+	
+
+
 	void ChangeSpacing(double newSpacingX, double newSpacingY, double newSpacingZ);
 	void Resample(double newSpacingX, double newSpacingY, double newSpacingZ, int interpolationMethod);
 	void Reslice(int extended, int interpolationMethod);
@@ -158,10 +163,12 @@ public:
 	void FlipZ();
 	void FlipX();
 	void FlipY();
-	
+	vtkGetMacro(Mask, vtkSmartPointer<vtkImageData>);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	void SetImageDataBin(vtkSmartPointer<vtkImageData> imgDataBin);
+	void SetMaskBin(vtkSmartPointer<vtkImageData> mskBin);
 	vtkSmartPointer<vtkImageData> GetImageDataBin();
+	vtkSmartPointer<vtkImageData> GetMaskBin();
 	
 	vtkGetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
 	vtkSetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
@@ -279,8 +286,11 @@ image->SetMapper(imageMapper);
 	vtkSmartPointer<vtkImageAccumulate> Hist;
 	vtkSmartPointer<vtkImageData> ImageData;
 	vtkSmartPointer<vtkImageData> ImageDataBin;
+	vtkSmartPointer<vtkImageData> Mask;
+	vtkSmartPointer<vtkImageData> MaskBin;
 	int useImageDataBinForVR;
 	int ImageDataBinComputed;
+	int MaskBinComputed;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXYMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceYZMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXZMapper;

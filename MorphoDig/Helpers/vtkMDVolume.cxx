@@ -81,9 +81,12 @@ renderer->AddViewProp(image);*/
 	this->Ctf = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->Hist = vtkSmartPointer<vtkImageAccumulate>::New();
 	this->ImageDataBinComputed = 0;
+	this->MaskBinComputed = 0;
 	this->useImageDataBinForVR = 0;
 	this->ImageData = vtkSmartPointer<vtkImageData>::New();
 	this->ImageDataBin = vtkSmartPointer<vtkImageData>::New();
+	this->Mask = vtkSmartPointer<vtkImageData>::New();
+	this->MaskBin = vtkSmartPointer<vtkImageData>::New();
 	this->SliceXY = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceXZ = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceYZ = vtkSmartPointer<vtkImageSlice>::New();
@@ -759,6 +762,53 @@ void vtkMDVolume::GetBoxBounds(double boxBounds[6])
 	boxBounds[4] = zmin;
 	boxBounds[5] = zmax;
 }
+void vtkMDVolume::ComputeMaskBin()
+{
+	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
+	resample->SetInputData(this->Mask);
+	double magnification = 0.5;
+	long long int numVox = (long long int) (this->myDim[0] * this->myDim[1] * this->myDim[2] / 8);
+	if (numVox > mqMorphoDigCore::instance()->Getmui_VolumeOutOfCoreThreshold())
+	{
+		int num_bin_needed = 2;// at least 2!
+		int ratio = (int)(numVox / mqMorphoDigCore::instance()->Getmui_VolumeOutOfCoreThreshold());
+		if (ratio > 4096)
+		{
+			num_bin_needed = 6;// could it happen????
+		}
+		else if (ratio > 512)
+		{
+			num_bin_needed = 5;
+		}
+		else if (ratio > 64)
+		{
+			num_bin_needed = 4;
+		}
+		else if (ratio > 8)
+		{
+			num_bin_needed = 3;
+		}
+		else
+		{
+			num_bin_needed = 2;
+		}
+		magnification = 1;
+		for (int i = 0; i < num_bin_needed; i++)
+		{
+			magnification /= 2;
+		}
+
+	}
+	cout << "binning magnification:" << endl;
+	resample->SetAutoCropOutput(true);
+	resample->SetAxisMagnificationFactor(0, magnification);
+	resample->SetAxisMagnificationFactor(1, magnification);
+	resample->SetAxisMagnificationFactor(2, magnification);
+	resample->Update();
+	this->MaskBin = resample->GetOutput();
+
+	this->MaskBinComputed = 1;
+}
 void vtkMDVolume::ComputeImageDataBin()
 {
 	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
@@ -949,6 +999,9 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 	MatRetranslated->SetElement(1, 3, Mat->GetElement(1, 3));
 	MatRetranslated->SetElement(2, 3, Mat->GetElement(2, 3));
 	this->ApplyMatrix(MatRetranslated);
+	QString myName = QString(this->GetName().c_str());
+	myName = myName + "_rsl";
+	this->SetName(myName.toStdString());
 	this->Modified();
 	this->SetImageDataAndMap(reslicedData);
 	this->Outline->SetInputData(reslicedData);
@@ -980,7 +1033,10 @@ void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpa
 	resample->Update();
 	vtkSmartPointer<vtkImageData> resampledData = resample->GetOutput();
 
-	
+	QString myName = QString(this->GetName().c_str());
+	myName = myName + "_rsp";
+	this->SetName(myName.toStdString());
+	this->Modified();
 	this->SetImageDataAndMap(resampledData);
 
 	
@@ -1002,6 +1058,16 @@ void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 		mapper->SetInputData(this->GetImageData());
 	}
 	
+}
+void vtkMDVolume::SetMaskData(vtkSmartPointer<vtkImageData> mskData)
+{
+	// to be called after SetImageDataAndMap, never before!
+	this->Mask = mskData;
+	this->MaskBinComputed = 0;
+	
+
+	
+
 }
 void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 {
@@ -1099,6 +1165,15 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 	return 1;
 
 }
+vtkSmartPointer<vtkImageData> vtkMDVolume::GetMaskBin()
+{
+	if (this->MaskBinComputed == 0)
+	{
+		cout << "ComputeImageDataBin" << endl;
+		this->ComputeMaskBin();
+	}
+	return this->MaskBin;
+}
 vtkSmartPointer<vtkImageData> vtkMDVolume::GetImageDataBin()
 {
 	if (this->ImageDataBinComputed ==0)
@@ -1113,6 +1188,10 @@ void vtkMDVolume::SetImageDataBin(vtkSmartPointer<vtkImageData> imgDataBin)
 	this->ImageDataBin = imgDataBin;
 	
 
+}
+void vtkMDVolume::SetMaskBin(vtkSmartPointer<vtkImageData> mskBin)
+{
+	this->MaskBin = mskBin;
 }
 
 void vtkMDVolume::SetSliceNumberXY(int slice)
@@ -1376,7 +1455,19 @@ void vtkMDVolume::CropVolume()
 	cout <<"crop volume" <<endl; 
 	int CropDimensions[6];
 	//int isRotated = this->IsRotated();
-	// if (isRotated)
+	if (this->isRotated())
+	{
+		QMessageBox msgBox;
+		msgBox.setText("This volume was rotated. In order to be cropped, it must be resliced, which may (slightly) decrease data quality. Do you want to proceed anyway? ");
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::No);
+		int ret = msgBox.exec();
+		if (ret == QMessageBox::No) {
+			cout << "no!!!" << endl;
+			return;
+		}
+		this->Reslice(1, 2);
+	}
 	//{
 	// warning message!
 	//this->reslice();}
@@ -1423,7 +1514,9 @@ void vtkMDVolume::CropVolume()
 	//croppedData->SetExtent(0, dim2[0] - 1, 0, dim2[1] - 1, 0, dim2[2] - 1);
 	
 	cout << "Cropped dims:" << dim2[0] << "," << dim2[1] << "," << dim2[2] <<endl;
-
+	QString myName = QString(this->GetName().c_str());
+	myName = myName + "_crp";
+	this->SetName(myName.toStdString());
 	this->Modified();
 	this->SetImageDataAndMap(croppedData);
 	this->Outline->SetInputData(croppedData);
