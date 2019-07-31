@@ -87,6 +87,9 @@ renderer->AddViewProp(image);*/
 	this->ImageDataBin = vtkSmartPointer<vtkImageData>::New();
 	this->Mask = vtkSmartPointer<vtkImageData>::New();
 	this->MaskBin = vtkSmartPointer<vtkImageData>::New();
+	this->MaskBinComputed = 0;
+	this->MaskEnabled = 0;
+	this->MaskInitialized = 0;
 	this->SliceXY = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceXZ = vtkSmartPointer<vtkImageSlice>::New();
 	this->SliceYZ = vtkSmartPointer<vtkImageSlice>::New();
@@ -149,8 +152,29 @@ vtkMDVolume::~vtkMDVolume()
 
 
 }
+void vtkMDVolume::SetMaskEnabled(int maskEnabled)
+{
+	this->MaskEnabled = maskEnabled;
+	if (this->MaskEnabled == 1)
+	{
+		if (this->MaskInitialized == 0)
+		{
+			this->InitializeMask();
+		}
+		//do stuff to associate the mask to the mapper
+	}
+	else
+	{
+		//stop mask inside mapper.
+	}
+	
 
-
+	// now associate
+}
+void vtkMDVolume::InitializeMask()
+{
+	// creates an empty mask
+}
 void vtkMDVolume::SetisVisible(int visible)
 {
 	

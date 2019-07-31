@@ -84,6 +84,7 @@ public:
 	void GetCropCenter(double cropCenter[3]);
 	void CreateCropBox();
 	void RemoveCropBox();
+	void InitializeMask();
 	void ComputeImageDataBin();
 	void ComputeMaskBin();
 	//vtkSetMacro(Selected, int);
@@ -169,7 +170,10 @@ public:
 	void SetMaskBin(vtkSmartPointer<vtkImageData> mskBin);
 	vtkSmartPointer<vtkImageData> GetImageDataBin();
 	vtkSmartPointer<vtkImageData> GetMaskBin();
-	
+	vtkGetMacro(MaskEnabled, int);
+	void SetMaskEnabled (int maskEnabled);
+	vtkGetMacro(MaskInitialized, int);
+	vtkSetMacro(MaskInitialized, int);
 	vtkGetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
 	vtkSetMacro(SliceXY, vtkSmartPointer<vtkImageSlice>);
 	
@@ -291,6 +295,8 @@ image->SetMapper(imageMapper);
 	int useImageDataBinForVR;
 	int ImageDataBinComputed;
 	int MaskBinComputed;
+	int MaskEnabled;
+	int MaskInitialized;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXYMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceYZMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXZMapper;
