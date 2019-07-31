@@ -12,6 +12,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkImageFlip.h>
 #include <vtkImagePermute.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkBoundingBox.h>
 #include <vtkMath.h>
 #include <vtkDataArray.h>
@@ -161,11 +162,39 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 		{
 			this->InitializeMask();
 		}
+
+		vtkGPUVolumeRayCastMapper *gpu_mapper = vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper());
+		if (gpu_mapper != NULL)
+		{
+			cout << "gpu mapper is not NULL!" << endl;
+			if (this->useImageDataBinForVR == 0)
+			{
+				gpu_mapper->SetMaskInput(this->GetMask());
+			}
+			else
+			{
+				gpu_mapper->SetMaskInput(this->GetMaskBin());
+			}
+
+		}
+		else
+		{
+			cout << "sorry, gpu mapper is NULL, can not do this!" << endl;
+		}
+		
 		//do stuff to associate the mask to the mapper
 	}
 	else
 	{
 		//stop mask inside mapper.
+		vtkGPUVolumeRayCastMapper *gpu_mapper = vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper());
+		if (gpu_mapper != NULL)
+		{
+			
+				gpu_mapper->SetMaskInput(NULL);
+			
+
+		}
 	}
 	
 
