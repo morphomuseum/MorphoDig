@@ -229,7 +229,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedVolumes()));
 	connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveVolume()));
 	connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
-	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
+	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotReinitializeMask()));
+	connect(this->Ui->reinitializeMASK, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
+
 	connect(this->Ui->cropVolume, SIGNAL(pressed()), this, SLOT(slotcropVolumeClicked()));
 	//
 	
@@ -376,6 +378,14 @@ void mqEditVolumeDialog::slotdisplayROIPressed()
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+void mqEditVolumeDialog::slotReinitializeMask()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		this->Volume->InitializeMask();
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
@@ -388,6 +398,7 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->pencilOn->setEnabled(true);
 			this->Ui->rubberOn->setEnabled(true);
 			this->Ui->lassoOn->setEnabled(true);
+			this->Ui->reinitializeMASK->setEnabled(true);
 		}
 		else
 		{
@@ -397,6 +408,7 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->pencilOn->setEnabled(false);
 			this->Ui->rubberOn->setEnabled(false);
 			this->Ui->lassoOn->setEnabled(false);
+			this->Ui->reinitializeMASK->setEnabled(false);
 
 
 		}

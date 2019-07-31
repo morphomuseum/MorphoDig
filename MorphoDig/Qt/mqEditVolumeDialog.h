@@ -78,6 +78,7 @@ public:
   virtual void slotEnableROIClicked(bool isChecked);
   virtual void slotEnableMASKClicked(bool isChecked);
   virtual void slotisVisibleClicked(bool isChecked);
+  virtual void slotReinitializeMask();
   virtual void slotisVisibleXYClicked(bool isChecked);
   virtual void slotisVisibleXZClicked(bool isChecked);
   virtual void slotisVisibleYZClicked(bool isChecked);
