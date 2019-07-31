@@ -203,6 +203,10 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 void vtkMDVolume::InitializeMask()
 {
 	// creates an empty mask
+	this->MaskBinComputed = 0;
+	this->Mask = vtkSmartPointer<vtkImageData>::New();
+	this->Mask->SetDimensions(this->GetImageData()->GetDimensions());
+	//this->Mask->SetScalarType()
 }
 void vtkMDVolume::SetisVisible(int visible)
 {
