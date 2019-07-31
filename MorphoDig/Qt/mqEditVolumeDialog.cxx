@@ -283,6 +283,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 	connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
 	connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
+	connect(this->Ui->enableMASK, SIGNAL(clicked(bool)), this, SLOT(slotEnableMASKClicked(bool)));
 	//virtual void slotEnableROIPressed(bool isChecked);
 	this->Ui->displayROI->setChecked(true);
 
@@ -370,6 +371,33 @@ void mqEditVolumeDialog::slotdisplayROIPressed()
 		{
 
 			this->Volume->SetdisplayROI(1);
+
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		if (isChecked)
+			//if (this->Volume->GetdisplayROI() == 0)
+		{
+			cout << "Call volume enable mask" << endl;
+			this->Volume->SetMaskEnabled(true);
+			this->Ui->pencilOn->setEnabled(true);
+			this->Ui->rubberOn->setEnabled(true);
+			this->Ui->lassoOn->setEnabled(true);
+		}
+		else
+		{
+			cout << "Call volume disable mask" << endl;
+
+			this->Volume->SetMaskEnabled(false);
+			this->Ui->pencilOn->setEnabled(false);
+			this->Ui->rubberOn->setEnabled(false);
+			this->Ui->lassoOn->setEnabled(false);
+
 
 		}
 		mqMorphoDigCore::instance()->Render();

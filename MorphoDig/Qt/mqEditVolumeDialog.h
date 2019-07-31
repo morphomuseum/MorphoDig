@@ -76,6 +76,7 @@ public:
   virtual void slotDeleteColorMap();
   virtual void slotdisplayROIPressed();
   virtual void slotEnableROIClicked(bool isChecked);
+  virtual void slotEnableMASKClicked(bool isChecked);
   virtual void slotisVisibleClicked(bool isChecked);
   virtual void slotisVisibleXYClicked(bool isChecked);
   virtual void slotisVisibleXZClicked(bool isChecked);
