@@ -219,9 +219,15 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 	
 	this->Ui->comboColorMap->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	
+	this->Ui->comboMapper->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	this->Ui->comboColorMap->clear();
+	this->Ui->comboMapper->addItem("Smart Volume Mapper");
+	this->Ui->comboMapper->addItem("GPU Ray Cast Mapper");
+	this->Ui->comboMapper->addItem("OPENGL Ray Cast Mapper");
+
 	connect(this->Ui->comboColorMap, SIGNAL(activated(int)), this, SLOT(slotLoadPreset(int)));
 
+	connect(this->Ui->comboMapper, SIGNAL(activated(int)), this, SLOT(slotMapper(int)));
 
 	this->Ui->scalarOpacityUnitDistance->setMaximum(DBL_MAX);
 
@@ -800,6 +806,14 @@ void mqEditVolumeDialog::slotLoadPreset(int idx)
 	this->LoadPreset();
 
 }
+void mqEditVolumeDialog::slotMapper(int idx)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection()) {
+		this->Volume->SetMapperType(idx);
+	}
+	
+
+}
 void mqEditVolumeDialog::RefreshComboColorMaps()
 {
 
@@ -995,7 +1009,10 @@ void mqEditVolumeDialog::GetFirstVolume()
 void mqEditVolumeDialog::UpdateUI()
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
-		
+		int mtype = this->Volume->Getmapper_type();
+		if (mtype ==0){ this->Ui->comboMapper->setCurrentIndex(0); }
+		if (mtype == 1) { this->Ui->comboMapper->setCurrentIndex(1); }
+		if (mtype == 2) { this->Ui->comboMapper->setCurrentIndex(2); }
 		this->Ui->enableROI->setChecked(this->Volume->GetenableROI());
 		this->Ui->displayROI->setChecked(this->Volume->GetdisplayROI());
 		if (this->Volume->GetuseImageDataBinForVR() == 1)

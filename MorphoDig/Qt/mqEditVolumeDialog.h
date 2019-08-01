@@ -46,6 +46,7 @@ public:
   void RefreshSuggestedRange();
   void RefreshComboColorMaps();
   void LoadPreset();
+  
   void CropVolume();
   /*double GetCTFMin();
   double GetCTFMax();
@@ -70,6 +71,8 @@ public:
   virtual void slotAcceptSuggestedMax();
   virtual void slotRefreshUi();
   virtual void slotLoadPreset(int idx);
+  virtual void slotMapper(int idx);
+
   virtual void slotRefreshColorMaps();
   virtual void slotReinitializeColorMap();
   virtual void slotEditColorMapName();
