@@ -23,6 +23,8 @@
 #include "vtkLMActorCollection.h"
 #include "vtkMDInteractorStyle.h"
 #include <vtkSmartVolumeMapper.h>
+#include <vtkGPUVolumeRayCastMapper.h>
+#include<vtkOpenGLGPUVolumeRayCastMapper.h>
 #include <vtkBoxWidget.h>
 #include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkPlanes.h>
@@ -72,6 +74,20 @@ public:
 			this->Mapper->SetClippingPlanes(planes);
 			planes->Delete();
 		}
+		if (this->Mapper1)
+		{
+			vtkPlanes *planes = vtkPlanes::New();
+			widget->GetPlanes(planes);
+			this->Mapper1->SetClippingPlanes(planes);
+			planes->Delete();
+		}
+		if (this->Mapper2)
+		{
+			vtkPlanes *planes = vtkPlanes::New();
+			widget->GetPlanes(planes);
+			this->Mapper2->SetClippingPlanes(planes);
+			planes->Delete();
+		}
 	}
 	void SetMapper(vtkSmartPointer<vtkSmartVolumeMapper> m)
 	{
@@ -79,12 +95,29 @@ public:
 
 		this->Mapper = m;
 	}
+	void SetMapper1(vtkSmartPointer<vtkGPUVolumeRayCastMapper> m)
+	{
+		cout << "Command: set Mapper!!!" << endl;
+
+		this->Mapper1 = m;
+	}
+	void SetMapper2(vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper> m)
+	{
+		cout << "Command: set Mapper!!!" << endl;
+
+		this->Mapper2 = m;
+	}
 protected:
 	vtkBoxWidgetCallback()
 	{
 		this->Mapper = NULL;
+		this->Mapper1 = NULL;
+		this->Mapper2 = NULL;
 	}
 	vtkSmartPointer<vtkSmartVolumeMapper> Mapper;
+	vtkSmartPointer<vtkGPUVolumeRayCastMapper> Mapper1;
+	vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper> Mapper2;
+	
 };
 class vtkPDBoxWidgetCallback : public vtkCommand
 {

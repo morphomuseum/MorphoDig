@@ -5068,10 +5068,6 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			//cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			//mapper->SetRequestedRenderModeToGPU();
-			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
-			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -5270,10 +5266,6 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		//cout << "Try visualize!!!" << endl;
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-		//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-		//mapper->SetRequestedRenderModeToGPU();
-		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
-		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 		//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 		vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -5468,11 +5460,6 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		//cout << "Try visualize!!!" << endl;
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-		//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-		//mapper->SetRequestedRenderModeToGPU();
-
-		//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
-		//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 		//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 		vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -5715,10 +5702,6 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			//cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			//mapper->SetRequestedRenderModeToGPU();
-			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
-			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -5984,10 +5967,6 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 			//cout << "Try visualize!!!" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-			//mapper->SetRequestedRenderModeToGPU();
-			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
-			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
 			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();

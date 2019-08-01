@@ -164,6 +164,8 @@ public:
 	void FlipZ();
 	void FlipX();
 	void FlipY();
+	vtkGetMacro(mapper_type, int);
+	void SetMapperType(int mtype);
 	vtkGetMacro(Mask, vtkSmartPointer<vtkImageData>);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	void SetImageDataBin(vtkSmartPointer<vtkImageData> imgDataBin);
@@ -265,6 +267,7 @@ public:
 	void SetColorDiffuse(double diffuse);
 	void SetColorProperties(double ambient, double diffuse, double specular, double specularPower);
 	void SetColorProperties(int ambient, int diffuse, int specular, double specularPower);
+	void InitializeMapper();
 	
 protected:
 	vtkMDVolume();
@@ -297,6 +300,12 @@ image->SetMapper(imageMapper);
 	int MaskBinComputed;
 	int MaskEnabled;
 	int MaskInitialized;
+	int mapper_type; //0 smartvolume //1GPU //2 OpenGL
+	/*//vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+			//mapper->SetRequestedRenderModeToGPU();
+			//vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+			//vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New(); //NOthing works... 
+			*/
 	vtkSmartPointer<vtkImageResliceMapper> SliceXYMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceYZMapper;
 	vtkSmartPointer<vtkImageResliceMapper> SliceXZMapper;

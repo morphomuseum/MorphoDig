@@ -33,6 +33,9 @@ Module:    vtkMDVolume.cxx
 #include <vtkPointData.h>
 #include <vtkCellData.h>
 #include <vtkSmartVolumeMapper.h>
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <vtkOpenGLGPUVolumeRayCastMapper.h>
+
 #include <vtkCenterOfMass.h>
 #include <vtkTransform.h>
 #include <vtkPolyData.h>
@@ -54,7 +57,7 @@ vtkMDVolume::vtkMDVolume()
 {
 	this->UndoRedo = new vtkMDVolumeUndoRedo;
 	this->Selected = 1;
-	
+	this->mapper_type = 2;
 	this->displayROI = 0;
 	this->enableROI = 0;
 	this->isVisible = 1;
@@ -139,9 +142,35 @@ renderer->AddViewProp(image);*/
 	this->init_center[0] = 0;
 	this->init_center[1] = 0;
 	this->init_center[2] = 0;
+	this->InitializeMapper();
 
 }
+void vtkMDVolume::SetMapperType(int mtype)
+{
+	this->mapper_type = mtype;
+	this->SetImageDataAndMap(this->GetImageData());//will call Initialize mapper
+}
+void vtkMDVolume::InitializeMapper()
+{
+	if (mapper_type == 0)
+	{
+		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		this->SetMapper(mapper);
 
+	}
+	else if (mapper_type == 1)
+	{
+
+		vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+		this->SetMapper(mapper);
+	}
+	else if (mapper_type == 2)
+	{
+		//mapper->SetRequestedRenderModeToGPU();
+		vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+		this->SetMapper(mapper);
+	}
+}
 //----------------------------------------------------------------------------
 vtkMDVolume::~vtkMDVolume()
 {
@@ -162,40 +191,53 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 		{
 			this->InitializeMask();
 		}
-
-		vtkGPUVolumeRayCastMapper *gpu_mapper = vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper());
-		if (gpu_mapper != NULL)
+		if (this->mapper_type == 1)
 		{
-			cout << "gpu mapper is not NULL!" << endl;
+			vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskTypeToBinary();
 			if (this->useImageDataBinForVR == 0)
 			{
-				gpu_mapper->SetMaskInput(this->GetMask());
+				vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMask());
 			}
 			else
 			{
-				gpu_mapper->SetMaskInput(this->GetMaskBin());
+				vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
 			}
-
 		}
-		else
+		else if (this->mapper_type == 2)
 		{
-			cout << "sorry, gpu mapper is NULL, can not do this!" << endl;
+			vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskTypeToBinary();
+			if (this->useImageDataBinForVR == 0)
+			{
+				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMask());
+			}
+			else
+			{
+				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
+			}
 		}
+		
 		
 		//do stuff to associate the mask to the mapper
 	}
 	else
 	{
 		//stop mask inside mapper.
-		vtkGPUVolumeRayCastMapper *gpu_mapper = vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper());
-		if (gpu_mapper != NULL)
+		if (this->mapper_type == 1)
 		{
-			
-				gpu_mapper->SetMaskInput(NULL);
-			
+
+			vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(NULL);
 
 		}
+		else if (this->mapper_type == 2)
+		{
+			
+				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(NULL);
+			
+		}
 	}
+	
+		
+	
 	
 
 	// now associate
@@ -205,7 +247,94 @@ void vtkMDVolume::InitializeMask()
 	// creates an empty mask
 	this->MaskBinComputed = 0;
 	this->Mask = vtkSmartPointer<vtkImageData>::New();
-	this->Mask->SetDimensions(this->GetImageData()->GetDimensions());
+	int dims[3];
+	this->GetImageData()->GetDimensions(dims);
+
+
+	this->Mask->SetDimensions(dims);
+	this->Mask->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+	std::cout << "Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
+
+	std::cout << "Mask Number of points: " << this->Mask->GetNumberOfPoints() << std::endl;
+	std::cout << "Number of cells: " << this->Mask->GetNumberOfCells() << std::endl;
+	for (int z = 0; z < dims[2]; z++)
+	{
+		for (int y = 0; y < dims[1]; y++)
+		{
+			for (int x = 0; x < dims[0]; x++)
+			{
+				
+				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+				if (x > 50)
+				{
+					pixel[0] = 255;
+				}
+				else
+				{
+					pixel[0] = 0;
+				}
+			}
+		}
+	}
+
+	for (int z = 0; z < dims[2]; z++)
+	{
+		for (int y = 0; y < dims[1]; y++)
+		{
+			for (int x = 0; x < dims[0]; x++)
+			{
+				uint8_t* pixel = static_cast<uint8_t*>(this->Mask->GetScalarPointer(x, y, z));
+				// do something with v
+				if (z < 10 && y < 10 && ((x<60) && (x>40)))
+				{
+					std::cout << pixel[0] << " " << endl;
+				}
+			}
+			
+		}
+		
+	}
+
+	int dataType = this->Mask->GetScalarType();
+	
+	QString dataTypeAsString;
+	if (dataType == VTK_UNSIGNED_SHORT)
+	{
+		dataTypeAsString = "Unsigned shorts (16 bits)";
+	}
+	else if (dataType == VTK_SHORT)
+	{
+		dataTypeAsString = "Signed shorts (16 bits)";
+	}
+	else if (dataType == VTK_CHAR)
+	{
+		dataTypeAsString = "Char (8 bits)";
+	}
+	else if (dataType == VTK_UNSIGNED_CHAR)
+	{
+		dataTypeAsString = "Unsigned char (8 bits)";
+	}
+	else if (dataType == VTK_SIGNED_CHAR)
+	{
+		dataTypeAsString = "Signed char (8 bits)";
+	}
+	else if (dataType == VTK_FLOAT)
+	{
+		dataTypeAsString = "Float (32 bits)";
+	}
+	else if (dataType == VTK_DOUBLE)
+	{
+		dataTypeAsString = "Double (64 bits)";
+	}
+	else if (dataType == VTK_BIT)
+	{
+		dataTypeAsString = "Bit (1 bit)";
+	}
+	else
+	{
+		dataTypeAsString = "Unknown";
+	}
+	cout << "Default Mask data type: " << dataTypeAsString.toStdString() << endl;
 	//this->Mask->SetScalarType()
 }
 void vtkMDVolume::SetisVisible(int visible)
@@ -673,10 +802,25 @@ int vtkMDVolume::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 	int is_insideALL[6] = { 0,0,0,0,0,0 };
 	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 	this->GetMatrix(Mat);
-	vtkSmartVolumeMapper *mapper = vtkSmartVolumeMapper::SafeDownCast(this->GetMapper());
 	
+	int ok = 0;
+	if (this->mapper_type == 0)
+	{
+		vtkSmartVolumeMapper *mapper = vtkSmartVolumeMapper::SafeDownCast(this->GetMapper());
+		if (mapper != NULL) { ok = 1; }
+	}
+	else if (this->mapper_type == 1)
+	{
+		vtkGPUVolumeRayCastMapper *mapper = vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper());
+		if (mapper != NULL) { ok = 1; }
+	}
+	else if (this->mapper_type == 2)
+	{
+		vtkOpenGLGPUVolumeRayCastMapper *mapper = vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper());
+		if (mapper != NULL) { ok = 1; }
+	}
 	//this->GetB
-	if (mapper != NULL)
+	if (ok)
 	{
 		
 
@@ -1102,17 +1246,38 @@ void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpa
 void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->SetImageData(imgData);
-	vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-	this->SetMapper(mapper);
-	
+	this->InitializeMapper();
 	if (this->useImageDataBinForVR == 1)
 	{
+		if (this->mapper_type == 0)
+		{
+			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+		}
+		else if (this->mapper_type == 1)
+		{
+			vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+		}
+		else if (this->mapper_type == 2)
+		{
+			vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+		}
 		
-		mapper->SetInputData(this->GetImageDataBin());
 	}
 	else
 	{
-		mapper->SetInputData(this->GetImageData());
+		if (this->mapper_type == 0)
+		{
+			vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+		}
+		else if (this->mapper_type == 1)
+		{
+			vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+		}
+		else if (this->mapper_type == 2)
+		{
+			vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+		}
+		
 	}
 	
 }
@@ -1157,13 +1322,11 @@ void vtkMDVolume::SetDesiredMappedImageData()
 		QMessageBox msgBox;
 		msgBox.setText("Number of voxels > Out of core threshold value (adjustable in Edit->Volume options). Volume rendering will be achieved on a subsampled version.");
 		msgBox.exec();
-		//vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
 		this->SetuseImageDataBinForVR(1);
 	}
 	else
 	{
 
-		//vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->ImageData);
 		this->SetuseImageDataBinForVR(0);
 	}
 	//
@@ -1178,15 +1341,26 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 	}*/
 	if (changed == 1)
 	{
-		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-
+		this->InitializeMapper();
+	
 		long long int numVox = this->myDim[0] * this->myDim[1] * this->myDim[2];
 		if (use == 1)
 		{
 			cout << "change input data binned image" << endl;
 			this->useImageDataBinForVR = 1;
-			this->SetMapper(mapper);
-			mapper->SetInputData(this->GetImageDataBin());
+			if (this->mapper_type == 0)
+			{
+				vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+			}
+			else if (this->mapper_type == 1)
+			{
+				vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+			}
+			else if (this->mapper_type == 2)
+			{
+				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+			}
+			
 			
 		}
 		else
@@ -1203,9 +1377,20 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 					return 0; }
 			}
 			cout << "change input data normal image!" << endl;
-			this->SetMapper(mapper);
-			mapper->SetInputData(this->GetImageData());
 			
+			//mapper->SetInputData(this->GetImageData());
+			if (this->mapper_type == 0)
+			{
+				vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+			}
+			else if (this->mapper_type == 1)
+			{
+				vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+			}
+			else if (this->mapper_type == 2)
+			{
+				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+			}
 			this->useImageDataBinForVR = 0;
 		}
 		if (this->enableROI == 1
@@ -1215,7 +1400,19 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 			/*volume->PlaceBox(BoxBounds);*/
 			vtkPlanes *planes = vtkPlanes::New();
 			this->Box->GetPlanes(planes);
-			mapper->SetClippingPlanes(planes);
+			if (this->mapper_type == 0)
+			{
+				vtkSmartVolumeMapper::SafeDownCast(this->GetMapper())->SetClippingPlanes(planes);
+			}
+			else if (this->mapper_type == 1)
+			{
+				vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetClippingPlanes(planes);
+			}
+			else if (this->mapper_type == 2)
+			{
+				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetClippingPlanes(planes);
+			}
+			
 			planes->Delete();
 		}
 	}
@@ -1597,8 +1794,7 @@ void vtkMDVolume::CreateCropBox()
 	cropbox->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
 	cout << "Create box 3" << endl;
 	//vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
-	//callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
-
+	
 	//cropbox->AddObserver(vtkCommand::InteractionEvent, callback);
 
 	cropbox->EnabledOn();
@@ -1665,7 +1861,19 @@ void vtkMDVolume::CreateBox()
 	box->SetInteractor(mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor());
 	cout << "Create box 3" << endl;
 	vtkSmartPointer<vtkBoxWidgetCallback> callback = vtkSmartPointer<vtkBoxWidgetCallback>::New();
-	callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
+	if (this->mapper_type==0)
+	{
+		callback->SetMapper(vtkSmartVolumeMapper::SafeDownCast(this->GetMapper()));
+	}
+	else if (this->mapper_type == 1)
+	{
+		callback->SetMapper1(vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper()));
+	}
+	else if (this->mapper_type == 2)
+	{
+		callback->SetMapper2(vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper()));
+	}
+	
 	
 	box->AddObserver(vtkCommand::InteractionEvent, callback);
 
