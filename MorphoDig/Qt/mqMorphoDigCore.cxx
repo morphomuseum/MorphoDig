@@ -12168,6 +12168,7 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
 				POLYGON_VERTEX proj_screen;
 				int cpt = 0;
+				int cc = 0;
 				for (int z = 0; z < dims[2]; z++)
 				{
 					for (int y = 0; y < dims[1]; y++)
@@ -12189,8 +12190,13 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 							this->GetWorldToDisplay(ptWC[0], ptWC[1], ptWC[2], ptSCREEN);
 							proj_screen.x = ptSCREEN[0];
 							proj_screen.y = ptSCREEN[1];
-							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
 							
+							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+							if (cc < 100)
+							{
+								cout << "Screen x, y:" << ptSCREEN[0] << "," << ptSCREEN[1] << ", inside: "<< proj_is_inside<<endl;
+								cc++;
+							}
 							if (mask_inside == 0)// mask outside
 							{
 								if (proj_is_inside == 0) { proj_is_inside = 1; }
@@ -12199,6 +12205,7 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 									proj_is_inside = 0;
 								}
 							}
+							
 							if ((ptSCREEN[2] > -1.0) && ptSCREEN[2] < 1.0 && (proj_is_inside == 1))
 							{
 								cpt++;
@@ -12207,7 +12214,7 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 									cout << "mask " << x << "," << y << "," << z << endl;
 								}
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								pixel[0] = 255;
+								pixel[0] = 0;
 							}
 						
 							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
@@ -12215,11 +12222,12 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 					}
 				}
 				cout << "Done with mask loop" << endl;
-			
+				myVolume->UpdateMaskData(Mask);
+				myVolume->SetImageDataBinComputed(0);
+				if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
 
 			}
-			myVolume->SetImageDataBinComputed(0);
-			if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
+			
 		}
 	
 		this->Render();
@@ -12404,6 +12412,7 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 
 							vtkIdType ptId = Mask->ComputePointId(ijk);
 							Mask->GetPoint(ptId, pt);
+							
 							int proj_is_inside = 0;
 							mqMorphoDigCore::TransformPoint(Mat, pt, ptWC);
 							this->GetWorldToDisplay(ptWC[0], ptWC[1], ptWC[2], ptSCREEN);
@@ -12431,7 +12440,7 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 					}
 				}
 				cout << "Done with mask loop" << endl;
-
+				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
 				if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
 			}

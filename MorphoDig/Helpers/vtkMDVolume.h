@@ -150,7 +150,8 @@ public:
 	void SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData);
 
 	void SetMaskData(vtkSmartPointer<vtkImageData> mskData);
-	
+	void UpdateMaskData(vtkSmartPointer<vtkImageData> mskData);
+
 
 
 	void ChangeSpacing(double newSpacingX, double newSpacingY, double newSpacingZ);

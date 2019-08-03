@@ -265,14 +265,14 @@ void vtkMDVolume::InitializeMask()
 			{
 				
 				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
-				if (x > 50)
-				{
+				//if (x > 50)
+				//{
 					pixel[0] = 255;
-				}
+				/*}
 				else
 				{
 					pixel[0] = 0;
-				}
+				}*/
 			}
 		}
 	}
@@ -1286,9 +1286,40 @@ void vtkMDVolume::SetMaskData(vtkSmartPointer<vtkImageData> mskData)
 	// to be called after SetImageDataAndMap, never before!
 	this->Mask = mskData;
 	this->MaskBinComputed = 0;
-	
 
-	
+
+}
+void vtkMDVolume::UpdateMaskData(vtkSmartPointer<vtkImageData> mskData)
+{
+	// to be called after SetImageDataAndMap, never before!
+	this->Mask = mskData;
+	this->MaskBinComputed = 0;
+	if (this->mapper_type == 1)
+	{
+		vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskTypeToBinary();
+		if (this->useImageDataBinForVR == 1)
+		{
+			vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
+		}
+		else
+		{
+			vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMask());
+		}
+
+	}
+	else if (this->mapper_type == 2)
+	{
+		vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskTypeToBinary();
+
+		if (this->useImageDataBinForVR == 1)
+		{
+			vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
+		}
+		else
+		{
+			vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMask());
+		}
+	}
 
 }
 void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
