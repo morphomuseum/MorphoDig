@@ -1009,8 +1009,40 @@ void mqEditVolumeDialog::GetFirstVolume()
 void mqEditVolumeDialog::UpdateUI()
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
+		int maskEnabled = this->Volume->GetMaskEnabled();
+		if (maskEnabled)
+		{
+			this->Ui->enableMASK->setChecked(true);
+
+			this->Ui->pencilOn->setDisabled(false);
+			this->Ui->lassoOn->setDisabled(false);
+			this->Ui->rubberOn->setDisabled(false);
+			this->Ui->reinitializeMASK->setDisabled(false);
+		}
+		else
+		{
+			this->Ui->enableMASK->setChecked(false);
+			this->Ui->pencilOn->setDisabled(true);
+			this->Ui->lassoOn->setDisabled(true);
+			this->Ui->rubberOn->setDisabled(true);
+			this->Ui->reinitializeMASK->setDisabled(true);
+		}
 		int mtype = this->Volume->Getmapper_type();
-		if (mtype ==0){ this->Ui->comboMapper->setCurrentIndex(0); }
+		if (mtype ==0){ 
+			this->Ui->comboMapper->setCurrentIndex(0); 
+			this->Ui->enableMASK->setDisabled(true);
+
+			this->Ui->pencilOn->setDisabled(true);
+			this->Ui->lassoOn->setDisabled(true);
+			this->Ui->rubberOn->setDisabled(true);
+			this->Ui->reinitializeMASK->setDisabled(true);
+
+		}
+		else
+		{
+			this->Ui->enableMASK->setEnabled(true);
+		}
+		
 		if (mtype == 1) { this->Ui->comboMapper->setCurrentIndex(1); }
 		if (mtype == 2) { this->Ui->comboMapper->setCurrentIndex(2); }
 		this->Ui->enableROI->setChecked(this->Volume->GetenableROI());

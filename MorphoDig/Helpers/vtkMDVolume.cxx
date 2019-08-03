@@ -1355,10 +1355,18 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 			else if (this->mapper_type == 1)
 			{
 				vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+				if (this->GetMaskEnabled())
+				{
+					vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
+				}
 			}
 			else if (this->mapper_type == 2)
 			{
 				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageDataBin());
+				if (this->GetMaskEnabled())
+				{
+					vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
+				}
 			}
 			
 			
@@ -1386,10 +1394,18 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 			else if (this->mapper_type == 1)
 			{
 				vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+				if (this->GetMaskEnabled())
+				{
+					vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMask());
+				}
 			}
 			else if (this->mapper_type == 2)
 			{
 				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetInputData(this->GetImageData());
+				if (this->GetMaskEnabled())
+				{
+					vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMask());
+				}
 			}
 			this->useImageDataBinForVR = 0;
 		}
