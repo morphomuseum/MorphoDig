@@ -1248,6 +1248,7 @@ void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpa
 void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->SetImageData(imgData);
+	
 	this->InitializeMapper();
 	if (this->useImageDataBinForVR == 1)
 	{
@@ -1288,6 +1289,7 @@ void vtkMDVolume::SetMaskData(vtkSmartPointer<vtkImageData> mskData)
 	// to be called after SetImageDataAndMap, never before!
 	this->Mask = mskData;
 	this->MaskBinComputed = 0;
+	
 
 
 }
@@ -1328,6 +1330,7 @@ void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->ImageData = imgData;
 	this->ImageDataBinComputed = 0;
+	this->MaskInitialized = 0;
 	// now add a few things related to SliceXYMapper etc... 
 	
 	this->SliceXYMapper->SetInputData(imgData);
