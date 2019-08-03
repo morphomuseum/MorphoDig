@@ -12213,7 +12213,8 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 			
 
 			}
-			
+			myVolume->SetImageDataBinComputed(0);
+			if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
 		}
 	
 		this->Render();
@@ -12426,7 +12427,8 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 				}
 				cout << "Done with mask loop" << endl;
 
-
+				myVolume->SetImageDataBinComputed(0);
+				if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
 			}
 
 		}

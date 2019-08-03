@@ -90,7 +90,7 @@ public:
 	//vtkSetMacro(Selected, int);
 	vtkGetMacro(Selected, int);
 	vtkBooleanMacro(Selected, int);
-
+	
 
 	vtkGetMacro(ScalarDisplayMax, double);
 	//vtkSetMacro(ScalarDisplayMax, double);
@@ -166,6 +166,8 @@ public:
 	void FlipY();
 	vtkGetMacro(mapper_type, int);
 	void SetMapperType(int mtype);
+	vtkGetMacro(ImageDataBinComputed, int);
+	vtkSetMacro(ImageDataBinComputed, int);
 	vtkGetMacro(Mask, vtkSmartPointer<vtkImageData>);
 	vtkGetMacro(ImageData, vtkSmartPointer<vtkImageData>);
 	void SetImageDataBin(vtkSmartPointer<vtkImageData> imgDataBin);
