@@ -12167,6 +12167,7 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 				std::cout << "Lasso Number of cells: " << Mask->GetNumberOfCells() << std::endl;
 				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
 				POLYGON_VERTEX proj_screen;
+				int cpt = 0;
 				for (int z = 0; z < dims[2]; z++)
 				{
 					for (int y = 0; y < dims[1]; y++)
@@ -12200,9 +12201,13 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 							}
 							if ((ptSCREEN[2] > -1.0) && ptSCREEN[2] < 1.0 && (proj_is_inside == 1))
 							{
-								
+								cpt++;
+								if (cpt < 100)
+								{
+									cout << "mask " << x << "," << y << "," << z << endl;
+								}
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								pixel[0] = 0;
+								pixel[0] = 255;
 							}
 						
 							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
@@ -12418,7 +12423,7 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 							{
 
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								pixel[0] = 0;
+								pixel[0] = 255;
 							}
 
 							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
