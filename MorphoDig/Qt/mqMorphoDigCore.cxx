@@ -12220,8 +12220,7 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 	}
 
 }
-void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
-{}
+
 void mqMorphoDigCore::lassoTagActors(int tag_inside)
 {
 	POLYGON_LIST poly;
@@ -12330,6 +12329,111 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 		//
 		END_UNDO_SET();
 	}
+}
+void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
+{
+	POLYGON_LIST poly;
+
+	int mstart[2];
+	int mend[2];
+
+	this->RubberStyle->GetStartPosition(mstart);
+	this->RubberStyle->GetEndPosition(mend);
+	//std::vector<vtkVector2i>
+	vtkVector2i a, b, c, d;
+	a[0] = mstart[0];
+	a[1] = mstart[1];
+
+	b[0] = mstart[0];
+	b[1] = mend[1];
+
+	c[0] = mend[0];
+	c[1] = mend[1];
+
+	d[0] = mend[0];
+	d[1] = mstart[1];
+
+	std::vector<vtkVector2i> point_list;
+	point_list.push_back(a);
+	point_list.push_back(b);
+	point_list.push_back(c);
+	point_list.push_back(d);
+	poly.SetPointList(point_list);
+
+
+	cout << "Poly valide: " << poly.state << endl;
+	if (poly.state == 1)// only for valid lasso selections!
+	{
+		this->VolumeCollection->InitTraversal();
+		vtkIdType num = this->VolumeCollection->GetNumberOfItems();
+		int modified = 0;
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next volume:" << i << endl;
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+			if (myVolume->GetMaskEnabled())
+			{
+				vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
+				int dims[3];
+				Mask->GetDimensions(dims);
+				std::cout << "Lasso Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
+
+				std::cout << "Lasso Mask Number of points: " << Mask->GetNumberOfPoints() << std::endl;
+				std::cout << "Lasso Number of cells: " << Mask->GetNumberOfCells() << std::endl;
+				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
+				POLYGON_VERTEX proj_screen;
+				for (int z = 0; z < dims[2]; z++)
+				{
+					for (int y = 0; y < dims[1]; y++)
+					{
+						for (int x = 0; x < dims[0]; x++)
+						{
+							double pt[3];
+							double ptWC[3];
+							double ptSCREEN[3];
+							int ijk[3];
+							ijk[0] = x;
+							ijk[1] = y;
+							ijk[2] = z;
+
+							vtkIdType ptId = Mask->ComputePointId(ijk);
+							Mask->GetPoint(ptId, pt);
+							int proj_is_inside = 0;
+							mqMorphoDigCore::TransformPoint(Mat, pt, ptWC);
+							this->GetWorldToDisplay(ptWC[0], ptWC[1], ptWC[2], ptSCREEN);
+							proj_screen.x = ptSCREEN[0];
+							proj_screen.y = ptSCREEN[1];
+							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+
+							if (mask_inside == 0)// mask outside
+							{
+								if (proj_is_inside == 0) { proj_is_inside = 1; }
+								else
+								{
+									proj_is_inside = 0;
+								}
+							}
+							if ((ptSCREEN[2] > -1.0) && ptSCREEN[2] < 1.0 && (proj_is_inside == 1))
+							{
+
+								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
+								pixel[0] = 0;
+							}
+
+							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+						}
+					}
+				}
+				cout << "Done with mask loop" << endl;
+
+
+			}
+
+		}
+
+		this->Render();
+	}
+
 }
 void mqMorphoDigCore::rubberTagActors(int tag_inside)
 {
