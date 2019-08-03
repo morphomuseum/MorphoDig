@@ -12222,6 +12222,32 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 					}
 				}
 				cout << "Done with mask loop" << endl;
+				long long cpt2=0;
+				long long numvox = dims[0] * dims[1] * dims[2];
+				for (int z = 0; z < dims[2]; z++)
+				{
+					for (int y = 0; y < dims[1]; y++)
+					{
+						for (int x = 0; x < dims[0]; x++)
+						{
+							unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
+							// do something with v
+							if (pixel[0]!=255)
+							{ 
+								cpt2++;
+								//std::cout << "Pixel at " << x << "," << y << "," << z << ", differs from 255! "  << endl;
+
+							}
+							if (z < 10 && y < 10 && ((x < 60) && (x > 40)))
+							{
+								std::cout << "Pixel at " << x << "," << y << "," << z  << ", " << pixel[0] << endl;
+							}
+						}
+
+					}
+
+				}
+				cout << "Found " << cpt2 <<" out of "<<numvox<<" pixels that differ from 255" << endl;
 				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
 				if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
@@ -12432,14 +12458,14 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 							{
 
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								pixel[0] = 255;
+								pixel[0] = 0;
 							}
 
 							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
 						}
 					}
 				}
-				cout << "Done with mask loop" << endl;
+				cout << "Done with mask loop rubber band" << endl;
 				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
 				if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }

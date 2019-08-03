@@ -244,6 +244,7 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 }
 void vtkMDVolume::InitializeMask()
 {
+	cout << "Initialize mask!" << endl;
 	// creates an empty mask
 	this->MaskBinComputed = 0;
 	this->Mask = vtkSmartPointer<vtkImageData>::New();
@@ -283,11 +284,11 @@ void vtkMDVolume::InitializeMask()
 		{
 			for (int x = 0; x < dims[0]; x++)
 			{
-				uint8_t* pixel = static_cast<uint8_t*>(this->Mask->GetScalarPointer(x, y, z));
+				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
 				// do something with v
 				if (z < 10 && y < 10 && ((x<60) && (x>40)))
 				{
-					std::cout << pixel[0] << " " << endl;
+					std::cout <<"Pixel at "<<x<<","<<y<<","<<z<<":"<< ", " <<pixel[0] << endl;
 				}
 			}
 			
@@ -336,6 +337,7 @@ void vtkMDVolume::InitializeMask()
 	}
 	cout << "Default Mask data type: " << dataTypeAsString.toStdString() << endl;
 	//this->Mask->SetScalarType()
+	this->MaskInitialized = 1;
 }
 void vtkMDVolume::SetisVisible(int visible)
 {
