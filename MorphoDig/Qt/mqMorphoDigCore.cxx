@@ -11397,8 +11397,8 @@ void mqMorphoDigCore::startRubber(int rubber_mode)
 	this->currentRubberMode = rubber_mode;
 	if (rubber_mode == 0) { this->setCurrentCursor(9); }
 	if (rubber_mode == 1) { this->setCurrentCursor(8); }
-	if (rubber_mode == 2) { this->setCurrentCursor(9); }
-	if (rubber_mode == 3) { this->setCurrentCursor(8); }
+	if (rubber_mode == 2 || rubber_mode ==4) { this->setCurrentCursor(9); }
+	if (rubber_mode == 3 || rubber_mode ==5) { this->setCurrentCursor(8); }
 	// 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
 }
 
@@ -11408,15 +11408,16 @@ void mqMorphoDigCore::startLasso(int lasso_mode)
 	//lasso_mode 1: = lasso cut (for selected surfaces), and we will only keep the inside of the selection
 	//lasso_mode 2: = lasso tag and we will only tag the outside of the selection
 	//lasso_mode 3: = lasso tag and we will only tag the inside of the selection
-	
+	// lasso_mode 4: = lasso mask volume and we will mask the outside of the selection
+	// lasso_mode 5: = lasso mask volume and we will mask the inside of the selection
 	//cout << "Set Lasso style as current interaction style!" << endl;
 	//1 change interaction mode
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->LassoStyle);
 	this->currentLassoMode = lasso_mode;
 	if (lasso_mode == 0) { this->setCurrentCursor(3); }
 	if (lasso_mode == 1) { this->setCurrentCursor(2); }
-	if (lasso_mode == 2) { this->setCurrentCursor(3); }
-	if (lasso_mode == 3) { this->setCurrentCursor(2); }
+	if (lasso_mode == 2 || lasso_mode == 4) { this->setCurrentCursor(3); }
+	if (lasso_mode == 3|| lasso_mode ==5) { this->setCurrentCursor(2); }
 // 2 inform MorphoDigCore that this is a lasso start cut (and not lasso tag)
 }
 void mqMorphoDigCore::SwitchMoveMode()
@@ -11456,11 +11457,17 @@ void mqMorphoDigCore::stopLasso()
 		int keep_inside = this->currentLassoMode;
 		this->lassoCutSelectedActors(keep_inside);
 	}
-	else
+	else if (this->currentLassoMode <4)
 	{
-		int tag_inside = this->currentLassoMode;// 2: tag insiden 3 tag outside
+		int tag_inside = this->currentLassoMode;// 2: tag outside; 3 tag inside
 		this->lassoTagActors(tag_inside);
 		
+	}
+	else
+	{
+		int mask_inside = 1;
+		if (this->currentLassoMode == 4) { mask_inside = 0; }
+		this->lassoMaskVolumes(mask_inside);
 	}
 	
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
@@ -11478,13 +11485,19 @@ void mqMorphoDigCore::stopRubber()
 		cout << "Stop rubber cut!" << endl;
 		this->rubberCutSelectedActors(keep_inside);
 	}
-	else
+	else if (this->currentRubberMode<4)
 	{
-		int tag_inside = this->currentRubberMode;// 2: tag insiden 3 tag outside
+		int tag_inside = this->currentRubberMode;// 2: tag outside 3 tag inside
 		//@@@ to do
 		cout << "Stop rubber tag!" << endl;
 		this->rubberTagActors(tag_inside);
 
+	}
+	else
+	{
+		int mask_inside = 1;
+		if (this->currentRubberMode == 4) { mask_inside = 0; }
+		this->rubberMaskVolumes(mask_inside);
 	}
 
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
@@ -12128,6 +12141,87 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 	}
 }
 
+void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
+{
+	POLYGON_LIST poly;
+	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
+	cout << "Mask Poly valide: " << poly.state << endl;
+
+	if (poly.state == 1)// only for valid lasso selections!
+	{
+		this->VolumeCollection->InitTraversal();
+		vtkIdType num = this->VolumeCollection->GetNumberOfItems();
+		int modified = 0;
+		for (vtkIdType i = 0; i < num; i++)
+		{
+			cout << "try to get next volume:" << i << endl;
+			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
+			if (myVolume->GetMaskEnabled())
+			{ 
+				vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
+				int dims[3];
+				Mask->GetDimensions(dims);
+				std::cout << "Lasso Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
+
+				std::cout << "Lasso Mask Number of points: " << Mask->GetNumberOfPoints() << std::endl;
+				std::cout << "Lasso Number of cells: " << Mask->GetNumberOfCells() << std::endl;
+				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
+				POLYGON_VERTEX proj_screen;
+				for (int z = 0; z < dims[2]; z++)
+				{
+					for (int y = 0; y < dims[1]; y++)
+					{
+						for (int x = 0; x < dims[0]; x++)
+						{
+							double pt[3];
+							double ptWC[3];
+							double ptSCREEN[3];
+							int ijk[3];
+							ijk[0] = x;
+							ijk[1] = y;
+							ijk[2] = z;
+
+							vtkIdType ptId = Mask->ComputePointId(ijk);
+							Mask->GetPoint(ptId, pt);
+							int proj_is_inside=0;
+							mqMorphoDigCore::TransformPoint(Mat, pt, ptWC);
+							this->GetWorldToDisplay(ptWC[0], ptWC[1], ptWC[2], ptSCREEN);
+							proj_screen.x = ptSCREEN[0];
+							proj_screen.y = ptSCREEN[1];
+							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
+							
+							if (mask_inside == 0)// mask outside
+							{
+								if (proj_is_inside == 0) { proj_is_inside = 1; }
+								else
+								{
+									proj_is_inside = 0;
+								}
+							}
+							if ((ptSCREEN[2] > -1.0) && ptSCREEN[2] < 1.0 && (proj_is_inside == 1))
+							{
+								
+								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
+								pixel[0] = 0;
+							}
+						
+							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+						}
+					}
+				}
+				cout << "Done with mask loop" << endl;
+			
+
+			}
+			
+		}
+	
+		this->Render();
+	}
+
+}
+void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
+{}
 void mqMorphoDigCore::lassoTagActors(int tag_inside)
 {
 	POLYGON_LIST poly;
@@ -12139,7 +12233,6 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 		std::string action = "Lasso tag ";
 		
 		int Count = BEGIN_UNDO_SET(action);
-		vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 		this->ActorCollection->InitTraversal();
 		vtkIdType num = this->ActorCollection->GetNumberOfItems();
 		int modified = 0;
@@ -12194,7 +12287,7 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 						{
 						}
 
-						if (tag_inside == 2)
+						if (tag_inside == 2)// tag outside
 						{
 							if (proj_is_inside == 0) { proj_is_inside = 1; }
 							else
@@ -23101,11 +23194,22 @@ void mqMorphoDigCore::slotLassoCutKeepOutside() {
 		return;
 	}
 	this->startLasso(0); }
-void mqMorphoDigCore::slotLassoTagInside() { 
+void mqMorphoDigCore::slotLassoTagMaskInside(int tag) { 
 	
-	
-	this->startLasso(3); }
-void mqMorphoDigCore::slotLassoTagOutside() { this->startLasso(2); }
+	if (tag == 1)
+	{
+		this->startLasso(3);
+	}
+	else
+	{
+		this->startLasso(5);
+	}
+}
+void mqMorphoDigCore::slotLassoTagMaskOutside(int tag) { 
+	if (tag == 1) { this->startLasso(2); }
+	else{ this->startLasso(4); }
+
+}
 
 void mqMorphoDigCore::slotRubberCutKeepInside() {
 	
@@ -23126,11 +23230,24 @@ void mqMorphoDigCore::slotRubberCutKeepOutside() {
 		return;
 	}
 	this->startRubber(0); }
-void mqMorphoDigCore::slotRubberTagInside() { 
+void mqMorphoDigCore::slotRubberTagMaskInside(int tag) { 
 	
-	
-	this->startRubber(3); }
-void mqMorphoDigCore::slotRubberTagOutside() { this->startRubber(2); }
+		if (tag == 1)
+		{
+			this->startRubber(3);
+		}
+		else
+		{
+			this->startRubber(5);
+		}
+}
+void mqMorphoDigCore::slotRubberTagMaskOutside(int tag) { 
+	if (tag == 1) { this->startRubber(2); }
+	else
+	{
+		this->startRubber(4);
+	}
+}
 
 void mqMorphoDigCore::slotConvexHULL() {
 	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();

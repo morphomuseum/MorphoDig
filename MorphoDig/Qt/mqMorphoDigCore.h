@@ -847,8 +847,10 @@ public:
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
   void lassoTagActors(int tag_inside);
+  void lassoMaskVolumes(int mask_inside);
   void rubberCutSelectedActors(int keep_inside);
   void rubberTagActors(int tag_inside);
+  void rubberMaskVolumes(int mask_inside);
   void groupSelectedActors();
   void startRubber(int rubber_mode);//change interaction style
   void stopRubber();//change interaction style back to normal
@@ -1164,12 +1166,12 @@ public slots:
 	virtual void slotGroup();
 	virtual void slotLassoCutKeepInside();
 	virtual void slotLassoCutKeepOutside();
-	virtual void slotLassoTagInside();
-	virtual void slotLassoTagOutside();
+	virtual void slotLassoTagMaskInside(int tag=1);
+	virtual void slotLassoTagMaskOutside(int tag =1);
 	virtual void slotRubberCutKeepInside();
 	virtual void slotRubberCutKeepOutside();
-	virtual void slotRubberTagInside();
-	virtual void slotRubberTagOutside();
+	virtual void slotRubberTagMaskInside(int tag=1);
+	virtual void slotRubberTagMaskOutside(int tag=1);
 	virtual void slotMirror();
 	virtual void slotInvert();
 	virtual void slotKeepLargest();

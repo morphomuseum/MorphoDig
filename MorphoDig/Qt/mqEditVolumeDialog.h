@@ -72,7 +72,7 @@ public:
   virtual void slotRefreshUi();
   virtual void slotLoadPreset(int idx);
   virtual void slotMapper(int idx);
-
+  
   virtual void slotRefreshColorMaps();
   virtual void slotReinitializeColorMap();
   virtual void slotEditColorMapName();

@@ -125,8 +125,8 @@ mqEditTagsDialog::mqEditTagsDialog(QWidget* Parent)
 	connect(this->Ui->activateTagMode, SIGNAL(clicked()), this, SLOT(slotActivateTagMode()));
 	connect(this->Ui->bucketOn, SIGNAL(clicked()), this, SLOT(slotBucketOn()));
 	connect(this->Ui->pencilOn, SIGNAL(clicked()), this, SLOT(slotPencilOn()));
-	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoTagInside()));
-	connect(this->Ui->rubberOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberTagInside()));
+	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoTagMaskInside(1)));
+	connect(this->Ui->rubberOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberTagMaskInside(1)));
 	connect (this->Ui->erase, SIGNAL(pressed()), this, SLOT(slotEraseActiveTag()));
 	
 	QAction* mergeAction = new QAction(tr("&Merge"), this);
