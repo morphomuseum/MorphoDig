@@ -23194,20 +23194,24 @@ void mqMorphoDigCore::slotLassoCutKeepOutside() {
 		return;
 	}
 	this->startLasso(0); }
-void mqMorphoDigCore::slotLassoTagMaskInside(int tag) { 
+void mqMorphoDigCore::slotLassoTagInside() { 
 	
-	if (tag == 1)
-	{
 		this->startLasso(3);
-	}
-	else
-	{
-		this->startLasso(5);
-	}
 }
-void mqMorphoDigCore::slotLassoTagMaskOutside(int tag) { 
-	if (tag == 1) { this->startLasso(2); }
-	else{ this->startLasso(4); }
+void mqMorphoDigCore::slotLassoMaskInside() {
+
+	
+		this->startLasso(5);
+	
+}
+void mqMorphoDigCore::slotLassoTagOutside() { 
+	this->startLasso(2); 
+	
+
+}
+void mqMorphoDigCore::slotLassoMaskOutside() {
+	
+	 this->startLasso(4); 
 
 }
 
@@ -23230,25 +23234,26 @@ void mqMorphoDigCore::slotRubberCutKeepOutside() {
 		return;
 	}
 	this->startRubber(0); }
-void mqMorphoDigCore::slotRubberTagMaskInside(int tag) { 
+void mqMorphoDigCore::slotRubberTagInside() { 
 	
-		if (tag == 1)
-		{
+		
 			this->startRubber(3);
-		}
-		else
-		{
-			this->startRubber(5);
-		}
+		
 }
-void mqMorphoDigCore::slotRubberTagMaskOutside(int tag) { 
-	if (tag == 1) { this->startRubber(2); }
-	else
-	{
-		this->startRubber(4);
-	}
-}
+void mqMorphoDigCore::slotRubberMaskInside() {
 
+	
+		this->startRubber(5);
+	
+}
+void mqMorphoDigCore::slotRubberTagOutside() { 
+	this->startRubber(2); 
+}
+void mqMorphoDigCore::slotRubberMaskOutside() {
+	
+		this->startRubber(4);
+	
+}
 void mqMorphoDigCore::slotConvexHULL() {
 	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
 	if (num_selected_meshes == 0) {

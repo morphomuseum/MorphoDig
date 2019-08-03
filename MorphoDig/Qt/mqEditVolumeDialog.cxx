@@ -265,8 +265,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->deleteColorMap, SIGNAL(pressed()), this, SLOT(slotDeleteColorMap()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(colorMapsChanged()), this, SLOT(slotRefreshColorMaps()));
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
-	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoTagMaskInside(0)));
-	connect(this->Ui->rubberOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberTagMaskInside(0)));
+	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoMaskInside()));
+	connect(this->Ui->rubberOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberMaskInside()));
 
 
 

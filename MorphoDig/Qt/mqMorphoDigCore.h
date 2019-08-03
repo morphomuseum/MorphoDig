@@ -1166,12 +1166,17 @@ public slots:
 	virtual void slotGroup();
 	virtual void slotLassoCutKeepInside();
 	virtual void slotLassoCutKeepOutside();
-	virtual void slotLassoTagMaskInside(int tag=1);
-	virtual void slotLassoTagMaskOutside(int tag =1);
+	virtual void slotLassoMaskInside();
+	virtual void slotLassoMaskOutside();
+	virtual void slotLassoTagInside();
+	virtual void slotLassoTagOutside();
+
 	virtual void slotRubberCutKeepInside();
 	virtual void slotRubberCutKeepOutside();
-	virtual void slotRubberTagMaskInside(int tag=1);
-	virtual void slotRubberTagMaskOutside(int tag=1);
+	virtual void slotRubberTagInside();
+	virtual void slotRubberTagOutside();
+	virtual void slotRubberMaskInside();
+	virtual void slotRubberMaskOutside();
 	virtual void slotMirror();
 	virtual void slotInvert();
 	virtual void slotKeepLargest();
