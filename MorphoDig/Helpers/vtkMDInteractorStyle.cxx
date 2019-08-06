@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkMDInteractorStyle.h"
 #include "vtkMDActor.h"
+#include "vtkMDVolume.h"
 #include "vtkLMActor.h"
 #include "vtkMDVolume.h"
 #include "mqUndoStack.h"
@@ -92,7 +93,7 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 
 #define VTKISMT_ORIENT 0
 #define VTKISMD_SELECT 1
-#define VTKISMD_TAGPENCIL 2
+#define VTKISMD_TAGMASKPENCIL 2
 #define CTRL_RELEASED 0
 #define CTRL_PRESSED 1
 #define ALT_PRESSED 4
@@ -101,6 +102,8 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define L_RELEASED 3
 #define T_PRESSED 7
 #define T_RELEASED 8
+#define M_PRESSED 9
+#define M_RELEASED 11
 
 //#define SHIFT_PRESSED 9
 #define SHIFT_RELEASED 10
@@ -117,6 +120,7 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	//this->MoveMode = MOVECAM_MODE;
 	this->L = L_RELEASED;
 	this->T = T_RELEASED;
+	this->M = M_RELEASED;
 	this->MoveWhat = CAM;
 	this->Ctrl = CTRL_RELEASED;
 	this->Shift = SHIFT_RELEASED;
@@ -124,8 +128,8 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	this->RM_Button = RBUTTON_UP;
 	this->StartPosition[0] = this->StartPosition[1] = 0;
 	this->EndPosition[0] = this->EndPosition[1] = 0;
-	this->TagPencilCenterPosition[0] = this->TagPencilCenterPosition[1] = 0;
-	this->TagPencilStarted = 0;
+	this->TagMaskPencilCenterPosition[0] = this->TagMaskPencilCenterPosition[1] = 0;
+	this->TagMaskPencilStarted = 0;
 	this->Moving = 0;
 	this->PixelArray = vtkUnsignedCharArray::New();
 	this->PixelArray2 = vtkUnsignedCharArray::New();
@@ -282,19 +286,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 
 
 //--------------------------------------------------------------------------
-/*void vtkMDInteractorStyle::StartTagPencil()
-{
-	this->CurrentMode = VTKISMD_TAGPENCIL;
-	mqMorphoDigCore::instance()->setCurrentCursor(5);
-}
 
-
-//--------------------------------------------------------------------------
-void vtkMDInteractorStyle::StartSelect()
-{
-	this->CurrentMode = VTKISMD_SELECT;
-	mqMorphoDigCore::instance()->setCurrentCursor(4);
-}*/
 //--------------------------------------------------------------------------
   void vtkMDInteractorStyle::OnKeyPress()
   {
@@ -329,12 +321,12 @@ void vtkMDInteractorStyle::StartSelect()
 			int tool = mqMorphoDigCore::instance()->Getmui_TagTool();
 			if (tool ==0)// pencil
 			{
-				this->CurrentMode = VTKISMD_TAGPENCIL;
+				this->CurrentMode = VTKISMD_TAGMASKPENCIL;
 				mqMorphoDigCore::instance()->setCurrentCursor(5);
 				//cout << "Tag Pencil start" << endl;
 				
-				this->TagPencilStart();
-				this->RedrawTagPencilCircle();
+				this->TagMaskPencilStart();
+				this->RedrawTagMaskPencilCircle();
 				
 			}
 			else // paint buckett
@@ -342,6 +334,22 @@ void vtkMDInteractorStyle::StartSelect()
 				mqMorphoDigCore::instance()->setCurrentCursor(6);
 			}
 		}
+	}
+	if (key.compare("m") == 0 || key.compare("M") == 0)
+	{
+		//cout << "l pressed" << endl;
+		this->M = M_PRESSED;
+
+
+		
+			this->CurrentMode = VTKISMD_TAGMASKPENCIL;
+			mqMorphoDigCore::instance()->setCurrentCursor(5);
+			//cout << "Tag Pencil start" << endl;
+
+			this->TagMaskPencilStart();
+			this->RedrawTagMaskPencilCircle();
+
+		
 	}
 	if (key.compare("Shift_L") == 0)
 	{
@@ -1342,7 +1350,16 @@ void vtkMDInteractorStyle::StartSelect()
 	  if (key.compare("t") == 0 || key.compare("T") == 0)
 	  {
 		  this->T = T_RELEASED;
-		  this->TagPencilStop();
+		  this->TagMaskPencilStop();
+		  this->CurrentMode = VTKISMT_ORIENT;
+		  //mqMorphoDigCore::instance()->resetCursor();
+		  this->Interactor->Render();
+		  // std::cout << key << "Released" << '\n';
+	  }
+	  if (key.compare("m") == 0 || key.compare("M") == 0)
+	  {
+		  this->M = M_RELEASED;
+		  this->TagMaskPencilStop();
 		  this->CurrentMode = VTKISMT_ORIENT;
 		  //mqMorphoDigCore::instance()->resetCursor();
 		  this->Interactor->Render();
@@ -1395,7 +1412,7 @@ void vtkMDInteractorStyle::Dolly(double factor)
 	{
 		return;
 	}
-	if (this->T == T_PRESSED)
+	if (this->T == T_PRESSED || this->M == M_PRESSED)
 	{
 		//cout << "T Dolly" << factor << endl;
 		int tool = mqMorphoDigCore::instance()->Getmui_TagTool();
@@ -1415,7 +1432,7 @@ void vtkMDInteractorStyle::Dolly(double factor)
 				pencil_size+=5;
 			}
 				mqMorphoDigCore::instance()->Setmui_PencilSize(pencil_size,1);
-				this->RedrawTagPencilCircle();					
+				this->RedrawTagMaskPencilCircle();					
 			
 		}
 	}
@@ -1480,9 +1497,9 @@ void vtkMDInteractorStyle::RubberStart()
 
 	this->FindPokedRenderer(this->StartPosition[0], this->StartPosition[1]);
 }
-void vtkMDInteractorStyle::TagPencilStart()
+void vtkMDInteractorStyle::TagMaskPencilStart()
 {
-	if (this->TagPencilStarted == 0)
+	if (this->TagMaskPencilStarted == 0)
 	{
 		//cout << "PencilStart()" << endl;
 		//mqMorphoDigCore::instance()->setCurrentCursor(4);
@@ -1500,8 +1517,8 @@ void vtkMDInteractorStyle::TagPencilStart()
 
 		int x = this->Interactor->GetEventPosition()[0];
 		int y = this->Interactor->GetEventPosition()[1];
-		TagPencilCenterPosition[0] = x;
-		TagPencilCenterPosition[1] = y;
+		TagMaskPencilCenterPosition[0] = x;
+		TagMaskPencilCenterPosition[1] = y;
 
 
 		this->PixelArray2->Initialize();
@@ -1511,8 +1528,8 @@ void vtkMDInteractorStyle::TagPencilStart()
 
 		renWin->GetRGBACharPixelData(0, 0, size[0] - 1, size[1] - 1, 1, this->PixelArray2);
 
-		this->FindPokedRenderer(this->TagPencilCenterPosition[0], this->TagPencilCenterPosition[1]);
-		this->TagPencilStarted = 1;
+		this->FindPokedRenderer(this->TagMaskPencilCenterPosition[0], this->TagMaskPencilCenterPosition[1]);
+		this->TagMaskPencilStarted = 1;
 	}
 	
 
@@ -1522,8 +1539,8 @@ void vtkMDInteractorStyle::Tag(int mode)
 	//int* clickPos = this->GetInteractor()->GetEventPosition();
 	int x = this->Interactor->GetEventPosition()[0];
 	int y = this->Interactor->GetEventPosition()[1];
-	TagPencilCenterPosition[0] = x;
-	TagPencilCenterPosition[1] = y;
+	TagMaskPencilCenterPosition[0] = x;
+	TagMaskPencilCenterPosition[1] = y;
 	//std::cout << "Clicked at "
 	//	<< x << " " << y << std::endl;
 	if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
@@ -1561,6 +1578,50 @@ void vtkMDInteractorStyle::Tag(int mode)
 
 	}
 }
+void vtkMDInteractorStyle::Mask(int mode)
+{
+	//int* clickPos = this->GetInteractor()->GetEventPosition();
+	int x = this->Interactor->GetEventPosition()[0];
+	int y = this->Interactor->GetEventPosition()[1];
+	TagMaskPencilCenterPosition[0] = x;
+	TagMaskPencilCenterPosition[1] = y;
+	//std::cout << "Clicked at "
+	//	<< x << " " << y << std::endl;
+	if (this->CurrentRenderer == NULL) { cout << "Current renderer null" << endl; }
+	if (this->CurrentRenderer != NULL)
+	{
+		//std::cout << "Current renderer:" << this->CurrentRenderer << endl;
+		// Pick from this location.
+		/* vtkSmartPointer<vtkPropPicker>  picker =
+		vtkSmartPointer<vtkPropPicker>::New();*/
+
+		vtkSmartPointer<vtkCellPicker> picker =
+			vtkSmartPointer<vtkCellPicker>::New();
+
+		picker->Pick(x, y, 0, this->CurrentRenderer);
+
+
+
+		vtkIdType pickid = picker->GetPointId();
+
+
+		if (picker->GetVolume() == NULL) {
+			cout << "Picked Null volume" << endl;
+		}
+		else
+		{
+			vtkMDVolume * myVolume = vtkMDVolume::SafeDownCast(picker->GetVolume());
+			if (myVolume != NULL)
+			{
+				//right button down : no override
+				mqMorphoDigCore::instance()->MaskAt(pickid, myVolume, mode);
+			}
+
+			mqMorphoDigCore::instance()->Render();
+		}
+
+	}
+}
 //--------------------------------------------------------------------------
 void vtkMDInteractorStyle::OnRightButtonDown()
 {
@@ -1570,6 +1631,14 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 	{
 		this->Tag(0);
 		
+		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+		//this->T = T_RELEASED;
+
+	}
+	if (this->M == M_PRESSED)
+	{
+		this->Mask(0);
+
 		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 		//this->T = T_RELEASED;
 
@@ -1626,7 +1695,7 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 	}
 	else
 	{
-		if (this->T == T_RELEASED)
+		if (this->T == T_RELEASED || this->M == M_RELEASED)
 		{
 			this->ResetMoveWhat();
 		}
@@ -1779,9 +1848,19 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 
 		 // this->T = T_RELEASED;
 	  }//left button down, no landmark 
+	  else  if (this->M == M_PRESSED
+		  && this->Ctrl != CTRL_PRESSED
+		  )
+	  {
+
+		  this->Mask(1);
+		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+
+		 // this->T = T_RELEASED;
+	  }//left button down, no landmark 
 	  else
 	  { // left mouse pressed, no 
-		  if (this->T == T_RELEASED)
+		  if (this->T == T_RELEASED || this->M == M_RELEASED)
 		  {
 			  this->ResetMoveWhat();
 		  }
@@ -2052,7 +2131,7 @@ void vtkMDInteractorStyle::SaveSelectedActorsPositions()
 void vtkMDInteractorStyle::OnMouseMove()
 {
 	
-  if (this->CurrentMode != VTKISMD_SELECT &&  this->CurrentMode != VTKISMD_TAGPENCIL)
+  if (this->CurrentMode != VTKISMD_SELECT &&  this->CurrentMode != VTKISMD_TAGMASKPENCIL)
   {
 	 // this->ResetMoveWhat();
 	  //if (this->Ctrl != CTRL_PRESSED)
@@ -2138,39 +2217,39 @@ void vtkMDInteractorStyle::OnMouseMove()
 	  this->RedrawRubberBand();
   }
   
-  if (this->CurrentMode == VTKISMD_TAGPENCIL)
+  if (this->CurrentMode == VTKISMD_TAGMASKPENCIL)
   {
 	
-	  this->TagPencilCenterPosition[0] = this->Interactor->GetEventPosition()[0];
-	  this->TagPencilCenterPosition[1] = this->Interactor->GetEventPosition()[1];
+	  this->TagMaskPencilCenterPosition[0] = this->Interactor->GetEventPosition()[0];
+	  this->TagMaskPencilCenterPosition[1] = this->Interactor->GetEventPosition()[1];
 	  int *size = this->Interactor->GetRenderWindow()->GetSize();
-	  if (this->TagPencilCenterPosition[0] > (size[0] - 1))
+	  if (this->TagMaskPencilCenterPosition[0] > (size[0] - 1))
 	  {
-		  this->TagPencilCenterPosition[0] = size[0] - 1;
+		  this->TagMaskPencilCenterPosition[0] = size[0] - 1;
 	  }
-	  if (this->TagPencilCenterPosition[0] < 0)
+	  if (this->TagMaskPencilCenterPosition[0] < 0)
 	  {
-		  this->TagPencilCenterPosition[0] = 0;
+		  this->TagMaskPencilCenterPosition[0] = 0;
 	  }
-	  if (this->TagPencilCenterPosition[1] > (size[1] - 1))
+	  if (this->TagMaskPencilCenterPosition[1] > (size[1] - 1))
 	  {
-		  this->TagPencilCenterPosition[1] = size[1] - 1;
+		  this->TagMaskPencilCenterPosition[1] = size[1] - 1;
 	  }
-	  if (this->TagPencilCenterPosition[1] < 0)
+	  if (this->TagMaskPencilCenterPosition[1] < 0)
 	  {
-		  this->TagPencilCenterPosition[1] = 0;
+		  this->TagMaskPencilCenterPosition[1] = 0;
 	  }
 	 // cout << "this->LM_Button=" << this->LM_Button << endl;
-	  if (this->LM_Button == LBUTTON_DOWN)
+	  if (this->LM_Button == LBUTTON_DOWN && this->T ==T_PRESSED)
 	  {
 		  cout << "Tag inside moousmove" << endl;
 		  this->Tag(0);
 	  }
-	  if (this->RM_Button == RBUTTON_DOWN)
+	  if (this->RM_Button == RBUTTON_DOWN && this->T == T_PRESSED)
 	  {
 		  this->Tag(1);
 	  }
-	  this->RedrawTagPencilCircle();
+	  this->RedrawTagMaskPencilCircle();
   }
 }
 
@@ -2190,9 +2269,9 @@ if ((this->StartPosition[0] != this->EndPosition[0])
 }
 this->Moving = 0;
 }
-void vtkMDInteractorStyle::TagPencilStop()
+void vtkMDInteractorStyle::TagMaskPencilStop()
 {
-	this->TagPencilStarted = 0;
+	this->TagMaskPencilStarted = 0;
 	
 	//mqMorphoDigCore::instance()->setCurrentCursor(this->MoveWhat);
 	if (!this->Interactor || !this->Moving)
@@ -2443,7 +2522,7 @@ void vtkMDInteractorStyle::RedrawRubberBand()
 
   tmpPixelArray->Delete();
 }
-void vtkMDInteractorStyle::RedrawTagPencilCircle()
+void vtkMDInteractorStyle::RedrawTagMaskPencilCircle()
 {
 	// assume "R" is 
 	//update the rubber band on the screen
@@ -2456,8 +2535,8 @@ void vtkMDInteractorStyle::RedrawTagPencilCircle()
 	// adaptation of the midpoint circle algorithm to know which pixels form the outline of a circle of center x0,Y0 and radius "radius"
 	int radius = (int) mqMorphoDigCore::instance()->Getmui_PencilSize();
 	if (radius < 10) { radius = 10; }
-	int x0 = this->TagPencilCenterPosition[0];
-	int y0 = this->TagPencilCenterPosition[1];
+	int x0 = this->TagMaskPencilCenterPosition[0];
+	int y0 = this->TagMaskPencilCenterPosition[1];
 	int x = radius - 1;
 	int y = 0;
 	int dx = 1;

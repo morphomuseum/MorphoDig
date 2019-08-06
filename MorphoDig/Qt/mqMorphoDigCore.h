@@ -484,7 +484,10 @@ public:
 	void UnselectAll(int Count);
 	void SelectAll(int Count);
 	void Setmui_DisplayMode(int mode);
-
+	/*vtkGetMacro(mui_Mask, int);
+	vtkSetMacro(mui_Mask, int);*/
+	int Getmui_Mask();
+	void Setmui_Mask(int mask);
 	long long int Getmui_DefaultVolumeOutOfCoreThreshold();
 	long long int Getmui_VolumeOutOfCoreThreshold();
 	void Setmui_VolumeOutOfCoreThreshold(long long int newVolumeOutOfCoreThreshold);
@@ -586,7 +589,7 @@ public:
 	void Setmui_Z2Label(QString label);
 	QString Getmui_DefaultZ2Label();
 	QString Getmui_Z2Label();
-
+	void MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask);
 	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName, double BoxBounds[6]);
 	void SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ);
@@ -1116,6 +1119,7 @@ protected:
 	QString mui_DefaultZ1Label;
 	QString mui_DefaultZ2Label;
 
+	int mui_Mask;
 	int mui_DefaultShowGrid;
 	int mui_DefaultMoveMode;
 	int mui_DefaultAnaglyph;

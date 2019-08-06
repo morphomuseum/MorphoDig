@@ -34,8 +34,7 @@ public:
   vtkTypeMacro(vtkMDInteractorStyle, vtkInteractorStyleTrackballCamera);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /*void StartSelect();
-  void StartTagPencil();*/
+  
 
   //@{
   /**
@@ -51,9 +50,10 @@ public:
   virtual void OnChar();
   virtual void RubberStart();
   virtual void RubberStop();
-  virtual void TagPencilStart();
-  virtual void TagPencilStop();
+  virtual void TagMaskPencilStart();
+  virtual void TagMaskPencilStop();
   virtual void Tag(int mode);
+  virtual void Mask(int mode);
   virtual void OnKeyPress();
   virtual void OnKeyRelease();
   virtual void EndRotate();
@@ -95,10 +95,10 @@ protected:
 	double newAttachmentPoint[3]);*/
   virtual void Pick();
   void RedrawRubberBand();
-  void RedrawTagPencilCircle();
+  void RedrawTagMaskPencilCircle();
   int StartPosition[2];
-  int TagPencilCenterPosition[2];
-  int TagPencilStarted;
+  int TagMaskPencilCenterPosition[2];
+  int TagMaskPencilStarted;
   int EndPosition[2];
   int MoveWhat;
   int Moving;
@@ -118,6 +118,7 @@ protected:
   int Shift;
   int L;
   int T;
+  int M;
   int Alt;
   int LM_Button;
   int RM_Button;

@@ -19,7 +19,7 @@ Module:    vtkMDVolume.h
 #include <vtkImageAccumulate.h>
 #include <vtkImageResliceMapper.h>
 #include <vtkImageSliceMapper.h>
-
+#include <vtkKdTreePointLocator.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkOutlineFilter.h>
@@ -70,7 +70,9 @@ public:
 	
 	vtkTypeMacro(vtkMDVolume, vtkVolume);
 	void PrintSelf(ostream& os, vtkIndent indent);
-	
+	void BuildKdTree();
+	void FreeKdTree();
+	vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
 	// Description:
 	void GetInitCenter(double center[3]);
 	void InitCenter();
@@ -285,6 +287,7 @@ protected:
 	int isVisibleXZ;
 	int isVisibleYZ;
 	int myDim[3];
+	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
 
 	/*imageMapper
 	 vtkSmartPointer<vtkImageSlice> image =

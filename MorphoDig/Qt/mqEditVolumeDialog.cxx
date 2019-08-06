@@ -235,12 +235,13 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedVolumes()));
 	connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveVolume()));
 	connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
-	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotReinitializeMask()));
-	connect(this->Ui->reinitializeMASK, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
+	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
+	connect(this->Ui->reinitializeMASK, SIGNAL(pressed()), this, SLOT(slotReinitializeMask()));
 
 	connect(this->Ui->cropVolume, SIGNAL(pressed()), this, SLOT(slotcropVolumeClicked()));
 	//
-	
+	connect(this->Ui->maskR, SIGNAL(clicked(bool)), this, SLOT(slotMaskClicked(bool)));
+	connect(this->Ui->unmaskR, SIGNAL(clicked(bool)), this, SLOT(slotUnmaskClicked(bool)));
 	connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
 	connect(this->mColorMap, SIGNAL(shiftOrSlideStopped()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
@@ -267,6 +268,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoMaskInside()));
 	connect(this->Ui->rubberOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberMaskInside()));
+	connect(this->Ui->lassoOn2, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoMaskOutside()));
+	connect(this->Ui->rubberOn2, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberMaskOutside()));
 
 
 
@@ -391,6 +394,9 @@ void mqEditVolumeDialog::slotReinitializeMask()
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
 		this->Volume->InitializeMask();
+		this->Volume->UpdateMaskData(this->Volume->GetMask());
+		this->Volume->SetImageDataBinComputed(0);
+		if (this->Volume->GetuseImageDataBinForVR() == 1) { this->Volume->ComputeImageDataBin(); }
 		mqMorphoDigCore::instance()->Render();
 	}
 }
@@ -405,7 +411,13 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Volume->SetMaskEnabled(true);
 			this->Ui->pencilOn->setEnabled(true);
 			this->Ui->rubberOn->setEnabled(true);
+			this->Ui->lassoOn2->setEnabled(true);
+			this->Ui->rubberOn2->setEnabled(true);
+			this->Ui->maskR->setEnabled(true);
+			this->Ui->unmaskR->setEnabled(true);
+
 			this->Ui->lassoOn->setEnabled(true);
+
 			this->Ui->reinitializeMASK->setEnabled(true);
 		}
 		else
@@ -416,6 +428,10 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->pencilOn->setEnabled(false);
 			this->Ui->rubberOn->setEnabled(false);
 			this->Ui->lassoOn->setEnabled(false);
+			this->Ui->lassoOn2->setEnabled(false);
+			this->Ui->rubberOn2->setEnabled(false);
+			this->Ui->maskR->setEnabled(false);
+			this->Ui->unmaskR->setEnabled(false);
 			this->Ui->reinitializeMASK->setEnabled(false);
 
 
@@ -492,6 +508,16 @@ void mqEditVolumeDialog::CropVolume()
 	this->Volume->CropVolume();
 	this->UpdateUI();
 	// 2 
+}
+void mqEditVolumeDialog::slotMaskClicked(bool isChecked)
+{
+	cout << "mui_Mask:1" << endl;
+	mqMorphoDigCore::instance()->Setmui_Mask(1);
+}
+void mqEditVolumeDialog::slotUnmaskClicked(bool isChecked)
+{
+	cout << "mui_Mask:0" << endl;
+	mqMorphoDigCore::instance()->Setmui_Mask(0);
 }
 void mqEditVolumeDialog::slotcropVolumeClicked()
 {
@@ -1021,6 +1047,10 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->pencilOn->setDisabled(false);
 			this->Ui->lassoOn->setDisabled(false);
 			this->Ui->rubberOn->setDisabled(false);
+			this->Ui->lassoOn2->setEnabled(false);
+			this->Ui->rubberOn2->setEnabled(false);
+			this->Ui->maskR->setEnabled(false);
+			this->Ui->unmaskR->setEnabled(false);
 			this->Ui->reinitializeMASK->setDisabled(false);
 		}
 		else
@@ -1029,6 +1059,10 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->pencilOn->setDisabled(true);
 			this->Ui->lassoOn->setDisabled(true);
 			this->Ui->rubberOn->setDisabled(true);
+			this->Ui->lassoOn2->setDisabled(true);
+			this->Ui->rubberOn2->setDisabled(true);
+			this->Ui->maskR->setDisabled(true);
+			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
 		}
 		int mtype = this->Volume->Getmapper_type();
@@ -1039,6 +1073,10 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->pencilOn->setDisabled(true);
 			this->Ui->lassoOn->setDisabled(true);
 			this->Ui->rubberOn->setDisabled(true);
+			this->Ui->lassoOn2->setDisabled(true);
+			this->Ui->rubberOn2->setDisabled(true);
+			this->Ui->maskR->setDisabled(true);
+			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
 
 		}

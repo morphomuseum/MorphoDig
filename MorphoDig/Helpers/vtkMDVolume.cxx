@@ -67,6 +67,7 @@ vtkMDVolume::vtkMDVolume()
 	this->myDim[0] = 0;
 	this->myDim[1] = 0;
 	this->myDim[2] = 0;
+	this->KdTree = nullptr;
 	/*this->SliceXY->GetProperty()->SetColorWindow(range[1] - range[0]);
     this->SliceXY->GetProperty()->SetColorLevel(0.5*(range[0] + range[1]));
     this->SliceXY->GetProperty()->SetInterpolationTypeToNearest();
@@ -174,6 +175,7 @@ void vtkMDVolume::InitializeMapper()
 //----------------------------------------------------------------------------
 vtkMDVolume::~vtkMDVolume()
 {
+	this->FreeKdTree();
 	this->UndoRedo->RedoStack.clear();
 	this->UndoRedo->UndoStack.clear();
 	delete this->UndoRedo;
@@ -181,6 +183,26 @@ vtkMDVolume::~vtkMDVolume()
 
 
 
+}
+void vtkMDVolume::BuildKdTree()
+{
+	
+
+		vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+		this->KdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
+		//mPD = mymapper->GetInput();
+		
+		this->KdTree->SetDataSet(this->GetMask());
+		this->KdTree->BuildLocator();
+	
+}
+void vtkMDVolume::FreeKdTree()
+{
+	this->KdTree = nullptr;
+}
+vtkSmartPointer<vtkKdTreePointLocator> vtkMDVolume::GetKdTree()
+{
+	return this->KdTree;
 }
 void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 {
@@ -297,6 +319,7 @@ void vtkMDVolume::InitializeMask()
 	this->Mask->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 	std::cout << "Initialize Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
 
+	std::cout << "Initialize Mask Res: " << " x: " << res[0] << " y: " << res[1] << " z: " << res[2] << std::endl;
 	std::cout << "Initialize Mask Number of points: " << this->Mask->GetNumberOfPoints() << std::endl;
 	std::cout << "Initialize Number of cells: " << this->Mask->GetNumberOfCells() << std::endl;
 	for (int z = 0; z < dims[2]; z++)
@@ -318,7 +341,7 @@ void vtkMDVolume::InitializeMask()
 			}
 		}
 	}
-
+	Mask->Modified();
 	for (int z = 0; z < dims[2]; z++)
 	{
 		for (int y = 0; y < dims[1]; y++)

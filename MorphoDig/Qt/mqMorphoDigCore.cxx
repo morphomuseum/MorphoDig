@@ -10,6 +10,7 @@
 #include "vtkMDVolume.h"
 #include "vtkLMActor.h"
 #include <vtkDICOMImageReader.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
 #include <vtkImageFlip.h>
@@ -165,6 +166,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	double defaultSpecular = newactor->GetProperty()->GetSpecular();
 	double defaultSpecularPower = newactor->GetProperty()->GetSpecularPower();
 	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << endl;*/
+	this->mui_Mask = 1;
 	this->mui_DefaultSpecularPower = this->mui_SpecularPower = 1;
 	this->mui_DefaultSpecular = this->mui_Specular= 0;
 	this->mui_DefaultAmbient = this->mui_Ambient= 0;
@@ -1583,6 +1585,61 @@ void mqMorphoDigCore::Extract_Scalar_Range(double scalar_min, double scalar_max)
 	this->Extract_Array_Range(scalar_min, scalar_max);
 
 
+}
+void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
+{
+	cout << "Mask At " << pickid << endl;
+	if (myVolume != NULL && myVolume->GetMaskEnabled() == 1)
+	{
+		if (myVolume->GetKdTree() == nullptr)
+		{
+			cout << "Try to build volume kdtree!" << endl;
+			myVolume->BuildKdTree();
+			cout << "volume KdTree built" << endl;
+		}
+		vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
+		int dims[3];
+		double pt[3];
+
+		//double vn[3];
+		myVolume->GetImageData()->GetPoint(pickid, pt);
+		cout << "Volume picked point:"<<pickid<<", coords:" << pt[0] << "," << pt[1] << "," << pt[2] << endl;
+		vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+		double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize() / 100;
+		cout << "Call FindPointsWithinRadius with radius:" << Radius << endl;
+		myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+		cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+
+		//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
+		/*vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
+		if (scalars!=NULL)
+		{
+			for (vtkIdType i = 0; i < observedNeighbours->GetNumberOfIds(); i++)
+			{
+				vtkIdType ptId = observedNeighbours->GetId(i);
+				if (mask == 1)
+				{
+					//scalars->[ptId] = 0;
+					//scalars->SetTuple1(ptId, 0);
+				}
+				else
+				{
+					//scalars->SetTuple1(ptId, 255);
+					//scalars[ptId] = 255;
+				}
+
+
+			}
+		}
+		else
+		{
+			cout << "Unsigned char array is null" << endl;
+		}*/
+		//Mask->Modified();
+		//myVolume->UpdateMaskData(Mask);
+		//myVolume->SetImageDataBinComputed(0);
+		//if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
+	}
 }
 void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride)
 {
@@ -12214,7 +12271,14 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 									//cout << "mask " << x << "," << y << "," << z << endl;
 								}
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								pixel[0] = 0;
+								if (this->mui_Mask == 1)
+								{
+									pixel[0] = 0;
+								}
+								else
+								{
+									pixel[0] = 255;
+								}
 							}
 							//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
 							//if (x > 50) { pixel[0] = 0; }
@@ -12471,7 +12535,15 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 							{
 
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								pixel[0] = 0;
+								if (this->mui_Mask == 1)
+								{
+									pixel[0] = 0;
+								}
+								else
+								{
+									pixel[0] = 255;
+								}
+								
 							}
 
 							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
@@ -21068,7 +21140,8 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	
 	return name_obj;
 }
-
+int mqMorphoDigCore::Getmui_Mask() { return this->mui_Mask; }
+void mqMorphoDigCore::Setmui_Mask(int mask) { this->mui_Mask = mask; }
 void mqMorphoDigCore::Setmui_DisplayMode(int mode)
 {
 	this->mui_DisplayMode = mode;
