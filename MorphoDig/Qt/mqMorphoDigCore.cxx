@@ -12194,7 +12194,7 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
 							if (cc < 100)
 							{
-								cout << "Screen x, y:" << ptSCREEN[0] << "," << ptSCREEN[1] << ", inside: "<< proj_is_inside<<endl;
+								//cout << "Screen x, y:" << ptSCREEN[0] << "," << ptSCREEN[1] << ", inside: "<< proj_is_inside<<endl;
 								cc++;
 							}
 							if (mask_inside == 0)// mask outside
@@ -12211,18 +12211,22 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 								cpt++;
 								if (cpt < 100)
 								{
-									cout << "mask " << x << "," << y << "," << z << endl;
+									//cout << "mask " << x << "," << y << "," << z << endl;
 								}
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
 								pixel[0] = 0;
 							}
+							//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
+							//if (x > 50) { pixel[0] = 0; }
 						
 							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
 						}
 					}
 				}
-				cout << "Done with mask loop" << endl;
+				cout << "Lasso : Done with mask loop" << endl;
 				long long cpt2=0;
+				long long cpt255 = 0;
+				long long cpt0 = 0;
 				long long numvox = dims[0] * dims[1] * dims[2];
 				for (int z = 0; z < dims[2]; z++)
 				{
@@ -12232,22 +12236,31 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 						{
 							unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
 							// do something with v
-							if (pixel[0]!=255)
+							if (pixel[0] == 255)
+							{
+								cpt255++;
+							}
+							else if (pixel[0]==0)
 							{ 
-								cpt2++;
+								cpt0++;
 								//std::cout << "Pixel at " << x << "," << y << "," << z << ", differs from 255! "  << endl;
 
 							}
+							else
+							{
+								cpt2++;
+							}
 							if (z < 10 && y < 10 && ((x < 60) && (x > 40)))
 							{
-								std::cout << "Pixel at " << x << "," << y << "," << z  << ", " << pixel[0] << endl;
+								//std::cout << "Pixel at " << x << "," << y << "," << z  << ", " << pixel[0] << endl;
 							}
 						}
 
 					}
 
 				}
-				cout << "Found " << cpt2 <<" out of "<<numvox<<" pixels that differ from 255" << endl;
+				cout << "Lasso : Found "<<cpt255 << "=255, "<<cpt0 <<"=0, and " << cpt2 <<" others out of "<<numvox<<" pixels " << endl;
+				Mask->Modified();
 				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
 				if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
@@ -12466,6 +12479,7 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 					}
 				}
 				cout << "Done with mask loop rubber band" << endl;
+				Mask->Modified();
 				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
 				if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }

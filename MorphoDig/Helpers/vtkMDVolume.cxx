@@ -189,6 +189,7 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 	{
 		if (this->MaskInitialized == 0)
 		{
+			cout << "Initialize mask..." << endl;
 			this->InitializeMask();
 		}
 		if (this->mapper_type == 1)
@@ -215,7 +216,44 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
 			}
 		}
-		
+		long long cpt2 = 0;
+		long long cpt255 = 0;
+		long long cpt0 = 0;
+		int dims[3];
+		this->GetImageData()->GetDimensions(dims);
+		long long numvox = dims[0] * dims[1] * dims[2];
+		for (int z = 0; z < dims[2]; z++)
+		{
+			for (int y = 0; y < dims[1]; y++)
+			{
+				for (int x = 0; x < dims[0]; x++)
+				{
+					unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+					// do something with v
+					if (pixel[0] == 255)
+					{
+						cpt255++;
+					}
+					else if (pixel[0] == 0)
+					{
+						cpt0++;
+						//std::cout << "Pixel at " << x << "," << y << "," << z << ", differs from 255! "  << endl;
+
+					}
+					else
+					{
+						cpt2++;
+					}
+					if (z < 10 && y < 10 && ((x < 60) && (x > 40)))
+					{
+						//std::cout << "Pixel at " << x << "," << y << "," << z << ", " << pixel[0] << endl;
+					}
+				}
+
+			}
+
+		}
+		cout << "Set Mask enabled: Found " << cpt255 << "=255, " << cpt0 << "=0, and " << cpt2 << " others out of " << numvox << " pixels " << endl;
 		
 		//do stuff to associate the mask to the mapper
 	}
@@ -249,15 +287,18 @@ void vtkMDVolume::InitializeMask()
 	this->MaskBinComputed = 0;
 	this->Mask = vtkSmartPointer<vtkImageData>::New();
 	int dims[3];
+	double res[3];
 	this->GetImageData()->GetDimensions(dims);
+	this->GetImageData()->GetSpacing(res);
 
 
 	this->Mask->SetDimensions(dims);
+	this->Mask->SetSpacing(res);
 	this->Mask->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-	std::cout << "Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
+	std::cout << "Initialize Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
 
-	std::cout << "Mask Number of points: " << this->Mask->GetNumberOfPoints() << std::endl;
-	std::cout << "Number of cells: " << this->Mask->GetNumberOfCells() << std::endl;
+	std::cout << "Initialize Mask Number of points: " << this->Mask->GetNumberOfPoints() << std::endl;
+	std::cout << "Initialize Number of cells: " << this->Mask->GetNumberOfCells() << std::endl;
 	for (int z = 0; z < dims[2]; z++)
 	{
 		for (int y = 0; y < dims[1]; y++)
@@ -269,11 +310,11 @@ void vtkMDVolume::InitializeMask()
 				//if (x > 50)
 				//{
 					pixel[0] = 255;
-				/*}
-				else
-				{
-					pixel[0] = 0;
-				}*/
+					//}
+				//else
+				//{
+				//	pixel[0] = 0;
+				//}
 			}
 		}
 	}
@@ -288,7 +329,7 @@ void vtkMDVolume::InitializeMask()
 				// do something with v
 				if (z < 10 && y < 10 && ((x<60) && (x>40)))
 				{
-					std::cout <<"Pixel at "<<x<<","<<y<<","<<z<<":"<< ", " <<pixel[0] << endl;
+					//std::cout <<"Pixel at "<<x<<","<<y<<","<<z<<":"<< ", " <<pixel[0] << endl;
 				}
 			}
 			
@@ -335,7 +376,7 @@ void vtkMDVolume::InitializeMask()
 	{
 		dataTypeAsString = "Unknown";
 	}
-	cout << "Default Mask data type: " << dataTypeAsString.toStdString() << endl;
+	cout << "Initialize Mask data type: " << dataTypeAsString.toStdString() << endl;
 	//this->Mask->SetScalarType()
 	this->MaskInitialized = 1;
 }
@@ -1298,6 +1339,22 @@ void vtkMDVolume::UpdateMaskData(vtkSmartPointer<vtkImageData> mskData)
 	// to be called after SetImageDataAndMap, never before!
 	this->Mask = mskData;
 	this->MaskBinComputed = 0;
+
+	// Reset to NULL
+	if (this->mapper_type == 1)
+	{
+
+		vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(NULL);
+
+	}
+	else if (this->mapper_type == 2)
+	{
+
+		vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(NULL);
+
+	}
+
+
 	if (this->mapper_type == 1)
 	{
 		vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskTypeToBinary();
