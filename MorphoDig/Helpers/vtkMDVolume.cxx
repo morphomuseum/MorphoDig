@@ -68,6 +68,7 @@ vtkMDVolume::vtkMDVolume()
 	this->myDim[1] = 0;
 	this->myDim[2] = 0;
 	this->KdTree = nullptr;
+	this->Octree = nullptr;
 	/*this->SliceXY->GetProperty()->SetColorWindow(range[1] - range[0]);
     this->SliceXY->GetProperty()->SetColorLevel(0.5*(range[0] + range[1]));
     this->SliceXY->GetProperty()->SetInterpolationTypeToNearest();
@@ -176,6 +177,7 @@ void vtkMDVolume::InitializeMapper()
 vtkMDVolume::~vtkMDVolume()
 {
 	this->FreeKdTree();
+	this->FreeOctree();
 	this->UndoRedo->RedoStack.clear();
 	this->UndoRedo->UndoStack.clear();
 	delete this->UndoRedo;
@@ -188,11 +190,11 @@ void vtkMDVolume::BuildKdTree()
 {
 	
 
-		vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
 		this->KdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
-		//mPD = mymapper->GetInput();
-		
+	
 		this->KdTree->SetDataSet(this->GetMask());
+		cout << "Build KDtree with mask of " << this->GetMask()->GetNumberOfPoints() << " points" << endl;
+
 		this->KdTree->BuildLocator();
 	
 }
@@ -203,6 +205,25 @@ void vtkMDVolume::FreeKdTree()
 vtkSmartPointer<vtkKdTreePointLocator> vtkMDVolume::GetKdTree()
 {
 	return this->KdTree;
+}
+void vtkMDVolume::BuildOctree()
+{
+
+
+	this->Octree = vtkSmartPointer<vtkOctreePointLocator>::New();
+
+	this->Octree->SetDataSet(this->GetMask());
+	cout << "Build Octree with mask of " << this->GetMask()->GetNumberOfPoints()<<" points"<< endl;
+	this->Octree->BuildLocator();
+
+}
+void vtkMDVolume::FreeOctree()
+{
+	this->Octree = nullptr;
+}
+vtkSmartPointer<vtkOctreePointLocator> vtkMDVolume::GetOctree()
+{
+	return this->Octree;
 }
 void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 {

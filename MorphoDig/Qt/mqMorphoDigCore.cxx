@@ -1597,6 +1597,12 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 			myVolume->BuildKdTree();
 			cout << "volume KdTree built" << endl;
 		}
+		if (myVolume->GetOctree() == nullptr)
+		{
+			cout << "Try to build volume octree!" << endl;
+			myVolume->BuildOctree();
+			cout << "volume Octree built" << endl;
+		}
 		vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
 		int dims[3];
 		double pt[3];
@@ -1606,7 +1612,10 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		cout << "Volume picked point:"<<pickid<<", coords:" << pt[0] << "," << pt[1] << "," << pt[2] << endl;
 		vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 		double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize() / 100;
-		cout << "Call FindPointsWithinRadius with radius:" << Radius << endl;
+		cout << "Call Octree FindPointsWithinRadius with radius:" << Radius << endl;
+		myVolume->GetOctree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+
+		cout << "Call Kdtree FindPointsWithinRadius with radius:" << Radius << endl;
 		myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
 		cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
 
