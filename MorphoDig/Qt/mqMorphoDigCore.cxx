@@ -1614,13 +1614,13 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize() / 100;
 		cout << "Call Octree FindPointsWithinRadius with radius:" << Radius << endl;
 		myVolume->GetOctree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
-
-		cout << "Call Kdtree FindPointsWithinRadius with radius:" << Radius << endl;
-		myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
 		cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+		cout << "Call Kdtree FindPointsWithinRadius with radius:" << Radius << endl;
+		//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+		//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
 
 		//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
-		/*vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
+		vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 		if (scalars!=NULL)
 		{
 			for (vtkIdType i = 0; i < observedNeighbours->GetNumberOfIds(); i++)
@@ -1629,11 +1629,11 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 				if (mask == 1)
 				{
 					//scalars->[ptId] = 0;
-					//scalars->SetTuple1(ptId, 0);
+					scalars->SetTuple1(ptId, 0);
 				}
 				else
 				{
-					//scalars->SetTuple1(ptId, 255);
+					scalars->SetTuple1(ptId, 255);
 					//scalars[ptId] = 255;
 				}
 
@@ -1643,11 +1643,11 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		else
 		{
 			cout << "Unsigned char array is null" << endl;
-		}*/
-		//Mask->Modified();
-		//myVolume->UpdateMaskData(Mask);
-		//myVolume->SetImageDataBinComputed(0);
-		//if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
+		}
+		Mask->Modified();
+		myVolume->UpdateMaskData(Mask);
+		myVolume->SetImageDataBinComputed(0);
+		if (myVolume->GetuseImageDataBinForVR() == 1) { myVolume->ComputeImageDataBin(); }
 	}
 }
 void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride)
