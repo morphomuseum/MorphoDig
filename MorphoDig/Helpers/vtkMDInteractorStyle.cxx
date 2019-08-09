@@ -309,7 +309,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 		//cout << "l pressed" << endl;
 		this->L = L_PRESSED;
 	}
-	if (key.compare("t") == 0 || key.compare("T") == 0)
+	if (key.compare("t") == 0 || key.compare("T") == 0 && this->CurrentMode != VTKISMD_TAGMASKPENCIL)
 	{
 		//cout << "l pressed" << endl;
 		this->T = T_PRESSED;
@@ -327,7 +327,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 				
 				this->TagMaskPencilStart();
 				this->RedrawTagMaskPencilCircle();
-				
+				cout << "T pressed" << endl;
 			}
 			else // paint buckett
 			{
@@ -335,9 +335,9 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 			}
 		}
 	}
-	if (key.compare("m") == 0 || key.compare("M") == 0)
+	if ((key.compare("m") == 0 || key.compare("M") == 0)&& this->CurrentMode != VTKISMD_TAGMASKPENCIL)
 	{
-		//cout << "l pressed" << endl;
+		cout << "this->CurrentMode="<< this->CurrentMode<< endl;
 		this->M = M_PRESSED;
 
 
@@ -345,9 +345,10 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 			this->CurrentMode = VTKISMD_TAGMASKPENCIL;
 			mqMorphoDigCore::instance()->setCurrentCursor(5);
 			//cout << "Tag Pencil start" << endl;
-
 			this->TagMaskPencilStart();
 			this->RedrawTagMaskPencilCircle();
+			cout << "M pressed" << endl;
+
 
 		
 	}
@@ -539,6 +540,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 				}
 				mqMorphoDigCore::instance()->signal_actorSelectionChanged();
 				mqMorphoDigCore::instance()->signal_volumeSelectionChanged();
+				cout << "Render from onKeyPress" << endl;
 				rwi->Render();
 			}
 			
@@ -559,6 +561,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 			
 				END_UNDO_SET();
 				vtkRenderWindowInteractor *rwi = this->Interactor;
+				cout << "Render from onKeyPress2" << endl;
 				rwi->Render();
 			}
 			
@@ -1297,6 +1300,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 		{
 			//cout << "CTRL-Z detected!" << endl;
 			mqMorphoDigCore::instance()->Undo();
+			cout << "Render from onKeyPress 3 z" << endl;
 			rwi->Render();
 		}
 
@@ -1308,6 +1312,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 		{
 			//cout << "CTRL-Y detected!" << endl;
 			mqMorphoDigCore::instance()->Redo();
+			cout << "Render from onKeyPress 4 y" << endl;
 			rwi->Render();
 		}
 
@@ -1351,8 +1356,10 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	  {
 		  this->T = T_RELEASED;
 		  this->TagMaskPencilStop();
+		  cout << "Reset mode to 0 onKeyRelease" << endl;
 		  this->CurrentMode = VTKISMT_ORIENT;
 		  //mqMorphoDigCore::instance()->resetCursor();
+		  cout << "Render from onKeyRelease" << endl;
 		  this->Interactor->Render();
 		  // std::cout << key << "Released" << '\n';
 	  }
@@ -1360,10 +1367,12 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	  {
 		  this->M = M_RELEASED;
 		  this->TagMaskPencilStop();
+		  cout << "Reset mode to 0 onKeyRelease" << endl;
+
 		  this->CurrentMode = VTKISMT_ORIENT;
-		  //mqMorphoDigCore::instance()->resetCursor();
+		  cout << "Render from onKeyRelease 2" << endl;
 		  this->Interactor->Render();
-		  // std::cout << key << "Released" << '\n';
+		  
 	  }
 	  // Forward events
 	  vtkInteractorStyleTrackballCamera::OnKeyRelease();
@@ -1384,6 +1393,8 @@ void vtkMDInteractorStyle::OnChar()
 		}
 		else
 		{
+			cout << "Reset mode to 0 onChar" << endl;
+
 			this->CurrentMode = VTKISMT_ORIENT;
 		}
 		break;
@@ -1464,6 +1475,7 @@ void vtkMDInteractorStyle::Dolly(double factor)
 
 		mqMorphoDigCore::instance()->signal_zoomChanged();
 	}
+	cout << "Render from dolly" << endl;
 	this->Interactor->Render();
 
 
@@ -1536,6 +1548,7 @@ void vtkMDInteractorStyle::TagMaskPencilStart()
 }
 void vtkMDInteractorStyle::Tag(int mode)
 {
+	cout << "Tag" << mode << endl;
 	//int* clickPos = this->GetInteractor()->GetEventPosition();
 	int x = this->Interactor->GetEventPosition()[0];
 	int y = this->Interactor->GetEventPosition()[1];
@@ -1572,7 +1585,7 @@ void vtkMDInteractorStyle::Tag(int mode)
 				//right button down : no override
 				mqMorphoDigCore::instance()->TagAt(pickid, myActor, mode);
 			}
-
+			cout << "Render from Tag" << endl;
 			mqMorphoDigCore::instance()->Render();
 		}
 
@@ -1580,6 +1593,7 @@ void vtkMDInteractorStyle::Tag(int mode)
 }
 void vtkMDInteractorStyle::Mask(int mode)
 {
+	cout << "Mask" << mode << endl;
 	//int* clickPos = this->GetInteractor()->GetEventPosition();
 	int x = this->Interactor->GetEventPosition()[0];
 	int y = this->Interactor->GetEventPosition()[1];
@@ -1615,9 +1629,10 @@ void vtkMDInteractorStyle::Mask(int mode)
 			{
 				//right button down : no override
 				mqMorphoDigCore::instance()->MaskAt(pickid, myVolume, mode);
+				cout << "Render From Mask" << endl;
+				mqMorphoDigCore::instance()->Render();
 			}
-
-			mqMorphoDigCore::instance()->Render();
+			
 		}
 
 	}
@@ -1630,8 +1645,8 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 	if (this->T == T_PRESSED)
 	{
 		this->Tag(0);
-		
-		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
+		this->Mask(0);
+		//this->GetInthis->Tag(0);teractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 		//this->T = T_RELEASED;
 
 	}
@@ -1684,7 +1699,7 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 			else
 			{
 				mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
-
+				cout << "Render From OnRightButtonDown" << endl;
 				mqMorphoDigCore::instance()->Render();
 			}
 
@@ -1828,7 +1843,9 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 				   // else
 				  //  {
 				   mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
-				   mqMorphoDigCore::instance()->CreateLandmarkUndoSet(mqMorphoDigCore::instance()->Getmui_LandmarkMode());				   
+				   mqMorphoDigCore::instance()->CreateLandmarkUndoSet(mqMorphoDigCore::instance()->Getmui_LandmarkMode());		
+				   cout << "Render From onLeftButtonDown" << endl;
+				   
 				   mqMorphoDigCore::instance()->Render();
 				   //  }
 			   }
@@ -1842,8 +1859,8 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  && this->Ctrl != CTRL_PRESSED
 		  )
 	  {
-
 		  this->Tag(1);
+		  this->Mask(1);
 		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 
 		 // this->T = T_RELEASED;
@@ -1852,11 +1869,8 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  && this->Ctrl != CTRL_PRESSED
 		  )
 	  {
-
 		  this->Mask(1);
-		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
-
-		 // this->T = T_RELEASED;
+		 
 	  }//left button down, no landmark 
 	  else
 	  { // left mouse pressed, no 
@@ -2219,7 +2233,7 @@ void vtkMDInteractorStyle::OnMouseMove()
   
   if (this->CurrentMode == VTKISMD_TAGMASKPENCIL)
   {
-	
+	  cout << "Mouse move tag mask pencil" << endl;
 	  this->TagMaskPencilCenterPosition[0] = this->Interactor->GetEventPosition()[0];
 	  this->TagMaskPencilCenterPosition[1] = this->Interactor->GetEventPosition()[1];
 	  int *size = this->Interactor->GetRenderWindow()->GetSize();
@@ -2242,12 +2256,23 @@ void vtkMDInteractorStyle::OnMouseMove()
 	 // cout << "this->LM_Button=" << this->LM_Button << endl;
 	  if (this->LM_Button == LBUTTON_DOWN && this->T ==T_PRESSED)
 	  {
-		  cout << "Tag inside moousmove" << endl;
+		  cout << "Tag inside mousmove" << endl;
 		  this->Tag(0);
+		  this->Mask(0);
 	  }
 	  if (this->RM_Button == RBUTTON_DOWN && this->T == T_PRESSED)
 	  {
+		  this->Mask(1);
 		  this->Tag(1);
+	  }
+	  if(this->LM_Button == LBUTTON_DOWN && this->M == M_PRESSED)
+	  {
+		  cout << "Mask inside mousmove" << endl;
+		  this->Mask(0);
+	  }
+	  if (this->RM_Button == RBUTTON_DOWN && this->M == M_PRESSED)
+	  {
+		  this->Mask(1);
 	  }
 	  this->RedrawTagMaskPencilCircle();
   }
@@ -2327,6 +2352,8 @@ void vtkMDInteractorStyle::OnRightButtonUp()
 		return;
 	}
 	this->RubberStop();	
+	cout << "Reset mode to 0 onRightButtonUp" << endl;
+
 	this->CurrentMode = VTKISMT_ORIENT;
 }
 //--------------------------------------------------------------------------
@@ -2699,7 +2726,7 @@ void vtkMDInteractorStyle::Pick()
     }
     rwi->EndPickCallback();
   }
-
+  cout << "Render from Pick" << endl;
   this->Interactor->Render();
 }
 void vtkMDInteractorStyle::GetCenterOfMassOfSelectedActors(double com[3])
@@ -3183,7 +3210,7 @@ void vtkMDInteractorStyle::RotateActors()
 			this->CurrentRenderer->ResetCameraClippingRange();
 			mqMorphoDigCore::instance()->ActivateClippingPlane();
 		}
-
+		cout << "Render from RotateActors" << endl;
 		rwi->Render();
 	}
 }
@@ -3401,7 +3428,7 @@ void vtkMDInteractorStyle::SpinActors()
 		this->CurrentRenderer->ResetCameraClippingRange();
 		mqMorphoDigCore::instance()->ActivateClippingPlane();
 	}
-
+	cout << "Render from SpinActors" << endl;
 	rwi->Render();
 }
 
@@ -3738,7 +3765,7 @@ void vtkMDInteractorStyle::PanActors()
 		this->CurrentRenderer->ResetCameraClippingRange();
 		mqMorphoDigCore::instance()->ActivateClippingPlane();
 	}
-
+	cout << "Render from PanActors" << endl;
 	rwi->Render();
 }
 
