@@ -102,8 +102,8 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define L_RELEASED 3
 #define T_PRESSED 7
 #define T_RELEASED 8
-#define M_PRESSED 9
-#define M_RELEASED 11
+#define M_PRESSED 7
+#define M_RELEASED 8
 
 //#define SHIFT_PRESSED 9
 #define SHIFT_RELEASED 10
@@ -339,17 +339,21 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	{
 		cout << "this->CurrentMode="<< this->CurrentMode<< endl;
 		this->M = M_PRESSED;
+		if (mqMorphoDigCore::instance()->Getmui_TagModeActivated())
+		{
+			int tool = mqMorphoDigCore::instance()->Getmui_TagTool();
+			if (tool == 0)// pencil
+			{
 
 
-		
-			this->CurrentMode = VTKISMD_TAGMASKPENCIL;
-			mqMorphoDigCore::instance()->setCurrentCursor(5);
-			//cout << "Tag Pencil start" << endl;
-			this->TagMaskPencilStart();
-			this->RedrawTagMaskPencilCircle();
-			cout << "M pressed" << endl;
-
-
+				this->CurrentMode = VTKISMD_TAGMASKPENCIL;
+				mqMorphoDigCore::instance()->setCurrentCursor(5);
+				//cout << "Tag Pencil start" << endl;
+				this->TagMaskPencilStart();
+				this->RedrawTagMaskPencilCircle();
+				cout << "M pressed" << endl;
+			}
+		}
 		
 	}
 	if (key.compare("Shift_L") == 0)
