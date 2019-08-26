@@ -17,7 +17,7 @@ VTK : Build backend : OpenGL2 + Glew!
 VTK_QT_VERSION : 5
 VTK_Group_Qt : v
 vtlGuiSupportQt: v
-VTK_REQUIRE_LARGE_FILE_SUPPORT : v
+VTK_USE_LARGE_DATA : v
 Module_vtkGUISupportQtOpenGL : v
 
 http://www.vtk.org/Wiki/VTK/Tutorials/QtSetup
