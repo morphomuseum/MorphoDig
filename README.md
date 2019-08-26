@@ -43,6 +43,7 @@ Windows binaries are downloadable at the following address : http://morphomuseum
 4.  download and install CMAKE (>=3.4.x) (http://cmake.org).
 5.  download and build VTK (>=8.2) (http://vtk.org) using CMAKE with the following options:
 * VTK_Group_Qt : v
+* VTK_REQUIRE_LARGE_FILE_SUPPORT: v
 * Module vtlGuiSupportQt: v
 * Module vtkGUISupportQtOpenGL : v
 
