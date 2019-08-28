@@ -157,6 +157,7 @@ void vtkMDVolume::InitializeMapper()
 	if (mapper_type == 0)
 	{
 		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+		//mapper->SetAutoAdjustSampleDistances(true);
 		this->SetMapper(mapper);
 
 	}
@@ -164,13 +165,22 @@ void vtkMDVolume::InitializeMapper()
 	{
 
 		vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+		//mapper->SetUseJittering(true);
+		//mapper->SetAutoAdjustSampleDistances(true);
+		//mapper->SetClampDepthToBackface(true);
+		//mapper->SetUseDepthPass(true);
 		this->SetMapper(mapper);
 	}
 	else if (mapper_type == 2)
 	{
 		//mapper->SetRequestedRenderModeToGPU();
 		vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+		//mapper->SetUseJittering(true);
+		//mapper->SetAutoAdjustSampleDistances(true);
+		//mapper->SetClampDepthToBackface(true);
+		//mapper->SetUseDepthPass(true);
 		this->SetMapper(mapper);
+
 	}
 }
 //----------------------------------------------------------------------------
