@@ -42,6 +42,9 @@
 #include <vtkTextProperty.h>
 #include <vtkPlatonicSolidSource.h>
 #include <vtkSphereSource.h>
+#include <vtkPolyDataToImageStencil.h>
+#include <vtkImageStencilData.h>
+#include <vtkImageStencilToImage.h>
 #include <vtkImageData.h>
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkRenderWindowInteractor.h>
@@ -1604,14 +1607,58 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 			cout << "volume Octree built" << endl;
 		}
 		vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
+		double spacing[3];
+		Mask->GetSpacing(spacing);
 		int dims[3];
 		double pt[3];
+		
 
 		//double vn[3];
 		myVolume->GetImageData()->GetPoint(pickid, pt);
 		cout << "Volume picked point:"<<pickid<<", coords:" << pt[0] << "," << pt[1] << "," << pt[2] << endl;
-		vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 		double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize() / 100;
+
+		// Create a sphere of desired dimensions
+		vtkSmartPointer<vtkSphereSource> sphereSource =
+			vtkSmartPointer<vtkSphereSource>::New();
+		
+		sphereSource->SetRadius(Radius);
+		sphereSource->SetCenter(pt);
+		sphereSource->SetThetaResolution(30);
+		sphereSource->SetPhiResolution(15);
+		sphereSource->Update();
+
+		// Use vtkPolyDataToStencil
+		vtkSmartPointer<vtkPolyDataToImageStencil> BrushPolyDataToStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+		BrushPolyDataToStencil->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
+		BrushPolyDataToStencil->SetInputData(sphereSource->GetOutput());
+
+		//iif (this->operationInside())
+		// Clip modifier labelmap to non-null region to make labelmap modification faster later
+
+		/*double* boundsIjk = sphereSource->GetOutput()->GetBounds();
+		BrushPolyDataToStencil->SetOutputWholeExtent(floor(boundsIjk[0]) - 1, ceil(boundsIjk[1]) + 1,
+			floor(boundsIjk[2]) - 1, ceil(boundsIjk[3]) + 1, floor(boundsIjk[4]) - 1, ceil(boundsIjk[5]) + 1);*/
+		// si on masque l'extérieur de la sphère... 		
+		BrushPolyDataToStencil->SetOutputWholeExtent(Mask->GetExtent());
+		BrushPolyDataToStencil->Update();
+		vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
+		int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };
+		stencilData->GetExtent(stencilExtent);
+		cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5]<< endl;
+		vtkSmartPointer<vtkImageStencilToImage> stencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
+
+		stencilToImage->SetInputData(BrushPolyDataToStencil->GetOutput());
+		stencilToImage->SetInsideValue(0);
+		stencilToImage->SetOutsideValue(255);
+		stencilToImage->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+		stencilToImage->Update();
+		//Apply result to Mask ImageData vktStencilToImageData
+		/**/
+
+
+
+		vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 		cout << "Call Octree FindPointsWithinRadius with radius:" << Radius << endl;
 		myVolume->GetOctree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
 		cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;

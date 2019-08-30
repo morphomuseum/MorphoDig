@@ -57,6 +57,7 @@ set( required_vtk_modules
   vtkGUISupportQt
   vtkImagingHybrid
   vtkImagingStatistics
+  vtkImagingStencil
   vtkInteractionStyle
   vtkIOCore
   vtkIOGeometry
@@ -235,6 +236,7 @@ IF (WIN32)
 "${VTK_DIR}/bin/Release/vtkIOXML-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkIOXMLParser-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkexpat-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+"${VTK_DIR}/bin/Release/vtkImagingStencil-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
 
 
