@@ -1653,21 +1653,59 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		stencilToImage->SetOutsideValue(255);
 		stencilToImage->SetOutputScalarType(VTK_UNSIGNED_CHAR);
 		stencilToImage->Update();
+
+		vtkNew<vtkImageData> brushOutput;
+	
+		brushOutput->ShallowCopy(stencilToImage->GetOutput());
 		//Apply result to Mask ImageData vktStencilToImageData
 		/**/
 
 
 
-		vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
-		cout << "Call Octree FindPointsWithinRadius with radius:" << Radius << endl;
-		myVolume->GetOctree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
-		cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
-		cout << "Call Kdtree FindPointsWithinRadius with radius:" << Radius << endl;
+	
 		//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
 		//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
 
 		//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
 		vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
+		vtkIdType cptStencil = 0;
+		brushOutput->GetDimensions(dims);
+		cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+		for (int z = 0; z < dims[2]; z++)
+		{
+			for (int y = 0; y < dims[1]; y++)
+			{
+				for (int x = 0; x < dims[0]; x++)
+				{
+
+					unsigned char* pixel = static_cast<unsigned char*>(brushOutput->GetScalarPointer(x, y, z));
+					//if (x > 50)
+					//{
+					if (pixel[0]==0)
+					{
+						cptStencil++;
+						unsigned char* pixelM = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
+						pixelM[0] = 0;
+					}
+					
+					
+					//}
+				//else
+				//{
+				//	pixel[0] = 0;
+				//}
+				}
+			}
+		}
+		cout << "Brush output contains  found " << cptStencil << " points to mask = 0" << endl;
+		
+		/*vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
+		cout << "Call Octree FindPointsWithinRadius with radius:" << Radius << endl;
+		myVolume->GetOctree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+		cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+		cout << "Call Kdtree FindPointsWithinRadius with radius:" << Radius << endl;
+		vtkIdType cptOct = observedNeighbours->GetNumberOfIds();
+		cout << "Octree found " << cptOct << " points to mask" << endl;
 		if (scalars!=NULL)
 		{
 			for (vtkIdType i = 0; i < observedNeighbours->GetNumberOfIds(); i++)
@@ -1677,6 +1715,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 				{
 					//scalars->[ptId] = 0;
 					scalars->SetTuple1(ptId, 0);
+					
 				}
 				else
 				{
@@ -1690,7 +1729,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		else
 		{
 			cout << "Unsigned char array is null" << endl;
-		}
+		}*/
 		Mask->Modified();
 		myVolume->UpdateMaskData(Mask);
 		myVolume->SetImageDataBinComputed(0);
