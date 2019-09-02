@@ -1632,14 +1632,41 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 
 		vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 		myVolume->GetMatrix(Mat);
-		vtkSmartPointer<vtkMatrix4x4> InvMat = vtkSmartPointer<vtkMatrix4x4>::New();
-		InvMat->DeepCopy(Mat);
-		cout << "InvMat" << *InvMat << endl;
-		InvMat->Transpose();
-		cout << "InvMat" << *InvMat<< endl;
+		vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
+		TransMat->DeepCopy(Mat);
+		cout << "InvMat" << *TransMat << endl;
+		TransMat->Transpose();
+		double N1, N2, N3;
+		N1 = -(Mat->GetElement(3, 0) * Mat->GetElement(0, 0) +
+			Mat->GetElement(3, 1) * Mat->GetElement(0, 1)
+			+ Mat->GetElement(3, 2) * Mat->GetElement(0, 2));
+
+
+
+		TransMat->SetElement(0, 3, N1);
+
+
+
+		N2 = -(Mat->GetElement(3, 0) * Mat->GetElement(1, 0) +
+			Mat->GetElement(3, 1) * Mat->GetElement(1, 1)
+			+ Mat->GetElement(3, 2) * Mat->GetElement(1, 2));
+
+		TransMat->SetElement(1, 3, N2);
+
+		N3 = -(Mat->GetElement(3, 0) * Mat->GetElement(2, 0) +
+			Mat->GetElement(3, 1) * Mat->GetElement(2, 1)
+			+ Mat->GetElement(3, 2) * Mat->GetElement(2, 2));
+
+		TransMat->SetElement(2, 3, N3);
+
+
+		TransMat->SetElement(3, 0, 0);
+		TransMat->SetElement(3, 1, 0);
+		TransMat->SetElement(3, 2, 0);
+		cout << "InvMat" << *TransMat<< endl;
 		vtkTransform *newTransform = vtkTransform::New();
 		newTransform->PostMultiply();
-		newTransform->SetMatrix(InvMat);
+		newTransform->SetMatrix(TransMat);
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();		
 		vtkSmartPointer<vtkPolyData> SphereInvPos = vtkSmartPointer<vtkPolyData>::New();		
 	
