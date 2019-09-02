@@ -70,6 +70,7 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkReflectionFilter.h>
 #include <vtkTransform.h>
+//#include <vtkTransformFilter.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkCellPicker.h>
 #include <vtkProperty.h>
@@ -1594,18 +1595,19 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 	cout << "Mask At " << pickid << endl;
 	if (myVolume != NULL && myVolume->GetMaskEnabled() == 1)
 	{
-		if (myVolume->GetKdTree() == nullptr)
+		/*if (myVolume->GetKdTree() == nullptr)
 		{
 			cout << "Try to build volume kdtree!" << endl;
 			myVolume->BuildKdTree();
 			cout << "volume KdTree built" << endl;
-		}
-		if (myVolume->GetOctree() == nullptr)
+		}*/
+
+		/*if (myVolume->GetOctree() == nullptr)
 		{
 			cout << "Try to build volume octree!" << endl;
 			myVolume->BuildOctree();
 			cout << "volume Octree built" << endl;
-		}
+		}*/
 		vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
 		double spacing[3];
 		Mask->GetSpacing(spacing);
@@ -1628,10 +1630,34 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		sphereSource->SetPhiResolution(15);
 		sphereSource->Update();
 
+		vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+		myVolume->GetMatrix(Mat);
+		vtkSmartPointer<vtkMatrix4x4> InvMat = vtkSmartPointer<vtkMatrix4x4>::New();
+		InvMat->DeepCopy(Mat);
+		cout << "InvMat" << *InvMat << endl;
+		InvMat->Transpose();
+		cout << "InvMat" << *InvMat<< endl;
+		vtkTransform *newTransform = vtkTransform::New();
+		newTransform->PostMultiply();
+		newTransform->SetMatrix(InvMat);
+		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();		
+		vtkSmartPointer<vtkPolyData> SphereInvPos = vtkSmartPointer<vtkPolyData>::New();		
+	
+
+
+
+		transformFilter->SetInputData(sphereSource->GetOutput());
+
+		/// applique le calcul du tps à l'objet
+		transformFilter->SetTransform(newTransform);
+		transformFilter->Update();
+
+
+
 		// Use vtkPolyDataToStencil
 		vtkSmartPointer<vtkPolyDataToImageStencil> BrushPolyDataToStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
 		BrushPolyDataToStencil->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
-		BrushPolyDataToStencil->SetInputData(sphereSource->GetOutput());
+		BrushPolyDataToStencil->SetInputData(transformFilter->GetOutput());
 
 		//iif (this->operationInside())
 		// Clip modifier labelmap to non-null region to make labelmap modification faster later
@@ -1641,6 +1667,8 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 			floor(boundsIjk[2]) - 1, ceil(boundsIjk[3]) + 1, floor(boundsIjk[4]) - 1, ceil(boundsIjk[5]) + 1);*/
 		// si on masque l'extérieur de la sphère... 		
 		BrushPolyDataToStencil->SetOutputWholeExtent(Mask->GetExtent());
+		BrushPolyDataToStencil->SetOutputOrigin(Mask->GetOrigin());
+		
 		BrushPolyDataToStencil->Update();
 		vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
 		int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };

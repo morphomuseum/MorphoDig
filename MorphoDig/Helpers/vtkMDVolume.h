@@ -19,8 +19,8 @@ Module:    vtkMDVolume.h
 #include <vtkImageAccumulate.h>
 #include <vtkImageResliceMapper.h>
 #include <vtkImageSliceMapper.h>
-#include <vtkKdTreePointLocator.h>
-#include <vtkOctreePointLocator.h>
+//#include <vtkKdTreePointLocator.h>
+//#include <vtkOctreePointLocator.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkOutlineFilter.h>
@@ -70,12 +70,12 @@ public:
 	
 	vtkTypeMacro(vtkMDVolume, vtkVolume);
 	void PrintSelf(ostream& os, vtkIndent indent);
-	void BuildOctree();
+	/*void BuildOctree();
 	void FreeOctree();
 	void BuildKdTree();
-	void FreeKdTree();
-	vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
-	vtkSmartPointer<vtkOctreePointLocator> GetOctree();
+	void FreeKdTree();*/
+	/*vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
+	vtkSmartPointer<vtkOctreePointLocator> GetOctree();*/
 	// Description:
 	void GetInitCenter(double center[3]);
 	void InitCenter();
@@ -290,8 +290,8 @@ protected:
 	int isVisibleXZ;
 	int isVisibleYZ;
 	int myDim[3];
-	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
-	vtkSmartPointer<vtkOctreePointLocator> Octree;
+	//vtkSmartPointer<vtkKdTreePointLocator> KdTree;
+	//vtkSmartPointer<vtkOctreePointLocator> Octree;
 	/*imageMapper
 	 vtkSmartPointer<vtkImageSlice> image =
       vtkSmartPointer<vtkImageSlice>::New();

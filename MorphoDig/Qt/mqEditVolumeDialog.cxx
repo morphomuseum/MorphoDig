@@ -89,7 +89,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 
 	this->GetFirstSelectedVolume();
-
+	this->Ui->oX->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->oY->setButtonSymbols(QAbstractSpinBox::NoButtons);
+	this->Ui->oZ->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
 	this->Ui->M00->setButtonSymbols(QAbstractSpinBox::NoButtons);
 	this->Ui->M01->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -133,6 +135,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->res2->setDecimals(7);
 
 
+	this->Ui->oX->setMinimum(-DBL_MAX); 
+	this->Ui->oY->setMinimum(-DBL_MAX);
+	this->Ui->oZ->setMinimum(-DBL_MAX);
 
 	this->Ui->M00->setMinimum(-DBL_MAX);
 	this->Ui->M01->setMinimum(-DBL_MAX);
@@ -151,6 +156,12 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->M32->setMinimum(-DBL_MAX);
 	this->Ui->M33->setMinimum(-DBL_MAX);
 
+
+	this->Ui->oX->setMaximum(DBL_MAX); 
+	this->Ui->oY->setMaximum(DBL_MAX); 
+	this->Ui->oZ->setMaximum(DBL_MAX);
+	
+
 	this->Ui->M00->setMaximum(DBL_MAX);
 	this->Ui->M01->setMaximum(DBL_MAX);
 	this->Ui->M02->setMaximum(DBL_MAX);
@@ -168,6 +179,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->M32->setMaximum(DBL_MAX);
 	this->Ui->M33->setMaximum(DBL_MAX);
 
+	this->Ui->oX->setDecimals(7);
+	this->Ui->oY->setDecimals(7);
+	this->Ui->oZ->setDecimals(7);
 	this->Ui->M00->setDecimals(7);
 	this->Ui->M01->setDecimals(7);
 	this->Ui->M02->setDecimals(7);
@@ -1038,7 +1052,16 @@ void mqEditVolumeDialog::GetFirstVolume()
 
 void mqEditVolumeDialog::UpdateUI()
 {
+
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
+
+		double origin[3];
+		this->Volume->GetImageData()->GetOrigin(origin);
+		
+		cout << "Volume origin: " << origin[0] << "," << origin[1] << "," << origin[2] << endl;
+		this->Ui->oX->setValue(origin[0]);
+		this->Ui->oY->setValue(origin[1]);
+		this->Ui->oZ->setValue(origin[2]);
 		int maskEnabled = this->Volume->GetMaskEnabled();
 		if (maskEnabled)
 		{

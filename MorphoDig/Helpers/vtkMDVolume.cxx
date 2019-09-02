@@ -67,8 +67,8 @@ vtkMDVolume::vtkMDVolume()
 	this->myDim[0] = 0;
 	this->myDim[1] = 0;
 	this->myDim[2] = 0;
-	this->KdTree = nullptr;
-	this->Octree = nullptr;
+	//this->KdTree = nullptr;
+	//this->Octree = nullptr;
 	/*this->SliceXY->GetProperty()->SetColorWindow(range[1] - range[0]);
     this->SliceXY->GetProperty()->SetColorLevel(0.5*(range[0] + range[1]));
     this->SliceXY->GetProperty()->SetInterpolationTypeToNearest();
@@ -186,8 +186,8 @@ void vtkMDVolume::InitializeMapper()
 //----------------------------------------------------------------------------
 vtkMDVolume::~vtkMDVolume()
 {
-	this->FreeKdTree();
-	this->FreeOctree();
+	//this->FreeKdTree();
+	//this->FreeOctree();
 	this->UndoRedo->RedoStack.clear();
 	this->UndoRedo->UndoStack.clear();
 	delete this->UndoRedo;
@@ -196,6 +196,7 @@ vtkMDVolume::~vtkMDVolume()
 
 
 }
+/*
 void vtkMDVolume::BuildKdTree()
 {
 	
@@ -208,14 +209,18 @@ void vtkMDVolume::BuildKdTree()
 		this->KdTree->BuildLocator();
 	
 }
-void vtkMDVolume::FreeKdTree()
+*/
+/*void vtkMDVolume::FreeKdTree()
 {
 	this->KdTree = nullptr;
-}
+}*/
+/*
 vtkSmartPointer<vtkKdTreePointLocator> vtkMDVolume::GetKdTree()
 {
 	return this->KdTree;
 }
+*/
+/*
 void vtkMDVolume::BuildOctree()
 {
 
@@ -227,14 +232,21 @@ void vtkMDVolume::BuildOctree()
 	this->Octree->BuildLocator();
 
 }
+*/
+/*
 void vtkMDVolume::FreeOctree()
 {
 	this->Octree = nullptr;
 }
+*/
+
+
+/*
 vtkSmartPointer<vtkOctreePointLocator> vtkMDVolume::GetOctree()
 {
 	return this->Octree;
 }
+*/
 void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 {
 	this->MaskEnabled = maskEnabled;
@@ -341,13 +353,26 @@ void vtkMDVolume::InitializeMask()
 	this->Mask = vtkSmartPointer<vtkImageData>::New();
 	int dims[3];
 	double res[3];
+	double origin[3];
+	
+	
+	cout << "Get Matrix!" << endl;
 	this->GetImageData()->GetDimensions(dims);
 	this->GetImageData()->GetSpacing(res);
+	cout << "Get Origin!" << endl;
+	this->GetImageData()->GetOrigin(origin);
+	
 
 
+	cout << "Set dims!" << endl;
 	this->Mask->SetDimensions(dims);
 	this->Mask->SetSpacing(res);
+	cout << "Set Origin" << endl;
+
+	this->Mask->SetOrigin(origin);
+	cout << "Set Allocate scalars" << endl;
 	this->Mask->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+
 	std::cout << "Initialize Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
 
 	std::cout << "Initialize Mask Res: " << " x: " << res[0] << " y: " << res[1] << " z: " << res[2] << std::endl;

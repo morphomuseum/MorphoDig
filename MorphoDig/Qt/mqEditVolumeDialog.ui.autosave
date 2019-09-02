@@ -1618,6 +1618,9 @@
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="oX">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>210</x>
@@ -1641,6 +1644,9 @@
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="oZ">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>350</x>
@@ -1651,6 +1657,9 @@
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="oY">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>280</x>
