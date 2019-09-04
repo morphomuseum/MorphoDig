@@ -13,6 +13,7 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
+#include <vtkBoundingBox.h>
 #include <vtkImageFlip.h>
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
@@ -12361,121 +12362,145 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 		this->VolumeCollection->InitTraversal();
 		vtkIdType num = this->VolumeCollection->GetNumberOfItems();
 		int modified = 0;
+	
+
 		for (vtkIdType i = 0; i < num; i++)
 		{
+			
 			cout << "try to get next volume:" << i << endl;
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			if (myVolume->GetMaskEnabled())
 			{ 
+				vtkNew<vtkPoints> closedSurfacePoints; // p0Top, p0Bottom, p1Top, p1Bottom, ...
+				vtkNew<vtkCellArray> closedSurfaceStrips;
+				vtkNew<vtkCellArray> closedSurfacePolys;
+				//vtkNew< vtkPoints> pointsXY;
+
+				std::vector<vtkVector2i> point_list = this->LassoStyle->GetPolygonPoints();
+				//pointsXY->SetNumberOfPoints(point_list.size());
+				//closedSurfacePoints->SetNumberOfPoints(2 * point_list.size());
+
+				double vol_near = 1;
+				double vol_far = -1;
+				
+				double ptSCREEN[3];
+				int numPT = (int)point_list.size();
+				vtkBoundingBox bbox(myVolume->GetBounds());
+				for (vtkIdType i = 0; i < 8; i++)
+				{
+					double corner[3];
+					bbox.GetCorner(i, corner);
+					this->GetWorldToDisplay(corner[0], corner[1], corner[2], ptSCREEN);
+					if (ptSCREEN[2] > vol_far) {
+						vol_far = ptSCREEN[2];
+					}
+					if (ptSCREEN[2] < vol_near) {
+						vol_near = ptSCREEN[2];
+					}
+				}
+				if (vol_near < -1) { vol_near = -1; }
+				if (vol_far > 1) { vol_far = 1; }
+
+					for (vtkIdType i = 0; i < numPT; i++)
+					{
+						const vtkVector2i &V = point_list[i];
+						double x = (double)V[0];
+						double y = (double)V[1];
+						double pt1[3] = { x,y,vol_near };
+						
+						double pt2[3] = { x,y,vol_far };
+						
+						double pointWC_near[3] = { 0, 0, 0 };
+						double pointWC_far[3] = { 0,0,0 };
+
+						this->GetDisplayToWorld(pt1[0], pt1[1], pt1[2], pointWC_near);
+						
+						closedSurfacePoints->InsertNextPoint(pointWC_near[0], pointWC_near[1], pointWC_near[2]);
+						this->GetDisplayToWorld(pt2[0], pt2[1], pt2[2], pointWC_far);
+						
+						closedSurfacePoints->InsertNextPoint(pointWC_far[0], pointWC_far[1], pointWC_far[2]);
+						if (i < 500)
+						{
+							cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << endl;
+							cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
+							cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << endl;
+							cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << endl;
+						}
+						//pointsXY->SetPoint(i, x, y, 0);
+						
+
+					}
+					cout << "Found vol_far=" << vol_far << endl;
+					cout << "Found vol_near=" << vol_near << endl;
+					vtkNew<vtkPolyData> closedSurfacePolyData;
+					closedSurfacePolyData->SetPoints(closedSurfacePoints.GetPointer());
+					closedSurfacePolyData->SetStrips(closedSurfaceStrips.GetPointer());
+					closedSurfacePolyData->SetPolys(closedSurfacePolys.GetPointer());
+
+					// Skirt
+					closedSurfaceStrips->InsertNextCell(numPT * 2 + 2);
+					for (int i = 0; i < numPT * 2; i++)
+					{
+						closedSurfaceStrips->InsertCellPoint(i);
+					}
+					closedSurfaceStrips->InsertCellPoint(0);
+					closedSurfaceStrips->InsertCellPoint(1);
+					// Front cap
+					closedSurfacePolys->InsertNextCell(numPT);
+					for (int i = 0; i < numPT; i++)
+					{
+						closedSurfacePolys->InsertCellPoint(i * 2);
+					}
+					// Back cap
+					closedSurfacePolys->InsertNextCell(numPT);
+					for (int i = 0; i < numPT; i++)
+					{
+						closedSurfacePolys->InsertCellPoint(i * 2 + 1);
+					}
+					VTK_CREATE(vtkMDActor, actor);
+					if (this->mui_BackfaceCulling == 0)
+					{
+						actor->GetProperty()->BackfaceCullingOff();
+					}
+					else
+					{
+						actor->GetProperty()->BackfaceCullingOn();
+					}
+					VTK_CREATE(vtkPolyDataMapper, mapper);
+
+					mapper->SetColorModeToDefault();
+
+					mapper->SetInputData(closedSurfacePolyData);
+
+
+					// actor->SetmColor(0.68,0.47,0.37,1);//pink
+					actor->SetmColor(0.666667, 0.666667, 1, 1);//kind of violet
+					actor->SetMapper(mapper);
+					actor->SetSelected(0);
+					actor->SetName("lasso3D");
+					actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+					actor->SetDisplayMode(this->mui_DisplayMode);
+					
+
+					this->getActorCollection()->AddItem(actor);
+					emit this->actorsMightHaveChanged();
+
+					std::string action = "Create lasso 3D actor";
+					int mCount = BEGIN_UNDO_SET(action);
+					this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+					END_UNDO_SET();
+
+					this->getActorCollection()->SetChanged(1);
+
+					/* */
+
+
 				vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
 				int dims[3];
 				Mask->GetDimensions(dims);
-				std::cout << "Lasso Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
-
-				std::cout << "Lasso Mask Number of points: " << Mask->GetNumberOfPoints() << std::endl;
-				std::cout << "Lasso Number of cells: " << Mask->GetNumberOfCells() << std::endl;
+				
 				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
-				POLYGON_VERTEX proj_screen;
-				int cpt = 0;
-				int cc = 0;
-				for (int z = 0; z < dims[2]; z++)
-				{
-					for (int y = 0; y < dims[1]; y++)
-					{
-						for (int x = 0; x < dims[0]; x++)
-						{
-							double pt[3];
-							double ptWC[3];
-							double ptSCREEN[3];
-							int ijk[3];
-							ijk[0] = x;
-							ijk[1] = y;
-							ijk[2] = z;
-
-							vtkIdType ptId = Mask->ComputePointId(ijk);
-							Mask->GetPoint(ptId, pt);
-							int proj_is_inside=0;
-							mqMorphoDigCore::TransformPoint(Mat, pt, ptWC);
-							this->GetWorldToDisplay(ptWC[0], ptWC[1], ptWC[2], ptSCREEN);
-							proj_screen.x = ptSCREEN[0];
-							proj_screen.y = ptSCREEN[1];
-							
-							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
-							if (cc < 100)
-							{
-								//cout << "Screen x, y:" << ptSCREEN[0] << "," << ptSCREEN[1] << ", inside: "<< proj_is_inside<<endl;
-								cc++;
-							}
-							if (mask_inside == 0)// mask outside
-							{
-								if (proj_is_inside == 0) { proj_is_inside = 1; }
-								else
-								{
-									proj_is_inside = 0;
-								}
-							}
-							
-							if ((ptSCREEN[2] > -1.0) && ptSCREEN[2] < 1.0 && (proj_is_inside == 1))
-							{
-								cpt++;
-								if (cpt < 100)
-								{
-									//cout << "mask " << x << "," << y << "," << z << endl;
-								}
-								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								if (this->mui_Mask == 1)
-								{
-									pixel[0] = 0;
-								}
-								else
-								{
-									pixel[0] = 255;
-								}
-							}
-							//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-							//if (x > 50) { pixel[0] = 0; }
-						
-							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
-						}
-					}
-				}
-				cout << "Lasso : Done with mask loop" << endl;
-				long long cpt2=0;
-				long long cpt255 = 0;
-				long long cpt0 = 0;
-				long long numvox = dims[0] * dims[1] * dims[2];
-				for (int z = 0; z < dims[2]; z++)
-				{
-					for (int y = 0; y < dims[1]; y++)
-					{
-						for (int x = 0; x < dims[0]; x++)
-						{
-							unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-							// do something with v
-							if (pixel[0] == 255)
-							{
-								cpt255++;
-							}
-							else if (pixel[0]==0)
-							{ 
-								cpt0++;
-								//std::cout << "Pixel at " << x << "," << y << "," << z << ", differs from 255! "  << endl;
-
-							}
-							else
-							{
-								cpt2++;
-							}
-							if (z < 10 && y < 10 && ((x < 60) && (x > 40)))
-							{
-								//std::cout << "Pixel at " << x << "," << y << "," << z  << ", " << pixel[0] << endl;
-							}
-						}
-
-					}
-
-				}
-				cout << "Lasso : Found "<<cpt255 << "=255, "<<cpt0 <<"=0, and " << cpt2 <<" others out of "<<numvox<<" pixels " << endl;
+				
 				Mask->Modified();
 				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
