@@ -52,6 +52,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkPropPicker.h>
 #include <vtkCellPicker.h>
+#include <vtkVolumePicker.h>
 #include <vtk3DWidget.h>
 #include <vtkPolyDataMapper.h>
 vtkStandardNewMacro(vtkMDInteractorStyle);
@@ -1613,9 +1614,9 @@ void vtkMDInteractorStyle::Mask(int mode)
 		/* vtkSmartPointer<vtkPropPicker>  picker =
 		vtkSmartPointer<vtkPropPicker>::New();*/
 
-		vtkSmartPointer<vtkCellPicker> picker =
-			vtkSmartPointer<vtkCellPicker>::New();
-
+		vtkSmartPointer<vtkVolumePicker> picker =
+			vtkSmartPointer<vtkVolumePicker>::New();
+		//picker->mask
 		picker->Pick(x, y, 0, this->CurrentRenderer);
 
 
@@ -1678,8 +1679,8 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 			/* vtkSmartPointer<vtkPropPicker>  picker =
 			vtkSmartPointer<vtkPropPicker>::New();*/
 
-			vtkSmartPointer<vtkCellPicker> picker =
-				vtkSmartPointer<vtkCellPicker>::New();
+			vtkSmartPointer<vtkVolumePicker> picker =
+				vtkSmartPointer<vtkVolumePicker>::New();
 
 			picker->Pick(x, y, 0, this->CurrentRenderer);
 
@@ -1821,8 +1822,8 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 			  /* vtkSmartPointer<vtkPropPicker>  picker =
 			  vtkSmartPointer<vtkPropPicker>::New();*/
 
-			  vtkSmartPointer<vtkCellPicker> picker =
-				  vtkSmartPointer<vtkCellPicker>::New();
+			  vtkSmartPointer<vtkVolumePicker> picker =
+				  vtkSmartPointer<vtkVolumePicker>::New();
 
 			  picker->Pick(x, y, 0, this->CurrentRenderer);
 

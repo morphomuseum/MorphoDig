@@ -1616,7 +1616,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		
 
 		//double vn[3];
-		myVolume->GetImageData()->GetPoint(pickid, pt);
+		myVolume->GetImageData()->GetPoint(pickid, pt); // myVolume point non re-positionné par la matrice de position de l'acteur
 		cout << "Volume picked point:"<<pickid<<", coords:" << pt[0] << "," << pt[1] << "," << pt[2] << endl;
 		double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize() / 100;
 
@@ -1637,26 +1637,27 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		cout << "InvMat" << *TransMat << endl;
 		TransMat->Transpose();
 		double N1, N2, N3;
-		N1 = -(Mat->GetElement(3, 0) * Mat->GetElement(0, 0) +
-			Mat->GetElement(3, 1) * Mat->GetElement(0, 1)
-			+ Mat->GetElement(3, 2) * Mat->GetElement(0, 2));
+		N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
+			TransMat->GetElement(3, 1) * TransMat->GetElement(0, 1)
+			+ TransMat->GetElement(3, 2) * TransMat->GetElement(0, 2));
 
-
+		cout << "N1=" << N1 << endl;
 
 		TransMat->SetElement(0, 3, N1);
 
 
 
-		N2 = -(Mat->GetElement(3, 0) * Mat->GetElement(1, 0) +
-			Mat->GetElement(3, 1) * Mat->GetElement(1, 1)
-			+ Mat->GetElement(3, 2) * Mat->GetElement(1, 2));
+		N2 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(1, 0) +
+			TransMat->GetElement(3, 1) * TransMat->GetElement(1, 1)
+			+ TransMat->GetElement(3, 2) * TransMat->GetElement(1, 2));
 
+		cout << "N2=" << N2 << endl;
 		TransMat->SetElement(1, 3, N2);
 
-		N3 = -(Mat->GetElement(3, 0) * Mat->GetElement(2, 0) +
-			Mat->GetElement(3, 1) * Mat->GetElement(2, 1)
-			+ Mat->GetElement(3, 2) * Mat->GetElement(2, 2));
-
+		N3 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(2, 0) +
+			TransMat->GetElement(3, 1) * TransMat->GetElement(2, 1)
+			+ TransMat->GetElement(3, 2) * TransMat->GetElement(2, 2));
+		cout << "N3=" << N3 << endl;
 		TransMat->SetElement(2, 3, N3);
 
 
@@ -1684,7 +1685,8 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		// Use vtkPolyDataToStencil
 		vtkSmartPointer<vtkPolyDataToImageStencil> BrushPolyDataToStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
 		BrushPolyDataToStencil->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
-		BrushPolyDataToStencil->SetInputData(transformFilter->GetOutput());
+		//BrushPolyDataToStencil->SetInputData(transformFilter->GetOutput());
+		BrushPolyDataToStencil->SetInputData(sphereSource->GetOutput());
 
 		//iif (this->operationInside())
 		// Clip modifier labelmap to non-null region to make labelmap modification faster later
