@@ -90,6 +90,7 @@ public:
 	void CreateCropBox();
 	void RemoveCropBox();
 	void InitializeMask();
+	void InvertMask();
 	void ComputeImageDataBin();
 	void ComputeMaskBin();
 	//vtkSetMacro(Selected, int);

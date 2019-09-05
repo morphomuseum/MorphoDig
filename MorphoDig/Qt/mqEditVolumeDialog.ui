@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>868</width>
-    <height>668</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="palette">
@@ -461,7 +461,7 @@
      <x>10</x>
      <y>10</y>
      <width>851</width>
-     <height>651</height>
+     <height>691</height>
     </rect>
    </property>
    <property name="title">
@@ -1413,6 +1413,9 @@
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_6">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1556,7 +1559,7 @@
     </widget>
     <widget class="QToolButton" name="isVisibleCropBox">
      <property name="enabled">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -1618,6 +1621,9 @@
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="oX">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>210</x>
@@ -1651,6 +1657,9 @@
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="oY">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>280</x>
@@ -1665,7 +1674,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>620</y>
+      <y>660</y>
       <width>195</width>
       <height>30</height>
      </rect>
@@ -1689,7 +1698,7 @@
       <x>10</x>
       <y>530</y>
       <width>421</width>
-      <height>91</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="title">
@@ -1711,9 +1720,9 @@
     <widget class="QWidget" name="horizontalLayoutWidget_2">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>20</y>
-       <width>171</width>
+       <x>110</x>
+       <y>30</y>
+       <width>141</width>
        <height>28</height>
       </rect>
      </property>
@@ -1727,7 +1736,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>Pencil mask</string>
+         <string>Pencil mask (press &quot;T&quot; + left click)</string>
         </property>
         <property name="text">
          <string>...</string>
@@ -1759,20 +1768,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="lassoOn2">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../Icons/icons.qrc">
-          <normaloff>:/Icons/Lasso_keepoutside.png</normaloff>:/Icons/Lasso_keepoutside.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QToolButton" name="rubberOn">
         <property name="enabled">
          <bool>false</bool>
@@ -1783,20 +1778,6 @@
         <property name="icon">
          <iconset resource="../Icons/icons.qrc">
           <normaloff>:/Icons/rubber_mode_keepinside.png</normaloff>:/Icons/rubber_mode_keepinside.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="rubberOn2">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../Icons/icons.qrc">
-          <normaloff>:/Icons/rubber_mode_keepoutside.png</normaloff>:/Icons/rubber_mode_keepoutside.png</iconset>
         </property>
        </widget>
       </item>
@@ -1817,25 +1798,42 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QToolButton" name="invertMASK">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Invert Mask</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/Invert24.png</normaloff>:/Icons/Invert24.png</iconset>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_3">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>50</y>
-       <width>171</width>
+       <x>250</x>
+       <y>60</y>
+       <width>129</width>
        <height>31</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QRadioButton" name="maskR">
+       <widget class="QRadioButton" name="maskInsideR">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Mask</string>
+         <string>Iinside </string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -1843,17 +1841,119 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="unmaskR">
+       <widget class="QRadioButton" name="maskOutsideR">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Unmask</string>
+         <string>Outside </string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_5">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>60</y>
+       <width>181</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QRadioButton" name="pencilSphereR">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Pencil sphere</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="pencilTubeR">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Pencil tube</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QSpinBox" name="pencilSearchSize">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>90</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>500</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>90</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pencil radius (px):</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>560</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QRadioButton" name="maskR">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Mask</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="unmaskR">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Unmask</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <zorder>groupBox_6</zorder>
    <zorder>label</zorder>
@@ -1868,6 +1968,7 @@
    <zorder>groupBox_5</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>groupBox_7</zorder>
+   <zorder>horizontalLayoutWidget_4</zorder>
   </widget>
  </widget>
  <resources>

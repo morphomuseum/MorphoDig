@@ -78,13 +78,25 @@ public:
   virtual void slotEditColorMapName();
   virtual void slotDeleteColorMap();
   virtual void slotdisplayROIPressed();
-  virtual void slotMaskClicked(bool isChecked);
-  virtual void slotUnmaskClicked(bool isChecked);
+  
 
   virtual void slotEnableROIClicked(bool isChecked);
   virtual void slotEnableMASKClicked(bool isChecked);
   virtual void slotisVisibleClicked(bool isChecked);
   virtual void slotReinitializeMask();
+  virtual void slotInvertMask();
+  virtual void slotRefreshPencilSearchSize(int newsize);
+  virtual void slotPencilSearchSizeChanged(int newSize);
+  virtual void slotMaskInsideRClicked(bool isChecked);
+  virtual void slotMaskOutsideRClicked(bool isChecked);
+  virtual void slotMaskRClicked(bool isChecked);
+  
+  virtual void slotUnmaskRClicked(bool isChecked);
+  virtual void slotPencilMaskSphereRClicked(bool isChecked);
+  virtual void slotPencilMaskTubeRClicked(bool isChecked);
+
+
+
   virtual void slotisVisibleXYClicked(bool isChecked);
   virtual void slotisVisibleXZClicked(bool isChecked);
   virtual void slotisVisibleYZClicked(bool isChecked);

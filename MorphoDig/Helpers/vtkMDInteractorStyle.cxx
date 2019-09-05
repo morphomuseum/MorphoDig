@@ -1596,9 +1596,9 @@ void vtkMDInteractorStyle::Tag(int mode)
 
 	}
 }
-void vtkMDInteractorStyle::Mask(int mode)
+void vtkMDInteractorStyle::Mask()
 {
-	cout << "Mask" << mode << endl;
+	//cout << "Mask" << mode << endl;
 	//int* clickPos = this->GetInteractor()->GetEventPosition();
 	int x = this->Interactor->GetEventPosition()[0];
 	int y = this->Interactor->GetEventPosition()[1];
@@ -1633,7 +1633,7 @@ void vtkMDInteractorStyle::Mask(int mode)
 			if (myVolume != NULL)
 			{
 				//right button down : no override
-				mqMorphoDigCore::instance()->MaskAt(pickid, myVolume, mode);
+				mqMorphoDigCore::instance()->MaskAt(pickid, x, y,myVolume);
 				cout << "Render From Mask" << endl;
 				mqMorphoDigCore::instance()->Render();
 			}
@@ -1650,14 +1650,14 @@ void vtkMDInteractorStyle::OnRightButtonDown()
 	if (this->T == T_PRESSED)
 	{
 		this->Tag(0);
-		this->Mask(0);
+		this->Mask();
 		//this->GetInthis->Tag(0);teractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 		//this->T = T_RELEASED;
 
 	}
 	if (this->M == M_PRESSED)
 	{
-		this->Mask(0);
+		this->Mask();
 
 		//this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 		//this->T = T_RELEASED;
@@ -1865,7 +1865,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  )
 	  {
 		  this->Tag(1);
-		  this->Mask(1);
+		  this->Mask();
 		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 
 		 // this->T = T_RELEASED;
@@ -1874,7 +1874,7 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  && this->Ctrl != CTRL_PRESSED
 		  )
 	  {
-		  this->Mask(1);
+		  this->Mask();
 		 
 	  }//left button down, no landmark 
 	  else
@@ -2263,21 +2263,21 @@ void vtkMDInteractorStyle::OnMouseMove()
 	  {
 		  cout << "Tag inside mousmove" << endl;
 		  this->Tag(0);
-		  this->Mask(0);
+		  this->Mask();
 	  }
 	  if (this->RM_Button == RBUTTON_DOWN && this->T == T_PRESSED)
 	  {
-		  this->Mask(1);
+		  this->Mask();
 		  this->Tag(1);
 	  }
 	  if(this->LM_Button == LBUTTON_DOWN && this->M == M_PRESSED)
 	  {
 		  cout << "Mask inside mousmove" << endl;
-		  this->Mask(0);
+		  this->Mask();
 	  }
 	  if (this->RM_Button == RBUTTON_DOWN && this->M == M_PRESSED)
 	  {
-		  this->Mask(1);
+		  this->Mask();
 	  }
 	  this->RedrawTagMaskPencilCircle();
   }
@@ -2557,7 +2557,7 @@ void vtkMDInteractorStyle::RedrawRubberBand()
 void vtkMDInteractorStyle::RedrawTagMaskPencilCircle()
 {
 	// assume "R" is 
-	//update the rubber band on the screen
+	//update the circle drawn on the screen
 	int *size = this->Interactor->GetRenderWindow()->GetSize();
 
 	vtkUnsignedCharArray *tmpPixelArray = vtkUnsignedCharArray::New();

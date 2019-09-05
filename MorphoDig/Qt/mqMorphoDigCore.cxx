@@ -171,7 +171,6 @@ mqMorphoDigCore::mqMorphoDigCore()
 	double defaultSpecular = newactor->GetProperty()->GetSpecular();
 	double defaultSpecularPower = newactor->GetProperty()->GetSpecularPower();
 	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << endl;*/
-	this->mui_Mask = 1;
 	this->mui_DefaultSpecularPower = this->mui_SpecularPower = 1;
 	this->mui_DefaultSpecular = this->mui_Specular= 0;
 	this->mui_DefaultAmbient = this->mui_Ambient= 0;
@@ -208,6 +207,11 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_ActiveTagMap = new ActiveTagMap;
 	this->mui_ActiveTag = 1;
 	this->mui_PencilSize = 15;
+	this->mui_MaskInside = 1; // masks inside
+	this->mui_PencilMaskSphere = 1; // pencil: spherical shape by default
+	this->mui_MaskOn = 1; // mask (and not erase mask =unmask)
+
+	
 	this->mui_PencilLimitAngle = 180;
 	this->mui_PencilContiguous = 0;
 	this->mui_ExistingTagMaps = new ExistingTagMaps;
@@ -1591,7 +1595,7 @@ void mqMorphoDigCore::Extract_Scalar_Range(double scalar_min, double scalar_max)
 
 
 }
-void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
+void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVolume *myVolume)
 {
 	cout << "Mask At " << pickid << endl;
 	if (myVolume != NULL && myVolume->GetMaskEnabled() == 1)
@@ -1686,8 +1690,17 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		// Use vtkPolyDataToStencil
 		vtkSmartPointer<vtkPolyDataToImageStencil> BrushPolyDataToStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
 		BrushPolyDataToStencil->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
-		//BrushPolyDataToStencil->SetInputData(transformFilter->GetOutput());
-		BrushPolyDataToStencil->SetInputData(sphereSource->GetOutput());
+		int pencilSphere = this->Getmui_PencilMaskSphere();
+		if (pencilSphere == 0)
+		{
+			// tube!
+			BrushPolyDataToStencil->SetInputData(transformFilter->GetOutput());
+		}
+		else
+		{
+
+			BrushPolyDataToStencil->SetInputData(sphereSource->GetOutput());
+		}
 
 		//iif (this->operationInside())
 		// Clip modifier labelmap to non-null region to make labelmap modification faster later
@@ -1729,6 +1742,8 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 		vtkIdType cptStencil = 0;
 		brushOutput->GetDimensions(dims);
 		cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+		int maskInside = this->Getmui_MaskInside();
+		int maskOn = this->Getmui_MaskOn();
 		for (int z = 0; z < dims[2]; z++)
 		{
 			for (int y = 0; y < dims[1]; y++)
@@ -1739,19 +1754,25 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask)
 					unsigned char* pixel = static_cast<unsigned char*>(brushOutput->GetScalarPointer(x, y, z));
 					//if (x > 50)
 					//{
-					if (pixel[0]==0)
+					int toMask = 0;
+					
+					if (maskInside == 1 && pixel[0] == 0) { toMask = 1; }
+					else if (maskInside == 0 && pixel[0] == 255) { toMask = 1; }
+
+					if (toMask==1)
 					{
 						cptStencil++;
 						unsigned char* pixelM = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-						pixelM[0] = 0;
-					}
-					
-					
-					//}
-				//else
-				//{
-				//	pixel[0] = 0;
-				//}
+						
+						if (maskOn == 1)
+						{
+							pixelM[0] = 0;
+						}
+						else
+						{
+							pixelM[0] = 255;
+						}						
+					}														
 				}
 			}
 		}
@@ -12457,6 +12478,10 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 					{
 						closedSurfacePolys->InsertCellPoint(i * 2 + 1);
 					}
+					// Lines below : add an actor which has the shape of the 3D lasso!
+					/*
+
+
 					VTK_CREATE(vtkMDActor, actor);
 					if (this->mui_BackfaceCulling == 0)
 					{
@@ -12491,16 +12516,146 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 					END_UNDO_SET();
 
 					this->getActorCollection()->SetChanged(1);
-
+					*/
 					/* */
 
 
 				vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
 				int dims[3];
+				double spacing[3];
+				Mask->GetSpacing(spacing);
 				Mask->GetDimensions(dims);
 				
-				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
+								
+				vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+				myVolume->GetMatrix(Mat);
+				vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
+				TransMat->DeepCopy(Mat);
+				cout << "InvMat" << *TransMat << endl;
+				TransMat->Transpose();
+				double N1, N2, N3;
+				N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
+					TransMat->GetElement(3, 1) * TransMat->GetElement(0, 1)
+					+ TransMat->GetElement(3, 2) * TransMat->GetElement(0, 2));
+
+				cout << "N1=" << N1 << endl;
+
+				TransMat->SetElement(0, 3, N1);
+
+
+
+				N2 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(1, 0) +
+					TransMat->GetElement(3, 1) * TransMat->GetElement(1, 1)
+					+ TransMat->GetElement(3, 2) * TransMat->GetElement(1, 2));
+
+				cout << "N2=" << N2 << endl;
+				TransMat->SetElement(1, 3, N2);
+
+				N3 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(2, 0) +
+					TransMat->GetElement(3, 1) * TransMat->GetElement(2, 1)
+					+ TransMat->GetElement(3, 2) * TransMat->GetElement(2, 2));
+				cout << "N3=" << N3 << endl;
+				TransMat->SetElement(2, 3, N3);
+
+
+				TransMat->SetElement(3, 0, 0);
+				TransMat->SetElement(3, 1, 0);
+				TransMat->SetElement(3, 2, 0);
+				cout << "Transpose_Mat" << *TransMat << endl;
+				vtkTransform *newTransform = vtkTransform::New();
+				newTransform->PostMultiply();
+				newTransform->SetMatrix(TransMat);
+				vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+				vtkSmartPointer<vtkPolyData> SphereInvPos = vtkSmartPointer<vtkPolyData>::New();
+
+
+
+
+				transformFilter->SetInputData(closedSurfacePolyData);
+
+				/// applique le calcul du tps à l'objet
+				transformFilter->SetTransform(newTransform);
+				transformFilter->Update();
+
+
+
+				// Use vtkPolyDataToStencil
+				vtkSmartPointer<vtkPolyDataToImageStencil> BrushPolyDataToStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+				BrushPolyDataToStencil->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
+				BrushPolyDataToStencil->SetInputData(transformFilter->GetOutput());
+				//BrushPolyDataToStencil->SetInputData(sphereSource->GetOutput());
+
+				//iif (this->operationInside())
+				// Clip modifier labelmap to non-null region to make labelmap modification faster later
+
+				/*double* boundsIjk = sphereSource->GetOutput()->GetBounds();
+				BrushPolyDataToStencil->SetOutputWholeExtent(floor(boundsIjk[0]) - 1, ceil(boundsIjk[1]) + 1,
+					floor(boundsIjk[2]) - 1, ceil(boundsIjk[3]) + 1, floor(boundsIjk[4]) - 1, ceil(boundsIjk[5]) + 1);*/
+					// si on masque l'extérieur de la sphère... 		
+				BrushPolyDataToStencil->SetOutputWholeExtent(Mask->GetExtent());
+				BrushPolyDataToStencil->SetOutputOrigin(Mask->GetOrigin());
+
+				BrushPolyDataToStencil->Update();
+				vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
+				int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };
+				stencilData->GetExtent(stencilExtent);
+				cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << endl;
+				vtkSmartPointer<vtkImageStencilToImage> stencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
+
+				stencilToImage->SetInputData(BrushPolyDataToStencil->GetOutput());
+				stencilToImage->SetInsideValue(0);
+				stencilToImage->SetOutsideValue(255);
+				stencilToImage->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+				stencilToImage->Update();
+
+				vtkNew<vtkImageData> brushOutput;
+
+				brushOutput->ShallowCopy(stencilToImage->GetOutput());
+				//Apply result to Mask ImageData vktStencilToImageData
+				/**/
+
+
+
+
+				//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+				//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+
+				//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
+				vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
+				vtkIdType cptStencil = 0;
+				brushOutput->GetDimensions(dims);
+				cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+				for (int z = 0; z < dims[2]; z++)
+				{
+					for (int y = 0; y < dims[1]; y++)
+					{
+						for (int x = 0; x < dims[0]; x++)
+						{
+
+							unsigned char* pixel = static_cast<unsigned char*>(brushOutput->GetScalarPointer(x, y, z));
+							//if (x > 50)
+							//{
+							if (pixel[0] == 0)
+							{
+								cptStencil++;
+								unsigned char* pixelM = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
+								pixelM[0] = 0;
+							}
+
+
+							//}
+						//else
+						//{
+						//	pixel[0] = 0;
+						//}
+						}
+					}
+				}
+				cout << "Laso mask output contains  found " << cptStencil << " points to mask = 0" << endl;
+
 				
+
+
 				Mask->Modified();
 				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
@@ -12712,7 +12867,7 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 							{
 
 								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								if (this->mui_Mask == 1)
+								if (this->mui_MaskOn == 1)
 								{
 									pixel[0] = 0;
 								}
@@ -21317,8 +21472,7 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	
 	return name_obj;
 }
-int mqMorphoDigCore::Getmui_Mask() { return this->mui_Mask; }
-void mqMorphoDigCore::Setmui_Mask(int mask) { this->mui_Mask = mask; }
+
 void mqMorphoDigCore::Setmui_DisplayMode(int mode)
 {
 	this->mui_DisplayMode = mode;
@@ -22473,6 +22627,14 @@ void mqMorphoDigCore::RefreshColorMapsAndArrayVisibility()
 
 	}
 }
+
+
+int mqMorphoDigCore::Getmui_PencilMaskSphere() { return this->mui_PencilMaskSphere; }
+void mqMorphoDigCore::Setmui_PencilMaskSphere(int sphere) { this->mui_PencilMaskSphere = sphere; }
+	int mqMorphoDigCore::Getmui_MaskInside() { return this->mui_MaskInside; }
+	void mqMorphoDigCore::Setmui_MaskInside(int inside) { this->mui_MaskInside = inside; }
+	int mqMorphoDigCore::Getmui_MaskOn() { return this->mui_MaskOn; }
+	void mqMorphoDigCore::Setmui_MaskOn(int maskOn) { this->mui_MaskOn = maskOn; }
 
 void mqMorphoDigCore::Setmui_PencilSize(int pencilSize, int emit_signal)
 {

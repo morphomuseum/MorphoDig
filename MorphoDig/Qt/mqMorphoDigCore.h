@@ -486,8 +486,7 @@ public:
 	void Setmui_DisplayMode(int mode);
 	/*vtkGetMacro(mui_Mask, int);
 	vtkSetMacro(mui_Mask, int);*/
-	int Getmui_Mask();
-	void Setmui_Mask(int mask);
+	
 	long long int Getmui_DefaultVolumeOutOfCoreThreshold();
 	long long int Getmui_VolumeOutOfCoreThreshold();
 	void Setmui_VolumeOutOfCoreThreshold(long long int newVolumeOutOfCoreThreshold);
@@ -589,7 +588,7 @@ public:
 	void Setmui_Z2Label(QString label);
 	QString Getmui_DefaultZ2Label();
 	QString Getmui_Z2Label();
-	void MaskAt(vtkIdType pickid, vtkMDVolume *myVolume, int mask);
+	void MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVolume *myVolume);
 	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName, double BoxBounds[6]);
 	void SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ);
@@ -733,6 +732,19 @@ public:
 	int Getmui_ActiveTag();
 	int Getmui_PencilSize();
 	void Setmui_PencilSize(int pencilSize, int emit_signal=0);
+
+	int Getmui_PencilMaskSphere();
+	void Setmui_PencilMaskSphere(int sphere);
+	int Getmui_MaskInside();
+	void Setmui_MaskInside(int inside);
+	int Getmui_MaskOn();
+	void Setmui_MaskOn(int maskOn);
+	/*	int mui_PencilMaskSphere; //1 sphere, 0, tube
+
+
+	int mui_PencilMaskInside; //1 mask inside selection, 0 mask outside selection
+	int mui_PencilMaskOn; //1 masks  0 unmasks*/
+
 	int Getmui_PencilLimitAngle();
 	void Setmui_PencilLimitAngle(int pencilLimitAngle);
 	int Getmui_PencilContiguous();
@@ -1062,6 +1074,9 @@ protected:
 	ExistingTagMaps *mui_ExistingTagMaps;
 	int mui_ActiveTag;
 	int mui_PencilSize;
+	int mui_PencilMaskSphere; //1 pencil maks shape: sphere, 0, tube
+	int mui_MaskInside; //1 mask inside selection, 0 mask outside selection
+	int mui_MaskOn; //1 masks  0 unmasks
 	int mui_PencilLimitAngle;
 	int mui_PencilContiguous;
 
@@ -1119,7 +1134,7 @@ protected:
 	QString mui_DefaultZ1Label;
 	QString mui_DefaultZ2Label;
 
-	int mui_Mask;
+	
 	int mui_DefaultShowGrid;
 	int mui_DefaultMoveMode;
 	int mui_DefaultAnaglyph;

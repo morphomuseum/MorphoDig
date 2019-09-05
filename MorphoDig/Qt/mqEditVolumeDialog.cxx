@@ -73,6 +73,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(mqMorphoDigCore::instance(), SIGNAL(volumeSelectionChanged()), this, SLOT(slotRefreshDialog()));
 	connect(this->Ui->next, SIGNAL(pressed()), this, SLOT(slotGetNextVolume()));
 	connect(this->Ui->prec, SIGNAL(pressed()), this, SLOT(slotGetPrecedingVolume()));
+	this->Ui->pencilSearchSize->setValue(mqMorphoDigCore::instance()->Getmui_PencilSize());
+	connect(mqMorphoDigCore::instance(), SIGNAL(pencilSizeChanged(int)), this, SLOT(slotRefreshPencilSearchSize(int)));
+	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(int)), this, SLOT(slotPencilSearchSizeChanged(int)));
 
 	this->Volume_Coll = NULL;
 	this->Volume = NULL;
@@ -251,11 +254,16 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
 	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
 	connect(this->Ui->reinitializeMASK, SIGNAL(pressed()), this, SLOT(slotReinitializeMask()));
-
+	connect(this->Ui->invertMASK, SIGNAL(pressed()), this, SLOT(slotInvertMask()));
 	connect(this->Ui->cropVolume, SIGNAL(pressed()), this, SLOT(slotcropVolumeClicked()));
 	//
-	connect(this->Ui->maskR, SIGNAL(clicked(bool)), this, SLOT(slotMaskClicked(bool)));
-	connect(this->Ui->unmaskR, SIGNAL(clicked(bool)), this, SLOT(slotUnmaskClicked(bool)));
+	connect(this->Ui->maskR, SIGNAL(clicked(bool)), this, SLOT(slotMaskRClicked(bool)));
+	connect(this->Ui->unmaskR, SIGNAL(clicked(bool)), this, SLOT(slotUnmaskRClicked(bool)));
+	connect(this->Ui->maskInsideR, SIGNAL(clicked(bool)), this, SLOT(slotMaskInsideRClicked(bool)));
+	connect(this->Ui->maskOutsideR, SIGNAL(clicked(bool)), this, SLOT(slotMaskOutsideRClicked(bool)));
+	connect(this->Ui->pencilSphereR, SIGNAL(clicked(bool)), this, SLOT(slotPencilMaskSphereRClicked(bool)));
+	connect(this->Ui->pencilTubeR, SIGNAL(clicked(bool)), this, SLOT(slotPencilMaskTubeRClicked(bool)));
+
 	connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
 	connect(this->Ui->scalarOpacityUnitDistance, SIGNAL(valueChanged(double)), this, SLOT(slotScalarOpacityUnitDistance(double)));
 	connect(this->mColorMap, SIGNAL(shiftOrSlideStopped()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
@@ -282,8 +290,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->mColorMap, SIGNAL(changeFinished()), this, SLOT(slotRefreshDialog()));
 	connect(this->Ui->lassoOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoMaskInside()));
 	connect(this->Ui->rubberOn, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberMaskInside()));
-	connect(this->Ui->lassoOn2, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoMaskOutside()));
-	connect(this->Ui->rubberOn2, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberMaskOutside()));
+	//connect(this->Ui->lassoOn2, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotLassoMaskOutside()));
+	//connect(this->Ui->rubberOn2, SIGNAL(pressed()), mqMorphoDigCore::instance(), SLOT(slotRubberMaskOutside()));
 
 
 
@@ -379,6 +387,60 @@ int mqEditVolumeDialog::SomeThingHasChanged()
 
 	return something_has_changed;
 }
+
+void mqEditVolumeDialog::slotMaskInsideRClicked(bool isChecked)
+{
+	if (isChecked)
+	{
+		mqMorphoDigCore::instance()->Setmui_MaskInside(1);
+	}
+}
+void mqEditVolumeDialog::slotMaskOutsideRClicked(bool isChecked)
+{
+	if (isChecked)
+	{
+		mqMorphoDigCore::instance()->Setmui_MaskInside(0);
+	}
+}
+void mqEditVolumeDialog::slotMaskRClicked(bool isChecked)
+{
+	if (isChecked)
+	{
+		mqMorphoDigCore::instance()->Setmui_MaskOn(1);
+	}
+}
+void mqEditVolumeDialog::slotUnmaskRClicked(bool isChecked)
+{
+	if (isChecked)
+	{
+		mqMorphoDigCore::instance()->Setmui_MaskOn(0);
+	}
+}
+void mqEditVolumeDialog::slotPencilMaskSphereRClicked(bool isChecked)
+{
+	if (isChecked)
+	{
+		mqMorphoDigCore::instance()->Setmui_PencilMaskSphere(1);
+	}
+}
+void mqEditVolumeDialog::slotPencilMaskTubeRClicked(bool isChecked)
+{
+	if (isChecked)
+	{
+		mqMorphoDigCore::instance()->Setmui_PencilMaskSphere(0);
+	}
+}
+
+void mqEditVolumeDialog::slotRefreshPencilSearchSize(int newsize)
+{
+	this->Ui->pencilSearchSize->setValue(newsize);
+}
+void mqEditVolumeDialog::slotPencilSearchSizeChanged(int newSize)
+{
+	mqMorphoDigCore::instance()->Setmui_PencilSize(newSize);
+
+}
+
 void mqEditVolumeDialog::slotRefreshUi()
 {
 	this->GetFirstSelectedVolume();
@@ -400,6 +462,14 @@ void mqEditVolumeDialog::slotdisplayROIPressed()
 			this->Volume->SetdisplayROI(1);
 
 		}
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotInvertMask()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		this->Volume->InvertMask();				
 		mqMorphoDigCore::instance()->Render();
 	}
 }
@@ -425,14 +495,21 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Volume->SetMaskEnabled(true);
 			this->Ui->pencilOn->setEnabled(true);
 			this->Ui->rubberOn->setEnabled(true);
-			this->Ui->lassoOn2->setEnabled(true);
-			this->Ui->rubberOn2->setEnabled(true);
+			//this->Ui->lassoOn2->setEnabled(true);
+			//this->Ui->rubberOn2->setEnabled(true);
 			this->Ui->maskR->setEnabled(true);
 			this->Ui->unmaskR->setEnabled(true);
 
 			this->Ui->lassoOn->setEnabled(true);
 
 			this->Ui->reinitializeMASK->setEnabled(true);
+			this->Ui->invertMASK->setEnabled(true);
+			this->Ui->pencilSearchSize->setEnabled(true);
+			this->Ui->pencilSphereR->setEnabled(true);
+			this->Ui->pencilTubeR->setEnabled(true);
+			this->Ui->maskInsideR->setEnabled(true);
+			this->Ui->maskOutsideR->setEnabled(true);
+
 		}
 		else
 		{
@@ -442,11 +519,17 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->pencilOn->setEnabled(false);
 			this->Ui->rubberOn->setEnabled(false);
 			this->Ui->lassoOn->setEnabled(false);
-			this->Ui->lassoOn2->setEnabled(false);
-			this->Ui->rubberOn2->setEnabled(false);
+			//this->Ui->lassoOn2->setEnabled(false);
+			//this->Ui->rubberOn2->setEnabled(false);
 			this->Ui->maskR->setEnabled(false);
 			this->Ui->unmaskR->setEnabled(false);
 			this->Ui->reinitializeMASK->setEnabled(false);
+			this->Ui->invertMASK->setEnabled(false);
+			this->Ui->pencilSearchSize->setEnabled(false);
+			this->Ui->pencilSphereR->setEnabled(false);
+			this->Ui->pencilTubeR->setEnabled(false);
+			this->Ui->maskInsideR->setEnabled(false);
+			this->Ui->maskOutsideR->setEnabled(false);
 
 
 		}
@@ -523,16 +606,7 @@ void mqEditVolumeDialog::CropVolume()
 	this->UpdateUI();
 	// 2 
 }
-void mqEditVolumeDialog::slotMaskClicked(bool isChecked)
-{
-	cout << "mui_Mask:1" << endl;
-	mqMorphoDigCore::instance()->Setmui_Mask(1);
-}
-void mqEditVolumeDialog::slotUnmaskClicked(bool isChecked)
-{
-	cout << "mui_Mask:0" << endl;
-	mqMorphoDigCore::instance()->Setmui_Mask(0);
-}
+
 void mqEditVolumeDialog::slotcropVolumeClicked()
 {
 	this->CropVolume();
@@ -1055,6 +1129,33 @@ void mqEditVolumeDialog::UpdateUI()
 
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected()==1) {
 
+		int maskInside = mqMorphoDigCore::instance()->Getmui_MaskInside();
+		if (maskInside ==1)
+		{
+			this->Ui->maskInsideR->setChecked(true);
+		}
+		else
+		{
+			this->Ui->maskOutsideR->setChecked(true);
+		}
+		int maskOn = mqMorphoDigCore::instance()->Getmui_MaskOn();
+		if (maskOn == 1)
+		{
+			this->Ui->maskR->setChecked(true);
+		}
+		else
+		{
+			this->Ui->unmaskR->setChecked(true);
+		}
+		int pencilMaskSphere = mqMorphoDigCore::instance()->Getmui_PencilMaskSphere();
+		if (pencilMaskSphere == 1)
+		{
+			this->Ui->pencilSphereR->setChecked(true);
+		}
+		else
+		{
+			this->Ui->pencilTubeR->setChecked(true);
+		}
 		double origin[3];
 		this->Volume->GetImageData()->GetOrigin(origin);
 		
@@ -1070,11 +1171,17 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->pencilOn->setDisabled(false);
 			this->Ui->lassoOn->setDisabled(false);
 			this->Ui->rubberOn->setDisabled(false);
-			this->Ui->lassoOn2->setEnabled(false);
-			this->Ui->rubberOn2->setEnabled(false);
-			this->Ui->maskR->setEnabled(false);
-			this->Ui->unmaskR->setEnabled(false);
+			//this->Ui->lassoOn2->setsetDisabled(false);
+			//this->Ui->rubberOn2->setDisabled(false);
+			this->Ui->maskR->setDisabled(false);
+			this->Ui->unmaskR->setDisabled(false);
 			this->Ui->reinitializeMASK->setDisabled(false);
+			this->Ui->invertMASK->setDisabled(false);
+			this->Ui->pencilSearchSize->setDisabled(false);
+			this->Ui->pencilSphereR->setDisabled(false);
+			this->Ui->pencilTubeR->setDisabled(false);
+			this->Ui->maskInsideR->setDisabled(false);
+			this->Ui->maskOutsideR->setDisabled(false);
 		}
 		else
 		{
@@ -1082,11 +1189,18 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->pencilOn->setDisabled(true);
 			this->Ui->lassoOn->setDisabled(true);
 			this->Ui->rubberOn->setDisabled(true);
-			this->Ui->lassoOn2->setDisabled(true);
-			this->Ui->rubberOn2->setDisabled(true);
+			//this->Ui->lassoOn2->setDisabled(true);
+			//this->Ui->rubberOn2->setDisabled(true);
 			this->Ui->maskR->setDisabled(true);
 			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
+			this->Ui->invertMASK->setDisabled(true);
+			this->Ui->pencilSearchSize->setDisabled(true);
+			this->Ui->pencilSphereR->setDisabled(true);
+			this->Ui->pencilTubeR->setDisabled(true);
+			this->Ui->maskInsideR->setDisabled(true);
+			this->Ui->maskOutsideR->setDisabled(true);
+
 		}
 		int mtype = this->Volume->Getmapper_type();
 		if (mtype ==0){ 
@@ -1096,11 +1210,17 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->pencilOn->setDisabled(true);
 			this->Ui->lassoOn->setDisabled(true);
 			this->Ui->rubberOn->setDisabled(true);
-			this->Ui->lassoOn2->setDisabled(true);
-			this->Ui->rubberOn2->setDisabled(true);
+			//this->Ui->lassoOn2->setDisabled(true);
+			//this->Ui->rubberOn2->setDisabled(true);
 			this->Ui->maskR->setDisabled(true);
 			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
+			this->Ui->invertMASK->setDisabled(true);
+			this->Ui->pencilSearchSize->setDisabled(true);
+			this->Ui->pencilSphereR->setDisabled(true);
+			this->Ui->pencilTubeR->setDisabled(true);
+			this->Ui->maskInsideR->setDisabled(true);
+			this->Ui->maskOutsideR->setDisabled(true);
 
 		}
 		else

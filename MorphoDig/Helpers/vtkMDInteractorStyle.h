@@ -53,7 +53,7 @@ public:
   virtual void TagMaskPencilStart();
   virtual void TagMaskPencilStop();
   virtual void Tag(int mode);
-  virtual void Mask(int mode);
+  virtual void Mask();
   virtual void OnKeyPress();
   virtual void OnKeyRelease();
   virtual void EndRotate();

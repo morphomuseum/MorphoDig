@@ -345,6 +345,36 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 
 	// now associate
 }
+void vtkMDVolume::InvertMask()
+{
+	cout << "Invert mask!" << endl;
+	// creates an empty mask
+	this->MaskBinComputed = 0;
+	int dims[3];
+	
+
+	this->Mask->GetDimensions(dims);
+
+	for (int z = 0; z < dims[2]; z++)
+	{
+		for (int y = 0; y < dims[1]; y++)
+		{
+			for (int x = 0; x < dims[0]; x++)
+			{
+
+				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+				if (pixel[0] == 0) { pixel[0] = 255; }
+				else if (pixel[0] == 255) { pixel[0] = 0; }
+
+			}
+		}
+	}
+	Mask->Modified();
+	this->UpdateMaskData(Mask);
+	this->SetImageDataBinComputed(0);
+	if (this->GetuseImageDataBinForVR() == 1) { this->ComputeImageDataBin(); }
+	
+}
 void vtkMDVolume::InitializeMask()
 {
 	cout << "Initialize mask!" << endl;
@@ -386,36 +416,14 @@ void vtkMDVolume::InitializeMask()
 			{
 				
 				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
-				//if (x > 50)
-				//{
+				
 					pixel[0] = 255;
-					//}
-				//else
-				//{
-				//	pixel[0] = 0;
-				//}
+					
 			}
 		}
 	}
 	Mask->Modified();
-	for (int z = 0; z < dims[2]; z++)
-	{
-		for (int y = 0; y < dims[1]; y++)
-		{
-			for (int x = 0; x < dims[0]; x++)
-			{
-				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
-				// do something with v
-				if (z < 10 && y < 10 && ((x<60) && (x>40)))
-				{
-					//std::cout <<"Pixel at "<<x<<","<<y<<","<<z<<":"<< ", " <<pixel[0] << endl;
-				}
-			}
-			
-		}
-		
-	}
-
+	
 	int dataType = this->Mask->GetScalarType();
 	
 	QString dataTypeAsString;
