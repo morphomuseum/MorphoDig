@@ -11696,9 +11696,9 @@ void mqMorphoDigCore::stopLasso()
 	}
 	else
 	{
-		int mask_inside = 1;
-		if (this->currentLassoMode == 4) { mask_inside = 0; }
-		this->lassoMaskVolumes(mask_inside);
+		/*int mask_inside = 1;
+		if (this->currentLassoMode == 4) { mask_inside = 0; }*/
+		this->lassoMaskVolumes();
 	}
 	
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
@@ -11726,9 +11726,9 @@ void mqMorphoDigCore::stopRubber()
 	}
 	else
 	{
-		int mask_inside = 1;
-		if (this->currentRubberMode == 4) { mask_inside = 0; }
-		this->rubberMaskVolumes(mask_inside);
+		/*int mask_inside = 1;
+		if (this->currentRubberMode == 4) { mask_inside = 0; }*/
+		this->rubberMaskVolumes();
 	}
 
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->Style);
@@ -12372,7 +12372,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 	}
 }
 
-void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
+void mqMorphoDigCore::lassoMaskVolumes()
 {
 	POLYGON_LIST poly;
 	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
@@ -12625,6 +12625,8 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 				vtkIdType cptStencil = 0;
 				brushOutput->GetDimensions(dims);
 				cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+				int maskOn = this->Getmui_MaskOn();
+				int maskInside = this->Getmui_MaskInside();
 				for (int z = 0; z < dims[2]; z++)
 				{
 					for (int y = 0; y < dims[1]; y++)
@@ -12635,11 +12637,23 @@ void mqMorphoDigCore::lassoMaskVolumes(int mask_inside)
 							unsigned char* pixel = static_cast<unsigned char*>(brushOutput->GetScalarPointer(x, y, z));
 							//if (x > 50)
 							//{
-							if (pixel[0] == 0)
+							int toMask = 0;
+							if (maskInside == 1 && pixel[0] == 0) { toMask = 1; }
+							else if (maskInside == 0 && pixel[0] == 255) { toMask = 1; }
+
+							if (toMask==1)
 							{
 								cptStencil++;
 								unsigned char* pixelM = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								pixelM[0] = 0;
+								if (maskOn ==1)
+								{
+									pixelM[0] = 0;
+								}
+								else
+								{
+									pixelM[0] = 255;
+								}
+								
 							}
 
 
@@ -12779,7 +12793,7 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 		END_UNDO_SET();
 	}
 }
-void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
+void mqMorphoDigCore::rubberMaskVolumes()
 {
 	POLYGON_LIST poly;
 
@@ -12855,14 +12869,14 @@ void mqMorphoDigCore::rubberMaskVolumes(int mask_inside)
 							proj_screen.y = ptSCREEN[1];
 							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
 
-							if (mask_inside == 0)// mask outside
-							{
+							//if (mask_inside == 0)// mask outside
+							//{
 								if (proj_is_inside == 0) { proj_is_inside = 1; }
 								else
 								{
 									proj_is_inside = 0;
 								}
-							}
+							//}
 							if ((ptSCREEN[2] > -1.0) && ptSCREEN[2] < 1.0 && (proj_is_inside == 1))
 							{
 

@@ -862,10 +862,10 @@ public:
   void addConvexHull();// create a convex hull for each selected surface
   void lassoCutSelectedActors(int keep_inside);
   void lassoTagActors(int tag_inside);
-  void lassoMaskVolumes(int mask_inside);
+  void lassoMaskVolumes();
   void rubberCutSelectedActors(int keep_inside);
   void rubberTagActors(int tag_inside);
-  void rubberMaskVolumes(int mask_inside);
+  void rubberMaskVolumes();
   void groupSelectedActors();
   void startRubber(int rubber_mode);//change interaction style
   void stopRubber();//change interaction style back to normal
