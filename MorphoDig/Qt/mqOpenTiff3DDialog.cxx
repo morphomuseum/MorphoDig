@@ -86,13 +86,23 @@ mqOpenTiff3DDialog::mqOpenTiff3DDialog(QWidget* Parent)
   this->Ui->comboDataType->addItem("32 bits float");
   this->Ui->comboDataType->addItem("64 bits float");
   this->Ui->comboDataType->setCurrentIndex(0);*/
-  this->Ui->voxelSizeX->setValue(1);
-  this->Ui->voxelSizeY->setValue(1);
-  this->Ui->voxelSizeZ->setValue(1);
-  this->mySpacingX = 1;
-  this->mySpacingY = 1;
-  this->mySpacingZ = 1;
+  this->Ui->voxelSizeX->setValue(mqMorphoDigCore::instance()->Getmui_VoxelSizeX());
+  this->Ui->voxelSizeY->setValue(mqMorphoDigCore::instance()->Getmui_VoxelSizeY());
+  this->Ui->voxelSizeZ->setValue(mqMorphoDigCore::instance()->Getmui_VoxelSizeZ());
+  
+  this->mySpacingX = mqMorphoDigCore::instance()->Getmui_VoxelSizeX();
+  this->mySpacingY = mqMorphoDigCore::instance()->Getmui_VoxelSizeY();
+  this->mySpacingZ = mqMorphoDigCore::instance()->Getmui_VoxelSizeZ();
  
+  int backToFront = mqMorphoDigCore::instance()->Getmui_BackToFront();
+  if (backToFront == 1) {
+	  this->Ui->backToFront->setChecked(true);
+  }
+  else
+  {
+	  this->Ui->frontToBack->setChecked(true);
+  }
+
   /*  connect(this->Ui->dimX, SIGNAL(valueChanged(int)), this, SLOT(slotDimXChanged(int)));
   connect(this->Ui->dimY, SIGNAL(valueChanged(int)), this, SLOT(slotDimYChanged(int)));
   connect(this->Ui->dimZ, SIGNAL(valueChanged(int)), this, SLOT(slotDimZChanged(int)));
@@ -102,6 +112,11 @@ mqOpenTiff3DDialog::mqOpenTiff3DDialog(QWidget* Parent)
   connect(this->Ui->comboDataType, SIGNAL(activated(int)), this, SLOT(slotDataTypeChanged(int)));*/
 
   connect(this->Ui->voxelSizeX, SIGNAL(valueChanged(double)), this, SLOT(slotVoxelSizeXChanged(double))); 
+  connect(this->Ui->voxelSizeY, SIGNAL(valueChanged(double)), this, SLOT(slotVoxelSizeYChanged(double)));
+  connect(this->Ui->voxelSizeZ, SIGNAL(valueChanged(double)), this, SLOT(slotVoxelSizeZChanged(double)));
+  connect(this->Ui->backToFront, SIGNAL(clicked(bool)), this, SLOT(slotBackToFrontClicked(bool)));
+  connect(this->Ui->frontToBack, SIGNAL(clicked(bool)), this, SLOT(slotFrontToBackClicked(bool)));
+
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotOpenTiff3D()));
 
 }
@@ -193,11 +208,32 @@ void mqOpenTiff3DDialog::set2DStackInput(vtkSmartPointer<vtkImageData> input)
 	this->myInput = input;
 }
 
+void mqOpenTiff3DDialog::slotFrontToBackClicked(bool isChecked) {
+
+	mqMorphoDigCore::instance()->Setmui_BackToFront(0);
+}
+void mqOpenTiff3DDialog::slotBackToFrontClicked(bool isChecked) {
+
+	mqMorphoDigCore::instance()->Setmui_BackToFront(1);
+}
+void mqOpenTiff3DDialog::slotVoxelSizeYChanged(double newsVoxelSizeY)
+{
+	mqMorphoDigCore::instance()->Setmui_VoxelSizeY(newsVoxelSizeY);
+}
+void mqOpenTiff3DDialog::slotVoxelSizeZChanged(double newsVoxelSizeZ)
+{
+	mqMorphoDigCore::instance()->Setmui_VoxelSizeZ(newsVoxelSizeZ);
+}
+
 void mqOpenTiff3DDialog::slotVoxelSizeXChanged(double newsVoxelSizeX)
 {
 	this->Ui->voxelSizeY->setValue(newsVoxelSizeX);
 	this->Ui->voxelSizeZ->setValue(newsVoxelSizeX);
+	mqMorphoDigCore::instance()->Setmui_VoxelSizeX(newsVoxelSizeX);
+	mqMorphoDigCore::instance()->Setmui_VoxelSizeY(newsVoxelSizeX);
+	mqMorphoDigCore::instance()->Setmui_VoxelSizeZ(newsVoxelSizeX);
 }
+
 /*
 void mqOpenTiff3DDialog::slotDataTypeChanged(int newDataType)
 {

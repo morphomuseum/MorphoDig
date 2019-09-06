@@ -35,14 +35,23 @@ public:
   
   public slots:
   
-  
+	  virtual void slotDataTypeChanged(int newDataType);
+	  
+	  virtual void slotBigEndianClicked(bool checked);
+	  virtual void slotLittleEndianClicked(bool isChecked);
+	  virtual void slotFrontToBackClicked(bool isChecked);
+	  virtual void slotBackToFrontClicked(bool isChecked);
+	  
+
 	  virtual void slotDimXChanged(int newDimX);
 	  virtual void slotDimYChanged(int newDimY);
 	  virtual void slotDimZChanged(int newDimZ);
 	  virtual void slotHeaderSizeChanged(double newHeaderSize);
 	  virtual void slotVoxelSizeXChanged(double newsVoxelSizeX);
+	  virtual void slotVoxelSizeYChanged(double newsVoxelSizeY);
+	  virtual void slotVoxelSizeZChanged(double newsVoxelSizeZ);
   virtual void slotOpenRaw();
-  virtual void slotDataTypeChanged(int newDataType);
+  
   
 
 protected:

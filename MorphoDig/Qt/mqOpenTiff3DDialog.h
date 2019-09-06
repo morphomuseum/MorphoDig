@@ -48,6 +48,11 @@ public:
 	  virtual void slotDimZChanged(int newDimZ);
 	  virtual void slotHeaderSizeChanged(double newHeaderSize);*/
 	  virtual void slotVoxelSizeXChanged(double newsVoxelSizeX);
+	  virtual void slotVoxelSizeYChanged(double newsVoxelSizeY);
+	  virtual void slotVoxelSizeZChanged(double newsVoxelSizeZ);
+	  virtual void slotFrontToBackClicked(bool isChecked);
+	  virtual void slotBackToFrontClicked(bool isChecked);
+
   virtual void slotOpenTiff3D();
  // virtual void slotDataTypeChanged(int newDataType);
   

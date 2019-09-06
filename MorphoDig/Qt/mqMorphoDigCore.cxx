@@ -179,6 +179,18 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->mui_DefaultDisplayLandmarkText = 1;
 	this->mui_DisplayLandmarkText = 1;
 	
+
+	this->mui_RawDataType=0;//default: 8bits unsigned
+	this->mui_RawDimX=0;
+	this->mui_RawDimY=0;
+	this->mui_RawDimZ=1;
+	this->mui_RawHeader=0;
+	this->mui_RawLittleEndian=1;
+	this->mui_BackToFront=1;
+	this->mui_VoxelSizeX=1;
+	this->mui_VoxelSizeY=1;
+	this->mui_VoxelSizeZ=1;
+
 	this->mui_DefaultVolumeDisplaySlice = this->mui_VolumeDisplaySlice = 0; //by default, construct a volume rendering;
 	this->mui_DefaultVolumeOutOfCoreThreshold= this->mui_VolumeOutOfCoreThreshold=500*500*500; // by default 500 * 500 * 500 pixels
 	//cout << "now instancitate this->mui_VolumeOutOfCoreThreshold" << endl;
@@ -847,6 +859,29 @@ void mqMorphoDigCore::ChangeBackfaceCulling() {
 	int Getmui_VolumeDisplaySlice();
 	int Getmui_DefaultVolumeDisplaySlice();
 	void Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice);*/
+
+
+int mqMorphoDigCore::Getmui_RawDataType() { return this->mui_RawDataType; }
+void mqMorphoDigCore::Setmui_RawDataType(int val){ this->mui_RawDataType=val; }
+int mqMorphoDigCore::Getmui_RawDimX() { return this->mui_RawDimX; }
+void mqMorphoDigCore::Setmui_RawDimX(int val) { this->mui_RawDimX = val; }
+int mqMorphoDigCore::Getmui_RawDimY() { return this->mui_RawDimY; }
+void mqMorphoDigCore::Setmui_RawDimY(int val) { this->mui_RawDimY = val; }
+int mqMorphoDigCore::Getmui_RawDimZ() { return this->mui_RawDimZ; }
+void mqMorphoDigCore::Setmui_RawDimZ(int val) { this->mui_RawDimZ = val; }
+double mqMorphoDigCore::Getmui_RawHeader() { return this->mui_RawHeader; }
+void mqMorphoDigCore::Setmui_RawHeader(double val) { this->mui_RawHeader = val; }
+int mqMorphoDigCore::Getmui_RawLittleEndian() { return this->mui_RawLittleEndian; }
+void mqMorphoDigCore::Setmui_RawLittleEndian(int val) { this->mui_RawLittleEndian = val; }
+int mqMorphoDigCore::Getmui_BackToFront() { return this->mui_BackToFront; }
+void mqMorphoDigCore::Setmui_BackToFront(int val) { this->mui_BackToFront = val; }
+double mqMorphoDigCore::Getmui_VoxelSizeX() { return this->mui_VoxelSizeX; }
+void mqMorphoDigCore::Setmui_VoxelSizeX(double val) { this->mui_VoxelSizeX = val; }
+double mqMorphoDigCore::Getmui_VoxelSizeY() { return this->mui_VoxelSizeY; }
+void mqMorphoDigCore::Setmui_VoxelSizeY(double val) { this->mui_VoxelSizeY= val; }
+double mqMorphoDigCore::Getmui_VoxelSizeZ() { return this->mui_VoxelSizeZ; }
+void mqMorphoDigCore::Setmui_VoxelSizeZ(double val) { this->mui_VoxelSizeZ = val; }
+
 long long int mqMorphoDigCore::Getmui_DefaultVolumeOutOfCoreThreshold()
 {
 	return this->mui_DefaultVolumeOutOfCoreThreshold;

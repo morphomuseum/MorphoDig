@@ -730,6 +730,29 @@ public:
 	void Setmui_ActiveTagMapAndRender(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap);
 	void Setmui_ActiveTag(int activeTag);
 	int Getmui_ActiveTag();
+
+	
+	int Getmui_RawDataType();
+	void Setmui_RawDataType(int val);
+	int Getmui_RawDimX();
+	void Setmui_RawDimX(int val);
+	int Getmui_RawDimY();
+	void Setmui_RawDimY(int val);
+	int Getmui_RawDimZ();
+	void Setmui_RawDimZ(int val);
+	double Getmui_RawHeader();
+	void Setmui_RawHeader(double val);
+	int Getmui_RawLittleEndian();
+	void Setmui_RawLittleEndian(int val);
+	int Getmui_BackToFront();
+	void Setmui_BackToFront(int val);
+	double Getmui_VoxelSizeX();
+	void Setmui_VoxelSizeX(double val);
+	double Getmui_VoxelSizeY();
+	void Setmui_VoxelSizeY(double val);
+	double Getmui_VoxelSizeZ();
+	void Setmui_VoxelSizeZ(double val);
+
 	int Getmui_PencilSize();
 	void Setmui_PencilSize(int pencilSize, int emit_signal=0);
 
@@ -1079,6 +1102,17 @@ protected:
 	int mui_MaskOn; //1 masks  0 unmasks
 	int mui_PencilLimitAngle;
 	int mui_PencilContiguous;
+	int mui_RawDataType;
+	int mui_RawDimX;
+	int mui_RawDimY;
+	int mui_RawDimZ;
+	double mui_RawHeader;
+	int mui_RawLittleEndian;
+	int mui_BackToFront;
+	double mui_VoxelSizeX;
+	double mui_VoxelSizeY;
+	double mui_VoxelSizeZ;
+
 
 	int mui_Specular;
 	double mui_SpecularPower;
