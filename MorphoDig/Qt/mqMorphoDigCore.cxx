@@ -13030,67 +13030,277 @@ void mqMorphoDigCore::rubberMaskVolumes()
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			if (myVolume->GetMaskEnabled())
 			{
+				vtkNew<vtkPoints> closedSurfacePoints; // p0Top, p0Bottom, p1Top, p1Bottom, ...
+				vtkNew<vtkCellArray> closedSurfaceStrips;
+				vtkNew<vtkCellArray> closedSurfacePolys;
+				//vtkNew< vtkPoints> pointsXY;
+				
+
+				double vol_near = 1;
+				double vol_far = -1;
+
+				double ptSCREEN[3];
+				int numPT = (int)point_list.size();
+				vtkBoundingBox bbox(myVolume->GetBounds());
+				for (vtkIdType i = 0; i < 8; i++)
+				{
+					double corner[3];
+					bbox.GetCorner(i, corner);
+					this->GetWorldToDisplay(corner[0], corner[1], corner[2], ptSCREEN);
+					if (ptSCREEN[2] > vol_far) {
+						vol_far = ptSCREEN[2];
+					}
+					if (ptSCREEN[2] < vol_near) {
+						vol_near = ptSCREEN[2];
+					}
+				}
+				if (vol_near < -1) { vol_near = -1; }
+				if (vol_far > 1) { vol_far = 1; }
+
+				for (vtkIdType i = 0; i < numPT; i++)
+				{
+					const vtkVector2i &V = point_list[i];
+					double x = (double)V[0];
+					double y = (double)V[1];
+					double pt1[3] = { x,y,vol_near };
+
+					double pt2[3] = { x,y,vol_far };
+
+					double pointWC_near[3] = { 0, 0, 0 };
+					double pointWC_far[3] = { 0,0,0 };
+
+					this->GetDisplayToWorld(pt1[0], pt1[1], pt1[2], pointWC_near);
+
+					closedSurfacePoints->InsertNextPoint(pointWC_near[0], pointWC_near[1], pointWC_near[2]);
+					this->GetDisplayToWorld(pt2[0], pt2[1], pt2[2], pointWC_far);
+
+					closedSurfacePoints->InsertNextPoint(pointWC_far[0], pointWC_far[1], pointWC_far[2]);
+					if (i < 500)
+					{
+						cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << endl;
+						cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
+						cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << endl;
+						cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << endl;
+					}
+					//pointsXY->SetPoint(i, x, y, 0);
+
+
+				}
+				cout << "Found vol_far=" << vol_far << endl;
+				cout << "Found vol_near=" << vol_near << endl;
+				vtkNew<vtkPolyData> closedSurfacePolyData;
+				closedSurfacePolyData->SetPoints(closedSurfacePoints.GetPointer());
+				closedSurfacePolyData->SetStrips(closedSurfaceStrips.GetPointer());
+				closedSurfacePolyData->SetPolys(closedSurfacePolys.GetPointer());
+
+				// Skirt
+				closedSurfaceStrips->InsertNextCell(numPT * 2 + 2);
+				for (int i = 0; i < numPT * 2; i++)
+				{
+					closedSurfaceStrips->InsertCellPoint(i);
+				}
+				closedSurfaceStrips->InsertCellPoint(0);
+				closedSurfaceStrips->InsertCellPoint(1);
+				// Front cap
+				closedSurfacePolys->InsertNextCell(numPT);
+				for (int i = 0; i < numPT; i++)
+				{
+					closedSurfacePolys->InsertCellPoint(i * 2);
+				}
+				// Back cap
+				closedSurfacePolys->InsertNextCell(numPT);
+				for (int i = 0; i < numPT; i++)
+				{
+					closedSurfacePolys->InsertCellPoint(i * 2 + 1);
+				}
+				// Lines below : add an actor which has the shape of the 3D lasso!
+				
+				/*
+
+				VTK_CREATE(vtkMDActor, actor);
+				if (this->mui_BackfaceCulling == 0)
+				{
+					actor->GetProperty()->BackfaceCullingOff();
+				}
+				else
+				{
+					actor->GetProperty()->BackfaceCullingOn();
+				}
+				VTK_CREATE(vtkPolyDataMapper, mapper);
+
+				mapper->SetColorModeToDefault();
+
+				mapper->SetInputData(closedSurfacePolyData);
+
+
+				// actor->SetmColor(0.68,0.47,0.37,1);//pink
+				actor->SetmColor(0.666667, 0.666667, 1, 1);//kind of violet
+				actor->SetMapper(mapper);
+				actor->SetSelected(0);
+				actor->SetName("rectangle3D");
+				actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+				actor->SetDisplayMode(this->mui_DisplayMode);
+
+
+				this->getActorCollection()->AddItem(actor);
+				emit this->actorsMightHaveChanged();
+
+				std::string action = "Create rectangle 3D actor";
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+				this->getActorCollection()->SetChanged(1);
+				*/
+				/* */
 				vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
 				int dims[3];
+				double spacing[3];
+				Mask->GetSpacing(spacing);
 				Mask->GetDimensions(dims);
-				std::cout << "Lasso Mask Dims: " << " x: " << dims[0] << " y: " << dims[1] << " z: " << dims[2] << std::endl;
 
-				std::cout << "Lasso Mask Number of points: " << Mask->GetNumberOfPoints() << std::endl;
-				std::cout << "Lasso Number of cells: " << Mask->GetNumberOfCells() << std::endl;
-				vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
-				POLYGON_VERTEX proj_screen;
+
+				vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+				myVolume->GetMatrix(Mat);
+				vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
+				TransMat->DeepCopy(Mat);
+				cout << "Transposed mat" << *TransMat << endl;
+				TransMat->Transpose();
+				double N1, N2, N3;
+				N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
+					TransMat->GetElement(3, 1) * TransMat->GetElement(0, 1)
+					+ TransMat->GetElement(3, 2) * TransMat->GetElement(0, 2));
+
+				cout << "N1=" << N1 << endl;
+
+				TransMat->SetElement(0, 3, N1);
+
+
+
+				N2 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(1, 0) +
+					TransMat->GetElement(3, 1) * TransMat->GetElement(1, 1)
+					+ TransMat->GetElement(3, 2) * TransMat->GetElement(1, 2));
+
+				cout << "N2=" << N2 << endl;
+				TransMat->SetElement(1, 3, N2);
+
+				N3 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(2, 0) +
+					TransMat->GetElement(3, 1) * TransMat->GetElement(2, 1)
+					+ TransMat->GetElement(3, 2) * TransMat->GetElement(2, 2));
+				cout << "N3=" << N3 << endl;
+				TransMat->SetElement(2, 3, N3);
+
+
+				TransMat->SetElement(3, 0, 0);
+				TransMat->SetElement(3, 1, 0);
+				TransMat->SetElement(3, 2, 0);
+				cout << "Transpose_Mat" << *TransMat << endl;
+				vtkTransform *newTransform = vtkTransform::New();
+				newTransform->PostMultiply();
+				newTransform->SetMatrix(TransMat);
+				vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+				vtkSmartPointer<vtkPolyData> SphereInvPos = vtkSmartPointer<vtkPolyData>::New();
+
+
+
+
+				transformFilter->SetInputData(closedSurfacePolyData);
+
+				/// applique le calcul du tps à l'objet
+				transformFilter->SetTransform(newTransform);
+				transformFilter->Update();
+
+
+
+				// Use vtkPolyDataToStencil
+				vtkSmartPointer<vtkPolyDataToImageStencil> BrushPolyDataToStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+				BrushPolyDataToStencil->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
+				BrushPolyDataToStencil->SetInputData(transformFilter->GetOutput());
+				//BrushPolyDataToStencil->SetInputData(sphereSource->GetOutput());
+
+				//iif (this->operationInside())
+				// Clip modifier labelmap to non-null region to make labelmap modification faster later
+
+				/*double* boundsIjk = sphereSource->GetOutput()->GetBounds();
+				BrushPolyDataToStencil->SetOutputWholeExtent(floor(boundsIjk[0]) - 1, ceil(boundsIjk[1]) + 1,
+					floor(boundsIjk[2]) - 1, ceil(boundsIjk[3]) + 1, floor(boundsIjk[4]) - 1, ceil(boundsIjk[5]) + 1);*/
+					// si on masque l'extérieur de la sphère... 		
+				BrushPolyDataToStencil->SetOutputWholeExtent(Mask->GetExtent());
+				BrushPolyDataToStencil->SetOutputOrigin(Mask->GetOrigin());
+
+				BrushPolyDataToStencil->Update();
+				vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
+				int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };
+				stencilData->GetExtent(stencilExtent);
+				cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << endl;
+				vtkSmartPointer<vtkImageStencilToImage> stencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
+
+				stencilToImage->SetInputData(BrushPolyDataToStencil->GetOutput());
+				stencilToImage->SetInsideValue(0);
+				stencilToImage->SetOutsideValue(255);
+				stencilToImage->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+				stencilToImage->Update();
+
+				vtkNew<vtkImageData> brushOutput;
+
+				brushOutput->ShallowCopy(stencilToImage->GetOutput());
+				//Apply result to Mask ImageData vktStencilToImageData
+				/**/
+
+
+
+
+				//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
+				//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+
+				//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
+				vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
+				vtkIdType cptStencil = 0;
+				brushOutput->GetDimensions(dims);
+				cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+				int maskOn = this->Getmui_MaskOn();
+				int maskInside = this->Getmui_MaskInside();
 				for (int z = 0; z < dims[2]; z++)
 				{
 					for (int y = 0; y < dims[1]; y++)
 					{
 						for (int x = 0; x < dims[0]; x++)
 						{
-							double pt[3];
-							double ptWC[3];
-							double ptSCREEN[3];
-							int ijk[3];
-							ijk[0] = x;
-							ijk[1] = y;
-							ijk[2] = z;
 
-							vtkIdType ptId = Mask->ComputePointId(ijk);
-							Mask->GetPoint(ptId, pt);
-							
-							int proj_is_inside = 0;
-							mqMorphoDigCore::TransformPoint(Mat, pt, ptWC);
-							this->GetWorldToDisplay(ptWC[0], ptWC[1], ptWC[2], ptSCREEN);
-							proj_screen.x = ptSCREEN[0];
-							proj_screen.y = ptSCREEN[1];
-							proj_is_inside = poly.POLYGON_POINT_INSIDE(proj_screen);
-
-							//if (mask_inside == 0)// mask outside
+							unsigned char* pixel = static_cast<unsigned char*>(brushOutput->GetScalarPointer(x, y, z));
+							//if (x > 50)
 							//{
-								if (proj_is_inside == 0) { proj_is_inside = 1; }
-								else
-								{
-									proj_is_inside = 0;
-								}
-							//}
-							if ((ptSCREEN[2] > -1.0) && ptSCREEN[2] < 1.0 && (proj_is_inside == 1))
-							{
+							int toMask = 0;
+							if (maskInside == 1 && pixel[0] == 0) { toMask = 1; }
+							else if (maskInside == 0 && pixel[0] == 255) { toMask = 1; }
 
-								unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
-								if (this->mui_MaskOn == 1)
+							if (toMask == 1)
+							{
+								cptStencil++;
+								unsigned char* pixelM = static_cast<unsigned char*>(Mask->GetScalarPointer(x, y, z));
+								if (maskOn == 1)
 								{
-									pixel[0] = 0;
+									pixelM[0] = 0;
 								}
 								else
 								{
-									pixel[0] = 255;
+									pixelM[0] = 255;
 								}
-								
+
 							}
 
-							//unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+
+							//}
+						//else
+						//{
+						//	pixel[0] = 0;
+						//}
 						}
 					}
 				}
-				cout << "Done with mask loop rubber band" << endl;
+				cout << "Rubber mask output contains  found " << cptStencil << " points to mask = 0" << endl;
+
+				
 				Mask->Modified();
 				myVolume->UpdateMaskData(Mask);
 				myVolume->SetImageDataBinComputed(0);
