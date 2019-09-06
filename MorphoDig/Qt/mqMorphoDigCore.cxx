@@ -1597,7 +1597,17 @@ void mqMorphoDigCore::Extract_Scalar_Range(double scalar_min, double scalar_max)
 }
 void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVolume *myVolume)
 {
-	cout << "Mask At " << pickid << endl;
+	cout << "Mask At " << pickid << "screenX="<< screenX<< "screenY="<<screenY<< endl;
+	double ptCenter[3] = { screenX,screenX,0};
+
+	
+
+	double pointWC_center[3] = { 0, 0, 0 };
+	
+
+	this->GetDisplayToWorld(ptCenter[0], ptCenter[1], ptCenter[2], pointWC_center);
+	cout << "Mask At " << pickid << "  WCscreenX=" << pointWC_center[0] << "screenY=" << pointWC_center [1]<< "screenZ="<< pointWC_center[2]<< endl;
+
 	if (myVolume != NULL && myVolume->GetMaskEnabled() == 1)
 	{
 		/*if (myVolume->GetKdTree() == nullptr)
@@ -1639,7 +1649,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		myVolume->GetMatrix(Mat);
 		vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
 		TransMat->DeepCopy(Mat);
-		cout << "InvMat" << *TransMat << endl;
+		cout << "Transpose Mat" << *TransMat << endl;
 		TransMat->Transpose();
 		double N1, N2, N3;
 		N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
@@ -1669,7 +1679,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		TransMat->SetElement(3, 0, 0);
 		TransMat->SetElement(3, 1, 0);
 		TransMat->SetElement(3, 2, 0);
-		cout << "InvMat" << *TransMat<< endl;
+		cout << "Transposed mat" << *TransMat<< endl;
 		vtkTransform *newTransform = vtkTransform::New();
 		newTransform->PostMultiply();
 		newTransform->SetMatrix(TransMat);
@@ -1682,7 +1692,32 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		//vtkNew< vtkPoints> pointsXY;
 
 		// ici on va construire une liste de points 2D d'un cercle de centre x,y.
-		std::vector<vtkVector2i> point_list = this->LassoStyle->GetPolygonPoints();
+		std::vector<vtkVector2d> point_list;
+		double RadiusPX = (double)this->Getmui_PencilSize();
+		/*  for (int i = 0; i < numberOfPoints; i++)
+          {
+          double angle = 2.0 * vtkMath::Pi() * i / double(numberOfPoints);
+          position[0] = this->DragStartPosition[0] + radius * sin(angle);
+          position[1] = this->DragStartPosition[1] + radius * cos(angle);
+          points->SetPoint(i, position);
+          }*/
+		int numPT = 50;
+		for (int i = 0; i < numPT; i++)
+		{
+			
+			double angle = 2.0 * vtkMath::Pi() * i / double(numPT);
+			double cX = (double)screenX + RadiusPX * sin(angle);
+			double cY = (double)screenY + RadiusPX * cos(angle);
+			vtkVector2d a;
+			a[0] = cX;
+			a[1] = cY;
+			point_list.push_back(a);
+		}
+		/*for(float i=0; i<=360; i+=0.1)
+		if(EstPlein)
+			drawline(CentreX-static_cast(Rayon*cos(i)),CentreY+static_cast(Rayon*sin(i)),CentreX+static_cast(Rayon*cos(i)),CentreY+static_cast(Rayon*sin(i)));
+			else
+			drawpixel(CentreX+static_cast(Rayon*cos(i)),CentreY+static_cast(Rayon*sin(i))); */
 		//pointsXY->SetNumberOfPoints(point_list.size());
 		//closedSurfacePoints->SetNumberOfPoints(2 * point_list.size());
 
@@ -1690,7 +1725,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		double vol_far = -1;
 
 		double ptSCREEN[3];
-		int numPT = (int)point_list.size();
+		//int numPT = (int)point_list.size();
 		vtkBoundingBox bbox(myVolume->GetBounds());
 		for (vtkIdType i = 0; i < 8; i++)
 		{
@@ -1709,9 +1744,9 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 
 		for (vtkIdType i = 0; i < numPT; i++)
 		{
-			const vtkVector2i &V = point_list[i];
-			double x = (double)V[0];
-			double y = (double)V[1];
+			const vtkVector2d &V = point_list[i];
+			double x = V[0];
+			double y = V[1];
 			double pt1[3] = { x,y,vol_near };
 
 			double pt2[3] = { x,y,vol_far };
@@ -1725,13 +1760,13 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 			this->GetDisplayToWorld(pt2[0], pt2[1], pt2[2], pointWC_far);
 
 			closedSurfacePoints->InsertNextPoint(pointWC_far[0], pointWC_far[1], pointWC_far[2]);
-			if (i < 500)
+			/*if (i < 500)
 			{
 				cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << endl;
 				cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
 				cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << endl;
 				cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << endl;
-			}
+			}*/
 			//pointsXY->SetPoint(i, x, y, 0);
 
 
@@ -1771,8 +1806,46 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		transformFilter->SetTransform(newTransform);
 		transformFilter->Update();
 
+		// Lines below : add an actor which has the shape of the 3D lasso!
+		/*
 
 
+					VTK_CREATE(vtkMDActor, actor);
+					if (this->mui_BackfaceCulling == 0)
+					{
+						actor->GetProperty()->BackfaceCullingOff();
+					}
+					else
+					{
+						actor->GetProperty()->BackfaceCullingOn();
+					}
+					VTK_CREATE(vtkPolyDataMapper, mapper);
+
+					mapper->SetColorModeToDefault();
+
+					mapper->SetInputData(closedSurfacePolyData);
+
+
+					// actor->SetmColor(0.68,0.47,0.37,1);//pink
+					actor->SetmColor(0.666667, 0.666667, 1, 1);//kind of violet
+					actor->SetMapper(mapper);
+					actor->SetSelected(0);
+					actor->SetName("tube3D");
+					actor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+					actor->SetDisplayMode(this->mui_DisplayMode);
+
+
+					this->getActorCollection()->AddItem(actor);
+					emit this->actorsMightHaveChanged();
+
+					std::string action = "Create Tube 3D actor";
+					int mCount = BEGIN_UNDO_SET(action);
+					this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+					END_UNDO_SET();
+
+					this->getActorCollection()->SetChanged(1);
+					
+*/
 		// Use vtkPolyDataToStencil
 		vtkSmartPointer<vtkPolyDataToImageStencil> BrushPolyDataToStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
 		BrushPolyDataToStencil->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
@@ -12617,7 +12690,7 @@ void mqMorphoDigCore::lassoMaskVolumes()
 				myVolume->GetMatrix(Mat);
 				vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
 				TransMat->DeepCopy(Mat);
-				cout << "InvMat" << *TransMat << endl;
+				cout << "Transposed mat" << *TransMat << endl;
 				TransMat->Transpose();
 				double N1, N2, N3;
 				N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
