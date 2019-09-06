@@ -1676,10 +1676,96 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();		
 		vtkSmartPointer<vtkPolyData> SphereInvPos = vtkSmartPointer<vtkPolyData>::New();		
 	
+		vtkNew<vtkPoints> closedSurfacePoints; // p0Top, p0Bottom, p1Top, p1Bottom, ...
+		vtkNew<vtkCellArray> closedSurfaceStrips;
+		vtkNew<vtkCellArray> closedSurfacePolys;
+		//vtkNew< vtkPoints> pointsXY;
+
+		// ici on va construire une liste de points 2D d'un cercle de centre x,y.
+		std::vector<vtkVector2i> point_list = this->LassoStyle->GetPolygonPoints();
+		//pointsXY->SetNumberOfPoints(point_list.size());
+		//closedSurfacePoints->SetNumberOfPoints(2 * point_list.size());
+
+		double vol_near = 1;
+		double vol_far = -1;
+
+		double ptSCREEN[3];
+		int numPT = (int)point_list.size();
+		vtkBoundingBox bbox(myVolume->GetBounds());
+		for (vtkIdType i = 0; i < 8; i++)
+		{
+			double corner[3];
+			bbox.GetCorner(i, corner);
+			this->GetWorldToDisplay(corner[0], corner[1], corner[2], ptSCREEN);
+			if (ptSCREEN[2] > vol_far) {
+				vol_far = ptSCREEN[2];
+			}
+			if (ptSCREEN[2] < vol_near) {
+				vol_near = ptSCREEN[2];
+			}
+		}
+		if (vol_near < -1) { vol_near = -1; }
+		if (vol_far > 1) { vol_far = 1; }
+
+		for (vtkIdType i = 0; i < numPT; i++)
+		{
+			const vtkVector2i &V = point_list[i];
+			double x = (double)V[0];
+			double y = (double)V[1];
+			double pt1[3] = { x,y,vol_near };
+
+			double pt2[3] = { x,y,vol_far };
+
+			double pointWC_near[3] = { 0, 0, 0 };
+			double pointWC_far[3] = { 0,0,0 };
+
+			this->GetDisplayToWorld(pt1[0], pt1[1], pt1[2], pointWC_near);
+
+			closedSurfacePoints->InsertNextPoint(pointWC_near[0], pointWC_near[1], pointWC_near[2]);
+			this->GetDisplayToWorld(pt2[0], pt2[1], pt2[2], pointWC_far);
+
+			closedSurfacePoints->InsertNextPoint(pointWC_far[0], pointWC_far[1], pointWC_far[2]);
+			if (i < 500)
+			{
+				cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << endl;
+				cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
+				cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << endl;
+				cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << endl;
+			}
+			//pointsXY->SetPoint(i, x, y, 0);
 
 
+		}
+		cout << "Found vol_far=" << vol_far << endl;
+		cout << "Found vol_near=" << vol_near << endl;
+		vtkNew<vtkPolyData> closedSurfacePolyData;
+		closedSurfacePolyData->SetPoints(closedSurfacePoints.GetPointer());
+		closedSurfacePolyData->SetStrips(closedSurfaceStrips.GetPointer());
+		closedSurfacePolyData->SetPolys(closedSurfacePolys.GetPointer());
 
-		transformFilter->SetInputData(sphereSource->GetOutput());
+		// Skirt
+		closedSurfaceStrips->InsertNextCell(numPT * 2 + 2);
+		for (int i = 0; i < numPT * 2; i++)
+		{
+			closedSurfaceStrips->InsertCellPoint(i);
+		}
+		closedSurfaceStrips->InsertCellPoint(0);
+		closedSurfaceStrips->InsertCellPoint(1);
+		// Front cap
+		closedSurfacePolys->InsertNextCell(numPT);
+		for (int i = 0; i < numPT; i++)
+		{
+			closedSurfacePolys->InsertCellPoint(i * 2);
+		}
+		// Back cap
+		closedSurfacePolys->InsertNextCell(numPT);
+		for (int i = 0; i < numPT; i++)
+		{
+			closedSurfacePolys->InsertCellPoint(i * 2 + 1);
+		}
+
+
+		transformFilter->SetInputData(closedSurfacePolyData);
 
 		/// applique le calcul du tps à l'objet
 		transformFilter->SetTransform(newTransform);
@@ -16315,7 +16401,7 @@ void mqMorphoDigCore::ICP(int transformationMode, int iterationNumber, vtkMDActo
 			icp->SetSource(mImpactedPDPos);
 			icp->SetTarget(mObservedPDPos);
 			icp->GetLandmarkTransform()->SetMode(transformationMode);
-			icp->SetMaximumNumberOfIterations(20);
+			icp->SetMaximumNumberOfIterations(iterationNumber);
 			//icp->StartByMatchingCentroidsOn();
 			icp->Modified();
 			icp->Update();

@@ -82,7 +82,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 
 	QString mylabel("...");
 	this->Ui->VolumeName->setText(mylabel);
-
+	this->Ui->isVisibleCropBox->setEnabled(true);
 	vtkDiscretizableColorTransferFunction* STC = mqMorphoDigCore::instance()->GetOneColorMap();
 	
 	cout << "Edit Volume Dialog: Create mqColorOpacityEditorWidget!" << endl;

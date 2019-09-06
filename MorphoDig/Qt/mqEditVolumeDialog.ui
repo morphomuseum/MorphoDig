@@ -1414,7 +1414,7 @@
    </widget>
    <widget class="QGroupBox" name="groupBox_6">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -1559,7 +1559,7 @@
     </widget>
     <widget class="QToolButton" name="isVisibleCropBox">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -1647,6 +1647,9 @@
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="oZ">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>350</x>
