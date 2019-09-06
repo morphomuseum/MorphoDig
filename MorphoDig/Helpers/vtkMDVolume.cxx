@@ -1331,7 +1331,7 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 	MatRetranslated->SetElement(2, 3, Mat->GetElement(2, 3));
 	this->ApplyMatrix(MatRetranslated);
 	QString myName = QString(this->GetName().c_str());
-	myName = myName + "_rsl";
+	myName = myName + "_rsp";
 	this->SetName(myName.toStdString());
 	this->Modified();
 	this->SetImageDataAndMap(reslicedData);
