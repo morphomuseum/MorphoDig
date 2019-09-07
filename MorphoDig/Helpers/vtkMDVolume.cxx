@@ -47,6 +47,7 @@ Module:    vtkMDVolume.cxx
 #include <vtkPlane.h>
 #include <QString>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <vtkImageResample.h>
 vtkStandardNewMacro(vtkMDVolume);
 
@@ -347,6 +348,8 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 }
 void vtkMDVolume::HardenMask()
 {
+
+	/*
 	QMessageBox msgBox;
 	msgBox.setText("This option will modify your volume data. There is no undo! Do you want to proceed anyway? ");
 	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -356,6 +359,13 @@ void vtkMDVolume::HardenMask()
 		cout << "no!!!" << endl;
 		return;
 	}
+	*/
+	bool ok;
+	double fillValue = QInputDialog::getDouble(0, "Harden mask",
+		"Fill masked voxels with value (warning no undo):", 0, 0, 65535, 0, &ok);
+	
+	if (!ok) { return; }
+	
 	cout << "Harden mask!" << endl;
 	// creates an empty mask
 	this->MaskBinComputed = 0;
@@ -382,41 +392,41 @@ void vtkMDVolume::HardenMask()
 					if (dataType == VTK_UNSIGNED_SHORT)
 					{
 						unsigned short* pixel2 = static_cast<unsigned short*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = 0;
+						pixel2[0] = fillValue;
 						
 					}
 					else if (dataType == VTK_SHORT)
 					{
 						signed short* pixel2 = static_cast<signed short*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = 0;
+						pixel2[0] = fillValue;
 						
 					}
 					else if (dataType == VTK_CHAR)
 					{
 						char* pixel2 = static_cast<char*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = 0;
+						pixel2[0] = fillValue;
 					}
 					else if (dataType == VTK_UNSIGNED_CHAR)
 					{
 						unsigned char* pixel2 = static_cast<unsigned char*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = 0;
+						pixel2[0] = fillValue;
 					}
 					else if (dataType == VTK_SIGNED_CHAR)
 					{
 						signed char* pixel2 = static_cast<signed char*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = 0;
+						pixel2[0] = fillValue;
 
 					}
 					else if (dataType == VTK_FLOAT)
 					{
 						float* pixel2 = static_cast<float*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = 0;
+						pixel2[0] = fillValue;
 
 					}
 					else if (dataType == VTK_DOUBLE)
 					{
 						double* pixel2 = static_cast<double*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = 0;
+						pixel2[0] = fillValue;
 
 					}
 					else if (dataType == VTK_BIT)
