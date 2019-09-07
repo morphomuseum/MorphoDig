@@ -255,6 +255,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
 	connect(this->Ui->reinitializeMASK, SIGNAL(pressed()), this, SLOT(slotReinitializeMask()));
 	connect(this->Ui->invertMASK, SIGNAL(pressed()), this, SLOT(slotInvertMask()));
+	connect(this->Ui->hardenMASK, SIGNAL(pressed()), this, SLOT(slotHardenMask()));
 	connect(this->Ui->cropVolume, SIGNAL(pressed()), this, SLOT(slotcropVolumeClicked()));
 	//
 	connect(this->Ui->maskR, SIGNAL(clicked(bool)), this, SLOT(slotMaskRClicked(bool)));
@@ -473,6 +474,14 @@ void mqEditVolumeDialog::slotInvertMask()
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+void mqEditVolumeDialog::slotHardenMask()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		this->Volume->HardenMask();
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotReinitializeMask()
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
@@ -504,6 +513,7 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 
 			this->Ui->reinitializeMASK->setEnabled(true);
 			this->Ui->invertMASK->setEnabled(true);
+			this->Ui->hardenMASK->setEnabled(true);
 			this->Ui->pencilSearchSize->setEnabled(true);
 			this->Ui->pencilSphereR->setEnabled(true);
 			this->Ui->pencilTubeR->setEnabled(true);
@@ -525,6 +535,7 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->unmaskR->setEnabled(false);
 			this->Ui->reinitializeMASK->setEnabled(false);
 			this->Ui->invertMASK->setEnabled(false);
+			this->Ui->hardenMASK->setEnabled(false);
 			this->Ui->pencilSearchSize->setEnabled(false);
 			this->Ui->pencilSphereR->setEnabled(false);
 			this->Ui->pencilTubeR->setEnabled(false);
@@ -1177,6 +1188,7 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->unmaskR->setDisabled(false);
 			this->Ui->reinitializeMASK->setDisabled(false);
 			this->Ui->invertMASK->setDisabled(false);
+			this->Ui->hardenMASK->setEnabled(false);
 			this->Ui->pencilSearchSize->setDisabled(false);
 			this->Ui->pencilSphereR->setDisabled(false);
 			this->Ui->pencilTubeR->setDisabled(false);
@@ -1195,6 +1207,8 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
 			this->Ui->invertMASK->setDisabled(true);
+			this->Ui->hardenMASK->setDisabled(true);
+
 			this->Ui->pencilSearchSize->setDisabled(true);
 			this->Ui->pencilSphereR->setDisabled(true);
 			this->Ui->pencilTubeR->setDisabled(true);
@@ -1216,6 +1230,7 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
 			this->Ui->invertMASK->setDisabled(true);
+			this->Ui->hardenMASK->setDisabled(true);
 			this->Ui->pencilSearchSize->setDisabled(true);
 			this->Ui->pencilSphereR->setDisabled(true);
 			this->Ui->pencilTubeR->setDisabled(true);

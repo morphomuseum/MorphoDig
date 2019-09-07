@@ -345,6 +345,102 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 
 	// now associate
 }
+void vtkMDVolume::HardenMask()
+{
+	QMessageBox msgBox;
+	msgBox.setText("This option will modify your volume data. There is no undo! Do you want to proceed anyway? ");
+	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	msgBox.setDefaultButton(QMessageBox::No);
+	int ret = msgBox.exec();
+	if (ret == QMessageBox::No) {
+		cout << "no!!!" << endl;
+		return;
+	}
+	cout << "Harden mask!" << endl;
+	// creates an empty mask
+	this->MaskBinComputed = 0;
+	int dims[3];
+
+
+	this->Mask->GetDimensions(dims);
+
+	for (int z = 0; z < dims[2]; z++)
+	{
+		for (int y = 0; y < dims[1]; y++)
+		{
+			for (int x = 0; x < dims[0]; x++)
+			{
+
+				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+				if (pixel[0] == 0)
+				{ 
+					pixel[0] = 255; 
+					// et là appliquer la desired value!
+					int dataType = this->GetImageData()->GetScalarType();
+
+					QString dataTypeAsString;
+					if (dataType == VTK_UNSIGNED_SHORT)
+					{
+						unsigned short* pixel2 = static_cast<unsigned short*>(this->GetImageData()->GetScalarPointer(x, y, z));
+						pixel2[0] = 0;
+						
+					}
+					else if (dataType == VTK_SHORT)
+					{
+						signed short* pixel2 = static_cast<signed short*>(this->GetImageData()->GetScalarPointer(x, y, z));
+						pixel2[0] = 0;
+						
+					}
+					else if (dataType == VTK_CHAR)
+					{
+						char* pixel2 = static_cast<char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+						pixel2[0] = 0;
+					}
+					else if (dataType == VTK_UNSIGNED_CHAR)
+					{
+						unsigned char* pixel2 = static_cast<unsigned char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+						pixel2[0] = 0;
+					}
+					else if (dataType == VTK_SIGNED_CHAR)
+					{
+						signed char* pixel2 = static_cast<signed char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+						pixel2[0] = 0;
+
+					}
+					else if (dataType == VTK_FLOAT)
+					{
+						float* pixel2 = static_cast<float*>(this->GetImageData()->GetScalarPointer(x, y, z));
+						pixel2[0] = 0;
+
+					}
+					else if (dataType == VTK_DOUBLE)
+					{
+						double* pixel2 = static_cast<double*>(this->GetImageData()->GetScalarPointer(x, y, z));
+						pixel2[0] = 0;
+
+					}
+					else if (dataType == VTK_BIT)
+					{
+						//dataTypeAsString = "Bit (1 bit)";
+					}
+				}
+				
+
+			}
+		}
+	}
+	Mask->Modified();
+	//update also volume image data!
+	this->UpdateMaskData(Mask);
+	QString myName = QString(this->GetName().c_str());
+	myName = myName + "_hrd";
+	this->SetName(myName.toStdString());
+	this->Modified();
+	this->SetImageDataAndMap(this->GetImageData());
+	this->SetImageDataBinComputed(0);
+	if (this->GetuseImageDataBinForVR() == 1) { this->ComputeImageDataBin(); }
+
+}
 void vtkMDVolume::InvertMask()
 {
 	cout << "Invert mask!" << endl;

@@ -1725,7 +1725,7 @@
       <rect>
        <x>110</x>
        <y>30</y>
-       <width>141</width>
+       <width>164</width>
        <height>28</height>
       </rect>
      </property>
@@ -1818,6 +1818,23 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QToolButton" name="hardenMASK">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Harden mask (fill masked voxels with some value)</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/masks.png</normaloff>:/Icons/masks.png</iconset>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
     <widget class="QWidget" name="horizontalLayoutWidget_3">
@@ -1825,7 +1842,7 @@
       <rect>
        <x>250</x>
        <y>60</y>
-       <width>129</width>
+       <width>151</width>
        <height>31</height>
       </rect>
      </property>
@@ -1858,9 +1875,9 @@
     <widget class="QWidget" name="horizontalLayoutWidget_5">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>10</x>
        <y>60</y>
-       <width>181</width>
+       <width>201</width>
        <height>31</height>
       </rect>
      </property>
@@ -1912,9 +1929,9 @@
     <widget class="QLabel" name="label_18">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>30</x>
        <y>90</y>
-       <width>91</width>
+       <width>111</width>
        <height>20</height>
       </rect>
      </property>
@@ -1926,9 +1943,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>290</x>
       <y>560</y>
-      <width>121</width>
+      <width>141</width>
       <height>31</height>
      </rect>
     </property>
