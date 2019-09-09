@@ -152,6 +152,7 @@ void vtkMDVolume::SetMapperType(int mtype)
 {
 	this->mapper_type = mtype;
 	this->SetImageDataAndMap(this->GetImageData());//will call Initialize mapper
+	
 }
 void vtkMDVolume::InitializeMapper()
 {
@@ -248,16 +249,10 @@ vtkSmartPointer<vtkOctreePointLocator> vtkMDVolume::GetOctree()
 	return this->Octree;
 }
 */
-void vtkMDVolume::SetMaskEnabled(int maskEnabled)
+void vtkMDVolume::ConnectMapperToMask()
 {
-	this->MaskEnabled = maskEnabled;
-	if (this->MaskEnabled == 1)
+	if (this->MaskEnabled == 1 && this->MaskInitialized==1)
 	{
-		if (this->MaskInitialized == 0)
-		{
-			cout << "Initialize mask..." << endl;
-			this->InitializeMask();
-		}
 		if (this->mapper_type == 1)
 		{
 			vtkGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskTypeToBinary();
@@ -282,46 +277,6 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(this->GetMaskBin());
 			}
 		}
-		long long cpt2 = 0;
-		long long cpt255 = 0;
-		long long cpt0 = 0;
-		int dims[3];
-		this->GetImageData()->GetDimensions(dims);
-		long long numvox = dims[0] * dims[1] * dims[2];
-		for (int z = 0; z < dims[2]; z++)
-		{
-			for (int y = 0; y < dims[1]; y++)
-			{
-				for (int x = 0; x < dims[0]; x++)
-				{
-					unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
-					// do something with v
-					if (pixel[0] == 255)
-					{
-						cpt255++;
-					}
-					else if (pixel[0] == 0)
-					{
-						cpt0++;
-						//std::cout << "Pixel at " << x << "," << y << "," << z << ", differs from 255! "  << endl;
-
-					}
-					else
-					{
-						cpt2++;
-					}
-					if (z < 10 && y < 10 && ((x < 60) && (x > 40)))
-					{
-						//std::cout << "Pixel at " << x << "," << y << "," << z << ", " << pixel[0] << endl;
-					}
-				}
-
-			}
-
-		}
-		cout << "Set Mask enabled: Found " << cpt255 << "=255, " << cpt0 << "=0, and " << cpt2 << " others out of " << numvox << " pixels " << endl;
-		
-		//do stuff to associate the mask to the mapper
 	}
 	else
 	{
@@ -334,14 +289,28 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 		}
 		else if (this->mapper_type == 2)
 		{
-			
-				vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(NULL);
-			
+
+			vtkOpenGLGPUVolumeRayCastMapper::SafeDownCast(this->GetMapper())->SetMaskInput(NULL);
+
 		}
+
 	}
-	
-		
-	
+
+}
+void vtkMDVolume::SetMaskEnabled(int maskEnabled)
+{
+	this->MaskEnabled = maskEnabled;
+	if (this->MaskEnabled == 1)
+	{
+		if (this->MaskInitialized == 0)
+		{
+			cout << "Initialize mask..." << endl;
+			this->InitializeMask();
+		}
+					
+	}
+				
+	this->ConnectMapperToMask();
 	
 
 	// now associate
@@ -1369,6 +1338,10 @@ void vtkMDVolume::FlipY()
 void vtkMDVolume::ChangeSpacing(double newSpacingX, double newSpacingY, double newSpacingZ)
 {
 	this->ImageData->SetSpacing(newSpacingX, newSpacingY, newSpacingZ);
+	if (this->MaskEnabled== 1 && this->MaskInitialized==1)
+	{
+		this->Mask->SetSpacing(newSpacingX, newSpacingY, newSpacingZ);
+	}
 	this->SetImageDataAndMap(this->ImageData);
 }
 void vtkMDVolume::Reslice(int extended, int interpolationMethod)
@@ -1439,6 +1412,11 @@ void vtkMDVolume::Reslice(int extended, int interpolationMethod)
 	QString myName = QString(this->GetName().c_str());
 	myName = myName + "_rsp";
 	this->SetName(myName.toStdString());
+
+	//mask is not set nor initialized... 
+	this->MaskEnabled = 0;
+	this->MaskInitialized = 0;
+
 	this->Modified();
 	this->SetImageDataAndMap(reslicedData);
 	this->Outline->SetInputData(reslicedData);
@@ -1473,7 +1451,11 @@ void vtkMDVolume::Resample(double newSpacingX, double newSpacingY, double newSpa
 	QString myName = QString(this->GetName().c_str());
 	myName = myName + "_rsp";
 	this->SetName(myName.toStdString());
+	//mask is not set nor initialized... 
+	this->MaskEnabled = 0;
+	this->MaskInitialized = 0;
 	this->Modified();
+	//reinit mask!!!!
 	this->SetImageDataAndMap(resampledData);
 
 	
@@ -1516,6 +1498,7 @@ void vtkMDVolume::SetImageDataAndMap(vtkSmartPointer<vtkImageData> imgData)
 		}
 		
 	}
+	this->ConnectMapperToMask();
 	
 }
 void vtkMDVolume::SetMaskData(vtkSmartPointer<vtkImageData> mskData)
@@ -1580,7 +1563,8 @@ void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 {
 	this->ImageData = imgData;
 	this->ImageDataBinComputed = 0;
-	this->MaskInitialized = 0;
+	//this->MaskInitialized = 0; => in some cases we want to keep the mask!!!
+	
 	// now add a few things related to SliceXYMapper etc... 
 	
 	this->SliceXYMapper->SetInputData(imgData);
@@ -2097,6 +2081,8 @@ void vtkMDVolume::CropVolume()
 	QString myName = QString(this->GetName().c_str());
 	myName = myName + "_crp";
 	this->SetName(myName.toStdString());
+	this->MaskEnabled = 0;
+	this->MaskInitialized = 0;
 	this->Modified();
 	this->SetImageDataAndMap(croppedData);
 	this->Outline->SetInputData(croppedData);

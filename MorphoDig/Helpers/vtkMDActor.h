@@ -74,7 +74,7 @@ public:
 	void BuildConnectivityFilter();
 	void FreeConnectivityFilter();
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> GetConnectivityFilter();
-
+	void HardenTransform();
 	vtkSmartPointer<vtkIdTypeArray> GetConnectivityRegions();
 	//vtkSmartPointer<vtkKdTreePointLocator> GetKdTree();
 	vtkSmartPointer<vtkIdList> GetConnectivityRegionsCorrList();

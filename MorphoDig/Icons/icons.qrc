@@ -25,6 +25,7 @@
     <!-- Typical file operations. -->
 	<file>crop.png</file>
 	<file>masks.png</file>
+	<file>hardentransform.png</file>
    <file>rubber_mode.png</file>
    <file>eye_opened.png</file>
    <file>eye_closed.png</file>

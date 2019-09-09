@@ -92,7 +92,7 @@ public:
 	void InitializeMask();
 	void InvertMask();
 	void HardenMask();
-
+	void ConnectMapperToMask();
 	void ComputeImageDataBin();
 	void ComputeMaskBin();
 	//vtkSetMacro(Selected, int);

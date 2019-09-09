@@ -33,6 +33,7 @@ Module:    vtkMDActor.cxx
 #include <vtkUnsignedCharArray.h>
 #include <vtkPlane.h>
 #include <QString>
+#include <QMessageBox>
 vtkStandardNewMacro(vtkMDActor);
 
 
@@ -382,6 +383,63 @@ void vtkMDActor::FreeKdTree()
 vtkSmartPointer<vtkKdTreePointLocator> vtkMDActor::GetKdTree()
 {
 	return this->KdTree;
+}
+void vtkMDActor::HardenTransform()
+{
+
+	
+	QMessageBox msgBox;
+	msgBox.setText("This option will modify your surface data. There is no undo. Do you want to proceed anyway? ");
+	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	msgBox.setDefaultButton(QMessageBox::No);
+	int ret = msgBox.exec();
+	if (ret == QMessageBox::No) {
+		cout << "no!!!" << endl;
+		return;
+	}
+	
+
+	vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
+	this->GetMatrix(Mat);
+	vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	
+	
+	//cout << "nr of nodes:" << nrPoints << endl;
+	
+	if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+	{
+		vtkPolyData *myPD = vtkPolyData::SafeDownCast(mapper->GetInput());
+		vtkSmartPointer<vtkPoints> points =
+			vtkSmartPointer<vtkPoints>::New();
+		points->SetNumberOfPoints(myPD->GetNumberOfPoints());
+		//we have six planes
+		for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
+		{
+			
+			double pt[3];
+			double ptwc[3];
+			
+			
+				myPD->GetPoint(j, pt);
+				mqMorphoDigCore::TransformPoint(Mat, pt, ptwc);
+				points->SetPoint(j, ptwc[0], ptwc[1], ptwc[2]);
+			
+
+		}
+		myPD->SetPoints(points);
+		
+
+
+		myPD->Modified();
+		this->cellNormals = nullptr;
+		this->pointNormals = nullptr;
+		this->SetDisplayMode(mqMorphoDigCore::instance()->Getmui_DisplayMode());
+		mapper->Modified();
+		vtkSmartPointer<vtkMatrix4x4> Identity = vtkSmartPointer<vtkMatrix4x4>::New();
+		Identity->Identity();
+		this->ApplyMatrix(Identity);
+	}
+
 }
 int vtkMDActor::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)
 {

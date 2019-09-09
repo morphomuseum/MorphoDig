@@ -214,6 +214,8 @@ mqEditACTORDialog::mqEditACTORDialog(QWidget* Parent)
 	connect(this->Ui->ApplyMatrix, SIGNAL(pressed()), this, SLOT(slotapplyMatrixToAllSelectedActors()));
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotsaveActor()));
  connect(this->Ui->Reinit, SIGNAL(pressed()), this, SLOT(slotReinitMatrix()));
+ 
+ connect(this->Ui->hardenTransform, SIGNAL(pressed()), this, SLOT(slotHardenTransform()));
  connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotRefreshMatrix()));
 connect(this->Ui->deleteScalar, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()));
 connect(this->Ui->editScalar, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
@@ -815,6 +817,14 @@ void mqEditACTORDialog::slotRefreshDialog()
 
 }
 
+void mqEditACTORDialog::slotHardenTransform()
+{
+	if (this->ACTOR != NULL)
+	{
+		this->ACTOR->HardenTransform();
+		this->UpdateUI();
+	}
+}
 void mqEditACTORDialog::slotReinitMatrix()
 {
 	this->Ui->M00->setValue(1);
@@ -837,26 +847,29 @@ void mqEditACTORDialog::slotReinitMatrix()
 
 void mqEditACTORDialog::slotRefreshMatrix()
 {
-	vtkSmartPointer<vtkMatrix4x4> Mat = this->ACTOR->GetMatrix();
-	//vtkSmartPointer<vtkMatrix3x3> Mat3 = vtkMatrix3x3::SafeDownCast(this->ACTOR->GetMatrix());
-	//Mat->PrintSelf(std::cout, vtkIndent(1));
-	
-	this->Ui->M00->setValue(Mat->GetElement(0, 0));
-	this->Ui->M01->setValue(Mat->GetElement(0, 1));
-	this->Ui->M02->setValue(Mat->GetElement(0, 2));
-	this->Ui->M03->setValue(Mat->GetElement(0, 3));
-	this->Ui->M10->setValue(Mat->GetElement(1, 0));
-	this->Ui->M11->setValue(Mat->GetElement(1, 1));
-	this->Ui->M12->setValue(Mat->GetElement(1, 2));
-	this->Ui->M13->setValue(Mat->GetElement(1, 3));
-	this->Ui->M20->setValue(Mat->GetElement(2, 0));
-	this->Ui->M21->setValue(Mat->GetElement(2, 1));
-	this->Ui->M22->setValue(Mat->GetElement(2, 2));
-	this->Ui->M23->setValue(Mat->GetElement(2, 3));
-	this->Ui->M30->setValue(Mat->GetElement(3, 0));
-	this->Ui->M31->setValue(Mat->GetElement(3, 1));
-	this->Ui->M32->setValue(Mat->GetElement(3, 2));
-	this->Ui->M33->setValue(Mat->GetElement(3, 3));
+	if (this->ACTOR != NULL)
+	{
+		vtkSmartPointer<vtkMatrix4x4> Mat = this->ACTOR->GetMatrix();
+		//vtkSmartPointer<vtkMatrix3x3> Mat3 = vtkMatrix3x3::SafeDownCast(this->ACTOR->GetMatrix());
+		//Mat->PrintSelf(std::cout, vtkIndent(1));
+
+		this->Ui->M00->setValue(Mat->GetElement(0, 0));
+		this->Ui->M01->setValue(Mat->GetElement(0, 1));
+		this->Ui->M02->setValue(Mat->GetElement(0, 2));
+		this->Ui->M03->setValue(Mat->GetElement(0, 3));
+		this->Ui->M10->setValue(Mat->GetElement(1, 0));
+		this->Ui->M11->setValue(Mat->GetElement(1, 1));
+		this->Ui->M12->setValue(Mat->GetElement(1, 2));
+		this->Ui->M13->setValue(Mat->GetElement(1, 3));
+		this->Ui->M20->setValue(Mat->GetElement(2, 0));
+		this->Ui->M21->setValue(Mat->GetElement(2, 1));
+		this->Ui->M22->setValue(Mat->GetElement(2, 2));
+		this->Ui->M23->setValue(Mat->GetElement(2, 3));
+		this->Ui->M30->setValue(Mat->GetElement(3, 0));
+		this->Ui->M31->setValue(Mat->GetElement(3, 1));
+		this->Ui->M32->setValue(Mat->GetElement(3, 2));
+		this->Ui->M33->setValue(Mat->GetElement(3, 3));
+	}
 
 }
 //-----------------------------------------------------------------------------

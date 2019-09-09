@@ -479,6 +479,7 @@ void mqEditVolumeDialog::slotHardenMask()
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
 		this->Volume->HardenMask();
+		this->UpdateUI();
 		mqMorphoDigCore::instance()->Render();
 	}
 }
