@@ -8828,10 +8828,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				{
 														
 					this->SaveVolume(_vol_fullpath, save_volumes_format, compression, myVolume);
-					if (myVolume->MaskWorthSaving == 1)
-					{
-						
-					}
+					
 				}
 				write = 1;
 				if (overwrite_msk == 0)
@@ -8847,7 +8844,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (write == 1)
 				{
 
-					if (myVolume->MaskWorthSaving == 1)
+					if (myVolume->MaskWorthSaving() == 1)
 					{
 						this->SaveVolume(_msk_fullpath, 0, compression, myVolume,1,1,1);
 
