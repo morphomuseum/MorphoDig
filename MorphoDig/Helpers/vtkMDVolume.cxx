@@ -2076,6 +2076,10 @@ void vtkMDVolume::CropVolume()
 {
 	cout <<"crop volume" <<endl; 
 	int CropDimensions[6];
+	int Extent[6];
+	
+	int ExtentCropped[6];
+	
 	double oldOrigin[3];
 	double oldOriginWC[3];
 	double newOrigin[3];
@@ -2095,6 +2099,8 @@ void vtkMDVolume::CropVolume()
 		}
 		this->Reslice(1, 2);
 	}
+	this->GetImageData()->GetExtent(Extent);
+
 	/*MatRetranslated->SetElement(0, 3, Mat->GetElement(0, 3));
 	MatRetranslated->SetElement(1, 3, Mat->GetElement(1, 3));
 	MatRetranslated->SetElement(2, 3, Mat->GetElement(2, 3));*/
@@ -2173,19 +2179,25 @@ void vtkMDVolume::CropVolume()
 	croppedData->GetPoint(0, pt);
 	
 	cout << "Crop point 0 coordinates:" << pt[0] << "," << pt[1] << "," << pt[2] << endl;
+	
 	cout << "New origin:" << newOrigin[0]<< "," << newOrigin[1] << "," << newOrigin[2] << endl;
 	//croppedData->SetOrigin(pt[0], pt[1], pt[2]); // si on fait ça il faut faire un hard transform pour remettre à 0 tous les points.
 	
-	int extent[3];
+	
 //	croppedData->GetExtent(extent);
-	cout << "Cropped data extent:" << extent[0] << "," << extent[1] << "," << extent[2] << endl;
-	/*
+	croppedData->GetExtent(ExtentCropped);
+	cout << "Init data extent:" << Extent[0] << "," << Extent[1] << "," << Extent[2] << "," << Extent[3] << "," << Extent[4] << "," << Extent[5] << endl;
+
+
+	cout << "Cropped data extent:" << ExtentCropped[0] << "," << ExtentCropped[1] << "," << ExtentCropped[2] << "," << ExtentCropped[3] << "," << ExtentCropped[4] <<  "," << ExtentCropped[5]<<endl;
+
+	
 	vtkSmartPointer<vtkImageChangeInformation> change = vtkSmartPointer<vtkImageChangeInformation>::New();
 	change->SetInputData(croppedData);
 	change->SetOutputSpacing(res[0], res[1], res[2]);
 	//change->SetOriginTranslation(pt[0], pt[1], pt[2]);
-	change->SetOutputOrigin(0, 0, 0);
-	
+	change->SetOutputOrigin(pt[0], pt[1], pt[2]);
+	change->SetExtentTranslation(-ExtentCropped[0], -ExtentCropped[2], -ExtentCropped[4]);
 
 
 
@@ -2193,98 +2205,10 @@ void vtkMDVolume::CropVolume()
 	change->Update();
 	double pt2[3];
 
-	cout << "PT2" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
-	*/
+	//cout << "PT2" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
 	
-	vtkSmartPointer<vtkImageData> croppedOrigin = vtkSmartPointer<vtkImageData>::New();	
 	
-	croppedOrigin->SetDimensions(dim2);
-	croppedOrigin->SetSpacing(res2);		  	
-	croppedOrigin->SetOrigin(pt[0], pt[1], pt[2]);
 	
-	cout << "croppedOrigin allocate scalars" << endl;
-	cout << "Cropped origin dimensions:" << dim2[0] << "," << dim2[1] << "," << dim2[2] << endl;
-	int dataType = this->GetImageData()->GetScalarType();
-	cout << "Data type: " << dataType << endl;
-	croppedOrigin->AllocateScalars(dataType, 1);	
-	cout << "and now?" << endl;
-	/*
-	for (int z = 0; z < dim2[2]; z++)
-	{
-		for (int y = 0; y < dim2[1]; y++)
-		{
-			for (int x = 0; x < dim2[0]; x++)
-			{
-				if (dataType == VTK_UNSIGNED_SHORT)
-				{
-					unsigned short* pixel = static_cast<unsigned short*>(croppedData->GetScalarPointer(x, y, z));
-					cout << "And???" << endl;
-					unsigned short newValue = pixel[0];
-					//cout << "pixel:" << newValue << endl;
-					unsigned short* pixel2 = static_cast<unsigned short*>(croppedOrigin->GetScalarPointer(x, y, z));
-					//cout << "What???" << endl;
-										
-					
-					pixel2[0] = p;
-					cout << "That???" << endl;
-				}
-				else if (dataType == VTK_SHORT)
-				{
-					signed short* pixel = static_cast<signed short*>(croppedData->GetScalarPointer(x, y, z));
-					signed short* pixel2 = static_cast<signed short*>(croppedOrigin->GetScalarPointer(x, y, z));
-					signed short newValue = pixel[0];
-					pixel2[0] = newValue;
-
-				}
-				else if (dataType == VTK_CHAR)
-				{
-					char* pixel = static_cast<char*>(croppedData->GetScalarPointer(x, y, z));
-					char* pixel2 = static_cast<char*>(croppedOrigin->GetScalarPointer(x, y, z));
-					char newValue = pixel[0];
-					pixel2[0] = newValue;
-				}
-				else if (dataType == VTK_UNSIGNED_CHAR)
-				{
-					unsigned char* pixel = static_cast<unsigned char*>(croppedData->GetScalarPointer(x, y, z));
-					unsigned char* pixel2 = static_cast<unsigned char*>(croppedOrigin->GetScalarPointer(x, y, z));
-					unsigned char newValue = pixel[0];
-					pixel2[0] = newValue;
-				}
-				else if (dataType == VTK_SIGNED_CHAR)
-				{
-					signed char* pixel = static_cast<signed char*>(croppedData->GetScalarPointer(x, y, z));
-					signed char* pixel2 = static_cast<signed char*>(croppedOrigin->GetScalarPointer(x, y, z));
-					signed char newValue = pixel[0];
-					pixel2[0] = newValue;
-
-				}
-				else if (dataType == VTK_FLOAT)
-				{
-					float* pixel = static_cast<float*>(croppedData->GetScalarPointer(x, y, z));
-					float* pixel2 = static_cast<float*>(croppedOrigin->GetScalarPointer(x, y, z));
-					float newValue = pixel[0];
-					pixel2[0] = newValue;
-
-				}
-				else if (dataType == VTK_DOUBLE)
-				{
-					double* pixel = static_cast<double*>(croppedData->GetScalarPointer(x, y, z));
-					double* pixel2 = static_cast<double*>(croppedOrigin->GetScalarPointer(x, y, z));
-					double newValue = pixel[0];
-					pixel2[0] = newValue;
-
-				}
-				
-				
-
-			}
-		}
-	}
-	*/
-	cout << "End copy croppedData into croppedOrigin" << endl;
-	double pt2[3];
-	croppedOrigin->GetPoint(0, pt2);
-	cout << "PT2" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
 	//si on veut faire ça, il faut aussi mettre à jour la matrice de position pour maintenir la même position!
 	//croppedData->SetExtent(0, dim2[0] - 1, 0, dim2[1] - 1, 0, dim2[2] - 1);
 	
@@ -2294,12 +2218,14 @@ void vtkMDVolume::CropVolume()
 	this->MaskEnabled = 0;
 	this->MaskInitialized = 0;
 	this->Modified();
-	this->SetImageDataAndMap(croppedData);
-	this->Outline->SetInputData(croppedData);
-	//this->SetImageDataAndMap(change->GetOutput());
-	//this->Outline->SetInputData(change->GetOutput());
-	//this->SetImageDataAndMap(croppedOrigin);
-	//this->Outline->SetInputData(croppedOrigin);
+	//this->SetImageDataAndMap(croppedData);
+	//this->Outline->SetInputData(croppedData);
+	change->GetOutput()->GetExtent(Extent);
+	cout << "Extent modified:" << Extent[0] << "," << Extent[1] << "," << Extent[2] << "," << Extent[3] << "," << Extent[4] << "," << Extent[5] << endl;
+
+	this->SetImageDataAndMap(change->GetOutput());
+	this->Outline->SetInputData(change->GetOutput());
+
 }
 void vtkMDVolume::CreateCropBox()
 {
