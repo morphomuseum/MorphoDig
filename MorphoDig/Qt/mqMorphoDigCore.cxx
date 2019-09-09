@@ -1664,7 +1664,9 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		int dims[3];
 		double pt[3];
 		
-
+		double ptOrig[3];
+		myVolume->GetImageData()->GetPoint(0, ptOrig); // myVolume point non re-positionné par la matrice de position de l'acteur
+		cout << "ptOrig:" << ptOrig[0] << "," << ptOrig[1] << "," << ptOrig[2] << endl;
 		//double vn[3];
 		myVolume->GetImageData()->GetPoint(pickid, pt); // myVolume point non re-positionné par la matrice de position de l'acteur
 		cout << "Volume picked point:"<<pickid<<", coords:" << pt[0] << "," << pt[1] << "," << pt[2] << endl;
