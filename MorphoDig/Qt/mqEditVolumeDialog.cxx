@@ -1189,7 +1189,7 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->unmaskR->setDisabled(false);
 			this->Ui->reinitializeMASK->setDisabled(false);
 			this->Ui->invertMASK->setDisabled(false);
-			this->Ui->hardenMASK->setEnabled(false);
+			this->Ui->hardenMASK->setDisabled(false);
 			this->Ui->pencilSearchSize->setDisabled(false);
 			this->Ui->pencilSphereR->setDisabled(false);
 			this->Ui->pencilTubeR->setDisabled(false);

@@ -8824,7 +8824,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				{
 						double BoxBounds[6] = { 0,0,0,0,0,0 };
 						vtkSmartPointer<vtkMatrix4x4> Mat = myVolume->GetMatrix();
-						if (myVolume->GetdisplayROI() == 1)
+						if (myVolume->GetenableROI() ==1 && myVolume->GetdisplayROI() == 1)
 						{
 							myVolume->GetBoxBounds(BoxBounds);
 						}

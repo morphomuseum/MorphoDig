@@ -1749,10 +1749,10 @@
           <normaloff>:/Cursors/pencil.png</normaloff>:/Cursors/pencil.png</iconset>
         </property>
         <property name="checkable">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -1832,6 +1832,9 @@
         <property name="icon">
          <iconset resource="../Icons/icons.qrc">
           <normaloff>:/Icons/masks.png</normaloff>:/Icons/masks.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
