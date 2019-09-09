@@ -319,194 +319,228 @@ void vtkMDVolume::SetMaskEnabled(int maskEnabled)
 }
 void vtkMDVolume::HardenMask()
 {
-
-	/*
-	QMessageBox msgBox;
-	msgBox.setText("This option will modify your volume data. There is no undo! Do you want to proceed anyway? ");
-	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-	msgBox.setDefaultButton(QMessageBox::No);
-	int ret = msgBox.exec();
-	if (ret == QMessageBox::No) {
-		cout << "no!!!" << endl;
-		return;
-	}
-	*/
-	double default_value;
-	double max_value;
-	double min_value;
-	int dataType = this->GetImageData()->GetScalarType();
-	default_value = 0;
-	min_value = 0;
-	max_value = 65535;
-	QString dataTypeAsString;
-	if (dataType == VTK_UNSIGNED_SHORT)
+	if (this->MaskEnabled == 1 && this->GetMaskInitialized() == 1)
 	{
+
+		/*
+		QMessageBox msgBox;
+		msgBox.setText("This option will modify your volume data. There is no undo! Do you want to proceed anyway? ");
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::No);
+		int ret = msgBox.exec();
+		if (ret == QMessageBox::No) {
+			cout << "no!!!" << endl;
+			return;
+		}
+		*/
+		double default_value;
+		double max_value;
+		double min_value;
+		int dataType = this->GetImageData()->GetScalarType();
 		default_value = 0;
 		min_value = 0;
 		max_value = 65535;
-		
-
-	}
-	else if (dataType == VTK_SHORT)
-	{
-		default_value = -1000;
-		min_value = -32767;
-		max_value = 32767;
-		
-	}
-	else if (dataType == VTK_CHAR)
-	{
-		default_value = -127;
-		min_value = 0;
-		max_value = 127;
-	}
-	else if (dataType == VTK_UNSIGNED_CHAR)
-	{
-		default_value = 0;
-		min_value = 0;
-		max_value = 255;
-	}
-	else if (dataType == VTK_SIGNED_CHAR)
-	{
-		default_value = 0;
-		min_value = -127;
-		max_value = 127;
-
-	}
-	else if (dataType == VTK_FLOAT)
-	{
-		default_value = 0;
-		min_value = -FLT_MAX;
-		max_value = FLT_MAX;
-
-	}
-	else if (dataType == VTK_DOUBLE)
-	{
-		default_value = 0;
-		min_value = -DBL_MAX;
-		max_value = DBL_MAX;
-	}
-
-	bool ok;
-	double fillValue = QInputDialog::getDouble(0, "Harden mask",
-		"Fill masked voxels with value (warning no undo):", default_value, min_value, max_value, 0, &ok);
-	
-	if (!ok) { return; }
-	
-	cout << "Harden mask!" << endl;
-	// creates an empty mask
-	this->MaskBinComputed = 0;
-	int dims[3];
-
-
-	this->Mask->GetDimensions(dims);
-
-	for (int z = 0; z < dims[2]; z++)
-	{
-		for (int y = 0; y < dims[1]; y++)
+		QString dataTypeAsString;
+		if (dataType == VTK_UNSIGNED_SHORT)
 		{
-			for (int x = 0; x < dims[0]; x++)
+			default_value = 0;
+			min_value = 0;
+			max_value = 65535;
+
+
+		}
+		else if (dataType == VTK_SHORT)
+		{
+			default_value = -1000;
+			min_value = -32767;
+			max_value = 32767;
+
+		}
+		else if (dataType == VTK_CHAR)
+		{
+			default_value = -127;
+			min_value = 0;
+			max_value = 127;
+		}
+		else if (dataType == VTK_UNSIGNED_CHAR)
+		{
+			default_value = 0;
+			min_value = 0;
+			max_value = 255;
+		}
+		else if (dataType == VTK_SIGNED_CHAR)
+		{
+			default_value = 0;
+			min_value = -127;
+			max_value = 127;
+
+		}
+		else if (dataType == VTK_FLOAT)
+		{
+			default_value = 0;
+			min_value = -FLT_MAX;
+			max_value = FLT_MAX;
+
+		}
+		else if (dataType == VTK_DOUBLE)
+		{
+			default_value = 0;
+			min_value = -DBL_MAX;
+			max_value = DBL_MAX;
+		}
+
+		bool ok;
+		double fillValue = QInputDialog::getDouble(0, "Harden mask",
+			"Fill masked voxels with value (warning no undo):", default_value, min_value, max_value, 0, &ok);
+
+		if (!ok) { return; }
+
+		cout << "Harden mask!" << endl;
+		// creates an empty mask
+		this->MaskBinComputed = 0;
+		int dims[3];
+
+
+		this->Mask->GetDimensions(dims);
+
+		for (int z = 0; z < dims[2]; z++)
+		{
+			for (int y = 0; y < dims[1]; y++)
 			{
+				for (int x = 0; x < dims[0]; x++)
+				{
 
-				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
-				if (pixel[0] == 0)
-				{ 
-					pixel[0] = 255; 
-					// et là appliquer la desired value!
-					int dataType = this->GetImageData()->GetScalarType();
+					unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+					if (pixel[0] == 0)
+					{
+						pixel[0] = 255;
+						// et là appliquer la desired value!
+						int dataType = this->GetImageData()->GetScalarType();
 
-					QString dataTypeAsString;
-					if (dataType == VTK_UNSIGNED_SHORT)
-					{
-						unsigned short* pixel2 = static_cast<unsigned short*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = fillValue;
-						
-					}
-					else if (dataType == VTK_SHORT)
-					{
-						signed short* pixel2 = static_cast<signed short*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = fillValue;
-						
-					}
-					else if (dataType == VTK_CHAR)
-					{
-						char* pixel2 = static_cast<char*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = fillValue;
-					}
-					else if (dataType == VTK_UNSIGNED_CHAR)
-					{
-						unsigned char* pixel2 = static_cast<unsigned char*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = fillValue;
-					}
-					else if (dataType == VTK_SIGNED_CHAR)
-					{
-						signed char* pixel2 = static_cast<signed char*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = fillValue;
+						QString dataTypeAsString;
+						if (dataType == VTK_UNSIGNED_SHORT)
+						{
+							unsigned short* pixel2 = static_cast<unsigned short*>(this->GetImageData()->GetScalarPointer(x, y, z));
+							pixel2[0] = fillValue;
 
-					}
-					else if (dataType == VTK_FLOAT)
-					{
-						float* pixel2 = static_cast<float*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = fillValue;
+						}
+						else if (dataType == VTK_SHORT)
+						{
+							signed short* pixel2 = static_cast<signed short*>(this->GetImageData()->GetScalarPointer(x, y, z));
+							pixel2[0] = fillValue;
 
-					}
-					else if (dataType == VTK_DOUBLE)
-					{
-						double* pixel2 = static_cast<double*>(this->GetImageData()->GetScalarPointer(x, y, z));
-						pixel2[0] = fillValue;
+						}
+						else if (dataType == VTK_CHAR)
+						{
+							char* pixel2 = static_cast<char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+							pixel2[0] = fillValue;
+						}
+						else if (dataType == VTK_UNSIGNED_CHAR)
+						{
+							unsigned char* pixel2 = static_cast<unsigned char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+							pixel2[0] = fillValue;
+						}
+						else if (dataType == VTK_SIGNED_CHAR)
+						{
+							signed char* pixel2 = static_cast<signed char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+							pixel2[0] = fillValue;
 
+						}
+						else if (dataType == VTK_FLOAT)
+						{
+							float* pixel2 = static_cast<float*>(this->GetImageData()->GetScalarPointer(x, y, z));
+							pixel2[0] = fillValue;
+
+						}
+						else if (dataType == VTK_DOUBLE)
+						{
+							double* pixel2 = static_cast<double*>(this->GetImageData()->GetScalarPointer(x, y, z));
+							pixel2[0] = fillValue;
+
+						}
+						else if (dataType == VTK_BIT)
+						{
+							//dataTypeAsString = "Bit (1 bit)";
+						}
 					}
-					else if (dataType == VTK_BIT)
-					{
-						//dataTypeAsString = "Bit (1 bit)";
-					}
+
+
 				}
-				
-
 			}
 		}
+		Mask->Modified();
+		//update also volume image data!
+		this->UpdateMaskData(Mask);
+		QString myName = QString(this->GetName().c_str());
+		myName = myName + "_hrd";
+		this->SetName(myName.toStdString());
+		this->Modified();
+		this->SetImageDataAndMap(this->GetImageData());
+		this->SetImageDataBinComputed(0);
+		if (this->GetuseImageDataBinForVR() == 1) { this->ComputeImageDataBin(); }
 	}
-	Mask->Modified();
-	//update also volume image data!
-	this->UpdateMaskData(Mask);
-	QString myName = QString(this->GetName().c_str());
-	myName = myName + "_hrd";
-	this->SetName(myName.toStdString());
-	this->Modified();
-	this->SetImageDataAndMap(this->GetImageData());
-	this->SetImageDataBinComputed(0);
-	if (this->GetuseImageDataBinForVR() == 1) { this->ComputeImageDataBin(); }
+}
+int vtkMDVolume::MaskWorthSaving()
+{
+	int worth = 0;
+	int foundwhite= 0;
+	int foundblack = 0;
+	if (this->MaskEnabled == 1 && this->GetMaskInitialized() == 1)
+	{
+		int dims[3];
 
+
+		this->Mask->GetDimensions(dims);
+
+		for (int z = 0; z < dims[2]; z++)
+		{
+			for (int y = 0; y < dims[1]; y++)
+			{
+				for (int x = 0; x < dims[0]; x++)
+				{
+
+					unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+					if (pixel[0] == 0) { foundblack=1; }
+					else if (pixel[0] == 255) { foundwhite =1; }
+
+				}
+			}
+		}
+		if (foundblack == 1 && foundwhite == 1) { worth = 1; }
+	}
+	return worth;
 }
 void vtkMDVolume::InvertMask()
 {
-	cout << "Invert mask!" << endl;
-	// creates an empty mask
-	this->MaskBinComputed = 0;
-	int dims[3];
-	
-
-	this->Mask->GetDimensions(dims);
-
-	for (int z = 0; z < dims[2]; z++)
+	if (this->MaskEnabled == 1 && this->GetMaskInitialized() == 1)
 	{
-		for (int y = 0; y < dims[1]; y++)
+		cout << "Invert mask!" << endl;
+		// creates an empty mask
+		this->MaskBinComputed = 0;
+		int dims[3];
+
+
+		this->Mask->GetDimensions(dims);
+
+		for (int z = 0; z < dims[2]; z++)
 		{
-			for (int x = 0; x < dims[0]; x++)
+			for (int y = 0; y < dims[1]; y++)
 			{
+				for (int x = 0; x < dims[0]; x++)
+				{
 
-				unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
-				if (pixel[0] == 0) { pixel[0] = 255; }
-				else if (pixel[0] == 255) { pixel[0] = 0; }
+					unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+					if (pixel[0] == 0) { pixel[0] = 255; }
+					else if (pixel[0] == 255) { pixel[0] = 0; }
 
+				}
 			}
 		}
+		Mask->Modified();
+		this->UpdateMaskData(Mask);
+		this->SetImageDataBinComputed(0);
+		if (this->GetuseImageDataBinForVR() == 1) { this->ComputeImageDataBin(); }
 	}
-	Mask->Modified();
-	this->UpdateMaskData(Mask);
-	this->SetImageDataBinComputed(0);
-	if (this->GetuseImageDataBinForVR() == 1) { this->ComputeImageDataBin(); }
-	
 }
 void vtkMDVolume::InitializeMask()
 {
@@ -2203,7 +2237,7 @@ void vtkMDVolume::CropVolume()
 
 	//change->CenterImageOn();
 	change->Update();
-	double pt2[3];
+	//double pt2[3];
 
 	//cout << "PT2" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
 	

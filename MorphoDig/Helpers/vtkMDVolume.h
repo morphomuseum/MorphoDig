@@ -91,6 +91,7 @@ public:
 	void RemoveCropBox();
 	void InitializeMask();
 	void InvertMask();
+	int MaskWorthSaving();
 	void HardenMask();
 	void ConnectMapperToMask();
 	void ComputeImageDataBin();

@@ -8365,6 +8365,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		int overwrite_mesh = 1;
 		//int overwrite_pos = 1;
 		int overwrite_vol = 1;
+		int overwrite_msk = 1;
 		int overwrite_map = 1;
 		int overwrite_ori = 1;
 		int overwrite_tag = 1;
@@ -8422,6 +8423,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		}
 
 		int vol_exists = 0;
+		int msk_exists = 0;
 		cout << "Save volume format =" << save_volumes_format << endl;
 		if (save_volumes_format == 0)//MHD
 		{
@@ -8445,6 +8447,8 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			vol_exists = this->selected_file_exists(onlypath, vtiExt, no_postfix);
 			//cout << "vol_exists:" << vol_exists << endl;
 		}
+		QString onlypathmsk = onlypath + "_MSK";
+		msk_exists  = this->selected_file_exists(onlypathmsk, mhdExt, no_postfix);
 
 		
 	
@@ -8504,6 +8508,17 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			msgBox.setDefaultButton(QMessageBox::Yes);
 			int ret = msgBox.exec();
 			if (ret == QMessageBox::Cancel) { overwrite_vol = 0; }
+
+
+		}
+		if (msk_exists == 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("At least one mask file already exists: overwrite existing mask files?");
+			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Yes);
+			int ret = msgBox.exec();
+			if (ret == QMessageBox::Cancel) { overwrite_msk = 0; }
 
 
 		}
@@ -8748,12 +8763,16 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			if (myVolume->GetSelected() == 1)
 			{
 				QString _vol_fullpath;
+				QString _msk_fullpath;
 				QString _pos_fullpath;
 				QString _map_fullpath;
 				QString _vol_file;
+				QString _msk_file;
 				QString _pos_file;
 				QString _map_file;
 				_vol_file.append(myVolume->GetName().c_str());
+				_msk_file.append(myVolume->GetName().c_str());
+				_msk_file.append("_MSK.mhd");
 				_pos_file.append(myVolume->GetName().c_str());
 				_map_file.append(myVolume->GetName().c_str());
 
@@ -8785,6 +8804,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				_vol_fullpath = onlypath;
 				_vol_fullpath += _vol_file;
 
+				_msk_fullpath = onlypath;
+				_msk_fullpath += _msk_file;
+
 				_pos_fullpath = onlypath;
 				_pos_fullpath += _pos_file;
 
@@ -8806,8 +8828,31 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				{
 														
 					this->SaveVolume(_vol_fullpath, save_volumes_format, compression, myVolume);
+					if (myVolume->MaskWorthSaving == 1)
+					{
+						
+					}
 				}
+				write = 1;
+				if (overwrite_msk == 0)
+				{
+					// in that case, check if file exists...								
+					ifstream file2(_msk_fullpath.toLocal8Bit());
+					if (file2)
+					{
+						write = 0;
+						file2.close();
+					}
+				}
+				if (write == 1)
+				{
 
+					if (myVolume->MaskWorthSaving == 1)
+					{
+						this->SaveVolume(_msk_fullpath, 0, compression, myVolume,1,1,1);
+
+					}
+				}
 				write = 1;
 				if (overwrite_pos == 0)
 				{
@@ -19832,7 +19877,7 @@ void mqMorphoDigCore::groupSelectedActors()
 
 	}
 }
-void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compression, vtkMDVolume *myVolume, int compression_type, int  bigendian)
+void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compression, vtkMDVolume *myVolume, int compression_type, int  bigendian, int isMSK)
 {
 	// File_type 0 : mhd
 	// File_type 1 : mha
@@ -19866,7 +19911,14 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compressio
 	if (myVolume2 != NULL)
 	{
 		vtkSmartPointer<vtkImageData> output = vtkSmartPointer<vtkImageData>::New();
-		output = myVolume2->GetImageData();
+		if (isMSK == 0)
+		{
+			output = myVolume2->GetImageData();
+		}
+		else
+		{
+			output = myVolume2->GetMask();
+		}
 		if (file_type == 0 || file_type == 1)
 		{
 			std::size_t found = fileName.toStdString().find(MHDext);

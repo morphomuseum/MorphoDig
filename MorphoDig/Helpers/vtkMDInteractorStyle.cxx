@@ -1624,7 +1624,7 @@ void vtkMDInteractorStyle::Mask()
 		vtkIdType pickid = picker->GetPointId();
 
 
-		if (picker->GetVolume() == NULL) {
+		if (picker->GetVolume() == NULL ) {
 			cout << "Picked Null volume" << endl;
 		}
 		else
