@@ -10,6 +10,7 @@
 #include "mqOpenDicomStackDialog.h"
 #include "mqCoreUtilities.h"
 #include "mqMorphoDigCore.h"
+#include "vtkMDVolume.h"
 #include "mqUndoStack.h"
 #include <vtkImageAppend.h>
 #include <vtkDICOMImageReader.h>
@@ -68,7 +69,7 @@ void mqOpenDataReaction::OpenVolume()
 
 	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
 		tr("Load MHD/MHA volume"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("surfaces (*.mhd *.mha)"));
+		tr("volume (*.mhd *.mha *.vti)"));
 
 
 
@@ -81,6 +82,47 @@ void mqOpenDataReaction::OpenVolume()
 
 	mqMorphoDigCore::instance()->OpenVolume(fileName);
 }
+void mqOpenDataReaction::ImportMask()
+{
+	vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+	if (num_selected_volumes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No volume selected. Please select at least one volume to use this option.");
+		msgBox.exec();
+		return;
+	}
+	else if (num_selected_volumes > 1)
+	{
+		QMessageBox msgBox;
+		msgBox.setText("More than one volume are currently selected. Please only select one volume");
+
+		msgBox.exec();
+		return;
+
+	}
+	vtkMDVolume *myVolume = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
+	if (myVolume != NULL)
+	{
+		//mqMorphoDigCore::instance()->getUndoStack();
+		cout << "Import MHA MHD VTI mask!" << endl;
+
+		QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
+			tr("Import MHD/MHA mask"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+			tr("volume (*.mhd *.mha *.vti)"));
+
+
+		cout << fileName.toStdString();
+		if (fileName.isEmpty()) return;
+
+		QFileInfo fileInfo(fileName);
+		mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+
+		mqMorphoDigCore::instance()->OpenVolume(fileName, myVolume, 1);
+	}
+	
+}
+/**/
 
 void mqOpenDataReaction::OpenLandmark(int mode)
 {

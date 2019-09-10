@@ -42,6 +42,7 @@ public:
    void OpenTAGMAP();
    void OpenORI();
    void OpenVolume();
+   void ImportMask();
    void OpenTIFF3D();
    void OpenTIFF2DStack();
    void OpenDicom2DStack();
@@ -155,6 +156,10 @@ protected:
 	else if (this->Mode == 24)
 	{
 		this->OpenDicom2DStack();
+	}
+	else if (this->Mode == 25)
+	{
+	this->ImportMask();
 	}
   }
 

@@ -6382,7 +6382,12 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 
 		if (isMSK ==1 && input->GetScalarType()!=VTK_UNSIGNED_CHAR)
 		{
-			cout << " mask should be VTK_UNSIGNED_CHAR" << endl;
+			QMessageBox msgBox;
+			msgBox.setText("Mask import failed: mask should only contain unsigned chars");
+
+			msgBox.exec();
+			return;
+			
 			return;
 		}
 		if (isMSK == 1 && myVolume!=NULL)
@@ -6392,7 +6397,10 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 			myVolume->GetImageData()->GetDimensions(dimVol);
 			if ((dimVol[0] != dim[0])|| (dimVol[1] != dim[1])|| (dimVol[2] != dim[2]))
 			{
-				cout << " mask should have the same dimensions as the input" << endl;
+				QMessageBox msgBox;
+				msgBox.setText("Mask import failed: mask should have the same dimensions as those of the volume");
+
+				msgBox.exec();
 				return;
 			}
 		}
