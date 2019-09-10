@@ -86,6 +86,7 @@ public:
   virtual void slotReinitializeMask();
   virtual void slotInvertMask();
   virtual void slotHardenMask();
+  virtual void slotMaskWithSurface();
   virtual void slotRefreshPencilSearchSize(int newsize);
   virtual void slotPencilSearchSizeChanged(int newSize);
   virtual void slotMaskInsideRClicked(bool isChecked);

@@ -1723,9 +1723,9 @@
     <widget class="QWidget" name="horizontalLayoutWidget_2">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>100</x>
        <y>30</y>
-       <width>164</width>
+       <width>165</width>
        <height>28</height>
       </rect>
      </property>
@@ -1781,6 +1781,23 @@
         <property name="icon">
          <iconset resource="../Icons/icons.qrc">
           <normaloff>:/Icons/rubber_mode_keepinside.png</normaloff>:/Icons/rubber_mode_keepinside.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="maskWithSurface">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Mask using first selected surface</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../Icons/icons.qrc">
+          <normaloff>:/Icons/polydata.png</normaloff>:/Icons/polydata.png</iconset>
         </property>
        </widget>
       </item>
@@ -1946,7 +1963,7 @@
    <widget class="QWidget" name="horizontalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>280</x>
       <y>560</y>
       <width>141</width>
       <height>31</height>

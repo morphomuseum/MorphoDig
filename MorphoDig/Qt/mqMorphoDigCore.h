@@ -589,6 +589,7 @@ public:
 	QString Getmui_DefaultZ2Label();
 	QString Getmui_Z2Label();
 	void MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVolume *myVolume);
+	void MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor);
 	void TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride);
 	void SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileName, double BoxBounds[6]);
 	void SetCAM(double cNear, double cFar, double cX, double cY, double cZ, double fX, double fY, double fZ, double uX, double uY, double uZ);

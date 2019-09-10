@@ -13,6 +13,7 @@
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDVolume.h"
+#include "vtkMDActor.h"
 #include "vtkMDVolumeCollection.h"
 #include <vtkVolumeProperty.h>
 #include <vtkMatrix4x4.h>
@@ -256,6 +257,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->reinitializeMASK, SIGNAL(pressed()), this, SLOT(slotReinitializeMask()));
 	connect(this->Ui->invertMASK, SIGNAL(pressed()), this, SLOT(slotInvertMask()));
 	connect(this->Ui->hardenMASK, SIGNAL(pressed()), this, SLOT(slotHardenMask()));
+	connect(this->Ui->maskWithSurface, SIGNAL(pressed()), this, SLOT(slotMaskWithSurface()));
 	connect(this->Ui->cropVolume, SIGNAL(pressed()), this, SLOT(slotcropVolumeClicked()));
 	//
 	connect(this->Ui->maskR, SIGNAL(clicked(bool)), this, SLOT(slotMaskRClicked(bool)));
@@ -483,6 +485,49 @@ void mqEditVolumeDialog::slotHardenMask()
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+void mqEditVolumeDialog::slotMaskWithSurface()
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		vtkIdType num_selected_volumes = mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes();
+		if (num_selected_volumes == 0) {
+			QMessageBox msgBox;
+			msgBox.setText("No volume selected. Please select at least one volume to use this option.");
+			msgBox.exec();
+			return;
+		}
+		else if (num_selected_volumes > 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("More than one volume are currently selected. Please only select one volume");
+
+			msgBox.exec();
+			return;
+
+		}
+		vtkIdType num_selected_actors = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+		if (num_selected_actors == 0) {
+			QMessageBox msgBox;
+			msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+			msgBox.exec();
+			return;
+		}
+		else if (num_selected_actors > 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("More than one actor are currently selected. Please only select one actor.");
+
+			msgBox.exec();
+			return;
+
+		}
+		vtkMDVolume *myVolume = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
+		vtkMDActor *myActor = mqMorphoDigCore::instance()->GetFirstSelectedActor();
+		mqMorphoDigCore::instance()->MaskWithSurface(myVolume, myActor);
+		this->UpdateUI();
+		mqMorphoDigCore::instance()->Render();
+	}
+}
 void mqEditVolumeDialog::slotReinitializeMask()
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
@@ -513,7 +558,10 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->lassoOn->setEnabled(true);
 
 			this->Ui->reinitializeMASK->setEnabled(true);
+			
+			this->Ui->maskWithSurface->setEnabled(true);
 			this->Ui->invertMASK->setEnabled(true);
+
 			this->Ui->hardenMASK->setEnabled(true);
 			this->Ui->pencilSearchSize->setEnabled(true);
 			this->Ui->pencilSphereR->setEnabled(true);
@@ -535,6 +583,8 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->maskR->setEnabled(false);
 			this->Ui->unmaskR->setEnabled(false);
 			this->Ui->reinitializeMASK->setEnabled(false);
+			
+			this->Ui->maskWithSurface->setEnabled(false);
 			this->Ui->invertMASK->setEnabled(false);
 			this->Ui->hardenMASK->setEnabled(false);
 			this->Ui->pencilSearchSize->setEnabled(false);
@@ -1190,6 +1240,7 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->maskR->setDisabled(false);
 			this->Ui->unmaskR->setDisabled(false);
 			this->Ui->reinitializeMASK->setDisabled(false);
+			this->Ui->maskWithSurface->setDisabled(false);
 			this->Ui->invertMASK->setDisabled(false);
 			this->Ui->hardenMASK->setDisabled(false);
 			this->Ui->pencilSearchSize->setDisabled(false);
@@ -1209,6 +1260,7 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->maskR->setDisabled(true);
 			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
+			this->Ui->maskWithSurface->setDisabled(true);
 			this->Ui->invertMASK->setDisabled(true);
 			this->Ui->hardenMASK->setDisabled(true);
 
@@ -1232,6 +1284,7 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->maskR->setDisabled(true);
 			this->Ui->unmaskR->setDisabled(true);
 			this->Ui->reinitializeMASK->setDisabled(true);
+			this->Ui->maskWithSurface->setDisabled(true);
 			this->Ui->invertMASK->setDisabled(true);
 			this->Ui->hardenMASK->setDisabled(true);
 			this->Ui->pencilSearchSize->setDisabled(true);
