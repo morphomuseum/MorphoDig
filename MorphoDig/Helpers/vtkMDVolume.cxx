@@ -653,6 +653,7 @@ void vtkMDVolume::SetisVisible(int visible)
 			if (this->isVisibleXY == 1) { mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXY2); }
 			if (this->isVisibleXZ == 1) { mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceXZ2); }
 			if (this->isVisibleYZ == 1) { mqMorphoDigCore::instance()->getRenderer()->AddViewProp(this->SliceYZ2); }
+			this->ConnectMapperToMask();
 		}
 	}
 	else

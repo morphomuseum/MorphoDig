@@ -6287,7 +6287,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 	}
 }
 
-void mqMorphoDigCore::OpenVolume(QString fileName)
+void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int isMSK)
 {
 	int file_exists = 1;
 	QFile file(fileName);
@@ -6380,8 +6380,22 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		
 		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
 
-	
-		
+		if (isMSK ==1 && input->GetScalarType()!=VTK_UNSIGNED_CHAR)
+		{
+			cout << " mask should be VTK_UNSIGNED_CHAR" << endl;
+			return;
+		}
+		if (isMSK == 1 && myVolume!=NULL)
+		{
+			//check dimensions.
+			int dimVol[3];
+			myVolume->GetImageData()->GetDimensions(dimVol);
+			if ((dimVol[0] != dim[0])|| (dimVol[1] != dim[1])|| (dimVol[2] != dim[2]))
+			{
+				cout << " mask should have the same dimensions as the input" << endl;
+				return;
+			}
+		}
 		
 		if (dim[0] < 2 ||
 		        dim[1] < 2 ||
@@ -6391,163 +6405,176 @@ void mqMorphoDigCore::OpenVolume(QString fileName)
 		}
 		else 
 		{
-			//cout << "Try visualize!!!" << endl;
-
-			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
-			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
-			//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
-			vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
-			vtkSmartPointer<vtkImageAccumulate> histogram =
-				  vtkSmartPointer<vtkImageAccumulate>::New();
-			//mapper->SetRequestedRenderModeToDefault();
 			
-						
-			
-			volume->GetOutline()->SetInputData(input);
+			if (isMSK == 0)
+			{
+				//cout << "Try visualize!!!" << endl;
 
-			histogram->SetInputData(input);
-			double bin_spacing = 1;
-			
-		
-			
-
-			// bin_spacing :
-			
-
-			
-			histogram->SetComponentExtent(input->GetScalarRange()[0], input->GetScalarRange()[1], 0, 0, 0, 0);
-			histogram->SetComponentOrigin(input->GetScalarRange()[0], 0, 0);
-			bin_spacing = (double)(input->GetScalarRange()[1] - input->GetScalarRange()[0]) / 100;
-			//
-			//histogram->SetComponentExtent(6544, 30540, 0, 0, 0, 0);
-			//histogram->SetComponentOrigin(6544, 0, 0);
-			//bin_spacing = (double)(30540 - 6544) / 100;
-
-			//
-			histogram->SetComponentSpacing(bin_spacing, 0, 0);
-			cout << "Bin spacing = " << bin_spacing << endl;
-			histogram->Update();
-			// faire plutôt une liste avec push.			
-			  // Create the property and attach the transfer functions
-			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
-			property->SetIndependentComponents(true);
-			volume->SetCtf(TF);
-			property->SetColor(TF);
-			property->SetScalarOpacity(opacityFun);
-			property->SetInterpolationTypeToLinear();
-			//mapper->SetInputData(input);
-			//mapper->SetInputConnection(reader->GetOutputPort());
-			// connect up the volume to the property and the mapper
-			volume->SetProperty(property);
-			//volume->SetMapper(mapper);
-			volume->SetImageData(input);
-			volume->SetDesiredMappedImageData();
-			volume->SetHist(histogram);
-
-			
-
-
-			double first_point = 0; // as first low... a
-			double last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
-								
-			double width = input->GetScalarRange()[1] - input->GetScalarRange()[0];
-
-
-			first_point = input->GetScalarRange()[0] + 0.15*width;
-			last_point = input->GetScalarRange()[1] - 0.3*width;
-			//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
-			//cout << "EH???" << endl;
-
-			double second_point = first_point + 0.2*(last_point - first_point);
-			double third_point = first_point + 0.4*(last_point - first_point);
-		
-			TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
-			TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
-			TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
-			TF->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
-
-			opacityFun->AddPoint(first_point, 0, 0.5, 0);
-			opacityFun->AddPoint(second_point, 0.5, .5, 0);
-			opacityFun->AddPoint(third_point, 0.8, .5, 0);
-			opacityFun->AddPoint(last_point, 1, 0.5, 0);
-			TF->SetEnableOpacityMapping(true);
-			TF->SetScalarOpacityFunction(opacityFun);
-			TF->Build();
-			//	mapper->SetBlendModeToComposite();
-				  
-				  
-				  //property->set
-				  property->SetAmbient(this->mui_Ambient);
-			      property->SetDiffuse(this->mui_Diffuse);
-			      property->SetSpecular(this->mui_Specular);
-			      property->SetSpecularPower(this->mui_SpecularPower);
-				  property->SetInterpolationTypeToLinear();
-				  property->ShadeOn();
-				  double bblength = volume->GetBoundingBoxLength();
-				  double SOUD = bblength / 500;
-				  //cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
-				  if (SOUD == 0) { SOUD = 0.89; }
-				 
-			     property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
-				 //mapper->Update();
-				 //volume->Update();
-				 volume->SetSelected(1);
-				 volume->SetScalarOpacityUnitDistance(SOUD);
-				 volume->SetScalarDisplayMin((double)first_point);
-				 volume->SetScalarDisplayMax((double)last_point);
-				 //volume->UpdateLookupTableRange();
-
-				 QFileInfo fileInfo(fileName);
-				 QString onlyfilename(fileInfo.fileName());
-				 std::string only_filename = onlyfilename.toStdString();
-				 std::string newname = only_filename.c_str();
-				 size_t nPos = newname.find_last_of(".");
-				 if (nPos > 0)
-				 {
-
-					 newname = newname.substr(0, nPos);
-				 }
-
-				 //@@TODO! 
-
-				 newname = this->CheckingName(newname);
-				 cout << "Volume Name= " << newname << endl;
-				 //volume->SetOrientation(0, 0, 180);
-				 volume->SetName(newname);
-				 volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
-				 volume->InitCenter();
-				
-				 
-				 //this->getRenderer()->AddVolume(volume);
-				 this->getVolumeCollection()->AddItem(volume);
-				 //emit this->actorsMightHaveChanged();
-				 emit this->volumesMightHaveChanged();
-				 cout << "init arrays... needed?" << endl;
-				 //this->Initmui_ExistingArrays();
-				 std::string action = "Load volume";
-				 int mCount = BEGIN_UNDO_SET(action);
-				 this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
-				 END_UNDO_SET();
+				vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
+				vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+				//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();
+				vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
+				vtkSmartPointer<vtkImageAccumulate> histogram =
+					vtkSmartPointer<vtkImageAccumulate>::New();
+				//mapper->SetRequestedRenderModeToDefault();
 
 
 
-				 this->getVolumeCollection()->SetChanged(1);
+				volume->GetOutline()->SetInputData(input);
 
-				 cout << "try adjust camera grid" << endl;
-				 this->AdjustCameraAndGrid();
-				 cout << "camera and grid adjusted" << endl;
-				 
-				 if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
-				 {
-					 this->UpdateLandmarkSettings();
-				 }				
-				 volume->SetisVisible(1);
-				 if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisibleVR(0); }
-				 else { volume->SetisVisibleVR(1); }
+				histogram->SetInputData(input);
+				double bin_spacing = 1;
 
-				 if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
-				 if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
-				 if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1);  }
+
+
+
+				// bin_spacing :
+
+
+
+				histogram->SetComponentExtent(input->GetScalarRange()[0], input->GetScalarRange()[1], 0, 0, 0, 0);
+				histogram->SetComponentOrigin(input->GetScalarRange()[0], 0, 0);
+				bin_spacing = (double)(input->GetScalarRange()[1] - input->GetScalarRange()[0]) / 100;
+				//
+				//histogram->SetComponentExtent(6544, 30540, 0, 0, 0, 0);
+				//histogram->SetComponentOrigin(6544, 0, 0);
+				//bin_spacing = (double)(30540 - 6544) / 100;
+
+				//
+				histogram->SetComponentSpacing(bin_spacing, 0, 0);
+				cout << "Bin spacing = " << bin_spacing << endl;
+				histogram->Update();
+				// faire plutôt une liste avec push.			
+				  // Create the property and attach the transfer functions
+				vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
+				property->SetIndependentComponents(true);
+				volume->SetCtf(TF);
+				property->SetColor(TF);
+				property->SetScalarOpacity(opacityFun);
+				property->SetInterpolationTypeToLinear();
+				//mapper->SetInputData(input);
+				//mapper->SetInputConnection(reader->GetOutputPort());
+				// connect up the volume to the property and the mapper
+				volume->SetProperty(property);
+				//volume->SetMapper(mapper);
+				volume->SetImageData(input);
+				volume->SetDesiredMappedImageData();
+				volume->SetHist(histogram);
+
+
+
+
+				double first_point = 0; // as first low... a
+				double last_point = 0; //somme pondérée autres peaks,  puis chercher s'il y a un low après cette valeur. Si oui, moyenne des deux. sinon on garde la moyenne pondérée.
+
+				double width = input->GetScalarRange()[1] - input->GetScalarRange()[0];
+
+
+				first_point = input->GetScalarRange()[0] + 0.15*width;
+				last_point = input->GetScalarRange()[1] - 0.3*width;
+				//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
+				//cout << "EH???" << endl;
+
+				double second_point = first_point + 0.2*(last_point - first_point);
+				double third_point = first_point + 0.4*(last_point - first_point);
+
+				TF->AddRGBPoint(first_point, 0, 0, 0, 0.5, 0);
+				TF->AddRGBPoint(second_point, 0.73, 0, 0, 0.5, 0);
+				TF->AddRGBPoint(third_point, .90, .82, .56, .5, 0);
+				TF->AddRGBPoint(last_point, 1, 1, 1, .5, 0);
+
+				opacityFun->AddPoint(first_point, 0, 0.5, 0);
+				opacityFun->AddPoint(second_point, 0.5, .5, 0);
+				opacityFun->AddPoint(third_point, 0.8, .5, 0);
+				opacityFun->AddPoint(last_point, 1, 0.5, 0);
+				TF->SetEnableOpacityMapping(true);
+				TF->SetScalarOpacityFunction(opacityFun);
+				TF->Build();
+				//	mapper->SetBlendModeToComposite();
+
+
+					  //property->set
+				property->SetAmbient(this->mui_Ambient);
+				property->SetDiffuse(this->mui_Diffuse);
+				property->SetSpecular(this->mui_Specular);
+				property->SetSpecularPower(this->mui_SpecularPower);
+				property->SetInterpolationTypeToLinear();
+				property->ShadeOn();
+				double bblength = volume->GetBoundingBoxLength();
+				double SOUD = bblength / 500;
+				//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+				if (SOUD == 0) { SOUD = 0.89; }
+
+				property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
+				//mapper->Update();
+				//volume->Update();
+				volume->SetSelected(1);
+				volume->SetScalarOpacityUnitDistance(SOUD);
+				volume->SetScalarDisplayMin((double)first_point);
+				volume->SetScalarDisplayMax((double)last_point);
+				//volume->UpdateLookupTableRange();
+
+				QFileInfo fileInfo(fileName);
+				QString onlyfilename(fileInfo.fileName());
+				std::string only_filename = onlyfilename.toStdString();
+				std::string newname = only_filename.c_str();
+				size_t nPos = newname.find_last_of(".");
+				if (nPos > 0)
+				{
+
+					newname = newname.substr(0, nPos);
+				}
+
+				//@@TODO! 
+
+				newname = this->CheckingName(newname);
+				cout << "Volume Name= " << newname << endl;
+				//volume->SetOrientation(0, 0, 180);
+				volume->SetName(newname);
+				volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+				volume->InitCenter();
+
+
+				//this->getRenderer()->AddVolume(volume);
+				this->getVolumeCollection()->AddItem(volume);
+				//emit this->actorsMightHaveChanged();
+				emit this->volumesMightHaveChanged();
+				cout << "init arrays... needed?" << endl;
+				//this->Initmui_ExistingArrays();
+				std::string action = "Load volume";
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getVolumeCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+
+
+				this->getVolumeCollection()->SetChanged(1);
+
+				cout << "try adjust camera grid" << endl;
+				this->AdjustCameraAndGrid();
+				cout << "camera and grid adjusted" << endl;
+
+				if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+				{
+					this->UpdateLandmarkSettings();
+				}
+				volume->SetisVisible(1);
+				if (this->Getmui_VolumeDisplaySlice() > 0) { volume->SetisVisibleVR(0); }
+				else { volume->SetisVisibleVR(1); }
+
+				if (this->Getmui_VolumeDisplaySlice() == 1) { volume->SetisVisibleXY(1); }
+				if (this->Getmui_VolumeDisplaySlice() == 2) { volume->SetisVisibleXZ(1); }
+				if (this->Getmui_VolumeDisplaySlice() == 3) { volume->SetisVisibleYZ(1); }
+			}
+			else
+			{
+				// here we have a mask (same dims and VTK_UNSIGNED_CHAR)!
+				myVolume->SetMaskEnabled(1);
+				myVolume->SetMaskInitialized(1);								
+				myVolume->SetMaskData(input);				
+				myVolume->ConnectMapperToMask();
+
+			}
 			this->Render();
 
 		}
@@ -7226,7 +7253,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 				std::string PLYext2(".PLY");
 				std::string OBJext(".obj");
 				std::string OBJext2(".OBJ");
-
+				
 				int lmk_file = 0; // top lines
 				
 				std::size_t found = myline.find(FLGext);
@@ -7394,6 +7421,8 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 				if (found != std::string::npos || found2 != std::string::npos)
 				{
 					std::cout << "found a MHA file!:<<" << myline.c_str() << std::endl;
+					
+					
 					surface_file = 0; volume_file = 1;
 				}
 				found = myline.find(MHDext);
@@ -7538,6 +7567,16 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 							//length=(int)strlen(oneline);						
 							//strncpy(param1, oneline, length-1);
 							std::string volname = line.toStdString();
+							std::string mskname = volname.c_str();
+							std::string mskname_with_path;
+							size_t nPos = mskname.find_last_of(".");
+							if (nPos > 0)
+							{
+
+								mskname = mskname.substr(0, nPos);
+							}
+							mskname.append("_MSK.mhd");
+
 							QFileInfo volfileInfo(line);
 							QString onlyvolumefilename(volfileInfo.fileName());
 							std::string volumefilename = onlyvolumefilename.toStdString();
@@ -7546,15 +7585,19 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 							{
 								volname = path.c_str();
 								volname.append(volumefilename.c_str());
+								mskname_with_path = path.c_str();
+								mskname_with_path.append(mskname.c_str());
 							}
+							cout << "Mask name:" << mskname_with_path << endl;
 							QString volumefile(volname.c_str());
+							QString maskfile(mskname_with_path.c_str());
 
 
 							cout << "Open volume!" << endl;
 							this->OpenVolume(volumefile);
 							cout << "Open volume done!" << endl;
 							vtkMDVolume* volume = this->GetLastVolume();
-
+							this->OpenVolume(maskfile, volume, 1);
 							if (volume != NULL)
 							{
 

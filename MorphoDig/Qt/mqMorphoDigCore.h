@@ -641,7 +641,7 @@ public:
 	void OpenTPS(QString fileName, int mode);
 	void OpenPTS(QString fileName, int mode);
 	int OpenMesh(QString fileName);
-	void OpenVolume(QString fileName);
+	void OpenVolume(QString fileName, vtkMDVolume *myVolume = NULL, int isMSK = 0);
 	void OpenDicomFolder(QString folderName);
 	
 	void Open2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack);

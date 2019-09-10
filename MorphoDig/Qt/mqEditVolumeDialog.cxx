@@ -937,7 +937,9 @@ void mqEditVolumeDialog::slotLoadPreset(int idx)
 void mqEditVolumeDialog::slotMapper(int idx)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection()) {
-		this->Volume->SetMapperType(idx);
+		this->Volume->SetenableROI(0);
+		this->Volume->SetdisplayROI(0);
+		this->Volume->SetMapperType(idx);		
 		this->UpdateUI();
 		mqMorphoDigCore::instance()->Render();
 	}
