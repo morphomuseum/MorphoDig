@@ -17,6 +17,8 @@
 #include <vtkImageFlip.h>
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
 #include <vtkXMLImageDataWriter.h>
 #include <vtkFlyingEdges3D.h>
 #include <vtkMarchingCubes.h>
@@ -4113,6 +4115,49 @@ int mqMorphoDigCore::selected_file_exists(QString path, QString ext, QString pos
 	}
 	//cout << "file " << path << " " << ext <<  postfix<< " exists" << exists;
 	return exists;
+
+}
+
+void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int rgba, int front)
+{
+	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter =
+		vtkSmartPointer<vtkWindowToImageFilter>::New();
+	windowToImageFilter->SetInput(this->RenderWindow);
+	windowToImageFilter->SetScale(scaleX, scaleY); 
+	if (rgba ==1)
+	{ 
+		windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+	}
+	if (front == 0)
+	{
+		windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
+	}
+	else
+	{ 
+		windowToImageFilter->ReadFrontBufferOn(); // read from the front buffer
+	}
+	windowToImageFilter->Update();
+	std::string PNGext = ".png";
+	std::string PNGext2 = ".PNG";
+	std::size_t found = fileName.toStdString().find(PNGext);
+	std::size_t found2 = fileName.toStdString().find(PNGext2);
+	if (found == std::string::npos && found2 == std::string::npos)
+	{
+		fileName.append(".png");
+	}
+
+	cout << "Write image" << endl;
+	vtkSmartPointer<vtkPNGWriter> writer =
+		vtkSmartPointer<vtkPNGWriter>::New();
+	writer->SetFileName(fileName.toStdString().c_str());
+	writer->SetInputData(windowToImageFilter->GetOutput());
+	writer->Write();
+	cout << "Done!" << endl;
+	QMessageBox msgBox;
+	msgBox.setText("Screenshot written.");
+	msgBox.exec();
+	return;
+
 
 }
 

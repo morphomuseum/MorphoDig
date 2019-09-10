@@ -2,6 +2,7 @@
 <RCC version="1.0">
  <qresource prefix="/Cursors">
  <file>Lasso_add.png</file>
+
  <file>move3.png</file>
  <file>move_mode2.png</file>
  <file>select_mode2.png</file>
@@ -29,6 +30,7 @@
 	<file>hardentransform.png</file>
    <file>rubber_mode.png</file>
    <file>eye_opened.png</file>
+ <file>screenshot.png</file>
    <file>eye_closed.png</file>
    <file>rubber_mode_keepinside.png</file>
    <file>rubber_mode_keepoutside.png</file>

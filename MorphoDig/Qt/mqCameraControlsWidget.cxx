@@ -12,6 +12,7 @@
 #include "mqUndoRedoReaction.h"
 #include "mqMorphoDigCore.h"
 #include "mqCameraReaction.h"
+#include "mqScreenshotDialogReaction.h"
 #include <vtkRenderer.h>
 #include "QDoubleSlider.h"
 #include "QReleaseDial.h"
@@ -167,6 +168,19 @@ void mqCameraControlsWidget::constructor()
   //  exportColorMap->setIcon(icon);
   actionCameraOrthoPerspectiveToggle->setIcon(icon8);
   new mqCameraReaction(actionCameraOrthoPerspectiveToggle, 7); //7 = camera OrthoPerspective toggle
+
+
+  QAction* actionScreenshot = new QAction(tr("&Screenshot"), this);
+  actionCameraAbove->setToolTip(tr("Take screenshot."));
+  this->ui->ScreenShot->addAction(actionScreenshot);
+  this->ui->ScreenShot->setDefaultAction(actionScreenshot);
+  QIcon icon9;
+  icon9.addFile(QStringLiteral(":/Icons/screenshot.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionScreenshot->setIcon(icon9);
+
+
+  new mqScreenshotDialogReaction(actionScreenshot); //Screenshot!!!
+
 
   if (mqMorphoDigCore::instance()->Getmui_CameraCentreOfMassAtOrigin() == 0)
   {

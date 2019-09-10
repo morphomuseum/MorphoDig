@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>27</width>
-    <height>186</height>
+    <width>29</width>
+    <height>205</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -206,6 +206,17 @@
          <property name="icon">
           <iconset resource="../Icons/icons.qrc">
            <normaloff>:/Icons/camera_below.png</normaloff>:/Icons/camera_below.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QToolButton" name="ScreenShot">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../Icons/icons.qrc">
+           <normaloff>:/Icons/screenshot.png</normaloff>:/Icons/screenshot.png</iconset>
          </property>
         </widget>
        </item>
