@@ -17,6 +17,7 @@
 #include <vtkImageFlip.h>
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
+//#include <vtkImageTransparencyFilter.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtkPNGWriter.h>
 #include <vtkXMLImageDataWriter.h>
@@ -4118,25 +4119,45 @@ int mqMorphoDigCore::selected_file_exists(QString path, QString ext, QString pos
 
 }
 
-void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int rgba, int front)
+void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int rgba, int front, int transparent)
 {
 	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter =
 		vtkSmartPointer<vtkWindowToImageFilter>::New();
-	windowToImageFilter->SetInput(this->RenderWindow);
-	windowToImageFilter->SetScale(scaleX, scaleY); 
-	if (rgba ==1)
-	{ 
-		windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
-	}
-	if (front == 0)
-	{
-		windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
-	}
-	else
-	{ 
-		windowToImageFilter->ReadFrontBufferOn(); // read from the front buffer
-	}
-	windowToImageFilter->Update();
+
+	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilterWithe =
+		vtkSmartPointer<vtkWindowToImageFilter>::New();
+
+	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilterBlack =
+		vtkSmartPointer<vtkWindowToImageFilter>::New();
+
+	//vtkSmartPointer <vtkImageTransparencyFilter> transparency = vtkSmartPointer <vtkImageTransparencyFilter>::New();
+	
+		windowToImageFilter->SetInput(this->RenderWindow);
+		windowToImageFilter->SetScale(scaleX, scaleY);
+		if (rgba == 1)
+		{
+			windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+		}
+		else
+		{
+			windowToImageFilter->SetInputBufferTypeToRGB(); //
+		}
+		if (front == 0)
+		{
+			windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
+		}
+		else
+		{
+			windowToImageFilter->ReadFrontBufferOn(); // read from the front buffer
+		}
+		windowToImageFilter->Update();
+	
+		if (transparent == 1)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Transparency not yet implemented.");
+			msgBox.exec();
+		}
 	std::string PNGext = ".png";
 	std::string PNGext2 = ".PNG";
 	std::size_t found = fileName.toStdString().find(PNGext);

@@ -605,7 +605,7 @@ public:
 	void SaveMAP(QString fileName, QString Name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap);
 	int SaveTAGMAPFile(QString fileName, int save_only_active);
 	void SaveTAGMAP(QString fileName, int mapId, int mode);
-	void Screenshot(QString fileName, int scaleX, int scaleY, int rgba, int front);
+	void Screenshot(QString fileName, int scaleX, int scaleY, int rgba, int front, int transparent);
 	void OpenMAP(QString fileName, int mode=0);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
