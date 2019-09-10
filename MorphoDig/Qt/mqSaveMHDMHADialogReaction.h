@@ -22,12 +22,12 @@ class  mqSaveMHDMHADialogReaction : public mqReaction
   typedef mqReaction Superclass;
 
 public:
-  mqSaveMHDMHADialogReaction(QAction* parent);
+  mqSaveMHDMHADialogReaction(QAction* parent, int _mode =0);
 
   /**
   * Shows the SaveMHDMHA dialog for the application.
   */
-  static void showSaveMHDMHADialog(QString fileName);
+  static void showSaveMHDMHADialog(QString fileName, int mode);
 
 protected:
   /**
@@ -38,6 +38,7 @@ protected:
 
 private:
   Q_DISABLE_COPY(mqSaveMHDMHADialogReaction)
+	  int Mode;
 };
 
 #endif

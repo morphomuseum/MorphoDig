@@ -41,12 +41,13 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqSaveMHDMHADialog::mqSaveMHDMHADialog(QWidget* Parent, QString fileName)
+mqSaveMHDMHADialog::mqSaveMHDMHADialog(QWidget* Parent, QString fileName, int _mode)
   : QDialog(Parent)
   , Ui(new Ui::mqSaveMHDMHADialog())
 {
 
 	this->Ui->setupUi(this);
+	this->Mode = _mode;
 	this->setObjectName("mqSaveMHDMHADialog");
 	this->m_fileName = fileName;
 	this->myVolume = NULL;
@@ -128,7 +129,16 @@ void mqSaveMHDMHADialog::slotSaveMHDMHAFile()
 	this->myVolume = mqMorphoDigCore::instance()->GetFirstSelectedVolume();
 	if (this->myVolume != NULL)
 	{
-		mqMorphoDigCore::instance()->SaveVolume(this->m_fileName, file_type, compressionOn, this->myVolume);
+		if (this->Mode == 0)
+		{
+			//normal volume
+			mqMorphoDigCore::instance()->SaveVolume(this->m_fileName, file_type, compressionOn, this->myVolume);
+		}
+		else
+		{
+			//mask
+			mqMorphoDigCore::instance()->SaveVolume(this->m_fileName, file_type, compressionOn, this->myVolume,1,1,1);
+		}
 	}
 	
 

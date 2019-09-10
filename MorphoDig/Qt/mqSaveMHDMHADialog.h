@@ -25,7 +25,7 @@ class  mqSaveMHDMHADialog : public QDialog
   Q_OBJECT
 
 public:
-  mqSaveMHDMHADialog(QWidget* Parent, QString fileName);
+  mqSaveMHDMHADialog(QWidget* Parent, QString fileName, int _mode=0);
   
   ~mqSaveMHDMHADialog();
 
@@ -41,6 +41,7 @@ private:
 	vtkMDVolume *myVolume;
   Q_DISABLE_COPY(mqSaveMHDMHADialog)
   Ui::mqSaveMHDMHADialog* const Ui;
+  int Mode;
   // Here we should have the file name, no ?
 };
 

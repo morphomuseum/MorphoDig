@@ -242,7 +242,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   //new mqOpenRawDialogReaction(submenuVolume->addAction("Open Raw Volume") << mqSetName("actionOpenRawVolume"));
 
 //#include "mqOpenRawDialogReaction.h"
-  new mqSaveMHDMHADialogReaction(submenuVolume->addAction("Save first selected volume as .MHD or .MHA file") << mqSetName("actionSaveMHDMHA"));
+  new mqSaveMHDMHADialogReaction(submenuVolume->addAction("Save first selected volume as .MHD or .MHA file") << mqSetName("actionSaveMHDMHA"),0);
+  new mqSaveMHDMHADialogReaction(submenuVolume->addAction("Save mask of first selected volume as .MHD or .MHA file") << mqSetName("actionSaveMHDMHA"), 1);
   new mqSaveVTIDialogReaction(submenuVolume->addAction("Save first selected volume as .VTI") << mqSetName("actionSaveVTI"));
   //new mqMinimalDialogReaction(menu.addAction("Minimal Window") << mqSetName("actionOpenMinimal"));
   
