@@ -17,7 +17,7 @@
 #include <vtkImageFlip.h>
 #include "vtkOrientationHelperActor.h"
 #include <vtkMetaImageWriter.h>
-//#include <vtkImageTransparencyFilter.h>
+#include "vtkImageTransparencyFilter.h"
 #include <vtkWindowToImageFilter.h>
 #include <vtkPNGWriter.h>
 #include <vtkXMLImageDataWriter.h>
@@ -4130,8 +4130,9 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilterBlack =
 		vtkSmartPointer<vtkWindowToImageFilter>::New();
 
-	//vtkSmartPointer <vtkImageTransparencyFilter> transparency = vtkSmartPointer <vtkImageTransparencyFilter>::New();
-	
+	vtkSmartPointer <vtkImageTransparencyFilter> transparency = vtkSmartPointer <vtkImageTransparencyFilter>::New();
+	if (transparent == 0)
+	{
 		windowToImageFilter->SetInput(this->RenderWindow);
 		windowToImageFilter->SetScale(scaleX, scaleY);
 		if (rgba == 1)
@@ -4151,13 +4152,14 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 			windowToImageFilter->ReadFrontBufferOn(); // read from the front buffer
 		}
 		windowToImageFilter->Update();
-	
-		if (transparent == 1)
-		{
+
+	}
+	else
+	{
 			QMessageBox msgBox;
 			msgBox.setText("Transparency not yet implemented.");
 			msgBox.exec();
-		}
+	}
 	std::string PNGext = ".png";
 	std::string PNGext2 = ".PNG";
 	std::size_t found = fileName.toStdString().find(PNGext);

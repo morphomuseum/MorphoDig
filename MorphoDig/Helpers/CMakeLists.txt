@@ -2,6 +2,7 @@
 SET (Helpers_SRCS
 vtkOrientationHelperActor.cxx 
 vtkGridActor.cxx 
+vtkImageTransparencyFilter.cxx
 vtkMDActor.cxx 
 vtkMDVolume.cxx 
 vtkLMActor.cxx 
@@ -29,6 +30,7 @@ vtkMDActorCollection.h
 vtkMDVolumeCollection.h 
 vtkLMActorCollection.h 
 vtkGridActor.h 
+vtkImageTransparencyFilter.h
 vtkOrientationHelperWidget.h 
 vtkMDInteractorStyle.h 
 vtkUndoStack.h 
