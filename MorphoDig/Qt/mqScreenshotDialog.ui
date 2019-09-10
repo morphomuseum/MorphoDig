@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>342</width>
-    <height>272</height>
+    <height>278</height>
    </rect>
   </property>
   <property name="palette">
@@ -458,10 +458,10 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>220</y>
-     <width>161</width>
-     <height>25</height>
+     <x>60</x>
+     <y>240</y>
+     <width>195</width>
+     <height>30</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -483,7 +483,7 @@
      <x>10</x>
      <y>10</y>
      <width>311</width>
-     <height>201</height>
+     <height>211</height>
     </rect>
    </property>
    <property name="title">
@@ -492,9 +492,9 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>126</y>
-      <width>111</width>
+      <x>40</x>
+      <y>136</y>
+      <width>131</width>
       <height>31</height>
      </rect>
     </property>
@@ -505,10 +505,10 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>30</y>
+      <x>30</x>
+      <y>20</y>
       <width>220</width>
-      <height>41</height>
+      <height>49</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -537,8 +537,8 @@
    <widget class="QSpinBox" name="magnificationX">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>130</y>
+      <x>180</x>
+      <y>140</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -553,10 +553,10 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>80</y>
       <width>220</width>
-      <height>41</height>
+      <height>49</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -582,8 +582,8 @@
    <widget class="QSpinBox" name="magnificationY">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>150</y>
+      <x>180</x>
+      <y>160</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -598,9 +598,9 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>148</y>
-      <width>111</width>
+      <x>40</x>
+      <y>158</y>
+      <width>131</width>
       <height>31</height>
      </rect>
     </property>
@@ -611,14 +611,14 @@
    <widget class="QCheckBox" name="transparent">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>140</y>
-      <width>81</width>
+      <x>30</x>
+      <y>190</y>
+      <width>181</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Transparent</string>
+     <string>Transparent background</string>
     </property>
     <property name="checked">
      <bool>true</bool>

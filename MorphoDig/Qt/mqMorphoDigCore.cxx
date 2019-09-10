@@ -4124,13 +4124,14 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter =
 		vtkSmartPointer<vtkWindowToImageFilter>::New();
 
-	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilterWithe =
+	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilterWhite =
 		vtkSmartPointer<vtkWindowToImageFilter>::New();
 
 	vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilterBlack =
 		vtkSmartPointer<vtkWindowToImageFilter>::New();
 
 	vtkSmartPointer <vtkImageTransparencyFilter> transparency = vtkSmartPointer <vtkImageTransparencyFilter>::New();
+
 	if (transparent == 0)
 	{
 		windowToImageFilter->SetInput(this->RenderWindow);
@@ -4156,9 +4157,55 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 	}
 	else
 	{
-			QMessageBox msgBox;
-			msgBox.setText("Transparency not yet implemented.");
-			msgBox.exec();
+		this->Renderer->SetGradientBackground(false);
+		this->Renderer->SetTexturedBackground(false);
+		this->Renderer->SetBackground(1.0, 1.0, 1.0);
+		windowToImageFilterWhite->SetInput(this->RenderWindow);
+		windowToImageFilterWhite->SetScale(scaleX, scaleY);
+		if (rgba == 1)
+		{
+			windowToImageFilterWhite->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+		}
+		else
+		{
+			windowToImageFilterWhite->SetInputBufferTypeToRGB(); //
+		}
+		if (front == 0)
+		{
+			windowToImageFilterWhite->ReadFrontBufferOff(); // read from the back buffer
+		}
+		else
+		{
+			windowToImageFilterWhite->ReadFrontBufferOn(); // read from the front buffer
+		}
+		windowToImageFilterWhite->Update();
+		transparency->AddInputData(windowToImageFilterWhite->GetOutput());
+		this->Renderer->SetBackground(0.0, 0.0, 0.0);
+		windowToImageFilterBlack->SetInput(this->RenderWindow);
+		windowToImageFilterBlack->SetScale(scaleX, scaleY);
+		if (rgba == 1)
+		{
+			windowToImageFilterBlack->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+		}
+		else
+		{
+			windowToImageFilterBlack->SetInputBufferTypeToRGB(); //
+		}
+		if (front == 0)
+		{
+			windowToImageFilterBlack->ReadFrontBufferOff(); // read from the back buffer
+		}
+		else
+		{
+			windowToImageFilterBlack->ReadFrontBufferOn(); // read from the front buffer
+		}
+		windowToImageFilterBlack->Update();
+
+		transparency->AddInputData(windowToImageFilterBlack->GetOutput());
+		transparency->Update();
+		this->Renderer->SetGradientBackground(true);
+		this->Renderer->SetBackground(this->Getmui_BackGroundColor());
+		this->Renderer->SetBackground2(this->Getmui_BackGroundColor2());
 	}
 	std::string PNGext = ".png";
 	std::string PNGext2 = ".PNG";
@@ -4173,7 +4220,15 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 	vtkSmartPointer<vtkPNGWriter> writer =
 		vtkSmartPointer<vtkPNGWriter>::New();
 	writer->SetFileName(fileName.toLocal8Bit());
-	writer->SetInputData(windowToImageFilter->GetOutput());
+	if (transparent == 0)
+	{
+		writer->SetInputData(windowToImageFilter->GetOutput());
+	}
+	else
+	{
+		
+		writer->SetInputData(transparency->GetOutput());
+	}
 	writer->Write();
 	cout << "Done!" << endl;
 	QMessageBox msgBox;
