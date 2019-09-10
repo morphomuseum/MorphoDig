@@ -4149,7 +4149,7 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 	cout << "Write image" << endl;
 	vtkSmartPointer<vtkPNGWriter> writer =
 		vtkSmartPointer<vtkPNGWriter>::New();
-	writer->SetFileName(fileName.toStdString().c_str());
+	writer->SetFileName(fileName.toLocal8Bit());
 	writer->SetInputData(windowToImageFilter->GetOutput());
 	writer->Write();
 	cout << "Done!" << endl;
@@ -11429,9 +11429,17 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 	// mode=0: icosahedron
 	// mode =1: sphere
 	double mRadius = radius;
-	double bbz = this->getActorCollection()->GetBoundingBox()[5];
-	double bbx = this->getActorCollection()->GetBoundingBox()[3];
-	double bby = this->getActorCollection()->GetBoundingBox()[4];
+	double bbx = 0;
+	double bby = 0;
+	double bbz = 0;
+
+	if (this->ActorCollection->GetNumberOfItems() > 0)
+	{
+		bbz = this->getActorCollection()->GetBoundingBox()[5];
+		bbx = this->getActorCollection()->GetBoundingBox()[3];
+		bby = this->getActorCollection()->GetBoundingBox()[4];
+	}
+	
 	int msubdivisions = subdivisions;
 	if (msubdivisions < 0 || msubdivisions == INT_MAX)
 	{
@@ -11606,9 +11614,17 @@ void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double size
 	double msizeX = sizeX;
 	double msizeY = sizeY;
 	double msizeZ = sizeZ;
-	double bbz = this->getActorCollection()->GetBoundingBox()[5];
-	double bbx = this->getActorCollection()->GetBoundingBox()[3];
-	double bby = this->getActorCollection()->GetBoundingBox()[4];
+	double bbx = 0;
+	double bby = 0; 
+	double bbz = 0; 
+
+	if (this->ActorCollection->GetNumberOfItems()>0)
+	{
+		bbz = this->getActorCollection()->GetBoundingBox()[5];
+		bbx = this->getActorCollection()->GetBoundingBox()[3];
+		bby = this->getActorCollection()->GetBoundingBox()[4];
+	}
+	
 	
 	if (msizeY <= 0 || msizeX == DBL_MAX)
 	{
@@ -11717,9 +11733,16 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, d
 	double mcylHeight = cylHeight;
 	double mcylRadius = cylRadius;
 	double mcylRadius2 = cylRadius;
-	double bbz = this->getActorCollection()->GetBoundingBox()[5];
-	double bbx = this->getActorCollection()->GetBoundingBox()[3];
-	double bby = this->getActorCollection()->GetBoundingBox()[4];
+	double bbx = 0;
+	double bby = 0;
+	double bbz = 0;
+
+	if (this->ActorCollection->GetNumberOfItems() > 0)
+	{
+		bbz = this->getActorCollection()->GetBoundingBox()[5];
+		bbx = this->getActorCollection()->GetBoundingBox()[3];
+		bby = this->getActorCollection()->GetBoundingBox()[4];
+	}
 	if (circular_shaft ==0 && cylRadius2>0)
 	{
 		mcylRadius2 = cylRadius2;
