@@ -631,13 +631,18 @@ void mqEditVolumeDialog::slotuseImageDataBinForVRClicked(bool isChecked)
 		if (isChecked)
 		{
 			int res = this->Volume->SetuseImageDataBinForVR(1);
-			if (res == 0) {
+			/*if (res == 0) {
+				cout << "No!" << endl;
 				this->Ui->useImageDataBinForVR->setChecked(false);
-			}
+			}*/
 		}
 		else
 		{
-			this->Volume->SetuseImageDataBinForVR(0);
+			int res = this->Volume->SetuseImageDataBinForVR(0);
+			if (res == 0) {
+				cout << "No!" << endl;
+				this->Ui->useImageDataBinForVR->setChecked(true);
+			}
 		}
 		mqMorphoDigCore::instance()->Render();
 	}

@@ -1704,11 +1704,12 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 	}*/
 	if (changed == 1)
 	{
-		this->InitializeMapper();
-	
+		
 		long long int numVox = this->myDim[0] * this->myDim[1] * this->myDim[2];
 		if (use == 1)
 		{
+			this->InitializeMapper();
+
 			cout << "change input data binned image" << endl;
 			this->useImageDataBinForVR = 1;
 			if (this->mapper_type == 0)
@@ -1741,6 +1742,8 @@ int vtkMDVolume::SetuseImageDataBinForVR(int use)
 					cout << "no!!!" << endl;
 					return 0; }
 			}
+			this->InitializeMapper();
+
 			cout << "change input data normal image!" << endl;
 			
 			//mapper->SetInputData(this->GetImageData());
