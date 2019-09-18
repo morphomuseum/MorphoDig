@@ -713,6 +713,9 @@ void mqEditVolumeDialog::slotisVisibleVRClicked(bool isChecked)
 		{
 			this->Volume->SetisVisibleVR(1);
 			this->Ui->enableROI->setEnabled(true);
+			this->Ui->interpolationToLinear->setEnabled(true);
+			this->Ui->scalarOpacityUnitDistance->setEnabled(true);
+			this->Ui->useImageDataBinForVR->setEnabled(true);
 			if (this->Ui->enableROI->isChecked())
 			{
 				this->Ui->displayROI->setEnabled(true);
@@ -722,6 +725,10 @@ void mqEditVolumeDialog::slotisVisibleVRClicked(bool isChecked)
 		{
 			this->Volume->SetisVisibleVR(0);
 			this->Ui->enableROI->setEnabled(false);
+			this->Ui->interpolationToLinear->setEnabled(false);
+			this->Ui->scalarOpacityUnitDistance->setEnabled(false);
+			this->Ui->useImageDataBinForVR->setEnabled(false);
+			
 			this->Ui->displayROI->setEnabled(false);
 			
 		}
