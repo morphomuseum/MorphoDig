@@ -450,6 +450,7 @@ void mqEditACTORDialog::slotEnableROIClicked(bool isChecked)
 		{
 			cout << "Call volume create box function" << endl;
 			this->ACTOR->CreateBox();
+			this->ACTOR->SetenableROI(true);
 			this->Ui->displayROI->setEnabled(true);
 		}
 		else
@@ -457,6 +458,7 @@ void mqEditACTORDialog::slotEnableROIClicked(bool isChecked)
 			cout << "Call volume remove box function" << endl;
 
 			this->ACTOR->RemoveBox();
+			this->ACTOR->SetenableROI(false);
 			this->Ui->displayROI->setEnabled(false);
 			this->Ui->displayROI->setChecked(false);
 
