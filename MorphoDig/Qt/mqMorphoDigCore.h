@@ -483,6 +483,16 @@ public:
 	double GetHundredPxSU();
 	void UnselectAll(int Count);
 	void SelectAll(int Count);
+
+	void Setmui_RendererOcclusionRatio(double ratio);
+	void Setmui_RendererMaximalNumberOfPeels(int numpeels);
+	double Getmui_RendererOcclusionRatio();
+	int Getmui_RendererMaximalNumberOfPeels();
+
+	
+	
+	double Getmui_DefaultRendererOcclusionRatio();
+	int Getmui_DefaultRendererMaximalNumberOfPeels();
 	void Setmui_DisplayMode(int mode);
 	/*vtkGetMacro(mui_Mask, int);
 	vtkSetMacro(mui_Mask, int);*/
@@ -504,6 +514,7 @@ public:
 	void Setmui_SpecularPower(double specularPower);
 	void Setmui_Diffuse(int diffuse);
 	int Getmui_Diffuse();
+
 	int Getmui_DefaultDiffuse();
 	int Getmui_FontSize(); // LM Actors font size
 	int Getmui_DefaultFontSize(); // LM Actors font size
@@ -609,7 +620,7 @@ public:
 	void OpenMAP(QString fileName, int mode=0);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
-
+	void SetOcclusionRatioAndNumPeels(double ratio, int numpeels);
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
 	void SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fileName);
@@ -1097,6 +1108,10 @@ protected:
 
 	ActiveTagMap *mui_ActiveTagMap;
 	ExistingTagMaps *mui_ExistingTagMaps;
+	double mui_RendererOcclusionRatio;
+	int mui_RendererMaximalNumberOfPeels;
+	double mui_DefaultRendererOcclusionRatio;
+	int mui_DefaultRendererMaximalNumberOfPeels;
 	int mui_ActiveTag;
 	int mui_PencilSize;
 	int mui_PencilMaskSphere; //1 pencil maks shape: sphere, 0, tube

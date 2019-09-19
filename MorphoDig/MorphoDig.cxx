@@ -871,6 +871,14 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	this->MorphoDigCore->Setmui_DisplayMode(settings.value("DisplayMode", "0").toInt());
 	cout << "In .ini file: Anaglyph = " << settings.value("Anaglyph", "0").toInt() << endl;
 	cout << "In .ini file: DisplayMode = " << settings.value("DisplayMode", "0").toInt() << endl;
+
+	
+	double defaultRendererOcclusionRatio = this->MorphoDigCore->Getmui_DefaultRendererOcclusionRatio();
+	int defaultRendererMaximalNumberOfPeels = this->MorphoDigCore->Getmui_DefaultRendererMaximalNumberOfPeels();
+	this->MorphoDigCore->Setmui_RendererOcclusionRatio(settings.value("OcclusionRatio", defaultRendererOcclusionRatio).toDouble());
+	this->MorphoDigCore->Setmui_RendererMaximalNumberOfPeels(settings.value("NumPeels", defaultRendererMaximalNumberOfPeels).toInt());
+	
+
 	settings.endGroup();
 
 	
@@ -1871,6 +1879,9 @@ void MorphoDig::saveSettings()
 	settings.beginGroup("renderer_settings");
 	settings.setValue("Anaglyph", this->MorphoDigCore->Getmui_Anaglyph());	
 	settings.setValue("DisplayMode", this->MorphoDigCore->Getmui_DisplayMode());
+	settings.setValue("OcclusionRatio", this->MorphoDigCore->Getmui_RendererOcclusionRatio());
+	settings.setValue("NumPeels", this->MorphoDigCore->Getmui_RendererMaximalNumberOfPeels());
+	
 	settings.endGroup();
 
 	settings.beginGroup("volumes");

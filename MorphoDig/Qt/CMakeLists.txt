@@ -191,6 +191,10 @@ mqOrientationLabelsDialogReaction.cxx
 mqOrientationLabelsDialogReaction.h
 mqReaction.cxx
 mqReaction.h
+mqRendererOptionsDialog.cxx
+mqRendererOptionsDialog.h
+mqRendererOptionsDialogReaction.cxx
+mqRendererOptionsDialogReaction.h
 mqResampleDialog.cxx
 mqResampleDialog.h
 mqResampleDialogReaction.cxx
@@ -395,6 +399,7 @@ mqOpenRawDialog.ui
 mqOpenTiff3DDialog.ui
 mqOrientationLabelsDialog.ui
 mqResampleDialog.ui
+mqRendererOptionsDialog.ui
 mqResliceDialog.ui
 mqSaveCURDialog.ui
 mqSaveCURasVERDialog.ui

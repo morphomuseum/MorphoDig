@@ -174,6 +174,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 	double defaultSpecular = newactor->GetProperty()->GetSpecular();
 	double defaultSpecularPower = newactor->GetProperty()->GetSpecularPower();
 	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << endl;*/
+	this->mui_DefaultRendererOcclusionRatio = this->mui_RendererOcclusionRatio = 0.05;
+	this->mui_DefaultRendererMaximalNumberOfPeels = this->mui_RendererMaximalNumberOfPeels = 50;
 	this->mui_DefaultSpecularPower = this->mui_SpecularPower = 1;
 	this->mui_DefaultSpecular = this->mui_Specular= 0;
 	this->mui_DefaultAmbient = this->mui_Ambient= 0;
@@ -408,8 +410,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 	this->Renderer->SetUseDepthPeeling(1);
 	this->Renderer->UseDepthPeelingForVolumesOn();
-	this->Renderer->SetMaximumNumberOfPeels(100);
-	this->Renderer->SetOcclusionRatio(0.05);
+	this->Renderer->SetMaximumNumberOfPeels(this->Getmui_RendererMaximalNumberOfPeels());
+	this->Renderer->SetOcclusionRatio(this->Getmui_RendererOcclusionRatio());
 	this->Camera = this->Renderer->GetActiveCamera();
 	this->GridActor = vtkSmartPointer<vtkGridActor>::New();
 	this->GridActor->SetGridSpacing(this->Getmui_GridSpacing());
@@ -862,6 +864,23 @@ void mqMorphoDigCore::ChangeBackfaceCulling() {
 	int Getmui_VolumeDisplaySlice();
 	int Getmui_DefaultVolumeDisplaySlice();
 	void Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice);*/
+
+
+void mqMorphoDigCore::Setmui_RendererOcclusionRatio(double ratio) { this->mui_RendererOcclusionRatio = ratio;}
+void mqMorphoDigCore::Setmui_RendererMaximalNumberOfPeels(int numpeels){ this->mui_RendererMaximalNumberOfPeels = numpeels; }
+double mqMorphoDigCore::Getmui_RendererOcclusionRatio() { return this->mui_RendererOcclusionRatio; }
+int mqMorphoDigCore::Getmui_RendererMaximalNumberOfPeels() { return this->mui_RendererMaximalNumberOfPeels; }
+
+double mqMorphoDigCore::Getmui_DefaultRendererOcclusionRatio() { return this->mui_DefaultRendererOcclusionRatio; }
+int mqMorphoDigCore::Getmui_DefaultRendererMaximalNumberOfPeels(){ return this->mui_DefaultRendererMaximalNumberOfPeels; }
+void mqMorphoDigCore::SetOcclusionRatioAndNumPeels(double ratio, int numpeels)
+{
+	this->Setmui_RendererOcclusionRatio(ratio);
+	this->Setmui_RendererMaximalNumberOfPeels(numpeels);
+	this->Renderer->SetOcclusionRatio(ratio);
+	this->Renderer->SetMaximumNumberOfPeels(numpeels);
+	this->Render();
+}
 
 
 int mqMorphoDigCore::Getmui_RawDataType() { return this->mui_RawDataType; }

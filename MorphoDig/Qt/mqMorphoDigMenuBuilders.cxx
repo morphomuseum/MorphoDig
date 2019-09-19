@@ -28,8 +28,10 @@
 #include "mqChangeNodeReaction.h"
 
 #include "mqVolumeOptionsDialogReaction.h"
+#include "mqRendererOptionsDialogReaction.h"
 #include "mqEditACTORDialogReaction.h"
 #include "mqEditVolumeDialogReaction.h"
+
 #include "mqResliceDialogReaction.h"
 #include "mqEditFLGDialogReaction.h"
 #include "mqEditLMKDialogReaction.h"
@@ -267,6 +269,7 @@ void mqMorphoDigMenuBuilders::buildEditMenu(QMenu& menu)
   new mqOrientationLabelsDialogReaction(menu.addAction("Edit orientation labels") << mqSetName("actionOrientationLabels"));
   new mqCameraDialogReaction(menu.addAction("Edit camera options") << mqSetName("actionOrientationCamera"));
   new mqVolumeOptionsDialogReaction(menu.addAction("Edit volume options") << mqSetName("actionVolumeOptions"));
+  new mqRendererOptionsDialogReaction(menu.addAction("Edit renderer options (transparency rendering)") << mqSetName("actionRendererOptions"));
   //new pqUndoRedoReaction(ui.actionEditUndo, true);
   //new pqUndoRedoReaction(ui.actionEditRedo, false);
   //new pqCameraUndoRedoReaction(ui.actionEditCameraUndo, true);
