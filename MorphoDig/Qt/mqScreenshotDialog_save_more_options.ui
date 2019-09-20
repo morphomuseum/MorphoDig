@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>342</width>
-    <height>187</height>
+    <height>278</height>
    </rect>
   </property>
   <property name="palette">
@@ -458,8 +458,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>140</y>
+     <x>60</x>
+     <y>240</y>
      <width>195</width>
      <height>30</height>
     </rect>
@@ -483,7 +483,7 @@
      <x>10</x>
      <y>10</y>
      <width>311</width>
-     <height>121</height>
+     <height>211</height>
     </rect>
    </property>
    <property name="title">
@@ -493,7 +493,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>26</y>
+      <y>136</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -502,11 +502,43 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Magnification factor X:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>220</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QRadioButton" name="RGB">
+       <property name="text">
+        <string>RGB</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="RGBA">
+       <property name="text">
+        <string>RGBA</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <widget class="QSpinBox" name="magnificationX">
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>30</y>
+      <y>140</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -518,11 +550,40 @@
      <number>5</number>
     </property>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>80</y>
+      <width>220</width>
+      <height>49</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="back">
+       <property name="text">
+        <string>Back buffer</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="front">
+       <property name="text">
+        <string>Front buffer</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <widget class="QSpinBox" name="magnificationY">
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>50</y>
+      <y>160</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -538,7 +599,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>48</y>
+      <y>158</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -551,7 +612,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>80</y>
+      <y>190</y>
       <width>181</width>
       <height>17</height>
      </rect>

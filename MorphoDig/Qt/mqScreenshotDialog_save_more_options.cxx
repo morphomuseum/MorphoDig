@@ -83,8 +83,7 @@ void mqScreenshotDialog::Screenshot()
 	
 		std::string action = "Screenshot selected actors";
 		cout << "Screenshot!!!!" << endl;
-		//mqMorphoDigCore::instance()->Screenshot(this->m_fileName, this->Ui->magnificationX->value(), this->Ui->magnificationY->value(), this->Ui->RGBA->isChecked(), this->Ui->front->isChecked(), this->Ui->transparent->isChecked());
-		mqMorphoDigCore::instance()->Screenshot(this->m_fileName, this->Ui->magnificationX->value(), this->Ui->magnificationY->value(), 1, 0, this->Ui->transparent->isChecked());
+		mqMorphoDigCore::instance()->Screenshot(this->m_fileName, this->Ui->magnificationX->value(), this->Ui->magnificationY->value(), this->Ui->RGBA->isChecked(), this->Ui->front->isChecked(), this->Ui->transparent->isChecked());
 		mqMorphoDigCore::instance()->Render();
 	
 }
