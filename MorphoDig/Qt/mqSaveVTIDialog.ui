@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Save MHD/MHA</string>
+   <string>Save VTI</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -949,7 +949,7 @@
        <x>30</x>
        <y>20</y>
        <width>160</width>
-       <height>41</height>
+       <height>42</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout1_4">
