@@ -6158,12 +6158,12 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 	int numcells = input->GetNumberOfCells();
 	input->GetScalarTypeAsString();
 	//input->Get
-	cout << "Tiff Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
-	cout << "Tiff Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
-	cout << "Tiff Spacing0 Spacing1 Spacing2:" << spacing[0] <<","<< spacing[1]<<","<< spacing[2] << endl;
-	cout << "Tiff Image type:" << input->GetScalarTypeAsString() << endl;
-	cout << "Tiff Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
-	cout << "Tiff Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+	cout << "DCM Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
+	cout << "DCM Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
+	cout << "DCM Spacing0 Spacing1 Spacing2:" << spacing[0] <<","<< spacing[1]<<","<< spacing[2] << endl;
+	cout << "DCM Image type:" << input->GetScalarTypeAsString() << endl;
+	cout << "DCM Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
+	cout << "DCM Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
 
 
 	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
