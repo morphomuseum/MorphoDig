@@ -438,7 +438,9 @@ void vtkMDActor::HardenTransform()
 		vtkSmartPointer<vtkMatrix4x4> Identity = vtkSmartPointer<vtkMatrix4x4>::New();
 		Identity->Identity();
 		this->ApplyMatrix(Identity);
+		mqMorphoDigCore::instance()->Render();
 	}
+	
 
 }
 int vtkMDActor::IsInsideFrustum(vtkSmartPointer<vtkPlanes> myPlanes)

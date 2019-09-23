@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Open Raw Data</string>
+   <string>Open Raw Volume</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -538,6 +538,9 @@
        </item>
        <item>
         <widget class="QSpinBox" name="dimX">
+         <property name="minimum">
+          <number>1</number>
+         </property>
          <property name="maximum">
           <number>100000</number>
          </property>
@@ -545,6 +548,9 @@
        </item>
        <item>
         <widget class="QSpinBox" name="dimY">
+         <property name="minimum">
+          <number>1</number>
+         </property>
          <property name="maximum">
           <number>100000</number>
          </property>
@@ -552,6 +558,9 @@
        </item>
        <item>
         <widget class="QSpinBox" name="dimZ">
+         <property name="minimum">
+          <number>1</number>
+         </property>
          <property name="maximum">
           <number>100000</number>
          </property>

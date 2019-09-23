@@ -930,7 +930,7 @@ public:
   void ResetCameraOrthoPerspective();
   
   void SetGridVisibility();
-  void SetGridInfos();
+  void SetGridInfos(int multpx=1);
   void SetOrientationHelperVisibility();
   std::string CheckingName(std::string name_obj);
   vtkMDActor* GetLastActor();

@@ -824,6 +824,8 @@ void mqEditACTORDialog::slotHardenTransform()
 	if (this->ACTOR != NULL)
 	{
 		this->ACTOR->HardenTransform();
+		this->Ui->hardenTransform->setCheckable(false);
+		this->Ui->hardenTransform->setChecked(false);
 		this->UpdateUI();
 	}
 }

@@ -4151,6 +4151,9 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 
 	vtkSmartPointer <vtkImageTransparencyFilter> transparency = vtkSmartPointer <vtkImageTransparencyFilter>::New();
 
+	int multpx = scaleY;
+	//if (scaleY > scaleX) { multpx = scaleY; }
+	this->SetGridInfos(multpx);
 	if (transparent == 0)
 	{
 		windowToImageFilter->SetInput(this->RenderWindow);
@@ -4226,6 +4229,7 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 		this->Renderer->SetBackground(this->Getmui_BackGroundColor());
 		this->Renderer->SetBackground2(this->Getmui_BackGroundColor2());
 	}
+	this->SetGridInfos(1);
 	std::string PNGext = ".png";
 	std::string PNGext2 = ".PNG";
 	std::size_t found = fileName.toStdString().find(PNGext);
@@ -22367,7 +22371,7 @@ double mqMorphoDigCore::GetHundredPxSU()
 	double dist = sqrt(vtkMath::Distance2BetweenPoints(p1, p2));
 	return dist;
 }
-void mqMorphoDigCore::SetGridInfos()
+void mqMorphoDigCore::SetGridInfos(int multpx)
 {
 	QString myAnnotation;
 	//QString myBeginning("Size unit: ");
@@ -22379,7 +22383,7 @@ void mqMorphoDigCore::SetGridInfos()
 	if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
 	{
 		
-		double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU();
+		double HundredPxSU = mqMorphoDigCore::instance()->GetHundredPxSU()/multpx;
 		QString hundredpx = QString::number(HundredPxSU, 'f', 2);
 		onehundredpx = ", 100px=" + hundredpx + this->Getmui_SizeUnit();
 		

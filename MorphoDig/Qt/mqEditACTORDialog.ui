@@ -1002,6 +1002,9 @@
      <iconset resource="../Icons/icons.qrc">
       <normaloff>:/Icons/hardentransform.png</normaloff>:/Icons/hardentransform.png</iconset>
     </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
    </widget>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
