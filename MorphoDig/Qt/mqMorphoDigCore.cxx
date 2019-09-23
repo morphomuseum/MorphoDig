@@ -11782,7 +11782,7 @@ void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double size
 
 
 		//actor->SetmColor(0.68, 0.47, 0.37, 1);//pink
-		actor->SetmColor(0.666667, 0.666667, 1, 1);//kind of violet
+		actor->SetmColor(0.666667, 0.666667, 1, 0.5);//kind of violet
 		actor->SetMapper(mapper);
 		actor->SetSelected(0);
 		actor->SetName(newname);
@@ -11908,7 +11908,7 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, d
 		 
 
 		 // actor->SetmColor(0.68,0.47,0.37,1);//pink
-		 actor->SetmColor(0.666667, 0.666667, 1, 1);//kind of violet
+		 actor->SetmColor(0.666667, 0.666667, 1, 0.5);//kind of violet
 		  actor->SetMapper(mapper);
 		  actor->SetSelected(0);
 		  actor->SetName(newname);

@@ -625,7 +625,7 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>388</width>
+      <width>437</width>
       <height>65</height>
      </rect>
     </property>
@@ -640,7 +640,8 @@
      <item>
       <widget class="QRadioButton" name="ApplyPositionToSurfaces">
        <property name="text">
-        <string>Apply position to surfaces , and set .POS as identity matrix</string>
+        <string>Harden transform position:
+apply position to surfaces , and set .POS as identity matrix</string>
        </property>
       </widget>
      </item>

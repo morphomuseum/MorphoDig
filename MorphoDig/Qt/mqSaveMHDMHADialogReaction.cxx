@@ -75,7 +75,7 @@ void mqSaveMHDMHADialogReaction::onTriggered()
 		{
 			mqMorphoDigCore::instance()->ComputeSelectedNamesLists();
 			fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-				tr("Save MHD or MHA files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str()+"MSK",
+				tr("Save MHD or MHA files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str()+"_MSK",
 				tr("MHD (*.mhd);; MHA (*.mha);; (*.*)"), NULL
 				//, QFileDialog::DontConfirmOverwrite
 			);
