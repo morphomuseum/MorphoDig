@@ -129,6 +129,10 @@ mqFlipSwapDialog.cxx
 mqFlipSwapDialog.h
 mqFlipSwapDialogReaction.cxx
 mqFlipSwapDialogReaction.h
+mqGaussianFilterDialog.cxx
+mqGaussianFilterDialog.h
+mqGaussianFilterDialogReaction.cxx
+mqGaussianFilterDialogReaction.h
 mqGridSizeDialog.cxx
 mqGridSizeDialog.h
 mqGridSizeDialogReaction.cxx
@@ -163,6 +167,10 @@ mqMergeTagsDialog.cxx
 mqMergeTagsDialog.h
 mqMergeTagsDialogReaction.cxx
 mqMergeTagsDialogReaction.h
+mqMedianFilterDialog.cxx
+mqMedianFilterDialog.h
+mqMedianFilterDialogReaction.cxx
+mqMedianFilterDialogReaction.h
 mqMinimalDialog.cxx
 mqMinimalDialog.h
 mqMinimalDialogReaction.cxx
@@ -382,6 +390,7 @@ mqExtractScalarRangeDialog.ui
 mqExtractTagRangeDialog.ui
 mqFillHolesDialog.ui
 mqFlipSwapDialog.ui
+mqGaussianFilterDialog.ui
 mqGridSizeDialog.ui
 mqICPDialog.ui
 mqIcosahedronDialog.ui
@@ -390,6 +399,7 @@ mqInteractionControlsWidget.ui
 mqLandmarkDialog.ui
 mqLightControlsWidget.ui
 mqMainControlsWidget.ui
+mqMedianFilterDialog.ui
 mqMergeTagsDialog.ui
 mqMinimalDialog.ui
 mqMoveCurveHandlesDialog.ui

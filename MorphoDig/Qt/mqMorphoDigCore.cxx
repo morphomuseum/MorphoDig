@@ -24693,6 +24693,23 @@ void mqMorphoDigCore::slotInvert() {
 		this->addInvert(); 
 
 }
+void mqMorphoDigCore::slotInvertVolume()
+{
+	vtkIdType num_selected_volumes = this->getVolumeCollection()->GetNumberOfSelectedVolumes();
+	if (num_selected_volumes != 1) {
+		QMessageBox msgBox;
+		msgBox.setText("Please select one single volume to use this option.");
+		msgBox.exec();
+		return;
+	}
+	vtkMDVolume *vol = this->GetFirstSelectedVolume();
+	if (vol !=NULL)
+	{
+		vol->Invert();
+	}
+
+
+}
 
 void mqMorphoDigCore::slotCreateTagArray()
 {

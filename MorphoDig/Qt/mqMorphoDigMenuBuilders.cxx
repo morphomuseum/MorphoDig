@@ -42,7 +42,8 @@
 #include "mqFlipSwapDialogReaction.h"
 #include "mqSpacingDialogReaction.h"
 #include "mqResampleDialogReaction.h"
-
+#include "mqMedianFilterDialogReaction.h"
+#include "mqGaussianFilterDialogReaction.h"
 #include "mqEditAllFLGColorDialogReaction.h"
 #include "mqShrinkWrapDialogReaction.h"
 #include "mqShrinkWrapIterativeDialogReaction.h"
@@ -340,6 +341,10 @@ void mqMorphoDigMenuBuilders::buildEditVolumesMenu(QMenu& menu)
 	new mqSpacingDialogReaction(menu.addAction("Change voxel size of first selected volume (keep dimensions, no resampling)") << mqSetName("actionSpacingVolume"));
 	new mqResampleDialogReaction(menu.addAction("Resample first selected volume (dimensions will be changed and voxel size as well)") << mqSetName("actionResampleVolume"));
 	new mqResliceDialogReaction(menu.addAction("Reslice first selected volume") << mqSetName("actionResliceVolume"));
+	new mqMedianFilterDialogReaction(menu.addAction("Median filter of first selected volume") << mqSetName("actionMedianFilterVolume"));
+	new mqGaussianFilterDialogReaction(menu.addAction("Gaussian filter of first selected volume") << mqSetName("actionGaussianFilterVolume"));
+	QAction *InvertV = menu.addAction("Invert first selected volume");
+	QAction::connect(InvertV, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotInvertVolume()));
 
 }
 

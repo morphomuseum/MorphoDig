@@ -13,6 +13,9 @@ Module:    vtkMDVolume.cxx
 #include <vtkTransformFilter.h>
 #include <vtkImagePermute.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkImageMedian3D.h>
+#include <vtkImageGaussianSmooth.h>
+#include <vtkImageShiftScale.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkBoundingBox.h>
@@ -1399,6 +1402,91 @@ void vtkMDVolume::SwapXYZ()
 	this->SetImageDataAndMap(permutedData);
 	this->Outline->SetInputData(permutedData);
 }
+void vtkMDVolume::MedianFilter(int x, int y, int z)
+{
+	vtkSmartPointer<vtkImageMedian3D> median = vtkSmartPointer<vtkImageMedian3D>::New();
+	median->SetInputData(this->ImageData);
+	median->SetKernelSize(x, y, z);
+	median->Update();
+	vtkSmartPointer<vtkImageData> medianData = median->GetOutput();
+	this->SetImageDataAndMap(medianData);
+	this->Outline->SetInputData(medianData);
+	
+}
+void vtkMDVolume::Invert()
+{
+	vtkSmartPointer<vtkImageShiftScale> shiftScale = vtkSmartPointer<vtkImageShiftScale>::New();
+	shiftScale->SetInputData(this->ImageData);
+
+	int dataType = this->GetImageData()->GetScalarType();	
+	double shiftV = 0;
+	if (dataType == VTK_UNSIGNED_SHORT)
+	{
+		
+		shiftV = 65535;
+
+
+	}
+	else if (dataType == VTK_SHORT)
+	{
+		
+		
+		shiftV = 0;
+
+	}
+	else if (dataType == VTK_CHAR)
+	{
+		
+		shiftV = 0;
+	}
+	else if (dataType == VTK_UNSIGNED_CHAR)
+	{
+		
+		shiftV = 255;
+	}
+	else if (dataType == VTK_SIGNED_CHAR)
+	{
+		shiftV = 0;
+		
+	}
+	else if (dataType == VTK_FLOAT)
+	{
+		shiftV = 0;
+		
+
+	}
+	else if (dataType == VTK_DOUBLE)
+	{
+		shiftV= 0;
+		
+	}
+
+
+	shiftScale->SetShift(shiftV); 
+	shiftScale->SetScale(-1);
+	shiftScale->Update();
+	vtkSmartPointer<vtkImageData> shiftScaleData = shiftScale->GetOutput();
+	this->SetImageDataAndMap(shiftScaleData);
+	this->Outline->SetInputData(shiftScaleData);
+	
+	
+
+}
+
+void vtkMDVolume::GaussianFilter(double std_x, double std_y, double std_z, double rad_x, double rad_y, double rad_z)
+{
+	vtkSmartPointer<vtkImageGaussianSmooth> gaussian = vtkSmartPointer<vtkImageGaussianSmooth>::New();
+	gaussian->SetInputData(this->ImageData);
+	gaussian->SetDimensionality(3);
+	gaussian->SetStandardDeviations(std_x, std_y, std_z);
+	gaussian->SetRadiusFactors(rad_x, rad_y, rad_z);
+	gaussian->Update();
+	vtkSmartPointer<vtkImageData> gaussianData = gaussian->GetOutput();
+	this->SetImageDataAndMap(gaussianData);
+	this->Outline->SetInputData(gaussianData);
+
+}
+
 void vtkMDVolume::FlipZ()
 {
 	vtkSmartPointer<vtkImageFlip> flip = vtkSmartPointer<vtkImageFlip>::New();

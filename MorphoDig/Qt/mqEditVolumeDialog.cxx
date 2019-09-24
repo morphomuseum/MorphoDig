@@ -12,6 +12,8 @@
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
+#include "mqOpenDataReaction.h"
+#include "mqSaveMHDMHADialogReaction.h"
 #include "vtkMDVolume.h"
 #include "vtkMDActor.h"
 #include "vtkMDVolumeCollection.h"
@@ -257,6 +259,27 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->reinitializeMASK, SIGNAL(pressed()), this, SLOT(slotReinitializeMask()));
 	connect(this->Ui->invertMASK, SIGNAL(pressed()), this, SLOT(slotInvertMask()));
 	connect(this->Ui->hardenMASK, SIGNAL(pressed()), this, SLOT(slotHardenMask()));
+
+	QAction* actionImportMask = new QAction(tr("&ImportMask"), this);
+	actionImportMask->setToolTip(tr("Import Mask."));
+	this->Ui->importMASK->addAction(actionImportMask);
+	this->Ui->importMASK->setDefaultAction(actionImportMask);
+	QIcon icon;
+	icon.addFile(QStringLiteral(":/Icons/fileopen22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	actionImportMask->setIcon(icon);
+	new mqOpenDataReaction(actionImportMask, 25);
+	
+
+	QAction* actionExportMask = new QAction(tr("&ExportMask"), this);
+	actionExportMask->setToolTip(tr("Export Mask."));
+	this->Ui->exportMASK->addAction(actionExportMask);
+	this->Ui->exportMASK->setDefaultAction(actionExportMask);
+	QIcon icon2;
+	icon2.addFile(QStringLiteral(":/Icons/filesave22.png"), QSize(), QIcon::Normal, QIcon::Off);
+	actionExportMask->setIcon(icon2);	
+	new mqSaveMHDMHADialogReaction(actionExportMask, 1);
+
+	
 	connect(this->Ui->maskWithSurface, SIGNAL(pressed()), this, SLOT(slotMaskWithSurface()));
 	connect(this->Ui->cropVolume, SIGNAL(pressed()), this, SLOT(slotcropVolumeClicked()));
 	//
@@ -563,6 +586,9 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->invertMASK->setEnabled(true);
 
 			this->Ui->hardenMASK->setEnabled(true);
+			this->Ui->importMASK->setEnabled(true);
+			this->Ui->exportMASK->setEnabled(true);
+			
 			this->Ui->pencilSearchSize->setEnabled(true);
 			this->Ui->pencilSphereR->setEnabled(true);
 			this->Ui->pencilTubeR->setEnabled(true);
@@ -587,6 +613,8 @@ void mqEditVolumeDialog::slotEnableMASKClicked(bool isChecked)
 			this->Ui->maskWithSurface->setEnabled(false);
 			this->Ui->invertMASK->setEnabled(false);
 			this->Ui->hardenMASK->setEnabled(false);
+			this->Ui->importMASK->setEnabled(false);
+			this->Ui->exportMASK->setEnabled(false);
 			this->Ui->pencilSearchSize->setEnabled(false);
 			this->Ui->pencilSphereR->setEnabled(false);
 			this->Ui->pencilTubeR->setEnabled(false);
@@ -1255,6 +1283,8 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->maskWithSurface->setDisabled(false);
 			this->Ui->invertMASK->setDisabled(false);
 			this->Ui->hardenMASK->setDisabled(false);
+			this->Ui->importMASK->setDisabled(false);
+			this->Ui->exportMASK->setDisabled(false);
 			this->Ui->pencilSearchSize->setDisabled(false);
 			this->Ui->pencilSphereR->setDisabled(false);
 			this->Ui->pencilTubeR->setDisabled(false);
@@ -1275,7 +1305,8 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->maskWithSurface->setDisabled(true);
 			this->Ui->invertMASK->setDisabled(true);
 			this->Ui->hardenMASK->setDisabled(true);
-
+			this->Ui->importMASK->setDisabled(true);
+			this->Ui->exportMASK->setDisabled(true);
 			this->Ui->pencilSearchSize->setDisabled(true);
 			this->Ui->pencilSphereR->setDisabled(true);
 			this->Ui->pencilTubeR->setDisabled(true);
@@ -1299,6 +1330,8 @@ void mqEditVolumeDialog::UpdateUI()
 			this->Ui->maskWithSurface->setDisabled(true);
 			this->Ui->invertMASK->setDisabled(true);
 			this->Ui->hardenMASK->setDisabled(true);
+			this->Ui->importMASK->setDisabled(true);
+			this->Ui->exportMASK->setDisabled(true);
 			this->Ui->pencilSearchSize->setDisabled(true);
 			this->Ui->pencilSphereR->setDisabled(true);
 			this->Ui->pencilTubeR->setDisabled(true);

@@ -1249,6 +1249,7 @@ public slots:
 	virtual void slotRubberMaskOutside();
 	virtual void slotMirror();
 	virtual void slotInvert();
+	virtual void slotInvertVolume();
 	virtual void slotKeepLargest();
 	virtual void slotScalarsCameraDistance();
 	virtual void slotScalarsRGB();
