@@ -1213,6 +1213,11 @@ void mqEditVolumeDialog::GetFirstSelectedVolume()
 void mqEditVolumeDialog::slotUpdateHistogram()
 {
 	cout << "slotUpdateHistogram" << endl;
+
+	this->mColorMap->setInitHistRangeMinMax(this->Volume->GetRangeMin(), this->Volume->GetRangeMax());
+	
+	cout << "New display range Min:" << this->Volume->GetScalarDisplayMin();
+	cout << "New display range Max:" << this->Volume->GetScalarDisplayMax();
 	this->mColorMap->reInitializeHIST(this->Volume->GetHist(), 255, this->Volume->GetRangeMin(), this->Volume->GetRangeMax(), this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());
 
 

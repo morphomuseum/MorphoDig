@@ -1542,6 +1542,13 @@ void vtkMDVolume::Invert()
 	QString myName = QString(this->GetName().c_str());
 	myName = myName + "_inv";
 	this->SetName(myName.toStdString());
+	this->GetImageData()->Modified();
+	this->GetImageData()->GetPointData()->GetScalars()->Modified(); // otherwise scalar range is not computed!
+	
+	//this->GetImageData()->GetScalarRan
+	cout << "Invert, new scalar range:"<<this->GetImageData()->GetScalarRange()[0] << "," << this->GetImageData()->GetScalarRange()[1] << endl;
+	/*this->SetScalarDisplayMin(this->GetImageData()->GetScalarRange()[0]);
+	this->SetScalarDisplayMax(this->GetImageData()->GetScalarRange()[1]);*/
 	this->Modified();
 	this->SetImageDataAndMap(this->GetImageData());
 	this->SetImageDataBinComputed(0);
@@ -1551,6 +1558,8 @@ void vtkMDVolume::Invert()
 	this->UpdateHistogram();
 	cout << "Call sendSignalVolumeUpdateHistogram" << endl;
 	mqMorphoDigCore::instance()->sendSignalVolumeUpdateHistogram();
+	mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
+	mqMorphoDigCore::instance()->Render();
 
 	//shiftScale->SetClampOverflow(true);
 	//shiftScale->Set
