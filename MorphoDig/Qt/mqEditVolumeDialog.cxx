@@ -79,6 +79,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	this->Ui->pencilSearchSize->setValue(mqMorphoDigCore::instance()->Getmui_PencilSize());
 	connect(mqMorphoDigCore::instance(), SIGNAL(pencilSizeChanged(int)), this, SLOT(slotRefreshPencilSearchSize(int)));
 	connect(this->Ui->pencilSearchSize, SIGNAL(valueChanged(int)), this, SLOT(slotPencilSearchSizeChanged(int)));
+	
 
 	this->Volume_Coll = NULL;
 	this->Volume = NULL;
@@ -299,6 +300,8 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->mColorMap, SIGNAL(minmaxChanged()), this, SLOT(slotSaveActorMinMaxHaveBeenChangedInWidget()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(volumesMightHaveChanged()), this, SLOT(slotRefreshUi()));
 	connect(mqMorphoDigCore::instance(), SIGNAL(volumeSelectionChanged()), this, SLOT(slotRefreshUi()));
+	connect(mqMorphoDigCore::instance(), SIGNAL(volumeUpdateHistogram()), this, SLOT(slotUpdateHistogram()));
+
 	connect(this->Ui->cutMinPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->cutMaxPercent, SIGNAL(valueChanged(int)), this, SLOT(slotRefreshSuggestedRange()));
 	connect(this->Ui->sliderXY, SIGNAL(valueChanged(int)), this, SLOT(slotSliderXYChanged(int)));
@@ -1205,6 +1208,14 @@ void mqEditVolumeDialog::GetFirstSelectedVolume()
 		this->Volume_Coll->Modified();
 	}
 	
+}
+
+void mqEditVolumeDialog::slotUpdateHistogram()
+{
+	cout << "slotUpdateHistogram" << endl;
+	this->mColorMap->reInitializeHIST(this->Volume->GetHist(), 255, this->Volume->GetRangeMin(), this->Volume->GetRangeMax(), this->Volume->GetScalarDisplayMin(), this->Volume->GetScalarDisplayMax());
+
+
 }
 
 void mqEditVolumeDialog::GetFirstVolume()

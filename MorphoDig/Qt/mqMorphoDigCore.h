@@ -1027,6 +1027,7 @@ public:
   double ComputeActiveScalarsMedian(vtkSmartPointer<vtkPolyData> mPD, vtkSmartPointer<vtkIdList> list, int cutMinMax, double cutMin, double cutMax);
   void TestVolume();
   void sendSignalVolumesMightHaveChanged();
+  void sendSignalVolumeUpdateHistogram();
 signals:
   void pencilSizeChanged(int pencilSize);
   void projectionModeChanged();
@@ -1040,7 +1041,7 @@ signals:
   void activeArrayChanged();
   void actorsMightHaveChanged();
   void volumesMightHaveChanged();
-  
+  void volumeUpdateHistogram();
   void modeModeChanged();
   void thicknessProgression(int percent);
   void iterativeShrinkWrapProgression(int percent);

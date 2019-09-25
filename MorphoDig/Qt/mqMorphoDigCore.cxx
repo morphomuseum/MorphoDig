@@ -681,8 +681,10 @@ void mqMorphoDigCore::TestVolume()
 		// Create the property and attach the transfer functions
 		vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 		property->SetIndependentComponents(true);
-		property->SetColor(TF);
+		
+		opacityFun->SetClamping(true);
 		property->SetScalarOpacity(opacityFun);
+		property->SetColor(TF);
 		property->SetInterpolationTypeToLinear();
 		//mapper->SetInputData(input);
 		mapper->SetInputConnection(metaReader->GetOutputPort());
@@ -5822,8 +5824,10 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
 			volume->SetCtf(TF);
-			property->SetColor(TF);
+			
+			opacityFun->SetClamping(true);
 			property->SetScalarOpacity(opacityFun);
+			property->SetColor(TF);
 			property->SetInterpolationTypeToLinear();
 			
 			//mapper->SetInputConnection(reader->GetOutputPort());
@@ -6026,8 +6030,10 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 		property->SetIndependentComponents(true);
 		volume->SetCtf(TF);
-		property->SetColor(TF);
+		
+		opacityFun->SetClamping(true);
 		property->SetScalarOpacity(opacityFun);
+		property->SetColor(TF);
 		property->SetInterpolationTypeToLinear();
 		//mapper->SetInputData(input);
 		//mapper->SetInputData(input);
@@ -6462,8 +6468,10 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 			property->SetIndependentComponents(true);
 			volume->SetCtf(TF);
-			property->SetColor(TF);
+			opacityFun->SetClamping(true);
 			property->SetScalarOpacity(opacityFun);
+			property->SetColor(TF);
+			
 			property->SetInterpolationTypeToLinear();
 			
 			//mapper->SetInputData(input);
@@ -6752,8 +6760,10 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 				vtkSmartPointer < vtkVolumeProperty> property = vtkSmartPointer <vtkVolumeProperty>::New();
 				property->SetIndependentComponents(true);
 				volume->SetCtf(TF);
-				property->SetColor(TF);
+				
+				opacityFun->SetClamping(true);
 				property->SetScalarOpacity(opacityFun);
+				property->SetColor(TF);
 				property->SetInterpolationTypeToLinear();
 				//mapper->SetInputData(input);
 				//mapper->SetInputConnection(reader->GetOutputPort());
@@ -19800,6 +19810,11 @@ void mqMorphoDigCore::DeleteSelectedActors()
 void mqMorphoDigCore::sendSignalVolumesMightHaveChanged()
 {
 	emit this->volumesMightHaveChanged();
+}
+void mqMorphoDigCore::sendSignalVolumeUpdateHistogram()
+{
+	cout << "Emit volumeUpdateHistogram" << endl;
+	emit this->volumeUpdateHistogram();
 }
 void mqMorphoDigCore::addInvert()
 {

@@ -1409,14 +1409,22 @@ void vtkMDVolume::MedianFilter(int x, int y, int z)
 	median->SetKernelSize(x, y, z);
 	median->Update();
 	vtkSmartPointer<vtkImageData> medianData = median->GetOutput();
+	QString myName = QString(this->GetName().c_str());
+	myName = myName + "_med";
+	this->SetName(myName.toStdString());
+	this->Modified();
 	this->SetImageDataAndMap(medianData);
 	this->Outline->SetInputData(medianData);
+	this->UpdateHistogram();
+	mqMorphoDigCore::instance()->sendSignalVolumeUpdateHistogram();
+	// send message to recompute histogram and update XY slices!
 	
 }
 void vtkMDVolume::Invert()
 {
-	vtkSmartPointer<vtkImageShiftScale> shiftScale = vtkSmartPointer<vtkImageShiftScale>::New();
-	shiftScale->SetInputData(this->ImageData);
+	//vtkSmartPointer<vtkImageShiftScale> shiftScale = vtkSmartPointer<vtkImageShiftScale>::New();
+	// Bug with shiftscale : pixels with "0" value remain "0"... wrong!
+	//shiftScale->SetInputData(this->ImageData);
 
 	int dataType = this->GetImageData()->GetScalarType();	
 	double shiftV = 0;
@@ -1460,14 +1468,98 @@ void vtkMDVolume::Invert()
 		shiftV= 0;
 		
 	}
+	
+		int dims[3];
 
 
-	shiftScale->SetShift(shiftV); 
-	shiftScale->SetScale(-1);
-	shiftScale->Update();
-	vtkSmartPointer<vtkImageData> shiftScaleData = shiftScale->GetOutput();
-	this->SetImageDataAndMap(shiftScaleData);
-	this->Outline->SetInputData(shiftScaleData);
+	this->GetImageData()->GetDimensions(dims);
+	double fillValue = 0;
+	for (int z = 0; z < dims[2]; z++)
+	{
+		for (int y = 0; y < dims[1]; y++)
+		{
+			for (int x = 0; x < dims[0]; x++)
+			{
+
+				/*unsigned char* pixel = static_cast<unsigned char*>(this->Mask->GetScalarPointer(x, y, z));
+				if (pixel[0] == 0) { pixel[0] = 255; }
+				else if (pixel[0] == 255) { pixel[0] = 0; }*/
+				if (dataType == VTK_UNSIGNED_SHORT)
+				{
+					unsigned short* pixel2 = static_cast<unsigned short*>(this->GetImageData()->GetScalarPointer(x, y, z));
+					fillValue = (double)(-1 * pixel2[0]) + shiftV;
+					pixel2[0] = fillValue;
+
+				}
+				else if (dataType == VTK_SHORT)
+				{
+					signed short* pixel2 = static_cast<signed short*>(this->GetImageData()->GetScalarPointer(x, y, z));
+					fillValue = (double)(-1 * pixel2[0]) + shiftV;
+					pixel2[0] = fillValue;
+
+				}
+				else if (dataType == VTK_CHAR)
+				{
+					char* pixel2 = static_cast<char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+					fillValue = (double)(-1 * pixel2[0]) + shiftV;
+					pixel2[0] = fillValue;
+				}
+				else if (dataType == VTK_UNSIGNED_CHAR)
+				{
+					unsigned char* pixel2 = static_cast<unsigned char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+					fillValue = (double)(-1 * pixel2[0]) + shiftV;
+					pixel2[0] = fillValue;
+				}
+				else if (dataType == VTK_SIGNED_CHAR)
+				{
+					signed char* pixel2 = static_cast<signed char*>(this->GetImageData()->GetScalarPointer(x, y, z));
+					fillValue = (double)(-1 * pixel2[0]) + shiftV;
+					pixel2[0] = fillValue;
+
+				}
+				else if (dataType == VTK_FLOAT)
+				{
+					float* pixel2 = static_cast<float*>(this->GetImageData()->GetScalarPointer(x, y, z));
+					fillValue = (double)(-1 * pixel2[0]) + shiftV;
+					pixel2[0] = fillValue;
+
+				}
+				else if (dataType == VTK_DOUBLE)
+				{
+					double* pixel2 = static_cast<double*>(this->GetImageData()->GetScalarPointer(x, y, z));
+					fillValue = (double)(-1 * pixel2[0]) + shiftV;
+					pixel2[0] = fillValue;
+
+				}
+				else if (dataType == VTK_BIT)
+				{
+					//dataTypeAsString = "Bit (1 bit)";
+				}
+
+			}
+		}
+	}
+	QString myName = QString(this->GetName().c_str());
+	myName = myName + "_inv";
+	this->SetName(myName.toStdString());
+	this->Modified();
+	this->SetImageDataAndMap(this->GetImageData());
+	this->SetImageDataBinComputed(0);
+	if (this->GetuseImageDataBinForVR() == 1) { this->ComputeImageDataBin(); }
+	this->Outline->SetInputData(this->GetImageData());
+	cout << "Call UpdateHistogram" << endl;
+	this->UpdateHistogram();
+	cout << "Call sendSignalVolumeUpdateHistogram" << endl;
+	mqMorphoDigCore::instance()->sendSignalVolumeUpdateHistogram();
+
+	//shiftScale->SetClampOverflow(true);
+	//shiftScale->Set
+	//shiftScale->SetShift(shiftV); 
+	//shiftScale->SetScale(-1);
+	//shiftScale->Update();
+	//vtkSmartPointer<vtkImageData> shiftScaleData = shiftScale->GetOutput();
+	//this->SetImageDataAndMap(shiftScaleData);
+	//this->Outline->SetInputData(shiftScaleData);
 	
 	
 
@@ -1482,8 +1574,14 @@ void vtkMDVolume::GaussianFilter(double std_x, double std_y, double std_z, doubl
 	gaussian->SetRadiusFactors(rad_x, rad_y, rad_z);
 	gaussian->Update();
 	vtkSmartPointer<vtkImageData> gaussianData = gaussian->GetOutput();
+	QString myName = QString(this->GetName().c_str());
+	myName = myName + "_gauss";
+	this->SetName(myName.toStdString());
+	this->Modified();
 	this->SetImageDataAndMap(gaussianData);
 	this->Outline->SetInputData(gaussianData);
+	this->UpdateHistogram();
+	mqMorphoDigCore::instance()->sendSignalVolumeUpdateHistogram();
 
 }
 
@@ -2351,7 +2449,8 @@ void vtkMDVolume::CropVolume()
 
 	this->SetImageDataAndMap(change->GetOutput());
 	this->Outline->SetInputData(change->GetOutput());
-
+	this->UpdateHistogram();
+	mqMorphoDigCore::instance()->sendSignalVolumeUpdateHistogram();
 }
 void vtkMDVolume::CreateCropBox()
 {
@@ -2672,7 +2771,12 @@ void vtkMDVolume::GetMCenter(double center[3])
 	center[2] = mCenter[2];
 
 }
-
+void vtkMDVolume::UpdateHistogram()
+{
+	this->Hist->SetInputData(this->GetImageData());		
+	this->Hist->Modified();
+	this->Hist->Update();
+}
 void vtkMDVolume::PopUndoStack()
 {
 	cout << "Inside MD Volume "<< this->GetName()<<" PopUndoStack" << endl;

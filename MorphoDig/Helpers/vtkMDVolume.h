@@ -170,6 +170,8 @@ public:
 	void SwapXZ();	
 	void SwapYZ();	
 	void SwapXYZ();
+	void UpdateHistogram();
+
 	void MedianFilter(int x, int y, int z);
 	void GaussianFilter(double std_x, double std_y, double std_z, double rad_x, double rad_y, double rad_z);
 	void Invert();
