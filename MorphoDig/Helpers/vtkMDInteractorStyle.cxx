@@ -31,6 +31,8 @@
 #include <vtkImageAppend.h>
 #include <vtkDICOMImageReader.h>
 #include <vtkTIFFReader.h>
+#include <vtkPNGReader.h>
+#include <vtkBMPReader.h>
 #include <vtkBillboardTextActor3D.h>
 #include <vtkIndent.h>
 #include <vtkProperty.h>
@@ -584,12 +586,50 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 			
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff *.dcm *.ima )"));
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff *.bmp *.png *.dcm *.ima )"));
 			int cpt_tiff = 0;
 			int tiff_3D = 1;
-
+			int cpt_bmp = 0;
+			int cpt_png = 0;
 			if (!filenames.isEmpty())
 			{
+
+				
+				for (int i = 0; i < filenames.count(); i++)
+				{
+					QString fileName = filenames.at(i);
+					
+					std::string PNGext(".png");
+					std::string PNGext2(".PNG");
+
+					std::size_t found = fileName.toStdString().find(PNGext);
+					std::size_t found2 = fileName.toStdString().find(PNGext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						cpt_png++;
+						tiff_3D = 0;
+
+					}
+
+				}
+				
+				for (int i = 0; i < filenames.count(); i++)
+				{
+					QString fileName = filenames.at(i);
+					std::string BMPext(".bmp");
+					std::string BMPext2(".BMP");
+
+					std::size_t found = fileName.toStdString().find(BMPext);
+					std::size_t found2 = fileName.toStdString().find(BMPext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						cpt_bmp++;
+						tiff_3D = 0;
+
+					}
+
+				}
+
 				for (int i = 0; i < filenames.count(); i++)
 				{
 					QString fileName = filenames.at(i);
@@ -691,6 +731,10 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 					std::string TIFext2(".TIF");
 					std::string TIFext3(".tiff");
 					std::string TIFext4(".TIFF");
+					std::string BMPext(".bmp");
+					std::string BMPext2(".BMP");
+					std::string PNGext(".png");
+					std::string PNGext2(".PNG");
 					std::string DCMext(".dcm");
 					std::string DCMext2(".DCM");
 					std::string DCMext3(".ima");
@@ -839,9 +883,17 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 					found2 = fileName.toStdString().find(TIFext2);
 					found3 = fileName.toStdString().find(TIFext3);
 					found4 = fileName.toStdString().find(TIFext4);
-					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+					std::size_t found5 = fileName.toStdString().find(BMPext);
+					std::size_t found6 = fileName.toStdString().find(BMPext2);
+					std::size_t found7 = fileName.toStdString().find(PNGext);
+					std::size_t found8 = fileName.toStdString().find(PNGext2);
+					if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos
+						|| found5 != std::string::npos || found6 != std::string::npos || found7 != std::string::npos || found8 != std::string::npos
+						)
 					{
-						type = 17;
+						
+						type = 17;// TIFF PNG BMP
+						cout << "CTRL+0 found tiff png bmp" << endl;
 						
 					}
 					found = fileName.toStdString().find(DCMext);
@@ -939,7 +991,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 
 
 				}
-				if (cpt_tiff > 1)
+				if (cpt_tiff > 1 || cpt_png> 1 || cpt_bmp>1)
 				{
 					int first_image = 1;
 					int found_3Dtiff = 0;
@@ -959,12 +1011,33 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 						std::string TIFext2(".TIF");
 						std::string TIFext3(".tiff");
 						std::string TIFext4(".TIFF");
+						std::string BMPext(".bmp");
+						std::string BMPext2(".BMP");
+						std::string PNGext(".png");
+						std::string PNGext2(".PNG");
+
 						std::size_t found = fileName.toStdString().find(TIFext);
 						std::size_t found2 = fileName.toStdString().find(TIFext2);
 						std::size_t found3 = fileName.toStdString().find(TIFext3);
 						std::size_t found4 = fileName.toStdString().find(TIFext4);
+						std::size_t found5 = fileName.toStdString().find(BMPext);
+						std::size_t found6 = fileName.toStdString().find(BMPext2);
+						std::size_t found7 = fileName.toStdString().find(PNGext);
+						std::size_t found8 = fileName.toStdString().find(PNGext2);
+						int file_format = 0; // tiff
+						if (found5 != std::string::npos || found6 != std::string::npos)
+						{
+							file_format = 1; //bmp
 
-						if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+						}
+						if (found7 != std::string::npos || found8 != std::string::npos)
+						{
+							file_format = 2; //png
+
+						}
+
+						if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos
+							|| found5 != std::string::npos || found6 != std::string::npos || found7 != std::string::npos || found8 != std::string::npos)
 						{
 
 							QFile file(fileName);
@@ -974,11 +1047,32 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 
 								name = file.fileName(); // Return only a file name		
 								vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
-								vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
-								tiffReader->SetFileName(fileName.toLocal8Bit());
-								//tiffReader->GetF
-								tiffReader->Update();
-								input = tiffReader->GetOutput();
+								if (file_format == 0)
+								{
+									vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
+									tiffReader->SetFileName(fileName.toLocal8Bit());
+									//tiffReader->GetF
+									tiffReader->Update();
+									input = tiffReader->GetOutput();
+								}
+								else if (file_format == 1)
+								{
+									vtkSmartPointer <vtkBMPReader> bmpReader = vtkSmartPointer<vtkBMPReader>::New();
+									bmpReader->SetAllow8BitBMP(true);
+									bmpReader->SetFileName(fileName.toLocal8Bit());
+									//tiffReader->GetF
+									bmpReader->Update();
+									input = bmpReader->GetOutput();
+								}
+								else
+								{
+									vtkSmartPointer <vtkPNGReader> pngReader = vtkSmartPointer<vtkPNGReader>::New();
+									pngReader->SetFileName(fileName.toLocal8Bit());
+									//tiffReader->GetF
+									pngReader->Update();
+									input = pngReader->GetOutput();
+								}
+							
 								int dim[3];
 								input->GetDimensions(dim);
 
@@ -1011,7 +1105,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 										{
 											wrong_dims_msg = 1;
 											QMessageBox msgBox;
-											QString msg = "At lease one 2D image differs in dimensions from those of the first opened TIFF image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+											QString msg = "At least one 2D image differs in dimensions from those of the first opened image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 											msgBox.setText(msg);
 											msgBox.exec();
 										}
@@ -1165,7 +1259,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 										{
 											wrong_dims_msg = 1;
 											QMessageBox msgBox;
-											QString msg = "At lease one DICOM image differs in dimensions or voxel size from those of the first opened DICOM image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+											QString msg = "At least one DICOM image differs in dimensions or voxel size from those of the first opened DICOM image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 											msgBox.setText(msg);
 											msgBox.exec();
 										}

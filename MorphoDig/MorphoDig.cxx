@@ -5,6 +5,8 @@
 #include <vtkImageAppend.h>
 #include <vtkImageData.h>
 #include <vtkTIFFReader.h>
+#include <vtkPNGReader.h>
+#include <vtkBMPReader.h>
 #include <vtkDICOMImageReader.h>
 #include "mqOpenDicomStackDialog.h"
 #include "mqOpenTiff3DDialog.h"
@@ -1197,8 +1199,43 @@ void MorphoDig::dragEnterEvent(QDragEnterEvent *e)
 void MorphoDig::dropEvent(QDropEvent *e)
 {
 	cout << "drop event" << endl;
-	int cpt_tiff = 0;
 	int tiff_3D = 1;
+	int cpt_png = 0;
+	foreach(const QUrl &url, e->mimeData()->urls()) {
+		QString fileName = url.toLocalFile();
+		std::string PNGext(".png");
+		std::string PNGext2(".PNG");
+		
+		std::size_t found = fileName.toStdString().find(PNGext);
+		std::size_t found2 = fileName.toStdString().find(PNGext2);
+		if (found != std::string::npos || found2 != std::string::npos )
+		{
+			cpt_png++;
+			
+			tiff_3D = 0;
+		}
+
+	}
+	int cpt_bmp = 0;
+	foreach(const QUrl &url, e->mimeData()->urls()) {
+		QString fileName = url.toLocalFile();
+		std::string BMPext(".bmp");
+		std::string BMPext2(".BMP");
+
+		std::size_t found = fileName.toStdString().find(BMPext);
+		std::size_t found2 = fileName.toStdString().find(BMPext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			cpt_bmp++;
+
+			tiff_3D = 0;
+		}
+
+	}
+	int cpt_tiff = 0;
+	
+	
+
 	foreach(const QUrl &url, e->mimeData()->urls()) {
 		QString fileName = url.toLocalFile();
 		std::string TIFext(".tif");
@@ -1294,6 +1331,11 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::string TIFext2(".TIF");
 		std::string TIFext3(".tiff");
 		std::string TIFext4(".TIFF");
+		std::string BMPext(".bmp");
+		std::string BMPext2(".BMP");
+		std::string PNGext(".png");
+		std::string PNGext2(".PNG");
+
 		std::string DCMext(".dcm");
 		std::string DCMext2(".DCM");
 		std::string DCMext3(".ima");
@@ -1442,7 +1484,13 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		found2 = fileName.toStdString().find(TIFext2);
 		found3 = fileName.toStdString().find(TIFext3);
 		found4 = fileName.toStdString().find(TIFext4);
-		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+		std::size_t found5 = fileName.toStdString().find(BMPext);
+		std::size_t found6 = fileName.toStdString().find(BMPext2);
+		std::size_t found7 = fileName.toStdString().find(PNGext);
+		std::size_t found8 = fileName.toStdString().find(PNGext2);
+		if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos
+			|| found5 != std::string::npos || found6 != std::string::npos || found7 != std::string::npos || found8 != std::string::npos
+			)
 		{
 			type = 17;
 			
@@ -1543,7 +1591,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 	}
 	// now the 2D tiff case
 	cout << "here!!!!" << endl;
-	if (cpt_tiff > 1)
+	if (cpt_tiff > 1 || cpt_png> 1 || cpt_bmp > 1)
 	{
 		int first_image = 1;
 		int found_3Dtiff = 0;
@@ -1562,12 +1610,33 @@ void MorphoDig::dropEvent(QDropEvent *e)
 			std::string TIFext2(".TIF");
 			std::string TIFext3(".tiff");
 			std::string TIFext4(".TIFF");
+			std::string BMPext(".bmp");
+			std::string BMPext2(".BMP");
+			std::string PNGext(".png");
+			std::string PNGext2(".PNG");
+
 			std::size_t found = fileName.toStdString().find(TIFext);
 			std::size_t found2 = fileName.toStdString().find(TIFext2);
 			std::size_t found3 = fileName.toStdString().find(TIFext3);
 			std::size_t found4 = fileName.toStdString().find(TIFext4);
+			std::size_t found5 = fileName.toStdString().find(BMPext);
+			std::size_t found6 = fileName.toStdString().find(BMPext2);
+			std::size_t found7 = fileName.toStdString().find(PNGext);
+			std::size_t found8 = fileName.toStdString().find(PNGext2);
+			int file_format = 0; // tiff
+			if (found5 != std::string::npos || found6 != std::string::npos)
+			{ 
+				file_format = 1; //bmp
 
-			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+			}
+			if (found7 != std::string::npos || found8 != std::string::npos)
+			{
+				file_format = 2; //png
+
+			}
+
+			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos 
+				|| found5 != std::string::npos || found6 != std::string::npos || found7 != std::string::npos || found8 != std::string::npos)
 			{
 
 				QFile file(fileName);
@@ -1577,11 +1646,31 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 					name = file.fileName(); // Return only a file name		
 					vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
-					vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
-					tiffReader->SetFileName(fileName.toLocal8Bit());
-					//tiffReader->GetF
-					tiffReader->Update();
-					input = tiffReader->GetOutput();
+					if (file_format == 0)
+					{
+						vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
+						tiffReader->SetFileName(fileName.toLocal8Bit());
+						//tiffReader->GetF
+						tiffReader->Update();
+						input = tiffReader->GetOutput();
+					}
+					else if (file_format == 1)
+					{
+						vtkSmartPointer <vtkBMPReader> bmpReader = vtkSmartPointer<vtkBMPReader>::New();
+						bmpReader->SetAllow8BitBMP(true);
+						bmpReader->SetFileName(fileName.toLocal8Bit());
+						//tiffReader->GetF
+						bmpReader->Update();
+						input = bmpReader->GetOutput();
+					}
+					else
+					{
+						vtkSmartPointer <vtkPNGReader> pngReader = vtkSmartPointer<vtkPNGReader>::New();
+						pngReader->SetFileName(fileName.toLocal8Bit());
+						//tiffReader->GetF
+						pngReader->Update();
+						input = pngReader->GetOutput();
+					}
 					int dim[3];
 					input->GetDimensions(dim);
 
@@ -1590,7 +1679,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 						found_3Dtiff = 1;
 						//mettre un message : pas possible de mettre un 3D tiff 
 						QMessageBox msgBox;
-						msgBox.setText("Error: please only drag and drop several 2D TIFF files or one single 3D TIFF volume. Do not mix 2D and 3D TIFF files.");
+						msgBox.setText("Error: please only drag and drop several 2D files or one single 3D TIFF volume. Do not mix 2D and 3D TIFF files.");
 						msgBox.exec();
 						return;
 					}
@@ -1614,7 +1703,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 						{
 							wrong_dims_msg = 1;
 							QMessageBox msgBox;
-							QString msg = "At lease one 2D image differs in dimensions from those of the first opened tiff image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+							QString msg = "At lease one 2D image differs in dimensions from those of the first opened image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 							msgBox.setText(msg);
 							msgBox.exec();
 						}

@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Open 3D Tiff file or 2D Tiff stack</string>
+   <string>Open 3D Tiff file or 2D Tiff/PNG/BMP stack</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -487,7 +487,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Open 3D Tiff file or 2D Tiff stack</string>
+    <string>Open 3D Tiff file or 2D Tiff/PNG/BMP stack</string>
    </property>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">

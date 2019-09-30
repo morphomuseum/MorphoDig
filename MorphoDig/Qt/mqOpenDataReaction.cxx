@@ -15,6 +15,8 @@
 #include <vtkImageAppend.h>
 #include <vtkDICOMImageReader.h>
 #include <vtkTIFFReader.h>
+#include <vtkPNGReader.h>
+#include <vtkBMPReader.h>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextStream>
@@ -592,7 +594,7 @@ void mqOpenDataReaction::OpenTIFF2DStack()
 								{
 									wrong_dims_msg = 1;
 									QMessageBox msgBox;
-									QString msg = "At lease one 2D image differs in dimensions from those of the first opened tiff image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+									QString msg = "At least one 2D image differs in dimensions from those of the first opened tiff image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 									msgBox.setText(msg);
 									msgBox.exec();
 								}
@@ -625,6 +627,276 @@ void mqOpenDataReaction::OpenTIFF2DStack()
 	}
 
 }
+void mqOpenDataReaction::OpenPNG2DStack()
+{
+	//mqMorphoDigCore::instance()->getUndoStack();
+	cout << "Open Data!" << endl;
+
+
+	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
+		tr("Load 2D PNG stack"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("2D PNG files (*.png )"));
+	int cpt_png = 0;
+	
+
+	if (!filenames.isEmpty())
+	{
+		for (int i = 0; i < filenames.count(); i++)
+		{
+			QString fileName = filenames.at(i);
+			std::string PNGext(".png");
+			std::string PNGext2(".PNG");
+			
+			std::size_t found = fileName.toStdString().find(PNGext);
+			std::size_t found2 = fileName.toStdString().find(PNGext2);
+			
+			if (found != std::string::npos || found2 != std::string::npos )
+			{
+				cpt_png++;
+				//Tif TIFF
+
+			}
+
+		}		
+
+
+
+		if (cpt_png > 0)
+		{
+			int first_image = 1;
+			int wrong_dims_msg = 0;
+			int dimX = 0;
+			int dimY = 0;
+			int dimZ = 0;
+			//QString stackName = "";
+			QString firstFileName = "";
+			vtkSmartPointer<vtkImageAppend> imageAppend = vtkSmartPointer<vtkImageAppend>::New();
+			imageAppend->SetAppendAxis(2);
+
+			for (int i = 0; i < filenames.count(); i++)
+			{
+				QString fileName = filenames.at(i);
+				std::string PNGext(".png");
+				std::string PNGext2(".PNG");
+				std::size_t found = fileName.toStdString().find(PNGext);
+				std::size_t found2 = fileName.toStdString().find(PNGext2);
+				
+				if (found != std::string::npos || found2 != std::string::npos )
+				{
+
+					QFile file(fileName);
+					QString name = "";
+					if (file.exists()) {
+						dimZ++;
+
+						name = file.fileName(); // Return only a file name		
+						vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+						vtkSmartPointer <vtkPNGReader> pngReader = vtkSmartPointer<vtkPNGReader>::New();
+						pngReader->SetFileName(fileName.toLocal8Bit());
+						//tiffReader->GetF
+						pngReader->Update();
+						input = pngReader->GetOutput();
+						int dim[3];
+						input->GetDimensions(dim);
+
+						if (dim[2] != 1)
+						{
+							
+							//mettre un message : pas possible de mettre un 3D PNG (si ça existe!) 
+							QMessageBox msgBox;
+							msgBox.setText("Error: 3D file found. Please only open 2D  files when using this menu.");
+							msgBox.exec();
+							return;
+						}
+						if (first_image == 1)
+						{
+							firstFileName = fileName;
+							// now try to set dimX and dimY based on the first image.																							
+							cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] << endl;
+
+							dimX = dim[0];
+							dimY = dim[1];
+							imageAppend->AddInputData(input);
+							first_image = 0;
+						}
+						else
+						{
+							if (dimX != dim[0] || dimY != dim[1])
+							{
+								cout << "found an image of wrong dimensions" << endl;
+								if (wrong_dims_msg == 0)
+								{
+									wrong_dims_msg = 1;
+									QMessageBox msgBox;
+									QString msg = "At least one 2D image differs in dimensions from those of the first opened PNG image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+									msgBox.setText(msg);
+									msgBox.exec();
+								}
+
+							}
+							else
+							{
+								imageAppend->AddInputData(input);
+							}
+
+						}
+						file.close();
+					}
+					//PNG
+
+				}
+
+			}// end foreach
+			imageAppend->Update();
+			mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+			OpenTiff3D_dialog.setInputAsStack();
+			OpenTiff3D_dialog.set2DStackInput(imageAppend->GetOutput());
+			int dim[3];
+			imageAppend->GetOutput()->GetDimensions(dim);
+			OpenTiff3D_dialog.setDimensions(dim[0], dim[1], dim[2]);
+			OpenTiff3D_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
+			OpenTiff3D_dialog.setFileName(firstFileName);
+			OpenTiff3D_dialog.exec();
+		}
+	}
+
+}
+void mqOpenDataReaction::OpenBMP2DStack()
+{
+	//mqMorphoDigCore::instance()->getUndoStack();
+	cout << "Open Data!" << endl;
+
+
+	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
+		tr("Load 2D BMP stack"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
+		tr("2D BMP files (*.bmp )"));
+	int cpt_bmp = 0;
+
+
+	if (!filenames.isEmpty())
+	{
+		for (int i = 0; i < filenames.count(); i++)
+		{
+			QString fileName = filenames.at(i);
+			std::string BMPext(".bmp");
+			std::string BMPext2(".BMP");
+
+			std::size_t found = fileName.toStdString().find(BMPext);
+			std::size_t found2 = fileName.toStdString().find(BMPext2);
+
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				cpt_bmp++;
+				//Tif TIFF
+
+			}
+
+		}
+
+
+
+		if (cpt_bmp > 0)
+		{
+			int first_image = 1;
+			int wrong_dims_msg = 0;
+			int dimX = 0;
+			int dimY = 0;
+			int dimZ = 0;
+			//QString stackName = "";
+			QString firstFileName = "";
+			vtkSmartPointer<vtkImageAppend> imageAppend = vtkSmartPointer<vtkImageAppend>::New();
+			imageAppend->SetAppendAxis(2);
+
+			for (int i = 0; i < filenames.count(); i++)
+			{
+				QString fileName = filenames.at(i);
+				std::string BMPext(".bmp");
+				std::string BMPext2(".BMP");
+				std::size_t found = fileName.toStdString().find(BMPext);
+				std::size_t found2 = fileName.toStdString().find(BMPext2);
+
+				if (found != std::string::npos || found2 != std::string::npos)
+				{
+
+					QFile file(fileName);
+					QString name = "";
+					if (file.exists()) {
+						dimZ++;
+
+						name = file.fileName(); // Return only a file name		
+						vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
+						vtkSmartPointer <vtkBMPReader> bmpReader = vtkSmartPointer<vtkBMPReader>::New();
+						bmpReader->SetAllow8BitBMP(true);
+						bmpReader->SetFileName(fileName.toLocal8Bit());
+						//tiffReader->GetF
+						bmpReader->Update();
+						input = bmpReader->GetOutput();
+						int dim[3];
+						input->GetDimensions(dim);
+
+						if (dim[2] != 1)
+						{
+
+							//mettre un message : pas possible de mettre un 3D BMP (si ça existe!) 
+							QMessageBox msgBox;
+							msgBox.setText("Error: 3D file found. Please only open 2D  files when using this menu.");
+							msgBox.exec();
+							return;
+						}
+						if (first_image == 1)
+						{
+							firstFileName = fileName;
+							// now try to set dimX and dimY based on the first image.																							
+							cout << "First image dimensions: " << dim[0] << "," << dim[1] << "," << dim[2] << endl;
+
+							dimX = dim[0];
+							dimY = dim[1];
+							imageAppend->AddInputData(input);
+							first_image = 0;
+						}
+						else
+						{
+							if (dimX != dim[0] || dimY != dim[1])
+							{
+								cout << "found an image of wrong dimensions" << endl;
+								if (wrong_dims_msg == 0)
+								{
+									wrong_dims_msg = 1;
+									QMessageBox msgBox;
+									QString msg = "At least one 2D image differs in dimensions from those of the first opened BMP image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+									msgBox.setText(msg);
+									msgBox.exec();
+								}
+
+							}
+							else
+							{
+								imageAppend->AddInputData(input);
+							}
+
+						}
+						file.close();
+					}
+					//BMP
+
+				}
+
+			}// end foreach
+			imageAppend->Update();
+			mqOpenTiff3DDialog OpenTiff3D_dialog(mqCoreUtilities::mainWidget());
+			OpenTiff3D_dialog.setInputAsStack();
+			OpenTiff3D_dialog.set2DStackInput(imageAppend->GetOutput());
+			int dim[3];
+			imageAppend->GetOutput()->GetDimensions(dim);
+			OpenTiff3D_dialog.setDimensions(dim[0], dim[1], dim[2]);
+			OpenTiff3D_dialog.setDataType(imageAppend->GetOutput()->GetScalarType());
+			OpenTiff3D_dialog.setFileName(firstFileName);
+			OpenTiff3D_dialog.exec();
+		}
+	}
+
+}
+
 void mqOpenDataReaction::OpenDicom2DStack()
 {
 	//mqMorphoDigCore::instance()->getUndoStack();
@@ -764,7 +1036,7 @@ void mqOpenDataReaction::OpenDicom2DStack()
 								{
 									wrong_dims_msg = 1;
 									QMessageBox msgBox;
-									QString msg = "At lease one DICOM image differs in dimensions or voxel size from those of the first opened DICOM image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+									QString msg = "At least one DICOM image differs in dimensions or voxel size from those of the first opened DICOM image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 									msgBox.setText(msg);
 									msgBox.exec();
 								}
@@ -823,12 +1095,48 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff *.dcm *.ima )")); 
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.png *.bmp *.tif *.tiff *.dcm *.ima )")); 
 	int cpt_tiff = 0;
 	int tiff_3D = 1;
-	
+	int cpt_bmp = 0;
+	int cpt_png = 0;
+
 	if (!filenames.isEmpty())
 	{
+		for (int i = 0; i < filenames.count(); i++)
+		{
+			QString fileName = filenames.at(i);
+
+			std::string PNGext(".png");
+			std::string PNGext2(".PNG");
+
+			std::size_t found = fileName.toStdString().find(PNGext);
+			std::size_t found2 = fileName.toStdString().find(PNGext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				cpt_png++;
+				tiff_3D = 0;
+
+			}
+
+		}
+
+		for (int i = 0; i < filenames.count(); i++)
+		{
+			QString fileName = filenames.at(i);
+			std::string BMPext(".bmp");
+			std::string BMPext2(".BMP");
+
+			std::size_t found = fileName.toStdString().find(BMPext);
+			std::size_t found2 = fileName.toStdString().find(BMPext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				cpt_bmp++;
+				tiff_3D = 0;
+
+			}
+
+		}
 		for (int i = 0; i < filenames.count(); i++)
 		{
 			QString fileName = filenames.at(i);
@@ -931,6 +1239,10 @@ void mqOpenDataReaction::OpenData()
 			std::string TIFext2(".TIF");
 			std::string TIFext3(".tiff");
 			std::string TIFext4(".TIFF");
+			std::string BMPext(".bmp");
+			std::string BMPext2(".BMP");
+			std::string PNGext(".png");
+			std::string PNGext2(".PNG");
 			std::string DCMext(".dcm");
 			std::string DCMext2(".DCM");
 			std::string DCMext3(".ima");
@@ -1084,11 +1396,20 @@ void mqOpenDataReaction::OpenData()
 			found2 = fileName.toStdString().find(TIFext2);
 			found3 = fileName.toStdString().find(TIFext3);
 			found4 = fileName.toStdString().find(TIFext4);
-			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+			std::size_t found5 = fileName.toStdString().find(BMPext);
+			std::size_t found6 = fileName.toStdString().find(BMPext2);
+			std::size_t found7 = fileName.toStdString().find(PNGext);
+			std::size_t found8 = fileName.toStdString().find(PNGext2);
+			if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos
+				|| found5 != std::string::npos || found6 != std::string::npos || found7 != std::string::npos || found8 != std::string::npos
+				)
 			{
-				type = 17;
-				//Tif TIFF
+
+				type = 17;// TIFF PNG BMP
+				cout << "Open Data found tiff png bmp" << endl;
+
 			}
+			
 			found = fileName.toStdString().find(DCMext);
 			found2 = fileName.toStdString().find(DCMext2);
 			found3 = fileName.toStdString().find(DCMext3);
@@ -1180,7 +1501,7 @@ void mqOpenDataReaction::OpenData()
 			}
 			
 		}
-		if (cpt_tiff > 1)
+		if (cpt_tiff > 1 || cpt_png > 1 || cpt_bmp > 1)
 		{
 			int first_image = 1;
 			int found_3Dtiff = 0;
@@ -1200,13 +1521,35 @@ void mqOpenDataReaction::OpenData()
 				std::string TIFext2(".TIF");
 				std::string TIFext3(".tiff");
 				std::string TIFext4(".TIFF");
+				std::string BMPext(".bmp");
+				std::string BMPext2(".BMP");
+				std::string PNGext(".png");
+				std::string PNGext2(".PNG");
+
 				std::size_t found = fileName.toStdString().find(TIFext);
 				std::size_t found2 = fileName.toStdString().find(TIFext2);
 				std::size_t found3 = fileName.toStdString().find(TIFext3);
 				std::size_t found4 = fileName.toStdString().find(TIFext4);
-
-				if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos)
+				std::size_t found5 = fileName.toStdString().find(BMPext);
+				std::size_t found6 = fileName.toStdString().find(BMPext2);
+				std::size_t found7 = fileName.toStdString().find(PNGext);
+				std::size_t found8 = fileName.toStdString().find(PNGext2);
+				int file_format = 0; // tiff
+				if (found5 != std::string::npos || found6 != std::string::npos)
 				{
+					file_format = 1; //bmp
+
+				}
+				if (found7 != std::string::npos || found8 != std::string::npos)
+				{
+					file_format = 2; //png
+
+				}
+
+				if (found != std::string::npos || found2 != std::string::npos || found3 != std::string::npos || found4 != std::string::npos
+					|| found5 != std::string::npos || found6 != std::string::npos || found7 != std::string::npos || found8 != std::string::npos)
+				{
+
 
 					QFile file(fileName);
 					QString name = "";
@@ -1215,11 +1558,31 @@ void mqOpenDataReaction::OpenData()
 
 						name = file.fileName(); // Return only a file name		
 						vtkSmartPointer<vtkImageData> input = vtkSmartPointer<vtkImageData>::New();
-						vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
-						tiffReader->SetFileName(fileName.toLocal8Bit());
-						//tiffReader->GetF
-						tiffReader->Update();
-						input = tiffReader->GetOutput();
+						if (file_format == 0)
+						{
+							vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
+							tiffReader->SetFileName(fileName.toLocal8Bit());
+							//tiffReader->GetF
+							tiffReader->Update();
+							input = tiffReader->GetOutput();
+						}
+						else if (file_format == 1)
+						{
+							vtkSmartPointer <vtkBMPReader> bmpReader = vtkSmartPointer<vtkBMPReader>::New();
+							bmpReader->SetAllow8BitBMP(true);
+							bmpReader->SetFileName(fileName.toLocal8Bit());
+							//tiffReader->GetF
+							bmpReader->Update();
+							input = bmpReader->GetOutput();
+						}
+						else
+						{
+							vtkSmartPointer <vtkPNGReader> pngReader = vtkSmartPointer<vtkPNGReader>::New();
+							pngReader->SetFileName(fileName.toLocal8Bit());
+							//tiffReader->GetF
+							pngReader->Update();
+							input = pngReader->GetOutput();
+						}
 						int dim[3];
 						input->GetDimensions(dim);
 
@@ -1252,7 +1615,7 @@ void mqOpenDataReaction::OpenData()
 								{
 									wrong_dims_msg = 1;
 									QMessageBox msgBox;
-									QString msg = "At lease one 2D image differs in dimensions from those of the first opened TIFF image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+									QString msg = "At least one 2D image differs in dimensions from those of the first opened image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 									msgBox.setText(msg);
 									msgBox.exec();
 								}
@@ -1405,7 +1768,7 @@ void mqOpenDataReaction::OpenData()
 								{
 									wrong_dims_msg = 1;
 									QMessageBox msgBox;
-									QString msg = "At lease one DICOM image differs in dimensions or voxel size from those of the first opened DICOM image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
+									QString msg = "At least one DICOM image differs in dimensions or voxel size from those of the first opened DICOM image(" + QString(dimX) + "," + QString(dimY) + "). These files will be ignored.";
 									msgBox.setText(msg);
 									msgBox.exec();
 								}

@@ -29,6 +29,8 @@
 #include <vtkAlgorithm.h>
 #include <vtkImageReader.h>
 #include <vtkTIFFReader.h>
+#include <vtkPNGReader.h>
+#include <vtkBMPReader.h>
 #include<vtkBoxWidget.h>
 
 #include <vtkLight.h>

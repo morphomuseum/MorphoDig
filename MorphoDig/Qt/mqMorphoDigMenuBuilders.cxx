@@ -241,6 +241,8 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqOpenDataReaction(submenuVolume->addAction("Open 3D TIFF file") << mqSetName("actionOpenTiffVolume"), 21);
   new mqOpenDataReaction(submenuVolume->addAction("Open stack of 2D TIFF files") << mqSetName("actionOpenTiffStack"), 22);
   new mqOpenDataReaction(submenuVolume->addAction("Open DICOM 2D Stack") << mqSetName("actionOpenDicomStack"), 24);
+  new mqOpenDataReaction(submenuVolume->addAction("Open BMP image stack") << mqSetName("actionOpenBMPstack"), 26);
+  new mqOpenDataReaction(submenuVolume->addAction("Open PNG image stack") << mqSetName("actionOpenPNGStack"), 27);
   //new mqOpenDataReaction(submenuVolume->addAction("Open DICOM folder") << mqSetName("actionOpenDicomFolder"), 23);  
   //new mqOpenRawDialogReaction(submenuVolume->addAction("Open Raw Volume") << mqSetName("actionOpenRawVolume"));
   new mqOpenDataReaction(submenuVolume->addAction("Import MHD/MHA/VTI Mask and apply it to first selected volume") << mqSetName("actionImportMask"), 25);

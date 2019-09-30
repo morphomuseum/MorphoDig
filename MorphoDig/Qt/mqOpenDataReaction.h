@@ -45,6 +45,8 @@ public:
    void ImportMask();
    void OpenTIFF3D();
    void OpenTIFF2DStack();
+   void OpenPNG2DStack();
+   void OpenBMP2DStack();
    void OpenDicom2DStack();
    void OpenDicomFolder();
    void ImportAvizoLandmarks();
@@ -161,6 +163,15 @@ protected:
 	{
 	this->ImportMask();
 	}
+	else if (this->Mode == 26)
+	{
+	this->OpenBMP2DStack();
+	}
+	else if (this->Mode == 27)
+	{
+	this->OpenPNG2DStack();
+	}
+
   }
 
 private:
