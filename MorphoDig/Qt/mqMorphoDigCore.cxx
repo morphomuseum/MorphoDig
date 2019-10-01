@@ -23917,7 +23917,15 @@ void mqMorphoDigCore::Setmui_BackGroundColor2(double background[3])
 double mqMorphoDigCore::AdjustedLandmarkSize()
 {
 
-	double bbl = this->ActorCollection->GetBoundingBoxLength();
+	double bbl = this->Getmui_DefaultLandmarkRenderingSize();
+	if (this->ActorCollection->GetNumberOfItems() > 0)
+	{
+		bbl = this->ActorCollection->GetBoundingBoxLength();
+	}
+	else if (this->VolumeCollection->GetNumberOfItems()>0)
+	{
+		bbl = this->VolumeCollection->GetBoundingBoxLength();
+	}
 	
 	double adjusted_size = this->Getmui_AdjustScaleFactor()*bbl / 50;
 	if (adjusted_size > 0 && bbl < DBL_MAX)
