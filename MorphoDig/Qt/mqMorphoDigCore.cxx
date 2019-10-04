@@ -1785,7 +1785,7 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 			vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 			vtkIdType cptStencil = 0;
 			brushOutput->GetDimensions(dims);
-			cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+			cout << "Brush output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
 			int maskInside = this->Getmui_MaskInside();
 			int maskOn = this->Getmui_MaskOn();
 			for (int z = 0; z < dims[2]; z++)
@@ -2142,7 +2142,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 		vtkIdType cptStencil = 0;
 		brushOutput->GetDimensions(dims);
-		cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+		cout << "Brush output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
 		int maskInside = this->Getmui_MaskInside();
 		int maskOn = this->Getmui_MaskOn();
 		for (int z = 0; z < dims[2]; z++)
@@ -6672,12 +6672,12 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 		double spacing[3];
 		input->GetDimensions(dim);
 		input->GetSpacing(spacing);
-		int numcells = input->GetNumberOfCells();
+		vtkIdType numcells = input->GetNumberOfCells();
 		input->GetScalarTypeAsString();
 		//input->Get
 		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< endl;
-		cout << "Dim0*Dim1*Dim2:" << dim[0]* dim[1]* dim[2] << endl;
-		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
+		cout << "Dim0*Dim1*Dim2:" << (vtkIdType)((vtkIdType)dim[0]* (vtkIdType)dim[1]* (vtkIdType)dim[2]) << endl;
+		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] <<","<< spacing[1] <<","<< spacing[2] << endl;
 		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
 		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
 		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
@@ -13243,7 +13243,7 @@ void mqMorphoDigCore::lassoMaskVolumes()
 				vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 				vtkIdType cptStencil = 0;
 				brushOutput->GetDimensions(dims);
-				cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+				cout << "Lasso mask output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
 				int maskOn = this->Getmui_MaskOn();
 				int maskInside = this->Getmui_MaskInside();
 				for (int z = 0; z < dims[2]; z++)
@@ -13682,7 +13682,7 @@ void mqMorphoDigCore::rubberMaskVolumes()
 				vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 				vtkIdType cptStencil = 0;
 				brushOutput->GetDimensions(dims);
-				cout << "Brut output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+				cout << "Rubber mask output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
 				int maskOn = this->Getmui_MaskOn();
 				int maskInside = this->Getmui_MaskInside();
 				for (int z = 0; z < dims[2]; z++)

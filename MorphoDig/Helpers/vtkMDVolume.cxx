@@ -1873,7 +1873,10 @@ void vtkMDVolume::SetImageData(vtkSmartPointer<vtkImageData> imgData)
 }
 void vtkMDVolume::SetDesiredMappedImageData()
 {
-	long long int numVox = this->myDim[0] * this->myDim[1]*this->myDim[2];
+	vtkIdType numVox = (vtkIdType) ((vtkIdType)this->myDim[0] * (vtkIdType)this->myDim[1]* (vtkIdType)this->myDim[2]);
+	cout << "................................................................................................" << endl;
+	cout << "Found numVox="<<numVox << " voxels"<<endl;
+	cout << "................................................................................................" << endl;
 	if (numVox > mqMorphoDigCore::instance()->Getmui_VolumeOutOfCoreThreshold())
 	{
 		//
