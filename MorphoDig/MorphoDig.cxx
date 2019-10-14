@@ -370,31 +370,48 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	
 
 	
-	auto projectWindow = new QMainWindow(this->tabWidget);
+	auto projectTabWindow = new QMainWindow(this->tabWidget);
 	
 	
 	//this
 	QWidget *projectTab = new QWidget();
 	QHBoxLayout *projectLayout = new QHBoxLayout;
-	projectLayout->addWidget(projectWindow);
+	projectLayout->addWidget(projectTabWindow);
 
 	projectTab->setLayout(projectLayout);
 	this->tabWidget->addTab(projectTab, "Project");
 
-
+	QWidget *segmentationTab = new QWidget();
+	QHBoxLayout *segmentationLayout = new QHBoxLayout;
+	auto segmentationTabWindow = new QMainWindow(this->tabWidget);
+	segmentationLayout->addWidget(segmentationTabWindow);
+	segmentationTab->setLayout(segmentationLayout);
+	//this->tabWidget->addTab(segmentationTab, "Segmentation");
+	//segmentationTab->setDisabled(true);
+	//auto projectTabWindow = new QMainWindow();
 	
-	//auto projectWindow = new QMainWindow();
-	
-	//this->mdiArea->addSubWindow(projectWindow);
+	//this->mdiArea->addSubWindow(projectTabWindow);
 
 	
 	
 #if VTK_MAJOR_VERSION<8	
 	this->qvtkWidget2 = new QVTKWidget();
+	this->segView1 = new QVTKWidget();
+	this->segView2 = new QVTKWidget();
+	this->segView3 = new QVTKWidget();
+	this->segView4 = new QVTKWidget();
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
 	this->qvtkWidget2 = new QVTKOpenGLWidget();	
+this->segView1 = new QVTKOpenGLWidget();
+this->segView2 = new QVTKOpenGLWidget();
+this->segView3 = new QVTKOpenGLWidget();
+this->segView4 = new QVTKOpenGLWidget();
 #else
 	this->qvtkWidget2 = new QVTKOpenGLNativeWidget();		
+	this->segView1= new QVTKOpenGLNativeWidget();
+	this->segView2 = new QVTKOpenGLNativeWidget();
+	this->segView3 = new QVTKOpenGLNativeWidget();
+	this->segView4 = new QVTKOpenGLNativeWidget();
 #endif
 	
 
@@ -405,33 +422,46 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	sizePolicy.setHeightForWidth(qvtkWidget2->sizePolicy().hasHeightForWidth());
 	qvtkWidget2->setSizePolicy(sizePolicy);
 	qvtkWidget2->setMinimumSize(QSize(300, 300));
-
+	this->segView1->setSizePolicy(sizePolicy);
+	this->segView1->setMinimumSize(QSize(200,200));
 		
-	projectWindow->setCentralWidget(qvtkWidget2);
-
+	projectTabWindow->setCentralWidget(qvtkWidget2);
+	QHBoxLayout *hLayout1 = new QHBoxLayout;
+	QHBoxLayout *hLayout2 = new QHBoxLayout;
+	QVBoxLayout *vLayout = new QVBoxLayout;
+	segmentationTabWindow->setLayout(vLayout);
+	hLayout1->addWidget(this->segView1);
+	hLayout1->addWidget(this->segView2);
+	hLayout2->addWidget(this->segView3);
+	hLayout2->addWidget(this->segView4);
+	vLayout->addItem(hLayout1);
+	vLayout->addItem(hLayout2);
 
 	/*auto dock1 = new QDockWidget("3D viewer");
 	dock1->setWidget(qvtkWidget2);
 	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);*/
 	
-	//projectWindow->setCentralWidget(dock1);
+	//projectTabWindow->setCentralWidget(dock1);
 	
 
 
-	//projectWindow->Maximise
-	projectWindow->showMaximized();
+	//projectTabWindow->Maximise
+
+	projectTabWindow->showMaximized();
+	segmentationTabWindow->showMaximized();
 	//auto mytree = new QTreeView(this->TabProject);
 	/*auto mytree = new QTreeView(this->tabWidget);
 	auto dock2 = new QDockWidget("Actors");
 	dock2->setWidget(mytree);
 	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
-	projectWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);*/
+	projectTabWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);*/
 
-	projectWindow->setWindowModality(Qt::WindowModal);
+	projectTabWindow->setWindowModality(Qt::WindowModal);
+	segmentationTabWindow->setWindowModality(Qt::WindowModal);
 	/*Qt::WindowFlags flags = windowFlags();
 	Qt::WindowFlags closeFlag = Qt::WindowCloseButtonHint;
 	flags = flags & (~closeFlag);
-	projectWindow->setWindowFlags(flags);*/
+	projectTabWindow->setWindowFlags(flags);*/
 
 	cout << "Try to set render window" << endl;
   auto window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
@@ -442,7 +472,13 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	vtkObject::GlobalWarningDisplayOff();
 	this->MorphoDigCore =  new mqMorphoDigCore();
 	this->MorphoDigCore->setQVTKWidget(this->qvtkWidget2);
-	MorphoDigCore->SetProjectWindow(projectWindow);
+	this->MorphoDigCore->setSegmentationView1(this->segView1);
+	this->MorphoDigCore->setSegmentationView2(this->segView2);
+	this->MorphoDigCore->setSegmentationView3(this->segView3);
+	this->MorphoDigCore->setSegmentationView4(this->segView4);
+
+	MorphoDigCore->SetProjectWindow(projectTabWindow);
+	MorphoDigCore->SetSegmentationWindow(segmentationTabWindow);
 	//window->AddRenderer(this->MorphoDigCore->getRenderer());
 	this->qvtkWidget2->SetRenderWindow(window);
 	this->qvtkWidget2->GetRenderWindow()->AddRenderer(this->MorphoDigCore->getRenderer());
@@ -954,10 +990,10 @@ MorphoDig::MorphoDig(QWidget *parent) : QMainWindow(parent) {
 	mqMorphoDigMenuBuilders::buildHelpMenu(*this->menuHelp);
 	mqMorphoDigMenuBuilders::buildToolbars(*this);
 	mqMorphoDigMenuBuilders::buildStatusBar(*this);
-	mqMorphoDigMenuBuilders::buildProjectDocks(*projectWindow);
+	mqMorphoDigMenuBuilders::buildProjectDocks(*projectTabWindow);
 	cout << "OpenGL version:" << this->MorphoDigCore->GetOpenGLVersion().toStdString() << endl;
 	cout << "About to build view Menu!" << endl;
-	mqMorphoDigMenuBuilders::buildViewMenu(*this->menuView, *this, *projectWindow);
+	mqMorphoDigMenuBuilders::buildViewMenu(*this->menuView, *this, *projectTabWindow);
 	cout << "View Menu built!" << endl;
 	
 

@@ -1,3 +1,4 @@
+include(InstallRequiredSystemLibraries)
 
 cmake_minimum_required(VERSION 2.8.8)
 if(POLICY CMP0020)
@@ -260,6 +261,13 @@ IF (WIN32)
     "${qtico}"                
     DESTINATION bin/imageformats
     COMPONENT applications)
+
+   INSTALL(
+	FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} 
+	DESTINATION bin/vc 
+	COMPONENT applications
+)
+
 ELSE()
   #TO DO FOR OTHER SYSTEMS
 # not sure if needed in VTK 8.1

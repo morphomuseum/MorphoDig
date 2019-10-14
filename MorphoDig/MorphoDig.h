@@ -89,10 +89,22 @@ private:
 	//
 #if VTK_MAJOR_VERSION<8
 	QVTKWidget *qvtkWidget2;
+	QVTKWidget *segView1;
+	QVTKWidget *segView2;
+	QVTKWidget *segView3;
+	QVTKWidget *segView4;
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
 	QVTKOpenGLWidget *qvtkWidget2;
+	QVTKOpenGLWidget *segView1;
+	QVTKOpenGLWidget *segView2;
+	QVTKOpenGLWidget *segView3;
+	QVTKOpenGLWidget *segView4;
 #else
 	QVTKOpenGLNativeWidget *qvtkWidget2;
+	QVTKOpenGLNativeWidget *segView1;
+	QVTKOpenGLNativeWidget *segView2;
+	QVTKOpenGLNativeWidget *segView3;
+	QVTKOpenGLNativeWidget *segView4;
 #endif
 	
 	

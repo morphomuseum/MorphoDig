@@ -805,8 +805,10 @@ public:
 	void SetMainWindow(QMainWindow *_mainWindow);
 	void InitStatusBar();
 	void SetProjectWindow(QMainWindow *_projectWindow);
+	void SetSegmentationWindow(QMainWindow *_segmentationWindow);
 	QMainWindow* GetMainWindow();
 	QMainWindow* GetProjectWindow();
+	QMainWindow* GetSegmentationWindow();
 	void LandmarksMoveUp();
 	void LandmarksPushBack();
 	void LandmarksReorient();
@@ -987,12 +989,36 @@ public:
 #if VTK_MAJOR_VERSION<8	  
   void setQVTKWidget(QVTKWidget *mqvtkWidget);
   QVTKWidget* getQVTKWidget();
+  void setSegmentationView1(QVTKWidget *mSegView1);
+  QVTKWidget* getSegmentationView1();
+  void setSegmentationView2(QVTKWidget *mSegView2);
+  QVTKWidget* getSegmentationView2();
+  void setSegmentationView3(QVTKWidget *mSegView3);
+  QVTKWidget* getSegmentationView3();
+  void setSegmentationView4(QVTKWidget *mSegView4);
+  QVTKWidget* getSegmentationView4();
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2 
   void setQVTKWidget(QVTKOpenGLWidget *mqvtkWidget);
   QVTKOpenGLWidget* getQVTKWidget();
+  void setSegmentationView1(QVTKOpenGLWidget *mSegView1);
+  QVTKOpenGLWidget* getSegmentationView1();
+  void setSegmentationView2(QVTKOpenGLWidget *mSegView2);
+  QVTKOpenGLWidget* getSegmentationView2();
+  void setSegmentationView3(QVTKOpenGLWidget *mSegView3);
+  QVTKOpenGLWidget* getSegmentationView3();
+  void setSegmentationView4(QVTKOpenGLWidget *mSegView4);
+  QVTKOpenGLWidget* getSegmentationView4();
 #else
  void setQVTKWidget(QVTKOpenGLNativeWidget *mqvtkWidget);
   QVTKOpenGLNativeWidget* getQVTKWidget();  
+  void setSegmentationView1(QVTKOpenGLNativeWidget *mSegView1);
+  QVTKOpenGLNativeWidget* getSegmentationView1();
+  void setSegmentationView2(QVTKOpenGLNativeWidget *mSegView2);
+  QVTKOpenGLNativeWidget* getSegmentationView2();
+  void setSegmentationView3(QVTKOpenGLNativeWidget *mSegView3);
+  QVTKOpenGLNativeWidget* getSegmentationView3();
+  void setSegmentationView4(QVTKOpenGLNativeWidget *mSegView4);
+  QVTKOpenGLNativeWidget* getSegmentationView4();
 #endif
 
  
@@ -1094,6 +1120,7 @@ protected:
 	vtkSmartPointer<vtkLMActor> LMActor2;
 	QMainWindow* MainWindow;
 	QMainWindow* ProjectWindow;
+	QMainWindow* SegmentationWindow;
 	//vtkUndoStack* UndoStack;
 	mqUndoStack* UndoStack;
 	//vtkSmartPointer<vtkUndoStack> UndoStack;
@@ -1279,10 +1306,22 @@ private:
 	
 #if VTK_MAJOR_VERSION<8	  	
 	QVTKWidget *qvtkWidget;
+	QVTKWidget *segView1;
+	QVTKWidget *segView2;
+	QVTKWidget *segView3;
+	QVTKWidget *segView4;
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2		
 	QVTKOpenGLWidget *qvtkWidget;
+	QVTKOpenGLWidget *segView1;
+	QVTKOpenGLWidget *segView2;
+	QVTKOpenGLWidget *segView3;
+	QVTKOpenGLWidget *segView4;
 #else
 	QVTKOpenGLNativeWidget *qvtkWidget;		
+	QVTKOpenGLNativeWidget *segView1;
+	QVTKOpenGLNativeWidget *segView2;
+	QVTKOpenGLNativeWidget *segView3;
+	QVTKOpenGLNativeWidget *segView4;
 #endif
 	int currentLassoMode;
 	int currentRubberMode;

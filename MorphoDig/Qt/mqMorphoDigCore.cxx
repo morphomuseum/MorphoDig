@@ -495,6 +495,52 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	this->qvtkWidget = mqvtkWidget;
 }
 
+
+#if VTK_MAJOR_VERSION<8	  	
+	void mqMorphoDigCore::setSegmentationView1(QVTKWidget *mSegView1)
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		void mqMorphoDigCore::setSegmentationView1(QVTKOpenGLWidget *mSegView1)
+#else
+	void mqMorphoDigCore::setSegmentationView1(QVTKOpenGLNativeWidget *mSegView1)
+#endif
+	{
+		this->segView1 = mSegView1;
+	}
+
+#if VTK_MAJOR_VERSION<8	  	
+	void mqMorphoDigCore::setSegmentationView2(QVTKWidget *mSegView2)
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		void mqMorphoDigCore::setSegmentationView2(QVTKOpenGLWidget *mSegView2)
+#else
+	void mqMorphoDigCore::setSegmentationView2(QVTKOpenGLNativeWidget *mSegView2)
+#endif
+	{
+		this->segView2 = mSegView2;
+	}
+
+#if VTK_MAJOR_VERSION<8	  	
+	void mqMorphoDigCore::setSegmentationView3(QVTKWidget *mSegView3)
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		void mqMorphoDigCore::setSegmentationView3(QVTKOpenGLWidget *mSegView3)
+#else
+	void mqMorphoDigCore::setSegmentationView3(QVTKOpenGLNativeWidget *mSegView3)
+#endif
+	{
+		this->segView3 = mSegView3;
+	}
+
+#if VTK_MAJOR_VERSION<8	  	
+	void mqMorphoDigCore::setSegmentationView4(QVTKWidget *mSegView4)
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		void mqMorphoDigCore::setSegmentationView4(QVTKOpenGLWidget *mSegView4)
+#else
+	void mqMorphoDigCore::setSegmentationView4(QVTKOpenGLNativeWidget *mSegView4)
+#endif
+	{
+		this->segView4 = mSegView4;
+	}
+
+
 #if VTK_MAJOR_VERSION<8	  	
 	QVTKWidget* mqMorphoDigCore::getQVTKWidget()
 #elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
@@ -503,6 +549,53 @@ mqMorphoDigCore::~mqMorphoDigCore()
 	QVTKOpenGLNativeWidget* mqMorphoDigCore::getQVTKWidget()
 #endif
 { return this->qvtkWidget; }
+
+
+#if VTK_MAJOR_VERSION<8	  	
+	QVTKWidget* mqMorphoDigCore::getSegmentationView1()
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		QVTKOpenGLWidget* mqMorphoDigCore::getSegmentationView1()
+#else
+	QVTKOpenGLNativeWidget* mqMorphoDigCore::getSegmentationView1()
+#endif
+	{
+		return this->segView1;
+	}
+
+#if VTK_MAJOR_VERSION<8	  	
+	QVTKWidget* mqMorphoDigCore::getSegmentationView2()
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		QVTKOpenGLWidget* mqMorphoDigCore::getSegmentationView2()
+#else
+	QVTKOpenGLNativeWidget* mqMorphoDigCore::getSegmentationView2()
+#endif
+	{
+		return this->segView2;
+	}
+
+#if VTK_MAJOR_VERSION<8	  	
+	QVTKWidget* mqMorphoDigCore::getSegmentationView3()
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		QVTKOpenGLWidget* mqMorphoDigCore::getSegmentationView3()
+#else
+	QVTKOpenGLNativeWidget* mqMorphoDigCore::getSegmentationView3()
+#endif
+	{
+		return this->segView3;
+	}
+
+#if VTK_MAJOR_VERSION<8	  	
+	QVTKWidget* mqMorphoDigCore::getSegmentationView4()
+		#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+		QVTKOpenGLWidget* mqMorphoDigCore::getSegmentationView4()
+#else
+	QVTKOpenGLNativeWidget* mqMorphoDigCore::getSegmentationView4()
+#endif
+	{
+		return this->segView4;
+	}
+
+
 void mqMorphoDigCore::SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle)
 {
 	this->Style = mStyle;
@@ -21790,9 +21883,19 @@ QMainWindow* mqMorphoDigCore::GetMainWindow() {
 void mqMorphoDigCore::SetProjectWindow(QMainWindow *_projectWindow)
 {
 	this->ProjectWindow = _projectWindow;
+
+}
+void mqMorphoDigCore::SetSegmentationWindow(QMainWindow *_segmentationWindow)
+{
+	this->SegmentationWindow = _segmentationWindow;
+
 }
 QMainWindow* mqMorphoDigCore::GetProjectWindow() {
 	return this->ProjectWindow;
+}
+
+QMainWindow* mqMorphoDigCore::GetSegmentationWindow() {
+	return this->SegmentationWindow;
 }
 //Called to repplace camera and grid positions when switching from "orange grid mode" to "blue grid mode"
 //= when camera focalpoint and grid center are changed between 0,0,0 and COM of all opened meshes.
