@@ -18,6 +18,7 @@
 #include "QRAMThread.h"
 #include "vtkOrientationHelperWidget.h"
 #include "vtkMDActorCollection.h"
+#include <vtkImageViewer2.h>
 #include "vtkMDVolumeCollection.h"
 #include "vtkBezierCurveSource.h"
 #include "vtkLMActorCollection.h"
@@ -1021,7 +1022,12 @@ public:
   QVTKOpenGLNativeWidget* getSegmentationView4();
 #endif
 
+  void setSegViewer1(vtkSmartPointer< vtkImageViewer2> mSegViewer1);
+  void setSegViewer2(vtkSmartPointer< vtkImageViewer2> mSegViewer2);
+  void setSegViewer3(vtkSmartPointer< vtkImageViewer2> mSegViewer3);
  
+
+
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarGreyScaleLut();
@@ -1121,6 +1127,10 @@ protected:
 	QMainWindow* MainWindow;
 	QMainWindow* ProjectWindow;
 	QMainWindow* SegmentationWindow;
+	vtkSmartPointer< vtkImageViewer2 > segViewer1;
+	vtkSmartPointer< vtkImageViewer2 > segViewer2;
+	vtkSmartPointer< vtkImageViewer2 > segViewer3;
+	
 	//vtkUndoStack* UndoStack;
 	mqUndoStack* UndoStack;
 	//vtkSmartPointer<vtkUndoStack> UndoStack;

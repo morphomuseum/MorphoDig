@@ -540,6 +540,21 @@ mqMorphoDigCore::~mqMorphoDigCore()
 		this->segView4 = mSegView4;
 	}
 
+	void mqMorphoDigCore::setSegViewer1(vtkSmartPointer< vtkImageViewer2> mSegViewer1)
+	{
+		this->segViewer1 = mSegViewer1;
+		
+	}
+	void mqMorphoDigCore::setSegViewer2(vtkSmartPointer< vtkImageViewer2> mSegViewer2)
+	{
+		this->segViewer2 = mSegViewer2;
+
+	}
+	void mqMorphoDigCore::setSegViewer3(vtkSmartPointer< vtkImageViewer2> mSegViewer3)
+	{
+		this->segViewer3 = mSegViewer3;
+
+	}
 
 #if VTK_MAJOR_VERSION<8	  	
 	QVTKWidget* mqMorphoDigCore::getQVTKWidget()
@@ -6816,6 +6831,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 			{
 				//cout << "Try visualize!!!" << endl;
 
+				this->segViewer1->SetInputData(input);
+				this->segViewer1->SetSliceOrientationToXY();
+				this->segView1->show();
+				this->segViewer2->SetInputData(input);
+				this->segViewer2->SetSliceOrientationToYZ();
+				this->segView2->show();
+				this->segViewer3->SetInputData(input);
+				this->segViewer3->SetSliceOrientationToXZ();
+				this->segView3->show();
 				vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 				vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 				//vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer <vtkColorTransferFunction>::New();

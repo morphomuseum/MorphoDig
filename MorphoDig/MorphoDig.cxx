@@ -22,6 +22,8 @@
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
 #include "vtkMDInteractorStyle.h"
+#include <vtkImageViewer2.h>
+
 
 //#include "vtkMDLassoInteractorStyle.h"
 #include "vtkMDActorCollection.h"
@@ -422,14 +424,20 @@ this->segView4 = new QVTKOpenGLWidget();
 	sizePolicy.setHeightForWidth(qvtkWidget2->sizePolicy().hasHeightForWidth());
 	qvtkWidget2->setSizePolicy(sizePolicy);
 	qvtkWidget2->setMinimumSize(QSize(300, 300));
-	this->segView1->setSizePolicy(sizePolicy);
+	//this->segView1->setSizePolicy(sizePolicy);
 	this->segView1->setMinimumSize(QSize(200,200));
-		
+	
 	projectTabWindow->setCentralWidget(qvtkWidget2);
+	QWidget *segCentralWidget = new QWidget;
+
+	segmentationTabWindow->setCentralWidget(segCentralWidget);
 	QHBoxLayout *hLayout1 = new QHBoxLayout;
 	QHBoxLayout *hLayout2 = new QHBoxLayout;
 	QVBoxLayout *vLayout = new QVBoxLayout;
-	segmentationTabWindow->setLayout(vLayout);
+	//QGridLayout *gLayout = new QGridLayout;
+
+	//segmentationLayout
+	//segmentationLayout->addWidget(this->segView1);
 	hLayout1->addWidget(this->segView1);
 	hLayout1->addWidget(this->segView2);
 	hLayout2->addWidget(this->segView3);
@@ -437,6 +445,15 @@ this->segView4 = new QVTKOpenGLWidget();
 	vLayout->addItem(hLayout1);
 	vLayout->addItem(hLayout2);
 
+	//segmentationTabWindow->setLayout(vLayout);
+	cout << "Try that???" << endl;
+	segCentralWidget->setLayout(vLayout);
+	/*gLayout->addWidget(this->segView1);
+	gLayout->addWidget(this->segView2);
+	gLayout->addWidget(this->segView3);
+	gLayout->addWidget(this->segView4);*/
+
+	//this->segView1->show();
 	/*auto dock1 = new QDockWidget("3D viewer");
 	dock1->setWidget(qvtkWidget2);
 	dock1->setAllowedAreas(Qt::AllDockWidgetAreas);*/
@@ -448,7 +465,8 @@ this->segView4 = new QVTKOpenGLWidget();
 	//projectTabWindow->Maximise
 
 	projectTabWindow->showMaximized();
-	segmentationTabWindow->showMaximized();
+	//segmentationTabWindow->showMaximized();
+	
 	//auto mytree = new QTreeView(this->TabProject);
 	/*auto mytree = new QTreeView(this->tabWidget);
 	auto dock2 = new QDockWidget("Actors");
@@ -457,7 +475,7 @@ this->segView4 = new QVTKOpenGLWidget();
 	projectTabWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);*/
 
 	projectTabWindow->setWindowModality(Qt::WindowModal);
-	segmentationTabWindow->setWindowModality(Qt::WindowModal);
+	//segmentationTabWindow->setWindowModality(Qt::WindowModal);
 	/*Qt::WindowFlags flags = windowFlags();
 	Qt::WindowFlags closeFlag = Qt::WindowCloseButtonHint;
 	flags = flags & (~closeFlag);
@@ -465,6 +483,22 @@ this->segView4 = new QVTKOpenGLWidget();
 
 	cout << "Try to set render window" << endl;
   auto window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+  auto segrenwindow1 = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+  auto segrenwindow2 = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+  auto segrenwindow3 = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+
+  vtkSmartPointer< vtkImageViewer2> segViewer1 = vtkSmartPointer< vtkImageViewer2>::New();
+  vtkSmartPointer< vtkImageViewer2> segViewer2 = vtkSmartPointer< vtkImageViewer2>::New();
+  vtkSmartPointer< vtkImageViewer2> segViewer3 = vtkSmartPointer< vtkImageViewer2>::New();
+
+  segViewer1->SetRenderWindow(segrenwindow1);
+  segViewer2->SetRenderWindow(segrenwindow2);
+  segViewer3->SetRenderWindow(segrenwindow3);
+
+ /* riw[i] = vtkSmartPointer< vtkResliceImageViewer >::New();
+    vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
+    riw[i]->SetRenderWindow(renderWindow);*/
+
 
   cout << "Set render window done" << endl;
   
@@ -477,8 +511,20 @@ this->segView4 = new QVTKOpenGLWidget();
 	this->MorphoDigCore->setSegmentationView3(this->segView3);
 	this->MorphoDigCore->setSegmentationView4(this->segView4);
 
+	this->segView1->SetRenderWindow(segViewer1->GetRenderWindow());
+	segViewer1->SetupInteractor(this->segView1->GetRenderWindow()->GetInteractor());
+
+	this->segView2->SetRenderWindow(segViewer2->GetRenderWindow());
+	segViewer2->SetupInteractor(this->segView2->GetRenderWindow()->GetInteractor());
+	this->segView3->SetRenderWindow(segViewer3->GetRenderWindow());
+	segViewer3->SetupInteractor(this->segView3->GetRenderWindow()->GetInteractor());
+
+	MorphoDigCore->setSegViewer1(segViewer1);
+	MorphoDigCore->setSegViewer2(segViewer2);
+	MorphoDigCore->setSegViewer3(segViewer3);
+
 	MorphoDigCore->SetProjectWindow(projectTabWindow);
-	MorphoDigCore->SetSegmentationWindow(segmentationTabWindow);
+	//MorphoDigCore->SetSegmentationWindow(segmentationTabWindow);
 	//window->AddRenderer(this->MorphoDigCore->getRenderer());
 	this->qvtkWidget2->SetRenderWindow(window);
 	this->qvtkWidget2->GetRenderWindow()->AddRenderer(this->MorphoDigCore->getRenderer());
