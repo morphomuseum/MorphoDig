@@ -446,12 +446,9 @@ this->segView4 = new QVTKOpenGLWidget();
 	vLayout->addItem(hLayout2);
 
 	//segmentationTabWindow->setLayout(vLayout);
-	cout << "Try that???" << endl;
+	
 	segCentralWidget->setLayout(vLayout);
-	/*gLayout->addWidget(this->segView1);
-	gLayout->addWidget(this->segView2);
-	gLayout->addWidget(this->segView3);
-	gLayout->addWidget(this->segView4);*/
+	
 
 	//this->segView1->show();
 	/*auto dock1 = new QDockWidget("3D viewer");
@@ -494,6 +491,9 @@ this->segView4 = new QVTKOpenGLWidget();
   segViewer1->SetRenderWindow(segrenwindow1);
   segViewer2->SetRenderWindow(segrenwindow2);
   segViewer3->SetRenderWindow(segrenwindow3);
+  segViewer1->GetRenderer()->SetBackground(0.3, 0, 0);
+  segViewer2->GetRenderer()->SetBackground(0,0.3, 0);
+  segViewer3->GetRenderer()->SetBackground(0, 0, 0.3);
 
  /* riw[i] = vtkSmartPointer< vtkResliceImageViewer >::New();
     vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;

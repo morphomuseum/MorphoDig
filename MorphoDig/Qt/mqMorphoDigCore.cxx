@@ -6833,6 +6833,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 
 				this->segViewer1->SetInputData(input);
 				this->segViewer1->SetSliceOrientationToXY();
+				
 				this->segView1->show();
 				this->segViewer2->SetInputData(input);
 				this->segViewer2->SetSliceOrientationToYZ();
