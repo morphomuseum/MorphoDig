@@ -108,7 +108,7 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define M_PRESSED 7
 #define M_RELEASED 8
 
-//#define SHIFT_PRESSED 9
+#define SHIFT_PRESSED 9
 #define SHIFT_RELEASED 10
 
 #define VTK_CREATE(type, name) \
@@ -1436,7 +1436,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 
 	  if (key.compare("Shift") == 0)
 	  {
-		  this->Ctrl = SHIFT_RELEASED;
+		  this->Shift = SHIFT_RELEASED;
 		  this->L = L_RELEASED;
 		  // std::cout << key << "Released" << '\n';
 	  }

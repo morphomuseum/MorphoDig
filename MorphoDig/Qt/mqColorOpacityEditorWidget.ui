@@ -403,7 +403,7 @@
   <customwidget>
    <class>mqHistogramWidget</class>
    <extends>QWidget</extends>
-   <header>mqhistogramwidget.h</header>
+   <header>mqHistogramWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
