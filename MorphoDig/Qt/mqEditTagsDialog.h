@@ -11,7 +11,8 @@
 #include "vtkLMActorCollection.h"
 #include <vtkSmartPointer.h>
 #include <QDialog>
-
+#include <QTableWidgetItem>
+#include <QSpinBox>
 
 
 namespace Ui

@@ -29,6 +29,8 @@ public:
   */
   static void showSaveCURasVERDialog();
 
+	
+
 protected:
   /**
   * Called when the action is triggered.

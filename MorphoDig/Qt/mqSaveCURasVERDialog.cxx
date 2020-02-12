@@ -19,8 +19,8 @@
 #include <QFileDialog>
 #include <QCheckBox>
 #include <QHeaderView>
-
-
+#include <QTableWidgetItem>
+#include <QSpinBox>
 #include <sstream>
 
 // Check windows
@@ -56,9 +56,20 @@ mqSaveCURasVERDialog::mqSaveCURasVERDialog(QWidget* Parent)
  
  this->Ui->CUROnly->setChecked(true);
  this->Ui->VER->setChecked(true);
- this->Ui->Decimation->setValue(20);  // Should connect...
+ this->Ui->defaultDecimation->setValue(mqMorphoDigCore::instance()->Getmui_SegmentDecimation());  //connecter à un slot qui veuile bien 
+
+ QHeaderView *header = this->Ui->tableWidget->horizontalHeader();
+ header->setSectionResizeMode(QHeaderView::Stretch);
+
+ 
+
+ 
+ this->RefreshDecimationTable();
   
+ 
+ connect(this->Ui->defaultDecimation, SIGNAL(valueChanged(int)), this, SLOT(slotDefaultDecimationChanged(int)));
  connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveCURasVERFile()));
+ connect(this->Ui->reinitializeSegments, SIGNAL(pressed()), this, SLOT(slotReinitializeSegments()));
 
 }
 
@@ -73,6 +84,129 @@ mqSaveCURasVERDialog::~mqSaveCURasVERDialog()
 	
   delete this->Ui;
 }
+
+void mqSaveCURasVERDialog::updateDecimation(int row, int newdecimation)
+{
+	int numStoredDecimations = (int)mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.size();
+	if (row > numStoredDecimations)
+	{
+		cout << "numSegs > numStoredDecimations" << endl;
+		int to_complete = row - numStoredDecimations;
+		for (int i = 0; i < to_complete; i++)
+		{
+			cout << "push_back" << i << endl;
+			mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.push_back(mqMorphoDigCore::instance()->Getmui_SegmentDecimation());
+		}
+
+	}
+	mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation[row] = newdecimation;
+	
+	
+}
+
+void mqSaveCURasVERDialog::slotReinitializeSegments()
+{
+	this->RefreshDecimationTable(1);
+}
+void mqSaveCURasVERDialog::slotDecimationChanged(int newdecimation)
+{
+
+	QSpinBox *sb = (QSpinBox*)sender();
+	for (int i = 0; i < this->Ui->tableWidget->rowCount(); i++)
+	{
+
+		int j = 1; // column 2 = segment decimation
+		if (this->Ui->tableWidget->cellWidget(i, j) ==sb )
+		{
+			cout << "New decimation at row " << i << ", value=" << newdecimation << endl;
+			this->updateDecimation(i, newdecimation);
+		}
+	}
+}
+void mqSaveCURasVERDialog::slotDefaultDecimationChanged(int newdecimation)
+{
+	mqMorphoDigCore::instance()->Setmui_SegmentDecimation(newdecimation);
+}
+void mqSaveCURasVERDialog::RefreshDecimationTable(int toDefault)
+{
+	//toDefault = 0 => all values set to "Default Decimation".
+	//otherwise => populate with SegmentDecimations global table
+
+	SignalBlocker2 tagTableSignalBlocker(this->Ui->tableWidget); //blocks signals when populating the table! Blocking will stop 
+	this->Ui->tableWidget->clear();
+	this->Ui->tableWidget->setColumnCount(2);
+
+	QTableWidgetItem *header1 = new QTableWidgetItem();
+	header1->setText("Segment");
+	this->Ui->tableWidget->setHorizontalHeaderItem(0, header1);
+	QTableWidgetItem *header2 = new QTableWidgetItem();
+	header2->setText("Landmark number");
+	this->Ui->tableWidget->setHorizontalHeaderItem(1, header2);
+	
+	int numSegs = mqMorphoDigCore::instance()->GetNumberOfCurveSegments();
+	int numStoredDecimations = mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.size();
+	
+	
+	
+	if (numSegs > 0)
+	{
+		this->Ui->tableWidget->setRowCount(numSegs);
+		if (numSegs > numStoredDecimations)
+		{
+			cout << "numSegs > numStoredDecimations" << endl;
+			int to_complete = numSegs - numStoredDecimations;
+			for (int i=0; i<to_complete; i++)
+			{
+				cout << "push_back" << i << endl;
+				mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.push_back(mqMorphoDigCore::instance()->Getmui_SegmentDecimation());
+			}
+		}
+	}
+	QSpinBox *dcmSB;
+	for (int i = 0; i < mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.size(); i++) {
+		
+		
+		//int dcm = (int)(100 * DCMTable->GetTableValue(i));
+		
+		dcmSB = new QSpinBox();
+		dcmSB->setMinimum(2);
+		dcmSB->setMaximum(100);
+		if (toDefault == 0)
+		{
+			dcmSB->setValue(mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.at(i));
+		}
+		else
+		{
+			int dcm = mqMorphoDigCore::instance()->Getmui_SegmentDecimation();
+			dcmSB->setValue(dcm);
+			mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation[i] = dcm;
+
+		}
+
+		QTableWidgetItem *item2 = new QTableWidgetItem;
+		item2->setFlags(item2->flags() | Qt::ItemIsEditable);
+		QString SegName = "Segment " + QString::number(i+1);
+		item2->setText(SegName);
+
+
+		this->Ui->tableWidget->setItem(i, 0, item2); // TAG NAME
+													 //this->Ui->tableWidget->setCellWidget(i, 1, nom);
+
+		this->Ui->tableWidget->setCellWidget(i, 1, dcmSB); //DCM value
+		
+		
+		connect(dcmSB, SIGNAL(valueChanged(int)), this, SLOT(slotDecimationChanged(int)));
+
+
+	}
+	cout << "Done..." << endl;
+
+}
+
+
+
+
+
 void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 {
 	cout << "Export Cur as Landmarks !" << endl;
@@ -144,7 +278,7 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 	else if (this->Ui->PTS->isChecked()) { save_format = 2; }
 	else if (this->Ui->TPS->isChecked()) { save_format = 3; }
 	if (this->Ui->All->isChecked()) { save_other_lmks = 1; }
-	int decimation = this->Ui->Decimation->value();
+	int decimation = this->Ui->defaultDecimation->value();
 
 	mqMorphoDigCore::instance()->SaveCURasVERFile(fileName, decimation, save_format, save_other_lmks);
 

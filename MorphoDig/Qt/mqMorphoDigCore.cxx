@@ -221,6 +221,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->ScalarRainbowLut = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->ScalarGreyScaleLut = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	
+	this->mui_SegmentDecimations = new SegmentDecimations;
+	this->mui_DefaultSegmentDecimation = this->mui_SegmentDecimation = 15;
 	this->mui_ActiveColorMap = new ActiveColorMap;
 	this->mui_ExistingColorMaps = new ExistingColorMaps;
 	this->mui_ActiveTagMap = new ActiveTagMap;
@@ -458,6 +460,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 mqMorphoDigCore::~mqMorphoDigCore()
 {
 	//this->ActorCollection->Delete();
+	this->mui_SegmentDecimations->decimation.clear();
+	delete this->mui_SegmentDecimations;
 	this->mui_ExistingArrays->Stack.clear();
 	delete this->mui_ExistingArrays;
 	this->mui_ArrayList->Stack.clear();
@@ -977,6 +981,20 @@ void mqMorphoDigCore::ChangeBackfaceCulling() {
 	int Getmui_DefaultVolumeDisplaySlice();
 	void Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice);*/
 
+
+
+int mqMorphoDigCore::Getmui_DefaultSegmentDecimation()
+{
+	return this->mui_DefaultSegmentDecimation;
+}
+int mqMorphoDigCore::Getmui_SegmentDecimation()
+{
+	return this->mui_SegmentDecimation;
+}
+void mqMorphoDigCore::Setmui_SegmentDecimation(int decimation)
+{
+	this->mui_SegmentDecimation = decimation;
+}
 
 void mqMorphoDigCore::Setmui_RendererOcclusionRatio(double ratio) { this->mui_RendererOcclusionRatio = ratio;}
 void mqMorphoDigCore::Setmui_RendererMaximalNumberOfPeels(int numpeels){ this->mui_RendererMaximalNumberOfPeels = numpeels; }
@@ -10502,9 +10520,475 @@ int mqMorphoDigCore::SaveSTVFile(QString fileName, int save_only_selected)
 
 }
 
+int mqMorphoDigCore::GetNumberOfCurveSegments()
+{
+	int tot_num_seg = 0;
+	vtkLMActor *Node;
+	Node = this->NodeLandmarkCollection->GetLandmarkAfter(0);
+	while (Node != NULL)
+	{
+		if (Node->GetLMNodeType() == STARTING_NODE || Node->GetLMNodeType() == MILESTONE_NODE) { tot_num_seg++; }
+		int ind = Node->GetLMNumber();
+		Node= this->NodeLandmarkCollection->GetLandmarkAfter(ind);
+		
+	}
+	return tot_num_seg;
+}
+int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks)
+{
+	std::string VERext = ".ver";
+	std::string VERext2 = ".VER";
+	std::string LMKext = ".lmk";
+	std::string LMKext2 = ".LMK";
+	std::string TPSext = ".tps";
+	std::string TPSext2 = ".TPS";
+	std::string PTSext = ".pts";
+	std::string PTSext2 = ".PTS";
 
+	if (save_format == 0)
+	{
+		std::size_t found = fileName.toStdString().find(VERext);
+		std::size_t found2 = fileName.toStdString().find(VERext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".ver");
+		}
+	}
+	else if (save_format == 1)
+	{
+		std::size_t found = fileName.toStdString().find(LMKext);
+		std::size_t found2 = fileName.toStdString().find(LMKext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".lmk");
+		}
+	}
+	else if (save_format == 2)
+	{
+		std::size_t found = fileName.toStdString().find(PTSext);
+		std::size_t found2 = fileName.toStdString().find(PTSext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".pts");
+		}
+	}
+	else
+	{
+		std::size_t found = fileName.toStdString().find(TPSext);
+		std::size_t found2 = fileName.toStdString().find(TPSext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".tps");
+		}
+	}
+	//Combien de landmarks au total (besoin pour les formats TPS et PTS) en comptant les curves!
+	// combien de segments:
+
+	int tot_num_seg = this->GetNumberOfCurveSegments();
+	int tot_lm_number = 0;
+	for (int i = 0; i < tot_num_seg; i++)
+	{
+		if (i < this->Getmui_SegmentDecimations()->decimation.size()) // just in case decimation size does not match the number of segments!!!
+		{
+			tot_lm_number += this->Getmui_SegmentDecimations()->decimation.at(i);
+		}
+		else
+		{
+			tot_lm_number += default_decimation;
+		}
+
+	}
+	if (save_other_lmks == 1)
+	{
+		tot_lm_number += this->getNormalLandmarkCollection()->GetNumberOfItems() + this->getTargetLandmarkCollection()->GetNumberOfItems();
+	}
+	cout << "tot_lm_number=" << tot_lm_number << endl;
+
+	vtkIdType ci = 0;
+	std::string csi = "00";
+	std::string lsi = "00";
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+		if (save_format == 2)
+		{
+			stream << "Version 1.0" << endl;
+			stream << tot_lm_number << endl;
+		}
+		else if (save_format == 3)
+		{
+			stream << "LM=" << tot_lm_number << endl;
+		}
+
+		if (save_other_lmks == 1)
+		{
+			vtkLMActor  * normal, *target;
+			int num_normal = this->getNormalLandmarkCollection()->GetNumberOfItems();
+
+			if (num_normal > 0)
+			{
+				normal = this->getNormalLandmarkCollection()->GetLandmarkAfter(0);
+
+
+				while (normal != NULL)
+				{
+					int ind = normal->GetLMNumber();
+					double lmpos[3];
+					normal->GetLMOrigin(lmpos);
+					double ori[3];
+					normal->GetLMOrientation(ori);
+					double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
+
+					if (save_format == 0)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+					}
+					else if (save_format == 1)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 2)
+					{
+						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 3)
+					{
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					ci++;
+					if (ci < 10) { csi = "00"; }
+					else if (ci < 100) { csi = "0"; }
+					else { csi = ""; }
+					normal = this->getNormalLandmarkCollection()->GetLandmarkAfter(ind);
+				}
+
+			}
+
+			int num_target = this->getTargetLandmarkCollection()->GetNumberOfItems();
+			if (num_target > 0)
+			{
+				target = this->getTargetLandmarkCollection()->GetLandmarkAfter(0);
+				while (target != NULL)
+				{
+					int ind = target->GetLMNumber();
+					double lmpos[3];
+					target->GetLMOrigin(lmpos);
+					double ori[3];
+					target->GetLMOrientation(ori);
+					double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
+
+					if (save_format == 0)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+					}
+					else if (save_format == 1)
+					{
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 2)
+					{
+						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					else if (save_format == 3)
+					{
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					}
+					ci++;
+					if (ci < 10) { csi = "00"; }
+					else if (ci < 100) { csi = "0"; }
+					else { csi = ""; }
+					target = this->getTargetLandmarkCollection()->GetLandmarkAfter(ind);
+				}
+			}
+		}
+
+		vtkSmartPointer<vtkLMActorCollection> Nodes = vtkSmartPointer<vtkLMActorCollection>::New();
+		vtkSmartPointer<vtkLMActorCollection> Handles = vtkSmartPointer<vtkLMActorCollection>::New();
+		Nodes = this->NodeLandmarkCollection;
+		Handles = this->HandleLandmarkCollection;
+
+		//START
+		double length = 0;
+
+
+		//cout << "Export curves!" << endl;
+		// First a rigid line between node landmarks.
+		if (Nodes == NULL)
+		{
+			return 0;
+		}
+
+
+
+		vtkLMActor  * ob_H1, *ob_H2, *ob_N1, *ob_N2, *ob_Nstart, *ob_Hstart, *ob_HA, *ob_HB, *ob_NA, *ob_NB;
+		ob_H1 = NULL;
+		ob_N1 = NULL;
+		ob_H2 = NULL;
+		ob_N2 = NULL;
+		ob_Hstart = NULL;
+		ob_Nstart = NULL;
+		ob_NA = NULL;
+		ob_NB = NULL;
+		ob_HA = NULL;
+		ob_HB = NULL;
+
+
+		int k, m, num_seg, ind, ind2, indh, indh2;
+		int nint = 1002; // will iterate nint , to draw nint+1 lines, that is nint+2 points
+		double t, t2;
+
+
+		int num_landmark_H = Handles->GetNumberOfItems();
+		int num_landmark_N = Nodes->GetNumberOfItems();
+		int nbp = num_landmark_H;
+		double  nn1[3], nn2[3], hh1[3], hh2[3], intvv[3], intvv2[3], slm[3];
+
+		int new_segment = 0;
+		t2 = 0;
+		double preceding_length = 0;
+		double current_length = 0;
+		int decimation_index = 0;
+		double length_to_reach = 0;
+		double total_length = this->getBezierCurveSource()->GetCurveSegmentLength(1);
+
+
+		int print = 0;
+		num_seg = 0;
+		//if (num_landmark_T == num_landmark_N && num_landmark_T >0)
+		csi = "000";
+		lsi = "000";
+		int decimation = default_decimation;
+		if (this->Getmui_SegmentDecimations()->decimation.size()>0)
+		{
+			decimation = this->Getmui_SegmentDecimations()->decimation.at(0);
+		}
+
+		if (decimation > 1 && decimation < nint)
+		{
+
+			int cpt = 0;
+			//cout << "here" << endl;
+			ob_H1 = Handles->GetLandmarkAfter(0);
+			ob_Hstart = ob_H1;
+			ob_H2 = Handles->GetLandmarkAfter(ob_H1->GetLMNumber());
+			ob_N1 = Nodes->GetLandmarkAfter(0);
+			ob_Nstart = ob_N1;
+			ob_N2 = Nodes->GetLandmarkAfter(ob_N1->GetLMNumber());
+			k = 0;
+
+			while (ob_N1 != NULL && ob_H1 != NULL)
+			{
+
+				//stop drawing if the second point is a "start" of a new curve
+				if (ob_N1->GetLMNodeType() == STARTING_NODE) {
+					if (this->Getmui_SegmentDecimations()->decimation.size() > num_seg)
+					{
+						decimation = this->Getmui_SegmentDecimations()->decimation.at(num_seg);
+					}
+					else
+					{
+						decimation = default_decimation;
+					}
+					num_seg++;
+					//	cout << "num_seg:" << num_seg << endl;
+					t2 = 0;
+					length_to_reach = 0;
+					current_length = 0;
+					preceding_length = 0;
+					decimation_index = 0;
+					total_length = this->getBezierCurveSource()->GetCurveSegmentLength(num_seg);
+				}
+				if (ob_N1->GetLMNodeType() == MILESTONE_NODE) {
+					if (this->Getmui_SegmentDecimations()->decimation.size() > num_seg)
+					{
+						decimation = this->Getmui_SegmentDecimations()->decimation.at(num_seg);
+					}
+					else
+					{
+						decimation = default_decimation;
+					}
+					num_seg++;
+					//	cout << "num_seg:" << num_seg << endl;
+					t2 = 0;
+					length_to_reach = 0;
+					current_length = 0;
+					preceding_length = 0;
+					decimation_index = 0;
+					total_length = this->getBezierCurveSource()->GetCurveSegmentLength(num_seg);
+				}
+
+
+				if (ob_N1->GetLMNodeType() == CONNECT_NODE) // in that case we should connect that node to the preceding starting point
+				{
+					ob_NA = ob_N1;
+					ob_NB = ob_Nstart;
+					ob_HA = ob_H1;
+					ob_HB = ob_Hstart;
+
+				}
+				else
+				{
+					ob_NA = ob_N1;
+					ob_HA = ob_H1;
+					ob_NB = ob_N2;
+					ob_HB = ob_H2;
+				}
+
+				if (ob_NB != NULL && ob_HB != NULL)
+				{
+					vtkMatrix4x4 *MatNA = ob_NA->GetMatrix();
+					nn1[0] = MatNA->GetElement(0, 3);
+					nn1[1] = MatNA->GetElement(1, 3);
+					nn1[2] = MatNA->GetElement(2, 3);
+
+					vtkMatrix4x4 *MatNB = ob_NB->GetMatrix();
+					nn2[0] = MatNB->GetElement(0, 3);
+					nn2[1] = MatNB->GetElement(1, 3);
+					nn2[2] = MatNB->GetElement(2, 3);
+
+					vtkMatrix4x4 *MatHA = ob_HA->GetMatrix();
+					hh1[0] = MatHA->GetElement(0, 3);
+					hh1[1] = MatHA->GetElement(1, 3);
+					hh1[2] = MatHA->GetElement(2, 3);
+
+					vtkMatrix4x4 *MatHB = ob_HB->GetMatrix();
+					hh2[0] = MatHB->GetElement(0, 3);
+					hh2[1] = MatHB->GetElement(1, 3);
+					hh2[2] = MatHB->GetElement(2, 3);
+
+					//trick : second handle is mirrored relative to the second point!
+					hh2[0] = nn2[0] - (hh2[0] - nn2[0]);
+					hh2[1] = nn2[1] - (hh2[1] - nn2[1]);
+					hh2[2] = nn2[2] - (hh2[2] - nn2[2]);
+
+					// At this stage : we have all the input we need!
+					// Just draw the Bezier curve between nn1 and nn2
+
+					int compute = 1;
+
+					if (ob_NA->GetLMNodeType() == NORMAL_NODE && ob_NB->GetLMNodeType() == STARTING_NODE) { compute = 0; }
+
+					if (compute == 1)
+					{
+
+						for (m = 0; m <= nint; m++)
+						{
+							// t is [0.. 1]
+							t = (((double)m)) / (((double)nint + 1));
+							// glBegin(GL_LINES);
+							intvv[0] = (1 - t)*(1 - t)*(1 - t)*nn1[0] + 3 * (1 - t)*(1 - t)*t*hh1[0] + 3 * (1 - t)*t*t*hh2[0] + t * t*t*nn2[0];
+							intvv[1] = (1 - t)*(1 - t)*(1 - t)*nn1[1] + 3 * (1 - t)*(1 - t)*t*hh1[1] + 3 * (1 - t)*t*t*hh2[1] + t * t*t*nn2[1];
+							intvv[2] = (1 - t)*(1 - t)*(1 - t)*nn1[2] + 3 * (1 - t)*(1 - t)*t*hh1[2] + 3 * (1 - t)*t*t*hh2[2] + t * t*t*nn2[2];
+							// glVertex3d(intvv[0], intvv[1], intvv[2]);
+
+
+							t = (((double)m + 1)) / (((double)nint + 1));
+							intvv2[0] = (1 - t)*(1 - t)*(1 - t)*nn1[0] + 3 * (1 - t)*(1 - t)*t*hh1[0] + 3 * (1 - t)*t*t*hh2[0] + t * t*t*nn2[0];
+							intvv2[1] = (1 - t)*(1 - t)*(1 - t)*nn1[1] + 3 * (1 - t)*(1 - t)*t*hh1[1] + 3 * (1 - t)*t*t*hh2[1] + t * t*t*nn2[1];
+							intvv2[2] = (1 - t)*(1 - t)*(1 - t)*nn1[2] + 3 * (1 - t)*(1 - t)*t*hh1[2] + 3 * (1 - t)*t*t*hh2[2] + t * t*t*nn2[2];
+
+
+							double len = sqrt(vtkMath::Distance2BetweenPoints(intvv, intvv2));
+							// cout << "connect:" << ls[0] << "," << ls[1] << endl;
+							current_length += len;
+							//glVertex3d(intvv2[0], intvv2[1], intvv2[2]);
+							// glEnd();
+
+							if ((current_length >= length_to_reach) && (length_to_reach >= preceding_length) && (decimation_index < decimation))
+							{
+
+								slm[0] = 0; slm[1] = 0; slm[2] = 0;
+								decimation_index++;
+
+								t = 0.5;
+								if ((current_length - preceding_length) > 0)
+								{
+									t = (length_to_reach - preceding_length) / (current_length - preceding_length);
+								}
+								slm[0] = (1 - t)*intvv[0] + t * intvv2[0];
+								slm[1] = (1 - t)*intvv[1] + t * intvv2[1];
+								slm[2] = (1 - t)*intvv[2] + t * intvv2[2];
+								int wnum_seg = num_seg - 1;
+								if (wnum_seg < 10) { csi = "00"; }
+								else if (wnum_seg < 100) { csi = "0"; }
+								else { csi = ""; }
+
+								if (decimation_index == 0) { lsi = "000"; }
+								else if (decimation_index < 10) { lsi = "00"; }
+								else if (decimation_index < 100) { lsi = "0"; }
+								else { lsi = ""; }
+								if (save_format == 0)
+								{
+									stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << " 0 0 1" << endl;
+
+								}
+								else if (save_format == 1)
+								{
+									stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+								}
+								else if (save_format == 2)
+								{
+									stream << "C" << csi.c_str() << wnum_seg << "-" << lsi.c_str() << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+								}
+								else if (save_format == 3)
+								{
+									stream << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+								}
+
+
+
+
+
+								t2 = (double)(((double)decimation_index) / (((double)decimation - 1.0)));
+								length_to_reach = total_length * t2;
+
+							}
+
+						}
+
+					}
+
+				}
+
+
+
+
+				ind = ob_N1->GetLMNumber();
+				indh = ob_H1->GetLMNumber();
+
+				ob_H1 = Handles->GetLandmarkAfter(indh);
+				ob_N1 = Nodes->GetLandmarkAfter(ind);
+				if (ob_N1 != NULL)
+				{
+					ind2 = ob_N1->GetLMNumber();
+					ob_N2 = Nodes->GetLandmarkAfter(ind2);
+				}
+				if (ob_H1 != NULL)
+				{
+					indh2 = ob_H1->GetLMNumber();
+					ob_H2 = Handles->GetLandmarkAfter(indh2);
+				}
+				if (ob_N1 != NULL && ob_N1->GetLMNodeType() == STARTING_NODE) {
+					ob_Hstart = ob_H1;
+					ob_Nstart = ob_N1;
+
+				}
+
+				k++;
+			}
+		}
+
+		//END
+
+
+
+	}
+	file.close();
+	return 1;
+}
 //should only be done after main window is initialized.
-int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks)
+/*int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks)
 {
 	std::string VERext = ".ver";
 	std::string VERext2 = ".VER";
@@ -10553,15 +11037,8 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 	}
 	//Combien de landmarks au total (besoin pour les formats TPS et PTS) en comptant les curves!
 	// combien de segments:
-	int tot_num_seg = 0;		
-	vtkLMActor *Node;
-	Node = this->NodeLandmarkCollection->GetLandmarkAfter(0);
-	while(Node != NULL)
-	{
-		if (Node->GetLMNodeType() == STARTING_NODE|| Node->GetLMNodeType() == MILESTONE_NODE) { tot_num_seg++; }
-		int ind = Node->GetLMNumber();
-		Node = this->NodeLandmarkCollection->GetLandmarkAfter(ind);			
-	}
+	
+	int tot_num_seg = this->GetNumberOfCurveSegments();	
 	int tot_lm_number = tot_num_seg * decimation;
 	if (save_other_lmks == 1)
 	{
@@ -10930,7 +11407,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int decimation, int save
 	file.close();
 	return 1;
 }
-
+*/
 int mqMorphoDigCore::SaveCURFile(QString fileName, int save_only_selected)
 {
 
@@ -23506,6 +23983,10 @@ ActiveTagMap*   mqMorphoDigCore::Getmui_ActiveTagMap()
 ActiveColorMap * mqMorphoDigCore::Getmui_ActiveColorMap()
 {
 	return this->mui_ActiveColorMap;
+}
+SegmentDecimations * mqMorphoDigCore::Getmui_SegmentDecimations()
+{
+	return this->mui_SegmentDecimations;
 }
 
 ActiveArray* mqMorphoDigCore::Getmui_ActiveArray()

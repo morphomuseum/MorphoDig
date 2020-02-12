@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>330</height>
+    <width>646</width>
+    <height>393</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>300</y>
+     <y>360</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -469,8 +469,8 @@
   <widget class="QGroupBox" name="CURToBeSaved_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>70</y>
+     <x>330</x>
+     <y>10</y>
      <width>301</width>
      <height>121</height>
     </rect>
@@ -525,28 +525,130 @@
      <x>10</x>
      <y>10</y>
      <width>301</width>
-     <height>51</height>
+     <height>321</height>
     </rect>
    </property>
    <property name="title">
     <string>Number of landmarks / curve segment</string>
    </property>
-   <widget class="QSpinBox" name="Decimation">
+   <widget class="QSpinBox" name="defaultDecimation">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>210</x>
       <y>20</y>
       <width>81</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>281</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>281</width>
+       <height>231</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="PropertiesFrame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <widget class="QTableWidget" name="tableWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>281</width>
+           <height>231</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QToolButton" name="reinitializeSegments">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>290</y>
+      <width>23</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Reinitialize segments</string>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../Icons/icons.qrc">
+      <normaloff>:/Icons/Initialize24.png</normaloff>:/Icons/Initialize24.png</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>22</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Default number of landmarks / segment</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="NORTARToBeSaved">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>200</y>
+     <x>330</x>
+     <y>160</y>
      <width>301</width>
      <height>91</height>
     </rect>
@@ -585,7 +687,7 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>300</y>
+     <y>360</y>
      <width>159</width>
      <height>23</height>
     </rect>
@@ -598,7 +700,9 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../Icons/icons.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

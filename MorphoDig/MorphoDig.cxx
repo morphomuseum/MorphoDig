@@ -699,7 +699,31 @@ this->segView4 = new QVTKOpenGLWidget();
 	//	this->MorphoDigCore->Getmui_DefaultAdjustScaleFactor()
 	//	).toDouble() << endl;
 	settings.endGroup();
-	
+	settings.beginGroup("curve_settings");
+	this->MorphoDigCore->Setmui_SegmentDecimation(
+		settings.value("SegmentDecimation",
+			this->MorphoDigCore->Getmui_DefaultSegmentDecimation()
+		).toInt()
+	);
+	int nsegments = settings.value("nsegments", 0).toInt();
+	if (nsegments > 0)
+	{
+		
+		for (int i = 0; i < nsegments; i++)
+		{			
+
+			QString d = QString("d");
+			d = d + QString::number(i);
+			cout << "Segment " << i << ": decimation = " << settings.value(d, 0).toString().toStdString() << endl;
+
+			int decimation = settings.value(d, 0).toInt();
+			mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.push_back(decimation);
+			
+		}
+	}
+
+
+	settings.endGroup();
 	settings.beginGroup("volumes");
 	long long int iniVolumeOutOfCoreThreshold = settings.value("VolumeOutOfCoreThreshold", 10).toLongLong();
 	//cout << "iniVolumeOutOfCoreThreshold" << iniVolumeOutOfCoreThreshold << endl;
@@ -2047,6 +2071,28 @@ void MorphoDig::saveSettings()
 	settings.setValue("FontSize", this->MorphoDigCore->Getmui_FontSize());
 
 	settings.endGroup();
+	
+	
+	settings.beginGroup("curve_settings");
+	settings.setValue("SegmentDecimation", this->MorphoDigCore->Getmui_SegmentDecimation());
+	size_t numsegs = this->MorphoDigCore->Getmui_SegmentDecimations()->decimation.size();
+	settings.setValue("nsegments", numsegs);
+	
+	
+	
+	for (int i = 0; i < numsegs; i++)
+	{
+		int segdecimation = this->MorphoDigCore->Getmui_SegmentDecimations()->decimation.at(i);
+		
+		//2 set the name of colormap(cpt), and whether it's discretizable and opacity is enabled
+		QString d = QString("d");
+			d = d + QString::number(i);
+			settings.setValue(d, segdecimation);
+		
+	}
+	settings.endGroup();
+
+	
 	settings.beginGroup("renderer_settings");
 	settings.setValue("Anaglyph", this->MorphoDigCore->Getmui_Anaglyph());	
 	settings.setValue("DisplayMode", this->MorphoDigCore->Getmui_DisplayMode());

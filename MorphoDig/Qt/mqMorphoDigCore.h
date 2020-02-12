@@ -200,6 +200,12 @@ public:
 	
 };
 
+class SegmentDecimations
+{
+public:
+	std::vector<int> decimation;
+};
+
 class ExistingTagMaps
 {
 public:
@@ -494,6 +500,11 @@ public:
 	
 	double Getmui_DefaultRendererOcclusionRatio();
 	int Getmui_DefaultRendererMaximalNumberOfPeels();
+
+	int Getmui_DefaultSegmentDecimation();
+	int Getmui_SegmentDecimation();
+	void Setmui_SegmentDecimation(int decimation);
+
 	void Setmui_DisplayMode(int mode);
 	/*vtkGetMacro(mui_Mask, int);
 	vtkSetMacro(mui_Mask, int);*/
@@ -620,7 +631,8 @@ public:
 	void Screenshot(QString fileName, int scaleX, int scaleY, int rgba, int front, int transparent);
 	void OpenMAP(QString fileName, int mode=0);
 	int SaveCURFile(QString fileName, int save_only_selected);
-	int SaveCURasVERFile(QString fileName, int decimation, int save_format, int save_other_lmks);
+	int SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks);
+	int GetNumberOfCurveSegments();
 	void SetOcclusionRatioAndNumPeels(double ratio, int numpeels);
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
@@ -728,6 +740,8 @@ public:
 	void Setmui_ActiveArrayAndRender(QString Array, int dataType, int numComp);
 	void RefreshColorMapsAndArrayVisibility();
 	ActiveArray* Getmui_ActiveArray();
+
+	SegmentDecimations* Getmui_SegmentDecimations();
 
 
 	ExistingColorMaps* Getmui_ExistingColorMaps();
@@ -1142,7 +1156,7 @@ protected:
 
 	ActiveColorMap *mui_ActiveColorMap;
 	ExistingColorMaps *mui_ExistingColorMaps;
-
+	SegmentDecimations *mui_SegmentDecimations;
 
 	ActiveTagMap *mui_ActiveTagMap;
 	ExistingTagMaps *mui_ExistingTagMaps;
@@ -1181,6 +1195,9 @@ protected:
 	double mui_DefaultSpecularPower;
 	int mui_DefaultAmbient;
 	int mui_DefaultDiffuse;
+
+	int mui_SegmentDecimation;
+	int mui_DefaultSegmentDecimation;
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;
