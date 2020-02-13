@@ -21889,6 +21889,56 @@ void mqMorphoDigCore::LandmarksPushBack()
 	this->LandmarksPushBackOrReorient(0);
 	this->Render();
 }
+void mqMorphoDigCore::CreateCurveHandles()
+{
+	vtkIdType num_lmk = 0;
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No curve node landmark selected. Please select at least one curve node landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
+
+	vtkSmartPointer<vtkLMActorCollection> nodes = vtkSmartPointer<vtkLMActorCollection>::New();	
+	nodes = this->NodeLandmarkCollection;
+		//cout << "myColl->GetNumberOfItems()=" << myColl->GetNumberOfItems() << endl;	
+	nodes->InitTraversal();
+	for (vtkIdType i = 0; i < nodes->GetNumberOfItems(); i++)
+	{
+		vtkLMActor *myNode = vtkLMActor::SafeDownCast(nodes->GetNextActor());
+
+		if (myNode->GetSelected() == 1)
+		{
+			int node_nr = myNode->GetLMNumber();
+			vtkSmartPointer<vtkLMActorCollection> handles = vtkSmartPointer<vtkLMActorCollection>::New();
+			handles = this->HandleLandmarkCollection;
+			int exists = 0;
+			handles->InitTraversal();
+
+			for (vtkIdType j = 0; j < handles->GetNumberOfItems(); j++)
+			{
+				vtkLMActor *myHandle = vtkLMActor::SafeDownCast(handles->GetNextActor());
+				int handle_nr = myHandle->GetLMNumber();
+				if (handle_nr == node_nr) { exists = 1; }
+			}
+			if (exists ==0)
+			{
+				double lmpos[3];
+				myNode->GetLMOrigin(lmpos);
+				double ori[3];
+				myNode->GetLMOrientation(ori);
+				this->CreateLandmark(lmpos, ori, 3);
+			}
+
+		}
+
+		myNode->SetSelected(0);
+		
+	}
+	this->Render();
+
+}
 void mqMorphoDigCore::LandmarksMoveUp()
 {
 	vtkIdType num_lmk = 0;
@@ -22077,7 +22127,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	// lmk_type : 4 for flag landmark
 
 
-	//node_type: only used if mode ==2, curve node
+	//node_type: only used if lmk_type ==2, curve node
 	//node_type: 1 curve starting point 
 	//node_type: 0 normal node
 	//node_type: 2 curve milestone
@@ -22218,7 +22268,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 		this->NormalLandmarkCollection->AddItem(myLM);
 		//emit this->actorsMightHaveChanged();
 		
-		this->NodeLandmarkCollection->ReorderLandmarks();
+		this->NormalLandmarkCollection->ReorderLandmarks();
 		this->NormalLandmarkCollection->SetChanged(1);
 		//std::string action = "Create Normal landmark";
 		//int mCount = BEGIN_UNDO_SET(action);
@@ -22231,7 +22281,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 
 		this->TargetLandmarkCollection->AddItem(myLM);
 		//emit this->actorsMightHaveChanged();
-		this->NodeLandmarkCollection->ReorderLandmarks();
+		this->TargetLandmarkCollection->ReorderLandmarks();
 		this->TargetLandmarkCollection->SetChanged(1);
 		//std::string action = "Create Target landmark";
 		//int mCount = BEGIN_UNDO_SET(action);
@@ -25214,7 +25264,11 @@ void mqMorphoDigCore::slotDecomposeTag()
 	
 
 }
+void mqMorphoDigCore::slotCreateCurveHandles()
+{
+	this->CreateCurveHandles();
 
+}
 void mqMorphoDigCore::slotLandmarkMoveUp()
 {
 

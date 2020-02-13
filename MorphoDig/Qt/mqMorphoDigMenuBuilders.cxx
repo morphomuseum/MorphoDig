@@ -474,7 +474,12 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	QAction::connect(UpdateAllSelectedFlagsColors, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotUpdateAllSelectedFlagsColors()));
 	
 
-	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Move curve handles semi-automatically") << mqSetName("actionMoveHandles"), 4);
+	QAction *CreateCurveHandles = submenuLandmarksInvolved->addAction("Create curve handles for selected nodes");
+	QAction::connect(CreateCurveHandles, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotCreateCurveHandles()));
+
+	
+	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Move selected curve handles semi-automatically") << mqSetName("actionMoveHandles"), 4);
+	
 	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Normal nodes (red): change as starting nodes (dark green)") << mqSetName("actionStartingNode"), 1);
 	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Normal nodes (red): connect to preceding starting nodes (cyan)") << mqSetName("actionConnectNode"), 3);
 	new mqChangeNodeReaction(submenuLandmarksInvolved->addAction("Normal nodes (red): define as milestone nodes (blue)") << mqSetName("actionMilestoneNode"), 2);

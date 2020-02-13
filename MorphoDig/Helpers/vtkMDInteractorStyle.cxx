@@ -107,6 +107,11 @@ vtkStandardNewMacro(vtkMDInteractorStyle);
 #define T_RELEASED 8
 #define M_PRESSED 7
 #define M_RELEASED 8
+#define K_PRESSED 11
+#define K_RELEASED 12
+#define J_PRESSED 13
+#define J_RELEASED 14
+
 
 #define SHIFT_PRESSED 9
 #define SHIFT_RELEASED 10
@@ -122,6 +127,8 @@ vtkMDInteractorStyle::vtkMDInteractorStyle()
 	this->Alt = ALT_RELEASED;
 	//this->MoveMode = MOVECAM_MODE;
 	this->L = L_RELEASED;
+	this->J = J_RELEASED;
+	this->K = K_RELEASED;
 	this->T = T_RELEASED;
 	this->M = M_RELEASED;
 	this->MoveWhat = CAM;
@@ -316,6 +323,19 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 		//cout << "l pressed" << endl;
 		this->L = L_PRESSED;
 	}
+	if (key.compare("k") == 0 || key.compare("K") == 0)
+	{
+		//cout << "l pressed" << endl;
+		this->L = L_PRESSED;
+		this->K = K_PRESSED;
+
+	}
+	if (key.compare("j") == 0 || key.compare("J") == 0)
+	{
+		//cout << "l pressed" << endl;
+		this->L = L_PRESSED;
+		this->J = J_PRESSED;
+	}
 	if (key.compare("t") == 0 || key.compare("T") == 0 && this->CurrentMode != VTKISMD_TAGMASKPENCIL)
 	{
 		//cout << "l pressed" << endl;
@@ -374,7 +394,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	if (key.compare("Control_L") == 0)
 	{
 		this->Ctrl = CTRL_PRESSED;
-		
+		this->L = L_PRESSED;
 		/*QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
 		QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
 		//std::cout << key<< "Pressed" << '\n';*/
@@ -1435,7 +1455,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	  if (key.compare("Control_L") == 0)
 	  {
 		  this->Ctrl = CTRL_RELEASED;
-		  
+		  this->L = L_RELEASED;
 	  }
 
 	  if (key.compare("Shift") == 0)
@@ -1453,6 +1473,18 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	  if (key.compare("l") == 0 || key.compare("L") == 0)
 	  {
 		  this->L = L_RELEASED;
+		  // std::cout << key << "Released" << '\n';
+	  }
+	  if (key.compare("j") == 0 || key.compare("J") == 0)
+	  {
+		  this->L = L_RELEASED;
+		  this->J = J_RELEASED;
+		  // std::cout << key << "Released" << '\n';
+	  }
+	  if (key.compare("k") == 0 || key.compare("K") == 0)
+	  {
+		  this->L = L_RELEASED;
+		  this->K = K_RELEASED;
 		  // std::cout << key << "Released" << '\n';
 	  }
 	  if (key.compare("t") == 0 || key.compare("T") == 0)
@@ -1903,7 +1935,8 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 	  //this->Interactor->GetControlKey()
 
 	  //special case : landmark setting!
-	  if (this->L == L_PRESSED && this->Ctrl != CTRL_PRESSED)
+	  //if (this->L == L_PRESSED && this->Ctrl != CTRL_PRESSED)
+	  if (this->L == L_PRESSED )
 	  {
 
 
@@ -1945,7 +1978,30 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 			   
 				   // else
 				  //  {
-				   mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode());
+				   //if curve
+				   int node_type = 0;
+				   if (mqMorphoDigCore::instance()->Getmui_LandmarkMode()==2)
+				   { 
+					if (this->Shift==SHIFT_PRESSED)
+					{
+						node_type = 1; // starting point
+					}
+					else if (this->J == J_PRESSED)
+					{ 
+						node_type = 2; //curve milestone
+					
+					}
+					else if (this->K == K_PRESSED)
+					{
+						node_type = 3;// connect to preceding starting point
+					}
+				   }
+					   /*//node_type: only used if mode ==2, curve node
+	//node_type: 1 curve starting point 
+	//node_type: 0 normal node
+	//node_type: 2 curve milestone
+	//node_type: 3 connect to preceding starting point*/
+				   mqMorphoDigCore::instance()->CreateLandmark(pos, norm, mqMorphoDigCore::instance()->Getmui_LandmarkMode(), node_type);
 				   mqMorphoDigCore::instance()->CreateLandmarkUndoSet(mqMorphoDigCore::instance()->Getmui_LandmarkMode());		
 				   cout << "Render From onLeftButtonDown" << endl;
 				   
@@ -1957,6 +2013,10 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 		  //this->GetInteractor()->GetRenderWindow()->GetRenderers()->GetDefaultRenderer()->AddActor(actor);
 
 		  this->L = L_RELEASED;
+		  this->J = J_RELEASED;
+		  this->K = K_RELEASED;
+		  this->Shift = SHIFT_RELEASED;
+		  this->Ctrl = CTRL_RELEASED;
 	  }//left button down, no landmark 
 	  else  if (this->T == T_PRESSED 
 		  && this->Ctrl != CTRL_PRESSED

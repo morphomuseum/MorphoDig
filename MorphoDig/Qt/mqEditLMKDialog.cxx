@@ -79,7 +79,7 @@ mqEditLMKDialog::mqEditLMKDialog(QWidget* Parent)
 
 	this->GetFirstSelectedLandmark();
 	this->UpdateUI();
-	
+	connect(this->Ui->Refresh, SIGNAL(pressed()), this, SLOT(slotRefreshCoords()));
  
   
  //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotEditLMK()));
@@ -393,6 +393,21 @@ void mqEditLMKDialog::GetPrecedingLandmark()
 
 	}
 
+}
+void mqEditLMKDialog::slotRefreshCoords()
+{
+	if(LMK == NULL)
+	{
+		this->GetFirstLandmark();
+	}
+	else
+	{
+		double lmpos[3];
+		LMK->GetLMOrigin(lmpos);
+		this->Ui->x->setValue(lmpos[0]);
+		this->Ui->y->setValue(lmpos[1]);
+		this->Ui->z->setValue(lmpos[2]);
+	}
 }
 void mqEditLMKDialog::slotCamCenter()
 {

@@ -117,6 +117,8 @@ protected:
   int Ctrl;
   int Shift;
   int L;
+  int J;
+  int K;
   int T;
   int M;
   int Alt;

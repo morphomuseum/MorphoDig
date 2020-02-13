@@ -826,6 +826,7 @@ public:
 	QMainWindow* GetProjectWindow();
 	QMainWindow* GetSegmentationWindow();
 	void LandmarksMoveUp();
+	void CreateCurveHandles();
 	void LandmarksPushBack();
 	void LandmarksReorient();
 	void LandmarksPushBackOrReorient(int mode);
@@ -1285,6 +1286,7 @@ protected:
 	//
 	vtkOrientationHelperWidget* OrientationHelperWidget;
 public slots:
+	virtual void slotCreateCurveHandles();
 	virtual void slotLandmarkMoveUp();
 	virtual void slotLandmarkMoveDown();
 	virtual void slotLandmarkPushBack();
