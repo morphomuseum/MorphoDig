@@ -303,6 +303,10 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	{
 		mqMorphoDigCore::instance()->SwitchMoveMode();
 	}
+	if (key.compare("space") == 0)
+	{
+		mqMorphoDigCore::instance()->SwitchLandmarkMode();
+	}
 	if (key.compare("Alt_L")==0)
 	{
 		this->Alt = ALT_PRESSED;

@@ -61,7 +61,9 @@ void mqInteractionControlsWidget::constructor()
   connect(this->ui->MoveCamera, SIGNAL(pressed()), this, SLOT(slotMoveCamera()));
   connect(this->ui->MoveObjects, SIGNAL(pressed()), this, SLOT(slotMoveObjects()));
   connect(this->ui->MoveOnlyLandmarks, SIGNAL(pressed()), this, SLOT(slotMoveOnlyLandmarks()));
-  connect(mqMorphoDigCore::instance(), SIGNAL(modeModeChanged()), this, SLOT(slotMoveModeChanged()));
+  connect(mqMorphoDigCore::instance(), SIGNAL(moveModeChanged()), this, SLOT(slotMoveModeChanged()));
+  connect(mqMorphoDigCore::instance(), SIGNAL(landmarkModeChanged()), this, SLOT(slotLandmarkModeChanged()));
+  connect(mqMorphoDigCore::instance(), SIGNAL(curveModeChanged()), this, SLOT(slotCurveModeChanged()));
   
 }
 
@@ -82,6 +84,57 @@ void mqInteractionControlsWidget::slotMoveModeChanged()
 		this->ui->MoveObjects->setChecked(true);
 		this->ui->MoveOnlyLandmarks->setChecked(false);
 		this->ui->MoveCamera->setChecked(false);
+	}
+}
+
+void mqInteractionControlsWidget::slotLandmarkModeChanged()
+{
+	cout << "Slot move mode changed" << endl;
+	// move mode was changed externally (ex: "Escape" pressed)
+	if (mqMorphoDigCore::instance()->Getmui_LandmarkMode() == 0 ) 
+	{
+		this->ui->LandmarksModeNormal->setChecked(true);
+		this->ui->LandmarksModeTarget->setChecked(false);
+		this->ui->LandmarksModeNode->setChecked(false);
+		this->ui->LandmarksModeHandle->setChecked(false);
+		this->ui->LandmarksModeFlag->setChecked(false);
+		
+	}
+	else
+	{
+		
+			this->ui->LandmarksModeNormal->setChecked(false);
+			this->ui->LandmarksModeTarget->setChecked(true);
+			this->ui->LandmarksModeNode->setChecked(false);
+			this->ui->LandmarksModeHandle->setChecked(false);
+			this->ui->LandmarksModeFlag->setChecked(false);
+
+		
+	}
+}
+void mqInteractionControlsWidget::slotCurveModeChanged()
+{
+	cout << "Slot move mode changed" << endl;
+	// move mode was changed externally (ex: "Escape" pressed)
+	if (mqMorphoDigCore::instance()->Getmui_LandmarkMode() == 2)
+	{
+		this->ui->LandmarksModeNormal->setChecked(false);
+		this->ui->LandmarksModeTarget->setChecked(false);
+		this->ui->LandmarksModeNode->setChecked(true);
+		this->ui->LandmarksModeHandle->setChecked(false);
+		this->ui->LandmarksModeFlag->setChecked(false);
+
+	}
+	else
+	{
+		
+			this->ui->LandmarksModeNormal->setChecked(false);
+			this->ui->LandmarksModeTarget->setChecked(false);
+			this->ui->LandmarksModeNode->setChecked(false);
+			this->ui->LandmarksModeHandle->setChecked(true);
+			this->ui->LandmarksModeFlag->setChecked(false);
+
+		
 	}
 }
 

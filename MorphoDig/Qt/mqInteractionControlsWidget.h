@@ -41,6 +41,8 @@ public:
   virtual void slotMoveObjects();
   virtual void slotMoveOnlyLandmarks();
   virtual void slotMoveModeChanged();
+  virtual void slotLandmarkModeChanged();
+  virtual void slotCurveModeChanged();
 private:
 	Q_DISABLE_COPY(mqInteractionControlsWidget)
   

@@ -12879,8 +12879,39 @@ void mqMorphoDigCore::SwitchMoveMode()
 		this->Setmui_MoveMode(1);// swtich to camera mve mode
 		this->setCurrentCursor(0);//appropriate cursor
 	}
-	emit this->modeModeChanged();
+	emit this->moveModeChanged();
 }
+
+void mqMorphoDigCore::SwitchLandmarkMode()
+{
+	if (this->Getmui_LandmarkMode() == 0 || this->Getmui_LandmarkMode() == 1) //0 normal landmarks 1 target landmarks
+	{
+		if (this->Getmui_LandmarkMode() == 0)
+		{
+			this->Setmui_LandmarkMode(1);
+		}
+		else
+		{
+			this->Setmui_LandmarkMode(0);
+		}
+		emit this->landmarkModeChanged();
+	}
+
+	else if (this->Getmui_LandmarkMode() ==2 || this->Getmui_LandmarkMode() == 3)
+	{
+		if (this->Getmui_LandmarkMode() == 2)
+		{
+			this->Setmui_LandmarkMode(3);
+		}
+		else
+		{
+			this->Setmui_LandmarkMode(2);
+		}
+		emit this->curveModeChanged();
+	}
+	// if flag mode do nothing
+}
+
 void mqMorphoDigCore::resetCursor()
 {
 	if (this->Getmui_MoveMode() == 0 || this->Getmui_MoveMode() == 1)

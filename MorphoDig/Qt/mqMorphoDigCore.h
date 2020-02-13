@@ -555,6 +555,7 @@ public:
 	int Getmui_MoveMode();
 	int Getmui_DefaultMoveMode();
 	void SwitchMoveMode();
+	void SwitchLandmarkMode();
 	void Setmui_ShowGrid(int showgrid);
 	int Getmui_ShowGrid();
 	int Getmui_DefaultShowGrid();
@@ -1088,7 +1089,9 @@ signals:
   void actorsMightHaveChanged();
   void volumesMightHaveChanged();
   void volumeUpdateHistogram();
-  void modeModeChanged();
+  void moveModeChanged();
+  void landmarkModeChanged();
+  void curveModeChanged();
   void thicknessProgression(int percent);
   void iterativeShrinkWrapProgression(int percent);
   void complexityProgression(int percent);
