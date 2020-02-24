@@ -394,7 +394,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 	if (key.compare("Control_L") == 0)
 	{
 		this->Ctrl = CTRL_PRESSED;
-		this->L = L_PRESSED;
+		//this->L = L_PRESSED;
 		/*QPixmap cursor_pixmap = QPixmap(":/Cursors/move3.png");
 		QCursor projectCursor = QCursor(cursor_pixmap, 0, 0);
 		//std::cout << key<< "Pressed" << '\n';*/
@@ -1935,8 +1935,8 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 	  //this->Interactor->GetControlKey()
 
 	  //special case : landmark setting!
-	  //if (this->L == L_PRESSED && this->Ctrl != CTRL_PRESSED)
-	  if (this->L == L_PRESSED )
+	  if (this->L == L_PRESSED && this->Ctrl != CTRL_PRESSED)
+	  //if (this->L == L_PRESSED )
 	  {
 
 
