@@ -831,7 +831,8 @@ public:
 	void LandmarksReorient();
 	void LandmarksPushBackOrReorient(int mode);
 	void LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree, vtkSmartPointer<vtkPolyData> PD, int mcount);
-
+	void LandmarksMirror(int mode =1);
+	void LandmarksMirror(vtkSmartPointer<vtkLMActorCollection> LmkCollection, int mode = 1);
 
 	void ChangeClippingPlane();
 	int Getmui_ClippinPlane();
@@ -1289,6 +1290,9 @@ public slots:
 	virtual void slotCreateCurveHandles();
 	virtual void slotLandmarkMoveUp();
 	virtual void slotLandmarkMoveDown();
+	virtual void slotLandmarkMirrorX();
+	virtual void slotLandmarkMirrorY();
+	virtual void slotLandmarkMirrorZ();
 	virtual void slotLandmarkPushBack();
 	virtual void slotLandmarkReorient();
 	virtual void slotUpdateAllSelectedFlagsColors();

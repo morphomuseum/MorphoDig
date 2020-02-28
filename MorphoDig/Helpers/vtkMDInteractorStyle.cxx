@@ -1982,6 +1982,12 @@ void vtkMDInteractorStyle::OnLeftButtonDown()
 				   int node_type = 0;
 				   if (mqMorphoDigCore::instance()->Getmui_LandmarkMode()==2)
 				   { 
+					int num_nodes= mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfItems();
+					if (num_nodes == 0)
+					{
+						node_type = 1; // first node is mandatory a starting point
+					}
+
 					if (this->Shift==SHIFT_PRESSED)
 					{
 						node_type = 1; // starting point

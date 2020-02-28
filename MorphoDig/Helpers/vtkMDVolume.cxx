@@ -166,27 +166,48 @@ void vtkMDVolume::InitializeMapper()
 		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 		//mapper->SetAutoAdjustSampleDistances(true);
 		this->SetMapper(mapper);
-
+		mapper->SetInteractiveAdjustSampleDistances(false);
+		cout << "SMART INTERACTIVE OFF" << endl;
+		mapper->PrintSelf(cout, vtkIndent(2));
+		mapper->SetInteractiveAdjustSampleDistances(true);
+		cout << "SMART INTERACTIVE ON" << endl;
+		mapper->PrintSelf(cout, vtkIndent(2));
+		// If false : ugly!
+		
+	
 	}
 	else if (mapper_type == 1)
 	{
 
 		vtkSmartPointer <vtkGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+		//mapper->SetBlendModeToAdditive();
 		//mapper->SetUseJittering(true);
 		//mapper->SetAutoAdjustSampleDistances(true);
 		//mapper->SetClampDepthToBackface(true);
 		//mapper->SetUseDepthPass(true);
 		this->SetMapper(mapper);
+		cout << "GPU" << endl;
+		mapper->PrintSelf(cout, vtkIndent(2));
 	}
 	else if (mapper_type == 2)
 	{
 		//mapper->SetRequestedRenderModeToGPU();
 		vtkSmartPointer <vtkOpenGLGPUVolumeRayCastMapper> mapper = vtkSmartPointer<vtkOpenGLGPUVolumeRayCastMapper>::New();
+		//mapper->SetAutoAdjustSampleDistances(false);
+		//mapper->SetSampleDistance(-1);
+		//mapper->SetMaskBlendFactor(0.8);
+		//mapper->SetFinalColorWindow(1);
+		//mapper->SetFinalColorLevel(0.5);
+		//mapper->SetSampleDistance(10);
+		//mapper->SetImageSampleDistance(0.5);
+		
 		//mapper->SetUseJittering(true);
 		//mapper->SetAutoAdjustSampleDistances(true);
 		//mapper->SetClampDepthToBackface(true);
 		//mapper->SetUseDepthPass(true);
 		this->SetMapper(mapper);
+		cout << "OPENGLGPU" << endl;
+		mapper->PrintSelf(cout, vtkIndent(2));
 
 	}
 }

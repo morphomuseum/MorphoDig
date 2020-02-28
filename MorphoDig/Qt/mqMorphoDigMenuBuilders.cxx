@@ -457,12 +457,17 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 		QAction *MoveUp = menu.addAction("Selected landmarks: decrease landmark number(move up in list)");
 	QAction *PushBack = menu.addAction("Selected landmarks: push back on closest surface's vertex");
 	QAction *ReOrient = menu.addAction("Selected landmarks: change orientation according to surface's normals");
+	QAction *MirrorLMKX = menu.addAction("Selected landmarks/flags: mirror along X plane");
+	QAction *MirrorLMKY = menu.addAction("Selected landmarks/flags: mirror along Y plane");
+	QAction *MirrorLMKZ = menu.addAction("Selected landmarks/flags: mirror along Z plane");
 	QAction::connect(MoveUp, SIGNAL(triggered()), mqMorphoDigCore::instance() , SLOT(slotLandmarkMoveUp()));
 	QAction::connect(MoveDown, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMoveDown()));
 
 	QAction::connect(PushBack, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkPushBack()));
 	QAction::connect(ReOrient, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkReorient()));
-
+	QAction::connect(MirrorLMKX, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMirrorX()));
+	QAction::connect(MirrorLMKY, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMirrorY()));
+	QAction::connect(MirrorLMKZ, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLandmarkMirrorZ()));
 
 	//actionLandmarskMoveUp
 

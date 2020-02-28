@@ -21855,6 +21855,81 @@ void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLM
 
 	
 }
+void mqMorphoDigCore::LandmarksMirror(int mode)
+{
+	vtkIdType num_lmk = 0;
+	num_lmk = mqMorphoDigCore::instance()->getNormalLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_lmk == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No landmark selected. Please select at least one landmark to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->LandmarksMirror(this->NormalLandmarkCollection,mode);
+	cout << "Target landmarks" << endl;
+	this->LandmarksMirror(this->TargetLandmarkCollection, mode);
+	
+	cout << "Node landmarks" << endl;
+	this->LandmarksMirror(this->NodeLandmarkCollection, mode);
+	
+	cout << "Handle landmarks" << endl;
+	this->LandmarksMirror(this->HandleLandmarkCollection, mode);
+	
+	cout << "Flag landmarks" << endl;
+	this->LandmarksMirror(this->FlagLandmarkCollection, mode);
+	this->Render();
+
+}
+void mqMorphoDigCore::LandmarksMirror(vtkSmartPointer<vtkLMActorCollection> LmkCollection, int mode)
+{
+	
+	//mode0: mirror along X plane
+	//mode 1: mirror along Y plane
+	//mode 2: mirror along Z plane
+	LmkCollection->InitTraversal();
+	
+
+	for (vtkIdType i = 0; i < LmkCollection->GetNumberOfItems(); i++)
+	{
+		vtkLMActor *myLMK = vtkLMActor::SafeDownCast(LmkCollection->GetNextActor());
+
+		if (myLMK->GetSelected() == 1)
+		{
+
+			double lmpos[3];
+			myLMK->GetLMOrigin(lmpos);
+			if (mode ==0)
+			{
+				lmpos[0] *= -1;
+			}
+			else if (mode == 1)
+			{
+				lmpos[1] *= -1;
+			}
+			else if (mode == 2)
+			{
+				lmpos[2] *= -1;
+			}
+
+						
+			myLMK->SetLMOrigin(lmpos);
+			
+			myLMK->Modified();
+			LmkCollection->Modified();
+
+
+
+			//cpt++;
+		}
+
+	}
+
+
+}
+
 void mqMorphoDigCore::LandmarksReorient()
 {
 //mqMorphoDigCore::instance()->UpdateFirstSelectedLandmark(pos, norm);
@@ -25274,6 +25349,20 @@ void mqMorphoDigCore::slotLandmarkMoveUp()
 
 	this->LandmarksMoveUp();
 }
+void mqMorphoDigCore::slotLandmarkMirrorX()
+{
+	this->LandmarksMirror(0);
+}
+void mqMorphoDigCore::slotLandmarkMirrorY()
+{
+	this->LandmarksMirror(1);
+}
+
+void mqMorphoDigCore::slotLandmarkMirrorZ()
+{
+	this->LandmarksMirror(2);
+}
+
 void mqMorphoDigCore::slotLandmarkPushBack()
 {
 	this->LandmarksPushBack();
