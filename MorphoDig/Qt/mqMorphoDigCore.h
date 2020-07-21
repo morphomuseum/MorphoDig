@@ -646,6 +646,7 @@ public:
 	void SaveVolume(QString fileName, int file_type, int compression=1, vtkMDVolume *myVolume=NULL, int compression_type=1, int bigendian =1, int isMSK=0);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);
 	int SaveFlagFile(QString fileName, int save_only_selected);
+	int ExportLandmarksAsFlags(QString fileName, int save_only_selected);
 	void DeleteSelectedActors();
 	void OpenFLG(QString fileName);
 	void OpenCUR(QString fileName);
@@ -929,7 +930,7 @@ public:
   void resetCursor(); // reset cursor when lasso stops, tag stop, landmark stop
   void startLasso(int lasso_mode);//change interaction style
   void stopLasso();//change interaction style back to normal
-  void addMirrorXZ(); //create a mirror surface through XZ plane for each selected surface
+  void addMirror(int plane); //create a mirror surface through XY, XZ, or YZ plane for each selected surface  
   void Redo(); // calls the undoStack Redo function
   void Undo(); // callse the undoStack Undo function
   void Render(); // called when something has changed and the app needs to redraw
@@ -1311,7 +1312,9 @@ public slots:
 	virtual void slotRubberTagOutside();
 	virtual void slotRubberMaskInside();
 	virtual void slotRubberMaskOutside();
-	virtual void slotMirror();
+	virtual void slotMirrorX();
+	virtual void slotMirrorY();
+	virtual void slotMirrorZ();
 	virtual void slotInvert();
 	virtual void slotInvertVolume();
 	virtual void slotKeepLargest();

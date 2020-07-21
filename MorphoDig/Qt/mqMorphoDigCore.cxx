@@ -9688,6 +9688,65 @@ void mqMorphoDigCore::SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileNam
 
 }
 //should only be done after main window is initialized.
+int mqMorphoDigCore::ExportLandmarksAsFlags(QString fileName, int save_only_selected)
+{
+	std::string FLGext = ".flg";
+	std::string FLGext2 = ".FLG";
+	std::size_t found = fileName.toStdString().find(FLGext);
+	std::size_t found2 = fileName.toStdString().find(FLGext2);
+	if (found == std::string::npos && found2 == std::string::npos)
+	{
+		fileName.append(".flg");
+	}
+
+
+
+
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+
+		vtkSmartPointer<vtkLMActorCollection> myColl = vtkSmartPointer<vtkLMActorCollection>::New();
+		myColl = this->NormalLandmarkCollection;
+
+
+		myColl->InitTraversal();
+		for (vtkIdType i = 0; i < myColl->GetNumberOfItems(); i++)
+		{
+			vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
+			if (myActor->GetSelected() == 1 || save_only_selected == 0)
+			{
+
+				double lmpos[3];
+				myActor->GetLMOrigin(lmpos);
+				double ori[3];
+				myActor->GetLMOrientation(ori);
+				double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
+
+				stream << myActor->GetLMLabelText() << endl;
+				stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " "
+					<< lmori[0] << " " << lmori[1] << " " << lmori[2] << " " <<
+					myActor->GetLMSize() << " " <<
+					myActor->GetmColor()[0] << " " <<
+					myActor->GetmColor()[1] << " " <<
+					myActor->GetmColor()[2] << " " <<
+					endl;
+
+
+
+
+			}
+
+		}
+
+
+
+
+	}
+	file.close();
+	return 1;
+}
 int mqMorphoDigCore::SaveFlagFile(QString fileName, int save_only_selected)
 {
 
@@ -14679,8 +14738,11 @@ void mqMorphoDigCore::addConvexHull()
 		this->Render();
 	}
 }
-void mqMorphoDigCore::addMirrorXZ()
+void mqMorphoDigCore::addMirror(int plane)
 {
+	//plane : 0 along YZ (along X)
+	//plane : 1 along XZ (along Y)
+	//plane : 2 along YZ (along Z)
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -14733,7 +14795,18 @@ void mqMorphoDigCore::addMirrorXZ()
 				vtkSmartPointer<vtkReflectionFilter> mfilter = vtkSmartPointer<vtkReflectionFilter>::New();
 				mfilter->CopyInputOff();
 				mfilter->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
-				mfilter->SetPlaneToY();
+				if (plane == 0)
+				{
+					mfilter->SetPlaneToX();
+				}
+				else if (plane ==1)
+				{
+					mfilter->SetPlaneToY();
+				}
+				else
+				{
+					mfilter->SetPlaneToZ();
+				}
 				
 				mfilter->Update();
 				vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
@@ -14776,12 +14849,13 @@ void mqMorphoDigCore::addMirrorXZ()
 				vtkSmartPointer<vtkMatrix4x4> Mat = vtkSmartPointer<vtkMatrix4x4>::New();
 				Mat->DeepCopy (myActor->GetMatrix());
 
+				//only works for XZ plane
 				double n1, n2, n3, n4, n5;
-				n1 = -1 * MatOrig->GetElement(1, 3);
-				n2 = -1 * MatOrig->GetElement(0, 1);
-				n3 = -1 * MatOrig->GetElement(1, 0);
-				n4 = -1 * MatOrig->GetElement(1, 2);
-				n5 = -1 * MatOrig->GetElement(2, 1);
+				n1 = -1 * MatOrig->GetElement(1, 3);// -Y for the translation term
+				n2 = -1 * MatOrig->GetElement(0, 1);// matrix
+				n3 = -1 * MatOrig->GetElement(1, 0);// matrix
+				n4 = -1 * MatOrig->GetElement(1, 2); // matrix
+				n5 = -1 * MatOrig->GetElement(2, 1); // matrix
 			
 
 
@@ -25481,7 +25555,7 @@ void mqMorphoDigCore::slotConvexHULL() {
 		return;
 	}
 	this->addConvexHull(); }
-void mqMorphoDigCore::slotMirror() { 
+void mqMorphoDigCore::slotMirrorY() { 
 	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
 	if (num_selected_meshes == 0) {
 		QMessageBox msgBox;
@@ -25489,7 +25563,27 @@ void mqMorphoDigCore::slotMirror() {
 		msgBox.exec();
 		return;
 	}
-	this->addMirrorXZ(); }
+	this->addMirror(1); }
+void mqMorphoDigCore::slotMirrorX() {
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->addMirror(0);
+}
+void mqMorphoDigCore::slotMirrorZ() {
+	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_selected_meshes == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	this->addMirror(2);
+}
 void mqMorphoDigCore::slotInvert() { 
 	vtkIdType num_selected_meshes = this->getActorCollection()->GetNumberOfSelectedActors();
 	if (num_selected_meshes == 0) {

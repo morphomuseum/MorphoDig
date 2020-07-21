@@ -41,6 +41,7 @@ public:
    void SaveMeshSize();
    void SaveORI();
    void ExportAvizoLandmarks();
+   void ExportLandmarksAsFlags();
    
    
    
@@ -56,10 +57,10 @@ protected:
 	  {
 		  this->ExportAvizoLandmarks();
 	  }
-	/*else if (this->Mode == 2)
+	else if (this->Mode == 2)
 	{
-		this->SavePLY();
-	}*/
+		this->ExportLandmarksAsFlags();
+	}
 	else if (this->Mode == 3)
 	{
 		

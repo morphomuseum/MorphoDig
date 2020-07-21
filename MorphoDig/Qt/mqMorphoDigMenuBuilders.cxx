@@ -200,6 +200,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Normal Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveNormalLMK"), 0);
   new mqSaveLandmarksDialogReaction(submenuLandmark->addAction("Save Target Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveTargetLMK"), 1);  
   new mqSaveDataReaction(submenuLandmark->addAction("Export Normal and Target Landmarks in Avizo/Amira format") << mqSetName("actionExportLM"), 1);
+  new mqSaveDataReaction(submenuLandmark->addAction("Export Normal Landmarks as Flags") << mqSetName("actionExportNormalLMKAsFlags"), 2);
   
   new mqOpenDataReaction(submenuCurves->addAction("Open Curve (.CUR)") << mqSetName("actionOpenCUR"), 5);
   new mqOpenDataReaction(submenuCurves->addAction("Open MorphoDig Landmark/Curve file (.STV)") << mqSetName("actionOpenSTV2"), 16);
@@ -370,7 +371,9 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *KeepLargest = submenuStructureModification->addAction("Connectivity : keep largest region for each selected surface");
 
 	QAction *Invert = submenuStructureModification->addAction("Invert each selected surface");
-	QAction *Mirror = submenuStructureModification->addAction("Mirror each selected surface along Y plane");
+	QAction *MirrorX = submenuStructureModification->addAction("Mirror each selected surface along X plane");
+	QAction *MirrorY = submenuStructureModification->addAction("Mirror each selected surface along Y plane");
+	QAction *MirrorZ = submenuStructureModification->addAction("Mirror each selected surface along Z plane");
 	
 	/*QAction *Lasso = submenuStructureModification->addAction("Lasso cut: keep inside the selection");
 	QAction *Lasso2 = submenuStructureModification->addAction("Lasso cut: keep outside the selection");*/
@@ -418,7 +421,9 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	
 	QAction::connect(KeepLargest, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotKeepLargest()));
 	QAction::connect(Invert, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotInvert()));
-	QAction::connect(Mirror, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirror()));
+	QAction::connect(MirrorX, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirrorX()));
+	QAction::connect(MirrorY, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirrorY()));
+	QAction::connect(MirrorZ, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotMirrorZ()));
 	QAction::connect(ConvexHULL, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotConvexHULL()));
 	/*QAction::connect(Lasso, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepInside()));
 	QAction::connect(Lasso2, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotLassoCutKeepOutside()));*/
