@@ -14743,6 +14743,7 @@ void mqMorphoDigCore::addMirror(int plane)
 	//plane : 0 along YZ (along X)
 	//plane : 1 along XZ (along Y)
 	//plane : 2 along YZ (along Z)
+	cout << "Miccor along : " << plane << endl;
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -14797,6 +14798,7 @@ void mqMorphoDigCore::addMirror(int plane)
 				mfilter->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
 				if (plane == 0)
 				{
+					cout << "Set plane to X" << endl;
 					mfilter->SetPlaneToX();
 				}
 				else if (plane ==1)
@@ -14851,21 +14853,58 @@ void mqMorphoDigCore::addMirror(int plane)
 
 				//only works for XZ plane
 				double n1, n2, n3, n4, n5;
-				n1 = -1 * MatOrig->GetElement(1, 3);// -Y for the translation term
-				n2 = -1 * MatOrig->GetElement(0, 1);// matrix
-				n3 = -1 * MatOrig->GetElement(1, 0);// matrix
-				n4 = -1 * MatOrig->GetElement(1, 2); // matrix
-				n5 = -1 * MatOrig->GetElement(2, 1); // matrix
-			
+				if (plane == 1)
+				{
+					n1 = -1 * MatOrig->GetElement(1, 3);// -Y for the translation term
+					n2 = -1 * MatOrig->GetElement(0, 1);// matrix
+					n3 = -1 * MatOrig->GetElement(1, 0);// matrix
+					n4 = -1 * MatOrig->GetElement(1, 2); // matrix
+					n5 = -1 * MatOrig->GetElement(2, 1); // matrix
 
 
 
-				Mat->SetElement(1, 3, n1);
-				Mat->SetElement(0, 1, n2);
-				Mat->SetElement(1, 0, n3);
-				Mat->SetElement(1, 2, n4);
-				Mat->SetElement(2, 1, n5);
-				
+
+					Mat->SetElement(1, 3, n1);
+					Mat->SetElement(0, 1, n2);
+					Mat->SetElement(1, 0, n3);
+					Mat->SetElement(1, 2, n4);
+					Mat->SetElement(2, 1, n5);
+				}
+				else if (plane == 2)
+				{
+					n1 = -1 * MatOrig->GetElement(2, 3);// -Z for the translation term
+					n2 = -1 * MatOrig->GetElement(0, 2);// matrix
+					n3 = -1 * MatOrig->GetElement(1, 2);// matrix
+					n4 = -1 * MatOrig->GetElement(2, 0); // matrix
+					n5 = -1 * MatOrig->GetElement(2, 1); // matrix
+
+
+
+
+					Mat->SetElement(2, 3, n1);
+					Mat->SetElement(0, 2, n2);
+					Mat->SetElement(1, 2, n3);
+					Mat->SetElement(2, 0, n4);
+					Mat->SetElement(2, 1, n5);
+				}
+				else if (plane == 0)
+				{
+					cout << "X" << endl;
+					n1 = -1 * MatOrig->GetElement(0, 3);// -X for the translation term
+					n2 = -1 * MatOrig->GetElement(0, 1);// matrix
+					n3 = -1 * MatOrig->GetElement(0, 2);// matrix
+					n4 = -1 * MatOrig->GetElement(1, 0); // matrix
+					n5 = -1 * MatOrig->GetElement(2, 0); // matrix
+
+
+
+
+					Mat->SetElement(0, 3, n1);
+					Mat->SetElement(0, 1, n2);
+					Mat->SetElement(0, 2, n3);
+					Mat->SetElement(1, 0, n4);
+					Mat->SetElement(2, 0, n5);
+				}
 
 				vtkTransform *newTransform = vtkTransform::New();
 				newTransform->PostMultiply();
