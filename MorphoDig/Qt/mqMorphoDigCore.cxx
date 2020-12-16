@@ -22167,7 +22167,60 @@ void mqMorphoDigCore::LandmarksMoveDown()
 	this->Render();
 	
 }
+void mqMorphoDigCore::SelectSmallObjects(int triangles)
+{
+	this->ActorCollection->InitTraversal();
+	std::string action = "Select small objects";
+	int mCount = BEGIN_UNDO_SET(action);
 
+
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetNumberOfCells()<triangles)
+		{
+			myActor->SaveState(mCount);
+			myActor->SetSelected(1);
+		}
+	}
+	END_UNDO_SET();
+
+
+
+}
+void mqMorphoDigCore::SelectSmallVolumes(double volume)
+{
+	this->ActorCollection->InitTraversal();
+	std::string action = "Select small volumes";
+	int mCount = BEGIN_UNDO_SET(action);
+
+
+
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+		vtkPolyData *mPD = mapper->GetInput();
+		double Area = 0;
+		double actorVolume = 0;
+		vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+		massProp->SetInputData(mapper->GetInput());
+		massProp->Update();		
+		actorVolume = massProp->GetVolume();
+
+
+		if (actorVolume < volume)
+		{
+			myActor->SaveState(mCount);
+			myActor->SetSelected(1);
+		}
+	}
+	END_UNDO_SET();
+
+
+
+}
 void mqMorphoDigCore::SelectLandmarkRange(int start, int end, int lm_type)
 {
 	//cout << "Select landmark range: " << start << ", " << end << ", " << lm_type << endl;
@@ -24623,6 +24676,20 @@ void mqMorphoDigCore::Getmui_DefaultMeshColor(double c[4])
 	c[2] = co[2];
 	c[3] = co[3];
 }
+
+
+void mqMorphoDigCore::Setmui_MeshColorNoAlpha(double c1, double c2, double c3)
+{
+	double c[3];
+	c[0] = c1;
+	c[1] = c2;
+	c[2] = c3;
+	
+
+
+	this->Setmui_MeshColor(c);
+}
+
 void mqMorphoDigCore::Setmui_MeshColor(double c1, double c2, double c3, double c4)
 {
 	double c[4];
@@ -24654,6 +24721,27 @@ void mqMorphoDigCore::Setmui_MeshColor(double c[4])
 	}
 }
 
+void mqMorphoDigCore::Setmui_MeshColorNoAlpha(double c[3])
+{
+	//keep alpha as it is.
+	this->mui_MeshColor[0] = c[0];
+	this->mui_MeshColor[1] = c[1];
+	this->mui_MeshColor[2] = c[2];
+	
+	//cout << "Core: this->mui_MeshColor[3]="<<this->mui_MeshColor[3] << endl;
+	this->ActorCollection->InitTraversal();
+	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+	{
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+			double alpha = myActor->GetmColor()[3];
+			this->mui_MeshColor[3] = alpha;
+			myActor->SetmColor(this->mui_MeshColor);
+			myActor->SetSelected(0);
+		}
+	}
+}
 double* mqMorphoDigCore::Getmui_FlagColor() { return this->mui_FlagColor; }
 void mqMorphoDigCore::Getmui_FlagColor(double c[3])
 {

@@ -87,6 +87,10 @@ mqEditAllFLGLengthDialog.cxx
 mqEditAllFLGLengthDialog.h
 mqEditAllFLGLengthDialogReaction.cxx
 mqEditAllFLGLengthDialogReaction.h
+mqEditAllSurfacesColorDialog.h
+mqEditAllSurfacesColorDialog.cxx
+mqEditAllSurfacesColorDialogReaction.h
+mqEditAllSurfacesColorDialogReaction.cxx
 mqEditAlphaDialog.cxx
 mqEditAlphaDialog.h
 mqEditAlphaDialogReaction.cxx
@@ -307,6 +311,14 @@ mqScreenshotDialog.cxx
 mqScreenshotDialog.h
 mqScreenshotDialogReaction.cxx
 mqScreenshotDialogReaction.h
+mqSelectSmallObjectsDialog.h
+mqSelectSmallObjectsDialog.cxx
+mqSelectSmallObjectsDialogReaction.h
+mqSelectSmallObjectsDialogReaction.cxx
+mqSelectSmallVolumesDialog.h
+mqSelectSmallVolumesDialog.cxx
+mqSelectSmallVolumesDialogReaction.h
+mqSelectSmallVolumesDialogReaction.cxx
 mqSelectLandmarkRangeDialog.cxx
 mqSelectLandmarkRangeDialog.h
 mqSelectLandmarkRangeDialogReaction.cxx
@@ -384,6 +396,7 @@ mqEditAlphaDialog.ui
 mqEditFLGDialog.ui
 mqEditLMKDialog.ui
 mqEditScalarsDialog.ui
+mqEditAllSurfacesColorDialog.ui
 mqEditTagsDialog.ui
 mqEditVolumeDialog.ui
 mqExtractScalarRangeDialog.ui
@@ -436,6 +449,8 @@ mqScalarsThicknessBetweenDialog.ui
 mqScalarsThicknessDialog.ui
 mqScreenshotDialog.ui
 mqSelectLandmarkRangeDialog.ui
+mqSelectSmallObjectsDialog.ui
+mqSelectSmallVolumesDialog.ui
 mqShrinkWrapDialog.ui
 mqShrinkWrapIterativeDialog.ui
 mqSmoothDialog.ui

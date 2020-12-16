@@ -6,8 +6,8 @@
  
 =========================================================================*/
 
-#include "mqMedianFilterDialog.h"
-#include "ui_mqMedianFilterDialog.h"
+#include "mqSelectSmallObjectsDialog.h"
+#include "ui_mqSelectSmallObjectsDialog.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
 #include "mqUndoStack.h"
@@ -21,8 +21,6 @@
 #include <QRadioButton>
 #include <QFileDialog>
 #include <QCheckBox>
-#include <QString>
-
 #include <QHeaderView>
 
 
@@ -53,16 +51,24 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqMedianFilterDialog::mqMedianFilterDialog(QWidget* Parent)
+mqSelectSmallObjectsDialog::mqSelectSmallObjectsDialog(QWidget* Parent)
   : QDialog(Parent)
-  , Ui(new Ui::mqMedianFilterDialog())
+  , Ui(new Ui::mqSelectSmallObjectsDialog())
 {
 	this->Ui->setupUi(this);
-	this->setObjectName("mqMedianFilterDialog");	
+	this->setObjectName("mqSelectSmallObjectsDialog");	
+	double meshcolor[4];
 	
-	this->myVolume = NULL;
+	
+	this->Ui->triangles->setMinimum(2);
+	this->Ui->triangles->setMaximum(20000000);
+	this->Ui->triangles->setSingleStep(1000);
+	this->Ui->triangles->setValue(500);
+	
+
+	
   
-	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotMedianFilter()));
+	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSelectSmallObjects()));
 
 }
 
@@ -70,45 +76,35 @@ mqMedianFilterDialog::mqMedianFilterDialog(QWidget* Parent)
 
 
 //-----------------------------------------------------------------------------
-mqMedianFilterDialog::~mqMedianFilterDialog()
+mqSelectSmallObjectsDialog::~mqSelectSmallObjectsDialog()
 {
 
  //depending on what is 
 	
   delete this->Ui;
 }
-void mqMedianFilterDialog::MedianFilter()
+void mqSelectSmallObjectsDialog::SelectSmallObjects()
 {
-	cout << "MedianFilter dialog" << endl;
+	cout << "Edit alpha" << endl;
 	
-	if (mqMorphoDigCore::instance()->getVolumeCollection()->GetNumberOfSelectedVolumes() ==1)
+	if (mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfItems() > 0)
 	{
-		std::string action = "MedianFilter";
-		if (this->myVolume != NULL)
-		{
-			this->myVolume->MedianFilter(this->Ui->x->value(), this->Ui->y->value(), this->Ui->z->value());
-			mqMorphoDigCore::instance()->sendSignalVolumesMightHaveChanged();
-			mqMorphoDigCore::instance()->Render();
-		}
-		//mqMorphoDigCore::instance()->addMedianFilter(this->Ui->flyingEdges->isChecked(), this->Ui->threshold->value());
+		std::string action = "Select small surfaces";
 		
+		mqMorphoDigCore::instance()->SelectSmallObjects(this->Ui->triangles->value());// to update body size!
+		mqMorphoDigCore::instance()->Render();
 	}
 }
 
 
 
-void mqMedianFilterDialog::setVolume (vtkMDVolume *vol)
+
+
+
+
+void mqSelectSmallObjectsDialog::slotSelectSmallObjects()
 {
-	this->myVolume = vol;
-	QString myLabel(this->myVolume->GetName().c_str());
-	this->Ui->VolumeName->setText(myLabel);
-}
-
-
-
-void mqMedianFilterDialog::slotMedianFilter()
-{
-	this->MedianFilter();
+	this->SelectSmallObjects();
 }
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>446</width>
-    <height>495</height>
+    <height>498</height>
    </rect>
   </property>
   <property name="palette">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>440</y>
+     <y>460</y>
      <width>161</width>
      <height>25</height>
     </rect>
@@ -472,7 +472,7 @@
      <x>10</x>
      <y>10</y>
      <width>421</width>
-     <height>401</height>
+     <height>421</height>
     </rect>
    </property>
    <property name="title">
@@ -775,9 +775,9 @@
    <widget class="QGroupBox" name="ActorScalars">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>260</y>
-      <width>331</width>
+      <x>30</x>
+      <y>290</y>
+      <width>351</width>
       <height>121</height>
      </rect>
     </property>
@@ -1006,12 +1006,25 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="ApplyMatrix_all">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>253</y>
+      <width>221</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply matrix to all surfaces</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>440</y>
+     <y>460</y>
      <width>159</width>
      <height>23</height>
     </rect>

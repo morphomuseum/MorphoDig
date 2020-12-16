@@ -683,7 +683,9 @@ public:
 	double* Getmui_DefaultMeshColor();
 	void Getmui_DefaultMeshColor(double c[4]);
 	void Setmui_MeshColor(double c1, double c2, double c3, double c4);
+	void Setmui_MeshColorNoAlpha(double c1, double c2, double c3);//do not change alpha
 	void Setmui_MeshColor(double c[4]);
+	void Setmui_MeshColorNoAlpha(double c[3]);//do not change alpha
 
 
 	double* Getmui_FlagColor();
@@ -848,6 +850,8 @@ public:
 
 	void LandmarksMoveDown();
 	void SelectLandmarkRange(int start, int end, int lm_type);
+	void SelectSmallObjects(int triangles);
+	void SelectSmallVolumes(double volume);
 	void UpdateAllSelectedFlagsColors();
 	void UpdateAllSelectedFlagsColors(double flagcolor[4]);
 	void UpdateAllSelectedFlagsLengths(double flag_rendering_size);

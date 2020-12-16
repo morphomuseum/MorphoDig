@@ -45,6 +45,9 @@
 #include "mqMedianFilterDialogReaction.h"
 #include "mqGaussianFilterDialogReaction.h"
 #include "mqEditAllFLGColorDialogReaction.h"
+#include "mqEditAllSurfacesColorDialogReaction.h"
+#include "mqSelectSmallObjectsDialogReaction.h"
+#include "mqSelectSmallVolumesDialogReaction.h"
 #include "mqShrinkWrapDialogReaction.h"
 #include "mqShrinkWrapIterativeDialogReaction.h"
 #include "mqBooleanOperationDialogReaction.h"
@@ -399,6 +402,7 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 
 	QMenu* submenuChangeObjectColor = submenuRenderingModification->addMenu("Change object solid color");
 
+	new mqEditAllSurfacesColorDialogReaction(submenuChangeObjectColor->addAction("Custom color") << mqSetName("actionEditAllSelectedSurfacesColors"));
 	QAction *Grey = submenuChangeObjectColor->addAction("Grey");
 	
 	QAction *Yellow = submenuChangeObjectColor->addAction("Yellow");
@@ -415,6 +419,9 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QAction *Brown = submenuChangeObjectColor->addAction("Brown");
 	
 	QMenu* submenuSupportMaterial = menu.addMenu("Create 3D primitives");
+	
+	new mqSelectSmallObjectsDialogReaction(menu.addAction("Select small objects") << mqSetName("actionSelectSmallObjects"));
+	new mqSelectSmallVolumesDialogReaction(menu.addAction("Select small volumes") << mqSetName("actionSelectSmallVolumes"));
 	new mqCylinderDialogReaction(submenuSupportMaterial->addAction("Create cylindric connective struts") << mqSetName("actionCylinders"));
 	new mqCubeDialogReaction(submenuSupportMaterial->addAction("Create cubic/box-shaped connective struts") << mqSetName("actionCubes"));	
 	new mqIcosahedronDialogReaction(submenuSupportMaterial->addAction("Create icosahedrons/spheres") << mqSetName("actionIcos"));

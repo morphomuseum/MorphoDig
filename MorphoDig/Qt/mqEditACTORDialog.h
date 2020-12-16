@@ -52,6 +52,7 @@ public:
   virtual void slotHardenTransform();
   virtual void slotRefreshMatrix();
   virtual void slotapplyMatrixToAllSelectedActors();
+  virtual void slotapplyMatrixToAllActors();
   virtual void slotEditScalar();
   virtual void slotDuplicateScalar();
   virtual void slotDeleteScalar();
