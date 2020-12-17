@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Edit transparency of all selected actors</string>
+   <string>Select objects having a small number of triangles</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">

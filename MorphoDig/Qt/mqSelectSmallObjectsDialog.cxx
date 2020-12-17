@@ -57,7 +57,7 @@ mqSelectSmallObjectsDialog::mqSelectSmallObjectsDialog(QWidget* Parent)
 {
 	this->Ui->setupUi(this);
 	this->setObjectName("mqSelectSmallObjectsDialog");	
-	double meshcolor[4];
+	
 	
 	
 	this->Ui->triangles->setMinimum(2);

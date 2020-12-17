@@ -453,7 +453,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Edit color of all selected flags</string>
+   <string>Edit color of all selected surfaces</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
