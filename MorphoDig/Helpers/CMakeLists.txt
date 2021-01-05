@@ -47,6 +47,36 @@ vtkMDCubeSource.h
 #Sorry but we need QT for the undo stack stuff... 
 #So far, in the interactor style and in the core
 #Something has to be improved
+
+
+find_package(VTK
+  COMPONENTS   
+  ChartsCore 
+  FiltersExtraction
+  FiltersGeometry
+  FiltersModeling
+  FiltersStatistics
+  GUISupportQt    
+  InfovisCore
+  ImagingGeneral
+  ImagingStatistics
+  ImagingStencil
+  InteractionImage
+  InteractionStyle
+  InteractionWidgets
+  IOGeometry
+  IOImage
+  IOLegacy
+  IOPLY
+  IOXML
+  RenderingAnnotation
+  RenderingFreeType
+  RenderingImage
+  RenderingOpenGL2 
+  RenderingVolumeOpenGL2
+  ViewsContext2D
+  )
+
 find_package(Qt5 COMPONENTS Widgets REQUIRED QUIET)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
@@ -55,6 +85,6 @@ ADD_LIBRARY (MorphoDigHelpers ${Helpers_SRCS} ${Helpers_HDRS} ${Qt5_LIBRARIES})
 include_directories ("${PROJECT_SOURCE_DIR}/Qt")
 
 TARGET_LINK_LIBRARIES(MorphoDigHelpers  ${VTK_LIBRARIES} )
-
+vtk_module_autoinit(TARGETS MorphoDigHelpers  MODULES ${VTK_LIBRARIES})
 
 

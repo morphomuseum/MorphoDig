@@ -15,6 +15,7 @@ Module:    vtkMDActorCollection.h
 #include <vtkActorCollection.h>
 #include <vtkMDActor.h>
 #include <vtkSmartPointer.h>
+#include <vtkRenderer.h>
 #include <vector>
 
 class vtkMTCollectionUndoRedo

@@ -15,6 +15,7 @@ Module:    vtkMDVolumeCollection.h
 #include <vtkVolumeCollection.h>
 #include <vtkMDVolume.h>
 #include <vtkSmartPointer.h>
+#include <vtkRenderer.h>
 #include <vector>
 
 class vtkMDVolumeCollectionUndoRedo

@@ -19,6 +19,7 @@ VTK_Group_Qt : v
 vtlGuiSupportQt: v
 VTK_USE_LARGE_DATA : v
 Module_vtkGUISupportQtOpenGL : v
+Enalbe VTK_RenderingOpenGL2 VTK_RenderingVolumeOpenGL2 VTK_RenderingContextOpenGL2  VTK_RenderingOpenGL 
 
 http://www.vtk.org/Wiki/VTK/Tutorials/QtSetup
 

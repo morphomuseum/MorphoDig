@@ -30,7 +30,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkLine.h>
 #include <vtkCellData.h>
 #include <vtkProperty.h>
-
+#include <vtkSmartPointer.h>
+#include <vtkUnsignedCharArray.h>
 
 vtkStandardNewMacro(vtkGridActor);
 

@@ -6,6 +6,11 @@
 
 =========================================================================*/
 #include "mqMorphoDigCore.h"
+
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+
 #include "vtkMDActor.h"
 #include "vtkMDVolume.h"
 #include "vtkLMActor.h"
@@ -4231,7 +4236,7 @@ int mqMorphoDigCore::context_file_exists(QString path, QString ext, QString post
 		filename = filename + postfix;
 	}
 	filename += ext;
-	ifstream file(filename.toLocal8Bit());
+	std::ifstream file(filename.toLocal8Bit());
 	if (file)
 	{
 		file.close();
@@ -4255,7 +4260,7 @@ int mqMorphoDigCore::selected_file_exists(QString path, QString ext, QString pos
 			filename += postfix;
 		}
 		filename += ext;;
-		ifstream file(filename.toLocal8Bit());
+		std::ifstream file(filename.toLocal8Bit());
 		if (file)
 		{
 			file.close();
@@ -4780,7 +4785,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -4908,7 +4913,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode, int doROI)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -5083,7 +5088,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -5255,7 +5260,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 	if (length > 0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -5481,7 +5486,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -5564,7 +5569,7 @@ void mqMorphoDigCore::OpenPTS(QString fileName, int mode)
 	if (length > 0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -5654,7 +5659,7 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 	if (length > 0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -5738,7 +5743,7 @@ void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -8162,7 +8167,7 @@ void mqMorphoDigCore::OpenORI(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -8257,7 +8262,7 @@ void mqMorphoDigCore::OpenCUR(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -8354,7 +8359,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -8494,7 +8499,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 
 
 		int file_exists = 1;
-		ifstream file(filename.c_str());
+		std::ifstream file(filename.c_str());
 
 		if (file)
 		{
@@ -8578,7 +8583,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
@@ -9186,7 +9191,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_mesh == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_mesh_fullpath.toLocal8Bit());
+					std::ifstream file2(_mesh_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -9208,7 +9213,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_pos == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_pos_fullpath.toLocal8Bit());
+					std::ifstream file2(_pos_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -9311,7 +9316,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_vol == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_vol_fullpath.toLocal8Bit());
+					std::ifstream file2(_vol_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -9328,7 +9333,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_msk == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_msk_fullpath.toLocal8Bit());
+					std::ifstream file2(_msk_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -9348,7 +9353,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_pos == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_pos_fullpath.toLocal8Bit());
+					std::ifstream file2(_pos_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -9370,7 +9375,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				if (overwrite_map == 0)
 				{
 					// in that case, check if file exists...								
-					ifstream file2(_map_fullpath.toLocal8Bit());
+					std::ifstream file2(_map_fullpath.toLocal8Bit());
 					if (file2)
 					{
 						write = 0;
@@ -9510,7 +9515,7 @@ void mqMorphoDigCore::OpenCAM(QString fileName)
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			file.close();
@@ -9825,7 +9830,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 	if (length>0)
 	{
 		int file_exists = 1;
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		if (file)
 		{
 			
@@ -21713,7 +21718,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		{
 			fileName.append(".ply");
 		}
-		ifstream file(fileName.toLocal8Bit());
+		std::ifstream file(fileName.toLocal8Bit());
 		
 		
 			Writer->SetFileName(fileName.toLocal8Bit());

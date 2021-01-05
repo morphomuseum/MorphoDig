@@ -34,6 +34,7 @@ Module:    vtkMDActor.cxx
 #include <vtkPlane.h>
 #include <QString>
 #include <QMessageBox>
+#include <vtkIdTypeArray.h>
 vtkStandardNewMacro(vtkMDActor);
 
 

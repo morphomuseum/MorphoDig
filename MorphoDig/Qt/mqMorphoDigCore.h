@@ -27,6 +27,8 @@
 #include <vtkGPUVolumeRayCastMapper.h>
 #include<vtkOpenGLGPUVolumeRayCastMapper.h>
 #include <vtkBoxWidget.h>
+#include <vtkSmartPointer.h>
+#include <vtkLookupTable.h>
 #include <vtkInteractorStyleDrawPolygon.h>
 #include <vtkPlanes.h>
 #include <vtkInteractorStyleRubberBand3D.h>

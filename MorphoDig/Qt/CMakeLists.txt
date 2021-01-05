@@ -1,3 +1,31 @@
+find_package(VTK
+  COMPONENTS
+  ChartsCore
+  GUISupportQt 
+  FiltersExtraction
+  FiltersGeometry
+  FiltersModeling
+  FiltersStatistics  
+  ImagingGeneral
+  ImagingStatistics   
+  ImagingStencil
+  InfovisCore
+  InteractionImage
+  InteractionStyle
+  InteractionWidgets
+  IOGeometry
+  IOImage
+  IOLegacy
+  IOPLY
+  IOXML
+  RenderingAnnotation
+  RenderingFreeType
+  RenderingImage 
+  RenderingOpenGL2 
+  RenderingVolumeOpenGL2
+  ViewsContext2D
+  )
+
 set (Qt_SRCS
 QDoubleReleaseSlider.cxx
 QDoubleReleaseSlider.h
@@ -493,10 +521,13 @@ include_directories ("${PROJECT_SOURCE_DIR}/Helpers")
 ADD_LIBRARY (MorphoDigQt ${Qt_SRCS} ${QtUI_Srcs} ${Qt_UIs}   
  
 
+
+
  
 #${Qt_HDRS}
 )
-
+TARGET_LINK_LIBRARIES(MorphoDigQt ${VTK_LIBRARIES} )
+vtk_module_autoinit(TARGETS MorphoDigQt   MODULES ${VTK_LIBRARIES})
 
 
 
