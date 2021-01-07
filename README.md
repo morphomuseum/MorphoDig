@@ -10,13 +10,13 @@ Unfortunately, MorphoDig cannot be compiled using the VTK packages in the reposi
 
 0. Install the necessary build tools
 `sudo apt install build-essential qtbase5-dev cmake-curses-gui`
-1. Install the current VTK version (8.2)
+1. Install the current VTK version (9.0)
 ```
-wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
-tar -xzfv VTK-8.2.0.tar.gz`
-mkdir vtk8.2-build
-cd vtk8.2-build
-cmake ../VTK-8.2.0 -DVTK_Group_Imaging=ON -DVTK_Group_Qt=ON -DVTK_Group_Rendering=ON -DVTK_Group_StandAlone=ON -DVTK_Group_Views=ON
+wget https://www.vtk.org/files/release/9.0.1/VTK-9.0.1.tar.gz
+tar -xzfv VTK-9.0.1.tar.gz`
+mkdir vtk9.0-build
+cd vtk9.0-build
+cmake ../VTK-9.0.0 -DVTK_Group_Imaging=ON -DVTK_Group_Qt=ON -DVTK_Group_Rendering=ON -DVTK_Group_StandAlone=ON -DVTK_Group_Views=ON
 make 
 sudo make install
 ```
@@ -40,13 +40,16 @@ Windows binaries are downloadable at the following address : http://morphomuseum
 ## Build morphodig on Windows
 1.  install visual studio 2017 express for desktop.
 2.  install Qt 5
-4.  download and install CMAKE (>=3.4.x) (http://cmake.org).
-5.  download and build VTK (>=8.2) (http://vtk.org) using CMAKE with the following options:
+4.  download and install CMAKE (>=3.19.x) (http://cmake.org).
+5.  download and build VTK (>=9.0) (http://vtk.org) using CMAKE with the following options:
 * VTK_Group_Qt : v
 * VTK_USE_LARGE_DATA : v
 * Module vtlGuiSupportQt: v
 * Module vtkGUISupportQtOpenGL : v
-
+* Module vtkGUISupportQtOpenGL : v
+* Module vtkRenderingContextOpenGL2 : YES
+* Module vtkRenderingOpenGL2 : YES
+* Module vtkRenderingVolumeOpenGL2 : YES
 
 
 Then add to environment variables: 
