@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>463</width>
-    <height>403</height>
+    <height>570</height>
    </rect>
   </property>
   <property name="palette">
@@ -458,8 +458,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>370</y>
+     <x>100</x>
+     <y>530</y>
      <width>239</width>
      <height>25</height>
     </rect>
@@ -587,6 +587,45 @@
     </property>
     <property name="value">
      <double>0.050000000000000</double>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>370</y>
+     <width>441</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Activate &quot;SSAO&quot;</string>
+   </property>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>811</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screen-Space ambiant occlusion (SSAO) is a rendering technique &lt;br/&gt;that improves depth perception of 3D surfaces.&lt;/p&gt;&lt;p&gt;Note: when on, anaglyph (red / blue ) rendering can not be achieved&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ssaoOn">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>100</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SSAO On</string>
     </property>
    </widget>
   </widget>

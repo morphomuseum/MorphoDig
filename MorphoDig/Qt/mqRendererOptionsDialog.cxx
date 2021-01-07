@@ -60,12 +60,16 @@ mqRendererOptionsDialog::mqRendererOptionsDialog(QWidget* Parent)
 	int numPeels= mqMorphoDigCore::instance()->Getmui_RendererMaximalNumberOfPeels();
 	this->Ui->numPeels->setValue(numPeels);
 	
+	int ssaoOn = mqMorphoDigCore::instance()->Getmui_SSAO_On();
+	this->Ui->ssaoOn->setChecked(ssaoOn);
+
 	double occlusionRatio = mqMorphoDigCore::instance()->Getmui_RendererOcclusionRatio();
 	this->Ui->occlusionRatio->setValue(occlusionRatio);
 
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotEditRendererOptions()));
 	 connect(this->Ui->reinit, SIGNAL(clicked()), this, SLOT(slotReinitialize()));
-	 	 
+	 connect(this->Ui->ssaoOn, SIGNAL(clicked(bool)), this, SLOT(slotEnableSSAO(bool)));
+	 
 	
 }
 
@@ -93,6 +97,12 @@ void mqRendererOptionsDialog::editRendererOptions()
 void mqRendererOptionsDialog::slotEditRendererOptions()
 {
 	this->editRendererOptions();
+}
+
+void mqRendererOptionsDialog::slotEnableSSAO(bool on)
+{
+	mqMorphoDigCore::instance()->Setmui_SSAO_On((int)on);
+	mqMorphoDigCore::instance()->Render();
 }
 
 void mqRendererOptionsDialog::slotReinitialize()

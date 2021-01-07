@@ -493,13 +493,17 @@ public:
 	void UnselectAll(int Count);
 	void SelectAll(int Count);
 
+	int Getmui_SSAO_On();
+	int Getmui_DefaultSSAO_On();
+	void Setmui_SSAO_On(int on);
+
 	void Setmui_RendererOcclusionRatio(double ratio);
 	void Setmui_RendererMaximalNumberOfPeels(int numpeels);
 	double Getmui_RendererOcclusionRatio();
-	int Getmui_RendererMaximalNumberOfPeels();
 
-	
-	
+
+	int Getmui_RendererMaximalNumberOfPeels();
+		
 	double Getmui_DefaultRendererOcclusionRatio();
 	int Getmui_DefaultRendererMaximalNumberOfPeels();
 
@@ -1174,6 +1178,8 @@ protected:
 	ExistingTagMaps *mui_ExistingTagMaps;
 	double mui_RendererOcclusionRatio;
 	int mui_RendererMaximalNumberOfPeels;
+	int mui_SSAO_On;
+	int mui_DefaultSSAO_On;
 	double mui_DefaultRendererOcclusionRatio;
 	int mui_DefaultRendererMaximalNumberOfPeels;
 	int mui_ActiveTag;

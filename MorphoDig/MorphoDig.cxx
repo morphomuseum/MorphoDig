@@ -983,9 +983,11 @@ this->segView4 = new QVTKOpenGLWidget();
 	
 	double defaultRendererOcclusionRatio = this->MorphoDigCore->Getmui_DefaultRendererOcclusionRatio();
 	int defaultRendererMaximalNumberOfPeels = this->MorphoDigCore->Getmui_DefaultRendererMaximalNumberOfPeels();
+
 	this->MorphoDigCore->Setmui_RendererOcclusionRatio(settings.value("OcclusionRatio", defaultRendererOcclusionRatio).toDouble());
 	this->MorphoDigCore->Setmui_RendererMaximalNumberOfPeels(settings.value("NumPeels", defaultRendererMaximalNumberOfPeels).toInt());
-	
+	int defaultSSAO_On = this->MorphoDigCore->Getmui_DefaultSSAO_On();
+	this->MorphoDigCore->Setmui_SSAO_On(settings.value("SSAO_On", defaultSSAO_On).toInt());
 
 	settings.endGroup();
 
@@ -2098,6 +2100,7 @@ void MorphoDig::saveSettings()
 	settings.setValue("DisplayMode", this->MorphoDigCore->Getmui_DisplayMode());
 	settings.setValue("OcclusionRatio", this->MorphoDigCore->Getmui_RendererOcclusionRatio());
 	settings.setValue("NumPeels", this->MorphoDigCore->Getmui_RendererMaximalNumberOfPeels());
+	settings.setValue("SSAO_On", this->MorphoDigCore->Getmui_SSAO_On());
 	
 	settings.endGroup();
 

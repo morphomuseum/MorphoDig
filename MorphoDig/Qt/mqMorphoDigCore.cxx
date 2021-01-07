@@ -14,6 +14,16 @@
 #include "vtkMDActor.h"
 #include "vtkMDVolume.h"
 #include "vtkLMActor.h"
+#include <vtkSSAOPass.h>
+#include <vtkLightsPass.h>
+#include <vtkOpaquePass.h>
+#include <vtkTranslucentPass.h>
+#include <vtkVolumetricPass.h>
+#include <vtkRenderStepsPass.h>
+#include <vtkRenderPassCollection.h>
+#include <vtkCameraPass.h>
+#include <vtkDualDepthPeelingPass.h>
+#include <vtkSequencePass.h>
 #include <vtkDICOMImageReader.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkCallbackCommand.h>
@@ -183,6 +193,8 @@ mqMorphoDigCore::mqMorphoDigCore()
 	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << endl;*/
 	this->mui_DefaultRendererOcclusionRatio = this->mui_RendererOcclusionRatio = 0.05;
 	this->mui_DefaultRendererMaximalNumberOfPeels = this->mui_RendererMaximalNumberOfPeels = 50;
+	this->mui_DefaultSSAO_On = this->mui_SSAO_On = 1;
+	
 	this->mui_DefaultSpecularPower = this->mui_SpecularPower = 1;
 	this->mui_DefaultSpecular = this->mui_Specular= 0;
 	this->mui_DefaultAmbient = this->mui_Ambient= 0;
@@ -421,6 +433,25 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->Renderer->UseDepthPeelingForVolumesOn();
 	this->Renderer->SetMaximumNumberOfPeels(this->Getmui_RendererMaximalNumberOfPeels());
 	this->Renderer->SetOcclusionRatio(this->Getmui_RendererOcclusionRatio());
+	
+	
+
+	/*
+	vtkSmartPointer<vtkRenderStepsPass> basicPasses  = vtkSmartPointer<vtkRenderStepsPass>::New();
+	
+	double sceneSize= 200; // e.g. the diagonal of the bounding box
+
+	
+	vtkSmartPointer<vtkSSAOPass> ssao = vtkSmartPointer<vtkSSAOPass>::New();
+	ssao->SetRadius(0.1 * sceneSize); // comparison radius
+	ssao->SetBias(0.001 * sceneSize); // comparison bias
+	ssao->SetKernelSize(128); // number of samples used
+	ssao->BlurOff(); // do not blur occlusion
+	ssao->SetDelegatePass(basicPasses);
+
+	this->Renderer->SetPass(ssao);
+	
+	*/
 	this->Camera = this->Renderer->GetActiveCamera();
 	this->GridActor = vtkSmartPointer<vtkGridActor>::New();
 	this->GridActor->SetGridSpacing(this->Getmui_GridSpacing());
@@ -1003,12 +1034,69 @@ void mqMorphoDigCore::Setmui_SegmentDecimation(int decimation)
 
 void mqMorphoDigCore::Setmui_RendererOcclusionRatio(double ratio) { this->mui_RendererOcclusionRatio = ratio;}
 void mqMorphoDigCore::Setmui_RendererMaximalNumberOfPeels(int numpeels){ this->mui_RendererMaximalNumberOfPeels = numpeels; }
+
+void mqMorphoDigCore::Setmui_SSAO_On(int on) { 
+	this->mui_SSAO_On = on;
+	if (on==0)
+	{
+		this->Renderer->SetPass(NULL);
+	}
+	else
+	{
+		//Anaglyph does not work with that.
+		vtkSmartPointer<vtkLightsPass> lightsP = vtkSmartPointer<vtkLightsPass>::New();
+		vtkSmartPointer<vtkOpaquePass> opaqueP = vtkSmartPointer<vtkOpaquePass>::New();
+		vtkSmartPointer<vtkTranslucentPass> translucentP = vtkSmartPointer<vtkTranslucentPass>::New();
+		vtkSmartPointer<vtkVolumetricPass> volumeP = vtkSmartPointer<vtkVolumetricPass>::New();
+
+		vtkSmartPointer<vtkRenderPassCollection> collection = vtkSmartPointer<vtkRenderPassCollection>::New();
+		collection->AddItem(lightsP);
+
+		//# opaque passes
+		vtkSmartPointer<vtkCameraPass> ssaoCamP = vtkSmartPointer<vtkCameraPass>::New();
+		ssaoCamP->SetDelegatePass(opaqueP);
+
+		double sceneSize = 200;
+		vtkSmartPointer<vtkSSAOPass> ssaoP = vtkSmartPointer<vtkSSAOPass>::New();
+		ssaoP->SetRadius(0.1 * sceneSize); // comparison radius
+		ssaoP->SetBias(0.001 * sceneSize); // comparison bias
+		ssaoP->SetKernelSize(128); // number of samples used
+		ssaoP->BlurOn(); //  blur occlusion
+		ssaoP->SetDelegatePass(ssaoCamP);
+
+
+
+		collection->AddItem(ssaoP);
+
+		//# translucent and volumic passes
+		vtkSmartPointer<vtkDualDepthPeelingPass>ddpP = vtkSmartPointer<vtkDualDepthPeelingPass>::New();
+		ddpP->SetTranslucentPass(translucentP);
+		ddpP->SetVolumetricPass(volumeP);
+		collection->AddItem(ddpP);
+
+		vtkSmartPointer<vtkSequencePass> sequence = vtkSmartPointer<vtkSequencePass>::New();
+		sequence->SetPasses(collection);
+
+		vtkSmartPointer<vtkCameraPass> camP = vtkSmartPointer<vtkCameraPass> ::New();
+		camP->SetDelegatePass(sequence);
+
+		this->Renderer->SetPass(camP);
+
+
+
+	}
+}
+
+
 double mqMorphoDigCore::Getmui_RendererOcclusionRatio() { return this->mui_RendererOcclusionRatio; }
 int mqMorphoDigCore::Getmui_RendererMaximalNumberOfPeels() { return this->mui_RendererMaximalNumberOfPeels; }
+int mqMorphoDigCore::Getmui_SSAO_On() { return this->mui_SSAO_On; }
+int mqMorphoDigCore::Getmui_DefaultSSAO_On() { return this->mui_DefaultSSAO_On; }
 
 double mqMorphoDigCore::Getmui_DefaultRendererOcclusionRatio() { return this->mui_DefaultRendererOcclusionRatio; }
 int mqMorphoDigCore::Getmui_DefaultRendererMaximalNumberOfPeels(){ return this->mui_DefaultRendererMaximalNumberOfPeels; }
 void mqMorphoDigCore::SetOcclusionRatioAndNumPeels(double ratio, int numpeels)
+
 {
 	this->Setmui_RendererOcclusionRatio(ratio);
 	this->Setmui_RendererMaximalNumberOfPeels(numpeels);
@@ -22810,6 +22898,88 @@ void mqMorphoDigCore::ReplaceCameraAndGridAt(double x, double y, double z)
 	this->Render();
 
 
+}
+double mqMorphoDigCore::GetBoundingBoxLength()
+{
+	double boundsa[6];
+	this->ActorCollection->GetBoundingBox(boundsa);
+	double Normalboundslm[6];
+	this->NormalLandmarkCollection->GetBoundingBox(Normalboundslm);
+	double Targetboundslm[6];
+	this->TargetLandmarkCollection->GetBoundingBox(Targetboundslm);
+	double Nodeboundslm[6];
+	this->NodeLandmarkCollection->GetBoundingBox(Nodeboundslm);
+	double Handleboundslm[6];
+	this->HandleLandmarkCollection->GetBoundingBox(Handleboundslm);
+	double Flagboundslm[6];
+	this->FlagLandmarkCollection->GetBoundingBox(Flagboundslm);
+
+
+
+	double largestbounds[6];
+	largestbounds[0] = DBL_MAX;
+	largestbounds[1] = -DBL_MAX;
+	largestbounds[2] = DBL_MAX;
+	largestbounds[3] = -DBL_MAX;
+	largestbounds[4] = DBL_MAX;
+	largestbounds[5] = -DBL_MAX;
+
+	if (boundsa[0] < largestbounds[0]) { largestbounds[0] = boundsa[0]; }
+	if (boundsa[1] > largestbounds[1]) { largestbounds[1] = boundsa[1]; }
+	if (boundsa[2] < largestbounds[2]) { largestbounds[2] = boundsa[2]; }
+	if (boundsa[3] > largestbounds[3]) { largestbounds[3] = boundsa[3]; }
+	if (boundsa[4] < largestbounds[4]) { largestbounds[4] = boundsa[4]; }
+	if (boundsa[5] > largestbounds[5]) { largestbounds[5] = boundsa[5]; }
+
+	if (Normalboundslm[0] < largestbounds[0]) { largestbounds[0] = Normalboundslm[0]; }
+	if (Normalboundslm[1] > largestbounds[1]) { largestbounds[1] = Normalboundslm[1]; }
+	if (Normalboundslm[2] < largestbounds[2]) { largestbounds[2] = Normalboundslm[2]; }
+	if (Normalboundslm[3] > largestbounds[3]) { largestbounds[3] = Normalboundslm[3]; }
+	if (Normalboundslm[4] < largestbounds[4]) { largestbounds[4] = Normalboundslm[4]; }
+	if (Normalboundslm[5] > largestbounds[5]) { largestbounds[5] = Normalboundslm[5]; }
+
+	if (Targetboundslm[0] < largestbounds[0]) { largestbounds[0] = Targetboundslm[0]; }
+	if (Targetboundslm[1] > largestbounds[1]) { largestbounds[1] = Targetboundslm[1]; }
+	if (Targetboundslm[2] < largestbounds[2]) { largestbounds[2] = Targetboundslm[2]; }
+	if (Targetboundslm[3] > largestbounds[3]) { largestbounds[3] = Targetboundslm[3]; }
+	if (Targetboundslm[4] < largestbounds[4]) { largestbounds[4] = Targetboundslm[4]; }
+	if (Targetboundslm[5] > largestbounds[5]) { largestbounds[5] = Targetboundslm[5]; }
+
+	if (Nodeboundslm[0] < largestbounds[0]) { largestbounds[0] = Nodeboundslm[0]; }
+	if (Nodeboundslm[1] > largestbounds[1]) { largestbounds[1] = Nodeboundslm[1]; }
+	if (Nodeboundslm[2] < largestbounds[2]) { largestbounds[2] = Nodeboundslm[2]; }
+	if (Nodeboundslm[3] > largestbounds[3]) { largestbounds[3] = Nodeboundslm[3]; }
+	if (Nodeboundslm[4] < largestbounds[4]) { largestbounds[4] = Nodeboundslm[4]; }
+	if (Nodeboundslm[5] > largestbounds[5]) { largestbounds[5] = Nodeboundslm[5]; }
+
+	if (Handleboundslm[0] < largestbounds[0]) { largestbounds[0] = Handleboundslm[0]; }
+	if (Handleboundslm[1] > largestbounds[1]) { largestbounds[1] = Handleboundslm[1]; }
+	if (Handleboundslm[2] < largestbounds[2]) { largestbounds[2] = Handleboundslm[2]; }
+	if (Handleboundslm[3] > largestbounds[3]) { largestbounds[3] = Handleboundslm[3]; }
+	if (Handleboundslm[4] < largestbounds[4]) { largestbounds[4] = Handleboundslm[4]; }
+	if (Handleboundslm[5] > largestbounds[5]) { largestbounds[5] = Handleboundslm[5]; }
+
+	if (Flagboundslm[0] < largestbounds[0]) { largestbounds[0] = Flagboundslm[0]; }
+	if (Flagboundslm[1] > largestbounds[1]) { largestbounds[1] = Flagboundslm[1]; }
+	if (Flagboundslm[2] < largestbounds[2]) { largestbounds[2] = Flagboundslm[2]; }
+	if (Flagboundslm[3] > largestbounds[3]) { largestbounds[3] = Flagboundslm[3]; }
+	if (Flagboundslm[4] < largestbounds[4]) { largestbounds[4] = Flagboundslm[4]; }
+	if (Flagboundslm[5] > largestbounds[5]) { largestbounds[5] = Flagboundslm[5]; }
+
+	double A[3];
+	double B[3];
+	double diag[3];
+	A[0] = largestbounds[0];
+	A[1] = largestbounds[2];
+	A[2] = largestbounds[4];
+	B[0] = largestbounds[1];
+	B[1] = largestbounds[3];
+	B[2] = largestbounds[5];
+	diag[0] = B[0] - A[0];
+	diag[1] = B[1] - A[1];
+	diag[2] = B[2] - A[2];
+	double lengthxyz = sqrt((diag[0])*(diag[0]) + (diag[1])*(diag[1]) + (diag[2])*(diag[2]));
+	return lengthxyz;
 }
 double mqMorphoDigCore::GetBoundingBoxLengthOfSelectedActors()
 {

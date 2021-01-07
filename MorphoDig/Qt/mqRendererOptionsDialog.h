@@ -37,7 +37,7 @@ public:
    
   virtual void slotEditRendererOptions();
   virtual void slotReinitialize();
-  
+  virtual void slotEnableSSAO(bool on);
 
 protected:
 	

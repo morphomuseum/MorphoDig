@@ -230,8 +230,12 @@ IF (WIN32)
 "${VTK_DIR}/bin/Release/vtkIOXMLParser-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkexpat-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 "${VTK_DIR}/bin/Release/vtkImagingStencil-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
-
-
+  "${VTK_DIR}/bin/Release/vtkjsoncpp-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+  "${VTK_DIR}/bin/Release/vtkRenderingUI-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+  "${VTK_DIR}/bin/Release/vtkpugixml-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+  "${VTK_DIR}/bin/Release/vtkloguru-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+ "${VTK_DIR}/bin/Release/vtkParallelCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+ "${VTK_DIR}/bin/Release/vtkParallelDIY-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
 
 
 
