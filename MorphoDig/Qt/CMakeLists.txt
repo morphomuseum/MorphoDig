@@ -335,6 +335,10 @@ mqScalarsThicknessDialog.cxx
 mqScalarsThicknessDialog.h
 mqScalarsThicknessDialogReaction.cxx
 mqScalarsThicknessDialogReaction.h
+mqScalarsVolumeDialog.cxx
+mqScalarsVolumeDialog.h
+mqScalarsVolumeDialogReaction.cxx
+mqScalarsVolumeDialogReaction.h
 mqScreenshotDialog.cxx
 mqScreenshotDialog.h
 mqScreenshotDialogReaction.cxx
@@ -475,6 +479,7 @@ mqScalarsNormalizationDialog.ui
 mqScalarsSmoothDialog.ui
 mqScalarsThicknessBetweenDialog.ui
 mqScalarsThicknessDialog.ui
+mqScalarsVolumeDialog.ui
 mqScreenshotDialog.ui
 mqSelectLandmarkRangeDialog.ui
 mqSelectSmallObjectsDialog.ui

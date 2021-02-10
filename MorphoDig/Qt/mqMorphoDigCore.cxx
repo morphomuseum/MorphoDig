@@ -16807,6 +16807,326 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 
 
 }
+void mqMorphoDigCore::scalarsAreaVolume(int type, QString scalarName) 
+{
+	//type = 0;
+				// 0 => global volume
+				// 1 =>	decompose volume
+				// 3 => global area
+				// 4 => decompose area
+				
+	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
+
+	vtkIdType num_surf = 0;
+	num_surf = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (num_surf == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+
+	this->ActorCollection->InitTraversal();
+	vtkIdType num = this->ActorCollection->GetNumberOfItems();
+	int modified = 0;
+	//std::string action = "Compute volume scalar";
+	//int Count = BEGIN_UNDO_SET(action);
+	this->ActorCollection->InitTraversal();
+	for (vtkIdType i = 0; i < num; i++)
+	{
+
+		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		if (myActor->GetSelected() == 1)
+		{
+
+			//myActor->SaveState(Count, scalarName);
+			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+			if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
+			{
+				double numvert = mymapper->GetInput()->GetNumberOfPoints();
+				vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray>::New();
+				newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+				newScalars->SetNumberOfTuples(numvert);	
+				//init volume scalar to 0
+				for (vtkIdType i = 0; i < numvert; i++)	// for each vertex of this
+				{
+					newScalars->InsertTuple1(i, 0);
+				}
+				newScalars->SetName(scalarName.toStdString().c_str());
+
+				if (type == 0 || type ==2)
+				{
+					myActor->SetSelected(0);
+					//just compute gloal volume or area
+					vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+					//int cpt = mymapper->GetInput()->GetNumberOfPoints();
+					massProp->SetInputData(mymapper->GetInput());
+					massProp->Update();
+					double Area = massProp->GetSurfaceArea();
+					double Volume = massProp->GetVolume();
+					for (vtkIdType i = 0; i < numvert; i++)	// for each vertex of this
+					{
+						if (type == 2)
+						{
+							newScalars->SetTuple1(i, Area);
+						}
+						else
+						{ 
+							newScalars->SetTuple1(i, Volume);
+						}
+					}
+					//newTagsArray->SetTuple1(j, 0);
+					
+					// test if exists...
+					//
+					int exists = 0;
+
+					vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
+					mPD = mymapper->GetInput();
+					mPD->GetPointData()->RemoveArray(scalarName.toStdString().c_str());
+					mPD->GetPointData()->AddArray(newScalars);
+					mPD->GetPointData()->SetActiveScalars(scalarName.toStdString().c_str());
+
+
+				}
+				else if (type == 1 || type == 3)
+				{
+					vtkSmartPointer<vtkPolyDataConnectivityFilter> cfilter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
+					cfilter->SetInputData(mymapper->GetInput());
+					cfilter->SetExtractionModeToAllRegions();
+					cfilter->ColorRegionsOn();
+					cfilter->Update();
+					int regions = cfilter->GetNumberOfExtractedRegions();
+					std::cout << "\nVtkConnectivity number of regions:" << regions << std::endl;
+					vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
+					region_sizes = cfilter->GetRegionSizes();
+					vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
+					MyObj = cfilter->GetOutput();
+
+					vtkSmartPointer<vtkIdTypeArray> currentRegions = vtkSmartPointer<vtkIdTypeArray>::New();
+					currentRegions = vtkIdTypeArray::SafeDownCast(cfilter->GetOutput()->GetPointData()->GetArray("RegionId"));
+
+					vtkSmartPointer<vtkFloatArray> newScalars2 =
+						vtkSmartPointer<vtkFloatArray>::New();
+					newScalars2->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					newScalars2->SetNumberOfTuples(mymapper->GetInput()->GetNumberOfPoints());
+
+					for (vtkIdType i = 0; i < mymapper->GetInput()->GetNumberOfPoints(); i++)	// for each vertex 
+					{
+						newScalars2->InsertTuple1(i, (double)currentRegions->GetTuple(i)[0]);
+					}
+					newScalars2->SetName("TMP");
+					vtkSmartPointer<vtkPolyData> MyObj3 = vtkSmartPointer<vtkPolyData>::New();
+					MyObj3 = cfilter->GetOutput();
+					MyObj3->GetPointData()->RemoveArray("RegionId");
+					MyObj3->GetPointData()->RemoveArray("TMP");
+					MyObj3->GetPointData()->AddArray(newScalars2);
+
+					for (vtkIdType j = 0; j < region_sizes->GetNumberOfTuples(); j++)
+					{
+
+						if (region_sizes->GetTuple((vtkIdType)j)[0] >= 10)
+						{
+							//std::cout << "\nRegion:" << j <<", nTupes:"<< region_sizes->GetTuple((vtkIdType)j)[0]<< std::endl;
+
+							vtkSmartPointer<vtkThreshold> selector = vtkSmartPointer<vtkThreshold>::New();
+							vtkSmartPointer<vtkMaskFields> scalarsOff = vtkSmartPointer<vtkMaskFields>::New();
+							vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
+
+							selector->SetInputData(MyObj3);
+							selector->SetInputArrayToProcess(0, 0, 0,
+								vtkDataObject::FIELD_ASSOCIATION_CELLS,
+								vtkDataSetAttributes::SCALARS);
+							selector->SetAllScalars(1);
+							selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "TMP");
+							selector->ThresholdBetween((double)(j), (double)(j));
+							selector->Update();
+
+							scalarsOff->SetInputData(selector->GetOutput());
+							scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
+							scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
+							scalarsOff->Update();
+							geometry->SetInputData(scalarsOff->GetOutput());
+							geometry->Update();
+
+							vtkSmartPointer<vtkPolyData> MyObj2 = vtkSmartPointer<vtkPolyData>::New();
+							MyObj2 = geometry->GetOutput();
+
+							vtkSmartPointer<vtkMassProperties> massProp = vtkSmartPointer<vtkMassProperties>::New();
+							//int cpt = mymapper->GetInput()->GetNumberOfPoints();
+							massProp->SetInputData(MyObj2);
+							massProp->Update();
+							double Area = massProp->GetSurfaceArea();
+							double Volume = massProp->GetVolume();
+							std::cout << "\nRegion:" << j << ", nTuples:" << region_sizes->GetTuple((vtkIdType)j)[0] << ", volume:" << Volume << std::endl;
+
+							for (vtkIdType i = 0; i < numvert; i++)	// for each vertex of this
+							{
+								if (currentRegions->GetTuple(i)[0] == j)
+								{
+									if (type == 3)
+									{
+										newScalars->SetTuple1(i, Area);
+									}
+									else
+									{
+										newScalars->SetTuple1(i, Volume);
+									}
+								}
+							}
+
+
+
+						} // if size big enough
+
+					}
+					//now create new actor
+					VTK_CREATE(vtkMDActor, newactor);
+					if (this->mui_BackfaceCulling == 0)
+					{
+						newactor->GetProperty()->BackfaceCullingOff();
+					}
+					else
+					{
+						newactor->GetProperty()->BackfaceCullingOn();
+					}
+					//newactor->SetSelected(0);
+
+					VTK_CREATE(vtkPolyDataMapper, newmapper);
+					newmapper->SetColorModeToDefault();
+
+					if (
+						(this->mui_ActiveArray->DataType == VTK_INT || this->mui_ActiveArray->DataType == VTK_UNSIGNED_INT)
+						&& this->mui_ActiveArray->NumComp == 1
+						)
+					{
+						newmapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
+						newmapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
+					}
+					else
+					{
+						newmapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
+					}
+
+					newmapper->ScalarVisibilityOn();
+					VTK_CREATE(vtkPolyData, myData);
+
+
+
+					MyObj3->GetPointData()->RemoveArray("TMP");
+					MyObj3->GetPointData()->AddArray(newScalars);
+					vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+					//cleanPolyDataFilter->SetInputData(ObjNormals->GetOutput());
+					cleanPolyDataFilter->SetInputData(MyObj3);
+					cleanPolyDataFilter->PieceInvariantOff();
+					cleanPolyDataFilter->ConvertLinesToPointsOff();
+					cleanPolyDataFilter->ConvertPolysToLinesOff();
+					cleanPolyDataFilter->ConvertStripsToPolysOff();
+					cleanPolyDataFilter->PointMergingOn();
+					cleanPolyDataFilter->Update();
+
+					myData = cleanPolyDataFilter->GetOutput();
+					newmapper->SetInputData(myData);
+					vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+					vtkTransform *newTransform = vtkTransform::New();
+					newTransform->PostMultiply();
+
+					newTransform->SetMatrix(Mat);
+					newactor->SetPosition(newTransform->GetPosition());
+					newactor->SetScale(newTransform->GetScale());
+					newactor->SetOrientation(newTransform->GetOrientation());
+					newTransform->Delete();
+
+
+					double color[4] = { 0.5, 0.5, 0.5, 1 };
+					myActor->GetmColor(color);
+					newactor->SetmColor(color);
+
+					newactor->SetMapper(newmapper);
+					newactor->SetSelected(0);
+
+					if (type == 1)
+					{
+					
+						newactor->SetName(myActor->GetName() + "_volume");
+					}	
+					else
+					{
+						newactor->SetName(myActor->GetName() + "_area");
+					}
+					cout << "try to add new actor=" << endl;
+					newcoll->AddTmpItem(newactor);
+
+
+				
+				}
+
+
+			
+				
+
+				modified = 1;
+
+			}
+
+		}
+	}
+	if (modified == 1 )
+	{
+
+		if (type == 0 || type == 2)
+		{
+			//cout << "camera and grid adjusted" << endl;
+			cout << "scalars updated " << endl;
+
+			this->Initmui_ExistingArrays();
+			this->Setmui_ActiveArrayAndRender(scalarName.toStdString().c_str(), VTK_DOUBLE, 1);
+		}
+		else
+		{
+			newcoll->InitTraversal();
+			vtkIdType num = newcoll->GetNumberOfItems();
+			for (vtkIdType i = 0; i < num; i++)
+			{
+				cout << "try to get next actor from newcoll:" << i << endl;
+				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
+				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
+				myActor->SetDisplayMode(this->mui_DisplayMode);
+				this->getActorCollection()->AddItem(myActor);
+				emit this->actorsMightHaveChanged();
+				std::string action = "Area/Volume scalars computed added: " + myActor->GetName();
+				int mCount = BEGIN_UNDO_SET(action);
+				this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
+				END_UNDO_SET();
+
+
+			}
+			//cout << "camera and grid adjusted" << endl;
+			cout << "new actor(s) added" << endl;
+			this->Initmui_ExistingArrays();
+
+			cout << "Set actor collection changed" << endl;
+			this->getActorCollection()->SetChanged(1);
+			cout << "Actor collection changed" << endl;
+
+			this->AdjustCameraAndGrid();
+			cout << "Camera and grid adjusted" << endl;
+
+			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
+			{
+				this->UpdateLandmarkSettings();
+			}
+			this->Render();
+		}
+
+	}
+	
+	/*
+	
+	*/
+	//END_UNDO_SET();
+}
 void mqMorphoDigCore::scalarsCurvature(int curvatureType, QString scalarName)
 {
 	std::string mScalarName = "Curvature";
