@@ -303,7 +303,7 @@ void mqMorphoDigMenuBuilders::buildScalarsMenu(QMenu& menu)
 	new mqScalarsDistanceDialogReaction(menu.addAction("Compute distance between two surfaces") << mqSetName("actionDistanceBetween"));
 	new mqScalarsCurvatureDialogReaction(menu.addAction("Compute curvature for each selected surface") << mqSetName("actionCurvature"));
 	new mqScalarsComplexityDialogReaction(menu.addAction("Compute complexity for each selected surface") << mqSetName("actionComplexity"));
-	new mqScalarsVolumeDialogReaction(menu.addAction("Compute volume for each selected surface") << mqSetName("actionVolume"));
+	new mqScalarsVolumeDialogReaction(menu.addAction("Compute volume or area for each selected surface") << mqSetName("actionVolume"));
 	new mqScalarsSmoothDialogReaction(menu.addAction("Smooth active scalars for each selected surface") << mqSetName("actionSmooth"));
 	new mqScalarsNormalizationDialogReaction(menu.addAction("Normalize or rescale active scalars for each selected surface") << mqSetName("actionNormalize"));
 	new mqExtractScalarRangeDialogReaction(menu.addAction("Extract scalar range for each selected surface") << mqSetName("actionExtractScalarRange"));

@@ -911,7 +911,7 @@ public:
   void scalarsThickness(double max_thickness, int smooth_normals, int avg, QString scalarName, double angularLimit);
   void scalarsComplexity(double localAreaLimit, int customLocalAreaLimit, QString scalarName, int mode);
   void scalarsCurvature(int curvatureType, QString scalarName);
-  void scalarsAreaVolume(int type, QString scalarName);
+  void scalarsAreaVolume(int type, int min_region_size, QString scalarName);
   void ShrinkWrap(int iteration, double relaxation, vtkMDActor *impactedActor, vtkMDActor* observedActor);
   void ShrinkWrapIterative(QString scalarName, int mode, int iteration, double stopCriterion, double radius, double angularLimit, double maxStepAmplitude,  vtkMDActor *impactedActor, vtkMDActor* observedActor, int smoothWrapping=1);
   void BooleanOperation( vtkMDActor *actorA, vtkMDActor *actorB, int mode=0);

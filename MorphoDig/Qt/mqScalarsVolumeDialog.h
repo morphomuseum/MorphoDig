@@ -35,6 +35,8 @@ public:
   
   virtual void slotdecomposeVolume();
   virtual void slotglobalVolume();
+  virtual void slotcomputeVolume();
+  virtual void slotcomputeArea();
   virtual void sloteditVolume();
     
 

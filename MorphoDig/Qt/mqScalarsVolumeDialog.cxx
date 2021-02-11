@@ -66,7 +66,8 @@ mqScalarsVolumeDialog::mqScalarsVolumeDialog(QWidget* Parent)
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
 	 connect(this->Ui->globalVolume, SIGNAL(pressed()), this, SLOT(slotglobalVolume()));
 	 connect(this->Ui->decomposeVolume, SIGNAL(pressed()), this, SLOT(slotdecomposeVolume()));
-	 
+	 connect(this->Ui->computeVolume, SIGNAL(pressed()), this, SLOT(slotcomputeVolume()));
+	 connect(this->Ui->computeArea, SIGNAL(pressed()), this, SLOT(slotcomputeArea()));
 }
 
 
@@ -91,14 +92,32 @@ void mqScalarsVolumeDialog::editVolume()
 		int volType = 0;
 		if (this->Ui->globalVolume->isChecked())
 		{
-			volType = 0;
+			if (this->Ui->computeVolume->isChecked())
+			{
+				volType = 0;
+			}
+			else
+			{
+				volType = 2;
+			}
 		}
 		else if (this->Ui->decomposeVolume->isChecked())
 		{
-			volType = 1;
+			if (this->Ui->computeVolume->isChecked())
+			{
+				volType = 1;
+			}
+			else
+			{
+				volType = 3;
+			}
 		}
-		
-		mqMorphoDigCore::instance()->scalarsAreaVolume(volType, this->Ui->scalarName->text());// to compute curvatures
+		int minSize = 10;
+		if (this->Ui->minsize->value() > 3)
+		{
+			minSize = this->Ui->minsize->value();
+		}
+		mqMorphoDigCore::instance()->scalarsAreaVolume(volType, minSize , this->Ui->scalarName->text());// to compute curvatures
 		
 	}
 
@@ -106,14 +125,53 @@ void mqScalarsVolumeDialog::editVolume()
 
 void mqScalarsVolumeDialog::slotglobalVolume()
 {
-	this->Ui->scalarName->setText("Volume_global");
+	if (this->Ui->computeVolume->isChecked())
+	{
+		this->Ui->scalarName->setText("Volume_global");
+	}
+	else		
+	{
+			this->Ui->scalarName->setText("Area_global");
+	}
+	this->Ui->minsize->setDisabled(true);
 }
 void mqScalarsVolumeDialog::slotdecomposeVolume()
 {
-	this->Ui->scalarName->setText("Volume_regions");
+	if (this->Ui->computeVolume->isChecked())
+	{
+		this->Ui->scalarName->setText("Volume_regions");
+	}
+	else
+	{
+		this->Ui->scalarName->setText("Area_regions");
+	}
+	this->Ui->minsize->setDisabled(false);
+
 }
+void mqScalarsVolumeDialog::slotcomputeVolume()
+{
+	if (this->Ui->globalVolume->isChecked())
+	{
+		this->Ui->scalarName->setText("Volume_global");
+	}
+	else
+	{
+		this->Ui->scalarName->setText("Volume_regions");
+	}
 
+}
+void mqScalarsVolumeDialog::slotcomputeArea()
+{
+	if (this->Ui->globalVolume->isChecked())
+	{
+		this->Ui->scalarName->setText("Area_global");
+	}
+	else
+	{
+		this->Ui->scalarName->setText("Area_regions");
+	}
 
+}
 
 
 

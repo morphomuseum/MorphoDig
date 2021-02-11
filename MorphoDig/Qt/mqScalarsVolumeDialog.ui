@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>241</height>
+    <height>335</height>
    </rect>
   </property>
   <property name="palette">
@@ -453,13 +453,13 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Scalars: compute volume</string>
+   <string>Scalars: compute volume or area</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>200</y>
+     <y>290</y>
      <width>191</width>
      <height>25</height>
     </rect>
@@ -487,26 +487,26 @@
      <x>10</x>
      <y>10</y>
      <width>411</width>
-     <height>181</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="title">
-    <string>Volume scalar</string>
+    <string>Volume / area scalar</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>59</x>
-      <y>30</y>
+      <x>50</x>
+      <y>110</y>
       <width>300</width>
-      <height>91</height>
+      <height>51</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="decomposeVolume">
+      <widget class="QRadioButton" name="globalVolume">
        <property name="text">
-        <string>Compute volume for each sub regions</string>
+        <string> global measurement for each surface</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -514,9 +514,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="globalVolume">
+      <widget class="QRadioButton" name="decomposeVolume">
        <property name="text">
-        <string>Compute global volume</string>
+        <string>decompose surfaces into non-connex sub regions</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -526,7 +529,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>150</y>
+      <y>210</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -539,14 +542,78 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>150</y>
+      <y>210</y>
       <width>113</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Volume</string>
+     <string>Volume_global</string>
     </property>
+   </widget>
+   <widget class="QSpinBox" name="minsize">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>170</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>10000000</number>
+    </property>
+    <property name="value">
+     <number>50</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>170</y>
+      <width>201</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimal triangle nr for each region:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>30</y>
+      <width>300</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="computeVolume">
+       <property name="text">
+        <string>Compute volume</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="computeArea">
+       <property name="text">
+        <string>Compute area </string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>

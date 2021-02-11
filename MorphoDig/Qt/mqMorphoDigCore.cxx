@@ -16807,7 +16807,7 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 
 
 }
-void mqMorphoDigCore::scalarsAreaVolume(int type, QString scalarName) 
+void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString scalarName)
 {
 	//type = 0;
 				// 0 => global volume
@@ -16926,7 +16926,7 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, QString scalarName)
 					for (vtkIdType j = 0; j < region_sizes->GetNumberOfTuples(); j++)
 					{
 
-						if (region_sizes->GetTuple((vtkIdType)j)[0] >= 10)
+						if (region_sizes->GetTuple((vtkIdType)j)[0] >= min_region_size)
 						{
 							//std::cout << "\nRegion:" << j <<", nTupes:"<< region_sizes->GetTuple((vtkIdType)j)[0]<< std::endl;
 
@@ -16959,8 +16959,14 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, QString scalarName)
 							massProp->Update();
 							double Area = massProp->GetSurfaceArea();
 							double Volume = massProp->GetVolume();
-							std::cout << "\nRegion:" << j << ", nTuples:" << region_sizes->GetTuple((vtkIdType)j)[0] << ", volume:" << Volume << std::endl;
-
+							if (type == 1)
+							{
+								std::cout << "\nRegion:" << j << ", nTuples:" << region_sizes->GetTuple((vtkIdType)j)[0] << ", volume:" << Volume << std::endl;
+							}
+							else
+							{ 
+								std::cout << "\nRegion:" << j << ", nTuples:" << region_sizes->GetTuple((vtkIdType)j)[0] << ", area:" << Area << std::endl;
+							}
 							for (vtkIdType i = 0; i < numvert; i++)	// for each vertex of this
 							{
 								if (currentRegions->GetTuple(i)[0] == j)
@@ -17117,7 +17123,8 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, QString scalarName)
 			{
 				this->UpdateLandmarkSettings();
 			}
-			this->Render();
+			this->Setmui_ActiveArrayAndRender(scalarName.toStdString().c_str(), VTK_DOUBLE, 1);
+			
 		}
 
 	}
