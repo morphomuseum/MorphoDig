@@ -193,7 +193,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << endl;*/
 	this->mui_DefaultRendererOcclusionRatio = this->mui_RendererOcclusionRatio = 0.05;
 	this->mui_DefaultRendererMaximalNumberOfPeels = this->mui_RendererMaximalNumberOfPeels = 50;
-	this->mui_DefaultSSAO_On = this->mui_SSAO_On = 1;
+	this->mui_DefaultSSAO_On = this->mui_SSAO_On = 0;
 	
 	this->mui_DefaultSpecularPower = this->mui_SpecularPower = 1;
 	this->mui_DefaultSpecular = this->mui_Specular= 0;
@@ -2061,7 +2061,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 
 	
 
-	double pointWC_center[3] = { 0, 0, 0 };
+	double pointWC_center[4] = { 0, 0, 0, 1 };
 	
 
 	this->GetDisplayToWorld(ptCenter[0], ptCenter[1], ptCenter[2], pointWC_center);
@@ -2212,8 +2212,8 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 
 			double pt2[3] = { x,y,vol_far };
 
-			double pointWC_near[3] = { 0, 0, 0 };
-			double pointWC_far[3] = { 0,0,0 };
+			double pointWC_near[4] = { 0, 0, 0,1 };
+			double pointWC_far[4] = { 0,0,0,1 };
 
 			this->GetDisplayToWorld(pt1[0], pt1[1], pt1[2], pointWC_near);
 
@@ -6172,7 +6172,9 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, 
 	double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack)
 {
-	if (frontToBack == true)
+	cout << "OPEN2DSTACK" << endl;
+	//if (frontToBack == true)
+	if (frontToBack == false) // VTK9 : seems that image sequence ordering has been reversed!
 	{
 		cout << "Flip Z used" << endl;
 		vtkSmartPointer<vtkImageFlip> flipZ = vtkSmartPointer<vtkImageFlip>::New();
@@ -13828,8 +13830,8 @@ void mqMorphoDigCore::lassoMaskVolumes()
 						
 						double pt2[3] = { x,y,vol_far };
 						
-						double pointWC_near[3] = { 0, 0, 0 };
-						double pointWC_far[3] = { 0,0,0 };
+						double pointWC_near[4] = { 0, 0, 0,1 };
+						double pointWC_far[4] = { 0,0,0,1 };
 
 						this->GetDisplayToWorld(pt1[0], pt1[1], pt1[2], pointWC_near);
 						
@@ -14269,8 +14271,8 @@ void mqMorphoDigCore::rubberMaskVolumes()
 
 					double pt2[3] = { x,y,vol_far };
 
-					double pointWC_near[3] = { 0, 0, 0 };
-					double pointWC_far[3] = { 0,0,0 };
+					double pointWC_near[4] = { 0, 0, 0, 1 };
+					double pointWC_far[4] = { 0,0,0, 1 };
 
 					this->GetDisplayToWorld(pt1[0], pt1[1], pt1[2], pointWC_near);
 
