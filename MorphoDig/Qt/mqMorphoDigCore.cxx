@@ -1057,6 +1057,8 @@ void mqMorphoDigCore::Setmui_SSAO_On(int on) {
 		ssaoCamP->SetDelegatePass(opaqueP);
 
 		double sceneSize = 200;
+		double bbl = this->getActorCollection()->GetBoundingBoxLength();
+		if (bbl > 0) { sceneSize = bbl; }
 		vtkSmartPointer<vtkSSAOPass> ssaoP = vtkSmartPointer<vtkSSAOPass>::New();
 		ssaoP->SetRadius(0.1 * sceneSize); // comparison radius
 		ssaoP->SetBias(0.001 * sceneSize); // comparison bias
@@ -8234,7 +8236,10 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 			}
 			inputFile.close();
 		}
-		if (cpt_surfaces > 0) { this->CreateSurfaceUndoSet(cpt_surfaces); }
+		if (cpt_surfaces > 0) { 
+			this->CreateSurfaceUndoSet(cpt_surfaces); 
+			
+		}
 		this->Render();
 	}
 }
@@ -22723,6 +22728,8 @@ void mqMorphoDigCore::CreateSurfaceUndoSet(int count_tot)
 	{
 		this->UpdateLandmarkSettings();
 	}
+	//just in case scene size has changed and SSAON is ON!
+	this->Setmui_SSAO_On(this->Getmui_SSAO_On());
 	this->Render();
 	this->matchTagMapToActorCollection();
 }
