@@ -677,6 +677,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QSpinBox" name="spinXY">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -719,6 +726,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QSpinBox" name="spinXZ">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -758,6 +772,13 @@
           </property>
           <property name="checkable">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinYZ">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
          </widget>
         </item>

@@ -109,6 +109,9 @@ public:
   virtual void slotSliderXYChanged(int val);
   virtual void slotSliderXZChanged(int val);
   virtual void slotSliderYZChanged(int val);
+  virtual void slotSpinXYChanged(int val);
+  virtual void slotSpinXZChanged(int val);
+  virtual void slotSpinYZChanged(int val);
 
   
  /* 

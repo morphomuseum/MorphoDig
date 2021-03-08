@@ -289,6 +289,7 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->maskInsideR, SIGNAL(clicked(bool)), this, SLOT(slotMaskInsideRClicked(bool)));
 	connect(this->Ui->maskOutsideR, SIGNAL(clicked(bool)), this, SLOT(slotMaskOutsideRClicked(bool)));
 	connect(this->Ui->pencilSphereR, SIGNAL(clicked(bool)), this, SLOT(slotPencilMaskSphereRClicked(bool)));
+
 	connect(this->Ui->pencilTubeR, SIGNAL(clicked(bool)), this, SLOT(slotPencilMaskTubeRClicked(bool)));
 
 	connect(this->Ui->interpolationToLinear, SIGNAL(clicked(bool)), this, SLOT(slotInterpolationToLinear(bool)));
@@ -307,7 +308,9 @@ mqEditVolumeDialog::mqEditVolumeDialog(QWidget* Parent)
 	connect(this->Ui->sliderXY, SIGNAL(valueChanged(int)), this, SLOT(slotSliderXYChanged(int)));
 	connect(this->Ui->sliderXZ, SIGNAL(valueChanged(int)), this, SLOT(slotSliderXZChanged(int)));
 	connect(this->Ui->sliderYZ, SIGNAL(valueChanged(int)), this, SLOT(slotSliderYZChanged(int)));
-	
+	connect(this->Ui->spinXY, SIGNAL(valueChanged(int)), this, SLOT(slotSpinXYChanged(int)));
+	connect(this->Ui->spinXZ, SIGNAL(valueChanged(int)), this, SLOT(slotSpinXZChanged(int)));
+	connect(this->Ui->spinYZ, SIGNAL(valueChanged(int)), this, SLOT(slotSpinYZChanged(int)));
 
 
 	connect(this->Ui->pushScalarSuggestedMax, SIGNAL(pressed()), this, SLOT(slotAcceptSuggestedMax()));
@@ -777,7 +780,35 @@ void mqEditVolumeDialog::slotSliderXYChanged(int val)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
+		this->Ui->spinXY->setValue(val);
 		this->Volume->SetSliceNumberXY(val);
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotSpinXYChanged(int val)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+		this->Ui->sliderXY->setValue(val);
+		this->Volume->SetSliceNumberXY(val);
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotSpinXZChanged(int val)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+				this->Ui->sliderXZ->setValue(val);
+		this->Volume->SetSliceNumberXZ(val);
+		mqMorphoDigCore::instance()->Render();
+	}
+}
+void mqEditVolumeDialog::slotSpinYZChanged(int val)
+{
+	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
+	{
+				this->Ui->sliderYZ->setValue(val);
+		this->Volume->SetSliceNumberYZ(val);
 		mqMorphoDigCore::instance()->Render();
 	}
 }
@@ -810,6 +841,7 @@ void mqEditVolumeDialog::slotSliderXZChanged(int val)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
+		this->Ui->spinXZ->setValue(val);
 		this->Volume->SetSliceNumberXZ(val);
 		mqMorphoDigCore::instance()->Render();
 	}
@@ -818,6 +850,7 @@ void mqEditVolumeDialog::slotSliderYZChanged(int val)
 {
 	if (this->Volume != NULL && this->CurrentVolumeInCollection() && this->Volume->GetSelected() == 1)
 	{
+		this->Ui->spinYZ->setValue(val);
 		this->Volume->SetSliceNumberYZ(val);
 		mqMorphoDigCore::instance()->Render();
 	}
@@ -837,6 +870,7 @@ void mqEditVolumeDialog::slotisVisibleXYClicked(bool isChecked)
 		{
 			this->Volume->SetisVisibleXY(0);
 		}
+		this->Ui->spinXY->setEnabled(isChecked);
 		this->Ui->sliderXY->setEnabled(isChecked);
 		mqMorphoDigCore::instance()->Render();
 	}
@@ -854,6 +888,7 @@ void mqEditVolumeDialog::slotisVisibleXZClicked(bool isChecked)
 		{
 			this->Volume->SetisVisibleXZ(0);
 		}
+		this->Ui->spinXZ->setEnabled(isChecked);
 		this->Ui->sliderXZ->setEnabled(isChecked);
 		mqMorphoDigCore::instance()->Render();
 	}
@@ -872,6 +907,7 @@ void mqEditVolumeDialog::slotisVisibleYZClicked(bool isChecked)
 		{
 			this->Volume->SetisVisibleYZ(0);
 		}
+		this->Ui->spinYZ->setEnabled(isChecked);
 		this->Ui->sliderYZ->setEnabled(isChecked);
 
 		mqMorphoDigCore::instance()->Render();
@@ -1492,12 +1528,23 @@ void mqEditVolumeDialog::UpdateUI()
 		this->Ui->dim0->setValue(dim[0]);
 		this->Ui->dim1->setValue(dim[1]);
 		this->Ui->dim2->setValue(dim[2]);
-		this->Ui->sliderXY->setMaximum(dim[2]);
+		this->Ui->sliderXY->setMaximum(dim[2]);		
 		this->Ui->sliderXY->setValue((int) (dim[2]/2));
+		
 		this->Ui->sliderXZ->setMaximum(dim[1]);
 		this->Ui->sliderXZ->setValue((int)(dim[1] / 2));
+
 		this->Ui->sliderYZ->setMaximum(dim[0]);
 		this->Ui->sliderYZ->setValue((int)(dim[0] / 2));
+
+		this->Ui->spinXY->setMaximum(dim[2]);
+		this->Ui->spinXY->setValue((int)(dim[2] / 2));
+
+		this->Ui->spinXZ->setMaximum(dim[1]);
+		this->Ui->spinXZ->setValue((int)(dim[1] / 2));
+
+		this->Ui->spinYZ->setMaximum(dim[0]);
+		this->Ui->spinYZ->setValue((int)(dim[0] / 2));
 
 
 		this->Volume->GetImageData()->GetSpacing(res);
