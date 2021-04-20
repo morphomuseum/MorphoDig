@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>646</width>
+    <width>848</width>
     <height>393</height>
    </rect>
   </property>
@@ -698,6 +698,48 @@
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="NORTARToBeSaved_2">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>270</y>
+     <width>511</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Curve milestones</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget_10">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>478</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout1_6">
+     <item>
+      <widget class="QRadioButton" name="milestonesOnce">
+       <property name="text">
+        <string>Export curve milestones only at segment end  (no duplication)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="milestonesTwice">
+       <property name="text">
+        <string>Export each curve milestone at segment start and end (each milestone will be duplicated once)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <resources>

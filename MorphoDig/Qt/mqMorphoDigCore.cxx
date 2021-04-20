@@ -7134,7 +7134,8 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 
 	int file_exists = 1;
 	int ok = 0;
-	QFile file(fileName);
+	
+	QFile file(fileName.toUtf8());
 	QString name = "";
 	if (file.exists()) {
 		// Message
@@ -7144,7 +7145,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 	else
 	{
 		file_exists = 0;
-
+		cout << "File does not exist:" << fileName.toStdString() << endl;
 
 	}
 
@@ -7210,7 +7211,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 			vtkSmartPointer<vtkSTLReader> reader =
 				vtkSmartPointer<vtkSTLReader>::New();
 
-			reader->SetFileName(fileName.toLocal8Bit());
+			reader->SetFileName(fileName.toUtf8());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -7220,7 +7221,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 
 			vtkSmartPointer<vtkPolyDataReader> reader =
 				vtkSmartPointer<vtkPolyDataReader>::New();
-			reader->SetFileName(fileName.toLocal8Bit());
+			reader->SetFileName(fileName.toUtf8());
 			cout << "inside open mesh:"<<fileName.toStdString().c_str() << endl;
 			//reader->SetFileName(fileName.toUtf8());
 			reader->Update();
@@ -7231,7 +7232,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 
 			vtkSmartPointer<vtkPLYReader> reader =
 				vtkSmartPointer<vtkPLYReader>::New();
-			reader->SetFileName(fileName.toLocal8Bit());
+			reader->SetFileName(fileName.toUtf8());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -7239,7 +7240,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 		{
 			vtkSmartPointer<vtkOBJReader> reader =
 				vtkSmartPointer<vtkOBJReader>::New();
-			reader->SetFileName(fileName.toLocal8Bit());
+			reader->SetFileName(fileName.toUtf8());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -7247,7 +7248,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 		{
 			vtkSmartPointer<vtkXMLPolyDataReader> reader =
 				vtkSmartPointer<vtkXMLPolyDataReader>::New();
-			reader->SetFileName(fileName.toLocal8Bit());
+			reader->SetFileName(fileName.toUtf8());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
 		}
@@ -10693,7 +10694,7 @@ int mqMorphoDigCore::GetNumberOfCurveSegments()
 	}
 	return tot_num_seg;
 }
-int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks)
+int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks, int milestones_once)
 {
 	std::string VERext = ".ver";
 	std::string VERext2 = ".VER";
@@ -10923,7 +10924,8 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 			decimation = this->Getmui_SegmentDecimations()->decimation.at(0);
 		}
 
-		if (decimation > 1 && decimation < nint)
+		//if (decimation > 1 && decimation < nint)
+		if (decimation < nint)
 		{
 
 			int cpt = 0;
@@ -10958,7 +10960,10 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 					decimation_index = 0;
 					total_length = this->getBezierCurveSource()->GetCurveSegmentLength(num_seg);
 				}
+				int forget_milestone_start = 0;
+				int mmilestones_once = milestones_once;
 				if (ob_N1->GetLMNodeType() == MILESTONE_NODE) {
+					if (milestones_once == 1 && forget_milestone_start == 0) { forget_milestone_start = 1; }
 					if (this->Getmui_SegmentDecimations()->decimation.size() > num_seg)
 					{
 						decimation = this->Getmui_SegmentDecimations()->decimation.at(num_seg);
@@ -11077,24 +11082,31 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 								else if (decimation_index < 10) { lsi = "00"; }
 								else if (decimation_index < 100) { lsi = "0"; }
 								else { lsi = ""; }
-								if (save_format == 0)
+								if (forget_milestone_start == 0) //99.99% of the cases
 								{
-									stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << " 0 0 1" << endl;
+									if (save_format == 0)
+									{
+										stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << " 0 0 1" << endl;
 
+									}
+									else if (save_format == 1)
+									{
+										stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+									}
+									else if (save_format == 2)
+									{
+										stream << "C" << csi.c_str() << wnum_seg << "-" << lsi.c_str() << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+									}
+									else if (save_format == 3)
+									{
+										stream << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+									}
 								}
-								else if (save_format == 1)
+								else // just in case we had are at the milestone!
 								{
-									stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+									//write nothing! and make sure we write the next one!
+									forget_milestone_start = 0;
 								}
-								else if (save_format == 2)
-								{
-									stream << "C" << csi.c_str() << wnum_seg << "-" << lsi.c_str() << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
-								}
-								else if (save_format == 3)
-								{
-									stream << slm[0] << " " << slm[1] << " " << slm[2] << endl;
-								}
-
 
 
 
@@ -24103,12 +24115,20 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 		for (vtkIdType i = 0; i < this->NodeLandmarkCollection->GetNumberOfItems(); i++)
 		{
 			vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NodeLandmarkCollection->GetNextActor());
+			
 			if (myActor->GetSelected() == 1)
 			{
+				
 				myActor->ApplyMatrix(Mat);;
+				myActor->SetChanged(1);
+
 				myActor->SetSelected(0);
-			}
+			}			
+			//this->BezierCurveSource->SetModified
+
 		}
+		this->NodeLandmarkCollection->Modified();
+
 		this->HandleLandmarkCollection->InitTraversal();
 		for (vtkIdType i = 0; i < this->HandleLandmarkCollection->GetNumberOfItems(); i++)
 		{
@@ -24116,9 +24136,15 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 			if (myActor->GetSelected() == 1)
 			{
 				myActor->ApplyMatrix(Mat);;
+				myActor->SetChanged(1);
+
 				myActor->SetSelected(0);
 			}
+
+			
+			//cout << "Coucou" << endl;
 		}
+		this->HandleLandmarkCollection->Modified();
 		this->FlagLandmarkCollection->InitTraversal();
 		for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
 		{
@@ -24131,6 +24157,7 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 				//cout << "modify flag " << i << "done"<< endl;
 			}
 		}
+
 		
 	}
 	cout <<" Actor collection changed" << endl;

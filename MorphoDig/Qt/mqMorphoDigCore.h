@@ -638,7 +638,7 @@ public:
 	void Screenshot(QString fileName, int scaleX, int scaleY, int rgba, int front, int transparent);
 	void OpenMAP(QString fileName, int mode=0);
 	int SaveCURFile(QString fileName, int save_only_selected);
-	int SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks);
+	int SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks, int milestones_once);
 	int GetNumberOfCurveSegments();
 	void SetOcclusionRatioAndNumPeels(double ratio, int numpeels);
 	int SaveShapeMeasures(QString fileName, int mode);

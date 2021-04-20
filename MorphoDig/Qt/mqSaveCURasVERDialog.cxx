@@ -169,7 +169,7 @@ void mqSaveCURasVERDialog::RefreshDecimationTable(int toDefault)
 		//int dcm = (int)(100 * DCMTable->GetTableValue(i));
 		
 		dcmSB = new QSpinBox();
-		dcmSB->setMinimum(2);
+		dcmSB->setMinimum(0);
 		dcmSB->setMaximum(100);
 		if (toDefault == 0)
 		{
@@ -279,8 +279,8 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 	else if (this->Ui->TPS->isChecked()) { save_format = 3; }
 	if (this->Ui->All->isChecked()) { save_other_lmks = 1; }
 	int decimation = this->Ui->defaultDecimation->value();
-
-	mqMorphoDigCore::instance()->SaveCURasVERFile(fileName, decimation, save_format, save_other_lmks);
+	int milestonesOnce = this->Ui->milestonesOnce->isChecked();
+	mqMorphoDigCore::instance()->SaveCURasVERFile(fileName, decimation, save_format, save_other_lmks, milestonesOnce);
 
 }
 

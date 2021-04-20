@@ -683,8 +683,13 @@ this->segView4 = new QVTKOpenGLWidget();
 			this->MorphoDigCore->Getmui_DefaultLandmarkRenderingSize()
 			).toDouble()
 		);
-	
+	this->MorphoDigCore->Setmui_AdjustLandmarkRenderingSize(
+		settings.value("AdjustLandmarkRenderingSize",
+			this->MorphoDigCore->Getmui_DefaultAdjustLandmarkRenderingSize()
+		).toInt()
+	);
 
+	
 	this->MorphoDigCore->Setmui_AdjustScaleFactor(
 		settings.value("AdjustScaleFactor",
 			this->MorphoDigCore->Getmui_DefaultAdjustScaleFactor()
