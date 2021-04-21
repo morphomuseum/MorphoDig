@@ -10722,12 +10722,12 @@ int mqMorphoDigCore::GetNumberOfMileStoneNodesToRemove(int default_decimation)
 	Node = this->NodeLandmarkCollection->GetLandmarkAfter(0);
 	while (Node != NULL)
 	{
-		if (Node->GetLMNodeType() == STARTING_NODE || Node->GetLMNodeType() == MILESTONE_NODE) { curr_seg++; }
 		if (Node->GetLMNodeType() == MILESTONE_NODE)
 		{
+
 			if (curr_seg < this->Getmui_SegmentDecimations()->decimation.size()) // just in case decimation size does not match the number of segments!!!
 			{
-				if (this->Getmui_SegmentDecimations()->decimation.at(curr_seg) > 0) 
+				if (this->Getmui_SegmentDecimations()->decimation.at(curr_seg) > 0)
 				{
 					tot_milestones_to_remove++;
 				}
@@ -10737,6 +10737,8 @@ int mqMorphoDigCore::GetNumberOfMileStoneNodesToRemove(int default_decimation)
 				if (default_decimation > 0) { tot_milestones_to_remove++; }
 			}
 		}
+		if (Node->GetLMNodeType() == STARTING_NODE || Node->GetLMNodeType() == MILESTONE_NODE) { curr_seg++; }
+		
 		int ind = Node->GetLMNumber();
 		Node = this->NodeLandmarkCollection->GetLandmarkAfter(ind);
 
