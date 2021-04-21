@@ -710,6 +710,25 @@ this->segView4 = new QVTKOpenGLWidget();
 			this->MorphoDigCore->Getmui_DefaultSegmentDecimation()
 		).toInt()
 	);
+
+	this->MorphoDigCore->Setmui_CURVERFormat(
+		settings.value("CURVERFormat",
+			this->MorphoDigCore->Getmui_DefaultCURVERFormat()
+		).toInt()
+	);
+
+	this->MorphoDigCore->Setmui_CURVERIncludeNormalLandmarks(
+		settings.value("CURVERIncludeNormalLandmarks",
+			this->MorphoDigCore->Getmui_DefaultCURVERIncludeNormalLandmarks()
+		).toInt()
+	);
+
+	this->MorphoDigCore->Setmui_CURVERExportMilestonesOnce(
+		settings.value("CURVERExportMilestonesOnce",
+			this->MorphoDigCore->Getmui_DefaultCURVERExportMilestonesOnce()
+		).toInt()
+	);
+
 	int nsegments = settings.value("nsegments", 0).toInt();
 	if (nsegments > 0)
 	{
@@ -2082,6 +2101,9 @@ void MorphoDig::saveSettings()
 	
 	settings.beginGroup("curve_settings");
 	settings.setValue("SegmentDecimation", this->MorphoDigCore->Getmui_SegmentDecimation());
+	settings.setValue("CURVERFormat", this->MorphoDigCore->Getmui_CURVERFormat());
+	settings.setValue("CURVERIncludeNormalLandmarks", this->MorphoDigCore->Getmui_CURVERIncludeNormalLandmarks());
+	settings.setValue("CURVERExportMilestonesOnce", this->MorphoDigCore->Getmui_CURVERExportMilestonesOnce());
 	size_t numsegs = this->MorphoDigCore->Getmui_SegmentDecimations()->decimation.size();
 	settings.setValue("nsegments", numsegs);
 	

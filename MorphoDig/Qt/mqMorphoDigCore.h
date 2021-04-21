@@ -507,9 +507,23 @@ public:
 	double Getmui_DefaultRendererOcclusionRatio();
 	int Getmui_DefaultRendererMaximalNumberOfPeels();
 
+	int Getmui_DefaultCURVERFormat();
+	int Getmui_CURVERFormat();
+	void Setmui_CURVERFormat(int lmk_format);
+
+	int Getmui_DefaultCURVERIncludeNormalLandmarks();
+	int Getmui_CURVERIncludeNormalLandmarks();
+	void Setmui_CURVERIncludeNormalLandmarks(int include);
+
+	int Getmui_DefaultCURVERExportMilestonesOnce();
+	int Getmui_CURVERExportMilestonesOnce();
+	void Setmui_CURVERExportMilestonesOnce(int milestones_once);
+
+
 	int Getmui_DefaultSegmentDecimation();
 	int Getmui_SegmentDecimation();
 	void Setmui_SegmentDecimation(int decimation);
+
 
 	void Setmui_DisplayMode(int mode);
 	/*vtkGetMacro(mui_Mask, int);
@@ -640,6 +654,7 @@ public:
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks, int milestones_once);
 	int GetNumberOfCurveSegments();
+	int GetNumberOfMileStoneNodesToRemove(int default_decimation);
 	void SetOcclusionRatioAndNumPeels(double ratio, int numpeels);
 	int SaveShapeMeasures(QString fileName, int mode);
 	void SaveMeshSize(QString fileName);
@@ -1217,6 +1232,15 @@ protected:
 
 	int mui_SegmentDecimation;
 	int mui_DefaultSegmentDecimation;
+
+	int mui_CURVERFormat;
+	int mui_DefaultCURVERFormat;
+
+	int mui_CURVERIncludeNormalLandmarks;
+	int mui_DefaultCURVERIncludeNormalLandmarks;
+
+	int mui_CURVERExportMilestonesOnce;
+	int mui_DefaultCURVERExportMilestonesOnce;
 
 	QString mui_LastUsedDir;
 	int mui_MoveMode;

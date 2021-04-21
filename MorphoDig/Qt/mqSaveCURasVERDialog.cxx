@@ -54,9 +54,56 @@ mqSaveCURasVERDialog::mqSaveCURasVERDialog(QWidget* Parent)
 	// This is where we 
   //
  
- this->Ui->CUROnly->setChecked(true);
- this->Ui->VER->setChecked(true);
+ 
+ 
  this->Ui->defaultDecimation->setValue(mqMorphoDigCore::instance()->Getmui_SegmentDecimation());  //connecter à un slot qui veuile bien 
+
+ int lmk_format = mqMorphoDigCore::instance()->Getmui_CURVERFormat();
+ if (lmk_format ==0)
+ {
+	 this->Ui->VER->setChecked(true);
+ }
+ else if (lmk_format==1 )
+ {
+	 this->Ui->LMK->setChecked(true);
+ }
+ else if (lmk_format == 2)
+ {
+	 this->Ui->PTS->setChecked(true);
+ }
+ else 
+ {
+	 this->Ui->TPS->setChecked(true);
+ }
+
+ int include = mqMorphoDigCore::instance()->Getmui_CURVERIncludeNormalLandmarks();
+ if (include == 1)
+ {
+	 this->Ui->All->setChecked(true);
+ }
+ else
+ {
+	 this->Ui->CUROnly->setChecked(true);
+ }
+
+ int milestones_once = mqMorphoDigCore::instance()->Getmui_CURVERExportMilestonesOnce();
+ if (milestones_once == 1)
+ {
+	 this->Ui->milestonesOnce->setChecked(true);
+ }
+ else
+ {
+	 this->Ui->milestonesTwice->setChecked(true);
+	 
+ }
+
+ /*
+
+	
+	int Getmui_DefaultCURVERExportMilestonesOnce();
+	int Getmui_CURVERExportMilestonesOnce();
+	void Setmui_CURVERExportMilestonesOnce(int milestones_once);
+*/
 
  QHeaderView *header = this->Ui->tableWidget->horizontalHeader();
  header->setSectionResizeMode(QHeaderView::Stretch);
@@ -238,6 +285,7 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 			tr("VER file (*.ver)"), NULL
 			//, QFileDialog::DontConfirmOverwrite
 		);
+		
 
 	}
 	else if (this->Ui->LMK->isChecked())
@@ -247,6 +295,7 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 			tr("LMK file (*.lmk)"), NULL
 			//, QFileDialog::DontConfirmOverwrite
 		);
+		
 	}
 	else if (this->Ui->PTS->isChecked())
 	{
@@ -255,6 +304,7 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 			tr("PTS file (*.pts)"), NULL
 			//, QFileDialog::DontConfirmOverwrite
 		);
+		
 	}
 	else if (this->Ui->TPS->isChecked())
 	{
@@ -263,6 +313,7 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 			tr("TPS file (*.tps)"), NULL
 			//, QFileDialog::DontConfirmOverwrite
 		);
+		
 	}
 	if (fileName.isEmpty()) return;
 	QFileInfo fileInfo(fileName);
@@ -277,9 +328,15 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 	else if (this->Ui->LMK->isChecked()) { save_format = 1; }
 	else if (this->Ui->PTS->isChecked()) { save_format = 2; }
 	else if (this->Ui->TPS->isChecked()) { save_format = 3; }
+	mqMorphoDigCore::instance()->Setmui_CURVERFormat(save_format);
+
 	if (this->Ui->All->isChecked()) { save_other_lmks = 1; }
+	mqMorphoDigCore::instance()->Setmui_CURVERIncludeNormalLandmarks(save_other_lmks);
+
 	int decimation = this->Ui->defaultDecimation->value();
 	int milestonesOnce = this->Ui->milestonesOnce->isChecked();
+	mqMorphoDigCore::instance()->Setmui_CURVERExportMilestonesOnce(milestonesOnce);
+
 	mqMorphoDigCore::instance()->SaveCURasVERFile(fileName, decimation, save_format, save_other_lmks, milestonesOnce);
 
 }

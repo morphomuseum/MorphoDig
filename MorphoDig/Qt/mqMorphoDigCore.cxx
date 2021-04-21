@@ -240,6 +240,12 @@ mqMorphoDigCore::mqMorphoDigCore()
 	
 	this->mui_SegmentDecimations = new SegmentDecimations;
 	this->mui_DefaultSegmentDecimation = this->mui_SegmentDecimation = 15;
+
+	this->mui_CURVERFormat =	this->mui_DefaultCURVERFormat=0;//VER by default
+	this->mui_CURVERIncludeNormalLandmarks=this->mui_DefaultCURVERIncludeNormalLandmarks= 0; //Do not include normal landmarks
+
+	this->mui_CURVERExportMilestonesOnce=this->mui_DefaultCURVERExportMilestonesOnce=0; // export milestone landmarks at segment start and end (results in duplication but useful in R geomorph to re-express curves)
+
 	this->mui_ActiveColorMap = new ActiveColorMap;
 	this->mui_ExistingColorMaps = new ExistingColorMaps;
 	this->mui_ActiveTagMap = new ActiveTagMap;
@@ -1016,6 +1022,18 @@ void mqMorphoDigCore::ChangeBackfaceCulling() {
 	int Getmui_VolumeDisplaySlice();
 	int Getmui_DefaultVolumeDisplaySlice();
 	void Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice);*/
+
+int mqMorphoDigCore::Getmui_DefaultCURVERFormat(){}
+int mqMorphoDigCore::Getmui_CURVERFormat(){}
+void mqMorphoDigCore::Setmui_CURVERFormat(int lmk_format){}
+
+int mqMorphoDigCore::Getmui_DefaultCURVERIncludeNormalLandmarks() {}
+int mqMorphoDigCore::Getmui_CURVERIncludeNormalLandmarks(){}
+void mqMorphoDigCore::Setmui_CURVERIncludeNormalLandmarks(int include){}
+
+int mqMorphoDigCore::Getmui_DefaultCURVERExportMilestonesOnce(){}
+int mqMorphoDigCore::Getmui_CURVERExportMilestonesOnce(){}
+void mqMorphoDigCore::Setmui_CURVERExportMilestonesOnce(int milestones_once){}
 
 
 
@@ -10694,6 +10712,38 @@ int mqMorphoDigCore::GetNumberOfCurveSegments()
 	}
 	return tot_num_seg;
 }
+int mqMorphoDigCore::GetNumberOfMileStoneNodesToRemove(int default_decimation)
+{
+	//function onlu used when one needs to export curves as equidistant landmarks : to know how many milestone landmarks to remove in case
+	// we do not want to duplicate milestones at segment end and segment start... but just in case there are >1 decimated things!
+	int curr_seg = 0;
+	int tot_milestones_to_remove = 0;
+	vtkLMActor *Node;
+	Node = this->NodeLandmarkCollection->GetLandmarkAfter(0);
+	while (Node != NULL)
+	{
+		if (Node->GetLMNodeType() == STARTING_NODE || Node->GetLMNodeType() == MILESTONE_NODE) { curr_seg++; }
+		if (Node->GetLMNodeType() == MILESTONE_NODE)
+		{
+			if (curr_seg < this->Getmui_SegmentDecimations()->decimation.size()) // just in case decimation size does not match the number of segments!!!
+			{
+				if (this->Getmui_SegmentDecimations()->decimation.at(curr_seg) > 0) 
+				{
+					tot_milestones_to_remove++;
+				}
+			}
+			else
+			{
+				if (default_decimation > 0) { tot_milestones_to_remove++; }
+			}
+		}
+		int ind = Node->GetLMNumber();
+		Node = this->NodeLandmarkCollection->GetLandmarkAfter(ind);
+
+	}
+	return tot_milestones_to_remove;
+}
+
 int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks, int milestones_once)
 {
 	std::string VERext = ".ver";
@@ -10704,6 +10754,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 	std::string TPSext2 = ".TPS";
 	std::string PTSext = ".pts";
 	std::string PTSext2 = ".PTS";
+	QString onlyFileName = fileName;
 
 	if (save_format == 0)
 	{
@@ -10758,6 +10809,13 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		}
 
 	}
+	// now, if milestones_once =1, remove as many landmarks as there are segments starting with a milestone and with decimation.at(i) >1
+	if (milestones_once == 1)
+	{
+		int tot_lm_to_remove = this->GetNumberOfMileStoneNodesToRemove(default_decimation);
+		tot_lm_number -= tot_lm_to_remove;
+	}
+
 	if (save_other_lmks == 1)
 	{
 		tot_lm_number += this->getNormalLandmarkCollection()->GetNumberOfItems() + this->getTargetLandmarkCollection()->GetNumberOfItems();
@@ -11149,7 +11207,10 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 				k++;
 			}
 		}
-
+		if (save_format == 3)
+		{
+			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << endl;
+		}
 		//END
 
 
@@ -11715,7 +11776,7 @@ void mqMorphoDigCore::ExportAvizoLandmarks(QString fileName)
 
 int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected)
 {
-
+	QString onlyFileName = fileName;
 	if (file_type == 0)
 	{
 		std::string VERext = ".ver";
@@ -11817,7 +11878,10 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 			}
 
 		}
-		
+		if (file_type == 3)
+		{
+			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << endl;
+		}
 		
 
 
