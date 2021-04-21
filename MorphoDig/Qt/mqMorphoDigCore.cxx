@@ -1023,17 +1023,17 @@ void mqMorphoDigCore::ChangeBackfaceCulling() {
 	int Getmui_DefaultVolumeDisplaySlice();
 	void Setmui_VolumeDisplaySlice(int newVolumeDisplaySlice);*/
 
-int mqMorphoDigCore::Getmui_DefaultCURVERFormat(){}
-int mqMorphoDigCore::Getmui_CURVERFormat(){}
-void mqMorphoDigCore::Setmui_CURVERFormat(int lmk_format){}
+int mqMorphoDigCore::Getmui_DefaultCURVERFormat() { return this->mui_DefaultCURVERFormat; }
+int mqMorphoDigCore::Getmui_CURVERFormat(){ return this->mui_CURVERFormat; }
+void mqMorphoDigCore::Setmui_CURVERFormat(int lmk_format) { this->mui_CURVERFormat = lmk_format; }
 
-int mqMorphoDigCore::Getmui_DefaultCURVERIncludeNormalLandmarks() {}
-int mqMorphoDigCore::Getmui_CURVERIncludeNormalLandmarks(){}
-void mqMorphoDigCore::Setmui_CURVERIncludeNormalLandmarks(int include){}
+int mqMorphoDigCore::Getmui_DefaultCURVERIncludeNormalLandmarks() { return this->mui_DefaultCURVERIncludeNormalLandmarks; }
+int mqMorphoDigCore::Getmui_CURVERIncludeNormalLandmarks(){ return this->mui_CURVERIncludeNormalLandmarks; }
+void mqMorphoDigCore::Setmui_CURVERIncludeNormalLandmarks(int include) { this->mui_CURVERIncludeNormalLandmarks = include; }
 
-int mqMorphoDigCore::Getmui_DefaultCURVERExportMilestonesOnce(){}
-int mqMorphoDigCore::Getmui_CURVERExportMilestonesOnce(){}
-void mqMorphoDigCore::Setmui_CURVERExportMilestonesOnce(int milestones_once){}
+int mqMorphoDigCore::Getmui_DefaultCURVERExportMilestonesOnce() { return this->mui_DefaultCURVERExportMilestonesOnce; }
+int mqMorphoDigCore::Getmui_CURVERExportMilestonesOnce(){ return this->mui_CURVERExportMilestonesOnce; }
+void mqMorphoDigCore::Setmui_CURVERExportMilestonesOnce(int milestones_once) {  this->mui_CURVERExportMilestonesOnce = milestones_once; }
 
 
 
