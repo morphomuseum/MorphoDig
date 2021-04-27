@@ -5799,8 +5799,20 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 				{
 					QTextStream in(&inputFile);
 					QString line0 = in.readLine(); // first line is not interesting
+					//Neverthe less, try to get landmark number!
+					int equal = line0.indexOf("=");
+					int numLM = 1000000;
+					if (equal != -1)
+					{
+						int num = line0.size() - equal -1;
+						cout << "TPS: length landmark to read:" << num << endl;
+						QString snumLM = line0.right(num);
+						cout << "Result:" << snumLM.toStdString() << endl;
+						numLM = snumLM.toInt();
+						cout << "numLM:" << numLM << endl;
+					}
 					int cpt = 0;
-					while (!in.atEnd())
+					while (!in.atEnd() && cpt< numLM)
 					{
 
 						QString line = in.readLine();
@@ -11778,7 +11790,12 @@ void mqMorphoDigCore::ExportAvizoLandmarks(QString fileName)
 
 int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected)
 {
-	QString onlyFileName = fileName;
+	//
+	//QString onlyFileName = fileName.splitRef("/").last().toString();
+	QFileInfo info(fileName);
+	//QString onlyFileName (info.fileName());
+	QString onlyFileName(info.baseName());
+
 	if (file_type == 0)
 	{
 		std::string VERext = ".ver";
@@ -11882,6 +11899,7 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 		}
 		if (file_type == 3)
 		{
+
 			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << endl;
 		}
 		
