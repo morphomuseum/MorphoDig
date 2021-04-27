@@ -10768,7 +10768,9 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 	std::string TPSext2 = ".TPS";
 	std::string PTSext = ".pts";
 	std::string PTSext2 = ".PTS";
-	QString onlyFileName = fileName;
+
+	QFileInfo info(fileName);
+	QString onlyFileName(info.baseName());
 
 	if (save_format == 0)
 	{
