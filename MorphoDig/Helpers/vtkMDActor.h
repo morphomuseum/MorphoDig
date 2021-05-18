@@ -82,6 +82,7 @@ public:
 	vtkIdType GetCorrPickedId(vtkIdType picked);
 	// Description:
 	void ShallowCopy(vtkProp *prop);
+	
 
 	//isVisible
 	void SetisVisible(int visible);

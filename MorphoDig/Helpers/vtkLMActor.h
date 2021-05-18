@@ -85,6 +85,7 @@ public:
 	vtkGetStringMacro(LMLabelText);
 	vtkSmartPointer<vtkPolyData> getLMBody() { return this->LMBody; }
 	// Enable/disable drawing the axis labels.
+	void fixLMOriginAndOrientation();
 
 	vtkGetMacro(LMText, std::string);
 	void SetLMText(std::string lm_text);

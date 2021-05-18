@@ -145,10 +145,39 @@ void vtkLMActor::GetLMOrigin(double origin[3])
 
 }
 
+void vtkLMActor::fixLMOriginAndOrientation()
+{
+	//in some cases, LM Origin does not reflect what is inside the LM actor matrix!
+	//this function is a "dirty hack" just to "purge" the position MAT of all landmarks and "inject" it in reset into VTKLMActor positions and orientation.
+	// I noticed that in some rare cases, the "vtkMDInteractorStyle" EndLandmarkMovements is not called, so when saving landmarks... some of them have the wrong
+	//position (!!!!).
+	//I do not find where vtkMDInteractorStyle->EndLandmarkMovements calls are missing... 
+	//So this function should fix the problem.
+	//we reset LMOrigin and LMOrientation
+	vtkMatrix4x4 *Mat = this->GetMatrix();
 
+	double lmorigin[3] = { Mat->GetElement(0, 3), Mat->GetElement(1, 3), Mat->GetElement(2, 3) };
+	//double lmorientation[3] = { 0,0,1 };
+	double a[3] = { 0,0,0 };
+	double at[3];
+	double b[3] = { 1,0,0 };
+	double bt[3];
+	mqMorphoDigCore::TransformPoint(Mat, a, at);
+	mqMorphoDigCore::TransformPoint(Mat, b, bt);
+	double lmorientation[3] = { bt[0] - at[0],bt[1] - at[1] ,bt[2] - at[2] };
+	vtkMath::Normalize(lmorientation);
+	//myActor->SetLMOrigin(lmorigin);
+	this->SetLMOriginAndOrientation(lmorigin, lmorientation);
+
+
+}
 
 double *vtkLMActor::GetLMOrigin()
 {
+
+	/**/
+	this->fixLMOriginAndOrientation();
+
 	return this->LMOrigin;
 }
 
