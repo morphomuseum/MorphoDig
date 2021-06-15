@@ -16943,8 +16943,10 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString s
 	{
 
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+		cout << "i=" << endl;
 		if (myActor->GetSelected() == 1)
 		{
+			cout << "i is selected" << endl;
 
 			//myActor->SaveState(Count, scalarName);
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());

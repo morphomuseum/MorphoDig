@@ -556,12 +556,12 @@
      <rect>
       <x>120</x>
       <y>630</y>
-      <width>71</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
     <property name="decimals">
-     <number>6</number>
+     <number>10</number>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="suggestedMax">
@@ -569,12 +569,12 @@
      <rect>
       <x>120</x>
       <y>660</y>
-      <width>71</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
     <property name="decimals">
-     <number>6</number>
+     <number>10</number>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
@@ -593,7 +593,7 @@
    <widget class="QPushButton" name="pushScalarSuggestedMin">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>220</x>
       <y>630</y>
       <width>31</width>
       <height>23</height>
@@ -609,7 +609,7 @@
    <widget class="QPushButton" name="pushScalarSuggestedMax">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>220</x>
       <y>660</y>
       <width>31</width>
       <height>23</height>
