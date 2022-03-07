@@ -1478,7 +1478,10 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 								vtkDataSetAttributes::SCALARS);
 							selector->SetAllScalars(1);
 							selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "TMP");
-							selector->ThresholdBetween((double)(i), (double)(i));
+							//selector->ThresholdBetween((double)(i), (double)(i));
+							selector->SetLowerThreshold((double)(i));
+							selector->SetUpperThreshold((double)(i));
+							//((double)(i), (double)(i));
 
 							selector->Update();
 							std::cout << "\n Extract_Scalar_Range new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
@@ -1689,7 +1692,9 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 						vtkDataSetAttributes::SCALARS);
 					selector->SetAllScalars(1);
 					selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "TMP");
-					selector->ThresholdBetween(array_min, array_max);
+					//selector->ThresholdBetween(array_min, array_max);
+					selector->SetLowerThreshold(array_min);
+					selector->SetUpperThreshold(array_max);
 					selector->Update();
 					std::cout << "\n Extract_Scalar_Range new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
 					std::cout << "\nExtract_Scalar_Range new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
@@ -6608,7 +6613,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 
 	}
-
+	cout << "Try to open single 3D tiff file" << endl;
 
 	if (file_exists == 1)
 	{
@@ -6634,6 +6639,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 		
 		vtkSmartPointer <vtkTIFFReader> tiffReader = vtkSmartPointer<vtkTIFFReader>::New();
+		
 		tiffReader->SetFileName(fileName.toLocal8Bit());
 		//tiffReader->SetFileLowerLeft(frontToBack);
 		
@@ -6676,13 +6682,15 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 		if (dim[0] < 2 ||
 			dim[1] < 2 ||
-			dim[2] < 2)
+			dim[2] < 2
+			)
 		{
+			cout << "Abort : some dimensions are below 2 !" << endl;
 			return;
 		}
 		else
 		{
-			//cout << "Try visualize!!!" << endl;
+			cout << "Continue open 3D tiff !" << endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -13464,7 +13472,9 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 						vtkDataSetAttributes::SCALARS);
 					selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
 					selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
-					selector->ThresholdBetween(0.9, 1.1);
+					//selector->ThresholdBetween(0.9, 1.1);
+					selector->SetLowerThreshold(0.9);
+					selector->SetUpperThreshold(1.1);
 					selector->Update();
 					std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
 					std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
@@ -13728,7 +13738,9 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 						vtkDataSetAttributes::SCALARS);
 					selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
 					selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
-					selector->ThresholdBetween(0.9, 1.1);
+					//selector->ThresholdBetween(0.9, 1.1);
+					selector->SetLowerThreshold(0.9);
+					selector->SetUpperThreshold(1.1);
 					selector->Update();
 					std::cout << "\nSelector new Number of points:" << selector->GetOutput()->GetNumberOfPoints() << std::endl;
 					std::cout << "\nSelector new Number of cells:" << selector->GetOutput()->GetNumberOfCells() << std::endl;
@@ -16543,7 +16555,9 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 							vtkDataSetAttributes::SCALARS);
 						selector->SetAllScalars(1);
 						selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "TMP");
-						selector->ThresholdBetween((double)(j), (double)(j));
+						//selector->ThresholdBetween((double)(j), (double)(j));
+						selector->SetLowerThreshold((double)(j));
+						selector->SetUpperThreshold((double)(j));
 						selector->Update();
 
 						scalarsOff->SetInputData(selector->GetOutput());
@@ -17049,7 +17063,10 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString s
 								vtkDataSetAttributes::SCALARS);
 							selector->SetAllScalars(1);
 							selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "TMP");
-							selector->ThresholdBetween((double)(j), (double)(j));
+							//selector->ThresholdBetween((double)(j), (double)(j));
+							selector->SetLowerThreshold((double)(j));
+							selector->SetUpperThreshold((double)(j));
+
 							selector->Update();
 
 							scalarsOff->SetInputData(selector->GetOutput());
@@ -20337,7 +20354,10 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 		vtkDataSetAttributes::SCALARS);
 	selector->SetAllScalars(1);// was g_tag_extraction_criterion_all
 	selector->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "Cuts");
-	selector->ThresholdBetween(0.9, 1.1);
+	//selector->ThresholdBetween(0.9, 1.1);
+	selector->SetLowerThreshold(0.9);
+	selector->SetUpperThreshold(1.1);
+
 	selector->Update();
 
 
@@ -22504,9 +22524,10 @@ void mqMorphoDigCore::LandmarksMirror(int mode)
 	num_lmk += mqMorphoDigCore::instance()->getTargetLandmarkCollection()->GetNumberOfSelectedActors();
 	num_lmk += mqMorphoDigCore::instance()->getNodeLandmarkCollection()->GetNumberOfSelectedActors();
 	num_lmk += mqMorphoDigCore::instance()->getHandleLandmarkCollection()->GetNumberOfSelectedActors();
+	num_lmk += mqMorphoDigCore::instance()->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
 	if (num_lmk == 0) {
 		QMessageBox msgBox;
-		msgBox.setText("No landmark selected. Please select at least one landmark to use this option.");
+		msgBox.setText("No landmark / flag selected. Please select at least one landmark or one flag to use this option.");
 		msgBox.exec();
 		return;
 	}
@@ -24633,7 +24654,7 @@ int mqMorphoDigCore::GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb)
 		{
 			cout << "Scalar name" << MyList->Stack.at(0).Name.toStdString() << endl;
 		}
-		return (MyList->Stack.size()-1);
+		return (int)(MyList->Stack.size()-1);
 	}
 	else
 	{

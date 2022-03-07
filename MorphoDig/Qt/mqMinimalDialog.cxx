@@ -94,8 +94,8 @@ mqMinimalDialog::mqMinimalDialog(QWidget* Parent)
 
 	// VTK/Qt wedded
 	vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
-	this->Ui->qvtkwidget->SetRenderWindow(renderWindow);
-	this->Ui->qvtkwidget->GetRenderWindow()->AddRenderer(ren);
+	this->Ui->qvtkwidget->setRenderWindow(renderWindow);
+	this->Ui->qvtkwidget->renderWindow()->AddRenderer(ren);
 
 	//this->Ui->qvtkwidget;
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotMinimal()));

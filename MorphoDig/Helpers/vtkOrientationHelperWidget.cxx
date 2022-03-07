@@ -44,7 +44,7 @@ public:
 		this->OrientationHelperWidget = 0;
 	}
 
-	void Execute(vtkObject* wdg, unsigned long event, void *calldata) VTK_OVERRIDE
+	void Execute(vtkObject* wdg, unsigned long event, void *calldata) override
 	{
 		if (this->OrientationHelperWidget)
 		{

@@ -1280,7 +1280,7 @@ double *vtkGridActor::GetBounds()
 }
 
 //----------------------------------------------------------------------------
-#if VTK_MAJOR_VERSION >= 8 || VTK_MINOR_VERSION >= 1
+
 
 vtkMTimeType vtkGridActor::GetMTime()
 {
@@ -1293,26 +1293,7 @@ vtkMTimeType vtkGridActor::GetRedrawMTime()
 	vtkMTimeType mTime = this->GetMTime();
 	return mTime;
 }
-#else
-unsigned long int vtkGridActor::GetMTime()
-{
-	unsigned long mTime = this->Superclass::GetMTime();
-	return mTime;
-}
 
-
-
-//----------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------
-unsigned long int vtkGridActor::GetRedrawMTime()
-{
-	unsigned long mTime = this->GetMTime();
-	return mTime;
-}
-
-#endif
 
 
 //----------------------------------------------------------------------------

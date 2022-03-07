@@ -790,7 +790,7 @@ QList<QVariant> mqColorOpacityEditorWidget::xrgbPoints() const
   {
     double xrgbms[6];
     stc->GetNodeValue(cc, xrgbms);
-    vtkVector<double, 4> value;
+    //vtkVector<double, 4> value;
     values.push_back(xrgbms[0]);
     values.push_back(xrgbms[1]);
     values.push_back(xrgbms[2]);

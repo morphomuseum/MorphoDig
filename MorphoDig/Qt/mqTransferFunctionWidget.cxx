@@ -81,7 +81,7 @@ public:
   // Perform any updates to the item that may be necessary before rendering.
   // The scene should take care of calling this on all items before their
   // Paint function is invoked.
-  void Update() VTK_OVERRIDE
+  void Update() //VTK_OVERRIDE
   {
 	//  cout << "mqTransferFunctionWidget Update" << endl;
     if (this->ControlPointsItem)
@@ -101,7 +101,7 @@ public:
     this->Superclass::Update();
   }
 
-  bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
+  bool PaintChildren(vtkContext2D* painter) override//VTK_OVERRIDE
   {
 	 // cout << "mqTransferFunctionWidget PaintChildren" << endl;
     if (this->DataValid)
@@ -112,37 +112,37 @@ public:
     return true;
   }
 
-  bool MouseEnterEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseEnterEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseEnterEvent(mouse) : false);
 	 // return this->Superclass::MouseEnterEvent(mouse);
   }
-  bool MouseMoveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseMoveEvent(const vtkContextMouseEvent& mouse) override
   {
    return (this->DataValid ? this->Superclass::MouseMoveEvent(mouse) : false);
 	 // return  this->Superclass::MouseMoveEvent(mouse);
   }
-  bool MouseLeaveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseLeaveEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseLeaveEvent(mouse) : false);
 	 // return this->Superclass::MouseLeaveEvent(mouse) ;
   }
-  bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseButtonPressEvent(mouse) : false);
 	//return this->Superclass::MouseButtonPressEvent(mouse);
   }
-  bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseButtonReleaseEvent(mouse) : false);
 	//  return this->Superclass::MouseButtonReleaseEvent(mouse);
   }
-  bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta) VTK_OVERRIDE
+  bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta) override
   {
     return (this->DataValid ? this->Superclass::MouseWheelEvent(mouse, delta) : false);
 	 // return this->Superclass::MouseWheelEvent(mouse, delta);
   }
-  bool KeyPressEvent(const vtkContextKeyEvent& key) VTK_OVERRIDE
+  bool KeyPressEvent(const vtkContextKeyEvent& key) override
   {
 	//  return this->Superclass::KeyPressEvent(key);
     return (this->DataValid ? this->Superclass::KeyPressEvent(key) : false);
@@ -215,14 +215,14 @@ public:
 #endif
 
     this->Widget->setObjectName("1QVTKWidget0");
-    this->Widget->SetRenderWindow(this->Window.Get());
+    this->Widget->setRenderWindow(this->Window.Get());
     this->ContextView->SetRenderWindow(this->Window.Get());
 
     this->ChartXY->SetAutoSize(true);
     this->ChartXY->SetShowLegend(false);
     this->ChartXY->SetForceAxesToBounds(true);
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
-    this->ContextView->SetInteractor(this->Widget->GetInteractor());
+    //this->ContextView->SetInteractor(this->Widget->GetInteractor());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 
     this->ChartXY->SetActionToButton(vtkChart::PAN, -1);
@@ -509,7 +509,8 @@ void mqTransferFunctionWidget::render()
 void mqTransferFunctionWidget::renderInternal()
 {
 	//cout << "mqTransferFunctionWidget renderInternal" << endl;
-  if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
+  //if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
+	if (this->isVisible() )
   {
     this->Internals->ContextView->GetRenderWindow()->Render();
 	mqMorphoDigCore::instance()->Render();

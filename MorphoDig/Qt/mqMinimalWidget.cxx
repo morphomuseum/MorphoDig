@@ -10,13 +10,13 @@
 //#include "pqTimer.h"
 #include <QTimer>
 
-#if VTK_MAJOR_VERSION<8
-#include <QVTKWidget.h>
-#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
-#include <QVTKOpenGLWidget.h>
-#else
+//#if VTK_MAJOR_VERSION <9
+//#include <QVTKWidget.h>
+//#elseif VTK_MAJOR_VERSION == 8 && VTK_MINOR_VERSION < 2
+//#include <QVTKOpenGLWidget.h>
+//#else
 #include <QVTKOpenGLNativeWidget.h>
-#endif
+//#endif
 
 //#include <vtkAutoInit.h>
 #include <vtkAxis.h>

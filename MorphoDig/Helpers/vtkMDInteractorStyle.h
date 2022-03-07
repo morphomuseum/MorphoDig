@@ -136,7 +136,7 @@ protected:
 private:
 
 	void TransformPoint(vtkMatrix4x4* matrix, double pointin[3], double pointout[3]);
-#if VTK_MINOR_VERSION >= 1
+#if VTK_MAJOR_VERSION < 9
 	vtkMDInteractorStyle(const vtkMDInteractorStyle&) VTK_DELETE_FUNCTION;
 	void operator=(const vtkMDInteractorStyle&) VTK_DELETE_FUNCTION;
 #else

@@ -49,7 +49,7 @@ void mqOpenDataReaction::OpenMesh()
 	
 	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
 		tr("Load surface"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("surfaces (*.ply *.stl *.vtk *.obj)"));
+		tr("surfaces (*.ply *.stl *.vtk *.vtp *.obj)"));
 
 	
 
