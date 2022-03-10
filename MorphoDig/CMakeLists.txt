@@ -148,17 +148,26 @@ set(CMAKE_AUTOUIC ON)
 
 
 IF (WIN32)
+ #message (STATUS "QT5 path")
+ # message (STATUS $ENV{QT5_DIR})
   install(TARGETS MorphoDig	
     RUNTIME
     DESTINATION bin
     COMPONENT applications)
-  #set (QT5_BINARIES "C:/Qt/5.8/msvc2015_64/bin") 
+  #set (QT5_BINARIES "D:/Qt/5.8/msvc2015_64/bin") 
+ 
+ # file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Core.dll" qtcore)
+ # file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Widgets.dll" qtwidgets)
+ # file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5GUI.dll" qtgui)
+ # file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/platforms/qwindows.dll" qtwindows)
+ # file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/imageformats/qico.dll" qtico)
 
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Core.dll" qtcore)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5Widgets.dll" qtwidgets)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt5GUI.dll" qtgui)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/platforms/qwindows.dll" qtwindows)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/imageformats/qico.dll" qtico)
+ file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/bin/Qt5Core.dll" qtcore)
+  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/bin/Qt5Widgets.dll" qtwidgets)
+  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/bin/Qt5GUI.dll" qtgui)
+  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/plugins/platforms/qwindows.dll" qtwindows)
+  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/plugins/imageformats/qico.dll" qtico)
+
 
   install(
     FILES
@@ -167,9 +176,11 @@ IF (WIN32)
     "${VTK_DIR}/bin/Release/vtkInteractionStyle-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkRenderingFreeType-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkRenderingCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersTexture-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkFiltersSources-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkFiltersGeneral-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkFiltersCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkfmt-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkIOGeometry-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkIOCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkCommonExecutionModel-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
@@ -182,6 +193,7 @@ IF (WIN32)
     "${VTK_DIR}/bin/Release/vtkRenderingAnnotation-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkIOLegacy-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkIOPLY-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkkissfft-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkRenderingContext2D-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkChartsCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkInfovisCore-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"

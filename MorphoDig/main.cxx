@@ -38,6 +38,8 @@ int main( int argc, char* argv[] )
   //QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
   #if QT_VERSION >= 0x050000
     QApplication::setStyle("fusion");
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	
   #else
     QApplication::setStyle(new QCleanlooksStyle);
   #endif

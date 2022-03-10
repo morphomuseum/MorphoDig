@@ -190,7 +190,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	double defaultDiffuse = newactor->GetProperty()->GetDiffuse();
 	double defaultSpecular = newactor->GetProperty()->GetSpecular();
 	double defaultSpecularPower = newactor->GetProperty()->GetSpecularPower();
-	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << endl;*/
+	cout << "When creating an actor with VTK, ambient=" << defaultAmbient << ", diffuse=" << defaultDiffuse << ", specular=" << defaultSpecular << ", specularPower=" << defaultSpecularPower << Qt::endl;*/
 	this->mui_DefaultRendererOcclusionRatio = this->mui_RendererOcclusionRatio = 0.05;
 	this->mui_DefaultRendererMaximalNumberOfPeels = this->mui_RendererMaximalNumberOfPeels = 50;
 	this->mui_DefaultSSAO_On = this->mui_SSAO_On = 0;
@@ -217,7 +217,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 
 	this->mui_DefaultVolumeDisplaySlice = this->mui_VolumeDisplaySlice = 0; //by default, construct a volume rendering;
 	this->mui_DefaultVolumeOutOfCoreThreshold= this->mui_VolumeOutOfCoreThreshold=500*500*500; // by default 500 * 500 * 500 pixels
-	//cout << "now instancitate this->mui_VolumeOutOfCoreThreshold" << endl;
+	//cout << "now instancitate this->mui_VolumeOutOfCoreThreshold" << Qt::endl;
 	this->mui_OpenGL_minor_version = 0;
 	this->mui_OpenGL_major_version = 0;
 	this->mui_DisplayMode = 1; // point normals by defaults
@@ -262,7 +262,7 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->InitLuts();
 	this->ActorCollection = vtkSmartPointer<vtkMDActorCollection>::New();
 	this->VolumeCollection = vtkSmartPointer<vtkMDVolumeCollection>::New();
-	cout << "try to create mui_ActiveArrays" << endl;
+	cout << "try to create mui_ActiveArrays" << Qt::endl;
 	this->mui_ActiveArray = new ActiveArray;
 	this->mui_ExistingArrays = new ExistingArrays;
 	this->mui_ArrayList = new ExistingArrays;
@@ -278,10 +278,10 @@ mqMorphoDigCore::mqMorphoDigCore()
 	//this->TagScalarBarActor->SetWidth(0.8);
 	//this->TagScalarBarActor->SetTitleRatio(10);
 
-	cout << "mui_ActiveArray created" << endl;
+	cout << "mui_ActiveArray created" << Qt::endl;
 	QString none = QString("Solid color");
 	this->Setmui_ActiveArray(none, -1, 0);
-	cout << "mui_ActiveArray instantiated" << endl;
+	cout << "mui_ActiveArray instantiated" << Qt::endl;
 	this->Addmui_ExistingArrays(this->mui_ActiveArray->Name, this->mui_ActiveArray->DataType, this->mui_ActiveArray->NumComp);
 
 	this->MainWindow = NULL;
@@ -698,12 +698,12 @@ void mqMorphoDigCore::TestVolume()
 	int numcells = input->GetNumberOfCells();
 	input->GetScalarTypeAsString();
 	//input->Get
-	cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
-	cout << "Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
-	cout << "Image type:" << input->GetScalarTypeAsString() << endl;
-	//cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
-	cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;	
-	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+	cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << Qt::endl;
+	cout << "Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << Qt::endl;
+	cout << "Image type:" << input->GetScalarTypeAsString() << Qt::endl;
+	//cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << Qt::endl;
+	cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << Qt::endl;	
+	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << Qt::endl;
 
 	if (dim[0] < 2 ||
 		dim[1] < 2 ||
@@ -713,7 +713,7 @@ void mqMorphoDigCore::TestVolume()
 	}
 	else
 	{
-		//cout << "Try visualize!!!" << endl;
+		//cout << "Try visualize!!!" << Qt::endl;
 
 		vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
 		vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
@@ -736,8 +736,8 @@ void mqMorphoDigCore::TestVolume()
 		}
 		if (input->GetScalarType() == VTK_SHORT)
 		{
-			//cout << "signed shorts !" << endl;
-			//cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << endl;
+			//cout << "signed shorts !" << Qt::endl;
+			//cout << "VTK SHORT MIN = " << VTK_SHORT_MIN << Qt::endl;
 			histogram->SetComponentExtent(VTK_SHORT_MIN, VTK_SHORT_MAX, 0, 0, 0, 0);
 			histogram->SetComponentOrigin(VTK_SHORT_MIN, 0, 0);
 		}
@@ -756,9 +756,9 @@ void mqMorphoDigCore::TestVolume()
 
 		int dims[3];
 		histogram->GetOutput()->GetDimensions(dims);
-		cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << endl;
+		cout << "Histogram (max) dims=" << dims[0] << ", " << dims[1] << ", " << dims[2]  << Qt::endl;
 		vtkIdType used_bins = (vtkIdType)(dims[0] / bin_spacing);
-		cout << "Histogram (used) dims=" << used_bins  << endl;
+		cout << "Histogram (used) dims=" << used_bins  << Qt::endl;
 		int prevbin = 0;
 
 
@@ -798,7 +798,7 @@ void mqMorphoDigCore::TestVolume()
 					lows.push_back(bin);
 					lowsT.push_back(binT);
 					lowVals.push_back(curbin);
-					l_i++; //cout << "l_i" << l_i << endl;
+					l_i++; //cout << "l_i" << l_i << Qt::endl;
 				}
 			}
 			if (p_or_l == 0)//search low
@@ -821,17 +821,17 @@ void mqMorphoDigCore::TestVolume()
 			}
 
 			//cout <<"bin="<<bin<<"|"<< *(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(bin, 0, 0))) << " ";
-		//	cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << endl;				
+		//	cout << histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(bin) << Qt::endl;				
 			prevbin = curbin;
 		}
 
 		for (int i = 0; i <= p_i; i++)
 		{
-			//cout << "p" << i <<":"<< peaksT.at(i) << ", val=" << peakVals.at(i) << endl;
+			//cout << "p" << i <<":"<< peaksT.at(i) << ", val=" << peakVals.at(i) << Qt::endl;
 		}
 		for (int i = 0; i <= l_i; i++)
 		{
-			//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << endl;
+			//cout << "l" << i << ":" << lowsT.at(i) << ", val=" << lowVals.at(i) << Qt::endl;
 		}
 
 		// Create the property and attach the transfer functions
@@ -880,20 +880,20 @@ void mqMorphoDigCore::TestVolume()
 			for (int i = 1; i <= p_i; i++)
 			{
 				//peaksT.at(i) peakVals.at(i) ;
-				//cout << "peaksT.at(i)="<<peaksT.at(i) << endl;
-				//cout << "peakVals.at(i)=" << peakVals.at(i) << endl;
+				//cout << "peaksT.at(i)="<<peaksT.at(i) << Qt::endl;
+				//cout << "peakVals.at(i)=" << peakVals.at(i) << Qt::endl;
 				double mult = (double)peaksT.at(i)*(double)peakVals.at(i);
-				//cout << "mult=" << mult << endl;
+				//cout << "mult=" << mult << Qt::endl;
 				sum_peakVals += (double)peakVals.at(i);
 				sum_peaks += mult;
-				//cout << "sum_peaks=" << sum_peaks << endl;
-				//cout << "sum_peakVals=" << sum_peakVals << endl;
+				//cout << "sum_peaks=" << sum_peaks << Qt::endl;
+				//cout << "sum_peakVals=" << sum_peakVals << Qt::endl;
 
 			}
 			if (sum_peakVals > 0)
 			{
 				avg_peaks = (int)(sum_peaks / sum_peakVals);
-				//cout << "avg_peaks="<<avg_peaks << endl;
+				//cout << "avg_peaks="<<avg_peaks << Qt::endl;
 				// search if a low exists after avg_peaks
 				int exists = 0;
 				int i_low = 0;
@@ -950,7 +950,7 @@ void mqMorphoDigCore::TestVolume()
 		property->ShadeOn();
 
 		double SOUD = 0.89;
-		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << Qt::endl;
 		if (SOUD == 0) { SOUD = 0.89; }
 
 		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
@@ -1410,18 +1410,18 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 {
 	// dirty hack:
 	//ActiveArrays *myActiveArrays = mqMorphoDigCore::instance()->Getmui_ActiveArray();
-	cout << "Call Decompose Tag" << endl;
+	cout << "Call Decompose Tag" << Qt::endl;
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
-	cout << "Here are num" << num << "Actors" << endl;
+	cout << "Here are num" << num << "Actors" << Qt::endl;
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "try to get next actor:" << i << endl;
+		cout << "try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		cout << "ok?" << i << endl;
+		cout << "ok?" << i << Qt::endl;
 		if (myActor->GetSelected() == 1)
 		{
 			//myActor->SetSelected(0); we don't unselect after a cut
@@ -1443,7 +1443,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 
 				vtkIntArray *currentTag;
 				currentTag = vtkIntArray::SafeDownCast(myPD->GetPointData()->GetScalars());
-				cout << "Got current Tag array... " << endl;
+				cout << "Got current Tag array... " << Qt::endl;
 				if (currentTag != NULL)
 				{
 					for (vtkIdType i = 0; i < myPD->GetNumberOfPoints(); i++)	// for each vertex 
@@ -1459,10 +1459,10 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 					vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
 					cout << "Try to call Get_Tag_Region_Sizes"<<endl;
 					region_sizes = this->Get_Tag_Region_Sizes(currentTag);
-					cout << "Number of regions: " << region_sizes->GetNumberOfTuples()<< endl;
+					cout << "Number of regions: " << region_sizes->GetNumberOfTuples()<< Qt::endl;
 					for (vtkIdType i = 0; i < region_sizes->GetNumberOfTuples(); i++)
 					{
-						cout << "region_sizes->GetTuple((vtkIdType)"<<i<<")[0]" << region_sizes->GetTuple((vtkIdType)i)[0] << endl;
+						cout << "region_sizes->GetTuple((vtkIdType)"<<i<<")[0]" << region_sizes->GetTuple((vtkIdType)i)[0] << Qt::endl;
 						if (region_sizes->GetTuple((vtkIdType)i)[0] >= (vtkIdType)4) // no region smaller than 4... could be parameterized somewhere though
 						{
 
@@ -1541,7 +1541,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 
 								newmapper->ScalarVisibilityOn();
 
-								cout << "extract object" << MyObj->GetNumberOfPoints() << endl;
+								cout << "extract object" << MyObj->GetNumberOfPoints() << Qt::endl;
 								//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 								newmapper->SetInputData(MyObj);
 
@@ -1578,7 +1578,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 								//std::string newname = this->CheckingName(myActor->GetName());
 								newactor->SetName(myActor->GetName() + "_tag_"+std::to_string((int)i));
 								//newactor->SetName(newname);
-								cout << "try to add new actor=" << endl;
+								cout << "try to add new actor=" << Qt::endl;
 								newcoll->AddTmpItem(newactor);
 								modified = 1;
 							}
@@ -1596,7 +1596,7 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
@@ -1610,16 +1610,16 @@ void mqMorphoDigCore::Decompose_Tag(int tag_min, int tag_max)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -1644,7 +1644,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 	QString Sauv_Active_Array_Name = this->Getmui_ActiveArray()->Name;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "try to get next actor:" << i << endl;
+		cout << "try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -1755,7 +1755,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 						newmapper->ScalarVisibilityOn();
 						MyObj->GetPointData()->SetActiveScalars(Sauv_Active_Array_Name.toStdString().c_str());
 
-						cout << "extract object" << MyObj->GetNumberOfPoints() << endl;
+						cout << "extract object" << MyObj->GetNumberOfPoints() << Qt::endl;
 						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 						newmapper->SetInputData(MyObj);
 
@@ -1799,7 +1799,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 							newactor->SetName(myActor->GetName() + QString::number(array_min).toStdString());
 						}
 						//newactor->SetName(newname);
-						cout << "try to add new actor=" << endl;
+						cout << "try to add new actor=" << Qt::endl;
 						newcoll->AddTmpItem(newactor);
 						modified = 1;
 					}
@@ -1815,7 +1815,7 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -1828,19 +1828,19 @@ void mqMorphoDigCore::Extract_Array_Range(double array_min, int array_max)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 			
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this
 				
 				
 			->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -1904,13 +1904,13 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 {
 	if (myVolume != NULL && myVolume->GetMaskEnabled() == 1)
 	{
-		cout << "Mask with surface!" << endl;
+		cout << "Mask with surface!" << Qt::endl;
 		//1 create a vtkPolyData with harden transformed coordinates!
 		if (myActor != NULL)
 		{
 			vtkSmartPointer<vtkPolyData> surface = vtkSmartPointer<vtkPolyData>::New();
 			surface->DeepCopy(vtkPolyData::SafeDownCast(myActor->GetMapper()->GetInput()));
-			cout << "here am I 2" << endl;
+			cout << "here am I 2" << Qt::endl;
 			double ve_init_pos[3];;
 			double ve_final_pos[3];
 			vtkSmartPointer<vtkMatrix4x4> MatAct = myActor->GetMatrix();
@@ -1936,14 +1936,14 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 			myVolume->GetMatrix(Mat);
 			vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
 			TransMat->DeepCopy(Mat);
-			cout << "Transpose Mat" << *TransMat << endl;
+			cout << "Transpose Mat" << *TransMat << Qt::endl;
 			TransMat->Transpose();
 			double N1, N2, N3;
 			N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
 				TransMat->GetElement(3, 1) * TransMat->GetElement(0, 1)
 				+ TransMat->GetElement(3, 2) * TransMat->GetElement(0, 2));
 
-			cout << "N1=" << N1 << endl;
+			cout << "N1=" << N1 << Qt::endl;
 
 			TransMat->SetElement(0, 3, N1);
 
@@ -1953,20 +1953,20 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 				TransMat->GetElement(3, 1) * TransMat->GetElement(1, 1)
 				+ TransMat->GetElement(3, 2) * TransMat->GetElement(1, 2));
 
-			cout << "N2=" << N2 << endl;
+			cout << "N2=" << N2 << Qt::endl;
 			TransMat->SetElement(1, 3, N2);
 
 			N3 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(2, 0) +
 				TransMat->GetElement(3, 1) * TransMat->GetElement(2, 1)
 				+ TransMat->GetElement(3, 2) * TransMat->GetElement(2, 2));
-			cout << "N3=" << N3 << endl;
+			cout << "N3=" << N3 << Qt::endl;
 			TransMat->SetElement(2, 3, N3);
 
 
 			TransMat->SetElement(3, 0, 0);
 			TransMat->SetElement(3, 1, 0);
 			TransMat->SetElement(3, 2, 0);
-			cout << "Transposed mat" << *TransMat << endl;
+			cout << "Transposed mat" << *TransMat << Qt::endl;
 			vtkTransform *newTransform = vtkTransform::New();
 			newTransform->PostMultiply();
 			newTransform->SetMatrix(TransMat);
@@ -2004,7 +2004,7 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 			vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
 			int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };
 			stencilData->GetExtent(stencilExtent);
-			cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << endl;
+			cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << Qt::endl;
 			vtkSmartPointer<vtkImageStencilToImage> stencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
 
 			stencilToImage->SetInputData(BrushPolyDataToStencil->GetOutput());
@@ -2023,13 +2023,13 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 
 
 			//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
-			//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+			//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << Qt::endl;
 
 			//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
 			vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 			vtkIdType cptStencil = 0;
 			brushOutput->GetDimensions(dims);
-			cout << "Brush output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+			cout << "Brush output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << Qt::endl;
 			int maskInside = this->Getmui_MaskInside();
 			int maskOn = this->Getmui_MaskOn();
 			for (int z = 0; z < dims[2]; z++)
@@ -2064,7 +2064,7 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 					}
 				}
 			}
-			cout << "Brush output contains  found " << cptStencil << " points to mask = 0" << endl;
+			cout << "Brush output contains  found " << cptStencil << " points to mask = 0" << Qt::endl;
 
 
 			Mask->Modified();
@@ -2081,7 +2081,7 @@ void mqMorphoDigCore::MaskWithSurface(vtkMDVolume *myVolume, vtkMDActor *myActor
 }
 void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVolume *myVolume)
 {
-	cout << "Mask At " << pickid << "screenX="<< screenX<< "screenY="<<screenY<< endl;
+	cout << "Mask At " << pickid << "screenX="<< screenX<< "screenY="<<screenY<< Qt::endl;
 	double ptCenter[3] = { (double)screenX,(double)screenX,0};
 
 	
@@ -2090,22 +2090,22 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 	
 
 	this->GetDisplayToWorld(ptCenter[0], ptCenter[1], ptCenter[2], pointWC_center);
-	cout << "Mask At " << pickid << "  WCscreenX=" << pointWC_center[0] << "screenY=" << pointWC_center [1]<< "screenZ="<< pointWC_center[2]<< endl;
+	cout << "Mask At " << pickid << "  WCscreenX=" << pointWC_center[0] << "screenY=" << pointWC_center [1]<< "screenZ="<< pointWC_center[2]<< Qt::endl;
 
 	if (myVolume != NULL && myVolume->GetMaskEnabled() == 1)
 	{
 		/*if (myVolume->GetKdTree() == nullptr)
 		{
-			cout << "Try to build volume kdtree!" << endl;
+			cout << "Try to build volume kdtree!" << Qt::endl;
 			myVolume->BuildKdTree();
-			cout << "volume KdTree built" << endl;
+			cout << "volume KdTree built" << Qt::endl;
 		}*/
 
 		/*if (myVolume->GetOctree() == nullptr)
 		{
-			cout << "Try to build volume octree!" << endl;
+			cout << "Try to build volume octree!" << Qt::endl;
 			myVolume->BuildOctree();
-			cout << "volume Octree built" << endl;
+			cout << "volume Octree built" << Qt::endl;
 		}*/
 		vtkSmartPointer<vtkImageData> Mask = myVolume->GetMask();
 		double spacing[3];
@@ -2115,10 +2115,10 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		
 		double ptOrig[3];
 		myVolume->GetImageData()->GetPoint(0, ptOrig); // myVolume point non re-positionné par la matrice de position de l'acteur
-		cout << "ptOrig:" << ptOrig[0] << "," << ptOrig[1] << "," << ptOrig[2] << endl;
+		cout << "ptOrig:" << ptOrig[0] << "," << ptOrig[1] << "," << ptOrig[2] << Qt::endl;
 		//double vn[3];
 		myVolume->GetImageData()->GetPoint(pickid, pt); // myVolume point non re-positionné par la matrice de position de l'acteur
-		cout << "Volume picked point:"<<pickid<<", coords:" << pt[0] << "," << pt[1] << "," << pt[2] << endl;
+		cout << "Volume picked point:"<<pickid<<", coords:" << pt[0] << "," << pt[1] << "," << pt[2] << Qt::endl;
 		double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize() / 100;
 
 		// Create a sphere of desired dimensions
@@ -2135,14 +2135,14 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		myVolume->GetMatrix(Mat);
 		vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
 		TransMat->DeepCopy(Mat);
-		cout << "Transpose Mat" << *TransMat << endl;
+		cout << "Transpose Mat" << *TransMat << Qt::endl;
 		TransMat->Transpose();
 		double N1, N2, N3;
 		N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
 			TransMat->GetElement(3, 1) * TransMat->GetElement(0, 1)
 			+ TransMat->GetElement(3, 2) * TransMat->GetElement(0, 2));
 
-		cout << "N1=" << N1 << endl;
+		cout << "N1=" << N1 << Qt::endl;
 
 		TransMat->SetElement(0, 3, N1);
 
@@ -2152,20 +2152,20 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 			TransMat->GetElement(3, 1) * TransMat->GetElement(1, 1)
 			+ TransMat->GetElement(3, 2) * TransMat->GetElement(1, 2));
 
-		cout << "N2=" << N2 << endl;
+		cout << "N2=" << N2 << Qt::endl;
 		TransMat->SetElement(1, 3, N2);
 
 		N3 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(2, 0) +
 			TransMat->GetElement(3, 1) * TransMat->GetElement(2, 1)
 			+ TransMat->GetElement(3, 2) * TransMat->GetElement(2, 2));
-		cout << "N3=" << N3 << endl;
+		cout << "N3=" << N3 << Qt::endl;
 		TransMat->SetElement(2, 3, N3);
 
 
 		TransMat->SetElement(3, 0, 0);
 		TransMat->SetElement(3, 1, 0);
 		TransMat->SetElement(3, 2, 0);
-		cout << "Transposed mat" << *TransMat<< endl;
+		cout << "Transposed mat" << *TransMat<< Qt::endl;
 		vtkTransform *newTransform = vtkTransform::New();
 		newTransform->PostMultiply();
 		newTransform->SetMatrix(TransMat);
@@ -2248,17 +2248,17 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 			closedSurfacePoints->InsertNextPoint(pointWC_far[0], pointWC_far[1], pointWC_far[2]);
 			/*if (i < 500)
 			{
-				cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << endl;
-				cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
-				cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << endl;
-				cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << endl;
+				cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << Qt::endl;
+				cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << Qt::endl;
+				cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << Qt::endl;
+				cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << Qt::endl;
 			}*/
 			//pointsXY->SetPoint(i, x, y, 0);
 
 
 		}
-		cout << "Found vol_far=" << vol_far << endl;
-		cout << "Found vol_near=" << vol_near << endl;
+		cout << "Found vol_far=" << vol_far << Qt::endl;
+		cout << "Found vol_near=" << vol_near << Qt::endl;
 		vtkNew<vtkPolyData> closedSurfacePolyData;
 		closedSurfacePolyData->SetPoints(closedSurfacePoints.GetPointer());
 		closedSurfacePolyData->SetStrips(closedSurfaceStrips.GetPointer());
@@ -2361,7 +2361,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 		vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
 		int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };
 		stencilData->GetExtent(stencilExtent);
-		cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5]<< endl;
+		cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5]<< Qt::endl;
 		vtkSmartPointer<vtkImageStencilToImage> stencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
 
 		stencilToImage->SetInputData(BrushPolyDataToStencil->GetOutput());
@@ -2380,13 +2380,13 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 
 	
 		//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
-		//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+		//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << Qt::endl;
 
 		//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
 		vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 		vtkIdType cptStencil = 0;
 		brushOutput->GetDimensions(dims);
-		cout << "Brush output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+		cout << "Brush output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << Qt::endl;
 		int maskInside = this->Getmui_MaskInside();
 		int maskOn = this->Getmui_MaskOn();
 		for (int z = 0; z < dims[2]; z++)
@@ -2421,7 +2421,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 				}
 			}
 		}
-		cout << "Brush output contains  found " << cptStencil << " points to mask = 0" << endl;
+		cout << "Brush output contains  found " << cptStencil << " points to mask = 0" << Qt::endl;
 		
 		
 		Mask->Modified();
@@ -2433,7 +2433,7 @@ void mqMorphoDigCore::MaskAt(vtkIdType pickid, int screenX, int screenY, vtkMDVo
 void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride)
 {
 
-	cout << "Tag At " << pickid << endl;
+	cout << "Tag At " << pickid << Qt::endl;
 	//1 check if myActor is not null
 	//2 now check if tagModeActivated is on
 	if (this->Getmui_TagModeActivated() == 1 && myActor !=NULL)
@@ -2459,15 +2459,15 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				//5 retrieve list of point ids which are selected by the currently active tool
 				if (myActor->GetKdTree() == nullptr)
 				{
-					cout << "Try to build kdtree!" << endl;
+					cout << "Try to build kdtree!" << Qt::endl;
 					myActor->BuildKdTree();
-					cout << "KdTree built" << endl;
+					cout << "KdTree built" << Qt::endl;
 				}
 				if (myActor->GetConnectivityFilter() == nullptr)
 				{
-					cout << "Try to build connectivity filter!" << endl;
+					cout << "Try to build connectivity filter!" << Qt::endl;
 					myActor->BuildConnectivityFilter();
-					cout << "Connectivity filter built" << endl;
+					cout << "Connectivity filter built" << Qt::endl;
 				}
 				double ve[3];
 
@@ -2482,8 +2482,8 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				mvn[1] = vn[1];
 				mvn[2] = vn[2];
 				int curTag = currentTags->GetTuple1(pickid);
-				cout << "pickid :" << pickid << ", tagid:" << curTag << endl;
-				cout << "vn[0] :" << vn[0] << ", vn[1]:" << vn[1] << ", vn[2]:" << vn[2] << endl;
+				cout << "pickid :" << pickid << ", tagid:" << curTag << Qt::endl;
+				cout << "vn[0] :" << vn[0] << ", vn[1]:" << vn[1] << ", vn[2]:" << vn[2] << Qt::endl;
 				int do_override;
 				
 				if (toverride==1) // if user explicitly asks to override OR current picked vertex is tagged with 0 (exterior), we do the override
@@ -2504,7 +2504,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 
 					vtkSmartPointer<vtkIdList> observedNeighbours = vtkSmartPointer<vtkIdList>::New();
 					double Radius = this->GetHundredPxSU()*this->Getmui_PencilSize()/100;
-					cout <<"Radius = " << Radius << endl;
+					cout <<"Radius = " << Radius << Qt::endl;
 					myActor->GetKdTree()->FindPointsWithinRadius(Radius, ve, observedNeighbours);
 					
 					// two cases:
@@ -2525,7 +2525,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 					{
 						if (this->Getmui_PencilLimitAngle() < 180)
 						{
-							cout << "Min cos = " << min_cos << endl;
+							cout << "Min cos = " << min_cos << Qt::endl;
 							for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 							{
 								vtkIdType investigatedPt = observedNeighbours->GetId(j);								
@@ -2542,7 +2542,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						}
 						else
 						{
-							cout << "Ids = observedNeighbours" << endl;
+							cout << "Ids = observedNeighbours" << Qt::endl;
 							ids = observedNeighbours;
 						}
 
@@ -2560,11 +2560,11 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						int list_changed = 1;
 						while (list_changed == 1)
 						{
-						//	cout << "cpt=" << cpt << endl;
-						//	cout << "observedNeighbours->GetNumberOfIds()=" << observedNeighbours->GetNumberOfIds() << endl;
-						//	cout << "ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
-						//	cout << "toInvestigatePtsList->GetNumberOfIds()=" << toInvestigatePtsList->GetNumberOfIds() << endl;
-						//	cout << "min_cos=" << min_cos << endl;
+						//	cout << "cpt=" << cpt << Qt::endl;
+						//	cout << "observedNeighbours->GetNumberOfIds()=" << observedNeighbours->GetNumberOfIds() << Qt::endl;
+						//	cout << "ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << Qt::endl;
+						//	cout << "toInvestigatePtsList->GetNumberOfIds()=" << toInvestigatePtsList->GetNumberOfIds() << Qt::endl;
+						//	cout << "min_cos=" << min_cos << Qt::endl;
 
 							this->PropagateVertices(
 								mesh,
@@ -2583,7 +2583,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						}
 
 						
-						//cout << " ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << endl;
+						//cout << " ids->GetNumberOfIds()=" << ids->GetNumberOfIds() << Qt::endl;
 
 					}
 
@@ -2596,7 +2596,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 
 						int mTag = currentTags->GetTuple1(observedConnectedVertex);
 						if (j < 10) {
-							std::cout << "neighbour id: " << observedConnectedVertex << ", tagid:" << mTag << endl;
+							std::cout << "neighbour id: " << observedConnectedVertex << ", tagid:" << mTag << Qt::endl;
 
 
 						}
@@ -2604,7 +2604,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 						{
 							if (j < 10)
 							{
-								cout << "change tag value" << endl;
+								cout << "change tag value" << Qt::endl;
 							}
 							currentTags->SetTuple1(observedConnectedVertex, activeTag);
 						}
@@ -2613,11 +2613,11 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 				}
 				else// paint bucket
 				{
-					cout << "Start non pencil Tool=" << tool << endl;
+					cout << "Start non pencil Tool=" << tool << Qt::endl;
 					vtkIdType corrpickedId = myActor->GetCorrPickedId(pickid);
 					int pickedRegion = myActor->GetConnectivityRegions()->GetTuple1(corrpickedId);
-					cout << "picked region:" << pickedRegion << endl;
-					cout << "small check: " << myPD->GetNumberOfPoints() << "=" << myActor->GetConnectivityRegions()->GetNumberOfTuples() << "?" << endl;
+					cout << "picked region:" << pickedRegion << Qt::endl;
+					cout << "small check: " << myPD->GetNumberOfPoints() << "=" << myActor->GetConnectivityRegions()->GetNumberOfTuples() << "?" << Qt::endl;
 					for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
 					{
 						vtkIdType corrj = myActor->GetCorrPickedId(j);
@@ -2645,7 +2645,7 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 			}
 			else
 			{
-				cout << "Can not tag, could not find tags" << endl;
+				cout << "Can not tag, could not find tags" << Qt::endl;
 			}
 			
 			
@@ -2655,12 +2655,12 @@ void mqMorphoDigCore::TagAt(vtkIdType pickid, vtkMDActor *myActor, int toverride
 		}
 		else
 		{
-			cout << "Can not tag, no mapper / polydata" << endl;
+			cout << "Can not tag, no mapper / polydata" << Qt::endl;
 		}
 	}
 	else
 	{
-		cout << "Can not tag : Tag Mode is deactivated" << endl;
+		cout << "Can not tag : Tag Mode is deactivated" << Qt::endl;
 	}
 
 
@@ -2722,7 +2722,7 @@ double mqMorphoDigCore::GetVolumeRangeMin()
 	}
 	if (my_min == VTK_DOUBLE_MAX )
 	{
-		cout << "Strange!!!" << endl;
+		cout << "Strange!!!" << Qt::endl;
 		return 0;
 	}
 	else
@@ -2753,7 +2753,7 @@ double mqMorphoDigCore::GetVolumeRangeMax()
 	}
 	if (my_max == VTK_DOUBLE_MIN)
 	{
-		cout << "Strange!!!" << endl;
+		cout << "Strange!!!" << Qt::endl;
 		return 1;
 	}
 	else
@@ -2843,7 +2843,7 @@ double mqMorphoDigCore::GetScalarRangeMin()
 	}
 	if (my_min == VTK_DOUBLE_MAX || my_min == VTK_FLOAT_MAX)
 	{
-		cout << "Strange!!!" << endl;
+		cout << "Strange!!!" << Qt::endl;
 		return 0;
 	}
 	else
@@ -2913,7 +2913,7 @@ int mqMorphoDigCore::GetTagRangeMin(QString TagArray)
 	}
 	if (my_min == VTK_INT_MAX)
 	{
-		cout << "Strange!!!" << endl;
+		cout << "Strange!!!" << Qt::endl;
 		return 0;
 	}
 	else
@@ -2935,7 +2935,7 @@ int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
 	{
 		mTagArray = TagArray;
 	}
-	cout << "mTagArray=" << mTagArray.toStdString() << endl;
+	cout << "mTagArray=" << mTagArray.toStdString() << Qt::endl;
 	//return this->ScalarRangeMin;
 	int my_max;
 	int my_currmax;
@@ -2982,7 +2982,7 @@ int mqMorphoDigCore::GetTagRangeMax(QString TagArray)
 	}
 	if (my_max == 0)
 	{
-		cout << "Odd... Tag max =0" << endl;
+		cout << "Odd... Tag max =0" << Qt::endl;
 		return 0;
 	}
 	else
@@ -3078,7 +3078,7 @@ double mqMorphoDigCore::GetScalarRangeMax()
 	}
 	else
 	{
-		cout << "my_max=" << my_max << endl;
+		cout << "my_max=" << my_max << Qt::endl;
 		return my_max;
 	}
 }
@@ -3133,7 +3133,7 @@ double mqMorphoDigCore::GetSuggestedVolumeRangeMin(int cutMin, int onlyselected 
 	}
 	if (suggested_min == VTK_DOUBLE_MAX || suggested_min == VTK_FLOAT_MAX)
 	{
-		cout << "Strange!!!" << endl;
+		cout << "Strange!!!" << Qt::endl;
 		return 0;
 	}
 	else
@@ -3194,7 +3194,7 @@ double mqMorphoDigCore::GetSuggestedVolumeRangeMax(int cutMax, int onlyselected)
 	}
 	if (suggested_max == VTK_DOUBLE_MIN || suggested_max == VTK_FLOAT_MIN)
 	{
-		cout << "Strange!!!" << endl;
+		cout << "Strange!!!" << Qt::endl;
 		return 1;
 	}
 	else
@@ -3260,9 +3260,9 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMin(int cutMin, int onlyselected)
 
 		}
 	}
-	cout << "try to sort vals Min at cutMin=" <<cutMin<< endl;
-	cout << "totalVeNr==" << totalVeNr << endl;
-	cout << "vals nr of values:" << vals.size() << endl;
+	cout << "try to sort vals Min at cutMin=" <<cutMin<< Qt::endl;
+	cout << "totalVeNr==" << totalVeNr << Qt::endl;
+	cout << "vals nr of values:" << vals.size() << Qt::endl;
 
 	if (totalVeNr > 0)
 	{
@@ -3277,14 +3277,14 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMin(int cutMin, int onlyselected)
 		size_t iQ = (size_t)(cut*totalVeNr);
 		if (iQ >= vals.size()) { iQ = vals.size() - 1; }
 		if (iQ < 0) { iQ = 0; }
-		cout << "iQ=" << iQ << endl;
+		cout << "iQ=" << iQ << Qt::endl;
 		my_currmin = (double)vals.at(iQ);
-		cout << "my_currmin=" << my_currmin << endl;
+		cout << "my_currmin=" << my_currmin << Qt::endl;
 		if (my_currmin < my_min) { my_min = my_currmin; }
 	}
 	if (my_min == VTK_DOUBLE_MAX || my_min == VTK_FLOAT_MAX)
 	{
-		cout << "Strange!!!" << endl;
+		cout << "Strange!!!" << Qt::endl;
 		return 0;
 	}
 	else
@@ -3353,9 +3353,9 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMax( int cutMax, int onlyselected
 		}
 									
 	}
-	cout << "try to sort vals Max at cutMax=" << cutMax << endl;
-	cout << "totalVeNr==" << totalVeNr << endl;
-	cout << "vals nr of values:" << vals.size() << endl;
+	cout << "try to sort vals Max at cutMax=" << cutMax << Qt::endl;
+	cout << "totalVeNr==" << totalVeNr << Qt::endl;
+	cout << "vals nr of values:" << vals.size() << Qt::endl;
 
 	if (totalVeNr > 0)
 	{
@@ -3369,9 +3369,9 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMax( int cutMax, int onlyselected
 		size_t iQ = (size_t)(cut*totalVeNr);
 		if (iQ >= vals.size()) { iQ = vals.size() - 1; }
 		if (iQ < 0) { iQ = 0; }
-		cout << "iQ=" << iQ << endl;
+		cout << "iQ=" << iQ << Qt::endl;
 		my_currmax = (double)vals.at(iQ);
-		cout << "my_currmax=" << my_currmax << endl;
+		cout << "my_currmax=" << my_currmax << Qt::endl;
 		if (my_currmax > my_max) { my_max = my_currmax; }
 	}
 	if (my_max == VTK_DOUBLE_MIN || my_max == VTK_FLOAT_MIN)
@@ -3380,7 +3380,7 @@ double mqMorphoDigCore::GetSuggestedScalarRangeMax( int cutMax, int onlyselected
 	}
 	else 
 	{
-		cout << "suggested range my_max=" << my_max << endl;
+		cout << "suggested range my_max=" << my_max << Qt::endl;
 		return my_max;
 	}
 	
@@ -3391,19 +3391,19 @@ vtkDiscretizableColorTransferFunction* mqMorphoDigCore::GetOneColorMap()
 {
 	if (this->mui_ExistingColorMaps->Stack.size() > 0)
 	{
-		cout <<"GetOneColorMap returns "<< this->mui_ExistingColorMaps->Stack.at(0).Name.toStdString()<< endl;
+		cout <<"GetOneColorMap returns "<< this->mui_ExistingColorMaps->Stack.at(0).Name.toStdString()<< Qt::endl;
 		return this->mui_ExistingColorMaps->Stack.at(0).ColorMap;
 	}
 	else
 	{
-		cout << "GetOneColorMap returns NULL" << endl;
+		cout << "GetOneColorMap returns NULL" << Qt::endl;
 		return NULL;
 	}
 
 }
 void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 {
-	cout << "UpdateLookupTablesRanges inside MqMorphoDigCore" << endl;
+	cout << "UpdateLookupTablesRanges inside MqMorphoDigCore" << Qt::endl;
 	for (int i = 0; i < this->mui_ExistingColorMaps->Stack.size(); i++)
 	{
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> CM = this->mui_ExistingColorMaps->Stack.at(i).ColorMap;
@@ -3411,18 +3411,18 @@ void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 		double *pts = CM->GetDataPointer();
 		
 		int numnodes = CM->GetSize();
-		cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": num nodes = " << numnodes << endl;
+		cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": num nodes = " << numnodes << Qt::endl;
 		double old_min = DBL_MAX;
 		double old_max = -DBL_MAX;
 		for (int j = 0; j < numnodes; j++)
 		{
 			double curr = pts[4 * j];
-			//cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << Qt::endl;
 			if (curr < old_min) { old_min = curr; }
 			if (curr > old_max) { old_max = curr; }
 
 		}
-		//cout << "old max:" << old_max << ", old min:" << old_min << endl;
+		//cout << "old max:" << old_max << ", old min:" << old_min << Qt::endl;
 		if (old_max > old_min)
 		{
 			double old_range = old_max - old_min;
@@ -3432,7 +3432,7 @@ void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 			for (int k = 0; k < numnodes; k++)
 			{
 				pts[4 * k] = pts[4 * k] * mult + c;
-				//cout << "nx" << k << "=" << pts[4 * k] << endl;
+				//cout << "nx" << k << "=" << pts[4 * k] << Qt::endl;
 			}
 			CM->FillFromDataPointer(numnodes, pts);
 
@@ -3440,13 +3440,13 @@ void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 		vtkPiecewiseFunction* OF = CM->GetScalarOpacityFunction();
 		int numnodes2 = OF->GetSize();
 		double *pts2 = OF->GetDataPointer();
-		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << Qt::endl;
 		double old_min2 = DBL_MAX;
 		double old_max2 = -DBL_MAX;
 		for (int j = 0; j < numnodes2; j++)
 		{
 			double curr = pts2[2*j];
-			//cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << Qt::endl;
 			if (curr < old_min2) { old_min2 = curr; }
 			if (curr > old_max2) { old_max2 = curr; }
 
@@ -3460,7 +3460,7 @@ void mqMorphoDigCore::UpdateLookupTablesRanges(double min, double max)
 			for (int k = 0; k < numnodes2; k++)
 			{
 				pts2[2*k] = pts2[2*k] * mult + c;
-				//cout << "nx" << k << "=" << pts2[2*k] << endl;
+				//cout << "nx" << k << "=" << pts2[2*k] << Qt::endl;
 			}
 			OF->FillFromDataPointer(numnodes2, pts2);
 
@@ -3477,13 +3477,13 @@ void mqMorphoDigCore::UpdateLookupTablesToData()
 	max = -DBL_MAX;
 	
 	min = this->GetScalarRangeMin();
-	cout << "min=" << min << endl;
+	cout << "min=" << min << Qt::endl;
 	max = this->GetScalarRangeMax();
 	
-	cout << "max=" << max << endl;
+	cout << "max=" << max << Qt::endl;
 	if (min <DBL_MAX && max>-DBL_MAX && min < max)
 	{
-		cout << "Update look up tables ranges"  << endl;
+		cout << "Update look up tables ranges"  << Qt::endl;
 		this->UpdateLookupTablesRanges(min, max);
 	}
 	
@@ -3505,7 +3505,7 @@ void mqMorphoDigCore::createCustomTagMap(QString name)
 	this->mui_ActiveTagMap->tagNames = tagNames;
 	this->mui_ActiveTagMap->Name = name;	
 
-	cout << "Add this map to !! create custom tag map" << endl;
+	cout << "Add this map to !! create custom tag map" << Qt::endl;
 	this->mui_ExistingTagMaps->Stack.push_back(ExistingTagMaps::Element(name, newTagMap, numTags, tagNames, 1));
 	emit this->tagMapsChanged();
 
@@ -3526,10 +3526,10 @@ void mqMorphoDigCore::createCustomColorMap(QString name, vtkDiscretizableColorTr
 
 
 	this->mui_ActiveColorMap->ColorMap = newSTC;
-	cout << "Active color map = newSTC!" << endl;
+	cout << "Active color map = newSTC!" << Qt::endl;
 	this->mui_ActiveColorMap->Name = name;
 
-	cout << "Add this map to create custom colormap!!" << endl;
+	cout << "Add this map to create custom colormap!!" << Qt::endl;
 	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(name, newSTC, 1));
 
 	emit colorMapsChanged();
@@ -3543,18 +3543,18 @@ void mqMorphoDigCore::invertRGB(vtkDiscretizableColorTransferFunction *STC)
 		double *pts = STC->GetDataPointer();
 
 		int numnodes = STC->GetSize();
-		//cout << ": num nodes = " << numnodes << endl;
+		//cout << ": num nodes = " << numnodes << Qt::endl;
 		double min = DBL_MAX;
 		double max = -DBL_MAX;
 		for (int j = 0; j < numnodes; j++)
 		{
 			double curr = pts[4 * j];
-			//cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << Qt::endl;
 			if (curr < min) { min = curr; }
 			if (curr > max) { max = curr; }
 
 		}
-		//cout << "max:" << max << ", old min:" << min << endl;
+		//cout << "max:" << max << ", old min:" << min << Qt::endl;
 		if (max > min)
 		{
 			double mult = -1;
@@ -3562,7 +3562,7 @@ void mqMorphoDigCore::invertRGB(vtkDiscretizableColorTransferFunction *STC)
 			for (int k = 0; k < numnodes; k++)
 			{
 				pts[4 * k] = pts[4 * k] * mult + c;
-				//cout << "nx" << k << "=" << pts[4 * k] << endl;
+				//cout << "nx" << k << "=" << pts[4 * k] << Qt::endl;
 			}
 			STC->FillFromDataPointer(numnodes, pts);
 
@@ -3576,13 +3576,13 @@ void mqMorphoDigCore::invertOpacity(vtkDiscretizableColorTransferFunction *STC)
 		vtkPiecewiseFunction* OF = STC->GetScalarOpacityFunction();
 		int numnodes2 = OF->GetSize();
 		double *pts2 = OF->GetDataPointer();
-		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << endl;
+		//cout << this->mui_ExistingColorMaps->Stack.at(i).Name.toStdString() << ": OF num nodes = " << numnodes2 << Qt::endl;
 		double min2 = DBL_MAX;
 		double max2 = -DBL_MAX;
 		for (int j = 0; j < numnodes2; j++)
 		{
 			double curr = pts2[2 * j];
-			//cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << Qt::endl;
 			if (curr < min2) { min2 = curr; }
 			if (curr > max2) { max2 = curr; }
 
@@ -3594,7 +3594,7 @@ void mqMorphoDigCore::invertOpacity(vtkDiscretizableColorTransferFunction *STC)
 			for (int k = 0; k < numnodes2; k++)
 			{
 				pts2[2 * k] = pts2[2 * k] * mult + c;
-				//cout << "nx" << k << "=" << pts2[2*k] << endl;
+				//cout << "nx" << k << "=" << pts2[2*k] << Qt::endl;
 			}
 			OF->FillFromDataPointer(numnodes2, pts2);
 
@@ -3603,7 +3603,7 @@ void mqMorphoDigCore::invertOpacity(vtkDiscretizableColorTransferFunction *STC)
 }
 void mqMorphoDigCore::InitLuts()
 {
-	cout << "Start Init LUTS!" << endl;
+	cout << "Start Init LUTS!" << Qt::endl;
 	/*this->TagLut->SetNumberOfTableValues(10);
 	this->TagLut->Build();
 	std::vector<std::string> tagNames;
@@ -3634,11 +3634,11 @@ void mqMorphoDigCore::InitLuts()
 	
 
 	QString TagMap = QString("TagMap");
-	cout << "Try to set existing color maps!!" << endl;
+	cout << "Try to set existing color maps!!" << Qt::endl;
 
 	this->mui_ExistingTagMaps->Stack.push_back(ExistingTagMaps::Element(TagMap, TagLut,10, tagNames, 0));
 	this->mui_ActiveTagMap->TagMap= this->TagLut;
-		cout << "Set Active color map2!" << endl;
+		cout << "Set Active color map2!" << Qt::endl;
 	
 	this->mui_ActiveTagMap->Name = TagMap;
 	this->mui_ActiveTagMap->numTags = 10;
@@ -3663,7 +3663,7 @@ void mqMorphoDigCore::InitLuts()
 	opacityRfunction->AddPoint(0.8, 0.8);
 	opacityRfunction->AddPoint(1, 1);
 	//opacityRfunction->AddPoint(1.0001, 0);
-	cout << "Rainbow scalar has opacity function!!!" << endl;
+	cout << "Rainbow scalar has opacity function!!!" << Qt::endl;
 	this->ScalarRainbowLut->SetScalarOpacityFunction(opacityRfunction);
 	this->ScalarRainbowLut->EnableOpacityMappingOn();
 	this->ScalarRainbowLut->Build();
@@ -3714,7 +3714,7 @@ void mqMorphoDigCore::InitLuts()
 	//opacityGSfunction->AddPoint(0.8, 0.8);
 	opacityGSfunction->AddPoint(1, 1);
 	//opacityRfunction->AddPoint(1.0001, 0);
-	cout << "Rainbow scalar has opacity function!!!" << endl;
+	cout << "Rainbow scalar has opacity function!!!" << Qt::endl;
 	this->ScalarGreyScaleLut->SetScalarOpacityFunction(opacityGSfunction);
 	this->ScalarGreyScaleLut->EnableOpacityMappingOn();
 	this->ScalarGreyScaleLut->Build();
@@ -3723,20 +3723,20 @@ void mqMorphoDigCore::InitLuts()
 
 	/*this->mui_ActiveColorMap->ColorMap = this->ScalarRedLut;
 	this->mui_ActiveColorMap->Name = QString("Black-Red-White_Alpha");*/
-	cout << "Set Active color map!" << endl;
+	cout << "Set Active color map!" << Qt::endl;
 	this->mui_ActiveColorMap->ColorMap = this->ScalarRainbowLut;
-	cout << "Set Active color map2!" << endl;
+	cout << "Set Active color map2!" << Qt::endl;
 	QString Rainbow = QString("Rainbow");
 	this->mui_ActiveColorMap->Name = Rainbow;
 
-	cout << "Try to set existing color maps!!" << endl;
+	cout << "Try to set existing color maps!!" << Qt::endl;
 	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(Rainbow, this->ScalarRainbowLut, 0));
 
-	cout << "Try to set existing color maps 2!!" << endl;
+	cout << "Try to set existing color maps 2!!" << Qt::endl;
 	QString BRWA = QString("Black-Red-White");
 
 	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(BRWA,this->ScalarRedLut, 0));
-	cout << "Try to set existing color maps 3!!" << endl;
+	cout << "Try to set existing color maps 3!!" << Qt::endl;
 
 	QString GS = QString("Grey scale");
 	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(GS, this->ScalarGreyScaleLut, 0));
@@ -3763,7 +3763,7 @@ void mqMorphoDigCore::InitLuts()
 		double* machin= scalarValues->GetTuple(i);
 		//scalarValues->GetTupleGetTupleValue(i, &machin);
 
-		//cout << "tuple i=" << machin[0] << endl;
+		//cout << "tuple i=" << machin[0] << Qt::endl;
 	}*/
 
 	/*
@@ -3819,7 +3819,7 @@ void mqMorphoDigCore::addTagToTagMap(int i)
 		/*for (int i = 0; i < tagnr; i++)
 		{
 			double rgba[4];
-			cout << "i=" << i << "try to get rgba" << endl;
+			cout << "i=" << i << "try to get rgba" << Qt::endl;
 
 			if (i == newtag)
 			{
@@ -3847,8 +3847,8 @@ void mqMorphoDigCore::matchTagMapToActorCollection()
 {
 	int activeTagMapNr = this->Getmui_ActiveTagMap()->numTags; 
 	int maxTagNr = this->highestTagInActorCollection();// 0 1 2 3 ... maxTagNr
-	cout << "activeTagMapNr =" << activeTagMapNr << endl;
-	cout << "maxTagNr =" << maxTagNr << endl;
+	cout << "activeTagMapNr =" << activeTagMapNr << Qt::endl;
+	cout << "maxTagNr =" << maxTagNr << Qt::endl;
 	
 	if (maxTagNr>=activeTagMapNr)
 	{
@@ -3963,12 +3963,12 @@ int mqMorphoDigCore::tagAlreadyExists(int tagnr)
 						exists = 1; return 1;
 					}
 				}
-				cout << "Finished loop and found no tag matching " << tagnr << endl;
+				cout << "Finished loop and found no tag matching " << tagnr << Qt::endl;
 			}
 			else
 			{
 
-				cout << "current tags is null!" << endl;
+				cout << "current tags is null!" << Qt::endl;
 			}
 		}
 		//}
@@ -3977,7 +3977,7 @@ int mqMorphoDigCore::tagAlreadyExists(int tagnr)
 }
 void mqMorphoDigCore::clearTag(int tagnr)
 {
-		cout << "Clean tag " << tagnr << endl;
+		cout << "Clean tag " << tagnr << Qt::endl;
 		int modified = 0;
 		this->ActorCollection->InitTraversal();
 		vtkIdType num = this->ActorCollection->GetNumberOfItems();
@@ -4019,7 +4019,7 @@ int mqMorphoDigCore::highestTagInActorCollection()
 	int max = 0;
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
-	cout << "Number of actors : " << num << endl;
+	cout << "Number of actors : " << num << Qt::endl;
 	for (vtkIdType i = 0; i < num; i++)
 	{
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
@@ -4067,7 +4067,7 @@ void mqMorphoDigCore::removeTagFromTagMap(int i)
 			int exists= this->tagAlreadyExists(tag_to_remove);
 			if (exists==1)
 			{
-				cout << "tag exists!"<< endl;
+				cout << "tag exists!"<< Qt::endl;
 				QMessageBox msgBox;
 				msgBox.setText("Some opened objets have vertices tagged with value " + QString::number(tag_to_remove) + ". Reset corresponding vertices to 0 ?");
 				msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -4129,7 +4129,7 @@ void mqMorphoDigCore::reinitializeTagMap(int i)
 		for (int i = 0; i < tagnr; i++)
 		{
 			double rgba[4];
-			cout << "i=" << i << "try to get rgba" << endl;
+			cout << "i=" << i << "try to get rgba" << Qt::endl;
 			this->GetDefaultTagColor(i, rgba);
 			mTagLut->SetTableValue(i, rgba[0], rgba[1], rgba[2], rgba[3]);
 			if (i == 0)
@@ -4142,9 +4142,9 @@ void mqMorphoDigCore::reinitializeTagMap(int i)
 				tagNames.push_back(TagName.toStdString());
 			}
 		}
-		cout << "End i loop" << endl;
+		cout << "End i loop" << Qt::endl;
 		QString TagMap = QString("TagMap");
-		cout << "Try to set existing color maps!!" << endl;
+		cout << "Try to set existing color maps!!" << Qt::endl;
 
 		this->Getmui_ExistingTagMaps()->Stack.at(i).numTags = tagnr;
 		this->Getmui_ExistingTagMaps()->Stack.at(i).tagNames = tagNames;
@@ -4215,10 +4215,10 @@ void mqMorphoDigCore::reinitializeColorMap(int i)
 		this->mui_ExistingColorMaps->Stack.at(i).Name = Name;
 
 	
-		cout << "Try to set existing color maps 3!!" << endl;
+		cout << "Try to set existing color maps 3!!" << Qt::endl;
 
 	}
-	cout << "colorMapsChanged reinitializeColorMap" << endl;
+	cout << "colorMapsChanged reinitializeColorMap" << Qt::endl;
 	emit this->colorMapsChanged();
 }
 void mqMorphoDigCore::deleteTagMap(int i)
@@ -4487,7 +4487,7 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 		fileName.append(".png");
 	}
 
-	cout << "Write image" << endl;
+	cout << "Write image" << Qt::endl;
 	vtkSmartPointer<vtkPNGWriter> writer =
 		vtkSmartPointer<vtkPNGWriter>::New();
 	writer->SetFileName(fileName.toLocal8Bit());
@@ -4501,7 +4501,7 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 		writer->SetInputData(transparency->GetOutput());
 	}
 	writer->Write();
-	cout << "Done!" << endl;
+	cout << "Done!" << Qt::endl;
 	QMessageBox msgBox;
 	msgBox.setText("Screenshot written.");
 	msgBox.exec();
@@ -4529,12 +4529,12 @@ void mqMorphoDigCore::SaveORI(QString fileName)
 	{
 		QTextStream stream(&file);
 
-		stream << this->Getmui_Z1Label() << endl;
-		stream << this->Getmui_Z2Label() << endl;
-		stream << this->Getmui_Y1Label() << endl;
-		stream << this->Getmui_Y2Label() << endl;
-		stream << this->Getmui_X1Label() << endl;
-		stream << this->Getmui_X2Label() << endl;
+		stream << this->Getmui_Z1Label() << Qt::endl;
+		stream << this->Getmui_Z2Label() << Qt::endl;
+		stream << this->Getmui_Y1Label() << Qt::endl;
+		stream << this->Getmui_Y2Label() << Qt::endl;
+		stream << this->Getmui_X1Label() << Qt::endl;
+		stream << this->Getmui_X2Label() << Qt::endl;
 
 
 	}
@@ -4548,7 +4548,7 @@ void mqMorphoDigCore::SaveORI(QString fileName)
 
 void mqMorphoDigCore::GetDefaultTagColor(int tagnr, double rgba[4])
 {
-	cout << "GetDefaultTagColor(" << tagnr <<")"<< endl;
+	cout << "GetDefaultTagColor(" << tagnr <<")"<< Qt::endl;
 	std::vector<double> r;
 	
 	std::vector<double> g;
@@ -4606,7 +4606,7 @@ void mqMorphoDigCore::GetDefaultTagColor(int tagnr, double rgba[4])
 	
 	if (tagnr < r.size())
 	{
-		cout << "r.size()=" << r.size() << endl;
+		cout << "r.size()=" << r.size() << Qt::endl;
 		rgba[0] = r.at(tagnr);
 		rgba[1] = g.at(tagnr);
 		rgba[2] = b.at(tagnr);
@@ -4615,7 +4615,7 @@ void mqMorphoDigCore::GetDefaultTagColor(int tagnr, double rgba[4])
 	}
 	else
 	{
-		cout << "Try rand..." << endl;
+		cout << "Try rand..." << Qt::endl;
 		rgba[0] = ((double)rand() / (double)RAND_MAX);
 		rgba[1] = ((double)rand() / (double)RAND_MAX);
 		rgba[2] = ((double)rand() / (double)RAND_MAX);
@@ -4656,7 +4656,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 				
 				myFlag->GetLMOrigin(flpos);
 				double closest[3] = { flpos[0] , flpos[1],flpos[2] };
-				cout << "Current flag :" << flpos[0] << "," << flpos[1] << "," << flpos[2] << endl;
+				cout << "Current flag :" << flpos[0] << "," << flpos[1] << "," << flpos[2] << Qt::endl;
 
 				this->ActorCollection->InitTraversal();
 				for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
@@ -4703,7 +4703,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 								
 							{
 								myActor->GetProperty()->GetColor(r1, g1, b1);
-								cout << "Mesh PLAIN color " <<i<<"("<< myActor->GetName() << "): " << "r="<<r1 << ", g=" << g1<< ", b="<<b1 << endl;
+								cout << "Mesh PLAIN color " <<i<<"("<< myActor->GetName() << "): " << "r="<<r1 << ", g=" << g1<< ", b="<<b1 << Qt::endl;
 								ok = 1;
 							}
 							else
@@ -4724,7 +4724,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 									r1 = rgb[0];
 									g1 = rgb[1];
 									b1 = rgb[2];
-									cout << "Mesh TAG-like color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << endl;
+									cout << "Mesh TAG-like color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << Qt::endl;
 									ok = 1;								
 								}
 								else if (
@@ -4744,7 +4744,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 									r1 = cur_r / 255;
 									g1 = cur_g / 255;
 									b1 = cur_b / 255;
-									cout << "Mesh RGB-like color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << endl;
+									cout << "Mesh RGB-like color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << Qt::endl;
 									ok = 1;
 
 								}
@@ -4765,7 +4765,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 										r1 = rgb[0];
 										g1 = rgb[1];
 										b1 = rgb[2];
-										cout << "Mesh Float-Scalar color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << endl;
+										cout << "Mesh Float-Scalar color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << Qt::endl;
 										ok = 1;
 									}
 									else
@@ -4781,7 +4781,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 										r1 = rgb[0];
 										g1 = rgb[1];
 										b1 = rgb[2];
-										cout << "Mesh Double-Scalar color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << endl;
+										cout << "Mesh Double-Scalar color " << i << "(" << myActor->GetName() << "): " << "r=" << r1 << ", g=" << g1 << ", b=" << b1 << Qt::endl;
 										ok = 1;
 
 									}
@@ -4881,7 +4881,7 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsLengths(double flag_rendering_size)
 
 void mqMorphoDigCore::OpenFLG(QString fileName)
 {
-	//cout << "OpenFLG " << fileName.toStdString() << endl;
+	//cout << "OpenFLG " << fileName.toStdString() << Qt::endl;
 	double  x, y, z, nx, ny, nz, flength, r, g, b;
 
 	QString FLGName;
@@ -4971,7 +4971,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 							myLastFlag->SetLMType(4);
 							myLastFlag->SetmColor(r, g, b, 0.5);
 							myLastFlag->SetLMText(FLGName.toStdString());
-							//cout << "Set LM Size:" << flength << endl;
+							//cout << "Set LM Size:" << flength << Qt::endl;
 							myLastFlag->SetLMSize(flength);
 							myLastFlag->SetChanged(1);
 							cpt_created ++;
@@ -5143,9 +5143,9 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode, int doROI)
 						myteststream >> xmin >> xmax >> ymin >> ymax >> zmin >> zmax;						
 						if (!(xmin==0 && xmax ==0 && ymin == 0 &&ymax == 0 && zmin == 0 && zmax == 0))
 						{doBox=1;}
-						//cout << "xmin ... " << xmin << "," << xmin << "," << ymin << "," << ymin << "," << zmin << "," << zmax << endl;
+						//cout << "xmin ... " << xmin << "," << xmin << "," << ymin << "," << ymin << "," << zmin << "," << zmax << Qt::endl;
 					}
-					//cout << "line was at end!" << endl;
+					//cout << "line was at end!" << Qt::endl;
 					inputFile.close();
 
 				}
@@ -5153,7 +5153,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode, int doROI)
 
 
 
-			 //cout << "call MorphoDig apply mat" << &Mat << endl;
+			 //cout << "call MorphoDig apply mat" << &Mat << Qt::endl;
 			if (doBox == 0)
 			{
 				this->ApplyMatrix(Mat, mode);
@@ -5341,7 +5341,7 @@ void mqMorphoDigCore::OpenPOSTrans(QString fileName, int mode)
 			Mat->SetElement(3, 1, 0);
 			Mat->SetElement(3, 2, 0);
 
-			//cout << "call MorphoDig apply mat" << &Mat << endl;
+			//cout << "call MorphoDig apply mat" << &Mat << Qt::endl;
 			this->ApplyMatrix(Mat, mode);
 
 			//ApplyChanges()
@@ -5362,7 +5362,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 
 	//Open a landmark file!
 
-	cout << "Import an Avizo/Amira file" << endl;
+	cout << "Import an Avizo/Amira file" << Qt::endl;
 	size_t  length;
 
 
@@ -5398,7 +5398,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 				QString line = in.readLine(); // # Avizo 3D ASCII 3.0
 				QTextStream mystream(&line);
 				mystream >> Word1;
-				cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+				cout << "line_" << li << ":" << line.toStdString().c_str() << Qt::endl;
 				
 				int ok = 0;
 				while (!in.atEnd() && ok==0)
@@ -5413,14 +5413,14 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 						//QString::compare(ArrayName, newArrayName, Qt::CaseInsensitive) ==0
 						if (line.contains("define Markers", Qt::CaseInsensitive))
 						{
-							cout << "Contains define Markers" << endl;
+							cout << "Contains define Markers" << Qt::endl;
 							myteststream >> Word1 >> Word2 >> num_lmk;
 						}
 						ok = 1;
 
 					}
 				}
-				cout << "line_" << li << ":num_lmk=" << num_lmk << endl;
+				cout << "line_" << li << ":num_lmk=" << num_lmk << Qt::endl;
 				// Now I want get NumSets 
 				ok = 0;
 				while (!in.atEnd() && ok == 0)
@@ -5428,14 +5428,14 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 					li++;
 					QString line = in.readLine();
 					QTextStream myteststream(&line);
-					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					cout << "line_" << li << ":" << line.toStdString().c_str() << Qt::endl;
 					if (line.length() > 0)
 					{
 						//define Markers 3
 						//QString::compare(ArrayName, newArrayName, Qt::CaseInsensitive) ==0
 						if (line.contains("NumSets",  Qt::CaseInsensitive))
 						{
-							cout << "Contains NumSets" << endl;
+							cout << "Contains NumSets" << Qt::endl;
 							myteststream >> Word1 >> num_sets;
 							ok = 1;
 						}
@@ -5443,7 +5443,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 
 					}
 				}
-				cout << "line_" << li << ":num_sets=" << num_sets << endl;
+				cout << "line_" << li << ":num_sets=" << num_sets << Qt::endl;
 				// Now make sure that this or these sets LandmarkSet.
 				ok = 0;
 				while (!in.atEnd() && ok == 0)
@@ -5451,7 +5451,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 					li++;
 					QString line = in.readLine(); 
 					QTextStream myteststream(&line);
-					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					cout << "line_" << li << ":" << line.toStdString().c_str() << Qt::endl;
 					if (line.length() > 0)
 					{					
 						if (line.contains("LandmarkSet", Qt::CaseInsensitive))
@@ -5467,12 +5467,12 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 				{
 					li++;
 					QString line = in.readLine();
-					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					cout << "line_" << li << ":" << line.toStdString().c_str() << Qt::endl;
 					QTextStream myteststream(&line);
 					if (line.length() > 0 && line.contains("Markers", Qt::CaseInsensitive) && curr_set ==1)
 					{
 						myteststream >> Word1 >> Word2 >> Word3 >> Word4 >> Word5 >> start1;
-						cout << "start1=" << start1.toStdString().c_str() << endl;
+						cout << "start1=" << start1.toStdString().c_str() << Qt::endl;
 						if (num_sets == curr_set)
 						{
 							ok = 1;
@@ -5485,10 +5485,10 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 					else if (line.length() > 0 && line.contains("Markers", Qt::CaseInsensitive) && curr_set == 2)
 					{
 						myteststream >> Word1 >> Word2 >> Word3 >> Word4 >> Word5 >> start2;
-						cout << "start2=" << start2.toStdString().c_str() << endl;
+						cout << "start2=" << start2.toStdString().c_str() << Qt::endl;
 						ok = 1;
 					}
-					cout << "line_" << li << ":" << Word1.toStdString().c_str() << "|"<<Word2.toStdString().c_str() << "|" << Word3.toStdString().c_str() << endl;			
+					cout << "line_" << li << ":" << Word1.toStdString().c_str() << "|"<<Word2.toStdString().c_str() << "|" << Word3.toStdString().c_str() << Qt::endl;			
 
 				}
 				//at this stage we should have start1 (and optionnally start2)
@@ -5499,7 +5499,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 					li++;
 					QString line = in.readLine();
 					QTextStream myteststream(&line);
-					cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+					cout << "line_" << li << ":" << line.toStdString().c_str() << Qt::endl;
 					if (line.length() > 0 && line.contains(start1))
 					{
 							ok = 1;
@@ -5535,7 +5535,7 @@ void mqMorphoDigCore::ImportAvizoLandmarks(QString fileName)
 						li++;
 						QString line = in.readLine();
 						QTextStream myteststream(&line);
-						cout << "line_" << li << ":" << line.toStdString().c_str() << endl;
+						cout << "line_" << li << ":" << line.toStdString().c_str() << Qt::endl;
 						if (line.length() > 0 && line.contains(start2))
 						{
 							ok = 1;
@@ -5589,7 +5589,7 @@ void mqMorphoDigCore::OpenLMK(QString fileName, int mode)
 	QString LMKName;
 	//Open a landmark file!
 
-	cout << "Open a lmk file" << endl;
+	cout << "Open a lmk file" << Qt::endl;
 	size_t  length;
 
 
@@ -5672,7 +5672,7 @@ void mqMorphoDigCore::OpenPTS(QString fileName, int mode)
 	QString LMKName;
 	//Open a landmark file!
 
-	cout << "Open a pts file" << endl;
+	cout << "Open a pts file" << Qt::endl;
 	size_t  length;
 
 
@@ -5762,7 +5762,7 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 	QString LMKName;
 	//Open a landmark file!
 
-	cout << "Open a tps file" << endl;
+	cout << "Open a tps file" << Qt::endl;
 	size_t  length;
 
 
@@ -5810,11 +5810,11 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 					if (equal != -1)
 					{
 						int num = line0.size() - equal -1;
-						cout << "TPS: length landmark to read:" << num << endl;
+						cout << "TPS: length landmark to read:" << num << Qt::endl;
 						QString snumLM = line0.right(num);
-						cout << "Result:" << snumLM.toStdString() << endl;
+						cout << "Result:" << snumLM.toStdString() << Qt::endl;
 						numLM = snumLM.toInt();
-						cout << "numLM:" << numLM << endl;
+						cout << "numLM:" << numLM << Qt::endl;
 					}
 					int cpt = 0;
 					while (!in.atEnd() && cpt< numLM)
@@ -6001,9 +6001,9 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			rawReader->SetHeaderSize((unsigned long)headerSize);
 
 			rawReader->SetDataSpacing(voxelSizeX, voxelSizeY, voxelSizeZ);
-			cout << "Dimx = " << dimX << endl;
-			cout << "Dimy = " << dimY << endl;
-			cout << "Dimz = " << dimZ << endl;
+			cout << "Dimx = " << dimX << Qt::endl;
+			cout << "Dimy = " << dimY << Qt::endl;
+			cout << "Dimz = " << dimZ << Qt::endl;
 			rawReader->SetDataExtent(0, dimX-1, 0, dimY-1, 0, dimZ-1);
 			rawReader->SetNumberOfScalarComponents(1);
 			if (dimZ > 1)
@@ -6026,15 +6026,15 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 		int numcells = input->GetNumberOfCells();
 		input->GetScalarTypeAsString();
 		//input->Get
-		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
-		cout << "Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
-		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
-		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
-		cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
-		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << Qt::endl;
+		cout << "Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << Qt::endl;
+		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << Qt::endl;
+		cout << "Image type:" << input->GetScalarTypeAsString() << Qt::endl;
+		cout << "Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << Qt::endl;
+		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << Qt::endl;
 
 
-		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << Qt::endl;
 
 
 
@@ -6047,7 +6047,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 		}
 		else
 		{
-			//cout << "Try visualize!!!" << endl;
+			//cout << "Try visualize!!!" << Qt::endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -6074,7 +6074,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 
 			//
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
-			cout << "Bin spacing = " << bin_spacing << endl;
+			cout << "Bin spacing = " << bin_spacing << Qt::endl;
 			histogram->Update();
 			// faire plutôt une liste avec push.
 			
@@ -6108,8 +6108,8 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 
 			first_point = input->GetScalarRange()[0] + 0.15*width;
 			last_point = input->GetScalarRange()[1] - 0.3*width;
-			//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
-			//cout << "EH???" << endl;
+			//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << Qt::endl;
+			//cout << "EH???" << Qt::endl;
 
 			double second_point = first_point + 0.2*(last_point - first_point);
 			double third_point = first_point + 0.4*(last_point - first_point);
@@ -6138,7 +6138,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			property->ShadeOn();
 			double bblength = volume->GetBoundingBoxLength();
 			double SOUD = bblength / 500;
-			//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+			//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << Qt::endl;
 			if (SOUD == 0) { SOUD = 0.89; }
 
 			property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
@@ -6164,7 +6164,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			//@@TODO! 
 
 			newname = this->CheckingName(objectName.toStdString());
-			cout << "Volume Name= " << newname << endl;
+			cout << "Volume Name= " << newname << Qt::endl;
 			//volume->SetOrientation(0, 0, 180);
 			volume->SetName(newname);
 			volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
@@ -6173,7 +6173,7 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 			this->getVolumeCollection()->AddItem(volume);
 			//emit this->actorsMightHaveChanged();
 			emit this->volumesMightHaveChanged();
-			cout << "init arrays... needed?" << endl;
+			cout << "init arrays... needed?" << Qt::endl;
 			//this->Initmui_ExistingArrays();
 			std::string action = "Load volume";
 			int mCount = BEGIN_UNDO_SET(action);
@@ -6184,11 +6184,11 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 
 			this->getVolumeCollection()->SetChanged(1);
 
-			cout << "try adjust camera grid" << endl;
+			cout << "try adjust camera grid" << Qt::endl;
 			this->AdjustCameraAndGrid();
-			cout << "camera and grid adjusted" << endl;
+			cout << "camera and grid adjusted" << Qt::endl;
 
-			//cout << "camera and grid adjusted" << endl;
+			//cout << "camera and grid adjusted" << Qt::endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
@@ -6209,11 +6209,11 @@ void mqMorphoDigCore::OpenRawVolume(QString fileName, QString objectName, int da
 void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString objectName, 
 	double voxelSizeX, double voxelSizeY, double voxelSizeZ, bool frontToBack)
 {
-	cout << "OPEN2DSTACK" << endl;
+	cout << "OPEN2DSTACK" << Qt::endl;
 	//if (frontToBack == true)
 	if (frontToBack == false) // VTK9 : seems that image sequence ordering has been reversed!
 	{
-		cout << "Flip Z used" << endl;
+		cout << "Flip Z used" << Qt::endl;
 		vtkSmartPointer<vtkImageFlip> flipZ = vtkSmartPointer<vtkImageFlip>::New();
 		flipZ->SetInputData(input);
 		flipZ->SetFilteredAxis(2);
@@ -6228,15 +6228,15 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 	int numcells = input->GetNumberOfCells();
 	input->GetScalarTypeAsString();
 	//input->Get
-	cout << "Stack Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
-	cout << "Stack Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
-	cout << "Stack Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << endl;
-	cout << "Stack Image type:" << input->GetScalarTypeAsString() << endl;
-	cout << "Stack Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
-	cout << "Stack Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+	cout << "Stack Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << Qt::endl;
+	cout << "Stack Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << Qt::endl;
+	cout << "Stack Spacing0*Spacing1*Spacing2:" << spacing[0] * spacing[1] * spacing[2] << Qt::endl;
+	cout << "Stack Image type:" << input->GetScalarTypeAsString() << Qt::endl;
+	cout << "Stack Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << Qt::endl;
+	cout << "Stack Number of scalar components:" << input->GetNumberOfScalarComponents() << Qt::endl;
 
 
-	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << Qt::endl;
 
 
 
@@ -6249,7 +6249,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 	}
 	else
 	{
-		//cout << "Try visualize!!!" << endl;
+		//cout << "Try visualize!!!" << Qt::endl;
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -6283,7 +6283,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 
 		//
 		histogram->SetComponentSpacing(bin_spacing, 0, 0);
-		cout << "Bin spacing = " << bin_spacing << endl;
+		cout << "Bin spacing = " << bin_spacing << Qt::endl;
 		histogram->Update();
 		// faire plutôt une liste avec push.			
 		  // Create the property and attach the transfer functions
@@ -6315,8 +6315,8 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 
 		first_point = input->GetScalarRange()[0] + 0.15*width;
 		last_point = input->GetScalarRange()[1] - 0.3*width;
-		//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
-		//cout << "EH???" << endl;
+		//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << Qt::endl;
+		//cout << "EH???" << Qt::endl;
 
 		double second_point = first_point + 0.2*(last_point - first_point);
 		double third_point = first_point + 0.4*(last_point - first_point);
@@ -6345,7 +6345,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		property->ShadeOn();
 		double bblength = volume->GetBoundingBoxLength();
 		double SOUD = bblength / 500;
-		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << Qt::endl;
 		if (SOUD == 0) { SOUD = 0.89; }
 
 		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
@@ -6362,7 +6362,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		//@@TODO! 
 		std::string newname = this->CheckingName(objectName.toStdString());
 		//newname = this->CheckingName(newname);
-		cout << "Volume Name= " << newname << endl;
+		cout << "Volume Name= " << newname << Qt::endl;
 		//volume->SetOrientation(0, 0, 180);
 		volume->SetName(newname);
 		volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
@@ -6371,7 +6371,7 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 		this->getVolumeCollection()->AddItem(volume);
 		//emit this->actorsMightHaveChanged();
 		emit this->volumesMightHaveChanged();
-		cout << "init arrays... needed?" << endl;
+		cout << "init arrays... needed?" << Qt::endl;
 		//this->Initmui_ExistingArrays();
 		std::string action = "Load volume";
 		int mCount = BEGIN_UNDO_SET(action);
@@ -6382,9 +6382,9 @@ void mqMorphoDigCore::Open2DStack(vtkSmartPointer<vtkImageData> input, QString o
 
 		this->getVolumeCollection()->SetChanged(1);
 
-		cout << "try adjust camera grid" << endl;
+		cout << "try adjust camera grid" << Qt::endl;
 		this->AdjustCameraAndGrid();
-		cout << "camera and grid adjusted" << endl;
+		cout << "camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -6424,15 +6424,15 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 	int numcells = input->GetNumberOfCells();
 	input->GetScalarTypeAsString();
 	//input->Get
-	cout << "DCM Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
-	cout << "DCM Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
-	cout << "DCM Spacing0 Spacing1 Spacing2:" << spacing[0] <<","<< spacing[1]<<","<< spacing[2] << endl;
-	cout << "DCM Image type:" << input->GetScalarTypeAsString() << endl;
-	cout << "DCM Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
-	cout << "DCM Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+	cout << "DCM Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << Qt::endl;
+	cout << "DCM Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << Qt::endl;
+	cout << "DCM Spacing0 Spacing1 Spacing2:" << spacing[0] <<","<< spacing[1]<<","<< spacing[2] << Qt::endl;
+	cout << "DCM Image type:" << input->GetScalarTypeAsString() << Qt::endl;
+	cout << "DCM Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << Qt::endl;
+	cout << "DCM Number of scalar components:" << input->GetNumberOfScalarComponents() << Qt::endl;
 
 
-	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+	cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << Qt::endl;
 
 
 
@@ -6445,7 +6445,7 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 	}
 	else
 	{
-		//cout << "Try visualize!!!" << endl;
+		//cout << "Try visualize!!!" << Qt::endl;
 
 		vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 		vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -6479,7 +6479,7 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 
 		//
 		histogram->SetComponentSpacing(bin_spacing, 0, 0);
-		cout << "Bin spacing = " << bin_spacing << endl;
+		cout << "Bin spacing = " << bin_spacing << Qt::endl;
 		histogram->Update();
 		// faire plutôt une liste avec push.			
 			// Create the property and attach the transfer functions
@@ -6509,8 +6509,8 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 
 		first_point = input->GetScalarRange()[0] + 0.15*width;
 		last_point = input->GetScalarRange()[1] - 0.3*width;
-		//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
-		//cout << "EH???" << endl;
+		//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << Qt::endl;
+		//cout << "EH???" << Qt::endl;
 
 		double second_point = first_point + 0.2*(last_point - first_point);
 		double third_point = first_point + 0.4*(last_point - first_point);
@@ -6539,7 +6539,7 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		property->ShadeOn();
 		double bblength = volume->GetBoundingBoxLength();
 		double SOUD = bblength / 500;
-		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+		//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << Qt::endl;
 		if (SOUD == 0) { SOUD = 0.89; }
 
 		property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
@@ -6558,7 +6558,7 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		//@@TODO! 
 		newname = this->CheckingName(patientName.toStdString());
 		//newname = this->CheckingName(newname);
-		cout << "Volume Name= " << newname << endl;
+		cout << "Volume Name= " << newname << Qt::endl;
 		//volume->SetOrientation(0, 0, 180);
 		volume->SetName(newname);
 		volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
@@ -6567,7 +6567,7 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 		this->getVolumeCollection()->AddItem(volume);
 		//emit this->actorsMightHaveChanged();
 		emit this->volumesMightHaveChanged();
-		cout << "init arrays... needed?" << endl;
+		cout << "init arrays... needed?" << Qt::endl;
 		//this->Initmui_ExistingArrays();
 		std::string action = "Load volume";
 		int mCount = BEGIN_UNDO_SET(action);
@@ -6578,9 +6578,9 @@ void mqMorphoDigCore::OpenDicomFolder(QString folderName)
 
 		this->getVolumeCollection()->SetChanged(1);
 
-		cout << "try adjust camera grid" << endl;
+		cout << "try adjust camera grid" << Qt::endl;
 		this->AdjustCameraAndGrid();
-		cout << "camera and grid adjusted" << endl;
+		cout << "camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -6613,7 +6613,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 
 	}
-	cout << "Try to open single 3D tiff file" << endl;
+	cout << "Try to open single 3D tiff file" << Qt::endl;
 
 	if (file_exists == 1)
 	{
@@ -6649,7 +6649,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 		reader = tiffReader;
 		if (frontToBack ==true)
 		{
-				cout << "Flip Z used" << endl;
+				cout << "Flip Z used" << Qt::endl;
 				vtkSmartPointer<vtkImageFlip> flipZ = vtkSmartPointer<vtkImageFlip>::New();
 				flipZ->SetInputData(input);
 				flipZ->SetFilteredAxis(2);
@@ -6667,15 +6667,15 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 		int numcells = input->GetNumberOfCells();
 		input->GetScalarTypeAsString();
 		//input->Get
-		cout << "Tiff Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << endl;
-		cout << "Tiff Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << endl;
-		cout << "Tiff Spacing0 Spacing1 Spacing2:" << spacing[0] <<","<< spacing[1]<<","<< spacing[2] << endl;
-		cout << "Tiff Image type:" << input->GetScalarTypeAsString() << endl;
-		cout << "Tiff Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << endl;
-		cout << "Tiff Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+		cout << "Tiff Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells=" << numcells << Qt::endl;
+		cout << "Tiff Dim0*Dim1*Dim2:" << dim[0] * dim[1] * dim[2] << Qt::endl;
+		cout << "Tiff Spacing0 Spacing1 Spacing2:" << spacing[0] <<","<< spacing[1]<<","<< spacing[2] << Qt::endl;
+		cout << "Tiff Image type:" << input->GetScalarTypeAsString() << Qt::endl;
+		cout << "Tiff Image type int:" << input->GetScalarType() << "=" << VTK_UNSIGNED_SHORT << "?" << Qt::endl;
+		cout << "Tiff Number of scalar components:" << input->GetNumberOfScalarComponents() << Qt::endl;
 
 
-		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << Qt::endl;
 
 
 
@@ -6685,12 +6685,12 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			dim[2] < 2
 			)
 		{
-			cout << "Abort : some dimensions are below 2 !" << endl;
+			cout << "Abort : some dimensions are below 2 !" << Qt::endl;
 			return;
 		}
 		else
 		{
-			cout << "Continue open 3D tiff !" << endl;
+			cout << "Continue open 3D tiff !" << Qt::endl;
 
 			vtkSmartPointer<vtkMDVolume> volume = vtkSmartPointer<vtkMDVolume>::New();
 			vtkSmartPointer<vtkDiscretizableColorTransferFunction> TF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
@@ -6724,7 +6724,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 			//
 			histogram->SetComponentSpacing(bin_spacing, 0, 0);
-			cout << "Bin spacing = " << bin_spacing << endl;
+			cout << "Bin spacing = " << bin_spacing << Qt::endl;
 			histogram->Update();
 			// faire plutôt une liste avec push.			
 			  // Create the property and attach the transfer functions
@@ -6757,8 +6757,8 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 			first_point = input->GetScalarRange()[0] + 0.15*width;
 			last_point = input->GetScalarRange()[1] - 0.3*width;
-			//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
-			//cout << "EH???" << endl;
+			//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << Qt::endl;
+			//cout << "EH???" << Qt::endl;
 
 			double second_point = first_point + 0.2*(last_point - first_point);
 			double third_point = first_point + 0.4*(last_point - first_point);
@@ -6787,7 +6787,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			property->ShadeOn();
 			double bblength = volume->GetBoundingBoxLength();
 			double SOUD = bblength / 500;
-			//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+			//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << Qt::endl;
 			if (SOUD == 0) { SOUD = 0.89; }
 
 			property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
@@ -6813,7 +6813,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			//@@TODO! 
 			newname = this->CheckingName(objectName.toStdString());
 			//newname = this->CheckingName(newname);
-			cout << "Volume Name= " << newname << endl;
+			cout << "Volume Name= " << newname << Qt::endl;
 			//volume->SetOrientation(0, 0, 180);
 			volume->SetName(newname);
 			volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
@@ -6822,7 +6822,7 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 			this->getVolumeCollection()->AddItem(volume);
 			//emit this->actorsMightHaveChanged();
 			emit this->volumesMightHaveChanged();
-			cout << "init arrays... needed?" << endl;
+			cout << "init arrays... needed?" << Qt::endl;
 			//this->Initmui_ExistingArrays();
 			std::string action = "Load volume";
 			int mCount = BEGIN_UNDO_SET(action);
@@ -6833,9 +6833,9 @@ void mqMorphoDigCore::OpenTiff3DVolume(QString fileName, QString objectName, dou
 
 			this->getVolumeCollection()->SetChanged(1);
 
-			cout << "try adjust camera grid" << endl;
+			cout << "try adjust camera grid" << Qt::endl;
 			this->AdjustCameraAndGrid();
-			cout << "camera and grid adjusted" << endl;
+			cout << "camera and grid adjusted" << Qt::endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
@@ -6936,15 +6936,15 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 		vtkIdType numcells = input->GetNumberOfCells();
 		input->GetScalarTypeAsString();
 		//input->Get
-		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< endl;
-		cout << "Dim0*Dim1*Dim2:" << (vtkIdType)((vtkIdType)dim[0]* (vtkIdType)dim[1]* (vtkIdType)dim[2]) << endl;
-		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] <<","<< spacing[1] <<","<< spacing[2] << endl;
-		cout << "Image type:" << input->GetScalarTypeAsString() << endl;
+		cout << "Read Volume: dim=" << dim[0] << ", " << dim[1] << ", " << dim[2] << "numcells="<<numcells<< Qt::endl;
+		cout << "Dim0*Dim1*Dim2:" << (vtkIdType)((vtkIdType)dim[0]* (vtkIdType)dim[1]* (vtkIdType)dim[2]) << Qt::endl;
+		cout << "Spacing0*Spacing1*Spacing2:" << spacing[0] <<","<< spacing[1] <<","<< spacing[2] << Qt::endl;
+		cout << "Image type:" << input->GetScalarTypeAsString() << Qt::endl;
 		cout << "Image type int:" << input->GetScalarType() << "="<<VTK_UNSIGNED_SHORT<< "?"<<endl;
-		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << endl;
+		cout << "Number of scalar components:" << input->GetNumberOfScalarComponents() << Qt::endl;
 		
 		
-		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << endl;
+		cout << "Range min:" << input->GetScalarRange()[0] << ", Range max:" << input->GetScalarRange()[1] << Qt::endl;
 
 		if (isMSK ==1 && input->GetScalarType()!=VTK_UNSIGNED_CHAR)
 		{
@@ -6982,7 +6982,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 			
 			if (isMSK == 0)
 			{
-				//cout << "Try visualize!!!" << endl;
+				//cout << "Try visualize!!!" << Qt::endl;
 
 				this->segViewer1->SetInputData(input);
 				this->segViewer1->SetSliceOrientationToXY();
@@ -7026,7 +7026,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 
 				//
 				histogram->SetComponentSpacing(bin_spacing, 0, 0);
-				cout << "Bin spacing = " << bin_spacing << endl;
+				cout << "Bin spacing = " << bin_spacing << Qt::endl;
 				histogram->Update();
 				// faire plutôt une liste avec push.			
 				  // Create the property and attach the transfer functions
@@ -7058,8 +7058,8 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 
 				first_point = input->GetScalarRange()[0] + 0.15*width;
 				last_point = input->GetScalarRange()[1] - 0.3*width;
-				//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << endl;
-				//cout << "EH???" << endl;
+				//cout << "Range based on 15p min and 5p low:" << first_point << "," << last_point << Qt::endl;
+				//cout << "EH???" << Qt::endl;
 
 				double second_point = first_point + 0.2*(last_point - first_point);
 				double third_point = first_point + 0.4*(last_point - first_point);
@@ -7088,7 +7088,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 				property->ShadeOn();
 				double bblength = volume->GetBoundingBoxLength();
 				double SOUD = bblength / 500;
-				//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << endl;
+				//cout << "Scalar Opacity Unit Distance:" << bblength << "/500=" << SOUD << Qt::endl;
 				if (SOUD == 0) { SOUD = 0.89; }
 
 				property->SetScalarOpacityUnitDistance(SOUD); // Ca doit être fonction de la taille des spécimens, sinon ça va pas... 
@@ -7114,7 +7114,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 				//@@TODO! 
 
 				newname = this->CheckingName(newname);
-				cout << "Volume Name= " << newname << endl;
+				cout << "Volume Name= " << newname << Qt::endl;
 				//volume->SetOrientation(0, 0, 180);
 				volume->SetName(newname);
 				volume->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
@@ -7125,7 +7125,7 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 				this->getVolumeCollection()->AddItem(volume);
 				//emit this->actorsMightHaveChanged();
 				emit this->volumesMightHaveChanged();
-				cout << "init arrays... needed?" << endl;
+				cout << "init arrays... needed?" << Qt::endl;
 				//this->Initmui_ExistingArrays();
 				std::string action = "Load volume";
 				int mCount = BEGIN_UNDO_SET(action);
@@ -7136,9 +7136,9 @@ void mqMorphoDigCore::OpenVolume(QString fileName, vtkMDVolume *myVolume, int is
 
 				this->getVolumeCollection()->SetChanged(1);
 
-				cout << "try adjust camera grid" << endl;
+				cout << "try adjust camera grid" << Qt::endl;
 				this->AdjustCameraAndGrid();
-				cout << "camera and grid adjusted" << endl;
+				cout << "camera and grid adjusted" << Qt::endl;
 
 				if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 				{
@@ -7183,7 +7183,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 	else
 	{
 		file_exists = 0;
-		cout << "File does not exist:" << fileName.toStdString() << endl;
+		cout << "File does not exist:" << fileName.toStdString() << Qt::endl;
 
 	}
 
@@ -7260,7 +7260,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 			vtkSmartPointer<vtkPolyDataReader> reader =
 				vtkSmartPointer<vtkPolyDataReader>::New();
 			reader->SetFileName(fileName.toUtf8());
-			cout << "inside open mesh:"<<fileName.toStdString().c_str() << endl;
+			cout << "inside open mesh:"<<fileName.toStdString().c_str() << Qt::endl;
 			//reader->SetFileName(fileName.toUtf8());
 			reader->Update();
 			MyPolyData = reader->GetOutput();
@@ -7318,7 +7318,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 		featureEdges->Update();
 		vtkIdType num_nonmanifold_pts = featureEdges->GetOutput()->GetNumberOfPoints();
 		vtkIdType num_nonmanifold_cells = featureEdges->GetOutput()->GetNumberOfCells();
-		cout << "NON MANIFOLD pts:" << num_nonmanifold_pts << " , cells:" << num_nonmanifold_cells << endl;
+		cout << "NON MANIFOLD pts:" << num_nonmanifold_pts << " , cells:" << num_nonmanifold_cells << Qt::endl;
 
 		MyPolyData = cleanPolyDataFilter->GetOutput();
 		//Too long for he moment! 
@@ -7349,7 +7349,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 					pt[0] = mpt[0]; pt[1] = mpt[1]; pt[2] = mpt[2];
 					if (pt[0] == fpt[0] && pt[1] == fpt[1] && pt[2] == fpt[2])
 					{
-						//cout << "Id=" << j << endl;
+						//cout << "Id=" << j << Qt::endl;
 						ids->InsertNextValue(j);
 					}
 				}
@@ -7396,35 +7396,35 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 		MyPolyData->GetCellData();
 
 		vtkFloatArray* norms = vtkFloatArray::SafeDownCast(MyPolyData->GetCellData()->GetNormals());
-		//	cout << "Safe cell downcast done ! " << endl;
+		//	cout << "Safe cell downcast done ! " << Qt::endl;
 		if (norms)
 		{
 
 			cout << "There are here " << norms->GetNumberOfTuples()
-				<< " Float Cell normals in norms" << endl;
+				<< " Float Cell normals in norms" << Qt::endl;
 		}
 		else
 		{
-			cout << "FloatNorms CELL is null " << endl;
+			cout << "FloatNorms CELL is null " << Qt::endl;
 		}
 
 		norms = vtkFloatArray::SafeDownCast
 		(MyPolyData->GetPointData()->GetNormals());
-		//cout << "Safe point downcast done ! " << endl;
+		//cout << "Safe point downcast done ! " << Qt::endl;
 		if (norms)
 		{
 
 			cout << "There are  " << norms->GetNumberOfTuples()
-				<< " Float POINT normals in norms" << endl;
+				<< " Float POINT normals in norms" << Qt::endl;
 		}
 		else
 		{
-			cout << "FloatNorms POINTS is null " << endl;
+			cout << "FloatNorms POINTS is null " << Qt::endl;
 		}
 
 		if (MyPolyData->GetNumberOfPoints() > 3)
 		{
-			cout << "More than 3 points!" << endl;
+			cout << "More than 3 points!" << Qt::endl;
 			VTK_CREATE(vtkMDActor, actor);
 			if (this->mui_BackfaceCulling == 0)
 			{
@@ -7450,16 +7450,16 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 			//@@TODO! 
 			
 			newname = this->CheckingName(newname);
-			cout << "Object Name= " << newname << endl;
+			cout << "Object Name= " << newname << Qt::endl;
 			
 			/*if ((vtkUnsignedCharArray*)MyPolyData->GetPointData()->GetScalars("RGB") != NULL)
 			{
 				QString RGB = QString("RGB");
 				this->Addmui_ExistingArrays(RGB);
 				//	MyPolyData->GetPointData()->SetScalars(NULL);
-					cout << "found RGB colours! " << endl;
+					cout << "found RGB colours! " << Qt::endl;
 			}*/
-			cout << "Current active scalar=" << this->mui_ActiveArray->Name.toStdString().c_str() << endl;
+			cout << "Current active scalar=" << this->mui_ActiveArray->Name.toStdString().c_str() << Qt::endl;
 
 			if (MyPolyData->GetPointData()->GetScalars(this->mui_ActiveArray->Name.toStdString().c_str()) != NULL)
 			{
@@ -7534,7 +7534,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 				
 				mapper->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
 				//mapper->UseLookupTableScalarRangeOff();
-				//cout << "Set color map" << this->Getmui_ActiveColorMap()->Name.toStdString() << endl;
+				//cout << "Set color map" << this->Getmui_ActiveColorMap()->Name.toStdString() << Qt::endl;
 			}
 
 			
@@ -7571,7 +7571,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 
 			//double BoundingBoxLength = MyPolyData->GetLength();
 			/*this->AdjustCameraAndGrid();
-			//cout << "camera and grid adjusted" << endl;
+			//cout << "camera and grid adjusted" << Qt::endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
@@ -7626,10 +7626,10 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 			{
 			double globalcenterofmass[3];
 			this->GetGlobalCenterOfMass(globalcenterofmass);
-			cout << "Center of mass of all opened surfaces is " << globalcenterofmass[0] << " " << globalcenterofmass[1] << " " << globalcenterofmass[2] << endl;
+			cout << "Center of mass of all opened surfaces is " << globalcenterofmass[0] << " " << globalcenterofmass[1] << " " << globalcenterofmass[2] << Qt::endl;
 
 			double GlobalBoundingBoxLength = this->GetGlobalBoundingBoxLength();
-			cout << "Global Bounding Box length is " << GlobalBoundingBoxLength << " mm" << endl;
+			cout << "Global Bounding Box length is " << GlobalBoundingBoxLength << " mm" << Qt::endl;
 
 			double campos[3];
 			this->getCamera()->GetPosition(campos);
@@ -7693,7 +7693,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 			newcolors->SetName("Init_RGB");
 			My_Obj->GetPointData()->AddArray(newcolors);
 			}
-			cout << "ok." << endl;
+			cout << "ok." << Qt::endl;
 
 			My_Obj->color[0] = color_obj[0];
 			My_Obj->color[1] = color_obj[1];
@@ -7729,11 +7729,11 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 			this->Compute_Global_Scalar_List();
 
 			}
-			cout << "Reinitialize camera" << endl;
+			cout << "Reinitialize camera" << Qt::endl;
 			rollinit_camera();
-			cout << "G_zoom after initialization:" << g_zoom << endl;
+			cout << "G_zoom after initialization:" << g_zoom << Qt::endl;
 			this->redraw();
-			cout << "G_zoom after redraw:" << g_zoom << endl;*/
+			cout << "G_zoom after redraw:" << g_zoom << Qt::endl;*/
 
 		}
 
@@ -7746,7 +7746,7 @@ int mqMorphoDigCore::OpenMesh(QString fileName)
 
 	
 	//this->MainWindow->vtkWidgetUpdate();
-	//cout << "call matchTagMapToActorCollection" << endl;
+	//cout << "call matchTagMapToActorCollection" << Qt::endl;
 	return ok;
 
 	/*this->Render();
@@ -7776,13 +7776,13 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 	if (file_exists == 1)
 	{
-		cout << "found file!!!!" << endl;
+		cout << "found file!!!!" << Qt::endl;
 
 
 		std::string only_filename = onlyfilename.toStdString();;
 		std::string path = fileName.toStdString().substr(0, (fileName.toStdString().length() - only_filename.length()));
-		cout << "only_filename" << only_filename << endl;
-		cout << "path" << path << endl;
+		cout << "only_filename" << only_filename << Qt::endl;
+		cout << "path" << path << Qt::endl;
 		this->UnselectAll(-1);
 
 
@@ -7801,12 +7801,12 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 			while (!in.atEnd())
 			{
 				QString line = in.readLine();
-				cout << "Line:" << line.toStdString() << endl;
+				cout << "Line:" << line.toStdString() << Qt::endl;
 				//sscanf(line.toStdString().c_str(), "%[^\n]s", param1);
-				//cout << "param1" << param1 << endl;
+				//cout << "param1" << param1 << Qt::endl;
 				//std::string myline = param1;
 				std::string myline = line.toStdString();
-				cout << "My line:" << myline << endl;
+				cout << "My line:" << myline << Qt::endl;
 				std::string FLGext(".flg");
 				std::string FLGext2(".FLG");
 				std::string VERext(".ver");
@@ -8022,7 +8022,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 				}
 				else
 				{
-					//cout << "no mhd????" << myline << endl;
+					//cout << "no mhd????" << myline << Qt::endl;
 				}
 				found = myline.find(VTIext);
 				found2 = myline.find(VTIext2);
@@ -8045,10 +8045,10 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 
 				if (lmk_file == 0)
 				{
-					cout << "Definitely not a landmark file. Ok status:" <<ok<< endl;
+					cout << "Definitely not a landmark file. Ok status:" <<ok<< Qt::endl;
 					if (surface_file == 1)
 					{
-						cout << "A surface file or related with surfaces" << endl;
+						cout << "A surface file or related with surfaces" << Qt::endl;
 						if (i == 0)
 						{
 							//length=(int)strlen(oneline);						
@@ -8075,7 +8075,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 							{
 
 								ok = 1; cpt_surfaces++;
-								cout << "Object has more than 10 points <<" << endl;
+								cout << "Object has more than 10 points <<" << Qt::endl;
 							}
 							else
 							{
@@ -8147,10 +8147,10 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 					}
 					else if (volume_file == 1)
 					{
-						cout << "A volume file or related with volume" << endl;
+						cout << "A volume file or related with volume" << Qt::endl;
 						if (i == 0)
 						{
-							cout << "i=" << i << endl;
+							cout << "i=" << i << Qt::endl;
 							//length=(int)strlen(oneline);						
 							//strncpy(param1, oneline, length-1);
 							std::string volname = line.toStdString();
@@ -8175,14 +8175,14 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 								mskname_with_path = path.c_str();
 								mskname_with_path.append(mskname.c_str());
 							}
-							cout << "Mask name:" << mskname_with_path << endl;
+							cout << "Mask name:" << mskname_with_path << Qt::endl;
 							QString volumefile(volname.c_str());
 							QString maskfile(mskname_with_path.c_str());
 
 
-							cout << "Open volume!" << endl;
+							cout << "Open volume!" << Qt::endl;
 							this->OpenVolume(volumefile);
-							cout << "Open volume done!" << endl;
+							cout << "Open volume done!" << Qt::endl;
 							vtkMDVolume* volume = this->GetLastVolume();
 							this->OpenVolume(maskfile, volume, 1);
 							if (volume != NULL)
@@ -8197,7 +8197,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						}
 						if (i == 1)
 						{
-							cout << "i =1" << endl;
+							cout << "i =1" << Qt::endl;
 							if (ok)
 							{
 
@@ -8221,7 +8221,7 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						}
 						if (i == 2)
 						{
-							cout << "i=" << i << endl;
+							cout << "i=" << i << Qt::endl;
 							if (ok)
 							{
 
@@ -8245,15 +8245,15 @@ void mqMorphoDigCore::OpenNTW(QString fileName)
 						}
 						if (i == 3)
 						{
-							cout << "i=" << i << endl;
+							cout << "i=" << i << Qt::endl;
 							if (ok)
 							{
 								vtkMDVolume *volume = this->GetLastVolume();
 								double Scalar_opacity, Scalar_min, Scalar_max;
 								QTextStream myteststream(&line);
 								myteststream >> Scalar_opacity >> Scalar_min >> Scalar_max;
-								cout << "Scalar_opacity =" << Scalar_opacity << endl;
-								cout << "Min and Max:" << Scalar_min <<","<< Scalar_max<< endl;
+								cout << "Scalar_opacity =" << Scalar_opacity << Qt::endl;
+								cout << "Min and Max:" << Scalar_min <<","<< Scalar_max<< Qt::endl;
 								volume->SetScalarOpacityUnitDistance(Scalar_opacity);
 								volume->SetScalarDisplayMin(Scalar_min);
 								volume->SetScalarDisplayMax(Scalar_max);
@@ -8553,7 +8553,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 							if (lmk_type == NODE_LMK)// curve node!
 							{
 								myteststream >> LMKName >> x >> y >> z >> nx >> ny >> nz >> node_type;
-								//cout << "lmtype!" << lmtype << endl;
+								//cout << "lmtype!" << lmtype << Qt::endl;
 								//lmtype: 1 curve starting point
 								//lmtype: 0 normal node
 								//lmtype: 2 curve milestone
@@ -8581,7 +8581,7 @@ void mqMorphoDigCore::OpenSTV(QString fileName)
 							}
 							/*if (lmtype != 0)
 							{
-							cout << "landmark_mode: " << landmark_mode << " lmtype: " << lmtype << endl;
+							cout << "landmark_mode: " << landmark_mode << " lmtype: " << lmtype << Qt::endl;
 							}*/
 							this->CreateLandmark(coord, ori, lmk_type, node_type);
 							if (lmk_type == NORMAL_LMK)
@@ -8701,13 +8701,13 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 	// mode 1: add map to Last Volume (for Volume objects)
 	// mode 2: add map to All selected Volumes (for Volume objects)
 	int nr, discretize, discretizenr, enableopacity, nc, no; 
-	cout << "Call open map in mode" << mode << endl;
+	cout << "Call open map in mode" << mode << Qt::endl;
 	double  cx, r, g, b, ox, ov;
 	QString ColorMapName;
 	QString SomeText;
 	//Open a STV file!
 
-	//cout << "start: " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+	//cout << "start: " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << Qt::endl;
 	size_t  length;
 
 	int type = 1;
@@ -8744,14 +8744,14 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 			{
 				type = 1;
 				//MAP
-				cout << "Open Map: Type 1!" << endl;
+				cout << "Open Map: Type 1!" << Qt::endl;
 			}
 			if (type == 1)
 			{
 				//filein = fopen(fileName.toLocal8Bit(), "rt");
 				QFile inputFile(fileName);
 				int ok = 0;
-				cout << "Open Map: Try open file!" << fileName.toStdString()<< endl;
+				cout << "Open Map: Try open file!" << fileName.toStdString()<< Qt::endl;
 				if (inputFile.open(QIODevice::ReadOnly))
 				{
 					QTextStream in(&inputFile);
@@ -8773,34 +8773,34 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 							line = in.readLine();
 							myteststream.setString(&line); 
 							myteststream >> SomeText >> ColorMapName;
-							cout << "Found a name: " << ColorMapName.toStdString() << endl;							
+							cout << "Found a name: " << ColorMapName.toStdString() << Qt::endl;							
 
 							line = in.readLine();
 							myteststream.setString(&line);
 							myteststream >> SomeText >> discretize;
-							cout << "Discretize: " << discretize << endl;
+							cout << "Discretize: " << discretize << Qt::endl;
 							
 							line = in.readLine();
 							myteststream.setString(&line);
 							myteststream >> SomeText >> discretizenr;
-							cout << "Discretizenr: " << discretizenr << endl;
+							cout << "Discretizenr: " << discretizenr << Qt::endl;
 							
 							line = in.readLine();
 							myteststream.setString(&line);							
 							myteststream >> SomeText >> enableopacity;
-							cout << "enableopacity: " << enableopacity << endl;
+							cout << "enableopacity: " << enableopacity << Qt::endl;
 							
 							line = in.readLine();
 							myteststream.setString(&line);
 							
 							myteststream >> SomeText >> nc;
-							cout << "nc: " << nc << endl;
+							cout << "nc: " << nc << Qt::endl;
 
 							line = in.readLine();
 							myteststream.setString(&line);
 							
 							myteststream >> SomeText >> no;
-							cout << "no: " << no << endl;
+							cout << "no: " << no << Qt::endl;
 							
 							
 
@@ -8819,7 +8819,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 								cout << "cx" << j << ":" << cx << ",";
 								cout << "rgb:" << r << ",";
 								cout << g << ",";
-								cout << b << endl;
+								cout << b << Qt::endl;
 								newSTC->AddRGBPoint(cx, r, g, b);
 
 							}
@@ -8833,7 +8833,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 								
 								myteststream >> SomeText >> ox >> ov;
 								cout << "ox" << j << ":" << ox << ",";
-								cout << "ov=" << j << ":" << ov << endl;
+								cout << "ov=" << j << ":" << ov << Qt::endl;
 								opacityfunction->AddPoint(ox, ov);
 							}
 
@@ -8841,7 +8841,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 							newSTC->Build();
 
 
-							cout << "Add this map to open map!!" << endl;
+							cout << "Add this map to open map!!" << Qt::endl;
 							int num = 2;
 							if (this->colorMapNameAlreadyExists(ColorMapName) == 1)
 							{
@@ -8861,7 +8861,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 								}
 							}
 							
-							//cout << "here: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+							//cout << "here: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << Qt::endl;
 							if (mode == 0)
 							{
 								this->Getmui_ExistingColorMaps()->Stack.push_back(ExistingColorMaps::Element(ColorMapName, newSTC, 1));
@@ -8871,10 +8871,10 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 								//mode 1: sets the MAP to the last inserted volume
 								// can only add one STC to a gve
 								vtkMDVolume *myVolume = this->GetLastVolume();
-								cout << "Tried to get last volume for map i==" << i << endl;
+								cout << "Tried to get last volume for map i==" << i << Qt::endl;
 								if (myVolume != NULL)
 								{
-									cout << "Set Ctf!!!!" << i << endl;
+									cout << "Set Ctf!!!!" << i << Qt::endl;
 									myVolume->SetCtf(newSTC);
 								}
 							}
@@ -8902,15 +8902,15 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 								}
 
 							}
-							//cout << "and now: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+							//cout << "and now: " << this->Getmui_ExistingColorMaps()->Stack.size() << " Color maps inside the stack!" << Qt::endl;
 							
 
 						}
 					
 						if (mode == 0)
 						{
-							cout << "have Just Imported " << nr << " ColorMaps" << endl;
-							cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << endl;
+							cout << "have Just Imported " << nr << " ColorMaps" << Qt::endl;
+							cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Color maps inside the stack!" << Qt::endl;
 							this->signal_colorMapsChanged();// emit this->colorMapsChanged();
 						}
 					}
@@ -8918,7 +8918,7 @@ void mqMorphoDigCore::OpenMAP(QString fileName, int mode)
 				}
 				else
 				{
-				cout << "Failed to open Map!" << endl;
+				cout << "Failed to open Map!" << Qt::endl;
 				 }
 					/**/
 
@@ -8943,7 +8943,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 	// save_volumes_format 0 : mhd
 	// save_volumes_format 1 : mha
 	// save_volumes_format 2 : vti
-	cout << "apply_position_to_surfaces=" << apply_position_to_surfaces << endl;
+	cout << "apply_position_to_surfaces=" << apply_position_to_surfaces << Qt::endl;
 	std::string NTWext = ".ntw";
 	std::string NTWext2 = ".NTW";
 	std::size_t found = fileName.toStdString().find(NTWext);
@@ -8957,9 +8957,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 	QString onlyfilename(fileInfo.fileName());
 	QString onlypath = fileName.left(fileName.length() - onlyfilename.length());
 	QString projectname = onlyfilename.left(onlyfilename.lastIndexOf("."));
-	cout << "QString onlyfilename: " << onlyfilename.toStdString() << endl;;
-	cout << "QString onlypath: " << onlypath.toStdString() << endl;;
-	cout << "QString projectname: " << projectname.toStdString() << endl;;
+	cout << "QString onlyfilename: " << onlyfilename.toStdString() << Qt::endl;;
+	cout << "QString onlypath: " << onlypath.toStdString() << Qt::endl;;
+	cout << "QString projectname: " << projectname.toStdString() << Qt::endl;;
 	QFile file(fileName);
 	QTextStream stream(&file);
 	this->ComputeSelectedNamesLists();
@@ -9057,7 +9057,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 
 		int vol_exists = 0;
 		int msk_exists = 0;
-		cout << "Save volume format =" << save_volumes_format << endl;
+		cout << "Save volume format =" << save_volumes_format << Qt::endl;
 		if (save_volumes_format == 0)//MHD
 		{
 			vol_exists = this->selected_file_exists(onlypath, mhdExt, no_postfix);
@@ -9076,9 +9076,9 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 		}
 		else //2 VTI
 		{
-			//cout << "checks if vti file already exists" << endl;
+			//cout << "checks if vti file already exists" << Qt::endl;
 			vol_exists = this->selected_file_exists(onlypath, vtiExt, no_postfix);
-			//cout << "vol_exists:" << vol_exists << endl;
+			//cout << "vol_exists:" << vol_exists << Qt::endl;
 		}
 		QString onlypathmsk = onlypath + "_MSK";
 		msk_exists  = this->selected_file_exists(onlypathmsk, mhdExt, no_postfix);
@@ -9119,7 +9119,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				//write or overwrite ORI file without further question (0)
 				this->SaveORI(_ori_fullpath);
 			}
-			stream << _ori_file.toStdString().c_str() << endl;
+			stream << _ori_file.toStdString().c_str() << Qt::endl;
 
 		}
 		if (mesh_exists == 1)
@@ -9209,7 +9209,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				//@@ TODO!
 				this->SaveTAGMAPFile(_tag_fullpath, 0);
 			}
-			stream << _tag_file.toLocal8Bit() << endl;
+			stream << _tag_file.toLocal8Bit() << Qt::endl;
 			
 
 		}
@@ -9238,12 +9238,12 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 			_flg_fullpath+=_flg_file;
 			if (overwrite_flg == 1)			
 			{
-				//cout << "Try to save FLG file" << endl;
+				//cout << "Try to save FLG file" << Qt::endl;
 				//write or overwrite FLG file without further question (0)
 				//QString qflg(_flg_fullpath.c_str());
 				this->SaveFlagFile(_flg_fullpath, 1);
 			}
-			stream << _flg_file.toStdString().c_str() << endl;
+			stream << _flg_file.toStdString().c_str() << Qt::endl;
 
 		}
 
@@ -9277,7 +9277,7 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				//QString qstv(_stv_fullpath.c_str());
 				this->SaveSTVFile(_stv_fullpath,1);
 			}
-			stream << _stv_file.toStdString().c_str() << endl;
+			stream << _stv_file.toStdString().c_str() << Qt::endl;
 			
 		}
 
@@ -9376,12 +9376,12 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 					}
 				}
 
-				stream << _mesh_file.toStdString().c_str() << endl;
-				stream << _pos_file.toStdString().c_str() << endl;
+				stream << _mesh_file.toStdString().c_str() << Qt::endl;
+				stream << _pos_file.toStdString().c_str() << Qt::endl;
 				
 				double colors[4];
 				myActor->GetmColor(colors);
-				stream << colors[0]<<" "<< colors[1]<<" "<< colors[2]<<" "<< colors[3] << endl;
+				stream << colors[0]<<" "<< colors[1]<<" "<< colors[2]<<" "<< colors[3] << Qt::endl;
 
 					
 			}
@@ -9521,15 +9521,15 @@ int mqMorphoDigCore::SaveNTWFile(QString fileName, int save_ori, int save_tag, i
 				{
 					
 					vtkSmartPointer<vtkDiscretizableColorTransferFunction> ctf = myVolume->GetCtf();
-					cout << "SaveNTW: call SaveMAP in volume mode" << endl;
+					cout << "SaveNTW: call SaveMAP in volume mode" << Qt::endl;
 					//this->SaveMAP(_map_fullpath, myVolume->GetName().c_str(), ctf, 1);
 					this->SaveMAPFile(_map_fullpath, 1, _map_file, myVolume);
 					
 				}
-				stream << _vol_file.toStdString().c_str() << endl;
-				stream << _pos_file.toStdString().c_str() << endl;
-				stream << _map_file.toStdString().c_str() << endl;
-				stream << myVolume->GetScalarOpacityUnitDistance() << " " << myVolume->GetScalarDisplayMin() << " "<< myVolume->GetScalarDisplayMax() << endl;
+				stream << _vol_file.toStdString().c_str() << Qt::endl;
+				stream << _pos_file.toStdString().c_str() << Qt::endl;
+				stream << _map_file.toStdString().c_str() << Qt::endl;
+				stream << myVolume->GetScalarOpacityUnitDistance() << " " << myVolume->GetScalarDisplayMin() << " "<< myVolume->GetScalarDisplayMax() << Qt::endl;
 				
 
 
@@ -9757,11 +9757,11 @@ void mqMorphoDigCore::SaveCAM(QString fileName, double cNear, double cFar, doubl
 	{
 		QTextStream stream(&file);
 
-		stream << "Clipping: " <<  cNear << " " << cFar<<endl;
-		stream << "Center: " << cX << " " << cY << " " << cZ << endl;
-		stream << "Focal: " << fX << " " << fY << " " << fZ << endl;
-		stream << "Up: " << uX << " " << uY << " " << uZ << endl;
-		stream << "Parallel: " << parallel << endl;
+		stream << "Clipping: " <<  cNear << " " << cFar<< Qt::endl;
+		stream << "Center: " << cX << " " << cY << " " << cZ << Qt::endl;
+		stream << "Focal: " << fX << " " << fY << " " << fZ << Qt::endl;
+		stream << "Up: " << uX << " " << uY << " " << uZ << Qt::endl;
+		stream << "Parallel: " << parallel << Qt::endl;
 		/*
 		if (mqMorphoDigCore::instance()->Getmui_CameraOrtho() == 1)
 	{
@@ -9808,17 +9808,17 @@ void mqMorphoDigCore::SavePOS(vtkSmartPointer<vtkMatrix4x4> Mat, QString fileNam
 	{
 		QTextStream stream(&file);
 
-		stream << "1 0 0 0" << endl;
-		stream << "0 1 0 0" << endl;
-		stream << "0 0 1 0" << endl;
-		stream << "0 0 0 1" << endl;
+		stream << "1 0 0 0" << Qt::endl;
+		stream << "0 1 0 0" << Qt::endl;
+		stream << "0 0 1 0" << Qt::endl;
+		stream << "0 0 0 1" << Qt::endl;
 
 
-		stream << Mat->GetElement(0, 0) << " " << Mat->GetElement(1, 0) << " " << Mat->GetElement(2, 0) << " " << Mat->GetElement(3, 0) << endl;
-		stream << Mat->GetElement(0, 1) << " " << Mat->GetElement(1, 1) << " " << Mat->GetElement(2, 1) << " " << Mat->GetElement(3, 1) << endl;
-		stream << Mat->GetElement(0, 2) << " " << Mat->GetElement(1, 2) << " " << Mat->GetElement(2, 2) << " " << Mat->GetElement(3, 2) << endl;
-		stream << Mat->GetElement(0, 3) << " " << Mat->GetElement(1, 3) << " " << Mat->GetElement(2, 3) << " " << Mat->GetElement(3, 3) << endl;
-		stream << BoxBounds[0] << " " << BoxBounds[1] << " " << BoxBounds[2] << " " << BoxBounds[3] << " " << BoxBounds[4] << " " << BoxBounds[5] << " " << endl;
+		stream << Mat->GetElement(0, 0) << " " << Mat->GetElement(1, 0) << " " << Mat->GetElement(2, 0) << " " << Mat->GetElement(3, 0) << Qt::endl;
+		stream << Mat->GetElement(0, 1) << " " << Mat->GetElement(1, 1) << " " << Mat->GetElement(2, 1) << " " << Mat->GetElement(3, 1) << Qt::endl;
+		stream << Mat->GetElement(0, 2) << " " << Mat->GetElement(1, 2) << " " << Mat->GetElement(2, 2) << " " << Mat->GetElement(3, 2) << Qt::endl;
+		stream << Mat->GetElement(0, 3) << " " << Mat->GetElement(1, 3) << " " << Mat->GetElement(2, 3) << " " << Mat->GetElement(3, 3) << Qt::endl;
+		stream << BoxBounds[0] << " " << BoxBounds[1] << " " << BoxBounds[2] << " " << BoxBounds[3] << " " << BoxBounds[4] << " " << BoxBounds[5] << " " << Qt::endl;
 
 	}
 	file.close();
@@ -9863,14 +9863,14 @@ int mqMorphoDigCore::ExportLandmarksAsFlags(QString fileName, int save_only_sele
 				myActor->GetLMOrientation(ori);
 				double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
 
-				stream << myActor->GetLMLabelText() << endl;
+				stream << myActor->GetLMLabelText() << Qt::endl;
 				stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " "
 					<< lmori[0] << " " << lmori[1] << " " << lmori[2] << " " <<
 					myActor->GetLMSize() << " " <<
 					myActor->GetmColor()[0] << " " <<
 					myActor->GetmColor()[1] << " " <<
 					myActor->GetmColor()[2] << " " <<
-					endl;
+					Qt::endl;
 
 
 
@@ -9924,14 +9924,14 @@ int mqMorphoDigCore::SaveFlagFile(QString fileName, int save_only_selected)
 				myActor->GetLMOrientation(ori);
 				double lmori[3] = { lmpos[0] + ori[0],lmpos[1] + ori[1] ,lmpos[2] + ori[2] };
 				
-				stream << myActor->GetLMLabelText()<< endl;
+				stream << myActor->GetLMLabelText()<< Qt::endl;
 				stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " 
 					<< lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << 
 					myActor->GetLMSize()<<" "<<
 					myActor->GetmColor()[0] << " "<<
 					myActor->GetmColor()[1] << " " <<
 					myActor->GetmColor()[2] << " " <<
-					endl;
+					Qt::endl;
 				
 					
 				
@@ -9954,7 +9954,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 
 	int ntagmap;
 	
-	cout << "start: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Tag maps inside the stack!" << endl;
+	cout << "start: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Tag maps inside the stack!" << Qt::endl;
 	size_t  length;
 
 	int type = 1;
@@ -10031,12 +10031,12 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 							line = in.readLine();
 							myteststream.setString(&line);
 							myteststream >> SomeText >> TagMapName;
-							cout << "Found a name: " << TagMapName.toStdString() << endl;
+							cout << "Found a name: " << TagMapName.toStdString() << Qt::endl;
 
 							line = in.readLine();
 							myteststream.setString(&line);
 							myteststream >> SomeText >> tagnr;
-							cout << "Tagnr: " << tagnr << endl;
+							cout << "Tagnr: " << tagnr << Qt::endl;
 							NewMap->SetNumberOfTableValues(tagnr);
 							NewMap->Build();
 
@@ -10061,7 +10061,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 							
 
 
-							cout << "Add this color map to !!" << endl;
+							cout << "Add this color map to !!" << Qt::endl;
 							int num = 2;
 							if (this->tagMapNameAlreadyExists(TagMapName) == 1)
 							{
@@ -10100,13 +10100,13 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 
 
 								this->Getmui_ExistingTagMaps()->Stack.push_back(ExistingTagMaps::Element(TagMapName, NewMap, tagnr, tagNames, 1));
-								cout << "and now: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Color maps inside the stack!" << endl;
+								cout << "and now: " << this->Getmui_ExistingTagMaps()->Stack.size() << " Color maps inside the stack!" << Qt::endl;
 							}
 
 						}
 
-						cout << "have Just Imported " << ntagmap << " Tag Maps" << endl;
-						cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Tag  maps inside the stack!" << endl;
+						cout << "have Just Imported " << ntagmap << " Tag Maps" << Qt::endl;
+						cout << "now " << this->Getmui_ExistingColorMaps()->Stack.size() << "Tag  maps inside the stack!" << Qt::endl;
 						this->signal_tagMapsChanged();// emit this->colorMapsChanged();
 					}
 
@@ -10139,7 +10139,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 
 					}
 					tagnr = (int)(cpt / 2);
-					cout << "found " << tagnr << " tags inside .TAG file" << endl;
+					cout << "found " << tagnr << " tags inside .TAG file" << Qt::endl;
 
 				}
 				inputFileTMP.close();
@@ -10179,7 +10179,7 @@ void mqMorphoDigCore::OpenTAGMAP(QString fileName) {
 
 
 
-					cout << "Add this color map to TAGMAP default !!" << endl;
+					cout << "Add this color map to TAGMAP default !!" << Qt::endl;
 					int num = 2;
 					
 					int id = 0; // default tag map									
@@ -10245,7 +10245,7 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 		{
 			if (mode == 0)
 			{
-				stream << "nr: 1" << endl;
+				stream << "nr: 1" << Qt::endl;
 			}
 			file.close();
 			int i = this->getActiveTagMapId();
@@ -10257,7 +10257,7 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 			size_t size = tagMaps->Stack.size();
 			if (mode == 0)
 			{
-				stream << "nr: " << size << endl;
+				stream << "nr: " << size << Qt::endl;
 			}
 			file.close();
 			for (int i = 0; i < size; i++)
@@ -10283,7 +10283,7 @@ int mqMorphoDigCore::SaveTAGMAPFile(QString fileName, int save_only_active)
 
 			if (mode == 0)
 			{
-				stream << "nr: " << sizec << endl;
+				stream << "nr: " << sizec << Qt::endl;
 			}
 			file.close();
 			int ic = 0;
@@ -10324,21 +10324,21 @@ void mqMorphoDigCore::SaveTAGMAP(QString fileName, int mapId, int mode)
 		{
 			for (int i = 0; i < tagnr; i++)
 			{
-				stream << QString::fromStdString(tagNames.at(i)) << endl;
+				stream << QString::fromStdString(tagNames.at(i)) << Qt::endl;
 				double *rgba = TagMap->GetTableValue(i);
-				stream << rgba[0] << " " << rgba[1] << " " << rgba[2] << " " << rgba[3] << " " << endl;
+				stream << rgba[0] << " " << rgba[1] << " " << rgba[2] << " " << rgba[3] << " " << Qt::endl;
 			}
 
 		}
 		else
 		{
-			stream <<"name: "<< Name << endl;
-			stream << "nt: " << tagnr << endl;
+			stream <<"name: "<< Name << Qt::endl;
+			stream << "nt: " << tagnr << Qt::endl;
 			for (int i = 0; i < tagnr; i++)
 			{
-				stream << "t" << QString::number(i) << ": "<< QString::fromStdString(tagNames.at(i)) << endl;
+				stream << "t" << QString::number(i) << ": "<< QString::fromStdString(tagNames.at(i)) << Qt::endl;
 				double *rgba = TagMap->GetTableValue(i);
-				stream << "c" << QString::number(i) <<": " << rgba[0] << " " << rgba[1] << " " << rgba[2] << " " << rgba[3] << " " << endl;
+				stream << "c" << QString::number(i) <<": " << rgba[0] << " " << rgba[1] << " " << rgba[2] << " " << rgba[3] << " " << Qt::endl;
 			}
 			
 		}		
@@ -10375,7 +10375,7 @@ int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active, QString
 			QTextStream stream(&file);
 		if (save_only_active ==1 ||volume !=NULL)
 		{
-			stream << "nr: 1" << endl;
+			stream << "nr: 1" << Qt::endl;
 			file.close();
 			if (volume == NULL)
 			{
@@ -10391,7 +10391,7 @@ int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active, QString
 			ExistingColorMaps *colorMaps = this->Getmui_ExistingColorMaps();
 			size_t size = colorMaps->Stack.size();
 
-			stream << "nr: " << size<< endl;
+			stream << "nr: " << size<< Qt::endl;
 			file.close();
 			for (int i = 0; i < size; i++)
 			{
@@ -10411,7 +10411,7 @@ int mqMorphoDigCore::SaveMAPFile(QString fileName, int save_only_active, QString
 				}				
 			}
 
-			stream << "nr: " << sizec << endl;
+			stream << "nr: " << sizec << Qt::endl;
 			file.close();
 			for (int i = 0; i < size; i++)
 			{
@@ -10450,21 +10450,21 @@ void mqMorphoDigCore::SaveOneMAP(vtkSmartPointer<vtkDiscretizableColorTransferFu
 		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 		{
 			QTextStream stream(&file);
-			stream << "nr: 1" << endl;
-			stream << "name: " << Name << endl;
+			stream << "nr: 1" << Qt::endl;
+			stream << "name: " << Name << Qt::endl;
 
-			stream << "discretize: " << ColorMap->GetDiscretize() << endl;
-			stream << "discretizenr: " << ColorMap->GetNumberOfValues() << endl;
-			stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << endl;
+			stream << "discretize: " << ColorMap->GetDiscretize() << Qt::endl;
+			stream << "discretizenr: " << ColorMap->GetNumberOfValues() << Qt::endl;
+			stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << Qt::endl;
 
 			//3 set numer of colors
 
 			int nc = ColorMap->GetSize();
-			stream << "nc: " << nc << endl;
+			stream << "nc: " << nc << Qt::endl;
 
 			//4 set number of opacity nodes
 			int no = ColorMap->GetScalarOpacityFunction()->GetSize();
-			stream << "no: " << no << endl;
+			stream << "no: " << no << Qt::endl;
 
 			double *pts = ColorMap->GetDataPointer();
 			//first : find max and min cx to reset cx range between 0 and 1
@@ -10473,7 +10473,7 @@ void mqMorphoDigCore::SaveOneMAP(vtkSmartPointer<vtkDiscretizableColorTransferFu
 			for (int j = 0; j < nc; j++)
 			{
 				double curr = pts[4 * j];
-				//cout << "x" << j << "=" << curr << endl;
+				//cout << "x" << j << "=" << curr << Qt::endl;
 				if (curr < cx_min) { cx_min = curr; }
 				if (curr > cx_max) { cx_max = curr; }
 
@@ -10493,7 +10493,7 @@ void mqMorphoDigCore::SaveOneMAP(vtkSmartPointer<vtkDiscretizableColorTransferFu
 				double r = pts[4 * j + 1];
 				double g = pts[4 * j + 2];
 				double b = pts[4 * j + 3];
-				stream << "c" << j << ": " << cx << " " << r << " " << g << " " << b << endl;
+				stream << "c" << j << ": " << cx << " " << r << " " << g << " " << b << Qt::endl;
 			}
 			double *pts2 = ColorMap->GetScalarOpacityFunction()->GetDataPointer();
 
@@ -10518,7 +10518,7 @@ void mqMorphoDigCore::SaveOneMAP(vtkSmartPointer<vtkDiscretizableColorTransferFu
 			{
 				double ox = mult * pts2[2 * j] + c;
 				double ov = pts2[2 * j + 1];
-				stream << "op" << j << ": " << ox << " " << ov << endl;
+				stream << "op" << j << ": " << ox << " " << ov << Qt::endl;
 
 
 			}
@@ -10534,20 +10534,20 @@ void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vt
 	{
 		QTextStream stream(&file);
 		
-		stream << "name: " << Name << endl;
+		stream << "name: " << Name << Qt::endl;
 				
-		stream << "discretize: " << ColorMap->GetDiscretize() << endl;
-		stream << "discretizenr: " << ColorMap->GetNumberOfValues() << endl;
-		stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << endl;
+		stream << "discretize: " << ColorMap->GetDiscretize() << Qt::endl;
+		stream << "discretizenr: " << ColorMap->GetNumberOfValues() << Qt::endl;
+		stream << "enableopacity: " << ColorMap->GetEnableOpacityMapping() << Qt::endl;
 		
 		//3 set numer of colors
 		
 		int nc = ColorMap->GetSize();
-		stream << "nc: " << nc<< endl;
+		stream << "nc: " << nc<< Qt::endl;
 
 		//4 set number of opacity nodes
 		int no = ColorMap->GetScalarOpacityFunction()->GetSize();
-		stream << "no: " << no << endl;
+		stream << "no: " << no << Qt::endl;
 				
 		double *pts = ColorMap->GetDataPointer();
 		//first : find max and min cx to reset cx range between 0 and 1
@@ -10556,7 +10556,7 @@ void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vt
 		for (int j = 0; j < nc; j++)
 		{
 			double curr = pts[4 * j];
-			//cout << "x" << j << "=" << curr << endl;
+			//cout << "x" << j << "=" << curr << Qt::endl;
 			if (curr < cx_min) { cx_min = curr; }
 			if (curr > cx_max) { cx_max = curr; }
 
@@ -10576,7 +10576,7 @@ void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vt
 			double r = pts[4 * j + 1];
 			double g = pts[4 * j + 2];
 			double b = pts[4 * j + 3];
-			stream << "c"<< j<< ": "<< cx << " "<< r <<" "<<g<<" "<< b << endl;
+			stream << "c"<< j<< ": "<< cx << " "<< r <<" "<<g<<" "<< b << Qt::endl;
 		}
 		double *pts2 = ColorMap->GetScalarOpacityFunction()->GetDataPointer();
 
@@ -10601,7 +10601,7 @@ void mqMorphoDigCore::SaveMAP(QString fileName, QString Name, vtkSmartPointer<vt
 		{
 			double ox = mult*pts2[2 * j] + c;
 			double ov = pts2[2 * j + 1];
-			stream << "op" << j << ": " <<  ox << " " << ov << endl;
+			stream << "op" << j << ": " <<  ox << " " << ov << Qt::endl;
 			
 
 		}
@@ -10660,11 +10660,11 @@ int mqMorphoDigCore::SaveSTVFile(QString fileName, int save_only_selected)
 			{
 				if (save_only_selected == 0)
 				{
-					stream <<j<<" "<< myColl->GetNumberOfItems() << endl;
+					stream <<j<<" "<< myColl->GetNumberOfItems() << Qt::endl;
 				}
 				else
 				{
-					stream << j << " " << myColl->GetNumberOfSelectedActors() << endl;
+					stream << j << " " << myColl->GetNumberOfSelectedActors() << Qt::endl;
 				}
 				myColl->InitTraversal();
 
@@ -10688,16 +10688,16 @@ int mqMorphoDigCore::SaveSTVFile(QString fileName, int save_only_selected)
 						
 						if (j < 2)
 						{
-							stream << "Landmark" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+							stream << "Landmark" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << Qt::endl;
 						}
 						else if (j==2)
 						{
 							int lmnodetype = myActor->GetLMNodeType();
-							stream << "CurveNode" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << lmnodetype <<endl;
+							stream << "CurveNode" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << lmnodetype << Qt::endl;
 						}
 						else
 						{
-							stream << "CurveHandle" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+							stream << "CurveHandle" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << Qt::endl;
 						}
 
 						
@@ -10845,7 +10845,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 	{
 		tot_lm_number += this->getNormalLandmarkCollection()->GetNumberOfItems() + this->getTargetLandmarkCollection()->GetNumberOfItems();
 	}
-	cout << "tot_lm_number=" << tot_lm_number << endl;
+	cout << "tot_lm_number=" << tot_lm_number << Qt::endl;
 
 	vtkIdType ci = 0;
 	std::string csi = "00";
@@ -10856,12 +10856,12 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		QTextStream stream(&file);
 		if (save_format == 2)
 		{
-			stream << "Version 1.0" << endl;
-			stream << tot_lm_number << endl;
+			stream << "Version 1.0" << Qt::endl;
+			stream << tot_lm_number << Qt::endl;
 		}
 		else if (save_format == 3)
 		{
-			stream << "LM=" << tot_lm_number << endl;
+			stream << "LM=" << tot_lm_number << Qt::endl;
 		}
 
 		if (save_other_lmks == 1)
@@ -10885,19 +10885,19 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 
 					if (save_format == 0)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << Qt::endl;
 					}
 					else if (save_format == 1)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 2)
 					{
-						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 3)
 					{
-						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					ci++;
 					if (ci < 10) { csi = "00"; }
@@ -10923,19 +10923,19 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 
 					if (save_format == 0)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << Qt::endl;
 					}
 					else if (save_format == 1)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 2)
 					{
-						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 3)
 					{
-						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					ci++;
 					if (ci < 10) { csi = "00"; }
@@ -10955,7 +10955,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		double length = 0;
 
 
-		//cout << "Export curves!" << endl;
+		//cout << "Export curves!" << Qt::endl;
 		// First a rigid line between node landmarks.
 		if (Nodes == NULL)
 		{
@@ -11012,7 +11012,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		{
 
 			int cpt = 0;
-			//cout << "here" << endl;
+			//cout << "here" << Qt::endl;
 			ob_H1 = Handles->GetLandmarkAfter(0);
 			ob_Hstart = ob_H1;
 			ob_H2 = Handles->GetLandmarkAfter(ob_H1->GetLMNumber());
@@ -11035,7 +11035,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 						decimation = default_decimation;
 					}
 					num_seg++;
-					//	cout << "num_seg:" << num_seg << endl;
+					//	cout << "num_seg:" << num_seg << Qt::endl;
 					t2 = 0;
 					length_to_reach = 0;
 					current_length = 0;
@@ -11056,7 +11056,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 						decimation = default_decimation;
 					}
 					num_seg++;
-					//	cout << "num_seg:" << num_seg << endl;
+					//	cout << "num_seg:" << num_seg << Qt::endl;
 					t2 = 0;
 					length_to_reach = 0;
 					current_length = 0;
@@ -11137,7 +11137,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 
 
 							double len = sqrt(vtkMath::Distance2BetweenPoints(intvv, intvv2));
-							// cout << "connect:" << ls[0] << "," << ls[1] << endl;
+							// cout << "connect:" << ls[0] << "," << ls[1] << Qt::endl;
 							current_length += len;
 							//glVertex3d(intvv2[0], intvv2[1], intvv2[2]);
 							// glEnd();
@@ -11169,20 +11169,20 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 								{
 									if (save_format == 0)
 									{
-										stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << " 0 0 1" << endl;
+										stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << " 0 0 1" << Qt::endl;
 
 									}
 									else if (save_format == 1)
 									{
-										stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+										stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << Qt::endl;
 									}
 									else if (save_format == 2)
 									{
-										stream << "C" << csi.c_str() << wnum_seg << "-" << lsi.c_str() << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+										stream << "C" << csi.c_str() << wnum_seg << "-" << lsi.c_str() << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << Qt::endl;
 									}
 									else if (save_format == 3)
 									{
-										stream << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+										stream << slm[0] << " " << slm[1] << " " << slm[2] << Qt::endl;
 									}
 								}
 								else // just in case we had are at the milestone!
@@ -11234,7 +11234,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		}
 		if (save_format == 3)
 		{
-			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << endl;
+			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << Qt::endl;
 		}
 		//END
 
@@ -11301,7 +11301,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 	{
 		tot_lm_number += this->getNormalLandmarkCollection()->GetNumberOfItems() + this->getTargetLandmarkCollection()->GetNumberOfItems();
 	}
-	cout << "tot_lm_number=" << tot_lm_number << endl;
+	cout << "tot_lm_number=" << tot_lm_number << Qt::endl;
 	
 	vtkIdType ci = 0;
 	std::string csi = "00";
@@ -11312,12 +11312,12 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		QTextStream stream(&file);
 		if (save_format == 2)
 		{
-			stream << "Version 1.0" << endl;
-			stream << tot_lm_number << endl;
+			stream << "Version 1.0" << Qt::endl;
+			stream << tot_lm_number << Qt::endl;
 		}
 		else if (save_format == 3)
 		{
-			stream << "LM=" << tot_lm_number<< endl;
+			stream << "LM=" << tot_lm_number<< Qt::endl;
 		}
 
 		if (save_other_lmks == 1)
@@ -11341,19 +11341,19 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 										
 					if (save_format == 0)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << Qt::endl;
 					}
 					else if (save_format ==1)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 2)
 					{
-						stream << "S"<< csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "S"<< csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 3)
 					{
-						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					ci++;
 					if (ci < 10) { csi = "00"; }
@@ -11379,19 +11379,19 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 
 					if (save_format == 0)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << " " << lmori[0] << " " << lmori[1] << " " << lmori[2] << " " << Qt::endl;
 					}
 					else if (save_format == 1)
 					{
-						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "Landmark" << ci << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 2)
 					{
-						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 3)
 					{
-						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					ci++;
 					if (ci < 10) { csi = "00"; }
@@ -11411,7 +11411,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		double length = 0;
 
 
-		//cout << "Export curves!" << endl;
+		//cout << "Export curves!" << Qt::endl;
 		// First a rigid line between node landmarks.
 		if (Nodes == NULL)
 		{
@@ -11461,7 +11461,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		{
 
 			int cpt = 0;
-			//cout << "here" << endl;
+			//cout << "here" << Qt::endl;
 			ob_H1 = Handles->GetLandmarkAfter(0);
 			ob_Hstart = ob_H1;
 			ob_H2 = Handles->GetLandmarkAfter(ob_H1->GetLMNumber());
@@ -11476,7 +11476,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 				//stop drawing if the second point is a "start" of a new curve
 				if (ob_N1->GetLMNodeType() == STARTING_NODE) {
 					num_seg++;
-				//	cout << "num_seg:" << num_seg << endl;
+				//	cout << "num_seg:" << num_seg << Qt::endl;
 					t2 = 0;
 					length_to_reach = 0;
 					current_length = 0;
@@ -11486,7 +11486,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 				}
 				if (ob_N1->GetLMNodeType() == MILESTONE_NODE) {
 					num_seg++;
-				//	cout << "num_seg:" << num_seg << endl;
+				//	cout << "num_seg:" << num_seg << Qt::endl;
 					t2 = 0;
 					length_to_reach = 0;
 					current_length = 0;
@@ -11567,7 +11567,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 
 							
 							double len = sqrt(vtkMath::Distance2BetweenPoints(intvv, intvv2));
-							// cout << "connect:" << ls[0] << "," << ls[1] << endl;
+							// cout << "connect:" << ls[0] << "," << ls[1] << Qt::endl;
 							current_length += len;
 							//glVertex3d(intvv2[0], intvv2[1], intvv2[2]);
 							// glEnd();
@@ -11602,15 +11602,15 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 								}
 								else if (save_format ==1)
 								{
-									stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2]  << endl;
+									stream << "Curve_segment:" << num_seg << "-" << decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2]  << Qt::endl;
 								}
 								else if (save_format == 2)
 								{
-									stream << "C" << csi.c_str()<<wnum_seg<< "-" << lsi.c_str()<< decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+									stream << "C" << csi.c_str()<<wnum_seg<< "-" << lsi.c_str()<< decimation_index << " " << slm[0] << " " << slm[1] << " " << slm[2] << Qt::endl;
 								}
 								else if (save_format == 3)
 								{
-									stream << slm[0] << " " << slm[1] << " " << slm[2] << endl;
+									stream << slm[0] << " " << slm[1] << " " << slm[2] << Qt::endl;
 								}
 						
 								
@@ -11709,7 +11709,7 @@ int mqMorphoDigCore::SaveCURFile(QString fileName, int save_only_selected)
 				int lmnodetype = myActorN->GetLMNodeType();
 				stream << "CurvePart"<<i+1<<": "<< lmposN[0] << " " << lmposN[1] << " " << lmposN[2] << " "
 					<< lmposH[0] << " " << lmposH[1] << " " << lmposH[2] << " " << lmnodetype<<
-					endl;
+					Qt::endl;
 
 			}
 
@@ -11752,43 +11752,43 @@ void mqMorphoDigCore::ExportAvizoLandmarks(QString fileName)
 			 {
 				 num_sets = 2;
 			 }
-				 stream << "# Avizo 3D ASCII 3.0" << endl;
-			 stream << "" << endl;
-			 stream << "define Markers " << num_lmk << endl;
-			 stream << "" << endl;
-			 stream << "Parameters {" << endl;
-			 stream << "    NumSets "<<num_sets<<"," << endl;
-			 stream << "    ContentType \"LandmarkSet\""<< endl;
-			 stream << "}" << endl;
-			 stream << "" << endl;
-			 stream << "Markers { float[3] Coordinates } @1" << endl; 
+				 stream << "# Avizo 3D ASCII 3.0" << Qt::endl;
+			 stream << "" << Qt::endl;
+			 stream << "define Markers " << num_lmk << Qt::endl;
+			 stream << "" << Qt::endl;
+			 stream << "Parameters {" << Qt::endl;
+			 stream << "    NumSets "<<num_sets<<"," << Qt::endl;
+			 stream << "    ContentType \"LandmarkSet\""<< Qt::endl;
+			 stream << "}" << Qt::endl;
+			 stream << "" << Qt::endl;
+			 stream << "Markers { float[3] Coordinates } @1" << Qt::endl; 
 			 if (num_sets == 2)
 			 {
-				 stream << "Markers { float[3] Coordinates2 } @2" << endl;
+				 stream << "Markers { float[3] Coordinates2 } @2" << Qt::endl;
 			 }
-			 stream << "" << endl;
-			 stream << "# Data section follows" << endl;
-			 stream << "@1" << endl;			 
+			 stream << "" << Qt::endl;
+			 stream << "# Data section follows" << Qt::endl;
+			 stream << "@1" << Qt::endl;			 
 			 myColl->InitTraversal();			 
 			 for (vtkIdType i = 0; i < myColl->GetNumberOfItems(); i++)
 			 {
 				 vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
 				 double lmpos[3];
 				 myActor->GetLMOrigin(lmpos);				 				 	
-				 stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+				 stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 			 }
-			 stream << "" << endl;
+			 stream << "" << Qt::endl;
 			 if (num_sets == 2)
 			 {
 				 myColl = this->TargetLandmarkCollection;
-				 stream << "@2" << endl;
+				 stream << "@2" << Qt::endl;
 				 myColl->InitTraversal();
 				 for (vtkIdType i = 0; i < myColl->GetNumberOfItems(); i++)
 				 {
 					 vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
 					 double lmpos[3];
 					 myActor->GetLMOrigin(lmpos);
-					 stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					 stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 				 }
 			 }
 		 }
@@ -11866,12 +11866,12 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 		int num_lmk = myColl->GetNumberOfItems();
 		if (file_type == 2)
 		{
-			stream << "Version 1.0" << endl;
-			stream << num_lmk << endl;
+			stream << "Version 1.0" << Qt::endl;
+			stream << num_lmk << Qt::endl;
 		}
 		if (file_type == 3)
 		{
-			stream << "LM=" << num_lmk << endl;
+			stream << "LM=" << num_lmk << Qt::endl;
 		}
 		myColl->InitTraversal();
 		std::string csi;
@@ -11892,19 +11892,19 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 
 				if (file_type == 0)
 				{
-					stream << "Landmark" << i+1 << ": " << lmpos[0]<<" "<<lmpos[1]<<" "<<lmpos[2]<<" "<<lmori[0]<< " "<< lmori[1] << " " <<  lmori[2] << " " << endl;
+					stream << "Landmark" << i+1 << ": " << lmpos[0]<<" "<<lmpos[1]<<" "<<lmpos[2]<<" "<<lmori[0]<< " "<< lmori[1] << " " <<  lmori[2] << " " << Qt::endl;
 				}
 				else if (file_type ==1)
 				{
-					stream << "Landmark" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					stream << "Landmark" << i+1 << ": " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 				}
 				else if (file_type == 2)
 				{
-					stream << "S" << csi.c_str() << i  << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					stream << "S" << csi.c_str() << i  << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 				}
 				else if (file_type == 3)
 				{
-					stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << endl;
+					stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 				}
 			}
 
@@ -11912,7 +11912,7 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 		if (file_type == 3)
 		{
 
-			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << endl;
+			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << Qt::endl;
 		}
 		
 
@@ -11942,7 +11942,7 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 			
 
 		}
-		stream << endl;
+		stream << Qt::endl;
 
 		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 		vtkPolyData *mPD = mapper->GetInput();
@@ -11977,11 +11977,11 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 
 
 			}
-			stream << endl;
+			stream << Qt::endl;
 
 
 		}
-		//stream << "Name	Mean Median	Variance Min Max Q5 Q10 Q90 Q95" << endl;
+		//stream << "Name	Mean Median	Variance Min Max Q5 Q10 Q90 Q95" << Qt::endl;
 
 
 		//this->ComputeSelectedNamesLists();
@@ -12041,7 +12041,7 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 					Volume = massProp->GetVolume();
 					NumVert = mapper->GetInput()->GetNumberOfPoints();
 					NumCells = mapper->GetInput()->GetNumberOfCells();
-					stream << myActor->GetName().c_str() << "	" << Area << "	" << Volume << "	" << NumVert << "	" << NumCells << "	" << "whole_surface" << endl;
+					stream << myActor->GetName().c_str() << "	" << Area << "	" << Volume << "	" << NumVert << "	" << NumCells << "	" << "whole_surface" << Qt::endl;
 				}
 				else
 				{// if useTags=1: construct cell list for TagId
@@ -12136,7 +12136,7 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, QStri
 					
 					if (NumVert > 10)
 					{
-						stream << myActor->GetName().c_str() << "	" << Area << "	" << Volume << "	" << NumVert << "	" << NumCells << "	" << TagName.c_str() << endl;
+						stream << myActor->GetName().c_str() << "	" << Area << "	" << Volume << "	" << NumVert << "	" << NumCells << "	" << TagName.c_str() << Qt::endl;
 
 					}
 				}
@@ -12156,24 +12156,24 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, int n
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
 		QTextStream stream(&file);
-		stream << "Name	Area	Volume	Vertex_nr	Triangle_nr	Structure" << endl;
-		cout << "First Summary Done" << endl;
+		stream << "Name	Area	Volume	Vertex_nr	Triangle_nr	Structure" << Qt::endl;
+		cout << "First Summary Done" << Qt::endl;
 		file.close();
 		this->SaveSurfaceTagSummary(fileName, 0, TagArray, numVer, 0);
 		//if useTags =1, search Max tagged value in all opened objects
 		if (useTags == 1 && TagArray.length() > 0)
 		{
-			cout << "useTags==1 and TagArray.length()>0" << endl;
+			cout << "useTags==1 and TagArray.length()>0" << Qt::endl;
 			
 			vtkIdType maxTagId = this->GetTagRangeMax(TagArray);
 			this->ActorCollection->InitTraversal();
 			
-			cout << "maxTagId=" << maxTagId << endl;
+			cout << "maxTagId=" << maxTagId << Qt::endl;
 			if (maxTagId > 0)
 			{
 				for (vtkIdType i = 0; i <= maxTagId; i++)
 				{
-					cout << "SaveActiveScalarSummary(" << i << ")" << endl;
+					cout << "SaveActiveScalarSummary(" << i << ")" << Qt::endl;
 					this->SaveSurfaceTagSummary(fileName, 1, TagArray, numVer, i);
 				}
 			}
@@ -12375,13 +12375,13 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 					//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
 					if (useTags == 0)
 					{
-						stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << "	" << "whole_surface" << endl;
+						stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << "	" << "whole_surface" << Qt::endl;
 					}
 					else
 					{
 						if (cpt > 10)
 						{
-							stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << "	" << TagName.c_str() << endl;
+							stream << myActor->GetName().c_str() << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95 << "	" << TagName.c_str() << Qt::endl;
 						}
 					}
 
@@ -12389,7 +12389,7 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 				}
 				else
 				{
-					stream << myActor->GetName().c_str() << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << endl;
+					stream << myActor->GetName().c_str() << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << Qt::endl;
 				}
 
 
@@ -12502,7 +12502,7 @@ void mqMorphoDigCore::Icosahedron(int numIcosahedrons, double radius, int subdiv
 			points->SetPoint(i, pt[0], pt[1], pt[2]);
 		}
 
-		//cout << "nr of nodes:" << nrPoints << endl;
+		//cout << "nr of nodes:" << nrPoints << Qt::endl;
 		
 		MyObj->SetPoints(points);
 		VTK_CREATE(vtkMDActor, actor);
@@ -12638,7 +12638,7 @@ void mqMorphoDigCore::Cube(int numCubes, double sizeX, double sizeY, double size
 
 
 
-		cout << "More than 10 points!" << endl;
+		cout << "More than 10 points!" << Qt::endl;
 		VTK_CREATE(vtkMDActor, actor);
 		if (this->mui_BackfaceCulling == 0)
 		{
@@ -12764,7 +12764,7 @@ void mqMorphoDigCore::Cylinder(int numCyl, double cylHeight, double cylRadius, d
 
 		  
 
-		  cout << "More than 10 points!" << endl;
+		  cout << "More than 10 points!" << Qt::endl;
 		  VTK_CREATE(vtkMDActor, actor);
 		  if (this->mui_BackfaceCulling == 0)
 		  {
@@ -12844,23 +12844,23 @@ void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QSt
 	{
 		QTextStream stream(&file);
 
-		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q10	Q90	Q95	Tagged_Region" << endl;
-		cout << "First Summary Done" << endl;
+		stream << "Name	Mean	Median	Variance	StdDev	Min	Max	Q5	Q10	Q90	Q95	Tagged_Region" << Qt::endl;
+		cout << "First Summary Done" << Qt::endl;
 		file.close();
 		this->SaveActiveScalarSummary(fileName, 0, TagArray, 0);
 		//if useTags =1, search Max tagged value in all opened objects
 		if (useTags == 1 && TagArray.length() > 0)
 		{
-			cout << "useTags==1 and TagArray.length()>0" << endl;
+			cout << "useTags==1 and TagArray.length()>0" << Qt::endl;
 			vtkIdType maxTagId = this->GetTagRangeMax(TagArray);
 			this->ActorCollection->InitTraversal();
 
-			cout << "maxTagId=" << maxTagId << endl;
+			cout << "maxTagId=" << maxTagId << Qt::endl;
 			if (maxTagId > 0)
 			{
 				for (vtkIdType i = 0; i <= maxTagId; i++)
 				{
-					cout << "SaveActiveScalarSummary(" << i<<")"<< endl;
+					cout << "SaveActiveScalarSummary(" << i<<")"<< Qt::endl;
 					this->SaveActiveScalarSummary(fileName, 1, TagArray, i);
 				}
 			}
@@ -12877,7 +12877,7 @@ void mqMorphoDigCore::SaveMeshSize(QString fileName)
 	{
 		QTextStream stream(&file);
 	
-			stream << "Name	Bounding_box_length	Mean_Dist_To_Cendroid	Max_Dist_To_Cendroid	PC1_Length	PC2_Length	PC3_Length	AVG_PC_Length" << endl;
+			stream << "Name	Bounding_box_length	Mean_Dist_To_Cendroid	Max_Dist_To_Cendroid	PC1_Length	PC2_Length	PC3_Length	AVG_PC_Length" << Qt::endl;
 		
 
 		//this->ComputeSelectedNamesLists();
@@ -12912,7 +12912,7 @@ void mqMorphoDigCore::SaveMeshSize(QString fileName)
 					
 
 						//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
-						stream << myActor->GetName().c_str() << "	" << bbl << "	" << meanCDist<<  "	" << maxCDist << "	" << pc1 << "	" << pc2 << "	" << pc3 << "	" << avgpc<< endl;
+						stream << myActor->GetName().c_str() << "	" << bbl << "	" << meanCDist<<  "	" << maxCDist << "	" << pc1 << "	" << pc2 << "	" << pc3 << "	" << avgpc<< Qt::endl;
 					
 
 				}
@@ -12938,16 +12938,16 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 		
 		if (mode == 1)
 		{
-			stream << "Surface_name	Area	Volume	Triangle_nr	Vertex_nr" << endl; 
+			stream << "Surface_name	Area	Volume	Triangle_nr	Vertex_nr" << Qt::endl; 
 		}
 		else
 		if (mode == 2)
 		{
-			stream << "Surface_name	Normalized_shape_index Area Volume" << endl;
+			stream << "Surface_name	Normalized_shape_index Area Volume" << Qt::endl;
 		}
 		else
 		{
-			stream << "Surface_name	Convex_Hull_Area_Ratio Convex_Hull_Shape_Index Area Volume Convex_hull_area Convex_hull_volume Normalized_shape_index" << endl;
+			stream << "Surface_name	Convex_Hull_Area_Ratio Convex_Hull_Shape_Index Area Volume Convex_hull_area Convex_hull_volume Normalized_shape_index" << Qt::endl;
 		}
 		
 		//this->ComputeSelectedNamesLists();
@@ -12976,11 +12976,11 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 						{
 							
 							//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
-							stream << myActor->GetName().c_str() << "	"  << surface_area << "	" << volume << "	" << mapper->GetInput()->GetNumberOfCells()<< "	"<< mapper->GetInput()->GetNumberOfPoints() << endl;
+							stream << myActor->GetName().c_str() << "	"  << surface_area << "	" << volume << "	" << mapper->GetInput()->GetNumberOfCells()<< "	"<< mapper->GetInput()->GetNumberOfPoints() << Qt::endl;
 						}
 						else if (mode == 2)
 						{
-							stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume << endl;
+							stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume << Qt::endl;
 						}
 						else if (mode ==3)
 						{
@@ -13027,7 +13027,7 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 							{
 								reduction_factor = 1 - new_factor;
 							}
-							cout << "try to update quadric decimation by a factor of " << reduction_factor<< endl;
+							cout << "try to update quadric decimation by a factor of " << reduction_factor<< Qt::endl;
 
 
 							
@@ -13041,16 +13041,16 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 							{
 								delaunay3D->SetInputData(mapper->GetInput());
 							}
-							cout << "try to update Delaunay 3D" << endl;
+							cout << "try to update Delaunay 3D" << Qt::endl;
 							delaunay3D->Update();
-							cout << "Delaunay 3D updated" << endl;
+							cout << "Delaunay 3D updated" << Qt::endl;
 							vtkSmartPointer<vtkGeometryFilter> geometryFilter =
 								vtkSmartPointer<vtkGeometryFilter>::New();
 
 							geometryFilter->SetInputConnection(delaunay3D->GetOutputPort());
-							cout << "Try to update geometry filter" << endl;
+							cout << "Try to update geometry filter" << Qt::endl;
 							geometryFilter->Update();
-							cout << "Geometry filter updated" << endl;
+							cout << "Geometry filter updated" << Qt::endl;
 							/*vtkSmartPointer<vtkDataSetSurfaceFilter> surfaceFilter2 =
 								vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
 							surfaceFilter2->SetInputData(geometryFilter->GetOutput());
@@ -13061,9 +13061,9 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 
 							massPropConvexHull->SetInputData(geometryFilter->GetOutput());
 							//massPropConvexHull->SetInputConnection(delaunay3D->GetOutputPort());
-							cout << "Try to update massPropConvexHull" << endl;
+							cout << "Try to update massPropConvexHull" << Qt::endl;
 							massPropConvexHull->Update();
-							cout << "massPropConvexHull updated" << endl;
+							cout << "massPropConvexHull updated" << Qt::endl;
 							
 							double sqrt_surface_area = sqrt(surface_area);
 
@@ -13072,7 +13072,7 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 
 
 							double volume_convex_hull = massPropConvexHull->GetVolume();
-							cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+							cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << Qt::endl;
 							double cbrt_volume_convex_hull = cbrt(volume_convex_hull);
 							double custom_complexity = sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233);
 							double surface_ratio = 1;
@@ -13082,7 +13082,7 @@ int mqMorphoDigCore::SaveShapeMeasures(QString fileName, int mode)
 
 							
 							
-							stream << myActor->GetName().c_str() << "	" << surface_ratio << "	" << custom_complexity << "	" << surface_area << "	" << volume << "	" << surface_area_convex_hull << "	" << volume_convex_hull << "	"<< massProp->GetNormalizedShapeIndex()<<  endl;
+							stream << myActor->GetName().c_str() << "	" << surface_ratio << "	" << custom_complexity << "	" << surface_area << "	" << volume << "	" << surface_area_convex_hull << "	" << volume_convex_hull << "	"<< massProp->GetNormalizedShapeIndex()<< Qt::endl;
 							
 						}
 						
@@ -13103,7 +13103,7 @@ void mqMorphoDigCore::startRubber(int rubber_mode)
 	//lasso_mode 2: = rubber tag and we will only tag the outside of the selection
 	//lasso_mode 3: = rubber tag and we will only tag the inside of the selection
 
-	//cout << "Set Lasso style as current interaction style!" << endl;
+	//cout << "Set Lasso style as current interaction style!" << Qt::endl;
 	//1 change interaction mode
 	this->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->RubberStyle);
 	this->currentRubberMode = rubber_mode;
@@ -13122,7 +13122,7 @@ void mqMorphoDigCore::startLasso(int lasso_mode)
 	//lasso_mode 3: = lasso tag and we will only tag the inside of the selection
 	// lasso_mode 4: = lasso mask volume and we will mask the outside of the selection
 	// lasso_mode 5: = lasso mask volume and we will mask the inside of the selection
-	//cout << "Set Lasso style as current interaction style!" << endl;
+	//cout << "Set Lasso style as current interaction style!" << Qt::endl;
 	//1 change interaction mode
 	mqMorphoDigCore::instance()->getRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(this->LassoStyle);
 	this->currentLassoMode = lasso_mode;
@@ -13225,14 +13225,14 @@ void mqMorphoDigCore::stopRubber()
 	{
 		int keep_inside = this->currentRubberMode;
 		//@@@ to do
-		cout << "Stop rubber cut!" << endl;
+		cout << "Stop rubber cut!" << Qt::endl;
 		this->rubberCutSelectedActors(keep_inside);
 	}
 	else if (this->currentRubberMode<4)
 	{
 		int tag_inside = this->currentRubberMode;// 2: tag outside 3 tag inside
 		//@@@ to do
-		cout << "Stop rubber tag!" << endl;
+		cout << "Stop rubber tag!" << Qt::endl;
 		this->rubberTagActors(tag_inside);
 
 	}
@@ -13391,7 +13391,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 {
 	POLYGON_LIST poly;
 	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
-	cout << "Poly valide: " << poly.state << endl;
+	cout << "Poly valide: " << poly.state << Qt::endl;
 	if (poly.state == 1)// only for valid lasso selections!
 	{
 
@@ -13402,7 +13402,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 		int modified = 0;
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor:" << i << endl;
+			cout << "try to get next actor:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
@@ -13433,7 +13433,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
 						if (i < 10)
 						{
-							cout << "ve_proj_screen "<<i<<"=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+							cout << "ve_proj_screen "<<i<<"=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << Qt::endl;
 						}
 						proj_screen.x = ve_proj_screen[0];
 						proj_screen.y = ve_proj_screen[1];
@@ -13533,7 +13533,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 
 						newmapper->ScalarVisibilityOn();
 						
-						cout << "cut object" << MyObj->GetNumberOfPoints() << endl;
+						cout << "cut object" << MyObj->GetNumberOfPoints() << Qt::endl;
 						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 						newmapper->SetInputData(MyObj);
 
@@ -13570,7 +13570,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 						//std::string newname = this->CheckingName(myActor->GetName());
 						newactor->SetName(myActor->GetName() + "_lc");
 						//newactor->SetName(newname);
-						cout << "try to add new actor=" << endl;
+						cout << "try to add new actor=" << Qt::endl;
 						newcoll->AddTmpItem(newactor);
 						modified = 1;
 					}
@@ -13588,7 +13588,7 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 			vtkIdType num = newcoll->GetNumberOfItems();
 			for (vtkIdType i = 0; i < num; i++)
 			{
-				cout << "try to get next actor from newcoll:" << i << endl;
+				cout << "try to get next actor from newcoll:" << i << Qt::endl;
 				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -13601,16 +13601,16 @@ void mqMorphoDigCore::lassoCutSelectedActors(int keep_inside)
 
 
 			}
-			//cout << "camera and grid adjusted" << endl;
-			cout << "new actor(s) added" << endl;
+			//cout << "camera and grid adjusted" << Qt::endl;
+			cout << "new actor(s) added" << Qt::endl;
 			this->Initmui_ExistingArrays();
 
-			cout << "Set actor collection changed" << endl;
+			cout << "Set actor collection changed" << Qt::endl;
 			this->getActorCollection()->SetChanged(1);
-			cout << "Actor collection changed" << endl;
+			cout << "Actor collection changed" << Qt::endl;
 
 			this->AdjustCameraAndGrid();
-			cout << "Camera and grid adjusted" << endl;
+			cout << "Camera and grid adjusted" << Qt::endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
@@ -13646,10 +13646,10 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 
 	d[0] = mend[0];
 	d[1] = mstart[1];
-	cout << a[0] << "," << a[1] << endl;
-	cout << b[0] << "," << b[1] << endl;
-	cout << c[0] << "," << c[1] << endl;
-	cout << d[0] << "," << d[1] << endl;
+	cout << a[0] << "," << a[1] << Qt::endl;
+	cout << b[0] << "," << b[1] << Qt::endl;
+	cout << c[0] << "," << c[1] << Qt::endl;
+	cout << d[0] << "," << d[1] << Qt::endl;
 
 	std::vector<vtkVector2i> point_list;
 	point_list.push_back(a);
@@ -13657,7 +13657,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 	point_list.push_back(c);
 	point_list.push_back(d);
 	poly.SetPointList(point_list);
-	cout << "Poly valide: " << poly.state << endl;
+	cout << "Poly valide: " << poly.state << Qt::endl;
 	if (poly.state == 1)// only for valid lasso and rubber band selections!
 	{
 
@@ -13668,7 +13668,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 		int modified = 0;
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor:" << i << endl;
+			cout << "try to get next actor:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
@@ -13699,7 +13699,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
 						if (i < 10)
 						{
-							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << Qt::endl;
 						}
 						proj_screen.x = ve_proj_screen[0];
 						proj_screen.y = ve_proj_screen[1];
@@ -13799,7 +13799,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 
 						newmapper->ScalarVisibilityOn();
 
-						cout << "cut object" << MyObj->GetNumberOfPoints() << endl;
+						cout << "cut object" << MyObj->GetNumberOfPoints() << Qt::endl;
 						//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 						newmapper->SetInputData(MyObj);
 
@@ -13836,7 +13836,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 						//std::string newname = this->CheckingName(myActor->GetName());
 						newactor->SetName(myActor->GetName() + "_rc");
 						//newactor->SetName(newname);
-						cout << "try to add new actor=" << endl;
+						cout << "try to add new actor=" << Qt::endl;
 						newcoll->AddTmpItem(newactor);
 						modified = 1;
 					}
@@ -13854,7 +13854,7 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 			vtkIdType num = newcoll->GetNumberOfItems();
 			for (vtkIdType i = 0; i < num; i++)
 			{
-				cout << "try to get next actor from newcoll:" << i << endl;
+				cout << "try to get next actor from newcoll:" << i << Qt::endl;
 				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -13867,16 +13867,16 @@ void mqMorphoDigCore::rubberCutSelectedActors(int keep_inside)
 
 
 			}
-			//cout << "camera and grid adjusted" << endl;
-			cout << "new actor(s) added" << endl;
+			//cout << "camera and grid adjusted" << Qt::endl;
+			cout << "new actor(s) added" << Qt::endl;
 			this->Initmui_ExistingArrays();
 
-			cout << "Set actor collection changed" << endl;
+			cout << "Set actor collection changed" << Qt::endl;
 			this->getActorCollection()->SetChanged(1);
-			cout << "Actor collection changed" << endl;
+			cout << "Actor collection changed" << Qt::endl;
 
 			this->AdjustCameraAndGrid();
-			cout << "Camera and grid adjusted" << endl;
+			cout << "Camera and grid adjusted" << Qt::endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
@@ -13892,7 +13892,7 @@ void mqMorphoDigCore::lassoMaskVolumes()
 {
 	POLYGON_LIST poly;
 	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
-	cout << "Mask Poly valide: " << poly.state << endl;
+	cout << "Mask Poly valide: " << poly.state << Qt::endl;
 
 	if (poly.state == 1)// only for valid lasso selections!
 	{
@@ -13904,7 +13904,7 @@ void mqMorphoDigCore::lassoMaskVolumes()
 		for (vtkIdType i = 0; i < num; i++)
 		{
 			
-			cout << "try to get next volume:" << i << endl;
+			cout << "try to get next volume:" << i << Qt::endl;
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			if (myVolume->GetMaskEnabled())
 			{ 
@@ -13958,17 +13958,17 @@ void mqMorphoDigCore::lassoMaskVolumes()
 						closedSurfacePoints->InsertNextPoint(pointWC_far[0], pointWC_far[1], pointWC_far[2]);
 						if (i < 500)
 						{
-							cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << endl;
-							cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
-							cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << endl;
-							cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << endl;
+							cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << Qt::endl;
+							cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << Qt::endl;
+							cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << Qt::endl;
+							cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << Qt::endl;
 						}
 						//pointsXY->SetPoint(i, x, y, 0);
 						
 
 					}
-					cout << "Found vol_far=" << vol_far << endl;
-					cout << "Found vol_near=" << vol_near << endl;
+					cout << "Found vol_far=" << vol_far << Qt::endl;
+					cout << "Found vol_near=" << vol_near << Qt::endl;
 					vtkNew<vtkPolyData> closedSurfacePolyData;
 					closedSurfacePolyData->SetPoints(closedSurfacePoints.GetPointer());
 					closedSurfacePolyData->SetStrips(closedSurfaceStrips.GetPointer());
@@ -14047,14 +14047,14 @@ void mqMorphoDigCore::lassoMaskVolumes()
 				myVolume->GetMatrix(Mat);
 				vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
 				TransMat->DeepCopy(Mat);
-				cout << "Transposed mat" << *TransMat << endl;
+				cout << "Transposed mat" << *TransMat << Qt::endl;
 				TransMat->Transpose();
 				double N1, N2, N3;
 				N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
 					TransMat->GetElement(3, 1) * TransMat->GetElement(0, 1)
 					+ TransMat->GetElement(3, 2) * TransMat->GetElement(0, 2));
 
-				cout << "N1=" << N1 << endl;
+				cout << "N1=" << N1 << Qt::endl;
 
 				TransMat->SetElement(0, 3, N1);
 
@@ -14064,20 +14064,20 @@ void mqMorphoDigCore::lassoMaskVolumes()
 					TransMat->GetElement(3, 1) * TransMat->GetElement(1, 1)
 					+ TransMat->GetElement(3, 2) * TransMat->GetElement(1, 2));
 
-				cout << "N2=" << N2 << endl;
+				cout << "N2=" << N2 << Qt::endl;
 				TransMat->SetElement(1, 3, N2);
 
 				N3 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(2, 0) +
 					TransMat->GetElement(3, 1) * TransMat->GetElement(2, 1)
 					+ TransMat->GetElement(3, 2) * TransMat->GetElement(2, 2));
-				cout << "N3=" << N3 << endl;
+				cout << "N3=" << N3 << Qt::endl;
 				TransMat->SetElement(2, 3, N3);
 
 
 				TransMat->SetElement(3, 0, 0);
 				TransMat->SetElement(3, 1, 0);
 				TransMat->SetElement(3, 2, 0);
-				cout << "Transpose_Mat" << *TransMat << endl;
+				cout << "Transpose_Mat" << *TransMat << Qt::endl;
 				vtkTransform *newTransform = vtkTransform::New();
 				newTransform->PostMultiply();
 				newTransform->SetMatrix(TransMat);
@@ -14115,7 +14115,7 @@ void mqMorphoDigCore::lassoMaskVolumes()
 				vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
 				int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };
 				stencilData->GetExtent(stencilExtent);
-				cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << endl;
+				cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << Qt::endl;
 				vtkSmartPointer<vtkImageStencilToImage> stencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
 
 				stencilToImage->SetInputData(BrushPolyDataToStencil->GetOutput());
@@ -14134,13 +14134,13 @@ void mqMorphoDigCore::lassoMaskVolumes()
 
 
 				//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
-				//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+				//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << Qt::endl;
 
 				//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
 				vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 				vtkIdType cptStencil = 0;
 				brushOutput->GetDimensions(dims);
-				cout << "Lasso mask output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+				cout << "Lasso mask output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << Qt::endl;
 				int maskOn = this->Getmui_MaskOn();
 				int maskInside = this->Getmui_MaskInside();
 				for (int z = 0; z < dims[2]; z++)
@@ -14181,7 +14181,7 @@ void mqMorphoDigCore::lassoMaskVolumes()
 						}
 					}
 				}
-				cout << "Laso mask output contains  found " << cptStencil << " points to mask = 0" << endl;
+				cout << "Laso mask output contains  found " << cptStencil << " points to mask = 0" << Qt::endl;
 
 				
 
@@ -14204,7 +14204,7 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 {
 	POLYGON_LIST poly;
 	poly.SetPointList(this->LassoStyle->GetPolygonPoints());
-	cout << "Poly valide: " << poly.state << endl;
+	cout << "Poly valide: " << poly.state << Qt::endl;
 
 	if (this->Getmui_TagModeActivated() == 1 && poly.state == 1)// only for valid lasso selections!
 	{
@@ -14216,7 +14216,7 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 		int modified = 0;
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor:" << i << endl;
+			cout << "try to get next actor:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			//myActor->SetSelected(0); we don't unselect after a cut
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
@@ -14256,7 +14256,7 @@ void mqMorphoDigCore::lassoTagActors(int tag_inside)
 						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
 						if (i < 10)
 						{
-							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << Qt::endl;
 						}
 						proj_screen.x = ve_proj_screen[0];
 						proj_screen.y = ve_proj_screen[1];
@@ -14340,7 +14340,7 @@ void mqMorphoDigCore::rubberMaskVolumes()
 	poly.SetPointList(point_list);
 
 
-	cout << "Poly valide: " << poly.state << endl;
+	cout << "Poly valide: " << poly.state << Qt::endl;
 	if (poly.state == 1)// only for valid lasso selections!
 	{
 		this->VolumeCollection->InitTraversal();
@@ -14348,7 +14348,7 @@ void mqMorphoDigCore::rubberMaskVolumes()
 		int modified = 0;
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next volume:" << i << endl;
+			cout << "try to get next volume:" << i << Qt::endl;
 			vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
 			if (myVolume->GetMaskEnabled())
 			{
@@ -14399,17 +14399,17 @@ void mqMorphoDigCore::rubberMaskVolumes()
 					closedSurfacePoints->InsertNextPoint(pointWC_far[0], pointWC_far[1], pointWC_far[2]);
 					if (i < 500)
 					{
-						cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << endl;
-						cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << endl;
-						cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << endl;
-						cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << endl;
+						cout << "SCR ptnear:" << pt1[0] << "," << pt1[1] << "," << pt1[2] << Qt::endl;
+						cout << "SCR ptfar:" << pt2[0] << "," << pt2[1] << "," << pt2[2] << Qt::endl;
+						cout << "WC ptnear:" << pointWC_near[0] << "," << pointWC_near[1] << "," << pointWC_near[2] << Qt::endl;
+						cout << "WC ptnear:" << pointWC_far[0] << "," << pointWC_far[1] << "," << pointWC_far[2] << Qt::endl;
 					}
 					//pointsXY->SetPoint(i, x, y, 0);
 
 
 				}
-				cout << "Found vol_far=" << vol_far << endl;
-				cout << "Found vol_near=" << vol_near << endl;
+				cout << "Found vol_far=" << vol_far << Qt::endl;
+				cout << "Found vol_near=" << vol_near << Qt::endl;
 				vtkNew<vtkPolyData> closedSurfacePolyData;
 				closedSurfacePolyData->SetPoints(closedSurfacePoints.GetPointer());
 				closedSurfacePolyData->SetStrips(closedSurfaceStrips.GetPointer());
@@ -14486,14 +14486,14 @@ void mqMorphoDigCore::rubberMaskVolumes()
 				myVolume->GetMatrix(Mat);
 				vtkSmartPointer<vtkMatrix4x4> TransMat = vtkSmartPointer<vtkMatrix4x4>::New();
 				TransMat->DeepCopy(Mat);
-				cout << "Transposed mat" << *TransMat << endl;
+				cout << "Transposed mat" << *TransMat << Qt::endl;
 				TransMat->Transpose();
 				double N1, N2, N3;
 				N1 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(0, 0) +
 					TransMat->GetElement(3, 1) * TransMat->GetElement(0, 1)
 					+ TransMat->GetElement(3, 2) * TransMat->GetElement(0, 2));
 
-				cout << "N1=" << N1 << endl;
+				cout << "N1=" << N1 << Qt::endl;
 
 				TransMat->SetElement(0, 3, N1);
 
@@ -14503,20 +14503,20 @@ void mqMorphoDigCore::rubberMaskVolumes()
 					TransMat->GetElement(3, 1) * TransMat->GetElement(1, 1)
 					+ TransMat->GetElement(3, 2) * TransMat->GetElement(1, 2));
 
-				cout << "N2=" << N2 << endl;
+				cout << "N2=" << N2 << Qt::endl;
 				TransMat->SetElement(1, 3, N2);
 
 				N3 = -(TransMat->GetElement(3, 0) * TransMat->GetElement(2, 0) +
 					TransMat->GetElement(3, 1) * TransMat->GetElement(2, 1)
 					+ TransMat->GetElement(3, 2) * TransMat->GetElement(2, 2));
-				cout << "N3=" << N3 << endl;
+				cout << "N3=" << N3 << Qt::endl;
 				TransMat->SetElement(2, 3, N3);
 
 
 				TransMat->SetElement(3, 0, 0);
 				TransMat->SetElement(3, 1, 0);
 				TransMat->SetElement(3, 2, 0);
-				cout << "Transpose_Mat" << *TransMat << endl;
+				cout << "Transpose_Mat" << *TransMat << Qt::endl;
 				vtkTransform *newTransform = vtkTransform::New();
 				newTransform->PostMultiply();
 				newTransform->SetMatrix(TransMat);
@@ -14554,7 +14554,7 @@ void mqMorphoDigCore::rubberMaskVolumes()
 				vtkImageStencilData* stencilData = BrushPolyDataToStencil->GetOutput();
 				int stencilExtent[6] = { 0, -1, 0, -1, 0, -1 };
 				stencilData->GetExtent(stencilExtent);
-				cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << endl;
+				cout << "Stencil extent:" << stencilExtent[0] << "," << stencilExtent[1] << "," << stencilExtent[2] << "," << stencilExtent[3] << "," << stencilExtent[4] << "," << stencilExtent[5] << Qt::endl;
 				vtkSmartPointer<vtkImageStencilToImage> stencilToImage = vtkSmartPointer<vtkImageStencilToImage>::New();
 
 				stencilToImage->SetInputData(BrushPolyDataToStencil->GetOutput());
@@ -14573,13 +14573,13 @@ void mqMorphoDigCore::rubberMaskVolumes()
 
 
 				//myVolume->GetKdTree()->FindPointsWithinRadius(Radius, pt, observedNeighbours);
-				//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << endl;
+				//cout << "Found" << observedNeighbours->GetNumberOfIds() << " volume neighbours" << Qt::endl;
 
 				//unsigned char* pixel = static_cast<unsigned char*>(Mask->GetScalarPointer(0, 0, 0));
 				vtkUnsignedCharArray *scalars = vtkUnsignedCharArray::SafeDownCast(Mask->GetPointData()->GetScalars());
 				vtkIdType cptStencil = 0;
 				brushOutput->GetDimensions(dims);
-				cout << "Rubber mask output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << endl;
+				cout << "Rubber mask output dimensions:" << dims[0] << "," << dims[1] << "," << dims[2] << Qt::endl;
 				int maskOn = this->Getmui_MaskOn();
 				int maskInside = this->Getmui_MaskInside();
 				for (int z = 0; z < dims[2]; z++)
@@ -14620,7 +14620,7 @@ void mqMorphoDigCore::rubberMaskVolumes()
 						}
 					}
 				}
-				cout << "Rubber mask output contains  found " << cptStencil << " points to mask = 0" << endl;
+				cout << "Rubber mask output contains  found " << cptStencil << " points to mask = 0" << Qt::endl;
 
 				
 				Mask->Modified();
@@ -14666,7 +14666,7 @@ void mqMorphoDigCore::rubberTagActors(int tag_inside)
 	poly.SetPointList(point_list);
 
 
-	cout << "Poly valide: " << poly.state << endl;
+	cout << "Poly valide: " << poly.state << Qt::endl;
 
 	if (this->Getmui_TagModeActivated() == 1 && poly.state == 1)// only for valid lasso selections!
 	{
@@ -14679,7 +14679,7 @@ void mqMorphoDigCore::rubberTagActors(int tag_inside)
 		int modified = 0;
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor:" << i << endl;
+			cout << "try to get next actor:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			//myActor->SetSelected(0); we don't unselect after a cut
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
@@ -14719,7 +14719,7 @@ void mqMorphoDigCore::rubberTagActors(int tag_inside)
 						this->GetWorldToDisplay(ve_final_pos[0], ve_final_pos[1], ve_final_pos[2], ve_proj_screen);
 						if (i < 10)
 						{
-							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << endl;
+							cout << "ve_proj_screen " << i << "=" << ve_proj_screen[0] << "," << ve_proj_screen[1] << "," << ve_proj_screen[2] << Qt::endl;
 						}
 						proj_screen.x = ve_proj_screen[0];
 						proj_screen.y = ve_proj_screen[1];
@@ -14780,7 +14780,7 @@ void mqMorphoDigCore::addConvexHull()
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "try to get next actor:" << i << endl;
+		cout << "try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -14804,7 +14804,7 @@ void mqMorphoDigCore::addConvexHull()
 				{
 					reduction_factor = 1 - new_factor;
 				}
-				cout << "try to update quadric decimation by a factor of " << reduction_factor << endl;
+				cout << "try to update quadric decimation by a factor of " << reduction_factor << Qt::endl;
 				new_factor = 0.9;
 
 				if (new_factor < 1)
@@ -14817,17 +14817,17 @@ void mqMorphoDigCore::addConvexHull()
 				{
 					delaunay3D->SetInputData(mymapper->GetInput());
 				}
-				cout << "try to update Delaunay 3D" << endl;
+				cout << "try to update Delaunay 3D" << Qt::endl;
 				delaunay3D->Update();
-				cout << "Delaunay 3D updated" << endl;
+				cout << "Delaunay 3D updated" << Qt::endl;
 
 				vtkSmartPointer<vtkGeometryFilter> geometryFilter =
 				vtkSmartPointer<vtkGeometryFilter>::New();
 
 				geometryFilter->SetInputConnection(delaunay3D->GetOutputPort());
-				cout << "Try to update geometry filter" << endl;
+				cout << "Try to update geometry filter" << Qt::endl;
 				geometryFilter->Update();
-				cout << "Geometry filter updated" << endl;
+				cout << "Geometry filter updated" << Qt::endl;
 				
 
 
@@ -14869,7 +14869,7 @@ void mqMorphoDigCore::addConvexHull()
 				newmapper->ScalarVisibilityOn();
 				VTK_CREATE(vtkPolyData, myData);
 				myData = geometryFilter->GetOutput();
-				cout << "myConvexHull: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "myConvexHull: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 				newmapper->SetInputData(myData);
 				
@@ -14905,7 +14905,7 @@ void mqMorphoDigCore::addConvexHull()
 				
 
 				newactor->SetName("CH" + myActor->GetName());
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 				
@@ -14919,7 +14919,7 @@ void mqMorphoDigCore::addConvexHull()
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -14932,16 +14932,16 @@ void mqMorphoDigCore::addConvexHull()
 
 		
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -14955,14 +14955,14 @@ void mqMorphoDigCore::addMirror(int plane)
 	//plane : 0 along YZ (along X)
 	//plane : 1 along XZ (along Y)
 	//plane : 2 along YZ (along Z)
-	cout << "Miccor along : " << plane << endl;
+	cout << "Miccor along : " << plane << Qt::endl;
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	this->ActorCollection->InitTraversal();
 	vtkIdType num = this->ActorCollection->GetNumberOfItems();
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Mirror XZ try to get next actor:" << i << endl;
+		cout << "Mirror XZ try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -15010,7 +15010,7 @@ void mqMorphoDigCore::addMirror(int plane)
 				mfilter->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
 				if (plane == 0)
 				{
-					cout << "Set plane to X" << endl;
+					cout << "Set plane to X" << Qt::endl;
 					mfilter->SetPlaneToX();
 				}
 				else if (plane ==1)
@@ -15032,7 +15032,7 @@ void mqMorphoDigCore::addMirror(int plane)
 				//MyObj = fgeo->GetOutput();
 
 				myData = fgeo->GetOutput();
-				cout << "myMirror: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "myMirror: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 				
 
@@ -15101,7 +15101,7 @@ void mqMorphoDigCore::addMirror(int plane)
 				}
 				else if (plane == 0)
 				{
-					cout << "X" << endl;
+					cout << "X" << Qt::endl;
 					n1 = -1 * MatOrig->GetElement(0, 3);// -X for the translation term
 					n2 = -1 * MatOrig->GetElement(0, 1);// matrix
 					n3 = -1 * MatOrig->GetElement(0, 2);// matrix
@@ -15137,7 +15137,7 @@ void mqMorphoDigCore::addMirror(int plane)
 
 
 				newactor->SetName(myActor->GetName()+"_mir");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 
@@ -15151,7 +15151,7 @@ void mqMorphoDigCore::addMirror(int plane)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -15164,16 +15164,16 @@ void mqMorphoDigCore::addMirror(int plane)
 
 			
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -15252,9 +15252,9 @@ bool mqMorphoDigCore::RecoverLandmarks(vtkSmartPointer< vtkPoints > landmarks_li
 
 				double lmtargetpos[3];
 				myTargetActor->GetLMOrigin(lmtargetpos);
-				//cout << "source" << i <<":"<< lmsourcepos[0] << "," << lmsourcepos[1] << "," << lmsourcepos[2] << endl;
+				//cout << "source" << i <<":"<< lmsourcepos[0] << "," << lmsourcepos[1] << "," << lmsourcepos[2] << Qt::endl;
 				landmarks_list_source->SetPoint(cpt, lmsourcepos);
-				//cout << "target" << i << ":" << lmtargetpos[0] << ","<< lmtargetpos[1]<<","<< lmtargetpos[2]<< endl;
+				//cout << "target" << i << ":" << lmtargetpos[0] << ","<< lmtargetpos[1]<<","<< lmtargetpos[2]<< Qt::endl;
 				landmarks_list_target->SetPoint(cpt, lmtargetpos);
 				cpt++;
 			}
@@ -15312,7 +15312,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Fill holes try to get next actor:" << i << endl;
+		cout << "Fill holes try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -15353,7 +15353,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 				newmapper->ScalarVisibilityOn();
 
-				cout << "TPS basis=" << r<< endl;
+				cout << "TPS basis=" << r<< Qt::endl;
 			
 				/// TPS
 				vtkSmartPointer<vtkThinPlateSplineTransform> tps =
@@ -15444,7 +15444,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 				myData = cleanPolyDataFilter->GetOutput();
 
-				cout << "TPS: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "TPS: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 
 
@@ -15479,7 +15479,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 
 				newactor->SetName(myActor->GetName() + "_tps");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 
@@ -15493,7 +15493,7 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -15506,16 +15506,16 @@ void mqMorphoDigCore::addTPS(int r, double factor, int all)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -15535,7 +15535,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Fill holes try to get next actor:" << i << endl;
+		cout << "Fill holes try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -15576,7 +15576,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 
 				newmapper->ScalarVisibilityOn();
 				
-				cout << "holes max size =" << maxsize << endl;
+				cout << "holes max size =" << maxsize << Qt::endl;
 				vtkSmartPointer<vtkFillHolesFilter> fillholes =
 					vtkSmartPointer<vtkFillHolesFilter>::New();
 				fillholes->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
@@ -15606,8 +15606,8 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 
 				myData = cleanPolyDataFilter->GetOutput();
 				//myData = fillholes->GetOutput();
-				cout << "original surface holes: nv=" << mymapper->GetInput()->GetNumberOfPoints() << endl;
-				cout << "fill holes: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "original surface holes: nv=" << mymapper->GetInput()->GetNumberOfPoints() << Qt::endl;
+				cout << "fill holes: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 			
 
 
@@ -15642,7 +15642,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 
 
 				newactor->SetName(myActor->GetName() + "_holesfilled");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 
@@ -15656,7 +15656,7 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -15669,16 +15669,16 @@ void mqMorphoDigCore::addFillHoles(int maxsize)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -15698,7 +15698,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 	for (vtkIdType i = 0; i < num; i++)
 	{
 		int ok_to_add = 1;
-		cout << "Densify try to get next actor:" << i << endl;
+		cout << "Densify try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -15715,7 +15715,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 					featureEdges->ManifoldEdgesOff();
 					featureEdges->NonManifoldEdgesOn();
 					featureEdges->Update();
-					cout << "Feature edges: nr of points in non manyfold edges" << featureEdges->GetOutput()->GetNumberOfPoints() << endl;
+					cout << "Feature edges: nr of points in non manyfold edges" << featureEdges->GetOutput()->GetNumberOfPoints() << Qt::endl;
 					if (featureEdges->GetOutput()->GetNumberOfPoints()>0)
 					{
 						msg_nonmanifold = 1;
@@ -15754,7 +15754,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 
 					newmapper->ScalarVisibilityOn();
 
-					cout << "densification subdivisions=" << subdivisions << endl;
+					cout << "densification subdivisions=" << subdivisions << Qt::endl;
 					vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
 					if (method == 0) // classic densify polydata
 					{
@@ -15780,10 +15780,10 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 						featureEdges->ManifoldEdgesOff();
 						featureEdges->NonManifoldEdgesOn();
 						featureEdges->Update();
-						cout << "Feature edges: nr of points in non manyfold edges" << featureEdges->GetOutput()->GetNumberOfPoints() << endl;
+						cout << "Feature edges: nr of points in non manyfold edges" << featureEdges->GetOutput()->GetNumberOfPoints() << Qt::endl;
 
-						cout << "Triangles numpoints" << triangles->GetOutput()->GetNumberOfPoints() << endl;
-						cout << "Triangles numcells" << triangles->GetOutput()->GetNumberOfCells() << endl;
+						cout << "Triangles numpoints" << triangles->GetOutput()->GetNumberOfPoints() << Qt::endl;
+						cout << "Triangles numcells" << triangles->GetOutput()->GetNumberOfCells() << Qt::endl;
 						vtkSmartPointer<vtkSphereSource> sphereSource =
 							vtkSmartPointer<vtkSphereSource>::New();
 						sphereSource->Update();
@@ -15795,8 +15795,8 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 						linear->SetNumberOfSubdivisions(subdivisions);
 						linear->SetCheckForTriangles(false);
 						linear->Update();
-						cout << "Linear numpoints" << linear->GetOutput()->GetNumberOfPoints() << endl;
-						cout << "Linear numcells" << linear->GetOutput()->GetNumberOfCells() << endl;
+						cout << "Linear numpoints" << linear->GetOutput()->GetNumberOfPoints() << Qt::endl;
+						cout << "Linear numcells" << linear->GetOutput()->GetNumberOfCells() << Qt::endl;
 						if (linear->GetOutput()->GetNumberOfPoints() > 0)
 						{
 							cleanPolyDataFilter->SetInputData(linear->GetOutput());
@@ -15822,8 +15822,8 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 						//loop->SetInputData(sphereSource->GetOutput()); 
 						loop->SetNumberOfSubdivisions(subdivisions);
 						loop->Update();
-						cout << "Loop numpoints" << loop->GetOutput()->GetNumberOfPoints() << endl;
-						cout << "Loop numcells" << loop->GetOutput()->GetNumberOfCells() << endl;
+						cout << "Loop numpoints" << loop->GetOutput()->GetNumberOfPoints() << Qt::endl;
+						cout << "Loop numcells" << loop->GetOutput()->GetNumberOfCells() << Qt::endl;
 
 						cleanPolyDataFilter->SetInputData(loop->GetOutput());
 					}
@@ -15841,8 +15841,8 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 
 						butterfly->SetNumberOfSubdivisions(subdivisions);
 						butterfly->Update();
-						cout << "butterfly numpoints" << butterfly->GetOutput()->GetNumberOfPoints() << endl;
-						cout << "butterfly numcells" << butterfly->GetOutput()->GetNumberOfCells() << endl;
+						cout << "butterfly numpoints" << butterfly->GetOutput()->GetNumberOfPoints() << Qt::endl;
+						cout << "butterfly numcells" << butterfly->GetOutput()->GetNumberOfCells() << Qt::endl;
 						cleanPolyDataFilter->SetInputData(butterfly->GetOutput());
 					}
 
@@ -15860,7 +15860,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 
 					myData = cleanPolyDataFilter->GetOutput();
 
-					cout << "densify: nv=" << myData->GetNumberOfPoints() << endl;
+					cout << "densify: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 					//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 					newmapper->SetInputData(myData);
 
@@ -15886,7 +15886,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 
 
 					newactor->SetName(myActor->GetName() + "_densify");
-					cout << "try to add new actor=" << endl;
+					cout << "try to add new actor=" << Qt::endl;
 					newcoll->AddTmpItem(newactor);
 					modified = 1;
 				}//ok to add
@@ -15906,7 +15906,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -15919,16 +15919,16 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -15942,7 +15942,7 @@ void mqMorphoDigCore::addDensify(int subdivisions, int method)
 void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 {
 	int modified = 0;
-	cout << "Add iso surface" << endl;
+	cout << "Add iso surface" << Qt::endl;
 	vtkMDVolume *myVolume = this->GetFirstSelectedVolume();
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	if (myVolume != NULL) // from menu => then unselect first selected volume!
@@ -15975,7 +15975,7 @@ void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 
 		newmapper->ScalarVisibilityOn();
 		
-		cout << "threshold =" << threshold << endl;
+		cout << "threshold =" << threshold << Qt::endl;
 		vtkSmartPointer<vtkFlyingEdges3D > isoFFilter =
 			vtkSmartPointer<vtkFlyingEdges3D >::New();
 		vtkSmartPointer<vtkMarchingCubes > isoMCFilter =
@@ -16023,7 +16023,7 @@ void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 
 		myData = cleanPolyDataFilter->GetOutput();
 
-		cout << "decimate: nv=" << myData->GetNumberOfPoints() << endl;
+		cout << "decimate: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 		//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 
 		newmapper->SetInputData(myData);
@@ -16052,7 +16052,7 @@ void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 
 
 		newactor->SetName(myVolume->GetName() + "_iso");
-		cout << "try to add new actor=" << endl;
+		cout << "try to add new actor=" << Qt::endl;
 		if (myData->GetNumberOfPoints() > 50)
 		{
 			newcoll->AddTmpItem(newactor);
@@ -16065,7 +16065,7 @@ void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 			vtkIdType num = newcoll->GetNumberOfItems();
 			for (vtkIdType i = 0; i < num; i++)
 			{
-				cout << "try to get next actor from newcoll:" << i << endl;
+				cout << "try to get next actor from newcoll:" << i << Qt::endl;
 				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -16078,16 +16078,16 @@ void  mqMorphoDigCore::addIsosurface(int flyingEdges, double threshold)
 
 
 			}
-			//cout << "camera and grid adjusted" << endl;
-			cout << "new actor added" << endl;
+			//cout << "camera and grid adjusted" << Qt::endl;
+			cout << "new actor added" << Qt::endl;
 			this->Initmui_ExistingArrays();
 
-			cout << "Set actor collection changed" << endl;
+			cout << "Set actor collection changed" << Qt::endl;
 			this->getActorCollection()->SetChanged(1);
-			cout << "Actor collection changed" << endl;
+			cout << "Actor collection changed" << Qt::endl;
 
 			this->AdjustCameraAndGrid();
-			cout << "Camera and grid adjusted" << endl;
+			cout << "Camera and grid adjusted" << Qt::endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
@@ -16107,7 +16107,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Decimate try to get next actor:" << i << endl;
+		cout << "Decimate try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -16149,7 +16149,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 				double mfactor = (100 - factor)/100;
 				if (mfactor == 0 || mfactor == 1) { mfactor = 0.9; }
 				mfactor = 1 - mfactor;
-				cout << "decimation factor=" << mfactor << endl;
+				cout << "decimation factor=" << mfactor << Qt::endl;
 				vtkSmartPointer<vtkDecimatePro> decimate =
 					vtkSmartPointer<vtkDecimatePro>::New();
 				decimate->SetInputData(vtkPolyData::SafeDownCast(mymapper->GetInput()));
@@ -16191,7 +16191,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 
 				myData = cleanPolyDataFilter->GetOutput();
 
-				cout << "decimate: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "decimate: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 
 
@@ -16227,7 +16227,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 
 				
 				newactor->SetName(myActor->GetName() + "_decimate");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 
@@ -16241,7 +16241,7 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -16254,16 +16254,16 @@ void  mqMorphoDigCore::addDecimate(int quadric, double factor)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -16281,7 +16281,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Smooth try to get next actor:" << i << endl;
+		cout << "Smooth try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -16346,7 +16346,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 
 				myData = cleanPolyDataFilter->GetOutput();
 
-				cout << "smooth: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "smooth: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 
 
@@ -16382,7 +16382,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 
 
 				newactor->SetName(myActor->GetName() + "_smooth");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 
@@ -16396,7 +16396,7 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -16409,16 +16409,16 @@ void  mqMorphoDigCore::addSmooth(int iteration, double relaxation)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -16442,7 +16442,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 	
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Largest region of next actor:" << i << endl;
+		cout << "Largest region of next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -16609,7 +16609,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 						newactor->SetName(myActor->GetName() + "_" + std::to_string(cpt));
-						//cout << "try to add new actor=" << endl;
+						//cout << "try to add new actor=" << Qt::endl;
 						newcoll->AddTmpItem(newactor);
 						modified = 1;
 					
@@ -16641,7 +16641,7 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -16654,16 +16654,16 @@ void mqMorphoDigCore::addDecompose(int color_mode, int min_region_size)
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -16805,7 +16805,7 @@ void mqMorphoDigCore::GetVertexColor(vtkMDActor *myActor, vtkIdType ve, int colo
 						na = (unsigned char)(255 * mymapper->GetLookupTable()->GetOpacity(cscalar));
 						if (ve<10)
 						{
-							cout << "ve=" << ve << ", cRGB[0]=" << cRGB[0] << endl;
+							cout << "ve=" << ve << ", cRGB[0]=" << cRGB[0] << Qt::endl;
 						}
 
 						// translate it as RGB
@@ -16856,11 +16856,11 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "RGB distance" << i << endl;
+		cout << "RGB distance" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
-			cout << "Set selected 0 for actor  " << i << endl;
+			cout << "Set selected 0 for actor  " << i << Qt::endl;
 
 			myActor->SetSelected(0);
 			myActor->SaveState(Count, QString(mScalarName.c_str()));
@@ -16906,7 +16906,7 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 				// 2 => "Minimum_Curvature"
 				// 3 => "Gauss_Curvature"
 				// 4 => "Mean_Curvature"
-				cout << "actor " << i << "is modified" << endl;
+				cout << "actor " << i << "is modified" << Qt::endl;
 				modified = 1;
 
 			}
@@ -16916,8 +16916,8 @@ void mqMorphoDigCore::scalarsRGB(QString newRGB)
 	if (modified == 1)
 	{
 
-		//cout << "camera and grid adjusted" << endl;
-		cout << "RGB scalars created" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "RGB scalars created" << Qt::endl;
 
 		this->Initmui_ExistingArrays();
 		this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_UNSIGNED_CHAR, 4);
@@ -16957,10 +16957,10 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString s
 	{
 
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		cout << "i=" << endl;
+		cout << "i=" << Qt::endl;
 		if (myActor->GetSelected() == 1)
 		{
-			cout << "i is selected" << endl;
+			cout << "i is selected" << Qt::endl;
 
 			//myActor->SaveState(Count, scalarName);
 			vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
@@ -17187,7 +17187,7 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString s
 					{
 						newactor->SetName(myActor->GetName() + "_area");
 					}
-					cout << "try to add new actor=" << endl;
+					cout << "try to add new actor=" << Qt::endl;
 					newcoll->AddTmpItem(newactor);
 
 
@@ -17209,8 +17209,8 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString s
 
 		if (type == 0 || type == 2)
 		{
-			//cout << "camera and grid adjusted" << endl;
-			cout << "scalars updated " << endl;
+			//cout << "camera and grid adjusted" << Qt::endl;
+			cout << "scalars updated " << Qt::endl;
 
 			this->Initmui_ExistingArrays();
 			this->Setmui_ActiveArrayAndRender(scalarName.toStdString().c_str(), VTK_DOUBLE, 1);
@@ -17221,7 +17221,7 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString s
 			vtkIdType num = newcoll->GetNumberOfItems();
 			for (vtkIdType i = 0; i < num; i++)
 			{
-				cout << "try to get next actor from newcoll:" << i << endl;
+				cout << "try to get next actor from newcoll:" << i << Qt::endl;
 				vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 				myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 				myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -17234,16 +17234,16 @@ void mqMorphoDigCore::scalarsAreaVolume(int type, int min_region_size, QString s
 
 
 			}
-			//cout << "camera and grid adjusted" << endl;
-			cout << "new actor(s) added" << endl;
+			//cout << "camera and grid adjusted" << Qt::endl;
+			cout << "new actor(s) added" << Qt::endl;
 			this->Initmui_ExistingArrays();
 
-			cout << "Set actor collection changed" << endl;
+			cout << "Set actor collection changed" << Qt::endl;
 			this->getActorCollection()->SetChanged(1);
-			cout << "Actor collection changed" << endl;
+			cout << "Actor collection changed" << Qt::endl;
 
 			this->AdjustCameraAndGrid();
-			cout << "Camera and grid adjusted" << endl;
+			cout << "Camera and grid adjusted" << Qt::endl;
 
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
@@ -17275,7 +17275,7 @@ void mqMorphoDigCore::scalarsCurvature(int curvatureType, QString scalarName)
 	int Count = BEGIN_UNDO_SET(action);
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Curvature " << i << endl;
+		cout << "Curvature " << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -17300,7 +17300,7 @@ void mqMorphoDigCore::scalarsCurvature(int curvatureType, QString scalarName)
 				vtkSmartPointer<vtkPolyData> MyObj = vtkSmartPointer<vtkPolyData>::New();
 				MyObj = curvaturesFilter->GetOutput();
 
-				//cout << "curv   c" << endl;
+				//cout << "curv   c" << Qt::endl;
 				// Get active scalars of output
 				vtkFloatArray *freshScalars;
 				freshScalars = (vtkFloatArray*)MyObj->GetPointData()->GetScalars();
@@ -17334,8 +17334,8 @@ void mqMorphoDigCore::scalarsCurvature(int curvatureType, QString scalarName)
 	if (modified == 1)
 	{
 
-		//cout << "camera and grid adjusted" << endl;
-		cout << "scalars updated " << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "scalars updated " << Qt::endl;
 
 		this->Initmui_ExistingArrays();
 		this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_FLOAT, 1);
@@ -17374,16 +17374,16 @@ void mqMorphoDigCore::scalarsNormalization(QString scalarName, double oldMin, do
 		int Count = BEGIN_UNDO_SET(action);
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "Scalar smooth :" << i << endl;
+			cout << "Scalar smooth :" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-			cout << "Got next actor:" << i << endl;
+			cout << "Got next actor:" << i << Qt::endl;
 			if (myActor != NULL && myActor->GetSelected() == 1)
 			{
 				myActor->SetSelected(0);
 				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 				{
-					cout << "found mapper for :" << i << endl;
+					cout << "found mapper for :" << i << Qt::endl;
 					vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
 					mPD = mymapper->GetInput();
 
@@ -17397,7 +17397,7 @@ void mqMorphoDigCore::scalarsNormalization(QString scalarName, double oldMin, do
 					}
 					if (currentScalars != NULL)
 					{
-						cout << "found scalars for :" << i << endl;
+						cout << "found scalars for :" << i << Qt::endl;
 
 						double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
@@ -17481,7 +17481,7 @@ void mqMorphoDigCore::scalarsNormalization(QString scalarName, double oldMin, do
 		{
 			this->Initmui_ExistingArrays();
 			this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
-			cout << "scalars updated " << endl;
+			cout << "scalars updated " << Qt::endl;
 			this->Render();
 		}
 
@@ -17514,7 +17514,7 @@ void mqMorphoDigCore::scalarsCameraDistance()
 	int Count = BEGIN_UNDO_SET(action);
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Camera distance" << i << endl;
+		cout << "Camera distance" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -17588,8 +17588,8 @@ void mqMorphoDigCore::scalarsCameraDistance()
 	if (modified == 1)
 	{
 		
-		//cout << "camera and grid adjusted" << endl;
-		cout << "scalars updated " << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "scalars updated " << Qt::endl;
 
 		this->Initmui_ExistingArrays();
 		this->Setmui_ActiveArrayAndRender("Depth", VTK_DOUBLE, 1);
@@ -17736,8 +17736,8 @@ vtkSmartPointer<vtkIdList> mqMorphoDigCore::GetConnectedVertices(vtkSmartPointer
 	{
 		auto norms = vtkFloatArray::SafeDownCast(mesh->GetPointData()->GetNormals());
 
-		//cout << "Have tried to get norms" << endl;
-		//cout << "Safe point downcast done ! " << endl;
+		//cout << "Have tried to get norms" << Qt::endl;
+		//cout << "Safe point downcast done ! " << Qt::endl;
 		if (norms)
 		{
 			//if (ve<10){std::cout << "Connected vertices: ";}		
@@ -17812,8 +17812,8 @@ void mqMorphoDigCore::RemoveArray(QString arrayName, int onlySelectedObjects)
 	if (modified == 1)
 	{
 
-		//cout << "camera and grid adjusted" << endl;
-		cout << "scalars modified " << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "scalars modified " << Qt::endl;
 		this->Initmui_ExistingArrays();		
 
 	}
@@ -17841,9 +17841,9 @@ void mqMorphoDigCore::createTagsConnectivity(QString newTags)
 		{
 			if (myActor->GetConnectivityFilter() == nullptr)
 			{
-				cout << "Try to build connectivity filter!" << endl;
+				cout << "Try to build connectivity filter!" << Qt::endl;
 				myActor->BuildConnectivityFilter();
-				cout << "Connectivity filter built" << endl;
+				cout << "Connectivity filter built" << Qt::endl;
 			}
 
 			myActor->SetSelected(0);
@@ -17868,17 +17868,17 @@ void mqMorphoDigCore::createTagsConnectivity(QString newTags)
 				}
 
 				//tag what's found in the cfilter output
-				//cout << "start new tags!" << endl;
+				//cout << "start new tags!" << Qt::endl;
 				vtkSmartPointer<vtkIdList> clist = myActor->GetConnectivityRegionsCorrList();
-				if (clist == nullptr) { cout << "clist is nullptr!" << endl; }
+				if (clist == nullptr) { cout << "clist is nullptr!" << Qt::endl; }
 				else
 				{
 					int numIDs = clist->GetNumberOfIds();
 					int numVeOrig = mymapper->GetInput()->GetNumberOfPoints();
-					//cout << "num VE in orig mesh:" << numVeOrig << endl;
-					//cout << "num corrlist ids:" << numIDs << endl;
+					//cout << "num VE in orig mesh:" << numVeOrig << Qt::endl;
+					//cout << "num corrlist ids:" << numIDs << Qt::endl;
 					int numTup = myActor->GetConnectivityRegions()->GetNumberOfTuples();
-					//cout << "num tups in connectivity regions:" << numTup << endl;
+					//cout << "num tups in connectivity regions:" << numTup << Qt::endl;
 					for (vtkIdType j = 0; j < myActor->GetConnectivityRegions()->GetNumberOfTuples(); j++)
 					{
 						vtkIdType k = myActor->GetConnectivityRegionsCorrList()->GetId(j);
@@ -17889,7 +17889,7 @@ void mqMorphoDigCore::createTagsConnectivity(QString newTags)
 						//newTagsArray->SetTuple1(j, myActor->GetConnectivityRegions()->GetTuple1(j));
 					}
 				}
-				//cout << "end new tags!" << endl;
+				//cout << "end new tags!" << Qt::endl;
 
 				newTagsArray->SetName(newTags.toStdString().c_str());
 				mymapper->GetInput()->GetPointData()->RemoveArray(newTags.toStdString().c_str());
@@ -18128,7 +18128,7 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 						//newTagsArray->SetTuple1(j, 0);
 
 					}
-					cout << "We found " << cdistinct << " distinct colors" << endl;
+					cout << "We found " << cdistinct << " distinct colors" << Qt::endl;
 					// then edit current Tag Map according to the cdistinct color found 
 					ActiveTagMap *tagMap = this->Getmui_ActiveTagMap();
 					int currenttagMapId = this->getActiveTagMapId();
@@ -18162,9 +18162,9 @@ void mqMorphoDigCore::createTagsFromRGB(QString newTags, int exact, int N)
 						tagNames.push_back(TagName.toStdString());
 						
 					}
-					cout << "End i loop" << endl;
+					cout << "End i loop" << Qt::endl;
 					QString TagMap = QString("TagMap");
-					cout << "Try to set existing color maps!!" << endl;
+					cout << "Try to set existing color maps!!" << Qt::endl;
 
 					this->Getmui_ExistingTagMaps()->Stack.at(currenttagMapId).numTags = tagnr;
 					this->Getmui_ExistingTagMaps()->Stack.at(currenttagMapId).tagNames = tagNames;
@@ -18366,9 +18366,9 @@ void mqMorphoDigCore::DeleteArray(vtkSmartPointer<vtkMDActor> actor, QString Arr
 	//this->Getmui_ActiveArray()->Name
 	 actor->GetMapper()->GetInput()->GetPointData()->RemoveArray(ArrayName.toStdString().c_str());
 	
-	 cout << "Try to init mui scalars" << endl;
+	 cout << "Try to init mui scalars" << Qt::endl;
 	this->Initmui_ExistingArrays();
-	cout << "Try to init mui scalars ok" << endl;
+	cout << "Try to init mui scalars ok" << Qt::endl;
 
 	
 }
@@ -18519,9 +18519,9 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 
 
 			kDTree->SetDataSet(observedMoved);
-			cout << "Start build kdtree"  << endl;
+			cout << "Start build kdtree"  << Qt::endl;
 			kDTree->BuildLocator();
-			cout << "KdTree built" << endl;
+			cout << "KdTree built" << Qt::endl;
 			for (ve = 0; ve < numvert; ve++)
 			{
 				min_dist = maxDist;
@@ -18597,7 +18597,7 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 				{
 					/*if (ve < 10)
 					{
-					cout << "try to sort thicknesses"  << endl;
+					cout << "try to sort thicknesses"  << Qt::endl;
 					}*/
 					std::sort(distances.begin(), distances.end());
 					double dist_avg = 0;
@@ -18632,8 +18632,8 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "DISTANCE scalars computed " << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "DISTANCE scalars computed " << Qt::endl;
 		this->Initmui_ExistingArrays();
 		this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 
@@ -18644,7 +18644,7 @@ void mqMorphoDigCore::scalarsDistance(double maxDist, int avg, QString scalarNam
 }
 void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_normals, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormals)
 {
-	cout << "Call scalarsThicknessBetween" << endl;
+	cout << "Call scalarsThicknessBetween" << Qt::endl;
 	if (impactedActor != NULL && observedActor != NULL)
 	{
 		std::string action = "Compute thickness for ";
@@ -18718,7 +18718,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 			{
 				min_cos = cos(angularLimit*vtkMath::Pi() / 180);
 			}
-			cout << "min_cos=" << min_cos << endl;
+			cout << "min_cos=" << min_cos << Qt::endl;
 			double cur_cos = 1.0; // compare ve1's normal and ve2's normal
 			double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
 			double AB[3];
@@ -18733,12 +18733,12 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 			auto observedNorms = observedActor->GetPointNormals(); 
 			//auto observedNorms = vtkFloatArray::SafeDownCast(mObservedPD->GetPointData()->GetNormals());
 			
-			//	cout << "Have tried to get norms" << endl;
-			//cout << "Safe point downcast done ! " << endl;
+			//	cout << "Have tried to get norms" << Qt::endl;
+			//cout << "Safe point downcast done ! " << Qt::endl;
 			//if (impactedNorms && observedNorms)
 			if (impactedNorms && observedNorms)
 			{
-				//	cout << "We have found some norms" << endl;
+				//	cout << "We have found some norms" << Qt::endl;
 
 				//QProgressDialog progress("Thickness computation.", "Abort thickness computation", 0, numvert);
 				//progress.setWindowModality(Qt::WindowModal);
@@ -18787,7 +18787,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 					if (ve < 10)
 					{
-						//cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+						//cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << Qt::endl;
 					}
 					vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
 					//ptn will be the average norm of all connected vertices.
@@ -18799,21 +18799,21 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					{
 						if (ve < 10)
 						{
-							//cout << "no ptn avg!" << endl;
+							//cout << "no ptn avg!" << Qt::endl;
 						}
 
 
 					}
 					mqMorphoDigCore::RotateNorm(impMat, ven_imp_init_pos, ptn);
 					if (ve < 10) {
-					//	cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << endl;
-					//	cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << endl;
+					//	cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << Qt::endl;
+					//	cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << Qt::endl;
 
 					}
 
 					if (ve < 10)
 					{
-						//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+						//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << Qt::endl;
 					}
 
 						////self thickness : look for norms in other directions!
@@ -18838,7 +18838,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					double newscalar = 0;
 					/*if (ve < 10)
 					{
-					cout << "found" << neighbours->GetNumberOfIds() << " neighbours" << endl;
+					cout << "found" << neighbours->GetNumberOfIds() << " neighbours" << Qt::endl;
 					}*/
 
 					std::vector<double> thicknesses;
@@ -18863,9 +18863,9 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 							ven_obs_init_pos[2] = ptn2[2];
 							mqMorphoDigCore::RotateNorm(obsMat, ven_obs_init_pos, ptn2obs);
 							if (ve<10 && j < 3) {
-							//	cout << "j=" << j << endl;
-							//	cout << "ven_obs_init_pos=" << ven_obs_init_pos[0] << "|" << ven_obs_init_pos[1] << "|" << ven_obs_init_pos[2] << "|" << endl;
-							//	cout << "ptn2obs=" << ptn2obs[0] << "|" << ptn2obs[1] << "|" << ptn2obs[2] << "|" << endl;
+							//	cout << "j=" << j << Qt::endl;
+							//	cout << "ven_obs_init_pos=" << ven_obs_init_pos[0] << "|" << ven_obs_init_pos[1] << "|" << ven_obs_init_pos[2] << "|" << Qt::endl;
+							//	cout << "ptn2obs=" << ptn2obs[0] << "|" << ptn2obs[1] << "|" << ptn2obs[2] << "|" << Qt::endl;
 
 							}
 
@@ -18901,8 +18901,8 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 								cur_cos2 = ABnorm[0] * ptn[0] + ABnorm[1] * ptn[1] + ABnorm[2] * ptn[2];
 
 								if (ve < 10 && j < 3) {
-								//	cout << "cur_cos=" << cur_cos << endl;
-								//	cout << "cur_cos2=" << cur_cos2 << endl;
+								//	cout << "cur_cos=" << cur_cos << Qt::endl;
+								//	cout << "cur_cos2=" << cur_cos2 << Qt::endl;
 								}
 
 								if (cur_cos > min_cos && cur_cos2 > min_cos )																	
@@ -18950,7 +18950,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					{
 						/*if (ve < 10)
 						{
-						cout << "try to sort thicknesses"  << endl;
+						cout << "try to sort thicknesses"  << Qt::endl;
 						}*/
 						std::sort(thicknesses.begin(), thicknesses.end());
 						double thick_avg = 0;
@@ -18964,7 +18964,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 						newScalars->InsertTuple1(ve, thick_avg);
 						if (ve < 10)
 						{
-							//cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << endl;
+							//cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << Qt::endl;
 						}
 
 					}
@@ -18994,19 +18994,19 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 			}
 			else
 			{
-				cout << "found no norms!" << endl;
+				cout << "found no norms!" << Qt::endl;
 
 			}
 
 
 		}
 
-		//cout << "camera and grid adjusted" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
 		if (impactedActor != observedActor) // very important because in the opposite case, we call this function WITHIN A LOOP on the actor list... and InitMui_ExistingArrays also calls a LOOP on the actor list!
 		{
-			cout << "thickness scalars between computed: now call initmui_ExistingArrays " << endl;
+			cout << "thickness scalars between computed: now call initmui_ExistingArrays " << Qt::endl;
 			this->Initmui_ExistingArrays();
-			cout << "set ActiveScalarAndRender" << endl;
+			cout << "set ActiveScalarAndRender" << Qt::endl;
 			this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 		}
 	
@@ -19019,7 +19019,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 }
 void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, int mode)
 {
-	cout << "Call Boolean operation" << endl;
+	cout << "Call Boolean operation" << Qt::endl;
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	int modified = 0;
 	if (actorA != NULL && actorB != NULL && actorA != actorB)
@@ -19128,7 +19128,7 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 
 			myData = cleanPolyDataFilter->GetOutput();
 
-			cout << "Boolean output: nv=" << myData->GetNumberOfPoints() << endl;
+			cout << "Boolean output: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 			//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 
 			newmapper->SetInputData(myData);
@@ -19143,7 +19143,7 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 			newactor->SetSelected(0);
 
 			newactor->SetName(actorA->GetName() + "_boolean");
-			cout << "try to add new actor=" << endl;
+			cout << "try to add new actor=" << Qt::endl;
 			if (myData->GetNumberOfPoints() > 10)
 			{
 				newcoll->AddTmpItem(newactor);
@@ -19167,7 +19167,7 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -19178,16 +19178,16 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
 			END_UNDO_SET();
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -19200,7 +19200,7 @@ void mqMorphoDigCore::BooleanOperation(vtkMDActor *actorA, vtkMDActor *actorB, i
 }
 void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 {
-	cout << "Start recompute point normals" << endl;
+	cout << "Start recompute point normals" << Qt::endl;
 
 	auto pointNorms = vtkFloatArray::SafeDownCast(mesh->GetPointData()->GetNormals());
 	vtkSmartPointer<vtkFloatArray> newPointNorms = vtkSmartPointer<vtkFloatArray>::New();
@@ -19237,7 +19237,7 @@ void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 			{
 				if (ve < 10)
 				{
-					//cout << "Normalize norm" << endl;
+					//cout << "Normalize norm" << Qt::endl;
 				}
 				vtkMath::Normalize(norm);
 
@@ -19254,7 +19254,7 @@ void mqMorphoDigCore::RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh)
 }
 void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
 {
-	cout << "Start recompute cell normals" << endl;
+	cout << "Start recompute cell normals" << Qt::endl;
 	vtkSmartPointer<vtkFloatArray>cellNorms = vtkFloatArray::SafeDownCast(mesh->GetCellData()->GetNormals());
 	vtkSmartPointer<vtkFloatArray> newCellNorms = vtkSmartPointer<vtkFloatArray>::New();
 	
@@ -19292,7 +19292,7 @@ void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
 			{
 				if (ce < 10)
 				{
-					//cout << "Triangle compute normal" << endl;
+					//cout << "Triangle compute normal" << Qt::endl;
 				}
 				vtkTriangle::ComputeNormal(A, B, C, norm);
 			}			
@@ -19310,7 +19310,7 @@ void mqMorphoDigCore::RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh)
 }
 void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iteration, double stopCriterion, double radius, double angularLimit, double maxStepAmplitude, vtkMDActor *impactedActor, vtkMDActor* observedActor, int smoothWrapping)
 {
-	cout << "Call ShrinkWrap" << endl;
+	cout << "Call ShrinkWrap" << Qt::endl;
 	if (radius <= 0) { radius = 1; }
 	if (maxStepAmplitude <= 0) { maxStepAmplitude = radius; }
 	if (maxStepAmplitude > radius) { maxStepAmplitude = radius; }
@@ -19391,7 +19391,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			int lmk_cpt = 0;
 		for (vtkIdType it=0; it<iteration;it++)
 		{
-			cout << "ITERATIVE SHRINK WRAP ITERATION " << it << endl;
+			cout << "ITERATIVE SHRINK WRAP ITERATION " << it << Qt::endl;
 			// now transform the norms
 			this->RecomputeCellNormals(impactedMoved);
 			this->RecomputePointNormals(impactedMoved);
@@ -19420,7 +19420,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 				{
 					min_cos = cos(angularLimit*vtkMath::Pi() / 180);
 				}
-				cout << "min_cos=" << min_cos << endl;
+				cout << "min_cos=" << min_cos << Qt::endl;
 
 				double cur_cos = 1.0; // compare ve1's normal and ve2's normal
 				double cur_cos2 = 1.0; //compare  ve1's normal and vector between ve1 and ve2
@@ -19435,7 +19435,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 				auto observedNorms = vtkFloatArray::SafeDownCast(observedMoved->GetPointData()->GetNormals());
 				if (impactedNorms && observedNorms)
 				{
-					cout << "ITERATION "<< it<< ", We have found some norms" << endl;
+					cout << "ITERATION "<< it<< ", We have found some norms" << Qt::endl;
 					vtkSmartPointer<vtkKdTreePointLocator> kDTree =
 						vtkSmartPointer<vtkKdTreePointLocator>::New();
 					kDTree->SetDataSet(observedMoved);
@@ -19450,7 +19450,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 					{
 						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							//cout << "ve=" << ve2 << endl;
+							//cout << "ve=" << ve2 << Qt::endl;
 							emit iterativeShrinkWrapProgression((int)(100 * ve2 / impactedNumvert));
 						}
 						impactedMoved->GetPoint(ve2, imp_pt);
@@ -19494,7 +19494,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							vtkIdType obsVerId = observedNeighbours->GetId(j);
 							if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 							{
-								//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
+								//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << Qt::endl;
 							}
 							observedMoved->GetPoint(obsVerId, obs_pt);
 							baryCentre[0] += obs_pt[0];
@@ -19519,7 +19519,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							vtkIdType obsVerId = observedNeighbours->GetId(j);
 							if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 							{
-								//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
+								//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << Qt::endl;
 							}
 							observedMoved->GetPoint(obsVerId, obs_pt);
 							ptn = observedNorms->GetTuple3(obsVerId);
@@ -19555,12 +19555,12 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 								
 								if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 								{
-								/*	cout << "cur_cos=" << cur_cos << endl;
-									cout << "cur_cos2=" << cur_cos2 << endl;
-									cout << "min_cos=" << min_cos << endl;
-									cout << "curr_dist=" << curr_dist << endl;
-									cout << "factor=" << factor << endl;
-									cout << "ABnorm[0]=" << ABnorm[0] << "ABnorm[1]=" << ABnorm[1] << "ABnorm[2]=" << ABnorm[2] << endl;*/
+								/*	cout << "cur_cos=" << cur_cos << Qt::endl;
+									cout << "cur_cos2=" << cur_cos2 << Qt::endl;
+									cout << "min_cos=" << min_cos << Qt::endl;
+									cout << "curr_dist=" << curr_dist << Qt::endl;
+									cout << "factor=" << factor << Qt::endl;
+									cout << "ABnorm[0]=" << ABnorm[0] << "ABnorm[1]=" << ABnorm[1] << "ABnorm[2]=" << ABnorm[2] << Qt::endl;*/
 								}		
 
 								currAmpl += factor;
@@ -19574,7 +19574,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						{
 							currAmpl /= toto;
 							if (currAmpl > maxStepAmplitude) { currAmpl = maxStepAmplitude; }
-							//cout << "REAL MOVE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt=" << toto << endl;
+							//cout << "REAL MOVE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt=" << toto << Qt::endl;
 						}						
 						else
 						{
@@ -19587,7 +19587,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 
 						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
+							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << Qt::endl;
 						}
 						//Stratégie B (non finie)
 						/*kDTree->FindPointsWithinRadius(radius, imp_pt, observedNeighbours);
@@ -19596,18 +19596,18 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						vtkIdType cpt_candidates = 0;
 						if (((int)ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							//cout << "ve=" << ve2 << ", neighbours" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << endl;
+							//cout << "ve=" << ve2 << ", neighbours" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << Qt::endl;
 						}
 						if (observedNeighbours->GetNumberOfIds() > 0)
 						{
-							cout << "ve=" << ve2 << ", KD tree neighbours:" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << endl;
+							cout << "ve=" << ve2 << ", KD tree neighbours:" << observedNeighbours->GetNumberOfIds() << ", imp_pt:" << imp_pt[0] << "," << imp_pt[1] << "," << imp_pt[2] << Qt::endl;
 						}
 						for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 						{
 							vtkIdType obsVerId = observedNeighbours->GetId(j);
 							if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 							{
-							//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << endl;
+							//	cout << "first observed neighbour init_pos=" << init_pos[0] << "," << init_pos[1] << "," << init_pos[2] << Qt::endl;
 							}
 							observedMoved->GetPoint(obsVerId, obs_pt);
 							ptn = observedNorms->GetTuple3(obsVerId);
@@ -19647,16 +19647,16 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 								 
 
 								double factor = cur_cos2*curr_dist;
-								cout << "cur_cos2=" << cur_cos2 << "," << "curr_dist=" << curr_dist <<  ", factor=" << factor << endl;
+								cout << "cur_cos2=" << cur_cos2 << "," << "curr_dist=" << curr_dist <<  ", factor=" << factor << Qt::endl;
 
 								if (((int)ve2 % (int)(impactedNumvert / 10)) == 0 && j == 0)
 								{
-									cout << "cur_cos=" << cur_cos << endl;
-									cout << "cur_cos2=" << cur_cos2 << endl;
-									cout << "min_cos=" << min_cos << endl;
-									cout << "curr_dist=" << curr_dist << endl;
-									cout << "factor=" << factor << endl;
-									cout << "ABnorm[0]=" << ABnorm[0] << "ABnorm[1]=" << ABnorm[1] << "ABnorm[2]=" << ABnorm[2] << endl;
+									cout << "cur_cos=" << cur_cos << Qt::endl;
+									cout << "cur_cos2=" << cur_cos2 << Qt::endl;
+									cout << "min_cos=" << min_cos << Qt::endl;
+									cout << "curr_dist=" << curr_dist << Qt::endl;
+									cout << "factor=" << factor << Qt::endl;
+									cout << "ABnorm[0]=" << ABnorm[0] << "ABnorm[1]=" << ABnorm[1] << "ABnorm[2]=" << ABnorm[2] << Qt::endl;
 
 								}
 								// we have a candidate!
@@ -19677,13 +19677,13 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						{
 							currAmpl /= cpt_candidates;
 							if (currAmpl > maxStepAmplitude) { currAmpl = maxStepAmplitude; }
-							cout << "REAL MOVE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt="<< cpt_candidates << endl;
+							cout << "REAL MOVE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt="<< cpt_candidates << Qt::endl;
 						}
 						else if (cpt_realneighbors == 0)
 						{
 							if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 							{
-								//cout << "currampl=" << currAmpl << ", ve=" << ve2 << "NO REAL NEIGHBOUR FOUND" << endl;
+								//cout << "currampl=" << currAmpl << ", ve=" << ve2 << "NO REAL NEIGHBOUR FOUND" << Qt::endl;
 							}
 							// this case should not happen but should be totally trust the KD Tree ? 
 							currAmpl = maxStepAmplitude; 
@@ -19694,9 +19694,9 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 							currAmpl = 0; // case where there are real neighbors around but no one is satisfying the desirfed angular condition(s).
 							if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 							{
-								//cout << "currampl=" << currAmpl << ", ve=" << ve2 << "Neigh exist but are not satisfactory" << endl;
+								//cout << "currampl=" << currAmpl << ", ve=" << ve2 << "Neigh exist but are not satisfactory" << Qt::endl;
 							}
-							cout << "NO CANDIDATE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt=" << cpt_candidates << endl;
+							cout << "NO CANDIDATE currampl=" << currAmpl << ", ve=" << ve2 << ", cpt=" << cpt_candidates << Qt::endl;
 						}
 
 
@@ -19704,7 +19704,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 
 						if ((ve2 % (int)(impactedNumvert / 10)) == 0)
 						{
-							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << endl;
+							//cout << "currampl=" << currAmpl << ", ve=" << ve2 << Qt::endl;
 						}
 
 						*/
@@ -19738,15 +19738,15 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 						proj_pt[0] = imp_pt[0] - imp_norm[0] * ampli;
 						proj_pt[1] = imp_pt[1] - imp_norm[1] * ampli;
 						proj_pt[2] = imp_pt[2] - imp_norm[2] * ampli;
-						//if (ampli>0){ cout << "i=" << i << ", ampli=" << ampli << endl; }
+						//if (ampli>0){ cout << "i=" << i << ", ampli=" << ampli << Qt::endl; }
 						if ((i % (int)(impactedNumvert / 10)) == 0)
 						{
-							//	cout << "i=" << i << endl;
-							//	cout << "i="<<i<<", ampli="<<ampli << endl;
-							//	cout << "ven_imp_final_pos[0]=" << ven_imp_final_pos[0] << endl;
-							//	cout << "ve_imp_init_pos[0]=" << ve_imp_init_pos[0] << ", ve_imp_init_pos[1]=" << ve_imp_init_pos[1] << "ve_imp_init_pos[2]=" << ve_imp_init_pos[2] << endl;
+							//	cout << "i=" << i << Qt::endl;
+							//	cout << "i="<<i<<", ampli="<<ampli << Qt::endl;
+							//	cout << "ven_imp_final_pos[0]=" << ven_imp_final_pos[0] << Qt::endl;
+							//	cout << "ve_imp_init_pos[0]=" << ve_imp_init_pos[0] << ", ve_imp_init_pos[1]=" << ve_imp_init_pos[1] << "ve_imp_init_pos[2]=" << ve_imp_init_pos[2] << Qt::endl;
 
-							//	cout << "ve_imp_final_pos[0]=" << ve_imp_final_pos[0] << ", ve_imp_final_pos[1]=" << ve_imp_final_pos[1] << "ve_imp_final_pos[2]=" << ve_imp_final_pos[2] << endl;
+							//	cout << "ve_imp_final_pos[0]=" << ve_imp_final_pos[0] << ", ve_imp_final_pos[1]=" << ve_imp_final_pos[1] << "ve_imp_final_pos[2]=" << ve_imp_final_pos[2] << Qt::endl;
 
 						}
 						impactedMoved->GetPoints()->SetPoint((vtkIdType)i, proj_pt);
@@ -19830,7 +19830,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 
 				myData = cleanPolyDataFilter->GetOutput();
 
-				cout << "shrink wrap output: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "shrink wrap output: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 
 				newmapper->SetInputData(myData);
@@ -19845,7 +19845,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 				newactor->SetSelected(0);
 
 				newactor->SetName(impactedActor->GetName() + "_shrinkwrap");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 			}
@@ -19859,7 +19859,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -19870,16 +19870,16 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
 			END_UNDO_SET();
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -19893,7 +19893,7 @@ void mqMorphoDigCore::ShrinkWrapIterative(QString scalarName, int mode, int iter
 }
 void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *impactedActor, vtkMDActor* observedActor)
 {
-	cout << "Call ShrinkWrap" << endl;
+	cout << "Call ShrinkWrap" << Qt::endl;
 	vtkSmartPointer<vtkMDActorCollection> newcoll = vtkSmartPointer<vtkMDActorCollection>::New();
 	int modified = 0;
 	if (impactedActor != NULL && observedActor != NULL && impactedActor != observedActor)
@@ -19993,7 +19993,7 @@ void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *i
 
 				myData = cleanPolyDataFilter->GetOutput();
 
-				cout << "shrink wrap output: nv=" << myData->GetNumberOfPoints() << endl;
+				cout << "shrink wrap output: nv=" << myData->GetNumberOfPoints() << Qt::endl;
 				//newmapper->SetInputConnection(delaunay3D->GetOutputPort());
 
 				newmapper->SetInputData(myData);
@@ -20008,7 +20008,7 @@ void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *i
 				newactor->SetSelected(0);
 
 				newactor->SetName(impactedActor->GetName() + "_shrinkwrap");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1; 
 		}
@@ -20022,7 +20022,7 @@ void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *i
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -20033,16 +20033,16 @@ void mqMorphoDigCore::ShrinkWrap(int iteration, double relaxation, vtkMDActor *i
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
 			END_UNDO_SET();
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -20061,7 +20061,7 @@ std::vector<std::string> mqMorphoDigCore::getActorNames()
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Get actor name :" << i << endl;
+		cout << "Get actor name :" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		myList.push_back(myActor->GetName());
 	}
@@ -20075,7 +20075,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Get first actor from name:" << i << endl;
+		cout << "Get first actor from name:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetName().compare(actorName.toStdString())==0)
 		{
@@ -20088,7 +20088,7 @@ vtkMDActor* mqMorphoDigCore::getFirstActorFromName(QString actorName)
 }
 void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normals, int avg, QString scalarName, double angularLimit )
 {
-	cout << "thickness scalars start " << endl;
+	cout << "thickness scalars start " << Qt::endl;
 	std::string mScalarName = "Thickness";
 	if (scalarName.length() >0)
 	{
@@ -20100,13 +20100,13 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normals,
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "scalarsThickness:" << i << endl;
+		cout << "scalarsThickness:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor!=NULL && myActor->GetSelected() == 1)
 		{
 			myActor->SetSelected(0);
 			// here we can call : 
-			cout << "thickness scalars between called " << endl;
+			cout << "thickness scalars between called " << Qt::endl;
 			this->scalarsThicknessBetween( max_thickness,  smooth_normals,  avg,  scalarName,  myActor, myActor, angularLimit);
 			modified = 1;
 
@@ -20115,10 +20115,10 @@ void mqMorphoDigCore::scalarsThickness(double max_thickness, int smooth_normals,
 	if (modified == 1)
 	{
 
-		//cout << "camera and grid adjusted" << endl;
-		cout << "thickness within scalars computed, call initExistingArrays " << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "thickness within scalars computed, call initExistingArrays " << Qt::endl;
 		this->Initmui_ExistingArrays();
-		cout << "Active scalars and render" << endl;
+		cout << "Active scalars and render" << Qt::endl;
 		this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 		
 	}
@@ -20130,7 +20130,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 	//mode = 2: local area / sphere area (surface_area / surface_area_sphere;
 	//mode = 3: local sphere shape index ( sqrt_surface_area / (cbrt_volume_sphere*2.199085233)
 	double defaultSearchSize = this->ActorCollection->GetBoundingBoxLength()/40;
-	cout << "COmplexity scalars start " << endl;
+	cout << "COmplexity scalars start " << Qt::endl;
 	std::string mScalarName = "Complexity";
 	if (scalarName.length() >0)
 	{
@@ -20142,7 +20142,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "scalarsComplexity:" << i << endl;
+		cout << "scalarsComplexity:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -20151,19 +20151,19 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 			if (customLocalAreaLimit == 1 && localAreaLimit > 0)
 			{
 				searchSize = localAreaLimit;
-				cout << "Custom search size :" << searchSize << endl;
+				cout << "Custom search size :" << searchSize << Qt::endl;
 			}
 			else
 			{
 				
 				searchSize = myActor->GetXYZAvgPCLength()/18; // looks like a reasonable neighbourhood sphere radius size.
-				cout << "Search size based on myActor GetXYZAvgPCLength / 18:" << searchSize << endl;
+				cout << "Search size based on myActor GetXYZAvgPCLength / 18:" << searchSize << Qt::endl;
 			}
 
 			cout << "searchSize=" << searchSize;
 			myActor->SetSelected(0);
 			// here we can call : 
-			cout << "scalars complexity start" << endl;
+			cout << "scalars complexity start" << Qt::endl;
 			std::string action = "Compute complexity for ";
 			action.append(myActor->GetName().c_str());
 			int Count = BEGIN_UNDO_SET(action);
@@ -20200,7 +20200,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 					tt0 = clock();
 					if (i % 1000 == 0)
 					{
-						cout << "complexity, vertex:" << i << endl;
+						cout << "complexity, vertex:" << i << Qt::endl;
 					}
 					// for every triangle 
 					mPD->GetPoint(i, ve_pos);
@@ -20222,11 +20222,11 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 					t1 = clock();
 					if (i % 1000 == 0)
 					{
-						cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds() << endl;
+						cout << "number of neighbours:" << observedNeighbours->GetNumberOfIds() << Qt::endl;
 					//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
-					//	cout << "sec0=" << sec0 << endl;
+					//	cout << "sec0=" << sec0 << Qt::endl;
 					}
-					//cout << "mode = " << mode << endl;
+					//cout << "mode = " << mode << Qt::endl;
 					// now extract surface
 					//compute surface
 					int printmode = 0;
@@ -20241,7 +20241,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 					currentComplexity = this->ComputeComplexity(mPD, observedNeighbours,Radius,  mode, printmode);
 					if (i % 1000 == 0)
 					{
-						cout << "currentComplexity:" << currentComplexity << endl;
+						cout << "currentComplexity:" << currentComplexity << Qt::endl;
 					}
 
 					newScalars->InsertTuple1(i, currentComplexity);
@@ -20250,7 +20250,7 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 					if (i % 1000 == 0)
 					{
 						ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
-						cout << "Total time for 1 vertex:" << ssec0 << endl;
+						cout << "Total time for 1 vertex:" << ssec0 << Qt::endl;
 						
 					}
 				}
@@ -20284,10 +20284,10 @@ void mqMorphoDigCore::scalarsComplexity(double localAreaLimit, int customLocalAr
 	if (modified == 1)
 	{
 
-		//cout << "camera and grid adjusted" << endl;
-		cout << "thickness within scalars computed, call initExistingArrays " << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "thickness within scalars computed, call initExistingArrays " << Qt::endl;
 		this->Initmui_ExistingArrays();
-		cout << "Active scalars and render" << endl;
+		cout << "Active scalars and render" << Qt::endl;
 		this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
 
 	}
@@ -20434,7 +20434,7 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 
 
 		double volume_convex_hull = massPropConvexHull->GetVolume();
-		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << Qt::endl;
 		double cbrt_volume_convex_hull = cbrt(volume_convex_hull);
 		double custom_complexity = sqrt_surface_area / (cbrt_volume_convex_hull*2.199085233);
 		double surface_ratio = 1;
@@ -20446,10 +20446,10 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 		if (printmode == 1)
 		{
 			cout << "convex hulls were computed... mode=" << mode <<  endl;
-			cout << "sec1:" << sec1 << endl;
-			cout << "sec2:" << sec2 << endl;
-			cout << "sec3:" << sec3 << endl;
-			cout << "sec4:" << sec4 << endl;
+			cout << "sec1:" << sec1 << Qt::endl;
+			cout << "sec2:" << sec2 << Qt::endl;
+			cout << "sec3:" << sec3 << Qt::endl;
+			cout << "sec4:" << sec4 << Qt::endl;
 		}
 		if (mode == 1) { return custom_complexity; }
 		else { return surface_ratio; }
@@ -20465,7 +20465,7 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 
 
 		double volume_sphere = 4* vtkMath::Pi() * sphere_radius*sphere_radius*sphere_radius/3;
-		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << endl;
+		//cout << myActor->GetName().c_str() << " volume=" << massProp->GetVolume() << " volume_convex_hull=" << massPropConvexHull->GetVolume() << Qt::endl;
 		double cbrt_volume_sphere = 1;
 		double custom_complexity = 1;
 		if (volume_sphere > 0)
@@ -20482,11 +20482,11 @@ double mqMorphoDigCore::ComputeComplexity(vtkSmartPointer<vtkPolyData> mPD, vtkS
 		sec4 = (double)(t5 - t4) / CLOCKS_PER_SEC;
 		if (printmode == 1)
 		{
-			cout << "sphere ratios... mode=" <<mode<< endl;
-			cout << "sec1:" << sec1 << endl;
-			cout << "sec2:" << sec2 << endl;
-			cout << "sec3:" << sec3 << endl;
-			cout << "sec4:" << sec4 << endl;
+			cout << "sphere ratios... mode=" <<mode<< Qt::endl;
+			cout << "sec1:" << sec1 << Qt::endl;
+			cout << "sec2:" << sec2 << Qt::endl;
+			cout << "sec3:" << sec3 << Qt::endl;
+			cout << "sec4:" << sec4 << Qt::endl;
 		}
 		if (mode == 3) { return custom_complexity; }
 		else { return surface_ratio; }
@@ -20599,8 +20599,8 @@ vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inpu
 
 	vtkIdType numTuples = inputArray->GetNumberOfTuples();
 	vtkIdType numVert = mPD->GetNumberOfPoints();
-	cout << "scalarSmooth : numTuples=" << numTuples << endl;;
-	cout << "scalarSmooth : numVert=" << numTuples << endl;;
+	cout << "scalarSmooth : numTuples=" << numTuples << Qt::endl;;
+	cout << "scalarSmooth : numVert=" << numTuples << Qt::endl;;
 
 	double cutMin = DBL_MAX;
 	double cutMax = -DBL_MAX;
@@ -20620,7 +20620,7 @@ vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inpu
 		}
 		cutMin = (double)vals.at(iMin);
 		cutMax = (double)vals.at(iMax);
-		cout << "Will cut between " << cutMin << ", and " << cutMax << endl;
+		cout << "Will cut between " << cutMin << ", and " << cutMax << Qt::endl;
 
 	}
 
@@ -20722,7 +20722,7 @@ vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inpu
 		if (this->Ui->localCustom->isChecked()) { mode = 2; }*/
 		double searchSize = localAreaLimit;
 		
-		cout << "mode=" << mode << ", searchSize=" << searchSize << endl;
+		cout << "mode=" << mode << ", searchSize=" << searchSize << Qt::endl;
 		double numvert = inputArray->GetNumberOfTuples();
 
 
@@ -20740,7 +20740,7 @@ vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inpu
 			//tt0 = clock();
 			/*if (i % 1000 == 0)
 			{
-			cout << "complexity, vertex:" << i << endl;
+			cout << "complexity, vertex:" << i << Qt::endl;
 			}*/
 			// for every triangle 
 			mPD->GetPoint(i, ve_pos);
@@ -20762,11 +20762,11 @@ vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inpu
 			//t1 = clock();
 			if (i % 10000 == 0)
 			{
-				cout << "number of neighbours(" << i << "): " << observedNeighbours->GetNumberOfIds() << endl;
+				cout << "number of neighbours(" << i << "): " << observedNeighbours->GetNumberOfIds() << Qt::endl;
 				//	sec0 = (double)(t1 - t0) / CLOCKS_PER_SEC;
-				//	cout << "sec0=" << sec0 << endl;
+				//	cout << "sec0=" << sec0 << Qt::endl;
 			}
-			//cout << "mode = " << mode << endl;
+			//cout << "mode = " << mode << Qt::endl;
 			// now extract surface
 			//compute surface
 			int printmode = 0;
@@ -20788,7 +20788,7 @@ vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inpu
 			}
 			if (i % 10000 == 0)
 			{
-				cout << "currentMean:" << currentMean << endl;
+				cout << "currentMean:" << currentMean << Qt::endl;
 			}
 			if (cutMinMax == 1)
 			{
@@ -20801,7 +20801,7 @@ vtkSmartPointer<vtkDoubleArray> mqMorphoDigCore::scalarSmooth(vtkDataArray *inpu
 			/*if (i % 1000 == 0)
 			{
 			ssec0 = (double)(tt1 - tt0) / CLOCKS_PER_SEC;
-			cout << "Total time for 1 vertex:" << ssec0 << endl;
+			cout << "Total time for 1 vertex:" << ssec0 << Qt::endl;
 
 			}*/
 		}
@@ -20845,9 +20845,9 @@ void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, i
 
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "Scalar smooth :" << i << endl;
+			cout << "Scalar smooth :" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-			cout << "Got next actor:" << i << endl;
+			cout << "Got next actor:" << i << Qt::endl;
 			if (myActor!=NULL && myActor->GetSelected() == 1)
 			{
 
@@ -20856,7 +20856,7 @@ void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, i
 				vtkPolyDataMapper *mymapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 				if (mymapper != NULL && vtkPolyData::SafeDownCast(mymapper->GetInput()) != NULL)
 				{
-					cout << "found mapper for :" << i << endl;
+					cout << "found mapper for :" << i << Qt::endl;
 					vtkSmartPointer<vtkPolyData> mPD = vtkSmartPointer<vtkPolyData>::New();
 					mPD = mymapper->GetInput();
 
@@ -20871,7 +20871,7 @@ void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, i
 					if (currentScalars!=NULL)
 					{
 					
-						cout << "found scalars for :" << i << endl;
+						cout << "found scalars for :" << i << Qt::endl;
 
 						double numvert = mymapper->GetInput()->GetNumberOfPoints();
 
@@ -20930,7 +20930,7 @@ void mqMorphoDigCore::scalarsSmooth(QString scalarName, double localAreaLimit, i
 
 			this->Initmui_ExistingArrays();
 			this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_DOUBLE, 1);
-			cout << "scalars updated " << endl;
+			cout << "scalars updated " << Qt::endl;
 			this->Render();
 		}
 		END_UNDO_SET();
@@ -20947,7 +20947,7 @@ void mqMorphoDigCore::addKeepLargest()
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Largest region of next actor:" << i << endl;
+		cout << "Largest region of next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -21038,7 +21038,7 @@ void mqMorphoDigCore::addKeepLargest()
 
 
 				newactor->SetName(myActor->GetName() + "_largest");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 
@@ -21052,7 +21052,7 @@ void mqMorphoDigCore::addKeepLargest()
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -21065,16 +21065,16 @@ void mqMorphoDigCore::addKeepLargest()
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -21103,7 +21103,7 @@ void mqMorphoDigCore::sendSignalVolumesMightHaveChanged()
 }
 void mqMorphoDigCore::sendSignalVolumeUpdateHistogram()
 {
-	cout << "Emit volumeUpdateHistogram" << endl;
+	cout << "Emit volumeUpdateHistogram" << Qt::endl;
 	emit this->volumeUpdateHistogram();
 }
 void mqMorphoDigCore::addInvert()
@@ -21114,7 +21114,7 @@ void mqMorphoDigCore::addInvert()
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Invert next actor:" << i << endl;
+		cout << "Invert next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -21219,7 +21219,7 @@ void mqMorphoDigCore::addInvert()
 				//newactor->SetName(myActor->GetName() + "_inv");
 				//std::string newname = this->CheckingName(myActor->GetName());
 				newactor->SetName(myActor->GetName() + "_inv");
-				cout << "try to add new actor=" << endl;
+				cout << "try to add new actor=" << Qt::endl;
 				newcoll->AddTmpItem(newactor);
 				modified = 1;
 
@@ -21233,7 +21233,7 @@ void mqMorphoDigCore::addInvert()
 		vtkIdType num = newcoll->GetNumberOfItems();
 		for (vtkIdType i = 0; i < num; i++)
 		{
-			cout << "try to get next actor from newcoll:" << i << endl;
+			cout << "try to get next actor from newcoll:" << i << Qt::endl;
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(newcoll->GetNextActor());
 			myActor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			myActor->SetDisplayMode(this->mui_DisplayMode);
@@ -21246,16 +21246,16 @@ void mqMorphoDigCore::addInvert()
 
 
 		}
-		//cout << "camera and grid adjusted" << endl;
-		cout << "new actor(s) added" << endl;
+		//cout << "camera and grid adjusted" << Qt::endl;
+		cout << "new actor(s) added" << Qt::endl;
 		this->Initmui_ExistingArrays();
 
-		cout << "Set actor collection changed" << endl;
+		cout << "Set actor collection changed" << Qt::endl;
 		this->getActorCollection()->SetChanged(1);
-		cout << "Actor collection changed" << endl;
+		cout << "Actor collection changed" << Qt::endl;
 
 		this->AdjustCameraAndGrid();
-		cout << "Camera and grid adjusted" << endl;
+		cout << "Camera and grid adjusted" << Qt::endl;
 
 		if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 		{
@@ -21279,7 +21279,7 @@ to achieve desired the correct rendering. Do not understand why yet.
 	int modified = 0;
 	for (vtkIdType i = 0; i < num; i++)
 	{
-		cout << "Mirror XZ try to get next actor:" << i << endl;
+		cout << "Mirror XZ try to get next actor:" << i << Qt::endl;
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		if (myActor->GetSelected() == 1)
 		{
@@ -21346,7 +21346,7 @@ to achieve desired the correct rendering. Do not understand why yet.
 					ve3 = newpoints->GetId(2);
 					if (i==10)
 					{
-						std::cout << "i:" << i << "AFTER: ve1=" << ve1 << "|ve2=" << ve2 << "|ve3=" << ve3 << endl;
+						std::cout << "i:" << i << "AFTER: ve1=" << ve1 << "|ve2=" << ve2 << "|ve3=" << ve3 << Qt::endl;
 
 					}
 				}
@@ -21361,7 +21361,7 @@ to achieve desired the correct rendering. Do not understand why yet.
 					ve3 = newpoints->GetId(2);
 					if (i == 10)
 					{
-						std::cout << "i:" << i << "AFTER: ve1=" << ve1 << "|ve2=" << ve2 << "|ve3=" << ve3 << endl;
+						std::cout << "i:" << i << "AFTER: ve1=" << ve1 << "|ve2=" << ve2 << "|ve3=" << ve3 << Qt::endl;
 
 					}
 				}
@@ -21385,7 +21385,7 @@ to achieve desired the correct rendering. Do not understand why yet.
 
 void mqMorphoDigCore::groupSelectedActors()
 {
-	cout << "Group 1" << endl;
+	cout << "Group 1" << Qt::endl;
 	int numsel = this->ActorCollection->GetNumberOfSelectedActors();
 	if (numsel < 2)
 	{
@@ -21407,13 +21407,13 @@ void mqMorphoDigCore::groupSelectedActors()
 			
 		
 		}
-		cout << "Group 2" << endl;
+		cout << "Group 2" << Qt::endl;
 
 		vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
 		int Ok = 1;
 		int modified = 0;
 
-		//cout << "myActor is null" << endl;
+		//cout << "myActor is null" << Qt::endl;
 
 		this->ActorCollection->InitTraversal();
 		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
@@ -21421,7 +21421,7 @@ void mqMorphoDigCore::groupSelectedActors()
 			vtkMDActor *myActor2 = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			if (myActor2->GetSelected() == 1)
 			{
-				cout << "Group 3" << i<< endl;
+				cout << "Group 3" << i<< Qt::endl;
 				vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor2->GetMapper());
 				if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 				{
@@ -21441,16 +21441,16 @@ void mqMorphoDigCore::groupSelectedActors()
 					}
 					// if we do not do that for each "toSave" before including them inside the "mergedObjects", vtkPolyDataNormals will crash... 
 					vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-					cout << "Group 4bis2" << endl;
+					cout << "Group 4bis2" << Qt::endl;
 					ObjNormals->SetInputData(toSave);
 					ObjNormals->ComputePointNormalsOn();
 					ObjNormals->ComputeCellNormalsOn();
 					ObjNormals->AutoOrientNormalsOn();
 					ObjNormals->ConsistencyOff();
-					cout << "Group 4bis5" << endl;
+					cout << "Group 4bis5" << Qt::endl;
 					ObjNormals->Update();
 
-					cout << " toSave->GetNumberOfPoints()=" << toSave->GetNumberOfPoints() << endl;
+					cout << " toSave->GetNumberOfPoints()=" << toSave->GetNumberOfPoints() << Qt::endl;
 					mergedObjects->AddInputData(ObjNormals->GetOutput());
 					//mergedObjects->AddInputData(toSave);
 					modified = 1;
@@ -21461,15 +21461,15 @@ void mqMorphoDigCore::groupSelectedActors()
 		}
 		if (modified == 1)
 		{
-			cout << "Group 4" << endl;
+			cout << "Group 4" << Qt::endl;
 			
 			mergedObjects->Update();
 			
-			cout << "Group 4bis" << endl;
+			cout << "Group 4bis" << Qt::endl;
 			// in group actor, we still need vtkPolyDataNormals
 
 
-			cout << "Group 4ter" << endl;
+			cout << "Group 4ter" << Qt::endl;
 			VTK_CREATE(vtkMDActor, newactor);
 			if (this->mui_BackfaceCulling == 0)
 			{
@@ -21479,7 +21479,7 @@ void mqMorphoDigCore::groupSelectedActors()
 			{
 				newactor->GetProperty()->BackfaceCullingOn();
 			}
-			cout << "Group 5" << endl;
+			cout << "Group 5" << Qt::endl;
 			VTK_CREATE(vtkPolyDataMapper, newmapper);
 			newmapper->SetColorModeToDefault();
 
@@ -21498,7 +21498,7 @@ void mqMorphoDigCore::groupSelectedActors()
 
 			newmapper->ScalarVisibilityOn();
 
-			cout << "Group 6" << endl;
+			cout << "Group 6" << Qt::endl;
 			newmapper->SetInputData(mergedObjects->GetOutput());
 			//newmapper->SetInputData(ObjNormals->GetOutput());
 
@@ -21517,27 +21517,27 @@ void mqMorphoDigCore::groupSelectedActors()
 
 			std::string actorName = this->CheckingName(newActorName.toStdString());
 			newactor->SetName(actorName);
-			cout << "Group 7" << endl;
-			cout << "try to add new actor=" << endl;
+			cout << "Group 7" << Qt::endl;
+			cout << "try to add new actor=" << Qt::endl;
 			newactor->SetColorProperties(this->mui_Ambient, this->mui_Diffuse, this->mui_Specular, this->mui_SpecularPower);
 			newactor->SetDisplayMode(this->mui_DisplayMode);
-			cout << "Group 7 display passed" << endl;
+			cout << "Group 7 display passed" << Qt::endl;
 			this->getActorCollection()->AddItem(newactor);
 			std::string action = "Grouped actor added: " + newactor->GetName();
 			int mCount = BEGIN_UNDO_SET(action);
 			this->getActorCollection()->CreateLoadUndoSet(mCount, 1);
 			END_UNDO_SET();
-			cout << "new actor(s) added" << endl;
+			cout << "new actor(s) added" << Qt::endl;
 			this->Initmui_ExistingArrays();
 
-			cout << "Set actor collection changed" << endl;
+			cout << "Set actor collection changed" << Qt::endl;
 			this->getActorCollection()->SetChanged(1);
-			cout << "Actor collection changed" << endl;
+			cout << "Actor collection changed" << Qt::endl;
 
 			this->AdjustCameraAndGrid();
-			cout << "Camera and grid adjusted" << endl;
+			cout << "Camera and grid adjusted" << Qt::endl;
 
-			cout << "Group 8" << endl;
+			cout << "Group 8" << Qt::endl;
 			if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 			{
 				this->UpdateLandmarkSettings();
@@ -21568,12 +21568,12 @@ void mqMorphoDigCore::SaveVolume(QString fileName, int file_type, int compressio
 
 
 	int Ok = 1;
-	cout << "here am I" << endl;
+	cout << "here am I" << Qt::endl;
 	vtkMDVolume *myVolume2 = myVolume;
 
 	if (myVolume == NULL) // from menu => then save first selected volume!
 	{
-		cout << "myVolume is null => we save first selected volume!" << endl;
+		cout << "myVolume is null => we save first selected volume!" << Qt::endl;
 		myVolume2 = this->GetFirstSelectedVolume();
 
 
@@ -21703,11 +21703,11 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 	vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
 	int Ok = 1;
-	cout << "here am I" << endl;
+	cout << "here am I" << Qt::endl;
 
 	if (myActor == NULL)
 	{
-		cout << "myActor is null" << endl;
+		cout << "myActor is null" << Qt::endl;
 
 		this->ActorCollection->InitTraversal();
 		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
@@ -21720,7 +21720,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 					{
 						vtkSmartPointer<vtkPolyData> toSave = vtkSmartPointer<vtkPolyData>::New();
 						toSave->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
-						cout << "here am I 2" << endl;
+						cout << "here am I 2" << Qt::endl;
 						if (position_mode == 1)
 						{
 							double ve_init_pos[3];;
@@ -21736,7 +21736,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 								toSave->GetPoints()->SetPoint((vtkIdType)j, ve_final_pos);
 							}
 						}
-						cout << "here am I 3" << endl;
+						cout << "here am I 3" << Qt::endl;
 						// herea rare case where we need to compute normals (save merged surface)!
 						vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
 						ObjNormals->SetInputData(toSave);
@@ -21744,7 +21744,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 						ObjNormals->ComputeCellNormalsOn();
 						ObjNormals->AutoOrientNormalsOff();
 						ObjNormals->ConsistencyOff();
-						cout << "update normals " << endl;
+						cout << "update normals " << Qt::endl;
 						ObjNormals->Update();
 						mergedObjects->AddInputData(ObjNormals->GetOutput());
 				}
@@ -21754,7 +21754,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	else
 	{
 		
-			cout << "I am where I should be in the save single actor function!" << endl;
+			cout << "I am where I should be in the save single actor function!" << Qt::endl;
 			vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 			if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
 			{
@@ -21789,7 +21789,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		}
 
 	}
-	cout << "will call mergedobjects update" << endl;
+	cout << "will call mergedobjects update" << Qt::endl;
 	Ok = 1;
 	mergedObjects->Update();
 
@@ -21814,7 +21814,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 	{
 		for (int i = 0; i < scalarsToBeRemoved.size(); i++)
 		{
-			cout << "Removed scalar:" << scalarsToBeRemoved.at(i) << endl;
+			cout << "Removed scalar:" << scalarsToBeRemoved.at(i) << Qt::endl;
 			cleanPolyDataFilter->GetOutput()->GetPointData()->RemoveArray(scalarsToBeRemoved.at(i).c_str());
 		}
 	}
@@ -21861,7 +21861,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 					if (sActiveArray != none && 	mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()) != NULL)
 					{
 						RGB_fromglobal = 0;
-						cout << "RGB from global =0" << endl;
+						cout << "RGB from global =0" << Qt::endl;
 					}
 
 					//auto colors =	vtkSmartPointer<vtkUnsignedCharArray>::New();
@@ -21873,10 +21873,10 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 					vtkFloatArray *currentFScalars = vtkFloatArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
 					vtkDoubleArray *currentDScalars = vtkDoubleArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
 					vtkIntArray *currentTags = vtkIntArray::SafeDownCast(mapper->GetInput()->GetPointData()->GetScalars(sActiveArray.toStdString().c_str()));
-					if (currentRGBcolors == NULL) { cout << "ccurrentRGBcolors is null" << endl; }
-					if (currentFScalars == NULL) { cout << "ccurrentFcolors is null" << endl; }
-					if (currentDScalars == NULL) { cout << "ccurrentDcolors is null" << endl; }
-					if (currentTags == NULL) { cout << "currentTags is null" << endl; }
+					if (currentRGBcolors == NULL) { cout << "ccurrentRGBcolors is null" << Qt::endl; }
+					if (currentFScalars == NULL) { cout << "ccurrentFcolors is null" << Qt::endl; }
+					if (currentDScalars == NULL) { cout << "ccurrentDcolors is null" << Qt::endl; }
+					if (currentTags == NULL) { cout << "currentTags is null" << Qt::endl; }
 
 						
 					
@@ -21948,7 +21948,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 										}
 										if (j<10)
 										{
-											cout << "j=" << j << ", cscalar=" << cscalar << endl;
+											cout << "j=" << j << ", cscalar=" << cscalar << Qt::endl;
 										}
 
 									}
@@ -21976,7 +21976,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 									na= (unsigned char)(255 * mapper->GetLookupTable()->GetOpacity(cscalar));
 									if (j<10)
 									{
-										cout << "j=" << j << ", cRGB[0]=" << cRGB[0] << endl;
+										cout << "j=" << j << ", cRGB[0]=" << cRGB[0] << Qt::endl;
 									}
 									// translate it as RGB
 
@@ -22248,7 +22248,7 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 		else
 		{
 
-			cout << "Save surface file: No 4 colors found inside merged object" << endl;
+			cout << "Save surface file: No 4 colors found inside merged object" << Qt::endl;
 
 		}
 
@@ -22280,20 +22280,20 @@ void mqMorphoDigCore::Setmui_LastUsedDir(QString dir) { this->mui_LastUsedDir = 
 
 QString mqMorphoDigCore::Getmui_LastUsedDir() { return this->mui_LastUsedDir; }
 void mqMorphoDigCore::Setmui_X1Label(QString label) { this->mui_X1Label = label;
-//cout << "this->mui_X1Label " << this->mui_X1Label.toStdString() << endl;
+//cout << "this->mui_X1Label " << this->mui_X1Label.toStdString() << Qt::endl;
 }
 QString mqMorphoDigCore::Getmui_DefaultX1Label() { return this->mui_DefaultX1Label; }
 QString mqMorphoDigCore::Getmui_X1Label() { return this->mui_X1Label; }
 
 
 void mqMorphoDigCore::Setmui_X2Label(QString label) { this->mui_X2Label = label; 
-//cout << "this->mui_X2Label " << this->mui_X2Label.toStdString() << endl;
+//cout << "this->mui_X2Label " << this->mui_X2Label.toStdString() << Qt::endl;
 }
 QString mqMorphoDigCore::Getmui_DefaultX2Label() { return this->mui_DefaultX2Label; }
 QString mqMorphoDigCore::Getmui_X2Label() { return this->mui_X2Label; }
 
 void mqMorphoDigCore::Setmui_Y1Label(QString label) { this->mui_Y1Label = label; 
-//cout << "this->mui_Y1Label " << this->mui_Y1Label.toStdString() << endl;
+//cout << "this->mui_Y1Label " << this->mui_Y1Label.toStdString() << Qt::endl;
 }
 QString mqMorphoDigCore::Getmui_DefaultY1Label() { return this->mui_DefaultY1Label; }
 QString mqMorphoDigCore::Getmui_Y1Label() { return this->mui_Y1Label; }
@@ -22301,7 +22301,7 @@ QString mqMorphoDigCore::Getmui_Y1Label() { return this->mui_Y1Label; }
 
 void mqMorphoDigCore::Setmui_Y2Label(QString label) { this->mui_Y2Label = label; 
 
-//cout << "this->mui_Y2Label " << this->mui_Y2Label.toStdString() << endl;
+//cout << "this->mui_Y2Label " << this->mui_Y2Label.toStdString() << Qt::endl;
 }
 QString mqMorphoDigCore::Getmui_DefaultY2Label() { return this->mui_DefaultY2Label; }
 QString mqMorphoDigCore::Getmui_Y2Label() { return this->mui_Y2Label; }
@@ -22329,8 +22329,8 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	vtkSmartPointer<vtkAppendPolyData> mergedObjects = vtkSmartPointer<vtkAppendPolyData>::New();
 	int Ok = 1;
 	
-		//cout << "myActor is null" << endl;
-	cout << "Try to create merged object landmarks" << endl;
+		//cout << "myActor is null" << Qt::endl;
+	cout << "Try to create merged object landmarks" << Qt::endl;
 	if (this->ActorCollection->GetNumberOfItems() == 0) { return; }
 
 		this->ActorCollection->InitTraversal();
@@ -22365,14 +22365,14 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 					mqMorphoDigCore::RotateNorm(Mat, ven_init_pos, ven_final_pos);
 					if (i < 50 || i== 14044)
 					{
-						cout << "Pt init:" << endl;
-						cout << ve_init_pos[0] << ", " << ve_init_pos[1] << "," << ve_init_pos[2] << endl;
-						cout << "Pt final:" << endl;
-						cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << endl;
-						cout << "Ori init:" << endl;
-						cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
-						cout << "Ori final:" << endl;
-						cout << ven_final_pos[0] << ", " << ven_final_pos[1] << "," << ven_final_pos[2] << endl;
+						cout << "Pt init:" << Qt::endl;
+						cout << ve_init_pos[0] << ", " << ve_init_pos[1] << "," << ve_init_pos[2] << Qt::endl;
+						cout << "Pt final:" << Qt::endl;
+						cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << Qt::endl;
+						cout << "Ori init:" << Qt::endl;
+						cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << Qt::endl;
+						cout << "Ori final:" << Qt::endl;
+						cout << ven_final_pos[0] << ", " << ven_final_pos[1] << "," << ven_final_pos[2] << Qt::endl;
 
 					}
 					
@@ -22386,7 +22386,7 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 			
 		}		
 	
-	cout << "Update merged object" << endl;
+	cout << "Update merged object" << Qt::endl;
 	mergedObjects->Update();
 	//Other case where we need to recompute normals outside "vtkMDActor"
 	vtkSmartPointer<vtkPolyDataNormals> ObjNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -22417,15 +22417,15 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 	ven_init_pos[0] = mImpactedptn[0];
 	ven_init_pos[1] = mImpactedptn[1];
 	ven_init_pos[2] = mImpactedptn[2];
-	cout << "Normal 14044 of merged object:" << endl;
-	cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
+	cout << "Normal 14044 of merged object:" << Qt::endl;
+	cout << ven_init_pos[0] << ", " << ven_init_pos[1] << "," << ven_init_pos[2] << Qt::endl;
 
 	// 2 : build kdtree on merged object
 	vtkSmartPointer<vtkKdTreePointLocator> kDTree =
 		vtkSmartPointer<vtkKdTreePointLocator>::New();
-	cout << "Try to set KDTree" << endl;
+	cout << "Try to set KDTree" << Qt::endl;
 	kDTree->SetDataSet(cleanPolyDataFilter->GetOutput());
-	cout << "Try to build locator" << endl;
+	cout << "Try to build locator" << Qt::endl;
 	kDTree->BuildLocator();
 	
 	std::string action;
@@ -22438,23 +22438,23 @@ void mqMorphoDigCore::LandmarksPushBackOrReorient(int mode)
 		action = "Reorient landmarks according to closest point's normal";
 	}
 
-	cout << "Begin undo set" << endl;
+	cout << "Begin undo set" << Qt::endl;
 	int mCount = BEGIN_UNDO_SET(action);
 
 	//double Radius = this->ActorCollection->GetBoundingBoxLength()/20;
-	cout << "Normal landmarks" << endl;
+	cout << "Normal landmarks" << Qt::endl;
 	this->LandmarkPushBackOrReorient(mode, this->NormalLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
-	cout << "Target landmarks" << endl;
+	cout << "Target landmarks" << Qt::endl;
 	this->LandmarkPushBackOrReorient(mode, this->TargetLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
-	cout << "Node landmarks" << endl;
+	cout << "Node landmarks" << Qt::endl;
 	this->LandmarkPushBackOrReorient(mode, this->NodeLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
-	cout << "Handle landmarks" << endl;
+	cout << "Handle landmarks" << Qt::endl;
 	this->LandmarkPushBackOrReorient(mode, this->HandleLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
-	cout << "Flag landmarks" << endl;
+	cout << "Flag landmarks" << Qt::endl;
 	this->LandmarkPushBackOrReorient(mode, this->FlagLandmarkCollection, kDTree, cleanPolyDataFilter->GetOutput(), mCount);
 
 	END_UNDO_SET();
-	cout << "Done!" << endl;
+	cout << "Done!" << Qt::endl;
 	//kDTree->FindPointsWithinRadius(Radius, ve_imp_final_pos, observedNeighbours);
 }
 void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLMActorCollection> LmkCollection, vtkSmartPointer<vtkKdTreePointLocator> kDTree, vtkSmartPointer<vtkPolyData> PD, int mcount)
@@ -22463,7 +22463,7 @@ void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLM
 	//mode0: pushback
 	//mode 1: reorient
 	LmkCollection->InitTraversal();
-	cout << "Get impacted norms" << endl;
+	cout << "Get impacted norms" << Qt::endl;
 	auto impactedNorms = vtkFloatArray::SafeDownCast(PD->GetPointData()->GetNormals());
 
 	for (vtkIdType i = 0; i < LmkCollection->GetNumberOfItems(); i++)
@@ -22477,32 +22477,32 @@ void mqMorphoDigCore::LandmarkPushBackOrReorient(int mode, vtkSmartPointer<vtkLM
 			myLMK->GetLMOrigin(lmpos);
 			double lmori[3];
 			myLMK->GetLMOrientation(lmori);
-			cout << "Try to find closest point!" << endl;
+			cout << "Try to find closest point!" << Qt::endl;
 			vtkIdType k = kDTree->FindClosestPoint(lmpos);
-			cout << k << " is the closest"<< endl;
+			cout << k << " is the closest"<< Qt::endl;
 			
 			myLMK->SaveState(mcount);
 			
 			if (mode == 0)
 			{
 				double ve_final_pos[3];
-				cout << "Get point " <<k << endl;
+				cout << "Get point " <<k << Qt::endl;
 				PD->GetPoint(k, ve_final_pos);
-				cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << endl;
+				cout << ve_final_pos[0] << ", " << ve_final_pos[1] << "," << ve_final_pos[2] << Qt::endl;
 				myLMK->SetLMOrigin(ve_final_pos);
 			}
 			else
 			{
-				cout << "Get norm " << k << endl;
+				cout << "Get norm " << k << Qt::endl;
 				double *mImpactedptn = impactedNorms->GetTuple3(k);
 				double ven_final_pos[3];
 				ven_final_pos[0] = mImpactedptn[0];
 				ven_final_pos[1] = mImpactedptn[1];
 				ven_final_pos[2] = mImpactedptn[2];
-				cout << "Ori init:" << endl;
-				cout << lmori[0] << ", " << lmori[1] << "," << lmori[2] << endl;
-				cout << "Ori final:" << endl;
-				cout << ven_final_pos[0] << ", " << ven_final_pos[1]<<","<< ven_final_pos[2] << endl;
+				cout << "Ori init:" << Qt::endl;
+				cout << lmori[0] << ", " << lmori[1] << "," << lmori[2] << Qt::endl;
+				cout << "Ori final:" << Qt::endl;
+				cout << ven_final_pos[0] << ", " << ven_final_pos[1]<<","<< ven_final_pos[2] << Qt::endl;
 				myLMK->SetLMOrientation(ven_final_pos);
 			}
 			myLMK->Modified();
@@ -22532,16 +22532,16 @@ void mqMorphoDigCore::LandmarksMirror(int mode)
 		return;
 	}
 	this->LandmarksMirror(this->NormalLandmarkCollection,mode);
-	cout << "Target landmarks" << endl;
+	cout << "Target landmarks" << Qt::endl;
 	this->LandmarksMirror(this->TargetLandmarkCollection, mode);
 	
-	cout << "Node landmarks" << endl;
+	cout << "Node landmarks" << Qt::endl;
 	this->LandmarksMirror(this->NodeLandmarkCollection, mode);
 	
-	cout << "Handle landmarks" << endl;
+	cout << "Handle landmarks" << Qt::endl;
 	this->LandmarksMirror(this->HandleLandmarkCollection, mode);
 	
-	cout << "Flag landmarks" << endl;
+	cout << "Flag landmarks" << Qt::endl;
 	this->LandmarksMirror(this->FlagLandmarkCollection, mode);
 	this->Render();
 
@@ -22640,7 +22640,7 @@ void mqMorphoDigCore::CreateCurveHandles()
 
 	vtkSmartPointer<vtkLMActorCollection> nodes = vtkSmartPointer<vtkLMActorCollection>::New();	
 	nodes = this->NodeLandmarkCollection;
-		//cout << "myColl->GetNumberOfItems()=" << myColl->GetNumberOfItems() << endl;	
+		//cout << "myColl->GetNumberOfItems()=" << myColl->GetNumberOfItems() << Qt::endl;	
 	nodes->InitTraversal();
 	for (vtkIdType i = 0; i < nodes->GetNumberOfItems(); i++)
 	{
@@ -22773,7 +22773,7 @@ void mqMorphoDigCore::SelectSmallVolumes(double volume)
 }
 void mqMorphoDigCore::SelectLandmarkRange(int start, int end, int lm_type)
 {
-	//cout << "Select landmark range: " << start << ", " << end << ", " << lm_type << endl;
+	//cout << "Select landmark range: " << start << ", " << end << ", " << lm_type << Qt::endl;
 	vtkSmartPointer<vtkLMActorCollection> myColl = vtkSmartPointer<vtkLMActorCollection>::New();
 	if (lm_type==0)
 	{ 
@@ -22785,11 +22785,11 @@ void mqMorphoDigCore::SelectLandmarkRange(int start, int end, int lm_type)
 	}
 	else if (lm_type == 2)
 	{
-		//cout << "Node landmark!" << endl;
+		//cout << "Node landmark!" << Qt::endl;
 
 		
 		myColl = this->NodeLandmarkCollection;
-		//cout << "myColl->GetNumberOfItems()=" << myColl->GetNumberOfItems() << endl;
+		//cout << "myColl->GetNumberOfItems()=" << myColl->GetNumberOfItems() << Qt::endl;
 	}
 	else //if (lm_type == 3)
 	{
@@ -22806,7 +22806,7 @@ void mqMorphoDigCore::SelectLandmarkRange(int start, int end, int lm_type)
 			myActor->SetSelected(0);
 			myActor->SetChanged(1);
 			coll_modified = 1;
-			//cout << "Unselect one landmark:" << myActor->GetLMNumber() << endl;
+			//cout << "Unselect one landmark:" << myActor->GetLMNumber() << Qt::endl;
 
 		}
 	}
@@ -22815,14 +22815,14 @@ void mqMorphoDigCore::SelectLandmarkRange(int start, int end, int lm_type)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
 		int mynum = myActor->GetLMNumber();
-		//cout << "Actor number: " << mynum << endl;
+		//cout << "Actor number: " << mynum << Qt::endl;
 		if (myActor->GetLMNumber()<=end && myActor->GetLMNumber() >=start)
 		{
 
 			myActor->SetSelected(1);
 			myActor->SetChanged(1);
 			coll_modified = 1;
-			//cout << "Select one landmark:" << myActor->GetLMNumber() << endl;
+			//cout << "Select one landmark:" << myActor->GetLMNumber() << Qt::endl;
 		}
 	}
 	if (coll_modified == 1) {
@@ -22845,7 +22845,7 @@ void mqMorphoDigCore::CreateSurfaceUndoSet(int count_tot)
 	END_UNDO_SET();
 
 	this->AdjustCameraAndGrid();
-	//cout << "camera and grid adjusted" << endl;
+	//cout << "camera and grid adjusted" << Qt::endl;
 
 	if (this->Getmui_AdjustLandmarkRenderingSize() == 1)
 	{
@@ -22912,7 +22912,7 @@ void mqMorphoDigCore::CreateLandmarkUndoSet(int lmk_type, int count_tot, int cou
 void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_type, int node_type)
 {
 	
-	//cout << "CreateLandmark:" << lmk_type <<", "<< node_type << endl;
+	//cout << "CreateLandmark:" << lmk_type <<", "<< node_type << Qt::endl;
 	// lmk_type : 0 for normal landmarks
 	// lmk_type : 1 for target landmarks
 	// lmk_type : 2 for curve nodes
@@ -23031,7 +23031,7 @@ void mqMorphoDigCore::CreateLandmark(double coord[3], double ori[3], int lmk_typ
 	}
 	else 
 	{
-		//cout << "Set LM TYPE TO FLAG!" << endl;
+		//cout << "Set LM TYPE TO FLAG!" << Qt::endl;
 		myLM->SetLMType(FLAG_LMK);
 		std::string flag = "Flag ";
 		std::string flag_num = flag + std::to_string(num);
@@ -23282,11 +23282,11 @@ void mqMorphoDigCore::GetCenterOfMass(double center[3])
 	double actorsCOM[3] = { 0,0,0 };
 	double volumesCOM[3] = { 0,0,0 };
 	this->getActorCollection()->GetCenterOfMass(actorsCOM);
-	cout << "actorsCOM:" << actorsCOM[0] << "," << actorsCOM[1] << "," << actorsCOM[2] << "," << endl;
+	cout << "actorsCOM:" << actorsCOM[0] << "," << actorsCOM[1] << "," << actorsCOM[2] << "," << Qt::endl;
 	
 	this->getActorCollection()->GetCenterOfMass(newcamerafocalpoint);
 	this->getVolumeCollection()->GetCenterOfMass(volumesCOM);
-	cout << "volumesCOM:" << volumesCOM[0] << "," << volumesCOM[1] << "," << volumesCOM[2] << "," << endl;
+	cout << "volumesCOM:" << volumesCOM[0] << "," << volumesCOM[1] << "," << volumesCOM[2] << "," << Qt::endl;
 	if (this->getVolumeCollection()->GetNumberOfItems() > 0)
 	{
 		newcamerafocalpoint[0] += volumesCOM[0];
@@ -23302,7 +23302,7 @@ void mqMorphoDigCore::GetCenterOfMass(double center[3])
 	center[0] = newcamerafocalpoint[0];
 	center[1] = newcamerafocalpoint[1];
 	center[2] = newcamerafocalpoint[2];
-	cout << "centerofmass=" << center[0] << "," << center[1] << "," << center[2] << "," << endl;
+	cout << "centerofmass=" << center[0] << "," << center[1] << "," << center[2] << "," << Qt::endl;
 }
 
 void mqMorphoDigCore::ReplaceCameraAndGrid()
@@ -23311,7 +23311,7 @@ void mqMorphoDigCore::ReplaceCameraAndGrid()
 	if (this->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
 		this->GetCenterOfMass(newcamerafocalpoint);
-		cout << "Replace camera and grid : new Cam Foc Point" << newcamerafocalpoint[0] << "," << newcamerafocalpoint[1] << "," << newcamerafocalpoint[1] << "," << endl;
+		cout << "Replace camera and grid : new Cam Foc Point" << newcamerafocalpoint[0] << "," << newcamerafocalpoint[1] << "," << newcamerafocalpoint[1] << "," << Qt::endl;
 	}
 
 	double oldcampos[3];
@@ -23528,7 +23528,7 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 	com[0] = 0;
 	com[1] = 0;
 	com[2] = 0;
-	//cout << "start a com:" << endl;
+	//cout << "start a com:" << Qt::endl;
 	//double com[3] = { 0, 0,0 };	
 	//Conception weakness : call COM before VN otherwise computation may not have been triggered!!
 
@@ -23542,15 +23542,15 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 		com[1] += coma[1] * nva;
 		com[2] += coma[2] * nva;
 	}
-	//cout << " com:" << com[0] << "," << com[1] << "," << com[2] << endl;
-	//cout << "selected nva:" << nva << endl;
-	//cout << "start  lm com:" << endl;
+	//cout << " com:" << com[0] << "," << com[1] << "," << com[2] << Qt::endl;
+	//cout << "selected nva:" << nva << Qt::endl;
+	//cout << "start  lm com:" << Qt::endl;
 	//Conception weakness : call COM before VN otherwise computation may not have been triggered!!
 	nv = nva;
 	double *Normalcomlm = this->NormalLandmarkCollection->GetCenterOfMassOfSelectedActors();
 	int Normalnvlm = this->NormalLandmarkCollection->GetGlobalSelectedVN();
 	if (Normalnvlm > 0) {
-		//cout << "nvlm>0" << endl;
+		//cout << "nvlm>0" << Qt::endl;
 
 		com[0] += Normalcomlm[0] * Normalnvlm;
 		com[1] += Normalcomlm[1] * Normalnvlm;
@@ -23561,7 +23561,7 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 	double *Targetcomlm = this->TargetLandmarkCollection->GetCenterOfMassOfSelectedActors();
 	int Targetnvlm = this->TargetLandmarkCollection->GetGlobalSelectedVN();
 	if (Targetnvlm > 0) {
-		//cout << "nvlm>0" << endl;
+		//cout << "nvlm>0" << Qt::endl;
 
 		com[0] += Targetcomlm[0] * Targetnvlm;
 		com[1] += Targetcomlm[1] * Targetnvlm;
@@ -23572,7 +23572,7 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 	double *Nodecomlm = this->NodeLandmarkCollection->GetCenterOfMassOfSelectedActors();
 	int Nodenvlm = this->NodeLandmarkCollection->GetGlobalSelectedVN();
 	if (Nodenvlm > 0) {
-		//cout << "nvlm>0" << endl;
+		//cout << "nvlm>0" << Qt::endl;
 
 		com[0] += Nodecomlm[0] * Nodenvlm;
 		com[1] += Nodecomlm[1] * Nodenvlm;
@@ -23583,7 +23583,7 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 	double *Handlecomlm = this->HandleLandmarkCollection->GetCenterOfMassOfSelectedActors();
 	int Handlenvlm = this->HandleLandmarkCollection->GetGlobalSelectedVN();
 	if (Handlenvlm > 0) {
-		//cout << "nvlm>0" << endl;
+		//cout << "nvlm>0" << Qt::endl;
 
 		com[0] += Handlecomlm[0] * Handlenvlm;
 		com[1] += Handlecomlm[1] * Handlenvlm;
@@ -23594,7 +23594,7 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 	double *Flagcomlm = this->FlagLandmarkCollection->GetCenterOfMassOfSelectedActors();
 	int Flagnvlm = this->FlagLandmarkCollection->GetGlobalSelectedVN();
 	if (Flagnvlm > 0) {
-		//cout << "nvlm>0" << endl;
+		//cout << "nvlm>0" << Qt::endl;
 
 		com[0] += Flagcomlm[0] * Flagnvlm;
 		com[1] += Flagcomlm[1] * Flagnvlm;
@@ -23617,8 +23617,8 @@ void mqMorphoDigCore::GetCenterOfMassOfSelectedActors(double com[3])
 			com[2] /= 2;
 		}
 	}
-	//cout << "global selected com:" << com[0] << ","<<com[1] << "," << com[2] << endl;
-	//cout << "global selected nv:" << nv << endl;
+	//cout << "global selected com:" << com[0] << ","<<com[1] << "," << com[2] << Qt::endl;
+	//cout << "global selected nv:" << nv << Qt::endl;
 	//return com;
 }
 void mqMorphoDigCore::AdjustCameraAndGrid()
@@ -23629,7 +23629,7 @@ void mqMorphoDigCore::AdjustCameraAndGrid()
 	if (this->Getmui_CameraCentreOfMassAtOrigin() == 0)
 	{
 		this->GetCenterOfMass(newcamerafocalpoint);
-		cout << "Adjust new Cam Foc Point" << newcamerafocalpoint[0] << "," << newcamerafocalpoint[1] << "," << newcamerafocalpoint[2] << "," << endl;
+		cout << "Adjust new Cam Foc Point" << newcamerafocalpoint[0] << "," << newcamerafocalpoint[1] << "," << newcamerafocalpoint[2] << "," << Qt::endl;
 		this->getGridActor()->SetGridOrigin(newcamerafocalpoint);
 
 
@@ -23682,7 +23682,7 @@ void mqMorphoDigCore::AdjustCameraAndGrid()
 {
 	
 	//this->BezierCurveSource->Update();
-	cout << "Render" << endl;
+	cout << "Render" << Qt::endl;
 	this->Render();
 }*/
 void mqMorphoDigCore::ResetCameraOrthoPerspective()
@@ -23707,14 +23707,14 @@ void mqMorphoDigCore::ResetCameraOrthoPerspective()
 	double campos[3] = { 0,0,0 };
 	double foc[3] = { 0,0,0 };
 	this->getCamera()->GetPosition(campos);
-	//cout << "Camera Position:" << campos[0] <<","<<campos[1]<<","<<campos[2]<< endl;
+	//cout << "Camera Position:" << campos[0] <<","<<campos[1]<<","<<campos[2]<< Qt::endl;
 	this->getCamera()->GetFocalPoint(foc);
-	//cout << "Camera Position:" << foc[0] << "," << foc[1] << "," << foc[2] << endl;
+	//cout << "Camera Position:" << foc[0] << "," << foc[1] << "," << foc[2] << Qt::endl;
 	
 	dist = sqrt(vtkMath::Distance2BetweenPoints(campos, foc));
-	//cout << "Distance between camera and focal point:" << dist << endl;
+	//cout << "Distance between camera and focal point:" << dist << Qt::endl;
 
-	//cout << "Camera viewing angle:" << this->MorphoDigCore->getCamera()->GetViewAngle() << endl;
+	//cout << "Camera viewing angle:" << this->MorphoDigCore->getCamera()->GetViewAngle() << Qt::endl;
 
 	this->Render(); // update main window!
 }
@@ -23740,7 +23740,7 @@ void mqMorphoDigCore::DollyCameraForParallelScale()
 
 	double newparallelscale = dist / multfactor;
 	this->getCamera()->SetParallelScale(newparallelscale);
-	cout << "Dolly4Parallel" << endl;
+	cout << "Dolly4Parallel" << Qt::endl;
 }
 
 /*
@@ -23762,33 +23762,33 @@ void mqMorphoDigCore::DollyCameraForPerspectiveMode()
 	double multfactor = 3.73; // at 30° vtk : angle = 2*atan((h/2)/d). 
 							  // then 2*d  =12/tan(viewangle/2) 
 	multfactor = 1 / tan(this->getCamera()->GetViewAngle() *  vtkMath::Pi() / 360.0);
-	//cout << "DollyCameraForPerspectiveMode" << endl;
-	//cout << "multfactor" << multfactor << endl;
-	//cout << "Old posisition:" << campos[0] << "," << campos[1] << "," << campos[2] << endl;
+	//cout << "DollyCameraForPerspectiveMode" << Qt::endl;
+	//cout << "multfactor" << multfactor << Qt::endl;
+	//cout << "Old posisition:" << campos[0] << "," << campos[1] << "," << campos[2] << Qt::endl;
 
 	vtkMath::Subtract(campos, foc, dispvector);
-	//cout<<"Disp Vector:" << dispvector[0] << ","<<dispvector[1] << "," << dispvector[2] << endl;
+	//cout<<"Disp Vector:" << dispvector[0] << ","<<dispvector[1] << "," << dispvector[2] << Qt::endl;
 	vtkMath::Normalize(dispvector);
-	//cout << "Normalized Disp Vector:" << dispvector[0] << "," << dispvector[1] << "," << dispvector[2] << endl;
+	//cout << "Normalized Disp Vector:" << dispvector[0] << "," << dispvector[1] << "," << dispvector[2] << Qt::endl;
 
 	double newdist = multfactor*this->getCamera()->GetParallelScale();
-	//cout << "New dist:" << newdist << endl;
+	//cout << "New dist:" << newdist << Qt::endl;
 	vtkMath::MultiplyScalar(dispvector, newdist);
-	//cout << "Multiplied Disp Vector:" << dispvector[0] << "," << dispvector[1] << "," << dispvector[2] << endl;
+	//cout << "Multiplied Disp Vector:" << dispvector[0] << "," << dispvector[1] << "," << dispvector[2] << Qt::endl;
 	double newpos[3] = { 0,0,0 };
 	vtkMath::Add(foc, dispvector, newpos);
-	//cout << "New pos:" << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+	//cout << "New pos:" << newpos[0] << "," << newpos[1] << "," << newpos[2] << Qt::endl;
 
 	this->getCamera()->SetPosition(newpos);
 
 
-	cout << "Dolly4Perspective" << endl;
+	cout << "Dolly4Perspective" << Qt::endl;
 }
 
 //On ajoute un indice au nom si le nom existe déjà.
 //fonction recurente pour savoir quel indice lui donner.
 std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
-	//cout << "check: " << name_obj << endl;
+	//cout << "check: " << name_obj << Qt::endl;
 
 	//1st: check if does not exist AT ALL (before searching for "(")
 	this->ActorCollection->InitTraversal();
@@ -23819,10 +23819,10 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 	size_t nPos = name_obj.find_first_of("(");
 	if (nPos >0 &&nPos<= name_obj.length())
 	{
-		//cout << "nPos=" << nPos << endl;		
+		//cout << "nPos=" << nPos << Qt::endl;		
 		name_base = name_base.substr(0, nPos);
 	}
-	//cout << "name_base: " << name_base << endl;
+	//cout << "name_base: " << name_base << Qt::endl;
 	
 	this->ActorCollection->InitTraversal();
 	
@@ -23831,11 +23831,11 @@ std::string  mqMorphoDigCore::CheckingName(std::string name_obj) {
 		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		std::string a_name_base = myActor->GetName();
 		
-		//cout << "actor name: " << a_name_base << endl;
+		//cout << "actor name: " << a_name_base << Qt::endl;
 		
 		size_t anPos = a_name_base.find_first_of("(");
 		size_t anPos2 = a_name_base.find_first_of(")");
-		//cout << "AnPos:" << anPos << endl;
+		//cout << "AnPos:" << anPos << Qt::endl;
 		if (anPos > 0 && anPos <= a_name_base.length())
 		{
 			a_name_base = a_name_base.substr(0, anPos);
@@ -24253,25 +24253,25 @@ void mqMorphoDigCore::ApplyMatrix(vtkSmartPointer<vtkMatrix4x4> Mat, int mode)
 			}
 
 			
-			//cout << "Coucou" << endl;
+			//cout << "Coucou" << Qt::endl;
 		}
 		this->HandleLandmarkCollection->Modified();
 		this->FlagLandmarkCollection->InitTraversal();
 		for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
 		{
-			//cout << "modify flag " << i << endl;
+			//cout << "modify flag " << i << Qt::endl;
 			vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->FlagLandmarkCollection->GetNextActor());
 			if (myActor->GetSelected() == 1)
 			{
 				myActor->ApplyMatrix(Mat);;
 				myActor->SetSelected(0);
-				//cout << "modify flag " << i << "done"<< endl;
+				//cout << "modify flag " << i << "done"<< Qt::endl;
 			}
 		}
 
 		
 	}
-	cout <<" Actor collection changed" << endl;
+	cout <<" Actor collection changed" << Qt::endl;
 	this->ActorCollection->SetChanged(1);
 }
 
@@ -24492,18 +24492,18 @@ void mqMorphoDigCore::Setmui_ArrayVisibility(int scalarvisibility)
 {
 	if (this->mui_ArrayVisibility != scalarvisibility)
 	{
-		//cout << "Scalar visibility has changed" << endl;
+		//cout << "Scalar visibility has changed" << Qt::endl;
 		//1 refresh scalar bar actor !
 		int sba_refresh_needed = 0; //conventional scalar bar actor
 		int tsba_refresh_needed = 0; //tag scalar bar actor (tag legent)
 		if ((this->mui_ActiveArray->DataType==VTK_FLOAT|| this->mui_ActiveArray->DataType == VTK_DOUBLE)&& this->mui_ActiveArray->NumComp == 1)
 		{
-			//cout << "SBA refresh needed" << endl;
+			//cout << "SBA refresh needed" << Qt::endl;
 			sba_refresh_needed = 1;
 		}
 		if (this->mui_ActiveArray->DataType == VTK_INT  && this->mui_ActiveArray->NumComp == 1)
 		{
-			//cout << "SBA refresh needed" << endl;
+			//cout << "SBA refresh needed" << Qt::endl;
 			tsba_refresh_needed = 1;
 		}
 		if (scalarvisibility == 1)
@@ -24514,7 +24514,7 @@ void mqMorphoDigCore::Setmui_ArrayVisibility(int scalarvisibility)
 				this->ScalarBarActor->SetLookupTable(this->Getmui_ActiveColorMap()->ColorMap);
 				this->ScalarBarActor->SetTitle(this->Getmui_ActiveArray()->Name.toStdString().c_str());
 				this->Renderer->AddActor(ScalarBarActor);
-				//cout << "Add SBA" << endl;
+				//cout << "Add SBA" << Qt::endl;
 			}
 			if (tsba_refresh_needed == 1)
 			{
@@ -24522,7 +24522,7 @@ void mqMorphoDigCore::Setmui_ArrayVisibility(int scalarvisibility)
 				this->TagScalarBarActor->SetNumberOfLabels(this->Getmui_ActiveTagMap()->numTags);
 				this->TagScalarBarActor->SetTitle(this->Getmui_ActiveArray()->Name.toStdString().c_str());
 				//this->Renderer->AddActor(TagScalarBarActor);
-				//cout << "Add SBA" << endl;
+				//cout << "Add SBA" << Qt::endl;
 			}
 
 		}
@@ -24531,11 +24531,11 @@ void mqMorphoDigCore::Setmui_ArrayVisibility(int scalarvisibility)
 			//turn off if needed
 			if (sba_refresh_needed == 1)
 			{
-			//	cout << "Remove SBA" << endl;
+			//	cout << "Remove SBA" << Qt::endl;
 				this->Renderer->RemoveActor(ScalarBarActor);
 			}
 			
-				//	cout << "Remove SBA" << endl;
+				//	cout << "Remove SBA" << Qt::endl;
 				//this->Renderer->RemoveActor(TagScalarBarActor);
 			
 		}
@@ -24591,7 +24591,7 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfActor(vtkSmartPointer<vtkMDActo
 {
 	// browse through all actors and check for existing scalar
 	// add
-	cout << "Init mui scalars of selected objects" << endl;
+	cout << "Init mui scalars of selected objects" << Qt::endl;
 	QStringList existing;
 	this->mui_ArrayList->Stack.clear();
 	QString none = QString("Solid color");
@@ -24605,7 +24605,7 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfActor(vtkSmartPointer<vtkMDActo
 		int nbarrays = myPD->GetPointData()->GetNumberOfArrays();
 		for (int i = 0; i < nbarrays; i++)
 		{
-			//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << endl;
+			//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << Qt::endl;
 			int num_comp = myPD->GetPointData()->GetArray(i)->GetNumberOfComponents();
 			//cout << "Array" << i << " has "<<myPD->GetPointData()->GetArray(i)->GetNumberOfComponents()<< " components"<<endl;
 			//std::cout << VTK_UNSIGNED_CHAR << " unsigned char" << std::endl;
@@ -24617,7 +24617,7 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfActor(vtkSmartPointer<vtkMDActo
 			if (dataType == VTK_UNSIGNED_CHAR && (num_comp == 3 || num_comp == 4))
 			{
 				// ok to add RGB like scalars
-				cout << "Found RGB like" << endl;
+				cout << "Found RGB like" << Qt::endl;
 				QString RGBlike = QString(myPD->GetPointData()->GetArrayName(i));
 				this->Addmui_ExistingArrays(RGBlike, dataType, num_comp, 0);
 			}
@@ -24652,7 +24652,7 @@ int mqMorphoDigCore::GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb)
 	{
 		if (MyList->Stack.size() > 1)
 		{
-			cout << "Scalar name" << MyList->Stack.at(0).Name.toStdString() << endl;
+			cout << "Scalar name" << MyList->Stack.at(0).Name.toStdString() << Qt::endl;
 		}
 		return (int)(MyList->Stack.size()-1);
 	}
@@ -24663,7 +24663,7 @@ int mqMorphoDigCore::GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb)
 			//if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
 			// {
 
-			cout <<"Scalar name"<< MyList->Stack.at(i).Name.toStdString() << endl;
+			cout <<"Scalar name"<< MyList->Stack.at(i).Name.toStdString() << Qt::endl;
 			if (MyList->Stack.at(i).Name != rgb && MyList->Stack.at(i).Name != sc)
 			{
 				cpt++;
@@ -24691,7 +24691,7 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfSelectedObjects(int onlyfirst)
 	
 		// browse through all actors and check for existing scalar
 	// add
-	cout << "Init mui scalars of selected objects" << endl;
+	cout << "Init mui scalars of selected objects" << Qt::endl;
 	QStringList existing;
 	this->ActorCollection->InitTraversal();
 	this->mui_ArrayList->Stack.clear();
@@ -24712,7 +24712,7 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfSelectedObjects(int onlyfirst)
 				int nbarrays = myPD->GetPointData()->GetNumberOfArrays();
 				for (int i = 0; i < nbarrays; i++)
 				{
-					//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << endl;
+					//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << Qt::endl;
 					int num_comp = myPD->GetPointData()->GetArray(i)->GetNumberOfComponents();
 					//cout << "Array" << i << " has "<<myPD->GetPointData()->GetArray(i)->GetNumberOfComponents()<< " components"<<endl;
 					//std::cout << VTK_UNSIGNED_CHAR << " unsigned char" << std::endl;
@@ -24777,7 +24777,7 @@ void mqMorphoDigCore::Addmui_ExistingArrays(QString Scalar, int dataType, int nu
 	QString none = QString("Solid color");
 	/*if (this->mui_ExistingArrays.size() == 1 && this->mui_ExistingArrays.at(0) == none)
 	{
-		cout << "1 scalar, and this is none! Confirmation:" << this->mui_ExistingArrays.at(0).toStdString() << endl;
+		cout << "1 scalar, and this is none! Confirmation:" << this->mui_ExistingArrays.at(0).toStdString() << Qt::endl;
 		this->mui_ExistingArrays.clear();
 		this->mui_ExistingArrays.push_back(Scalar);
 		
@@ -24802,7 +24802,7 @@ void mqMorphoDigCore::Addmui_ExistingArrays(QString Scalar, int dataType, int nu
 			if (myScalar == Scalar)
 			{
 				exists = 1;
-				//cout << Scalar.toStdString() << " already exists" << endl;
+				//cout << Scalar.toStdString() << " already exists" << Qt::endl;
 			}
 
 		}
@@ -24819,7 +24819,7 @@ void mqMorphoDigCore::Initmui_ExistingArrays()
 {
 	// browse through all actors and check for existing scalar
 	// add
-	cout << "Init mui existing scalars" << endl;
+	cout << "Init mui existing scalars" << Qt::endl;
 	QStringList existing;
 	this->ActorCollection->InitTraversal();
 	this->mui_ExistingArrays->Stack.clear();
@@ -24836,7 +24836,7 @@ void mqMorphoDigCore::Initmui_ExistingArrays()
 			int nbarrays = myPD->GetPointData()->GetNumberOfArrays();
 			for (int i = 0; i < nbarrays; i++)
 			{
-				//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << endl;
+				//cout << "Array " << i << "=" << myPD->GetPointData()->GetArrayName(i) << Qt::endl;
 				int num_comp = myPD->GetPointData()->GetArray(i)->GetNumberOfComponents();
 				//cout << "Array" << i << " has "<<myPD->GetPointData()->GetArray(i)->GetNumberOfComponents()<< " components"<<endl;
 				//std::cout << VTK_UNSIGNED_CHAR << " unsigned char" << std::endl;
@@ -24845,19 +24845,19 @@ void mqMorphoDigCore::Initmui_ExistingArrays()
 				//std::cout << VTK_DOUBLE << " double" << std::endl;
 				int dataType = myPD->GetPointData()->GetArray(i)->GetDataType();
 				if (dataType == VTK_UNSIGNED_CHAR) { 
-					//cout << "Array" << i << " contains UNSIGNED CHARs" << endl; 
+					//cout << "Array" << i << " contains UNSIGNED CHARs" << Qt::endl; 
 				}
 				if (dataType == VTK_UNSIGNED_INT) { 
-					//cout << "Array" << i << " contains UNSIGNED INTs" << endl; 
+					//cout << "Array" << i << " contains UNSIGNED INTs" << Qt::endl; 
 				}
 				if (dataType == VTK_INT) { 
-					//cout << "Array" << i << " contains INTs" << endl; 
+					//cout << "Array" << i << " contains INTs" << Qt::endl; 
 				}
 				if (dataType == VTK_FLOAT) { 
-					//cout << "Array" << i << " contains FLOATs" << endl; 
+					//cout << "Array" << i << " contains FLOATs" << Qt::endl; 
 				}
 				if (dataType == VTK_DOUBLE) { 
-				//	cout << "Array" << i << " contains DOUBLEs" << endl; 
+				//	cout << "Array" << i << " contains DOUBLEs" << Qt::endl; 
 				}
 
 				if (dataType == VTK_UNSIGNED_CHAR && (num_comp == 3 || num_comp == 4))
@@ -25002,7 +25002,7 @@ void mqMorphoDigCore::RefreshColorMapsAndArrayVisibility()
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
-		cout << "Something here or..." << endl;
+		cout << "Something here or..." << Qt::endl;
 		vtkMDActor * myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 
@@ -25017,7 +25017,7 @@ void mqMorphoDigCore::RefreshColorMapsAndArrayVisibility()
 				&& this->mui_ActiveArray->NumComp == 1
 				)
 			{
-				cout << "Set Tag Lut!!!" << endl;
+				cout << "Set Tag Lut!!!" << Qt::endl;
 				mapper->SetScalarRange(0, this->Getmui_ActiveTagMap()->numTags - 1);
 				mapper->SetLookupTable(this->Getmui_ActiveTagMap()->TagMap);
 
@@ -25035,7 +25035,7 @@ void mqMorphoDigCore::RefreshColorMapsAndArrayVisibility()
 			if (this->mui_ActiveArray->Name == none)
 			{
 				vtkPolyDataMapper::SafeDownCast(myActor->GetMapper())->ScalarVisibilityOff();
-				cout << "Scalar visibility off from Set mui active scalars" << endl;
+				cout << "Scalar visibility off from Set mui active scalars" << Qt::endl;
 			}
 			else
 			{
@@ -25116,7 +25116,7 @@ void  mqMorphoDigCore::Setmui_ActiveTagMap(QString name, int numtags, std::vecto
 	this->mui_ActiveTagMap->tagNames = tagnames;
 
 	this->RefreshColorMapsAndArrayVisibility();
-	cout << "Now active color map is " << name.toStdString() << endl;
+	cout << "Now active color map is " << name.toStdString() << Qt::endl;
 }
 
 void mqMorphoDigCore::Setmui_ActiveTagMapAndRender(QString name, int numtags, std::vector<std::string> tagnames, vtkSmartPointer<vtkLookupTable> tagMap)
@@ -25134,7 +25134,7 @@ void mqMorphoDigCore::Setmui_ActiveColorMap(QString name, vtkSmartPointer<vtkDis
 	this->mui_ActiveColorMap->ColorMap = colorMap;
 
 	this->RefreshColorMapsAndArrayVisibility();
-	cout << "Now active color map is " << name.toStdString() << endl;
+	cout << "Now active color map is " << name.toStdString() << Qt::endl;
 }
 void mqMorphoDigCore::Setmui_ActiveColorMapAndRender(QString name, vtkSmartPointer<vtkDiscretizableColorTransferFunction> colorMap)
 {
@@ -25209,7 +25209,7 @@ void mqMorphoDigCore::Setmui_ActiveArray(QString Scalar, int dataType, int numCo
 	this->mui_ActiveArray->Name = Scalar;
 	this->mui_ActiveArray->DataType = dataType;
 	this->mui_ActiveArray->NumComp = numComp;
-	cout << "Now active scalar is " << Scalar.toStdString() << endl;
+	cout << "Now active scalar is " << Scalar.toStdString() << Qt::endl;
 	
 	if ((this->mui_ActiveArray->DataType == VTK_INT) && this->mui_ActiveArray->NumComp == 1)
 	{
@@ -25221,7 +25221,7 @@ void mqMorphoDigCore::Setmui_ActiveArray(QString Scalar, int dataType, int numCo
 	
 	
 
-	cout << "Hello!!!!" << endl;
+	cout << "Hello!!!!" << Qt::endl;
 
 	// now brows through all actors and set active scalar 
 	/*
@@ -25295,7 +25295,7 @@ double mqMorphoDigCore::Getmui_AdjustScaleFactor() { return this->mui_AdjustScal
 
 void mqMorphoDigCore::Setmui_FlagRenderingSize(double size) { 
 	this->mui_FlagRenderingSize = size; 
-	cout << mui_FlagRenderingSize << endl;
+	cout << mui_FlagRenderingSize << Qt::endl;
 }
 double mqMorphoDigCore::Getmui_DefaultFlagRenderingSize() { return this->mui_DefaultFlagRenderingSize; }
 
@@ -25356,7 +25356,7 @@ void mqMorphoDigCore::Setmui_MeshColor(double c[4])
 	this->mui_MeshColor[1] = c[1];
 	this->mui_MeshColor[2] = c[2];
 	this->mui_MeshColor[3] = c[3];
-	//cout << "Core: this->mui_MeshColor[3]="<<this->mui_MeshColor[3] << endl;
+	//cout << "Core: this->mui_MeshColor[3]="<<this->mui_MeshColor[3] << Qt::endl;
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
@@ -25377,7 +25377,7 @@ void mqMorphoDigCore::Setmui_MeshColorNoAlpha(double c[3])
 	this->mui_MeshColor[1] = c[1];
 	this->mui_MeshColor[2] = c[2];
 	
-	//cout << "Core: this->mui_MeshColor[3]="<<this->mui_MeshColor[3] << endl;
+	//cout << "Core: this->mui_MeshColor[3]="<<this->mui_MeshColor[3] << Qt::endl;
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
@@ -25429,7 +25429,7 @@ void mqMorphoDigCore::Setmui_FlagColor(double c[3])
 	this->mui_FlagColor[1] = c[1];
 	this->mui_FlagColor[2] = c[2];
 	
-	//cout << "Core: this->mui_MeshColor[3]="<<this->mui_MeshColor[3] << endl;
+	//cout << "Core: this->mui_MeshColor[3]="<<this->mui_MeshColor[3] << Qt::endl;
 	/*this->FlagCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->FlagCollection->GetNumberOfItems(); i++)
 	{
@@ -25641,7 +25641,7 @@ void mqMorphoDigCore::Undo()
 	// a Set is only a label (action) and an id
 	//vtkUndoSet *MyUndoSet = this->UndoStack->GetNextUndoSet();
 	//this->ActorCollection->Undo(MySet);
-	//cout << "Root Undo!" << endl;
+	//cout << "Root Undo!" << Qt::endl;
 	this->UndoStack->undo(); // removes the next undo set.. 
 	emit this->actorsMightHaveChanged();
 	emit this->volumesMightHaveChanged();
@@ -25649,13 +25649,13 @@ void mqMorphoDigCore::Undo()
 }
 void mqMorphoDigCore::Undo(int Count)
 {
-	//cout << "Undo(" <<Count<<")"<< endl;
+	//cout << "Undo(" <<Count<<")"<< Qt::endl;
 	//Calls for the Undo method in vtkActorCollection for this particular Count etc.. 
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		cout << "MyActor" << myActor->GetName()<< "undo " <<Count<< endl;
+		cout << "MyActor" << myActor->GetName()<< "undo " <<Count<< Qt::endl;
 		myActor->Undo(Count);		
 	}
 	this->ActorCollection->Undo(Count);
@@ -25664,7 +25664,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
-		cout << "MyVolume " << myVolume->GetName() << " undo " << Count << endl;
+		cout << "MyVolume " << myVolume->GetName() << " undo " << Count << Qt::endl;
 		myVolume->Undo(Count);
 	}
 	this->VolumeCollection->Undo(Count);
@@ -25673,7 +25673,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NormalLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Undo(Count);
 	}
 	// To update to take into account reorder!
@@ -25683,7 +25683,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->TargetLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->TargetLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Undo(Count);
 	}
 	// To update to take into account reorder!
@@ -25693,7 +25693,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->NodeLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NodeLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Undo(Count);
 	}
 	//@@ dirty! Recompute bezier curve whatever we do!
@@ -25706,7 +25706,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->HandleLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->HandleLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Undo(Count);
 	}
 	
@@ -25722,7 +25722,7 @@ void mqMorphoDigCore::Undo(int Count)
 	for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->FlagLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Undo(Count);
 	}
 	// To update to take into account reorder!
@@ -25731,7 +25731,7 @@ void mqMorphoDigCore::Undo(int Count)
 }
 void mqMorphoDigCore::Redo()
 {
-	//cout << "Root Redo!" << endl;
+	//cout << "Root Redo!" << Qt::endl;
 	this->UndoStack->redo(); // removes the next undo set.. 
 	emit this->actorsMightHaveChanged();
 	emit this->volumesMightHaveChanged();
@@ -25739,13 +25739,13 @@ void mqMorphoDigCore::Redo()
 
 void mqMorphoDigCore::Redo(int Count)
 {
-	//cout << "Redo(" << Count << ")" << endl;
+	//cout << "Redo(" << Count << ")" << Qt::endl;
 	//Calls for the Undo method in vtkActorCollection for this particular Count etc.. 
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		//cout << "MyActor Redo!" << endl;
+		//cout << "MyActor Redo!" << Qt::endl;
 		myActor->Redo(Count);
 	}
 	this->ActorCollection->Redo(Count);
@@ -25754,7 +25754,7 @@ void mqMorphoDigCore::Redo(int Count)
 	for (vtkIdType i = 0; i < this->VolumeCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDVolume *myVolume = vtkMDVolume::SafeDownCast(this->VolumeCollection->GetNextVolume());
-		cout << "MyVolume" << myVolume->GetName() << "redo " << Count << endl;
+		cout << "MyVolume" << myVolume->GetName() << "redo " << Count << Qt::endl;
 		myVolume->Redo(Count);
 	}
 	this->VolumeCollection->Redo(Count);
@@ -25763,7 +25763,7 @@ void mqMorphoDigCore::Redo(int Count)
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NormalLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor redo from core!" << endl;
+		//cout << "Call MyLMActor redo from core!" << Qt::endl;
 		myActor->Redo(Count);
 	}
 	// To update to take into account reorder!
@@ -25773,7 +25773,7 @@ void mqMorphoDigCore::Redo(int Count)
 	for (vtkIdType i = 0; i < this->TargetLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->TargetLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Redo(Count);
 	}
 	// To update to take into account reorder!
@@ -25783,7 +25783,7 @@ void mqMorphoDigCore::Redo(int Count)
 	for (vtkIdType i = 0; i < this->NodeLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NodeLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Redo(Count);
 	}
 	// To update to take into account reorder!
@@ -25796,7 +25796,7 @@ void mqMorphoDigCore::Redo(int Count)
 	for (vtkIdType i = 0; i < this->HandleLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->HandleLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Redo(Count);
 	}
 
@@ -25810,7 +25810,7 @@ void mqMorphoDigCore::Redo(int Count)
 	for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->FlagLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Redo(Count);
 	}
 	// To update to take into account reorder!
@@ -25820,13 +25820,13 @@ void mqMorphoDigCore::Redo(int Count)
 
 void mqMorphoDigCore::Erase(int Count)
 {
-	//cout << "Erase(" << Count << ")" << endl;
+	//cout << "Erase(" << Count << ")" << Qt::endl;
 	//Calls for the Undo method in vtkActorCollection for this particular Count etc.. 
 	this->ActorCollection->InitTraversal();
 	for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
 	{
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
-		//cout << "MyActor Erase!" << endl;
+		//cout << "MyActor Erase!" << Qt::endl;
 		myActor->Erase(Count);
 	}
 	this->ActorCollection->Erase(Count);
@@ -25835,7 +25835,7 @@ void mqMorphoDigCore::Erase(int Count)
 	for (vtkIdType i = 0; i < this->NormalLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NormalLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor redo from core!" << endl;
+		//cout << "Call MyLMActor redo from core!" << Qt::endl;
 		myActor->Erase(Count);
 	}
 	// To update to take into account reorder!
@@ -25845,7 +25845,7 @@ void mqMorphoDigCore::Erase(int Count)
 	for (vtkIdType i = 0; i < this->TargetLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->TargetLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Erase(Count);
 	}
 	// To update to take into account reorder!
@@ -25855,7 +25855,7 @@ void mqMorphoDigCore::Erase(int Count)
 	for (vtkIdType i = 0; i < this->NodeLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->NodeLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Erase(Count);
 	}
 	// To update to take into account reorder!
@@ -25865,7 +25865,7 @@ void mqMorphoDigCore::Erase(int Count)
 	for (vtkIdType i = 0; i < this->HandleLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->HandleLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Erase(Count);
 	}
 	// To update to take into account reorder!
@@ -25875,7 +25875,7 @@ void mqMorphoDigCore::Erase(int Count)
 	for (vtkIdType i = 0; i < this->FlagLandmarkCollection->GetNumberOfItems(); i++)
 	{
 		vtkLMActor *myActor = vtkLMActor::SafeDownCast(this->FlagLandmarkCollection->GetNextActor());
-		//cout << "Call MyLMActor undo from core!" << endl;
+		//cout << "Call MyLMActor undo from core!" << Qt::endl;
 		myActor->Erase(Count);
 	}
 	// To update to take into account reorder!
@@ -25905,13 +25905,13 @@ void mqMorphoDigCore::setUndoStack(mqUndoStack* stack)
 
 void mqMorphoDigCore::signal_existingArraysChanged()
 {
-	//cout << "Emit existing scalars changed" << endl;
+	//cout << "Emit existing scalars changed" << Qt::endl;
 	emit this->existingArraysChanged();
 }
 
 void mqMorphoDigCore::signal_projectionModeChanged()
 {
-	//cout << "Emit projection Mode Changed" << endl;
+	//cout << "Emit projection Mode Changed" << Qt::endl;
 	emit this->projectionModeChanged();
 }
 
@@ -25921,24 +25921,24 @@ void mqMorphoDigCore::signal_tagMapsChanged()
 }
 void mqMorphoDigCore::signal_colorMapsChanged()
 {
-	//cout << "Emit projection Mode Changed" << endl;
-	cout << "colorMapsChanged signal_colorMapsChanged" << endl;
+	//cout << "Emit projection Mode Changed" << Qt::endl;
+	cout << "colorMapsChanged signal_colorMapsChanged" << Qt::endl;
 	emit this->colorMapsChanged();
 }
 void mqMorphoDigCore::signal_zoomChanged()
 {
-	//cout << "Emit projection Mode Changed" << endl;
+	//cout << "Emit projection Mode Changed" << Qt::endl;
 	emit this->zoomChanged();
 }
 
 void mqMorphoDigCore::signal_actorSelectionChanged()
 {
-	//cout << "Emit actor Selection changed" << endl;
+	//cout << "Emit actor Selection changed" << Qt::endl;
 	emit this->actorSelectionChanged();
 }
 void mqMorphoDigCore::signal_volumeSelectionChanged()
 {
-	//cout << "Emit volume Selection changed" << endl;
+	//cout << "Emit volume Selection changed" << Qt::endl;
 	emit this->volumeSelectionChanged();
 }
 void mqMorphoDigCore::signal_lmSelectionChanged()
@@ -26179,11 +26179,11 @@ void mqMorphoDigCore::slotDecomposeTag()
 	//this->Decompose_Tag();
 	vtkSmartPointer<vtkIdTypeArray> region_sizes = vtkSmartPointer<vtkIdTypeArray>::New();
 	// get min and max ranges.
-	cout << "Try to Get min and max" << endl;
+	cout << "Try to Get min and max" << Qt::endl;
 	int Tag_Min = this->GetTagRangeMin();
-	cout << "Tag_min" << Tag_Min<< endl;
+	cout << "Tag_min" << Tag_Min<< Qt::endl;
 	int Tag_Max = this->GetTagRangeMax();
-	cout << "Tag_max" << Tag_Max << endl;
+	cout << "Tag_max" << Tag_Max << Qt::endl;
 
 	this->Decompose_Tag(Tag_Min, Tag_Max);
 	
@@ -26405,13 +26405,13 @@ void mqMorphoDigCore::slotCreateTagArray()
 		TagArrayName, &dialogResult);
 	if (dialogResult)
 	{
-		cout << "Tag array chosen name:" << newTags.toStdString() << endl;
+		cout << "Tag array chosen name:" << newTags.toStdString() << Qt::endl;
 		this->createTags(newTags);
 		this->Render();
 	}
 	else
 	{
-		cout << "cancel " << endl;
+		cout << "cancel " << Qt::endl;
 	}
 }
 void mqMorphoDigCore::slotCreateTagArrayConnectivity()
@@ -26423,12 +26423,12 @@ void mqMorphoDigCore::slotCreateTagArrayConnectivity()
 		TagArrayName, &dialogResult);
 	if (dialogResult)
 	{
-		cout << "Tag array chosen name:" << newTags.toStdString() << endl;
+		cout << "Tag array chosen name:" << newTags.toStdString() << Qt::endl;
 		this->createTagsConnectivity(newTags);
 	}
 	else
 	{
-		cout << "cancel " << endl;
+		cout << "cancel " << Qt::endl;
 	}
 }
 void mqMorphoDigCore::slotScalarsRGB()
@@ -26447,12 +26447,12 @@ void mqMorphoDigCore::slotScalarsRGB()
 		RGB, &dialogResult);
 	if (dialogResult)
 	{
-		cout << "RGB chosen name:" << newRGB.toStdString() << endl;
+		cout << "RGB chosen name:" << newRGB.toStdString() << Qt::endl;
 		this->scalarsRGB(newRGB);		
 	}
 	else
 	{
-		cout << "cancel " << endl;
+		cout << "cancel " << Qt::endl;
 	}
 
 

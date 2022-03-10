@@ -103,7 +103,7 @@ public:
 #endif
 	this->Hist = NULL;
     this->Widget->setObjectName("1QVTKWidget0");
-    this->Widget->SetRenderWindow(this->Window.Get());
+    this->Widget->setRenderWindow(this->Window.Get());
     this->ContextView->SetRenderWindow(this->Window.Get());
 	this->maxbin = 0;
 	/*this->displayMinMax = vtkSmartPointer<vtkIntArray>::New();
@@ -569,7 +569,8 @@ void mqHistogramWidget::render()
 void mqHistogramWidget::renderInternal()
 {
 	//cout << "mqHistogramWidget renderInternal" << endl;
-  if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
+  if (this->isVisible() //&& this->Internals->ContextView->GetRenderWindow()->IsDrawable()
+	  )
   {
     this->Internals->ContextView->GetRenderWindow()->Render();
 	mqMorphoDigCore::instance()->Render();

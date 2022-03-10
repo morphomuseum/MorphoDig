@@ -38,27 +38,29 @@ make
 Windows binaries are downloadable at the following address : http://morphomuseum.com/morphodig 
   
 ## Build morphodig on Windows
-1.  install visual studio 2017 express for desktop.
+1.  install visual studio 2019 express for desktop.
 2.  install Qt 5
+3. 	add Qt5_DIR to environment variables: {PATH TO QT}\5.x.x\msvc2019_64\lib\cmake
 4.  download and install CMAKE (>=3.19.x) (http://cmake.org).
-5.  download and build VTK (>=9.0) (http://vtk.org) using CMAKE with the following options:
-* VTK_Group_Qt : v
+5.  download and build VTK (>=9.1) (http://vtk.org) using CMAKE with the following options:
+
 * VTK_USE_LARGE_DATA : v
-* Module vtlGuiSupportQt: v
-* Module vtkGUISupportQtOpenGL : v
-* Module vtkGUISupportQtOpenGL : v
-* Module vtkRenderingContextOpenGL2 : YES
-* Module vtkRenderingOpenGL2 : YES
-* Module vtkRenderingVolumeOpenGL2 : YES
+* VTK_Group_Enable_Qt : v (VTK should then find : QT5_DIR:  {PATH TO QT}\5.X\msvc2019_64\cmake\Qt5 )
+* VTK_QT_VERSION : 5 
+* VTK_MODULE_ENABLE_VTK_GUISupportQt: v
+* VTK_MODULE_ENABLE_VTK_ImagingOpenGL2: YES
+* VTK_MODULE_ENABLE_VTK_RenderingOpenGL2 : YES
+* VTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2 : YES
 
+Add environment variable
+* VTK_DIR to environment variables: {PATH TO VTK_BIN}
 
-Then add to environment variables: 
-* QTDIR {PATH TO QT}\5.X\msvc201_64
 Append environment PATH : 
 * {PATH TO QT}\5.X\msvc2017_64\bin
 * {PATH TO VTK_BIN}\bin\Release (needed to access the .dll!)
+* {PATH TO VTK_BIN}\lib\Release (needed to access the .lib when compiling!)
 * {PATH TO VTK_BIN} (needed for CMAKE to find which version of VTK is present on the computer)
-* {PATH TO QT}\5.X\msvc2017_64\bin 
+
 
 Load CMAKE after Path has been modified. Then add the directory where your .dll files have been created in your path.
 

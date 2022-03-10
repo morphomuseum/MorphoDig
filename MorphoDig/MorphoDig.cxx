@@ -511,13 +511,13 @@ this->segView4 = new QVTKOpenGLWidget();
 	this->MorphoDigCore->setSegmentationView3(this->segView3);
 	this->MorphoDigCore->setSegmentationView4(this->segView4);
 
-	this->segView1->SetRenderWindow(segViewer1->GetRenderWindow());
-	segViewer1->SetupInteractor(this->segView1->GetRenderWindow()->GetInteractor());
+	this->segView1->setRenderWindow(segViewer1->GetRenderWindow());
+	segViewer1->SetupInteractor(this->segView1->renderWindow()->GetInteractor());
 
-	this->segView2->SetRenderWindow(segViewer2->GetRenderWindow());
-	segViewer2->SetupInteractor(this->segView2->GetRenderWindow()->GetInteractor());
-	this->segView3->SetRenderWindow(segViewer3->GetRenderWindow());
-	segViewer3->SetupInteractor(this->segView3->GetRenderWindow()->GetInteractor());
+	this->segView2->setRenderWindow(segViewer2->GetRenderWindow());
+	segViewer2->SetupInteractor(this->segView2->renderWindow()->GetInteractor());
+	this->segView3->setRenderWindow(segViewer3->GetRenderWindow());
+	segViewer3->SetupInteractor(this->segView3->renderWindow()->GetInteractor());
 
 	MorphoDigCore->setSegViewer1(segViewer1);
 	MorphoDigCore->setSegViewer2(segViewer2);
@@ -526,8 +526,8 @@ this->segView4 = new QVTKOpenGLWidget();
 	MorphoDigCore->SetProjectWindow(projectTabWindow);
 	//MorphoDigCore->SetSegmentationWindow(segmentationTabWindow);
 	//window->AddRenderer(this->MorphoDigCore->getRenderer());
-	this->qvtkWidget2->SetRenderWindow(window);
-	this->qvtkWidget2->GetRenderWindow()->AddRenderer(this->MorphoDigCore->getRenderer());
+	this->qvtkWidget2->setRenderWindow(window);
+	this->qvtkWidget2->renderWindow()->AddRenderer(this->MorphoDigCore->getRenderer());
 
 	this->MorphoDigCore->setCurrentCursor(0);
 	//vtkUndoStack* undoStack = vtkUndoStack::New();
@@ -981,7 +981,7 @@ this->segView4 = new QVTKOpenGLWidget();
 	// Place the table view in the designer form
 	//this->ui->tableFrame->layout()->addWidget(this->TableView->GetWidget());
 	
-	this->qvtkWidget2->SetRenderWindow(window);
+	this->qvtkWidget2->setRenderWindow(window);
 
 	//this->MorphoDigCore->SetRenderWindow(this->ui->qvtkWidget->GetRenderWindow());
 	this->MorphoDigCore->SetRenderWindow(window);

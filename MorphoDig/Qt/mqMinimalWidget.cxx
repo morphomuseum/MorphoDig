@@ -172,7 +172,7 @@ public:
 
 		this->Widget->setObjectName("1QVTKWidget0");
 		cout << "mqMinimalWidget Widget constructor 7" << endl;
-		this->Widget->SetRenderWindow(this->Window.Get());
+		this->Widget->setRenderWindow(this->Window.Get());
 		cout << "mqMinimalWidget Widget constructor 8" << endl;
 		cout << "ContextView has a null renderer?" << endl;
 		cout << ContextView->GetRenderer() << endl;
@@ -234,7 +234,7 @@ mqMinimalWidget::mqMinimalWidget(QWidget* parentObject)
 	//ContextView->GetRenderer()->SetBackground(1.0, 0.0, 0.0);
 //	ContextView->GetInteractor()->Initialize();
 //	ContextView->GetInteractor()->Start();
-	cout << "Is drawable?" << this->Internals->ContextView->GetRenderWindow()->IsDrawable() << endl;
+//	cout << "Is drawable?" << this->Internals->ContextView->GetRenderWindow()->IsDrawable() << endl;
 	this->Internals->ContextView->GetRenderWindow()->Render();
   //QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(renderInternal()));
 }
