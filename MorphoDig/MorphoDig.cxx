@@ -1500,6 +1500,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 		if (found != std::string::npos || found2 != std::string::npos)
 		{
+			cout << "PLY" << endl;
 			type = 2; //PLY
 		}
 
@@ -1603,7 +1604,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		{
 			type = 15; //TPS
 		}
-		cout << "Test if raw:"  << endl;
+		
 
 		found = fileName.toStdString().find(RAWext);
 		found2 = fileName.toStdString().find(RAWext2);
@@ -1640,7 +1641,9 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		}
 		if (type < 4)
 		{
+			cout << "Open Mesh" << endl;
 			int ok = mqMorphoDigCore::instance()->OpenMesh(fileName);
+			cout << "Ok =" << ok << endl;
 			if (ok ==1){ mqMorphoDigCore::instance()->CreateSurfaceUndoSet(1); }
 			
 		}

@@ -342,7 +342,7 @@ void mqSaveDataReaction::SaveCURInfos()
 		int num_seg = mqMorphoDigCore::instance()->getBezierCurveSource()->GetCurveSegmentNumber();
 		for (int i = 1; i <= num_seg; i++)
 		{
-			stream << "Curve_segment_" << i << "_length:	" << mqMorphoDigCore::instance()->getBezierCurveSource()->GetCurveSegmentLength(i) << Qt::endl;
+			stream << "Curve_segment_" << i << "_length:	" << mqMorphoDigCore::instance()->getBezierCurveSource()->GetCurveSegmentLength(i) << endl;
 		}
 
 	}

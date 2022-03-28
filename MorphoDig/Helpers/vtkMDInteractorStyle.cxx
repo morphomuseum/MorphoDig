@@ -605,7 +605,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 			this->Ctrl = CTRL_RELEASED;
 			cout << "Open Data!" << endl;
 			//mqMorphoDigCore::instance()->getUndoStack();
-			cout << "Open Data!" << endl;
+			
 
 			
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
@@ -791,6 +791,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 
 					if (found != std::string::npos || found2 != std::string::npos)
 					{
+						cout << "PLY" << endl;
 						type = 2; //PLY
 					}
 
@@ -933,6 +934,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 
 					if (type < 4)
 					{
+						cout << "Open mesh" << endl;
 						int ok=mqMorphoDigCore::instance()->OpenMesh(fileName);
 						if (ok == 1) { mqMorphoDigCore::instance()->CreateSurfaceUndoSet(1); }
 					}

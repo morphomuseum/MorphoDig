@@ -34,11 +34,12 @@ int main( int argc, char* argv[] )
 	//QSurfaceFormat fmt = QVTKOpenGLWidget::defaultFormat();
 	//fmt.setSamples(0);
 	//QSurfaceFormat::setDefaultFormat(fmt);
+ QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QApplication app( argc, argv );
   //QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
   #if QT_VERSION >= 0x050000
     QApplication::setStyle("fusion");
-	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	
 	
   #else
     QApplication::setStyle(new QCleanlooksStyle);
