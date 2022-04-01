@@ -37,6 +37,7 @@ public:
   
   virtual void slotEditHundredPxSu();
   virtual void slotRefresh();
+  virtual void slotUnitChanged();
   virtual void slotEditGridSize();
   virtual void slotReinitialize();
   

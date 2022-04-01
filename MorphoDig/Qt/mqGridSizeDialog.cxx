@@ -59,7 +59,7 @@ mqGridSizeDialog::mqGridSizeDialog(QWidget* Parent)
 	this->setObjectName("mqGridSizeDialog");	
 	double GridSpacing= mqMorphoDigCore::instance()->Getmui_GridSpacing();
 	
-	this->Ui->gridspacing->setMinimum(0.00000001);
+	this->Ui->gridspacing->setMinimum(0.0000000001);
 	this->Ui->gridspacing->setMaximum(DBL_MAX);
 	this->Ui->gridspacing->setSingleStep(1);
 	this->Ui->gridspacing->setValue(GridSpacing);
@@ -87,8 +87,14 @@ mqGridSizeDialog::mqGridSizeDialog(QWidget* Parent)
 	 connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotEditGridSize()));
 	 connect(this->Ui->reinit, SIGNAL(clicked()), this, SLOT(slotReinitialize()));
 	 connect(this->Ui->hundredpxsu, SIGNAL(valueChanged(double)), this, SLOT(slotEditHundredPxSu()));
+	 connect(this->Ui->gridspacing, SIGNAL(valueChanged(double)), this, SLOT(slotEditGridSize()));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(zoomChanged()), this, SLOT(slotRefresh()));
 	 connect(mqMorphoDigCore::instance(), SIGNAL(projectionModeChanged()), this, SLOT(slotRefresh()));
+	 connect(this->Ui->m, SIGNAL(clicked()), this, SLOT(slotUnitChanged()));
+	 connect(this->Ui->cm, SIGNAL(clicked()), this, SLOT(slotUnitChanged()));
+	 connect(this->Ui->um, SIGNAL(clicked()), this, SLOT(slotUnitChanged()));
+	 connect(this->Ui->mm, SIGNAL(clicked()), this, SLOT(slotUnitChanged()));
+	 connect(this->Ui->nm, SIGNAL(clicked()), this, SLOT(slotUnitChanged()));
 
 	 //connect(mqMorphoDigCore::instance(), SIGNAL(actorSelectionChanged()), this, SLOT(slotRefreshDialog()));
 	
@@ -149,6 +155,51 @@ void mqGridSizeDialog::editGridSize()
 	mqMorphoDigCore::instance()->SetGridInfos();
 }
 
+
+
+void mqGridSizeDialog::slotUnitChanged()
+{
+	QString myOldUnit = mqMorphoDigCore::instance()->Getmui_SizeUnit();
+	QString mm("mm");
+	QString cm("cm");
+	QString m("m");
+	QString um("um");
+	QString nm("nm");
+	double old_unit_in_meters = 1;
+	if (QString::compare(myOldUnit, mm, Qt::CaseInsensitive) == 0) { old_unit_in_meters=0.001; cout << "old unit mm" << endl;
+	}
+	if (QString::compare(myOldUnit, cm, Qt::CaseInsensitive) == 0) { old_unit_in_meters = 0.01; cout << "old unit cm" << endl;
+	}
+	if (QString::compare(myOldUnit, um, Qt::CaseInsensitive) == 0) { old_unit_in_meters = 0.000001; cout << "old unit um" << endl;
+	}
+	if (QString::compare(myOldUnit, nm, Qt::CaseInsensitive) == 0) { old_unit_in_meters = 0.000000001; cout << "old unit nm" << endl;
+	}
+	if (QString::compare(myOldUnit, m, Qt::CaseInsensitive) == 0) { old_unit_in_meters = 1; cout << "old unit m" << endl;
+	}
+
+	double new_unit_in_meters = 1;
+	if (this->Ui->mm->isChecked()) { new_unit_in_meters = 0.001; }
+	else if (this->Ui->um->isChecked()) { new_unit_in_meters = 0.000001; }
+	else if (this->Ui->m->isChecked()) { new_unit_in_meters = 1; }
+	else if (this->Ui->cm->isChecked()) { new_unit_in_meters = 0.01; }
+	else if (this->Ui->nm->isChecked()) { new_unit_in_meters = 0.000000001; }
+	if (this->Ui->mm->isChecked()) { mqMorphoDigCore::instance()->Setmui_SizeUnit(mm); cout << "new unit mm" << endl; }
+	else if (this->Ui->um->isChecked()) { mqMorphoDigCore::instance()->Setmui_SizeUnit(um); cout << "new unit um" << endl;
+	}
+	else if (this->Ui->m->isChecked()) { mqMorphoDigCore::instance()->Setmui_SizeUnit(m); cout << "new unit m" << endl;
+	}
+	else if (this->Ui->cm->isChecked()) { mqMorphoDigCore::instance()->Setmui_SizeUnit(cm); cout << "new unit cm" << endl;
+	}
+	else if (this->Ui->nm->isChecked()) { mqMorphoDigCore::instance()->Setmui_SizeUnit(nm); cout << "new unit nm" << endl;
+	}
+	double ratio = new_unit_in_meters/old_unit_in_meters;
+	cout << "grid ratio:" << ratio << endl;
+	
+	double CurGridSpacing = this->Ui->gridspacing->value();
+
+	this->Ui->gridspacing->setValue(CurGridSpacing/ratio);
+
+}
 
 
 
