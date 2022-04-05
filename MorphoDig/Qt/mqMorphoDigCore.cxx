@@ -4490,7 +4490,7 @@ void  mqMorphoDigCore::Screenshot(QString fileName, int scaleX, int scaleY, int 
 	cout << "Write image" << endl;
 	vtkSmartPointer<vtkPNGWriter> writer =
 		vtkSmartPointer<vtkPNGWriter>::New();
-	writer->SetFileName(fileName.toLocal8Bit());
+	writer->SetFileName(fileName.toUtf8());
 	if (transparent == 0)
 	{
 		writer->SetInputData(windowToImageFilter->GetOutput());
@@ -4907,7 +4907,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
+			
 			file_exists = 0;
 		}
 
@@ -4934,7 +4934,7 @@ void mqMorphoDigCore::OpenFLG(QString fileName)
 			{
 
 
-				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				
 				QFile inputFile(fileName);
 				int ok = 0;
 				int cpt_created = 0;
@@ -5035,7 +5035,7 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode, int doROI)
 		else
 		{
 
-			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
+			
 			file_exists = 0;
 		}
 
@@ -5075,7 +5075,8 @@ void mqMorphoDigCore::OpenPOS(QString fileName, int mode, int doROI)
 			if (type == 1)
 			{
 				FILE	*filein;									// Filename To Open
-				filein = fopen(fileName.toLocal8Bit(), "rb");
+				cout << "OPEN POS" << endl;
+				filein = fopen(fileName.toLocal8Bit(), "rb");// toUtf8 works also... why?
 				for (i = 0; i<4; i++)
 					for (j = 0; j<4; j++)
 					{
@@ -22103,7 +22104,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 		}
 
-		Writer->SetFileName(fileName.toLocal8Bit());
+		//Writer->SetFileName(fileName.toLocal8Bit());
+		Writer->SetFileName(fileName.toUtf8());
 		Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 		//  stlWrite->Update();
 		Writer->Write();
@@ -22134,7 +22136,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 
 		}
 		
-			Writer->SetFileName(fileName.toLocal8Bit());
+			//Writer->SetFileName(fileName.toLocal8Bit());
+			Writer->SetFileName(fileName.toUtf8());
 			Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 			//  stlWrite->Update();
 			Writer->Write();
@@ -22165,7 +22168,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			}
 			
 
-			Writer->SetFileName(fileName.toLocal8Bit());
+			//Writer->SetFileName(fileName.toLocal8Bit());
+			Writer->SetFileName(fileName.toUtf8());
 			Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 			//  stlWrite->Update();
 			Writer->Write();
@@ -22184,7 +22188,8 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			}
 			
 
-			Writer->SetFileName(fileName.toLocal8Bit());
+			//Writer->SetFileName(fileName.toLocal8Bit()); => fails with accents!!! toUtf8 in that case!
+			Writer->SetFileName(fileName.toUtf8());
 			Writer->SetInputData(cleanPolyDataFilter->GetOutput());
 			//  stlWrite->Update();
 			Writer->Write();
@@ -22274,10 +22279,10 @@ int mqMorphoDigCore::SaveSurfaceFile(QString fileName, int write_type, int posit
 			fileName.append(".ply");
 		}
 		std::ifstream file(fileName.toLocal8Bit());
-		
-		
-			Writer->SetFileName(fileName.toLocal8Bit());
-			//
+		//cout << "Write PLY file : " << fileName.toUtf8().toStdString() << endl;
+		// PLY writer does not accept toLocal8bit... for some reason
+			Writer->SetFileName(fileName.toUtf8());
+			////@@@@@
 			Writer->SetInputData(MyMergedObject);
 			//Writer->SetInputData((vtkPolyData*)My_Obj);	
 			Writer->Write();

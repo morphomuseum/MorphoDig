@@ -1571,7 +1571,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		found2 = fileName.toStdString().find(POSext2);
 		if (found != std::string::npos || found2 != std::string::npos)
 		{
-			type = 12; //POS
+			type = 12; //POS			
 		}
 		found = fileName.toStdString().find(MHAext);
 		found2 = fileName.toStdString().find(MHAext2);
@@ -1639,6 +1639,7 @@ void MorphoDig::dropEvent(QDropEvent *e)
 
 
 		}
+
 		if (type < 4)
 		{
 			cout << "Open Mesh" << endl;
