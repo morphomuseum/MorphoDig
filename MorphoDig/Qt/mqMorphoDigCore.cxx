@@ -4816,6 +4816,116 @@ void mqMorphoDigCore::UpdateAllSelectedFlagsColors()
 	}
 }
 
+void mqMorphoDigCore::UpdateAllSelectedFlagsLabels()
+{
+	cout << "Update all selected flages: label of closest surface" << endl;
+	vtkIdType num_flg = 0;
+	num_flg = mqMorphoDigCore::instance()->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
+	if (num_flg == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No flag landmark selected. Please select at least one flag to use this option.");
+		msgBox.exec();
+		return;
+	}
+	vtkIdType selectedflags = this->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
+	if (selectedflags > 0)
+	{
+
+		vtkSmartPointer<vtkLMActorCollection> myColl = vtkSmartPointer<vtkLMActorCollection>::New();
+		myColl = this->FlagLandmarkCollection;
+
+		std::string action = "Update labels of all selected flags";
+		int mCount = BEGIN_UNDO_SET(action);
+
+
+		myColl->InitTraversal();
+		for (vtkIdType k = 0; k < myColl->GetNumberOfItems(); k++)
+		{
+			int ok = 1;
+			vtkLMActor* myFlag = vtkLMActor::SafeDownCast(myColl->GetNextActor());
+			double min_dist = DBL_MAX;
+			if (myFlag->GetSelected() == 1)
+			{
+				double flpos[3];
+
+				myFlag->GetLMOrigin(flpos);
+				double closest[3] = { flpos[0] , flpos[1],flpos[2] };
+				cout << "Current flag :" << flpos[0] << "," << flpos[1] << "," << flpos[2] << endl;
+
+				this->ActorCollection->InitTraversal();
+				vtkMDActor* myClosestActor;
+				myClosestActor = NULL;
+				for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+				{
+					vtkMDActor* myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+					if (i == 0) { myClosestActor = myActor;}
+					if (myActor->GetSelected() == 1) { myActor->SetSelected(0); }
+					vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+					if (mapper != NULL && vtkPolyData::SafeDownCast(mapper->GetInput()) != NULL)
+					{
+						vtkSmartPointer<vtkPolyData> myPD = vtkSmartPointer<vtkPolyData>::New();
+						myPD->DeepCopy(vtkPolyData::SafeDownCast(mapper->GetInput()));
+						double ve_init_pos[3];;
+						double ve_final_pos[3];
+						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+
+						vtkIdType id_min = -1;
+						for (vtkIdType j = 0; j < myPD->GetNumberOfPoints(); j++)
+						{
+							// for every triangle 
+							myPD->GetPoint(j, ve_init_pos);
+							mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+
+							double curr_dist = (ve_final_pos[0] - flpos[0]) * (ve_final_pos[0] - flpos[0]) +
+								(ve_final_pos[1] - flpos[1]) * (ve_final_pos[1] - flpos[1]) +
+								(ve_final_pos[2] - flpos[2]) * (ve_final_pos[2] - flpos[2]);
+							if (min_dist > curr_dist)
+							{
+
+								if (myClosestActor != myActor) { myClosestActor = myActor; }
+								id_min = j;
+								min_dist = curr_dist;
+								//now get current color!
+
+							}
+
+						}
+						
+					}
+
+				}
+
+
+				myFlag->SetSelected(0);
+				if (ok == 1)
+				{
+					myFlag->SaveState(mCount);
+				if (myClosestActor !=NULL){ 
+					
+					cout << "modify flag label" << endl;
+					myFlag->SetLMText(myClosestActor->GetName()); 
+					
+				
+				
+				}
+					
+					//myFlag->SetmColor(r1, g1, b1, 0.5);
+
+				}
+				this->UpdateLandmarkSettings(myFlag);
+
+
+
+			}
+
+		}
+		END_UNDO_SET();
+
+		this->Render();
+	}
+}
+
+
 void mqMorphoDigCore::UpdateAllSelectedFlagsColors(double flagcolor[4])
 {
 	vtkIdType selectedflags = this->getFlagLandmarkCollection()->GetNumberOfSelectedActors();
@@ -10791,7 +10901,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 	std::string PTSext2 = ".PTS";
 
 	QFileInfo info(fileName);
-	QString onlyFileName(info.baseName());
+	
 
 	if (save_format == 0)
 	{
@@ -10829,6 +10939,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 			fileName.append(".tps");
 		}
 	}
+	QString onlyFileName(info.fileName().left(info.fileName().length() - 4));
 	//Combien de landmarks au total (besoin pour les formats TPS et PTS) en comptant les curves!
 	// combien de segments:
 
@@ -11247,6 +11358,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		if (save_format == 3)
 		{
 			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << Qt::endl;
+			cout <<"SCAVF_IMAGE=" << onlyFileName.toStdString().c_str() << endl;
 		}
 		//END
 
@@ -11817,9 +11929,10 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 	//
 	//QString onlyFileName = fileName.splitRef("/").last().toString();
 	QFileInfo info(fileName);
+	cout << "Filename=" << fileName.toStdString().c_str() << endl;
 	//QString onlyFileName (info.fileName());
-	QString onlyFileName(info.baseName());
-
+	
+	
 	if (file_type == 0)
 	{
 		std::string VERext = ".ver";
@@ -11865,6 +11978,9 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 			fileName.append(".tps");
 		}
 	}
+	QString onlyFileName(info.fileName().left(info.fileName().length() - 4));
+
+
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
@@ -11925,6 +12041,7 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 		{
 
 			stream << "IMAGE=" << onlyFileName.toStdString().c_str() << Qt::endl;
+			cout << "SLF_IMAGE=" << onlyFileName.toStdString().c_str() << endl;
 		}
 		
 
@@ -26243,6 +26360,11 @@ void mqMorphoDigCore::slotUpdateAllSelectedFlagsColors()
 {
 	this->UpdateAllSelectedFlagsColors();
 }
+void mqMorphoDigCore::slotUpdateAllSelectedFlagsLabels()
+{
+	this->UpdateAllSelectedFlagsLabels();
+}
+
 void mqMorphoDigCore::slotLandmarkMoveDown()
 {
 

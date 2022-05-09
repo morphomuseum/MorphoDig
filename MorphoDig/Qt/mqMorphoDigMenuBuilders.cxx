@@ -491,7 +491,9 @@ void mqMorphoDigMenuBuilders::buildLandmarksMenu(QMenu& menu)
 	new mqEditAllFLGColorDialogReaction(menu.addAction("Edit color of all selected flag landmarks") << mqSetName("actionEditAllSelectedFlagsColors"));
 	new mqEditAllFLGLengthDialogReaction(menu.addAction("Edit length all selected flag landmarks") << mqSetName("actionEditAllSelectedFlagsLength"));
 	QAction *UpdateAllSelectedFlagsColors = menu.addAction("Update all selected flag landmarks' color to that of the closest vertex");
+	QAction* UpdateAllSelectedFlagsLabels = menu.addAction("Update all selected flag landmarks' label to closest vertex' surface name");
 	QAction::connect(UpdateAllSelectedFlagsColors, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotUpdateAllSelectedFlagsColors()));
+	QAction::connect(UpdateAllSelectedFlagsLabels, SIGNAL(triggered()), mqMorphoDigCore::instance(), SLOT(slotUpdateAllSelectedFlagsLabels()));
 	
 
 	QAction *CreateCurveHandles = submenuLandmarksInvolved->addAction("Create curve handles for selected nodes");

@@ -873,6 +873,7 @@ public:
 	void SelectLandmarkRange(int start, int end, int lm_type);
 	void SelectSmallObjects(int triangles);
 	void SelectSmallVolumes(double volume);
+	void UpdateAllSelectedFlagsLabels();
 	void UpdateAllSelectedFlagsColors();
 	void UpdateAllSelectedFlagsColors(double flagcolor[4]);
 	void UpdateAllSelectedFlagsLengths(double flag_rendering_size);
@@ -1334,6 +1335,7 @@ public slots:
 	virtual void slotLandmarkPushBack();
 	virtual void slotLandmarkReorient();
 	virtual void slotUpdateAllSelectedFlagsColors();
+	virtual void slotUpdateAllSelectedFlagsLabels();
 	virtual void slotConvexHULL();
 	virtual void slotGroup();
 	virtual void slotLassoCutKeepInside();
