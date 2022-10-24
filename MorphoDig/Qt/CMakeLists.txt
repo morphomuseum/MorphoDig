@@ -315,6 +315,10 @@ mqScalarsDistanceDialog.cxx
 mqScalarsDistanceDialog.h
 mqScalarsDistanceDialogReaction.cxx
 mqScalarsDistanceDialogReaction.h
+mqScalarsInfosAlongDirectionDialog.cxx
+mqScalarsInfosAlongDirectionDialog.h
+mqScalarsInfosAlongDirectionDialogReaction.cxx
+mqScalarsInfosAlongDirectionDialogReaction.h
 mqScalarsInfosDialog.cxx
 mqScalarsInfosDialog.h
 mqScalarsInfosDialogReaction.cxx
@@ -474,6 +478,7 @@ mqScalarsComplexityDialog.ui
 mqScalarsControlsWidget.ui
 mqScalarsCurvatureDialog.ui
 mqScalarsDistanceDialog.ui
+mqScalarsInfosAlongDirectionDialog.ui
 mqScalarsInfosDialog.ui
 mqScalarsNormalizationDialog.ui
 mqScalarsSmoothDialog.ui

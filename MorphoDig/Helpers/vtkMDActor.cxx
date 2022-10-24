@@ -699,7 +699,7 @@ double vtkMDActor::GetBoundingBoxLength()
 
 	
 		double bounds[6];
-
+		//Problem: gros bugs avec cette fonction VTK!
 		this->GetBounds(bounds);
 		double A[3];//min
 		double B[3];//max
@@ -844,6 +844,35 @@ void vtkMDActor::GetBoxCenter(double boxCenter[3])
 	boxCenter[1] = cy;
 	boxCenter[2] = cz;
 }
+//the "real" display bounds of an actor
+
+void vtkMDActor::GetDisplayBounds(double dbounds[6])
+{
+	dbounds[0] = DBL_MAX;
+	dbounds[1] = -DBL_MAX;
+	dbounds[2] = DBL_MAX;
+	dbounds[3] = -DBL_MAX;
+	dbounds[4] = DBL_MAX;
+	dbounds[5] = -DBL_MAX;
+	vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(this->GetMapper());
+	vtkPolyData* mPD = mapper->GetInput();
+	double ve_init_pos[3];;
+	double ve_final_pos[3];
+	vtkSmartPointer<vtkMatrix4x4> MatAct = this->GetMatrix();
+
+	for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+	{
+		mPD->GetPoint(j, ve_init_pos);
+		mqMorphoDigCore::TransformPoint(MatAct, ve_init_pos, ve_final_pos);
+		if (ve_final_pos[0] < dbounds[0]) { dbounds[0] = ve_final_pos[0]; }
+		if (ve_final_pos[0] > dbounds[1]) { dbounds[1] = ve_final_pos[0]; }
+		if (ve_final_pos[1] < dbounds[2]) { dbounds[2] = ve_final_pos[1]; }
+		if (ve_final_pos[1] > dbounds[3]) { dbounds[3] = ve_final_pos[1]; }
+		if (ve_final_pos[2] < dbounds[4]) { dbounds[4] = ve_final_pos[2]; }
+		if (ve_final_pos[2] > dbounds[5]) { dbounds[5] = ve_final_pos[2]; }
+
+	}
+}
 void vtkMDActor::GetBoxBounds(double boxBounds[6])
 {
 	double xmin, xmax, ymin, ymax, zmin, zmax;
@@ -873,7 +902,7 @@ void vtkMDActor::GetBoxBounds(double boxBounds[6])
 		if (origin[1] > ymax) { ymax = origin[1]; }
 		if (origin[2] < zmin) { zmin = origin[2]; }
 		if (origin[2] > zmax) { zmax = origin[2]; }
-		cout << "Plane " << i << ":" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
+		//cout << "Plane " << i << ":" << origin[0] << "," << origin[1] << "," << origin[2] << endl;
 		//cout << "Plane " << i << ":" << mBoxDiff[0] << "," << mBoxDiff[1] << "," << mBoxDiff[2] << endl;
 	}
 	boxBounds[0] = xmin;

@@ -35,6 +35,7 @@ public:
    void SaveVTP();*/
    void SavePOS(int mode);
    void SaveActiveScalarSummary();
+   //void SaveSelectedSurfaceSummaryAlongDirection();
    void SaveSelectedSurfaceScalars();
    void SaveCURInfos();
    void SaveShapeMeasures(int mode);
@@ -134,7 +135,10 @@ protected:
 	{
 		this->SaveSelectedSurfaceScalars();
 	}
-	
+	/*else if (this->Mode == 24)
+	  {
+		  this->SaveSelectedSurfaceSummaryAlongDirection();
+	  }*/
   }
 
 private:

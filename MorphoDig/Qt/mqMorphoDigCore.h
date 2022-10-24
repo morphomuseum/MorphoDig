@@ -663,6 +663,8 @@ public:
 	void SaveSurfaceTagSummary(QString fileName, int useTags, int numVer, QString TagArray);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId);
 	void SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray);
+	void SaveActiveScalarSummaryAlongDirection(QString fileName, int useTags, QString TagArray, int direction, int numvals, int relMinMax, double absMin, double absMax);
+	void SaveActiveScalarSummaryAlongDirection(QString fileName, int useTags, QString TagArray, int direction, int numvals, int relMinMax, double absMin, double absMax, vtkIdType TagId );
 	int SaveSurfaceFile(QString fileName, int write_type, int position_mode, int file_type, std::vector<std::string> arraysToBeRemoved, int RGBopt = 0, int save_norms = 0, vtkMDActor *myActor = NULL);
 	void SaveVolume(QString fileName, int file_type, int compression=1, vtkMDVolume *myVolume=NULL, int compression_type=1, int bigendian =1, int isMSK=0);
 	int SaveLandmarkFile(QString fileName, int lm_type, int file_type, int save_only_selected);

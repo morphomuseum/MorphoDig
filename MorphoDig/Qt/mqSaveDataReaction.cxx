@@ -398,6 +398,64 @@ void mqSaveDataReaction::SaveSelectedSurfaceScalars()
 
 	}
 }
+/*void mqSaveDataReaction::SaveSelectedSurfaceSummaryAlongDirection()
+{
+	int numsel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();
+	if (numsel == 0) {
+		QMessageBox msgBox;
+		msgBox.setText("No surface selected. Please select at least one surface to use this option.");
+		msgBox.exec();
+		return;
+	}
+	if (numsel > 0 && mqMorphoDigCore::instance()->Getmui_ActiveArray()->NumComp == 1 &&
+
+		(mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_FLOAT
+			|| mqMorphoDigCore::instance()->Getmui_ActiveArray()->DataType == VTK_DOUBLE
+			)
+		)
+
+	{
+
+		QString activeScalar = mqMorphoDigCore::instance()->Getmui_ActiveArray()->Name;
+		QString myText;
+
+		myText = tr("Save summary of scalars along direction") + activeScalar;
+
+
+
+
+		QString fileName = QFileDialog::getSaveFileName(this->MainWindow,
+			myText, mqMorphoDigCore::instance()->Getmui_LastUsedDir() + QDir::separator() + activeScalar + "_summary_along_direction.txt",
+			tr("text file (*.txt)"));
+
+		cout << fileName.toStdString() << endl;;
+		if (fileName.isEmpty()) return;
+		QFileInfo fileInfo(fileName);
+		mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
+
+
+		std::string TXText = ".txt";
+		std::string TXText2 = ".TXT";
+		std::size_t found = fileName.toStdString().find(TXText);
+		std::size_t found2 = fileName.toStdString().find(TXText2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".txt");
+		}
+
+		mqMorphoDigCore::instance()->SaveActiveScalarSummaryAlongDirection(fileName, 0, "", 0, 20, 0);
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Select at least one surface and activate existing scalars to use this option");
+		msgBox.exec();
+		return;
+
+	}
+}*/
+
+/*Not used any longer : now called from mqScalarsInfosDialogReaction*/
 void mqSaveDataReaction::SaveActiveScalarSummary()
 {
 	int numsel = mqMorphoDigCore::instance()->getActorCollection()->GetNumberOfSelectedActors();

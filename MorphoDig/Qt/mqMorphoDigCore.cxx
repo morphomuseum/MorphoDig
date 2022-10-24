@@ -12071,19 +12071,31 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 			
 
 		}
+		stream << "X	Y	Z	";
+		/*
+			vtkSmartPointer<vtkMatrix4x4> MatAct = myActor->GetMatrix();
+
+			for (vtkIdType j = 0; j < surface->GetNumberOfPoints(); j++) {
+				// for every triangle 
+				
+				surface->GetPoints()->SetPoint((vtkIdType)j, ve_final_pos);
+			}*/
 		stream << Qt::endl;
+		double ve_init_pos[3];;
+		double ve_final_pos[3];
+		vtkSmartPointer<vtkMatrix4x4> MatAct = myActor->GetMatrix();
 
 		vtkPolyDataMapper *mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
 		vtkPolyData *mPD = mapper->GetInput();
 		for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
 		{
-			stream <<j<< "	";
+			stream << j << "	";
 
 			for (size_t i = 0; i < MyList->Stack.size(); i++)
 			{
 				if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1)
 				{
-					vtkDataArray *currentScalars;
+					vtkDataArray* currentScalars;
 					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(MyList->Stack.at(i).Name.toStdString().c_str());
 					if (currentScalars == NULL)
 					{
@@ -12093,7 +12105,7 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 
 					if (currentScalars != NULL)
 					{
-						stream << currentScalars->GetTuple1(j)<<"	";
+						stream << currentScalars->GetTuple1(j) << "	";
 					}
 					else
 					{
@@ -12101,11 +12113,15 @@ void mqMorphoDigCore::SaveSelectedSurfaceScalars(vtkMDActor *myActor, QString fi
 					}
 
 
-					
+
 				}
 
 
 			}
+			mPD->GetPoint(j, ve_init_pos);
+			mqMorphoDigCore::TransformPoint(MatAct, ve_init_pos, ve_final_pos);
+			stream << ve_final_pos[0] << "	" << ve_final_pos[1] << "	" << ve_final_pos[2] << "	";
+
 			stream << Qt::endl;
 
 
@@ -12312,6 +12328,377 @@ void mqMorphoDigCore::SaveSurfaceTagSummary(QString fileName, int useTags, int n
 
 
 }
+
+//
+//
+void mqMorphoDigCore::SaveActiveScalarSummaryAlongDirection(QString fileName, int useTags, QString TagArray, int direction, int numvals,  int relMinMax, double absMin, double absMax)
+{
+	cout <<"numvals="<< numvals << endl;
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+
+		stream << "Name	Tagged_Region	";
+		if (direction == 0) { stream << "xMin" << "	" << "xMax"; }
+		if (direction == 1) { stream << "yMin" << "	" << "yMax"; }
+		if (direction == 2) { stream << "zMin" << "	" << "zMax"; }
+		stream << "	Mean	Median	Variance	StdDev	Min	Max	Q5	Q10	Q90	Q95";
+		stream << Qt::endl;
+		//cout << "First Summary Done" << endl;
+		file.close();
+		this->SaveActiveScalarSummaryAlongDirection(fileName, 0, TagArray, direction, numvals, relMinMax, absMin, absMax, 0);
+		//if useTags =1, search Max tagged value in all opened objects
+		if (useTags == 1 && TagArray.length() > 0)
+		{
+			//cout << "useTags==1 and TagArray.length()>0" << endl;
+			vtkIdType maxTagId = this->GetTagRangeMax(TagArray);
+			this->ActorCollection->InitTraversal();
+
+			//cout << "maxTagId=" << maxTagId << endl;
+			if (maxTagId > 0)
+			{
+				for (vtkIdType i = 0; i <= maxTagId; i++)
+				{
+					//cout << "SaveActiveScalarSummary(" << i << ")" << endl;
+					this->SaveActiveScalarSummaryAlongDirection(fileName, 1, TagArray, direction, numvals, relMinMax, absMin, absMax, i);
+				}
+			}
+
+		}//usetags=1
+	}//file open
+}
+void mqMorphoDigCore::SaveActiveScalarSummaryAlongDirection(QString fileName, int useTags, QString TagArray, int direction, int numvals,  int relMinMax, double absMin, double absMax, vtkIdType TagId)
+{
+	//cout << "numvals=" << numvals << endl;
+
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Append))
+	{
+		QTextStream stream(&file);
+
+		std::string TagName = "";
+		if (TagId < mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->numTags)
+		{
+			TagName = mqMorphoDigCore::instance()->Getmui_ActiveTagMap()->tagNames.at(TagId);
+		}
+		else
+		{
+			TagName = "Tag" + TagId;
+		}
+
+
+
+		//this->ComputeSelectedNamesLists();
+
+		this->ActorCollection->InitTraversal();
+
+
+
+		for (vtkIdType i = 0; i < this->ActorCollection->GetNumberOfItems(); i++)
+		{
+			vtkMDActor* myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
+			if (myActor->GetSelected() == 1)
+			{
+
+				vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(myActor->GetMapper());
+				vtkPolyData* mPD = mapper->GetInput();
+				//Min et Max : les bornes du calcul. 
+				double Max;
+				double Min;
+				if (relMinMax == 0) { Min = absMin; Max = absMax; }
+				else
+				{
+					double bounds[6];
+					myActor->GetDisplayBounds(bounds);
+					if (direction == 0) { Min = bounds[0]; Max = bounds[1]; }
+					else if (direction == 1) { Min = bounds[2]; Max = bounds[3]; }
+					else  { Min = bounds[4]; Max = bounds[5]; }
+
+				}
+				//cout << "Min=" << Min << ", Max=" << Max << endl;
+				// if relMinMax ==1, we have to compute
+
+				vtkDataArray* currentScalars = NULL;
+				if ((this->Getmui_ActiveArray()->DataType == VTK_FLOAT || this->Getmui_ActiveArray()->DataType == VTK_DOUBLE) && this->Getmui_ActiveArray()->NumComp == 1)
+				{
+
+					currentScalars = (vtkDoubleArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveArray()->Name.toStdString().c_str());
+					if (currentScalars == NULL)
+					{
+						currentScalars = (vtkFloatArray*)mPD->GetPointData()->GetScalars(this->Getmui_ActiveArray()->Name.toStdString().c_str());
+					}
+
+				}
+
+				vtkIntArray* currentTags = NULL; //
+
+				//4 if current tags exist, retrieve what tool is active
+				if (useTags == 1)
+				{
+					currentTags = vtkIntArray::SafeDownCast(mPD->GetPointData()->GetScalars(TagArray.toStdString().c_str()));
+				}
+
+				if (currentScalars != NULL)
+				{
+
+					for (int k = 0; k < numvals; k++)
+					{
+						//
+						//cout << "k=" << k << endl;
+						double interval = (Max - Min) / numvals;
+						double curMin;
+						curMin = Min + k * interval;
+						double curMax;
+						curMax = curMin + interval;
+						//cout << "curMin=" << curMin << ", curMax=" << curMax << endl;
+
+						double Mean = 0;
+						double Median = 0;
+						double Variance = 0;
+						double StdDev = 0;
+						double Min = DBL_MAX;
+						double Max = -DBL_MAX;
+						double Q5 = 0;
+						double Q10 = 0;
+						double Q90 = 0;
+						double Q95 = 0;
+						vtkIdType cpt = 0;
+						int ok = 0;
+						double ve_init_pos[3];;
+						double ve_final_pos[3];
+					
+						vtkSmartPointer<vtkMatrix4x4> Mat = myActor->GetMatrix();
+						vtkIdType cptInInterval = 0;
+						if (mPD->GetNumberOfPoints() > 10)
+						{
+
+							std::vector<float> vals;
+							//1st loop to compute mean
+							int printed = 0;
+							for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+							{
+								//test si on es sur un bon point (= point de l'interval du moment)
+								// for every triangle 
+								mPD->GetPoint(j, ve_init_pos);
+								mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+								int okInInterval = 0;
+								double curPosAlongDirection = 0;
+								if (direction == 0) { curPosAlongDirection = ve_final_pos[0]; }//along X
+								if (direction == 1) { curPosAlongDirection = ve_final_pos[1]; }//along Y
+								if (direction == 2) { curPosAlongDirection = ve_final_pos[2]; }//along Z
+								
+								if (curPosAlongDirection > curMin && curPosAlongDirection < curMax)
+								{
+									if (printed < 10)
+									{
+										//cout << "k=" << k << ", okInInterval=1 for j=" << j << endl;
+										printed++;
+									}
+
+									okInInterval = 1; cptInInterval++;
+								}
+								if (okInInterval == 1)
+								{
+									if (useTags == 0)
+									{
+										Mean += currentScalars->GetTuple1(j);
+										vals.push_back(currentScalars->GetTuple1(j));
+										cpt++;
+									}
+									else
+									{
+										//1: check if currentTags is null.
+										//2: check if vertex j is tagged like TagId
+										if (currentTags != NULL && currentTags->GetTuple1(j) == TagId)
+										{
+											cpt++;
+											Mean += currentScalars->GetTuple1(j);
+											vals.push_back(currentScalars->GetTuple1(j));
+
+										}
+									}
+								}
+							}
+							//cout << "First vertex loop finished" << endl;
+							//stream << "First vertex loop finished" << Qt::endl;
+
+							if (useTags == 0)
+							{
+								if (cptInInterval > 0)
+								{
+									Mean /= cptInInterval;
+									//stream <<"k="<<k<< ", Mean=" <<Mean<< ", cptInInterval=" << cptInInterval<< Qt::endl;
+									
+
+									ok = 1;
+								}
+							}
+							else
+							{
+								if (cpt > 0)
+								{
+									Mean /= cpt;
+									ok = 1;
+								}
+							}
+							cptInInterval = 0;
+							//second loop to compute variance
+							printed = 0;
+							//cout << "Start second vertex loop " << endl;
+							//stream << "Start second vertex loop " << Qt::endl;
+							for (vtkIdType j = 0; j < mPD->GetNumberOfPoints(); j++)
+							{
+								//test si on est sur un bon point de l'intervalle(redondance...)
+								// for every triangle 
+								mPD->GetPoint(j, ve_init_pos);
+								mqMorphoDigCore::TransformPoint(Mat, ve_init_pos, ve_final_pos);
+								int okInInterval = 0;
+								double curPosAlongDirection = 0;
+								if (direction == 0) { curPosAlongDirection = ve_final_pos[0]; }//along X
+								if (direction == 1) { curPosAlongDirection = ve_final_pos[1]; }//along Y
+								if (direction == 2) { curPosAlongDirection = ve_final_pos[2]; }//along Z
+								
+								if (curPosAlongDirection > curMin && curPosAlongDirection < curMax)
+								{
+									if (printed < 10)
+									{
+										//cout << "SECOND LOOP k=" << k << ", okInInterval=1 for j=" << j << endl;
+										printed++;
+									}
+									
+									okInInterval = 1; cptInInterval++;
+								}
+								if (okInInterval == 1)
+								{
+									if (useTags == 0)
+									{
+										Variance += (currentScalars->GetTuple1(j) - Mean) * (currentScalars->GetTuple1(j) - Mean);
+									}
+									else
+									{
+										//1: check if currentTags is null.
+										//2: check if vertex j is tagged like TagId
+										if (currentTags != NULL && currentTags->GetTuple1(j) == TagId)
+										{
+
+											Variance += (currentScalars->GetTuple1(j) - Mean) * (currentScalars->GetTuple1(j) - Mean);
+
+										}
+									}
+								}
+							}
+							//cout << "Second vertex loop finished" << endl;
+							//stream << "Second vertex loop finished" << Qt::endl;
+
+
+							if (useTags == 0)
+							{
+								if (cptInInterval > 0)
+								{
+									Variance /= cptInInterval;
+									//stream << "k=" << k << ", Variance=" << Variance << ", cptInInterval=" << cptInInterval << Qt::endl;
+
+								}
+
+							}
+							else
+							{
+								if (cpt > 0)
+								{
+									Variance /= cpt;
+
+								}
+							}
+							//cout <<"k="<<k<< "Now compute some stuff" << endl;
+							//stream << "k=" << k << "Now compute some stuff" << Qt::endl;
+
+							if (ok == 1)
+							{
+								StdDev = sqrt(Variance);
+								std::sort(vals.begin(), vals.end());
+
+								int iMin = 0;
+								int iMax = 0;
+								int iQ5 = 0;
+								int iQ10 = 0;
+								int iQ50 = 0;
+								int iQ90 = 0;
+								int iQ95 = 0;
+								if (useTags == 0)
+								{
+									iMax = cptInInterval - 1; if (iMax < 0) { iMax = 0; }
+									iQ5 = (int)(0.05 * cptInInterval);
+									iQ10 = (int)(0.1 * cptInInterval);
+									iQ50 = (int)(0.5 * cptInInterval);
+									iQ90 = (int)(0.9 * cptInInterval);
+									iQ95 = (int)(0.95 * cptInInterval);
+								}
+								else
+								{
+									iMax = cpt - 1; if (iMax < 0) { iMax = 0; }
+									iQ5 = (int)(0.05 * cpt);
+									iQ10 = (int)(0.1 * cpt);
+									iQ50 = (int)(0.5 * cpt);
+									iQ90 = (int)(0.9 * cpt);
+									iQ95 = (int)(0.95 * cpt);
+								}
+								//stream << "vals Size:" << vals.size()<< endl;
+
+								//stream << "iQ50" << iQ50 << endl;
+								//stream << "iMin" << iMin << endl;
+								//stream << "iMax" << iMax << endl;
+								//stream << "iQ10" << iQ10 << endl;
+								//stream << "iQ90" << iQ90 << endl;
+								//stream << "iQ95" << iQ95 << endl;
+								Median = (double)vals.at(iQ50);
+								Min = (double)vals.at(iMin);
+								Max = (double)vals.at(iMax);
+								Q5 = (double)vals.at(iQ5);
+								Q10 = (double)vals.at(iQ10);
+								Q90 = (double)vals.at(iQ90);
+								Q95 = (double)vals.at(iQ95);
+								//stream << "Ok for k=" << k << endl;
+
+							}
+
+							
+
+						}
+
+						//stream << "Loops finished" << endl;
+
+						//stream << myActor->GetName().c_str() << "	" << massProp->GetNormalizedShapeIndex() << "	" << surface_area << "	" << volume <<  endl;
+						if (useTags == 0)
+						{
+							stream << myActor->GetName().c_str() << "	"<< "whole_surface" <<  "	" << curMin << "	" << curMax << "	" << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95  ;
+							stream << Qt::endl;
+						}
+						else
+						{
+							if (cpt > 10)
+							{
+								stream << myActor->GetName().c_str() <<"	"<< TagName.c_str() << "	" << curMin << "	" << curMax << "	"  << Mean << "	" << Median << "	" << Variance << "	" << StdDev << "	" << Min << "	" << Max << "	" << Q5 << "	" << Q10 << "	" << Q90 << "	" << Q95;
+								stream << Qt::endl;
+							}
+						}
+
+					}
+				}
+				else
+				{
+					stream << myActor->GetName().c_str() << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << "	" << "NAN" << Qt::endl;
+					
+				}
+
+
+			}
+		}
+	}
+	file.close();
+
+}
+
 void mqMorphoDigCore::SaveActiveScalarSummary(QString fileName, int useTags, QString TagArray, vtkIdType TagId)
 {
 	QFile file(fileName);

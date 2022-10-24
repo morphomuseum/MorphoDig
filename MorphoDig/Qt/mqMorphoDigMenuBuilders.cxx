@@ -105,6 +105,7 @@
 #include "mqScalarsDistanceDialogReaction.h"
 #include "mqScalarsThicknessBetweenDialogReaction.h"
 #include "mqScalarsInfosDialogReaction.h"
+#include "mqScalarsInfosAlongDirectionDialogReaction.h"
 #include "mqScalarsVolumeDialogReaction.h"
 
 #include "mqSurfaceTagInfosDialogReaction.h"
@@ -239,6 +240,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   //new mqSaveDataReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"), 22);
   new mqScalarsInfosDialogReaction(submenuMeasurements->addAction("Save active scalar infos (mean, median, variance ...) of selected surfaces") << mqSetName("actionSaveSCInfos"));
   new mqSaveDataReaction(submenuMeasurements->addAction("Save scalar values of first selected surface") << mqSetName("actionSaveSCInfos"), 23);
+  new mqScalarsInfosAlongDirectionDialogReaction(submenuMeasurements->addAction("Save variation of active scalar infos (mean, median, variance ...) of selected surfaces along X, Y or Z direction") << mqSetName("actionSaveSCInfos"));
 
   
   QMenu* submenuVolume = menu.addMenu("Volume");

@@ -706,11 +706,15 @@ void vtkMDActorCollection::ComputeBoundingBoxLength()
 	this->InitTraversal();
 	for (vtkIdType i = 0; i < this->GetNumberOfItems(); i++)
 	{
-		vtkActor* actor = this->GetNextActor();
-		
+		vtkMDActor* actor = vtkMDActor::SafeDownCast(this->GetNextActor());
+		//il y a un bug avec certains objets pour GetBounds (étonnant!!!!!)
 			double bounds[6];
+			//actor->GetBounds(bounds); //rotten, does not give display bounds... 
+			 actor->GetDisplayBounds(bounds);
+			// A cause du bug qui affecte certains objets, on n'utilise pas la fonction native vtk GetBounds, mais 
+			 //on calcule nous meme avec GetDisplayBounds...
+			
 
-			actor->GetBounds(bounds);
 			if (bounds[0] < largestbounds[0]) { largestbounds[0] = bounds[0]; }
 			if (bounds[1] > largestbounds[1]) { largestbounds[1] = bounds[1]; }
 			if (bounds[2] < largestbounds[2]) { largestbounds[2] = bounds[2]; }
