@@ -706,11 +706,28 @@ void vtkMDActorCollection::ComputeBoundingBoxLength()
 	this->InitTraversal();
 	for (vtkIdType i = 0; i < this->GetNumberOfItems(); i++)
 	{
-		vtkMDActor* actor = vtkMDActor::SafeDownCast(this->GetNextActor());
+		//vtkMDActor* actor = vtkMDActor::SafeDownCast(this->GetNextActor());
+		 vtkActor* actor = this->GetNextActor();
 		//il y a un bug avec certains objets pour GetBounds (étonnant!!!!!)
 			double bounds[6];
-			//actor->GetBounds(bounds); //rotten, does not give display bounds... 
-			 actor->GetDisplayBounds(bounds);
+			std::string str1("vtkMDActor");
+			std::string str2("vtkLMActor");
+			if (str1.compare(actor->GetClassName()) == 0)
+			{
+				vtkMDActor* MDactor = vtkMDActor::SafeDownCast(actor);
+				MDactor->GetDisplayBounds(bounds);
+			}
+			else
+			{ 
+				// //rotten, does not give display bounds for meshes... 
+				actor->GetBounds(bounds);
+			}
+
+			
+			
+
+			
+			
 			// A cause du bug qui affecte certains objets, on n'utilise pas la fonction native vtk GetBounds, mais 
 			 //on calcule nous meme avec GetDisplayBounds...
 			
@@ -722,8 +739,6 @@ void vtkMDActorCollection::ComputeBoundingBoxLength()
 			if (bounds[4] < largestbounds[4]) { largestbounds[4] = bounds[4]; }
 			if (bounds[5] > largestbounds[5]) { largestbounds[5] = bounds[5]; }
 			int selected = 0;
-			std::string str1("vtkMDActor");
-			std::string str2("vtkLMActor");
 			if (str1.compare(actor->GetClassName()) == 0)
 			{
 				vtkMDActor* MTactor = vtkMDActor::SafeDownCast(actor);
