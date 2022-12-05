@@ -154,11 +154,11 @@ IF (WIN32)
     COMPONENT applications)
   #set (QT5_BINARIES "C:/Qt/5.8/msvc2015_64/bin") 
 
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt6Core.dll" qtcore)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt6Widgets.dll" qtwidgets)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/bin/Qt6GUI.dll" qtgui)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/platforms/qwindows.dll" qtwindows)
-  file(TO_CMAKE_PATH "$ENV{QTDIR}/plugins/imageformats/qico.dll" qtico)
+  file(TO_CMAKE_PATH "$ENV{Qt6_DIR}/bin/Qt6Core.dll" qtcore)
+  file(TO_CMAKE_PATH "$ENV{Qt6_DIR}/bin/Qt6Widgets.dll" qtwidgets)
+  file(TO_CMAKE_PATH "$ENV{Qt6_DIR}/bin/Qt6GUI.dll" qtgui)
+  file(TO_CMAKE_PATH "$ENV{Qt6_DIR}/plugins/platforms/qwindows.dll" qtwindows)
+  file(TO_CMAKE_PATH "$ENV{Qt6_DIR}/plugins/imageformats/qico.dll" qtico)
 
   install(
     FILES
