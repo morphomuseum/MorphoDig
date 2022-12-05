@@ -114,7 +114,9 @@ public:
     //this->ChartXY->SetShowLegend(true);
     
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
-    this->ContextView->SetInteractor(this->Widget->GetInteractor());
+	//@@@@
+	this->Widget->interactor();
+    this->ContextView->SetInteractor(this->Widget->interactor());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 
     this->ChartXY->SetActionToButton(vtkChart::PAN, -1);
