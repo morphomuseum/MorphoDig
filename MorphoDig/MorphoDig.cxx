@@ -471,7 +471,7 @@ this->segView4 = new QVTKOpenGLWidget();
 	dock2->setAllowedAreas(Qt::AllDockWidgetAreas);
 	projectTabWindow->addDockWidget(Qt::RightDockWidgetArea, dock2);*/
 
-	projectTabWindow->setWindowModality(Qt::WindowModal);
+	//projectTabWindow->setWindowModality(Qt::WindowModal);
 	//segmentationTabWindow->setWindowModality(Qt::WindowModal);
 	/*Qt::WindowFlags flags = windowFlags();
 	Qt::WindowFlags closeFlag = Qt::WindowCloseButtonHint;
