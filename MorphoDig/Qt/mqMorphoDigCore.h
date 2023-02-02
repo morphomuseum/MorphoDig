@@ -914,7 +914,7 @@ public:
 		double sc, vtkIdType id, int tool_mode, int compute_avg_norm = 0);	
 	void RecomputePointNormals(vtkSmartPointer<vtkPolyData> mesh);
 	void RecomputeCellNormals(vtkSmartPointer<vtkPolyData> mesh);
-	int mqMorphoDigCore::Already_Listed(vtkIdType ve, vtkSmartPointer<vtkIdList> ptList);
+	int Already_Listed(vtkIdType ve, vtkSmartPointer<vtkIdList> ptList);
 	void PropagateVertices(
 		vtkSmartPointer<vtkPolyData> mesh,
 		vtkSmartPointer<vtkFloatArray> norms,
