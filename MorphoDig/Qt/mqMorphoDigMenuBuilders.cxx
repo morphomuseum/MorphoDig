@@ -38,6 +38,7 @@
 #include "mqEditAllFLGLengthDialogReaction.h"
 #include "mqEditTagsDialogReaction.h"
 #include "mqICPDialogReaction.h"
+#include "mqC2SDialogReaction.h"
 #include "mqIsosurfaceDialogReaction.h"
 #include "mqFlipSwapDialogReaction.h"
 #include "mqSpacingDialogReaction.h"
@@ -396,8 +397,12 @@ void mqMorphoDigMenuBuilders::buildEditSelectedSurfacesMenu(QMenu& menu)
 	QMenu* submenuBoolean = menu.addMenu("Boolean operations");
 	new mqBooleanOperationDialogReaction(submenuBoolean->addAction("Boolean operations involving two surfaces") << mqSetName("actionBoolean"));
 
+
+
 	QMenu* submenuAlignment = menu.addMenu("Surface alignment");
 	new mqICPDialogReaction(submenuAlignment->addAction("Align 2 surfaces (iterative closest point algorithm)") << mqSetName("actionICP"));
+	QMenu* submenuC2S = menu.addMenu("Compare surfaces");
+	new mqC2SDialogReaction(submenuC2S->addAction("Compare 2 surfaces having the same topology") << mqSetName("actionC2S"));
 
 	
 	QMenu* submenuRenderingModification = menu.addMenu("Rendering modification");

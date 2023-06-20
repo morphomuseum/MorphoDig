@@ -936,6 +936,10 @@ public:
   void scalarsThicknessBetween(double max_thickness, int smooth_normals, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor, double angularLimit, int invertObservedNormals =0);
   void scalarsDistance(double maxDist, int avg, QString scalarName, vtkMDActor *impactedActor, vtkMDActor* observedActor);
   void ICP(int transformationMode, int iterationNumber, vtkMDActor *impactedActor, vtkMDActor* observedActor);
+  void C2S(int transformationMode, QString scalarName, vtkMDActor* impactedActor, vtkMDActor* observedActor);
+  int CalculateTangentVector(float land[], float norm[], float mean[], float* fX, float* fY, float* fZ, float* d);
+  void CalculateVectorNormal(float fVert1[], float fVert2[], float fVert3[], float* fNormalX, float* fNormalY, float* fNormalZ);
+  float TriangleArea(double p1[3], double p2[3], double p3[3]);
   vtkMDActor * getFirstActorFromName(QString actorName);
   std::vector<std::string> getActorNames();
   
@@ -1078,6 +1082,11 @@ public:
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRainbowLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarRedLut();
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarGreyScaleLut();
+
+
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarVioletWhiteYellowLut();
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> GetScalarGreenWhiteRedLut();
+
   void SetNormalInteractorStyle(vtkSmartPointer<vtkMDInteractorStyle> mStyle);
   void SetLassoInteractorStyle(vtkSmartPointer<vtkInteractorStyleDrawPolygon> mLassoStyle);
   void SetRubberInteractorStyle(vtkSmartPointer<vtkInteractorStyleRubberBand3D> mRubbertyle);
@@ -1145,6 +1154,8 @@ protected:
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRainbowLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarRedLut;
 	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarGreyScaleLut;
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarVioletWhiteYellowLut;
+	vtkSmartPointer<vtkDiscretizableColorTransferFunction> ScalarGreenWhiteRedLut;
 	vtkSmartPointer<vtkBezierCurveSource> BezierCurveSource;
 	vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation;
 	vtkSmartPointer<vtkPolyDataMapper> BezierMapper;

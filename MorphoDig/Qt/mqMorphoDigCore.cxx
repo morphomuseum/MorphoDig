@@ -237,7 +237,9 @@ mqMorphoDigCore::mqMorphoDigCore()
 	this->ScalarRedLut = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->ScalarRainbowLut = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 	this->ScalarGreyScaleLut = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
-	
+	this-> ScalarVioletWhiteYellowLut = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+	this->ScalarGreenWhiteRedLut = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+
 	this->mui_SegmentDecimations = new SegmentDecimations;
 	this->mui_DefaultSegmentDecimation = this->mui_SegmentDecimation = 15;
 
@@ -2695,6 +2697,16 @@ vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScala
 {
 	return this->ScalarGreyScaleLut;
 }
+
+vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScalarVioletWhiteYellowLut()
+{
+	return this->ScalarVioletWhiteYellowLut;
+}
+vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScalarGreenWhiteRedLut()
+{
+	return this->ScalarGreenWhiteRedLut;
+}
+
 vtkSmartPointer<vtkDiscretizableColorTransferFunction> mqMorphoDigCore::GetScalarRedLut()
 {
 	return this->ScalarRedLut;
@@ -3721,6 +3733,42 @@ void mqMorphoDigCore::InitLuts()
 
 
 
+	this->ScalarVioletWhiteYellowLut->DiscretizeOff();
+	this->ScalarVioletWhiteYellowLut->SetColorSpaceToRGB();
+
+	this->ScalarVioletWhiteYellowLut->AddRGBPoint(0.0, 0.67, 0.33, 1.0); //# Violet
+	this->ScalarVioletWhiteYellowLut->AddRGBPoint(0.3, 1.0, 1.0, 1.0); //# white
+	this->ScalarVioletWhiteYellowLut->AddRGBPoint(0.7, 1.0, 1.0, 1.0); //# white
+	this->ScalarVioletWhiteYellowLut->AddRGBPoint(1.0, 1.0, 1.0, 0.0); //# yellow
+	this->ScalarVioletWhiteYellowLut->GetNumberOfValues();
+	vtkSmartPointer<vtkPiecewiseFunction> opacityVWYfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+
+	opacityVWYfunction->AddPoint(0, 1);	
+	opacityVWYfunction->AddPoint(1, 1);
+	this->ScalarVioletWhiteYellowLut->SetScalarOpacityFunction(opacityVWYfunction);
+	this->ScalarVioletWhiteYellowLut->EnableOpacityMappingOn();
+	this->ScalarVioletWhiteYellowLut->Build();
+
+
+	this->ScalarGreenWhiteRedLut->DiscretizeOff();
+	this->ScalarGreenWhiteRedLut->SetColorSpaceToRGB();
+
+	this->ScalarGreenWhiteRedLut->AddRGBPoint(0.0, 0.0, 1.0, 0.0); //# Green
+	this->ScalarGreenWhiteRedLut->AddRGBPoint(0.3, 1.0, 1.0, 1.0); //# white
+	this->ScalarGreenWhiteRedLut->AddRGBPoint(0.7, 1.0, 1.0, 1.0); //# white
+	this->ScalarGreenWhiteRedLut->AddRGBPoint(1.0, 1.0, 0.0, 0.0); //# Red
+	this->ScalarGreenWhiteRedLut->GetNumberOfValues();
+	vtkSmartPointer<vtkPiecewiseFunction> opacityGWRfunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+
+	opacityGWRfunction->AddPoint(0, 1);
+	opacityGWRfunction->AddPoint(1, 1);
+	this->ScalarGreenWhiteRedLut->SetScalarOpacityFunction(opacityGWRfunction);
+	this->ScalarGreenWhiteRedLut->EnableOpacityMappingOn();
+	this->ScalarGreenWhiteRedLut->Build();
+
+
+
+
 	/*this->mui_ActiveColorMap->ColorMap = this->ScalarRedLut;
 	this->mui_ActiveColorMap->Name = QString("Black-Red-White_Alpha");*/
 	cout << "Set Active color map!" << endl;
@@ -3740,6 +3788,12 @@ void mqMorphoDigCore::InitLuts()
 
 	QString GS = QString("Grey scale");
 	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(GS, this->ScalarGreyScaleLut, 0));
+
+	QString VWY = QString("Violet White Yellow");
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(VWY, this->ScalarVioletWhiteYellowLut, 0));
+
+	QString GWR = QString("Green White Red");
+	this->mui_ExistingColorMaps->Stack.push_back(ExistingColorMaps::Element(GWR, this->ScalarGreenWhiteRedLut, 0));
 
 
 	vtkSmartPointer<vtkFloatArray> scalarValues = vtkSmartPointer<vtkFloatArray>::New();
@@ -18963,6 +19017,351 @@ void mqMorphoDigCore::ICP(int transformationMode, int iterationNumber, vtkMDActo
 		}
 
 		END_UNDO_SET();
+		this->Render();
+	}
+}
+
+int mqMorphoDigCore::CalculateTangentVector(float land[], float norm[], float mean[],
+	float* fX,
+	float* fY,
+	float* fZ,
+	float* d
+)
+{
+	int Ok;
+	
+	
+	float a1,   b1,   c1, d1;
+	float A[3];
+	float B[3];
+	float C[3];
+	float AB[3];
+	float AC[3];
+	
+
+	Ok = 1;
+	//plane1 Dertermine plane equation perpendicular to norm passing trough land 
+	a1 = norm[0]; b1 = norm[1]; c1 = norm[2]; d1 = -(norm[0] * land[0] + norm[1] * land[1] + norm[2] * land[2]);
+	//X*norm[0] + Y*norm[1] + Z*norm[2] -(norm[0]*land[0] +norm[1]*land[1] +norm[2]*land[2] ) = 0
+
+
+	A[0] = land[0]; A[1] = land[1]; A[2] = land[2];
+	B[0] = land[0] + norm[0]; B[1] = land[1] + norm[1]; B[2] = land[2] + norm[2];
+	C[0] = mean[0]; C[1] = mean[1]; C[2] = mean[2];
+
+	AB[0] = B[0] - A[0];
+	AC[0] = C[0] - A[0];
+	AB[1] = B[1] - A[1];
+	AC[1] = C[1] - A[1];
+	AB[2] = B[2] - A[2];
+	AC[2] = C[2] - A[2];
+	*d = AB[0] * AC[0] + AB[1] * AC[1] + AB[2] * AC[2];
+	*fX = land[0] - (AC[0] - *d * norm[0]);
+	*fY = land[1] - (AC[1] - *d * norm[1]);
+	*fZ = land[2] - (AC[2] - *d * norm[2]);
+
+	//*fX = 1; //+ *d*(norm[0]);
+	//*fY = 1; //+ *d*(norm[1]);
+	//*fZ = 1; //+ *d*(norm[2]);
+	return 1;
+}
+
+float mqMorphoDigCore::TriangleArea(double p1[3], double p2[3], double p3[3])
+{
+	//return ve[0];
+	float area;
+	float u1[3];
+	float u2[3];
+	float crossprod[3];
+	u1[0] = p2[0] - p1[0];
+	u1[1] = p2[1] - p1[1];
+	u1[2] = p2[2] - p1[2];
+	u2[0] = p3[0] - p1[0];
+	u2[1] = p3[1] - p1[1];
+	u2[2] = p3[2] - p1[2];
+
+	crossprod[0] = u1[1] * u2[2] - u1[2] * u2[1];
+	crossprod[1] = u1[0] * u2[2] - u1[2] * u2[0];
+	crossprod[2] = u1[0] * u2[1] - u1[1] * u2[0];
+	if ((p1[0] != -9999) && (p2[0] != -9999) && (p3[0] != -9999))
+	{
+		area = sqrt(crossprod[0] * crossprod[0] + crossprod[1] * crossprod[1] + crossprod[2] * crossprod[2]) / 2;
+	}
+	else
+	{
+		area = -9999;
+	}
+
+	return area;
+
+}
+void mqMorphoDigCore::CalculateVectorNormal(float fVert1[], float fVert2[],
+
+	float fVert3[], float* fNormalX,
+	float* fNormalY, float* fNormalZ)
+{
+	float Qx, Qy, Qz, Px, Py, Pz;
+
+	Qx = fVert2[0] - fVert1[0];
+	Qy = fVert2[1] - fVert1[1];
+	Qz = fVert2[2] - fVert1[2];
+	Px = fVert3[0] - fVert1[0];
+	Py = fVert3[1] - fVert1[1];
+	Pz = fVert3[2] - fVert1[2];
+
+	*fNormalX = Py * Qz - Pz * Qy;
+	*fNormalY = Pz * Qx - Px * Qz;
+	*fNormalZ = Px * Qy - Py * Qx;
+
+}
+
+void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor* impactedActor, vtkMDActor* observedActor)
+{
+	std::string mScalarName = "Difference";
+	int modified = 0;
+	if (scalarName.length() > 0)
+	{
+		mScalarName = scalarName.toStdString();
+	}
+	if (impactedActor != NULL && observedActor != NULL && (impactedActor != observedActor))
+	{
+		std::string action = "C2S Scalar computation transform for ";
+		action.append(impactedActor->GetName().c_str());
+		int Count = BEGIN_UNDO_SET(action);
+		impactedActor->SaveState(Count);
+		vtkPolyDataMapper* myImpactedMapper = vtkPolyDataMapper::SafeDownCast(impactedActor->GetMapper());
+		vtkPolyDataMapper* myObservedMapper = vtkPolyDataMapper::SafeDownCast(observedActor->GetMapper());
+		if (myImpactedMapper != NULL && vtkPolyData::SafeDownCast(myImpactedMapper->GetInput()) != NULL)
+		{
+			
+			vtkSmartPointer<vtkPolyData> mImpactedPD = vtkSmartPointer<vtkPolyData>::New();
+			mImpactedPD = myImpactedMapper->GetInput();
+
+			vtkSmartPointer<vtkPolyData> mObservedPD = vtkSmartPointer<vtkPolyData>::New();
+			mObservedPD = myObservedMapper->GetInput();
+
+
+			vtkIdType obVeN = mObservedPD->GetNumberOfPoints();
+			vtkIdType impVeN = mImpactedPD->GetNumberOfPoints();
+			if (obVeN == impVeN)
+			{
+
+				double ve_init_pos[3];;
+				double ve_final_pos[3];
+
+				vtkSmartPointer<vtkMatrix4x4> impMat = impactedActor->GetMatrix();
+
+				for (vtkIdType i = 0; i < mImpactedPD->GetNumberOfPoints(); i++) {
+					// for every triangle 
+					mImpactedPD->GetPoint(i, ve_init_pos);
+					mqMorphoDigCore::TransformPoint(impMat, ve_init_pos, ve_final_pos);
+
+				}
+
+				vtkSmartPointer<vtkMatrix4x4> obsMat = observedActor->GetMatrix();
+
+
+				for (vtkIdType i = 0; i < mObservedPD->GetNumberOfPoints(); i++) {
+					// for every triangle 
+					mObservedPD->GetPoint(i, ve_init_pos);
+					mqMorphoDigCore::TransformPoint(obsMat, ve_init_pos, ve_final_pos);
+
+					//mObservedPD->GetPoints()->SetPoint((vtkIdType)i, ve_final_pos);
+				}
+
+				if (transformationMode == 0) {// Area comparison
+					float area1, area2;
+					double ve[3];
+					double ve1[3];
+					double ve3[3];
+					// surface comparaison
+					
+					vtkSmartPointer<vtkDoubleArray> newScalars =
+						vtkSmartPointer<vtkDoubleArray>::New();
+
+					newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					newScalars->SetNumberOfTuples(obVeN);
+
+					
+					//Loop onto every vertex.
+					int index = 0;
+					vtkIdList* points1 = vtkIdList::New();
+					vtkIdList* points2 = vtkIdList::New();
+					vtkIdList* cells1 = vtkIdList::New();
+					vtkIdList* cells2 = vtkIdList::New();
+
+					
+
+					mObservedPD->GetPointCells(0, cells1);
+					if (cells1->GetNumberOfIds() < 1)
+					{
+			
+						cout << "GetNumberOfIds<1 END !!!";
+						cout.flush();
+						modified = 0;
+						return;
+					}
+
+					
+
+					for (vtkIdType i = 0; i < obVeN; i++)
+					{
+						area1 = 0;
+						area2 = 0;
+						mObservedPD->GetPointCells(i, cells1);
+						mImpactedPD->GetPointCells(i, cells2);
+						
+						for (vtkIdType j = 0; j < cells1->GetNumberOfIds(); j++)
+						{
+							if (cells1->GetNumberOfIds() > 2)
+							{
+
+								mObservedPD->GetCellPoints(cells1->GetId(j), points1);
+								mObservedPD->GetPoint(points1->GetId(0), ve);
+								mObservedPD->GetPoint(points1->GetId(1), ve1);
+								mObservedPD->GetPoint(points1->GetId(2), ve3);
+								area1 = area1 + this->TriangleArea(ve, ve1, ve3);								
+								mImpactedPD->GetCellPoints(cells2->GetId(j), points2);
+								mImpactedPD->GetPoint(points2->GetId(0), ve);
+								mImpactedPD->GetPoint(points2->GetId(1), ve1);
+								mImpactedPD->GetPoint(points2->GetId(2), ve3);
+								area2 += this->TriangleArea(ve, ve1, ve3);
+								//area2=1;
+								//printf ("\nnumber of ids:%d",cells1->GetNumberOfIds());
+
+							}
+						}
+						if (area1 != 0)
+						{
+
+							newScalars->InsertTuple1(i, -log(area1 / area2));
+							
+						}
+						else
+						{
+							
+							newScalars->InsertTuple1(i, 100);
+						}
+
+					}
+					newScalars->SetName(mScalarName.c_str());
+
+					// remove this scalar
+					//this->GetPointData()->SetScalars(newScalars);
+					mImpactedPD->GetPointData()->RemoveArray(mScalarName.c_str());
+					mImpactedPD->GetPointData()->AddArray(newScalars);
+					mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+					modified = 1;
+
+
+				}// fin surface
+				else if (transformationMode == 1)
+				{
+					cout << "HERE I AM" << endl;
+					vtkSmartPointer<vtkDoubleArray> newScalars =
+						vtkSmartPointer<vtkDoubleArray>::New();
+
+					newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					newScalars->SetNumberOfTuples(obVeN);
+
+					//normal displacement
+						int index = 0;
+						double* ve;
+						double* ve1;
+
+						double* ven;
+						float dn;
+						float ve2[3];
+						float fX, fY, fZ;
+						float land[3], mean[3], norm[3];
+
+					vtkIdList* points1 = vtkIdList::New();
+					vtkIdList* points2 = vtkIdList::New();
+					
+					vtkFloatArray* norms = (vtkFloatArray*)mObservedPD->GetPointData()->GetNormals();
+					vtkIdType nbp = obVeN;
+
+
+
+					vtkIdList* cells1 = vtkIdList::New();
+					mObservedPD->GetPointCells(0, cells1);
+					if (cells1->GetNumberOfIds() < 1)
+					{
+
+						cout << "GetNumberOfCells<1!!!";
+						cout.flush();
+						modified = 0;
+						return;
+					}
+
+
+
+					for (vtkIdType i = 0; i < nbp; i++)
+					{
+
+						//norms-> 
+
+						ven = norms->GetTuple(i);
+						ve = mObservedPD->GetPoint(i);
+						ve1 = mImpactedPD->GetPoint(i);
+						ve2[0] = ve[0] - ve1[0];
+						ve2[1] = ve[1] - ve1[1];
+						ve2[2] = ve[2] - ve1[2];
+
+
+						land[0] = ve1[0]; land[1] = ve1[1]; land[2] = ve1[2];
+						mean[0] = ve[0]; mean[1] = ve[1]; mean[2] = ve[2];
+						norm[0] = ven[0]; norm[1] = ven[1]; norm[2] = ven[2];
+						//norm[0] = 1;norm[1] = 1;norm[2] = 1;
+
+						CalculateTangentVector(land, norm, mean,
+							&fX,
+							&fY,
+							&fZ,
+							&dn
+						);
+
+
+						newScalars->InsertTuple1(i, - (double)dn);
+						if (i == 10)
+						{
+							cout << "HERE I AM POINT 10" << endl;
+
+						}
+
+					}
+					newScalars->SetName(mScalarName.c_str());
+					cout << "HERE I AM ADD NEW SCALAR" << endl;
+
+					// remove this scalar
+					//this->GetPointData()->SetScalars(newScalars);
+					mImpactedPD->GetPointData()->RemoveArray(mScalarName.c_str());
+					mImpactedPD->GetPointData()->AddArray(newScalars);
+					mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
+					modified = 1;
+
+				}
+
+
+				// now : apply current matrix to 
+
+				//impactedActor->SetmColor(r, g, b, 0.5);
+			}
+		}
+
+		END_UNDO_SET();
+		if (modified == 1)
+		{
+			cout << "scalars updated " << endl;
+
+			this->Initmui_ExistingArrays();
+			if (transformationMode != 2)
+			{
+				this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_FLOAT, 1);
+			}
+
+
+		}
 		this->Render();
 	}
 }

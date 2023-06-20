@@ -53,6 +53,10 @@ mqBooleanOperationDialog.cxx
 mqBooleanOperationDialog.h
 mqBooleanOperationDialogReaction.cxx
 mqBooleanOperationDialogReaction.h
+mqC2SDialog.cxx
+mqC2SDialog.h
+mqC2SDialogReaction.cxx
+mqC2SDialogReaction.h
 mqCameraControlsWidget.cxx
 mqCameraControlsWidget.h
 mqCameraDialog.cxx
@@ -414,6 +418,7 @@ set (Qt_MOC_HDRS
 set (Qt_UIs mqAboutDialog.ui
 mqActorTreePanel.ui
 mqBooleanOperationDialog.ui
+mqC2SDialog.ui
 mqCameraControlsWidget.ui
 mqCameraDialog.ui
 mqColorDialog.ui
