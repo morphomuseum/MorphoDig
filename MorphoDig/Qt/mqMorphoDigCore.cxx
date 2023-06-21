@@ -19337,11 +19337,43 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 					//this->GetPointData()->SetScalars(newScalars);
 					mImpactedPD->GetPointData()->RemoveArray(mScalarName.c_str());
 					mImpactedPD->GetPointData()->AddArray(newScalars);
+					
 					mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
 					modified = 1;
 
 				}
+				else if (transformationMode == 2)
+				{
+					//calculate normal :mean = observed object
+					// land = impacted object. 
+					// normal de l'impacted object serait mieux
+					//spikes
+					// on va utiliser vtkGlyph3D et vtkMask (ce dernier ne conservera qu'un objet sur N)
+					//
+					/*
+					vtkSmartPointer<vtkDoubleArray> scalars_spike =
+						vtkSmartPointer<vtkDoubleArray>::New();
+					scalars_spike = vtkFloatArray::New();
+					scalars_spike->SetNumberOfTuples(obVeN);
+					scalars_spike->SetNumberOfComponents(1);
+					// Set up 1D parametric system
+					vtkFloatArray* vectors = vtkFloatArray::New();
+					vectors->SetNumberOfTuples(numPts);
+					vectors->SetNumberOfComponents(3);
 
+					//Loop onto every vertex.
+					int index = 0;
+					vtkIdList* points1 = vtkIdList::New();
+					vtkIdList* points2 = vtkIdList::New();
+					//Get point normals  
+					//normals_norm->Update();
+
+					//vtkFloatArray * norms = (vtkFloatArray*)normals_norm->GetOutput()->GetPointData()->GetNormals();
+					vtkFloatArray* norms = (vtkFloatArray*)input2->GetPointData()->GetNormals();
+					int nbp = input1->GetNumberOfPoints();
+					*/
+
+				}
 
 				// now : apply current matrix to 
 
