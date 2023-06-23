@@ -223,6 +223,13 @@ connect(this->Ui->editScalar, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
 connect(this->Ui->duplicateScalar, SIGNAL(pressed()), this, SLOT(slotDuplicateScalar()));
 
 connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
+
+connect(this->Ui->displaySpikesCheckBox, SIGNAL(clicked(bool)), this, SLOT(slotDisplaySpikesClicked(bool)));
+connect(this->Ui->autoAdjustSpikeRenderingSizeCheckBox, SIGNAL(clicked(bool)), this, SLOT(slotAdjustSpikesClicked(bool)));
+
+
+
+
 connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
 connect(this->Ui->isVisible, SIGNAL(clicked(bool)), this, SLOT(slotisVisibleClicked(bool)));
 //virtual void slotEnableROIPressed(bool isChecked);
@@ -442,6 +449,61 @@ void mqEditACTORDialog::slotisVisibleClicked(bool isChecked)
 	}
 }
 
+
+void mqEditACTORDialog::slotDisplaySpikesClicked(bool isChecked)
+{
+	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
+	{
+		if (isChecked)
+			//if (this->Volume->GetdisplayROI() == 0)
+		{
+			this->ACTOR->SetdisplaySpikes(1);
+			this->Ui->autoAdjustSpikeRenderingSizeCheckBox->setEnabled(true);
+			this->Ui->adjustSpikeScaleFactor->setEnabled(true);
+			this->Ui->spikeMaskFactor->setEnabled(true);
+			
+		}
+		else
+		{
+			this->ACTOR->SetdisplaySpikes(1);
+			this->Ui->autoAdjustSpikeRenderingSizeCheckBox->setEnabled(false);
+			this->Ui->adjustSpikeScaleFactor->setEnabled(false);
+			this->Ui->spikeMaskFactor->setEnabled(false);
+
+
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+
+}
+void mqEditACTORDialog::slotAdjustSpikesClicked(bool isChecked)
+{
+	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
+	{
+		if (isChecked)
+			//if (this->Volume->GetdisplayROI() == 0)
+		{
+			this->ACTOR->SetautoAdjustSpikeRendering(1);
+			
+
+		}
+		else
+		{
+			this->ACTOR->SetautoAdjustSpikeRendering(0);
+			
+
+
+		}
+		mqMorphoDigCore::instance()->Render();
+	}
+
+}
+
+
+//virtual void slotDisplaySpikesClicked(bool isChecked);
+
+//virtual void slotAdjustSpikesClicked(bool isChecked);
+
 void mqEditACTORDialog::slotEnableROIClicked(bool isChecked)
 {
 	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
@@ -488,6 +550,8 @@ void mqEditACTORDialog::slotdisplayROIPressed()
 		mqMorphoDigCore::instance()->Render();
 	}
 }
+
+
 void mqEditACTORDialog::UpdateUI()
 {
 	if (this->ACTOR != NULL) {

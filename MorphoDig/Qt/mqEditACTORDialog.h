@@ -56,7 +56,11 @@ public:
   virtual void slotEditScalar();
   virtual void slotDuplicateScalar();
   virtual void slotDeleteScalar();
+  virtual void slotDisplaySpikesClicked(bool isChecked);
+  virtual void slotAdjustSpikesClicked(bool isChecked);
+
   virtual void slotEnableROIClicked(bool isChecked);
+
   virtual void slotdisplayROIPressed();
   virtual void slotisVisibleClicked(bool isChecked);
 

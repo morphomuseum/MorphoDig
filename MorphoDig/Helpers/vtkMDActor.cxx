@@ -25,8 +25,10 @@ Module:    vtkMDActor.cxx
 #include <vtkPolyDataMapper.h>
 #include <vtkCenterOfMass.h>
 #include <vtkTransform.h>
+#include <vtkNamedColors.h>
 #include <vtkPolyData.h>
 #include <vtkDoubleArray.h>
+#include <vtkTransformPolyDataFilter.h>
 #include <vtkUnsignedIntArray.h>
 #include <vtkFloatArray.h>
 #include <vtkIntArray.h>
@@ -62,6 +64,14 @@ vtkMDActor::vtkMDActor()
 	this->Changed = 0;
 	this->Box = vtkSmartPointer<vtkBoxWidget>::New();
 	this->Name = "New Mesh";
+	this->displaySpikes = 0;
+	this->autoAdjustSpikeRendering = 0;
+	this->spikeMaskFactor=100;
+	this->spikeScaleFactor=1;
+	this->Glyph = vtkSmartPointer<vtkGlyph3D>::New();
+	this->SpikeActor = vtkSmartPointer<vtkActor>::New();
+	this->SpikeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	this->Mask = vtkSmartPointer<vtkMaskPoints>::New();
 }
 
 //----------------------------------------------------------------------------
@@ -787,6 +797,47 @@ void vtkMDActor::SetSelected(int selected)
 		//this->GetBackfaceProperty()->SetOpacity(1);
 	}
 }
+
+
+void vtkMDActor::SetdisplaySpikes(int disp)
+{
+	this->displaySpikes = disp;
+	if (disp==0)
+	{ 
+		this->RemoveGlyph();
+	}
+	else
+	{ 
+		this->CreateGlyph();
+	}
+}
+
+
+void vtkMDActor::SetautoAdjustSpikeRendering(int autoAdjust)
+{
+	this->autoAdjustSpikeRendering = autoAdjust;
+	if (autoAdjust == 0)
+	{
+	}
+	else
+	{
+	}
+}
+
+
+void vtkMDActor::SetspikeMaskFactor(int maskFactor)
+{
+	this->spikeMaskFactor = maskFactor;
+	
+}
+
+
+void vtkMDActor::SetspikeScaleFactor(double scaleFactor)
+{
+	this->spikeScaleFactor = scaleFactor;
+}
+
+
 void vtkMDActor::SetenableROI(int enable)
 {
 	if (this->Box != NULL)
@@ -803,6 +854,9 @@ void vtkMDActor::SetenableROI(int enable)
 		}
 	}
 }
+
+
+
 void vtkMDActor::SetdisplayROI(int disp)
 {
 	if (this->Box != NULL)
@@ -912,6 +966,66 @@ void vtkMDActor::GetBoxBounds(double boxBounds[6])
 	boxBounds[4] = zmin;
 	boxBounds[5] = zmax;
 }
+void vtkMDActor::CreateGlyph()
+{
+	this->RemoveGlyph();
+	vtkPolyData* mPD = vtkPolyData::SafeDownCast(this->GetMapper()->GetInput());
+	vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+	normals->SetInputData(mPD);
+	normals->ComputePointNormalsOn();
+	normals->ComputeCellNormalsOn();
+	normals->AutoOrientNormalsOff();
+	//ObjNormals->FlipNormalsOn();
+	normals->ConsistencyOff();
+
+	normals->Update();
+
+	//normals->SetInputData(this->GetPointNormals());
+	normals->SetInputConnection(normals->GetOutputPort());
+	this->Mask= vtkSmartPointer<vtkMaskPoints>::New();
+	this->Mask->SetRandomMode(false);
+	this->Mask->SetOnRatio(this->spikeMaskFactor);
+	this->Mask->SetInputConnection(normals->GetOutputPort());
+
+	this->Glyph->SetInputConnection(this->Mask->GetOutputPort());
+	this->Glyph->SetScaleFactor(this->GetspikeScaleFactor());
+	vtkSmartPointer<vtkArrowSource>arrow = vtkSmartPointer<vtkArrowSource>::New();
+	arrow->SetShaftResolution(3);
+
+	vtkNew<vtkTransform> transform;
+	transform->Translate(0.5, 0.0, 0.0);
+
+	vtkNew<vtkTransformPolyDataFilter> transformF;
+	transformF->SetInputConnection(arrow->GetOutputPort());
+	transformF->SetTransform(transform);
+
+	this->Glyph->SetSourceConnection(transformF->GetOutputPort());
+	this->Glyph->SetVectorModeToUseNormal();
+	this->Glyph->SetScaleModeToScaleByVector();
+	this->SpikeMapper->SetInputConnection(this->Glyph->GetOutputPort());
+
+	this->SpikeActor->SetMapper(this->SpikeMapper);
+	vtkNew<vtkNamedColors> colors;
+
+	this->SpikeActor->GetProperty()->SetColor(
+		colors->GetColor3d("Emerald_Green").GetData());
+
+	mqMorphoDigCore::instance()->getRenderer()->AddActor(this->SpikeActor);
+}
+
+void vtkMDActor::RemoveGlyph()
+{
+	if (this->Glyph != NULL)
+	{
+		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->SpikeActor);
+
+		this->Glyph = vtkSmartPointer<vtkGlyph3D>::New();		
+		this->SpikeActor = vtkSmartPointer<vtkActor>::New();
+		
+	}
+	
+}
+
 void vtkMDActor::CreateBox()
 {
 	//just in case a Clipping Box already exists.
