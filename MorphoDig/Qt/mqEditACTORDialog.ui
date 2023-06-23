@@ -1051,6 +1051,9 @@
     </property>
    </widget>
    <widget class="QCheckBox" name="autoAdjustSpikeRenderingSizeCheckBox">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -1064,6 +1067,9 @@
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="adjustSpikeScaleFactor">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>270</x>
@@ -1109,6 +1115,9 @@
     </property>
    </widget>
    <widget class="QSpinBox" name="spikeMaskFactor">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>270</x>
