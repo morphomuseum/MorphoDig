@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
+    <width>496</width>
     <height>325</height>
    </rect>
   </property>
@@ -517,7 +517,7 @@
      <rect>
       <x>50</x>
       <y>160</y>
-      <width>366</width>
+      <width>351</width>
       <height>81</height>
      </rect>
     </property>
@@ -525,7 +525,7 @@
      <item>
       <widget class="QRadioButton" name="area">
        <property name="text">
-        <string>Compute -log(area1/area2)  (double array)</string>
+        <string>Compute local area variation  (-log(area1/area2))</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -533,16 +533,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="tangent">
-       <property name="text">
-        <string>Compute tangent displacement (vector array)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QRadioButton" name="normal">
        <property name="text">
-        <string>Compute normal displacement (double array)</string>
+        <string>Compute normal and tangent displacement</string>
        </property>
       </widget>
      </item>

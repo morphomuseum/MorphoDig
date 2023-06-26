@@ -226,8 +226,8 @@ connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPresse
 
 connect(this->Ui->displaySpikesCheckBox, SIGNAL(clicked(bool)), this, SLOT(slotDisplaySpikesClicked(bool)));
 connect(this->Ui->autoAdjustSpikeRenderingSizeCheckBox, SIGNAL(clicked(bool)), this, SLOT(slotAdjustSpikesClicked(bool)));
-
-
+connect(this->Ui->adjustSpikeScaleFactor, SIGNAL(valueChanged(double)), this, SLOT(slotadjustSpikeScaleFactor(double)));
+connect(this->Ui->spikeMaskFactor, SIGNAL(valueChanged(int)), this, SLOT(slotspikeMaskFactor(int)));
 
 
 connect(this->Ui->enableROI, SIGNAL(clicked(bool)), this, SLOT(slotEnableROIClicked(bool)));
@@ -465,7 +465,8 @@ void mqEditACTORDialog::slotDisplaySpikesClicked(bool isChecked)
 		}
 		else
 		{
-			this->ACTOR->SetdisplaySpikes(1);
+			this->ACTOR->SetdisplaySpikes(0);
+			
 			this->Ui->autoAdjustSpikeRenderingSizeCheckBox->setEnabled(false);
 			this->Ui->adjustSpikeScaleFactor->setEnabled(false);
 			this->Ui->spikeMaskFactor->setEnabled(false);
@@ -498,7 +499,21 @@ void mqEditACTORDialog::slotAdjustSpikesClicked(bool isChecked)
 	}
 
 }
+void mqEditACTORDialog::slotadjustSpikeScaleFactor(double factor)
+{
+	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
+	{
+		this->ACTOR->SetspikeScaleFactor(factor);
+	}
+}
+void mqEditACTORDialog::slotspikeMaskFactor(int factor)
+{
+	if (this->ACTOR != NULL && this->CurrentActorInCollection() && this->ACTOR->GetSelected() == 1)
+	{
+		this->ACTOR->SetspikeMaskFactor(factor);
 
+	}
+}
 
 //virtual void slotDisplaySpikesClicked(bool isChecked);
 
@@ -616,6 +631,33 @@ void mqEditACTORDialog::UpdateUI()
 		this->Ui->M33->setValue(Mat->GetElement(3, 3));
 		//QListView
 		//QItemDelegate
+		double spikeScaleFactor = this->ACTOR->GetspikeScaleFactor();
+		this->Ui->adjustSpikeScaleFactor->setValue(spikeScaleFactor);
+
+		int  maskFactor = this->ACTOR->GetspikeMaskFactor();
+		this->Ui->spikeMaskFactor->setValue(maskFactor);
+
+		int displaySpikes = this->ACTOR->GetdisplaySpikes();
+		this->Ui->displaySpikesCheckBox->setChecked(displaySpikes);
+		if (displaySpikes==1)
+		
+		{			
+			this->Ui->autoAdjustSpikeRenderingSizeCheckBox->setEnabled(true);
+			this->Ui->adjustSpikeScaleFactor->setEnabled(true);
+			this->Ui->spikeMaskFactor->setEnabled(true);
+
+		}
+		else
+		{			
+			this->Ui->autoAdjustSpikeRenderingSizeCheckBox->setEnabled(false);
+			this->Ui->adjustSpikeScaleFactor->setEnabled(false);
+			this->Ui->spikeMaskFactor->setEnabled(false);
+
+
+		}
+
+		int autoAdjustSpikes = this->ACTOR->GetautoAdjustSpikeRendering();
+		this->Ui->autoAdjustSpikeRenderingSizeCheckBox->setChecked(autoAdjustSpikes);
 
 		this->Ui->scalarList->clear();
 		ExistingArrays *MyList = mqMorphoDigCore::instance()->Getmui_ArraysOfActor(this->ACTOR);

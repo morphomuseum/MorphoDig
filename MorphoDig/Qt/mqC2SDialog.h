@@ -39,7 +39,7 @@ public:
   virtual void slotLaunchC2S();
   virtual void slotClose();
   virtual void slotArea();
-  virtual void slotTangent();
+  //virtual void slotTangent();
   virtual void slotNormal();
   
 

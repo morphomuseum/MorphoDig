@@ -314,6 +314,12 @@ void vtkMDActorCollection::DeleteSelectedActors()
 							{
 								myActor->GetBox()->SetEnabled(false);
 							}
+							cout << "myActor GetdisplaySpikes=" << myActor->GetdisplaySpikes();
+							if (myActor->GetdisplaySpikes()==1)
+							{
+								myActor->RemoveGlyph();
+								//myActor->SetdisplaySpikes(0);
+							}
 							found = 1;
 						}
 					}
@@ -403,6 +409,7 @@ void vtkMDActorCollection::PopUndoStack() {
 	// If stored event was a DELETE_EVENT, we need to put back deleted object in renderer + this
 	if (this->UndoRedo->UndoStack.back().EventType==DELETE_EVENT)
 	{
+		//cout << "This was a delete event"<<endl;
 		ActColl->InitTraversal();
 		for (vtkIdType i = 0; i < ActColl->GetNumberOfItems(); i++)
 		{
@@ -420,6 +427,12 @@ void vtkMDActorCollection::PopUndoStack() {
 						myMDActor->GetBox()->SetEnabled(true);
 					}
 				}
+				cout << "before createGlyph call myMDActor GetdisplaySpikes=" << myMDActor->GetdisplaySpikes();
+				if (myMDActor->GetdisplaySpikes() == 1)
+				{
+					myMDActor->CreateGlyph();
+				}
+
 			}
 
 
@@ -496,6 +509,13 @@ void vtkMDActorCollection::PopRedoStack() {
 				{
 					myMDActor->GetBox()->SetEnabled(false);
 				}
+				cout << "myMDActor GetdisplaySpikes=" << myMDActor->GetdisplaySpikes();
+				if (myMDActor->GetdisplaySpikes() == 1)
+				{
+					myMDActor->RemoveGlyph();
+					//myActor->SetdisplaySpikes(0);
+				}
+				
 			}
 			
 			std::string str1("vtkLMActor");

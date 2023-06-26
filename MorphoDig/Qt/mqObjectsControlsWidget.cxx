@@ -436,6 +436,7 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 		{
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(mqMorphoDigCore::instance()->getActorCollection()->GetNextActor());
 			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myActor);
+			vtkProp3D* myProprSpikes = vtkProp3D::SafeDownCast(myActor->GetSpikeActor());
 			if (myActor->GetSelected() == 1)
 			{
 				if (myPropr->GetUserMatrix() != NULL)
@@ -445,11 +446,15 @@ void mqObjectsControlsWidget::PanActors(int axis, int value)
 					t->SetMatrix(myPropr->GetUserMatrix());
 					t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
 					myPropr->GetUserMatrix()->DeepCopy(t->GetMatrix());
+					myProprSpikes->GetUserMatrix()->DeepCopy(t->GetMatrix());
 					t->Delete();
 				}
 				else
 				{
 					myPropr->AddPosition(motion_vector[0],
+						motion_vector[1],
+						motion_vector[2]);
+					myProprSpikes->AddPosition(motion_vector[0],
 						motion_vector[1],
 						motion_vector[2]);
 				}
@@ -814,6 +819,8 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 		{
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(mqMorphoDigCore::instance()->getActorCollection()->GetNextActor());
 			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myActor);
+			vtkProp3D* myProprSpikes = vtkProp3D::SafeDownCast(myActor->GetSpikeActor());
+
 			if (myActor->GetSelected() == 1)
 			{
 				//cout << "Apply prop3Dtransform" << endl;
@@ -833,6 +840,12 @@ void mqObjectsControlsWidget::RotateActors(int axis, int degrees)
 					1,
 					rotate,
 					scale);
+				this->Prop3DTransform(myProprSpikes,
+					rot_center,
+					1,
+					rotate,
+					scale);
+				
 				myActor->SetChanged(1);
 			}
 		}

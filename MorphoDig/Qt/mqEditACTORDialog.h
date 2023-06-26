@@ -58,7 +58,9 @@ public:
   virtual void slotDeleteScalar();
   virtual void slotDisplaySpikesClicked(bool isChecked);
   virtual void slotAdjustSpikesClicked(bool isChecked);
-
+  virtual void slotadjustSpikeScaleFactor(double factor);
+  virtual void slotspikeMaskFactor(int factor);
+  
   virtual void slotEnableROIClicked(bool isChecked);
 
   virtual void slotdisplayROIPressed();

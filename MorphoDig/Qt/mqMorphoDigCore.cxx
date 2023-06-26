@@ -19255,21 +19255,27 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 
 
 				}// fin surface
-				else if (transformationMode == 1)
+				else if (transformationMode == 1) //displacement comparison (normal and tangent)
 				{
 					cout << "HERE I AM" << endl;
-					vtkSmartPointer<vtkDoubleArray> newScalars =
+					vtkSmartPointer<vtkDoubleArray> newScalarsNormal =
 						vtkSmartPointer<vtkDoubleArray>::New();
 
-					newScalars->SetNumberOfComponents(1); //3d normals (ie x,y,z)
-					newScalars->SetNumberOfTuples(obVeN);
+					newScalarsNormal->SetNumberOfComponents(1); //3d normals (ie x,y,z)
+					newScalarsNormal->SetNumberOfTuples(obVeN);
 
-					//normal displacement
+					//normal 
 						int index = 0;
-						double* ve;
-						double* ve1;
+						double ve1_init_pos[3];;
+						double ve1_final_pos[3];
 
-						double* ven;
+						double ve2_init_pos[3];;
+						double ve2_final_pos[3];
+
+						double ven_init_pos[3];
+						double ven_final_pos[3];
+						
+						//double* ven;
 						float dn;
 						float ve2[3];
 						float fX, fY, fZ;
@@ -19301,17 +19307,20 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 
 						//norms-> 
 
-						ven = norms->GetTuple(i);
-						ve = mObservedPD->GetPoint(i);
-						ve1 = mImpactedPD->GetPoint(i);
-						ve2[0] = ve[0] - ve1[0];
-						ve2[1] = ve[1] - ve1[1];
-						ve2[2] = ve[2] - ve1[2];
+						norms->GetTuple(i, ven_init_pos);
+						mqMorphoDigCore::RotateNorm(obsMat, ven_init_pos, ven_final_pos);
+						mObservedPD->GetPoint(i, ve1_init_pos);
+						mqMorphoDigCore::TransformPoint(obsMat, ve1_init_pos, ve1_final_pos);
+						mImpactedPD->GetPoint(i, ve2_init_pos);
+						mqMorphoDigCore::TransformPoint(impMat, ve2_init_pos, ve2_final_pos);
+						ve2[0] = ve1_final_pos[0] - ve2_final_pos[0];
+						ve2[1] = ve1_final_pos[1] - ve2_final_pos[1];
+						ve2[2] = ve1_final_pos[2] - ve2_final_pos[2];
 
 
-						land[0] = ve1[0]; land[1] = ve1[1]; land[2] = ve1[2];
-						mean[0] = ve[0]; mean[1] = ve[1]; mean[2] = ve[2];
-						norm[0] = ven[0]; norm[1] = ven[1]; norm[2] = ven[2];
+						land[0] = ve2_final_pos[0]; land[1] = ve2_final_pos[1]; land[2] = ve2_final_pos[2];
+						mean[0] = ve1_final_pos[0]; mean[1] = ve1_final_pos[1]; mean[2] = ve1_final_pos[2];
+						norm[0] = ven_final_pos[0]; norm[1] = ven_final_pos[1]; norm[2] = ven_final_pos[2];
 						//norm[0] = 1;norm[1] = 1;norm[2] = 1;
 
 						CalculateTangentVector(land, norm, mean,
@@ -19322,7 +19331,7 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 						);
 
 
-						newScalars->InsertTuple1(i, - (double)dn);
+						newScalarsNormal->InsertTuple1(i, - (double)dn);
 						if (i == 10)
 						{
 							cout << "HERE I AM POINT 10" << endl;
@@ -19330,50 +19339,19 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 						}
 
 					}
-					newScalars->SetName(mScalarName.c_str());
+					newScalarsNormal->SetName((mScalarName + "_normal").c_str());
 					cout << "HERE I AM ADD NEW SCALAR" << endl;
 
 					// remove this scalar
 					//this->GetPointData()->SetScalars(newScalars);
-					mImpactedPD->GetPointData()->RemoveArray(mScalarName.c_str());
-					mImpactedPD->GetPointData()->AddArray(newScalars);
+					mImpactedPD->GetPointData()->RemoveArray((mScalarName+"_normal").c_str());
+					mImpactedPD->GetPointData()->AddArray(newScalarsNormal);
 					
 					mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
 					modified = 1;
 
 				}
-				else if (transformationMode == 2)
-				{
-					//calculate normal :mean = observed object
-					// land = impacted object. 
-					// normal de l'impacted object serait mieux
-					//spikes
-					// on va utiliser vtkGlyph3D et vtkMask (ce dernier ne conservera qu'un objet sur N)
-					//
-					/*
-					vtkSmartPointer<vtkDoubleArray> scalars_spike =
-						vtkSmartPointer<vtkDoubleArray>::New();
-					scalars_spike = vtkFloatArray::New();
-					scalars_spike->SetNumberOfTuples(obVeN);
-					scalars_spike->SetNumberOfComponents(1);
-					// Set up 1D parametric system
-					vtkFloatArray* vectors = vtkFloatArray::New();
-					vectors->SetNumberOfTuples(numPts);
-					vectors->SetNumberOfComponents(3);
-
-					//Loop onto every vertex.
-					int index = 0;
-					vtkIdList* points1 = vtkIdList::New();
-					vtkIdList* points2 = vtkIdList::New();
-					//Get point normals  
-					//normals_norm->Update();
-
-					//vtkFloatArray * norms = (vtkFloatArray*)normals_norm->GetOutput()->GetPointData()->GetNormals();
-					vtkFloatArray* norms = (vtkFloatArray*)input2->GetPointData()->GetNormals();
-					int nbp = input1->GetNumberOfPoints();
-					*/
-
-				}
+				
 
 				// now : apply current matrix to 
 

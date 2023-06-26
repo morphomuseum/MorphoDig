@@ -108,6 +108,9 @@ public:
 
 	vtkSetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
 	vtkGetMacro(Box, vtkSmartPointer<vtkBoxWidget>);
+	vtkSetMacro(SpikeActor, vtkSmartPointer<vtkActor>);
+	vtkGetMacro(SpikeActor, vtkSmartPointer<vtkActor>);
+
 	void SetdisplayROI(int disp);
 	//	vtkSetMacro(displayROI, int);
 	vtkGetMacro(displayROI, int);
@@ -175,8 +178,8 @@ protected:
 	vtkSmartPointer<vtkBoxWidget> Box;
 	vtkSmartPointer<vtkGlyph3D> Glyph;
 	vtkSmartPointer<vtkMaskPoints> Mask;
-	vtkSmartPointer<vtkActor> SpikeActor;
 	vtkSmartPointer<vtkPolyDataMapper> SpikeMapper;
+	vtkSmartPointer<vtkActor> SpikeActor;
 	int displayROI;
 	int enableROI;
 	int isVisible;
@@ -184,7 +187,7 @@ protected:
 	int autoAdjustSpikeRendering;
 	int spikeMaskFactor;
 	double spikeScaleFactor;
-
+	double autoAdjustSpikeScaleFactor;
 	vtkSmartPointer<vtkKdTreePointLocator> KdTree;
 	vtkSmartPointer<vtkPolyDataConnectivityFilter> cFilter;
 	vtkSmartPointer<vtkIdList> cFilterCorrList;// for some reason vertice ids are not the same in cFilter input / output => so a corresponding list has to be built . Here: 1,2,3,4 = cFilter ids. GetId(i) returns original list id

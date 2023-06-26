@@ -68,6 +68,7 @@ vtkMDActor::vtkMDActor()
 	this->autoAdjustSpikeRendering = 0;
 	this->spikeMaskFactor=100;
 	this->spikeScaleFactor=1;
+	this->autoAdjustSpikeScaleFactor = 1;
 	this->Glyph = vtkSmartPointer<vtkGlyph3D>::New();
 	this->SpikeActor = vtkSmartPointer<vtkActor>::New();
 	this->SpikeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -802,14 +803,21 @@ void vtkMDActor::SetSelected(int selected)
 void vtkMDActor::SetdisplaySpikes(int disp)
 {
 	this->displaySpikes = disp;
+	cout << "this->displaySpikes " << this->displaySpikes << endl;
 	if (disp==0)
 	{ 
+		cout << "Call RemoveGlyph from SetdisplaySpikes" << disp << endl;
 		this->RemoveGlyph();
 	}
 	else
-	{ 
+	{
+		cout << "this->displaySpikes " << this->displaySpikes << endl;
+		cout << "Call CreateGlyph from SetdisplaySpikes" << disp << endl;
 		this->CreateGlyph();
+		cout << "this->displaySpikes " << this->displaySpikes << endl;
 	}
+	cout << "this->displaySpikes " << this->displaySpikes << endl;
+	cout << "this->GetdisplaySpikes()" << this->GetdisplaySpikes()<< endl;
 }
 
 
@@ -818,23 +826,37 @@ void vtkMDActor::SetautoAdjustSpikeRendering(int autoAdjust)
 	this->autoAdjustSpikeRendering = autoAdjust;
 	if (autoAdjust == 0)
 	{
+		this->autoAdjustSpikeScaleFactor = 1;
 	}
 	else
 	{
+		this->autoAdjustSpikeScaleFactor = 0.02*this->GetBoundingBoxLength();
 	}
+	cout << "this->autoAdjustSpikeScaleFactor=" << this->autoAdjustSpikeScaleFactor << endl;
+	this->Glyph->SetScaleFactor(this->spikeScaleFactor * this->autoAdjustSpikeScaleFactor);
+	this->Glyph->Update();
+	mqMorphoDigCore::instance()->Render();
+
 }
 
 
 void vtkMDActor::SetspikeMaskFactor(int maskFactor)
 {
 	this->spikeMaskFactor = maskFactor;
-	
+	this->Mask->SetOnRatio(this->spikeMaskFactor);	
+	this->Mask->Update();
+	this->Glyph->Update();
+	mqMorphoDigCore::instance()->Render();
 }
 
 
 void vtkMDActor::SetspikeScaleFactor(double scaleFactor)
 {
 	this->spikeScaleFactor = scaleFactor;
+	this->Glyph->SetScaleFactor(scaleFactor* autoAdjustSpikeScaleFactor);
+	this->Glyph->Update();
+	mqMorphoDigCore::instance()->Render();
+
 }
 
 
@@ -968,6 +990,7 @@ void vtkMDActor::GetBoxBounds(double boxBounds[6])
 }
 void vtkMDActor::CreateGlyph()
 {
+	cout << "Start CreateGlyph function" << endl;
 	this->RemoveGlyph();
 	vtkPolyData* mPD = vtkPolyData::SafeDownCast(this->GetMapper()->GetInput());
 	vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -977,7 +1000,7 @@ void vtkMDActor::CreateGlyph()
 	normals->AutoOrientNormalsOff();
 	//ObjNormals->FlipNormalsOn();
 	normals->ConsistencyOff();
-
+	//cout << "Try to update normals" << endl;
 	normals->Update();
 
 	//normals->SetInputData(this->GetPointNormals());
@@ -985,44 +1008,82 @@ void vtkMDActor::CreateGlyph()
 	this->Mask= vtkSmartPointer<vtkMaskPoints>::New();
 	this->Mask->SetRandomMode(false);
 	this->Mask->SetOnRatio(this->spikeMaskFactor);
-	this->Mask->SetInputConnection(normals->GetOutputPort());
+	//this->Mask->SetInputConnection(normals->GetOutputPort());
+	this->Mask->SetInputData(normals->GetOutput());
+	this->Mask->Update();
 
-	this->Glyph->SetInputConnection(this->Mask->GetOutputPort());
+	this->Glyph->SetInputData(this->Mask->GetOutput());
+	//this->Glyph->SetInputConnection(this->Mask->GetOutputPort());
 	this->Glyph->SetScaleFactor(this->GetspikeScaleFactor());
 	vtkSmartPointer<vtkArrowSource>arrow = vtkSmartPointer<vtkArrowSource>::New();
 	arrow->SetShaftResolution(3);
-
+	arrow->Update();
 	vtkNew<vtkTransform> transform;
-	transform->Translate(0.5, 0.0, 0.0);
-
+	transform->Translate(0.0, 0.0, 0.0);
+	transform->Update();
 	vtkNew<vtkTransformPolyDataFilter> transformF;
-	transformF->SetInputConnection(arrow->GetOutputPort());
+	transformF->SetInputData(arrow->GetOutput());
 	transformF->SetTransform(transform);
+	transformF->Update();
 
-	this->Glyph->SetSourceConnection(transformF->GetOutputPort());
+	this->Glyph->SetSourceData(transformF->GetOutput());
 	this->Glyph->SetVectorModeToUseNormal();
 	this->Glyph->SetScaleModeToScaleByVector();
-	this->SpikeMapper->SetInputConnection(this->Glyph->GetOutputPort());
-
+	this->Glyph->Update();
+	this->SpikeMapper->SetInputData(this->Glyph->GetOutput());
 	this->SpikeActor->SetMapper(this->SpikeMapper);
+	
+
+	//Copy position and rotation of object and apply to spikes!
+	vtkSmartPointer<vtkMatrix4x4> Mat = this->GetMatrix();
+	vtkProp3D* myProprSpikes = vtkProp3D::SafeDownCast(this->SpikeActor);
+	vtkTransform* newTransform = vtkTransform::New();
+	newTransform->PostMultiply();
+	newTransform->SetMatrix(Mat);
+	myProprSpikes->SetPosition(newTransform->GetPosition());
+	myProprSpikes->SetScale(newTransform->GetScale());
+	myProprSpikes->SetOrientation(newTransform->GetOrientation());
+	newTransform->Delete();
+
+	//this->SpikeActor->ApplyMatrix(Mat);
+	/*
+	vtkProp3D* myPropr = vtkProp3D::SafeDownCast(this);
+	
+	if (myPropr->GetUserMatrix() != NULL)
+	{
+		cout << "Copy proprs from actor to spikes" << endl;
+		myProprSpikes->GetUserMatrix()->DeepCopy(myPropr->GetUserMatrix());
+	}
+	*/
 	vtkNew<vtkNamedColors> colors;
 
-	this->SpikeActor->GetProperty()->SetColor(
-		colors->GetColor3d("Emerald_Green").GetData());
 
+
+
+
+	this->SpikeActor->GetProperty()->SetColor(
+		colors->GetColor3d("ivory_black").GetData());
+	//cout << "Will add spike actor" << endl;
 	mqMorphoDigCore::instance()->getRenderer()->AddActor(this->SpikeActor);
+	cout << "CreateGlyph Spike actor added " << endl;
 }
 
 void vtkMDActor::RemoveGlyph()
 {
-	if (this->Glyph != NULL)
-	{
+	//if (this->Glyph != NULL)
+	//{
+	cout << "RemoveGlyph function" << endl;
 		mqMorphoDigCore::instance()->getRenderer()->RemoveActor(this->SpikeActor);
-
+		
+		/*this->displaySpikes = 0;
+		this->autoAdjustSpikeRendering = 0;
+		this->spikeMaskFactor = 100;
+		this->spikeScaleFactor = 1;
+		*/
 		this->Glyph = vtkSmartPointer<vtkGlyph3D>::New();		
 		this->SpikeActor = vtkSmartPointer<vtkActor>::New();
 		
-	}
+	//}
 	
 }
 

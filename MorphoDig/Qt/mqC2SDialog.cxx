@@ -85,7 +85,7 @@ mqC2SDialog::mqC2SDialog(QWidget* Parent)
 	 //connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(sloteditThickness()));
 	 connect(this->Ui->ok, SIGNAL(pressed()), this, SLOT(slotLaunchC2S()));
 	 connect(this->Ui->area, SIGNAL(pressed()), this, SLOT(slotArea()));
-	 connect(this->Ui->tangent, SIGNAL(pressed()), this, SLOT(slotTangent()));
+	// connect(this->Ui->tangent, SIGNAL(pressed()), this, SLOT(slotTangent()));
 	 connect(this->Ui->normal, SIGNAL(pressed()), this, SLOT(slotNormal()));
 
 	 connect(this->Ui->cancel, SIGNAL(pressed()), this, SLOT(slotClose()));
@@ -138,7 +138,7 @@ void mqC2SDialog::launchC2S()
 			int tMode = 0;
 			if (this->Ui->area->isChecked()) { tMode = 0; }
 			else if (this->Ui->normal->isChecked()) { tMode = 1; }
-			else if (this->Ui->tangent->isChecked()) { tMode = 2; }
+			//else if (this->Ui->tangent->isChecked()) { tMode = 2; }
 			mqMorphoDigCore::instance()->C2S(tMode, this->Ui->scalarName->text(), this->impactedActor, this->observedActor);// to launch C2S
 		}
 		
@@ -153,13 +153,13 @@ void mqC2SDialog::slotArea()
 }
 void mqC2SDialog::slotNormal()
 {
-	this->Ui->scalarName->setText("Normal_displacement");
+	this->Ui->scalarName->setText("Displacement");
 }
 
-void mqC2SDialog::slotTangent()
+/*void mqC2SDialog::slotTangent()
 {
 	this->Ui->scalarName->setText("Tangent_displacement");
-}
+}*/
 
 void mqC2SDialog::slotClose()
 {

@@ -3209,6 +3209,8 @@ void vtkMDInteractorStyle::RotateActors()
 		{
 			vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 			vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myActor);
+			vtkProp3D* myProprSpikes = vtkProp3D::SafeDownCast(myActor->GetSpikeActor());
+
 			if (myActor->GetSelected() == 1)
 			{
 				//cout << "Apply prop3Dtransform" << endl;
@@ -3224,6 +3226,11 @@ void vtkMDInteractorStyle::RotateActors()
 				//cout << "scale:" << scale[0] << ","<< scale[1] << ","<< scale[2] << endl;
 				
 				this->Prop3DTransform(myPropr,
+					rot_center,
+					2,
+					rotate,
+					scale);
+				this->Prop3DTransform(myProprSpikes,
 					rot_center,
 					2,
 					rotate,
@@ -3643,6 +3650,7 @@ void vtkMDInteractorStyle::PanActors()
 	{
 		vtkMDActor *myActor = vtkMDActor::SafeDownCast(this->ActorCollection->GetNextActor());
 		vtkProp3D *myPropr = vtkProp3D::SafeDownCast(myActor);
+		vtkProp3D* myProprSpikes = vtkProp3D::SafeDownCast(myActor->GetSpikeActor());
 		if (myActor->GetSelected() == 1)
 		{
 			if (myPropr->GetUserMatrix() != NULL)
@@ -3652,15 +3660,20 @@ void vtkMDInteractorStyle::PanActors()
 				t->SetMatrix(myPropr->GetUserMatrix());
 				t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
 				myPropr->GetUserMatrix()->DeepCopy(t->GetMatrix());
+				myProprSpikes->GetUserMatrix()->DeepCopy(t->GetMatrix());
 				t->Delete();
 			}
 			else
 			{
 				myPropr->AddPosition(motion_vector[0],
+				motion_vector[1],
+				motion_vector[2]);
+				myProprSpikes->AddPosition(motion_vector[0],
 					motion_vector[1],
 					motion_vector[2]);
 			}
 			myActor->SetChanged(1);
+			
 		}
 	}
 	this->VolumeCollection->InitTraversal();
