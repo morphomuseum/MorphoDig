@@ -54,6 +54,7 @@ public:
   virtual void slotapplyMatrixToAllSelectedActors();
   virtual void slotapplyMatrixToAllActors();
   virtual void slotEditScalar();
+  virtual void slotVectorScalar();
   virtual void slotDuplicateScalar();
   virtual void slotDeleteScalar();
   virtual void slotDisplaySpikesClicked(bool isChecked);

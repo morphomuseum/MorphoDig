@@ -1027,7 +1027,9 @@ void vtkMDActor::CreateGlyph()
 	transformF->Update();
 
 	this->Glyph->SetSourceData(transformF->GetOutput());
-	this->Glyph->SetVectorModeToUseNormal();
+	//this->Glyph->SetVectorModeToUseNormal();
+	
+	this->Glyph->SetVectorModeToUseVector();
 	this->Glyph->SetScaleModeToScaleByVector();
 	this->Glyph->Update();
 	this->SpikeMapper->SetInputData(this->Glyph->GetOutput());

@@ -16,6 +16,7 @@
 #include "vtkMDActorCollection.h"
 #include <vtkMatrix4x4.h>
 #include <vtkMatrix3x3.h>
+#include <vtkPointData.h>
 
 // we actually do not need glew...
 //#include <GL/glew.h>
@@ -221,6 +222,8 @@ mqEditACTORDialog::mqEditACTORDialog(QWidget* Parent)
 connect(this->Ui->deleteScalar, SIGNAL(pressed()), this, SLOT(slotDeleteScalar()));
 connect(this->Ui->editScalar, SIGNAL(pressed()), this, SLOT(slotEditScalar()));
 connect(this->Ui->duplicateScalar, SIGNAL(pressed()), this, SLOT(slotDuplicateScalar()));
+connect(this->Ui->vectorScalar, SIGNAL(pressed()), this, SLOT(slotVectorScalar()));
+
 
 connect(this->Ui->displayROI, SIGNAL(pressed()), this, SLOT(slotdisplayROIPressed()));
 
@@ -665,6 +668,7 @@ void mqEditACTORDialog::UpdateUI()
 		{
 			if (
 				((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 1) // conventional scalars
+				|| ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE) && MyList->Stack.at(i).NumComp == 3) // vector scalars (normales or else)
 				|| (MyList->Stack.at(i).DataType == VTK_UNSIGNED_CHAR  && MyList->Stack.at(i).NumComp >= 3 //RGB-like arrays
 					)
 				|| 
@@ -765,6 +769,35 @@ void mqEditACTORDialog::GetPrecedingActor()
 		}
 	}
 
+}
+
+
+void mqEditACTORDialog::slotVectorScalar()
+{
+	int row = this->Ui->scalarList->currentIndex().row();
+	if (this->ACTOR != NULL && row >= 0)
+	{
+		QString ScalarName = this->Ui->scalarList->item(row)->text();
+
+		ExistingArrays* MyList = mqMorphoDigCore::instance()->Getmui_ArraysOfActor(this->ACTOR);
+		int numS = 0;
+		for (int i = 0; i < MyList->Stack.size(); i++)
+		{
+			
+			if (MyList->Stack.at(i).Name == ScalarName)
+			{ 
+				numS = i;
+			}
+		}
+		cout << "numS=" << numS << endl;
+
+		if ((MyList->Stack.at(numS).DataType == VTK_FLOAT || MyList->Stack.at(numS).DataType == VTK_DOUBLE) && MyList->Stack.at(numS).NumComp == 3) // vector scalars (normales or else)
+		{
+			//mqMorphoDigCore::instance()->DuplicateArray(this->ACTOR, ScalarName);
+			cout << "Try to set vector" << endl;
+			this->ACTOR->GetMapper()->GetInput()->GetPointData()->SetVectors(this->ACTOR->GetMapper()->GetInput()->GetPointData()->GetScalars(ScalarName.toStdString().c_str()));
+		}
+	}
 }
 
 void mqEditACTORDialog::slotDuplicateScalar()

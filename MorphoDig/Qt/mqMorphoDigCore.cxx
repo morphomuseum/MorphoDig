@@ -19261,8 +19261,18 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 					vtkSmartPointer<vtkDoubleArray> newScalarsNormal =
 						vtkSmartPointer<vtkDoubleArray>::New();
 
+
+
 					newScalarsNormal->SetNumberOfComponents(1); //3d normals (ie x,y,z)
 					newScalarsNormal->SetNumberOfTuples(obVeN);
+
+					vtkSmartPointer<vtkDoubleArray> newScalarsVectors =
+						vtkSmartPointer<vtkDoubleArray>::New();
+
+
+
+					newScalarsVectors->SetNumberOfComponents(3); //3d normals (ie x,y,z)
+					newScalarsVectors->SetNumberOfTuples(obVeN);
 
 					//normal 
 						int index = 0;
@@ -19307,6 +19317,8 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 
 						//norms-> 
 
+
+
 						norms->GetTuple(i, ven_init_pos);
 						mqMorphoDigCore::RotateNorm(obsMat, ven_init_pos, ven_final_pos);
 						mObservedPD->GetPoint(i, ve1_init_pos);
@@ -19323,6 +19335,18 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 						norm[0] = ven_final_pos[0]; norm[1] = ven_final_pos[1]; norm[2] = ven_final_pos[2];
 						//norm[0] = 1;norm[1] = 1;norm[2] = 1;
 
+						if (i == 10)
+						{
+							cout << "ve1_init_pos:" << ve1_init_pos[0] << "," << ve1_init_pos[1] << "," << ve1_init_pos[2]  << endl;
+							
+							cout << "ve1_final_pos:" << ve1_final_pos[0] << "," << ve1_final_pos[1] << "," << ve1_final_pos[2] << endl;
+							cout << "ve2_init_pos:" << ve2_init_pos[0] << "," << ve2_init_pos[1] << "," << ve2_init_pos[2] << endl;
+							cout << "ve2_final_pos:" << ve2_final_pos[0] << "," << ve2_final_pos[1] << "," << ve2_final_pos[2] << endl;
+							cout << "ven_init_pos:" << ven_init_pos[0] << "," << ven_init_pos[1] << "," << ven_init_pos[2] << endl;
+							cout << "ven_final_pos:" << ven_final_pos[0] << "," << ven_final_pos[1] << "," << ven_final_pos[2] << endl;
+
+						}
+
 						CalculateTangentVector(land, norm, mean,
 							&fX,
 							&fY,
@@ -19337,9 +19361,24 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 							cout << "HERE I AM POINT 10" << endl;
 
 						}
+						if (mObservedPD->GetNumberOfPolys() > 0)
+						{
+							// fX-def
+							newScalarsVectors->InsertTuple3(i, fX - land[0], fY - land[1], fZ - land[2]);
+							//vectors->InsertTuple3(i, fX-ve[0],fY-ve[1],fZ-ve[2]); 
+							//vectors->InsertTuple3(i, x,y,z); 
+						}
+						else
+						{
+							// def - ref
+							newScalarsVectors->InsertTuple3(i, -ve2[0], -ve2[1], -ve2[2]);
+						}
+
 
 					}
 					newScalarsNormal->SetName((mScalarName + "_normal").c_str());
+					newScalarsVectors->SetName((mScalarName + "_tangent").c_str());
+
 					cout << "HERE I AM ADD NEW SCALAR" << endl;
 
 					// remove this scalar
@@ -19347,6 +19386,10 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 					mImpactedPD->GetPointData()->RemoveArray((mScalarName+"_normal").c_str());
 					mImpactedPD->GetPointData()->AddArray(newScalarsNormal);
 					
+					mImpactedPD->GetPointData()->RemoveArray((mScalarName + "_tangent").c_str());
+					mImpactedPD->GetPointData()->AddArray(newScalarsVectors);
+
+
 					mImpactedPD->GetPointData()->SetActiveScalars(mScalarName.c_str());
 					modified = 1;
 
@@ -19365,11 +19408,14 @@ void mqMorphoDigCore::C2S(int transformationMode, QString scalarName, vtkMDActor
 			cout << "scalars updated " << endl;
 
 			this->Initmui_ExistingArrays();
-			if (transformationMode != 2)
+			if (transformationMode == 0)
 			{
 				this->Setmui_ActiveArrayAndRender(mScalarName.c_str(), VTK_FLOAT, 1);
 			}
-
+			if (transformationMode == 1)
+			{
+				this->Setmui_ActiveArrayAndRender((mScalarName + "_normal").c_str(), VTK_FLOAT, 1);
+			}
 
 		}
 		this->Render();
@@ -25562,6 +25608,12 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfActor(vtkSmartPointer<vtkMDActo
 				QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
 				this->Addmui_ExistingArrays(ConvScalar, dataType, num_comp, 0);
 			}
+			if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 3))
+			{
+				// ok to add conventional scalars (like curvature, thickness, height etc... )
+				QString VectorScalar = QString(myPD->GetPointData()->GetArrayName(i));
+				this->Addmui_ExistingArrays(VectorScalar, dataType, num_comp, 0);
+			}
 
 		}
 
@@ -25602,6 +25654,11 @@ int mqMorphoDigCore::GetNumerOfNonRGBArraysOfSelectedObjects(int exclude_rgb)
 				if ((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 1)
 				{
 					//rare case: a Scalar or Tag array named RGB
+					cpt++;
+				}
+				if((MyList->Stack.at(i).DataType == VTK_FLOAT || MyList->Stack.at(i).DataType == VTK_DOUBLE || MyList->Stack.at(i).DataType == VTK_INT) && MyList->Stack.at(i).NumComp == 3)
+				{
+					//rare case: a Vector array named RGB
 					cpt++;
 				}
 			}
@@ -25669,7 +25726,12 @@ ExistingArrays * mqMorphoDigCore::Getmui_ArraysOfSelectedObjects(int onlyfirst)
 						QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
 						this->Addmui_ExistingArrays(ConvScalar, dataType, num_comp, 0);
 					}
-
+					if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 3))
+					{
+						// ok to add vector scalars (tangent displacement vector)
+						QString VecScalar = QString(myPD->GetPointData()->GetArrayName(i));
+						this->Addmui_ExistingArrays(VecScalar, dataType, num_comp, 0);
+					}
 				}
 
 			}
@@ -25802,6 +25864,14 @@ void mqMorphoDigCore::Initmui_ExistingArrays()
 					this->Addmui_ExistingArrays(Taglike, dataType, num_comp);
 				}
 				if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 1))
+				{
+					// ok to add conventional scalars (like curvature, thickness, height etc... )
+					QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
+					this->Addmui_ExistingArrays(ConvScalar, dataType, num_comp);
+				}
+
+				//VECTORS
+				if ((dataType == VTK_FLOAT || (dataType == VTK_DOUBLE)) && (num_comp == 3))
 				{
 					// ok to add conventional scalars (like curvature, thickness, height etc... )
 					QString ConvScalar = QString(myPD->GetPointData()->GetArrayName(i));
