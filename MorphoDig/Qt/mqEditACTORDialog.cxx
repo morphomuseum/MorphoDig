@@ -795,7 +795,19 @@ void mqEditACTORDialog::slotVectorScalar()
 		{
 			//mqMorphoDigCore::instance()->DuplicateArray(this->ACTOR, ScalarName);
 			cout << "Try to set vector" << endl;
-			this->ACTOR->GetMapper()->GetInput()->GetPointData()->SetVectors(this->ACTOR->GetMapper()->GetInput()->GetPointData()->GetScalars(ScalarName.toStdString().c_str()));
+			vtkSmartPointer<vtkDataArray> copyScalars = nullptr;
+			copyScalars = vtkSmartPointer<vtkDoubleArray>::New();
+		
+		// now we have to decide what type of array this is!
+
+			copyScalars->DeepCopy(this->ACTOR->GetMapper()->GetInput()->GetPointData()->GetScalars(ScalarName.toStdString().c_str()));
+			copyScalars->SetName("TMP");
+			this->ACTOR->GetMapper()->GetInput()->GetPointData()->SetVectors(copyScalars);
+			if(		this->ACTOR->GetdisplaySpikes() ==1)
+			{
+				this->ACTOR->CreateGlyph();
+				mqMorphoDigCore::instance()->Render();
+			}
 		}
 	}
 }

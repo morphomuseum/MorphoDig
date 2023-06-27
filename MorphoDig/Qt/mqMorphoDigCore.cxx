@@ -18896,6 +18896,7 @@ void mqMorphoDigCore::DuplicateArray(vtkSmartPointer<vtkMDActor> actor, QString 
 			int type = this->Getmui_ExistingArrays()->Stack.at(i).DataType;
 			int ncomp = this->Getmui_ExistingArrays()->Stack.at(i).NumComp;
 			if (ncomp == 1 && (type == VTK_FLOAT || type == VTK_DOUBLE)) { mode = 0; }
+			if (ncomp == 3 && (type == VTK_FLOAT || type == VTK_DOUBLE)) { mode = 3; }
 			if (ncomp >= 3 && type == VTK_UNSIGNED_CHAR) { mode = 1; }
 			if (ncomp == 1 && (type == VTK_INT || type == VTK_UNSIGNED_INT)) { mode = 2; }
 
@@ -18918,6 +18919,10 @@ void mqMorphoDigCore::DuplicateArray(vtkSmartPointer<vtkMDActor> actor, QString 
 	if (mode == 2)
 	{
 		newScalars = vtkSmartPointer<vtkIntArray>::New();
+	}
+	if (mode == 3)
+	{
+		newScalars = vtkSmartPointer<vtkDoubleArray>::New();
 	}
 	// now we have to decide what type of array this is!
 	 

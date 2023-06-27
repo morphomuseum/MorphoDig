@@ -1019,7 +1019,7 @@ void vtkMDActor::CreateGlyph()
 	arrow->SetShaftResolution(3);
 	arrow->Update();
 	vtkNew<vtkTransform> transform;
-	transform->Translate(0.0, 0.0, 0.0);
+	transform->Translate(0.1, 0.0, 0.0);
 	transform->Update();
 	vtkNew<vtkTransformPolyDataFilter> transformF;
 	transformF->SetInputData(arrow->GetOutput());
@@ -1031,8 +1031,16 @@ void vtkMDActor::CreateGlyph()
 	
 	this->Glyph->SetVectorModeToUseVector();
 	this->Glyph->SetScaleModeToScaleByVector();
+	//this->Glyph->SetScaleModeToScaleByVector();
+	//this->Glyph->SetColorModeToColorByScalar();
+	this->Glyph->SetIndexModeToOff();
+	//this->Glyph->SetScaleModeToDataScalingOff();
+	//this->Glyph->Set
 	this->Glyph->Update();
 	this->SpikeMapper->SetInputData(this->Glyph->GetOutput());
+
+	// Cette ligne empêche d'avoir des couleurs dans les glyphs
+	this->SpikeMapper->ScalarVisibilityOff();
 	this->SpikeActor->SetMapper(this->SpikeMapper);
 	
 
@@ -1064,7 +1072,7 @@ void vtkMDActor::CreateGlyph()
 
 
 	this->SpikeActor->GetProperty()->SetColor(
-		colors->GetColor3d("ivory_black").GetData());
+		colors->GetColor3d("black").GetData());
 	//cout << "Will add spike actor" << endl;
 	mqMorphoDigCore::instance()->getRenderer()->AddActor(this->SpikeActor);
 	cout << "CreateGlyph Spike actor added " << endl;
