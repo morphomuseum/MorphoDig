@@ -22,6 +22,7 @@
 //#include <GL/glew.h>
 #include <QApplication>
 #include <QFile>
+#include <QMessageBox>
 #include <QRadioButton>
 #include <QFileDialog>
 #include <QCheckBox>
@@ -808,6 +809,18 @@ void mqEditACTORDialog::slotVectorScalar()
 				this->ACTOR->CreateGlyph();
 				mqMorphoDigCore::instance()->Render();
 			}
+			//mqMorphoDigCore::instance()->DeleteArray(this->ACTOR, "TMP");
+
+			QMessageBox msgBox;
+			msgBox.setText("Spike display will use "+MyList->Stack.at(numS).Name + " as vector array.");
+			msgBox.exec();
+		}
+		else
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Could not set selected array as surface's vector for spike display : please select a float or double array that contains 3 components.");
+			msgBox.exec();
+			return;
 		}
 	}
 }

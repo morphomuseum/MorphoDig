@@ -1014,7 +1014,21 @@ void vtkMDActor::CreateGlyph()
 
 	this->Glyph->SetInputData(this->Mask->GetOutput());
 	//this->Glyph->SetInputConnection(this->Mask->GetOutputPort());
-	this->Glyph->SetScaleFactor(this->GetspikeScaleFactor());
+	
+	
+	//cout << "this->autoAdjustSpikeScaleFactor=" << this->autoAdjustSpikeScaleFactor << endl;
+	 
+	if (this->autoAdjustSpikeRendering == 0)
+	{
+		this->autoAdjustSpikeScaleFactor = 1;
+	}
+	else
+	{
+		this->autoAdjustSpikeScaleFactor = 0.02 * this->GetBoundingBoxLength();
+	}
+	this->Glyph->SetScaleFactor(this->spikeScaleFactor * this->autoAdjustSpikeScaleFactor);
+
+	
 	vtkSmartPointer<vtkArrowSource>arrow = vtkSmartPointer<vtkArrowSource>::New();
 	arrow->SetShaftResolution(3);
 	arrow->Update();
@@ -1027,9 +1041,17 @@ void vtkMDActor::CreateGlyph()
 	transformF->Update();
 
 	this->Glyph->SetSourceData(transformF->GetOutput());
-	//this->Glyph->SetVectorModeToUseNormal();
+	//
+	int normOrvect();
+	if (this->GetMapper()->GetInput()->GetPointData()->GetVectors() !=NULL)
+	{ 
+		this->Glyph->SetVectorModeToUseVector();
+	}
+	else
+	{
+		this->Glyph->SetVectorModeToUseNormal();
+	}
 	
-	this->Glyph->SetVectorModeToUseVector();
 	this->Glyph->SetScaleModeToScaleByVector();
 	//this->Glyph->SetScaleModeToScaleByVector();
 	//this->Glyph->SetColorModeToColorByScalar();
