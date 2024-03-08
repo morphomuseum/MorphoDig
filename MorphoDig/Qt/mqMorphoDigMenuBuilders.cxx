@@ -83,6 +83,7 @@
 #include "mqGridSizeDialogReaction.h"
 #include "mqEditAlphaDialogReaction.h"
 #include "mqSaveCURasVERDialogReaction.h"
+#include "mqCutSurfaceAlongCURDialogReaction.h"
 #include "mqOrientationLabelsDialogReaction.h"
 #include "mqExtractScalarRangeDialogReaction.h"
 #include "mqEditScalarsDialogReaction.h"
@@ -218,6 +219,7 @@ void mqMorphoDigMenuBuilders::buildFileMenu(QMenu& menu)
   new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Node Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveNodeLMK"), 2);
   new mqSaveLandmarksDialogReaction(submenuCurves->addAction("Save Curve Handle Landmarks (VER, LMK, PTS, TPS)") << mqSetName("actionSaveHandleLMK"), 3);
   new mqSaveCURasVERDialogReaction(submenuCurves->addAction("Export Curve Segments (and optionally normal and target landmarks) as landmark file (VER, LMK, PTS, TPS)") << mqSetName("actionExportCUR"));
+  new mqCutSurfaceAlongCURDialogReaction(submenuCurves->addAction("Cut surface along curve") << mqSetName("actionCutAlongCUR"));
   new mqSaveDataReaction(submenuCurves->addAction("Save curve infos (length per curve segment)") << mqSetName("actionSaveCURInfos"), 17);
   
 

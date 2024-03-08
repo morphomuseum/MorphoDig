@@ -156,17 +156,17 @@ IF (WIN32)
     COMPONENT applications)
   #set (QT5_BINARIES "D:/Qt/5.8/msvc2015_64/bin") 
  
-  file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/bin/Qt5Core.dll" qtcore)
-  file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/bin/Qt5Widgets.dll" qtwidgets)
-  file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/bin/Qt5GUI.dll" qtgui)
-  file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/plugins/platforms/qwindows.dll" qtwindows)
-  file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/plugins/imageformats/qico.dll" qtico)
+ # file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/bin/Qt5Core.dll" qtcore)
+ # file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/bin/Qt5Widgets.dll" qtwidgets)
+ # file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/bin/Qt5GUI.dll" qtgui)
+ # file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/plugins/platforms/qwindows.dll" qtwindows)
+ # file(TO_CMAKE_PATH "$ENV{Qt5_DIR}/plugins/imageformats/qico.dll" qtico)
 
-# file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/bin/Qt5Core.dll" qtcore)
-#  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/bin/Qt5Widgets.dll" qtwidgets)
-#  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/bin/Qt5GUI.dll" qtgui)
-#  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/plugins/platforms/qwindows.dll" qtwindows)
-#  file(TO_CMAKE_PATH "D:/Qt/5.15.2/msvc2019_64/plugins/imageformats/qico.dll" qtico)
+ file(TO_CMAKE_PATH "C:/Qt/5.15.2/msvc2019_64/bin/Qt5Core.dll" qtcore)
+  file(TO_CMAKE_PATH "C:/Qt/5.15.2/msvc2019_64/bin/Qt5Widgets.dll" qtwidgets)
+  file(TO_CMAKE_PATH "C:/Qt/5.15.2/msvc2019_64/bin/Qt5GUI.dll" qtgui)
+  file(TO_CMAKE_PATH "C:/Qt/5.15.2/msvc2019_64/plugins/platforms/qwindows.dll" qtwindows)
+  file(TO_CMAKE_PATH "C:/Qt/5.15.2/msvc2019_64/plugins/imageformats/qico.dll" qtico)
 
 
   install(
@@ -223,11 +223,13 @@ IF (WIN32)
     "${VTK_DIR}/bin/Release/vtkFiltersHybrid-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkImagingSources-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkFiltersModeling-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkFiltersHyperTree-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkImagingGeneral-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkImagingColor-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkInteractionImage-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkRenderingVolume-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkRenderingImage-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
+    "${VTK_DIR}/bin/Release/vtkRenderingHyperTreeGrid-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtksys-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtklz4-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"
     "${VTK_DIR}/bin/Release/vtkRenderingContextOpenGL2-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.dll"

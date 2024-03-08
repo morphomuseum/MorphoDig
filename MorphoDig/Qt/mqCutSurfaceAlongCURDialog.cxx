@@ -6,8 +6,8 @@
  
 =========================================================================*/
 
-#include "mqSaveCURasVERDialog.h"
-#include "ui_mqSaveCURasVERDialog.h"
+#include "mqCutSurfaceAlongCURDialog.h"
+#include "ui_mqCutSurfaceAlongCURDialog.h"
 #include "MorphoDigVersion.h"
 #include "mqMorphoDigCore.h"
 
@@ -42,13 +42,13 @@
 #endif
 
 //-----------------------------------------------------------------------------
-mqSaveCURasVERDialog::mqSaveCURasVERDialog(QWidget* Parent)
+mqCutSurfaceAlongCURDialog::mqCutSurfaceAlongCURDialog(QWidget* Parent)
   : QDialog(Parent)
-  , Ui(new Ui::mqSaveCURasVERDialog())
+  , Ui(new Ui::mqCutSurfaceAlongCURDialog())
 {
 
 	this->Ui->setupUi(this);
-	this->setObjectName("mqSaveCURasVERDialog");
+	this->setObjectName("mqCutSurfaceAlongCURDialog");
 	
 	
 	// This is where we 
@@ -58,52 +58,13 @@ mqSaveCURasVERDialog::mqSaveCURasVERDialog(QWidget* Parent)
  
  this->Ui->defaultDecimation->setValue(mqMorphoDigCore::instance()->Getmui_SegmentDecimation());  //connecter à un slot qui veuile bien 
 
- int lmk_format = mqMorphoDigCore::instance()->Getmui_CURVERFormat();
- if (lmk_format ==0)
- {
-	 this->Ui->VER->setChecked(true);
- }
- else if (lmk_format==1 )
- {
-	 this->Ui->LMK->setChecked(true);
- }
- else if (lmk_format == 2)
- {
-	 this->Ui->PTS->setChecked(true);
- }
- else 
- {
-	 this->Ui->TPS->setChecked(true);
- }
+ int save_format = 0;
+ 
+ this->Ui->STV->setChecked(true);
+ 
+ 
+ 
 
- int include = mqMorphoDigCore::instance()->Getmui_CURVERIncludeNormalLandmarks();
- if (include == 1)
- {
-	 this->Ui->All->setChecked(true);
- }
- else
- {
-	 this->Ui->CUROnly->setChecked(true);
- }
-
- int milestones_once = mqMorphoDigCore::instance()->Getmui_CURVERExportMilestonesOnce();
- if (milestones_once == 1)
- {
-	 this->Ui->milestonesOnce->setChecked(true);
- }
- else
- {
-	 this->Ui->milestonesTwice->setChecked(true);
-	 
- }
-
- /*
-
-	
-	int Getmui_DefaultCURVERExportMilestonesOnce();
-	int Getmui_CURVERExportMilestonesOnce();
-	void Setmui_CURVERExportMilestonesOnce(int milestones_once);
-*/
 
  QHeaderView *header = this->Ui->tableWidget->horizontalHeader();
  header->setSectionResizeMode(QHeaderView::Stretch);
@@ -115,7 +76,7 @@ mqSaveCURasVERDialog::mqSaveCURasVERDialog(QWidget* Parent)
   
  
  connect(this->Ui->defaultDecimation, SIGNAL(valueChanged(int)), this, SLOT(slotDefaultDecimationChanged(int)));
- connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotSaveCURasVERFile()));
+ connect(this->Ui->buttonBox, SIGNAL(accepted()), this, SLOT(slotCutSurfacee()));
  connect(this->Ui->reinitializeSegments, SIGNAL(pressed()), this, SLOT(slotReinitializeSegments()));
 
 }
@@ -124,7 +85,7 @@ mqSaveCURasVERDialog::mqSaveCURasVERDialog(QWidget* Parent)
 
 
 //-----------------------------------------------------------------------------
-mqSaveCURasVERDialog::~mqSaveCURasVERDialog()
+mqCutSurfaceAlongCURDialog::~mqCutSurfaceAlongCURDialog()
 {
 
  //depending on what is 
@@ -132,7 +93,7 @@ mqSaveCURasVERDialog::~mqSaveCURasVERDialog()
   delete this->Ui;
 }
 
-void mqSaveCURasVERDialog::updateDecimation(int row, int newdecimation)
+void mqCutSurfaceAlongCURDialog::updateDecimation(int row, int newdecimation)
 {
 	int numStoredDecimations = (int)mqMorphoDigCore::instance()->Getmui_SegmentDecimations()->decimation.size();
 	if (row > numStoredDecimations)
@@ -151,11 +112,11 @@ void mqSaveCURasVERDialog::updateDecimation(int row, int newdecimation)
 	
 }
 
-void mqSaveCURasVERDialog::slotReinitializeSegments()
+void mqCutSurfaceAlongCURDialog::slotReinitializeSegments()
 {
 	this->RefreshDecimationTable(1);
 }
-void mqSaveCURasVERDialog::slotDecimationChanged(int newdecimation)
+void mqCutSurfaceAlongCURDialog::slotDecimationChanged(int newdecimation)
 {
 
 	QSpinBox *sb = (QSpinBox*)sender();
@@ -170,16 +131,16 @@ void mqSaveCURasVERDialog::slotDecimationChanged(int newdecimation)
 		}
 	}
 }
-void mqSaveCURasVERDialog::slotDefaultDecimationChanged(int newdecimation)
+void mqCutSurfaceAlongCURDialog::slotDefaultDecimationChanged(int newdecimation)
 {
 	mqMorphoDigCore::instance()->Setmui_SegmentDecimation(newdecimation);
 }
-void mqSaveCURasVERDialog::RefreshDecimationTable(int toDefault)
+void mqCutSurfaceAlongCURDialog::RefreshDecimationTable(int toDefault)
 {
 	//toDefault = 0 => all values set to "Default Decimation".
 	//otherwise => populate with SegmentDecimations global table
 
-	SignalBlocker3 tagTableSignalBlocker(this->Ui->tableWidget); //blocks signals when populating the table! Blocking will stop 
+	SignalBlocker2 tagTableSignalBlocker(this->Ui->tableWidget); //blocks signals when populating the table! Blocking will stop 
 	this->Ui->tableWidget->clear();
 	this->Ui->tableWidget->setColumnCount(2);
 
@@ -201,7 +162,7 @@ void mqSaveCURasVERDialog::RefreshDecimationTable(int toDefault)
 		if (numSegs > numStoredDecimations)
 		{
 			cout << "numSegs > numStoredDecimations" << endl;
-			int to_complete = numSegs - (int)numStoredDecimations;
+			int to_complete = numSegs - numStoredDecimations;
 			for (int i=0; i<to_complete; i++)
 			{
 				cout << "push_back" << i << endl;
@@ -254,7 +215,7 @@ void mqSaveCURasVERDialog::RefreshDecimationTable(int toDefault)
 
 
 
-void mqSaveCURasVERDialog::slotSaveCURasVERFile()
+void mqCutSurfaceAlongCURDialog::slotCutSurface()
 {
 	cout << "Export Cur as Landmarks !" << endl;
 	
@@ -278,43 +239,26 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 			proposedName += +mqMorphoDigCore::instance()->g_distinct_selected_names.at(0).c_str();
 		}
 	}
-	if (this->Ui->VER->isChecked())
+	if (this->Ui->STV->isChecked())
 	{
 		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-			tr("Export as .VER file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir()+proposedName,
-			tr("VER file (*.ver)"), NULL
+			tr("Export as .SVT file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir()+proposedName,
+			tr("STV file (*.stv)"), NULL
 			//, QFileDialog::DontConfirmOverwrite
 		);
 		
 
 	}
-	else if (this->Ui->LMK->isChecked())
+	else if (this->Ui->VTP->isChecked())
 	{
 		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-			tr("Export as LMK file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir()+proposedName,
-			tr("LMK file (*.lmk)"), NULL
+			tr("Export as VTP file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir()+proposedName,
+			tr("VTP file (*.vtp)"), NULL
 			//, QFileDialog::DontConfirmOverwrite
 		);
 		
 	}
-	else if (this->Ui->PTS->isChecked())
-	{
-		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-			tr("Export as PTS file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
-			tr("PTS file (*.pts)"), NULL
-			//, QFileDialog::DontConfirmOverwrite
-		);
-		
-	}
-	else if (this->Ui->TPS->isChecked())
-	{
-		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
-			tr("Export as TPS file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
-			tr("TPS file (*.tps)"), NULL
-			//, QFileDialog::DontConfirmOverwrite
-		);
-		
-	}
+	
 	if (fileName.isEmpty()) return;
 	QFileInfo fileInfo(fileName);
 	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
@@ -324,20 +268,13 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 	int save_other_lmks = 0; //0 no, 1 save also Normal and Target landmarks
 	
 
-	if (this->Ui->VER->isChecked()) { save_format = 0; }
-	else if (this->Ui->LMK->isChecked()) { save_format = 1; }
-	else if (this->Ui->PTS->isChecked()) { save_format = 2; }
-	else if (this->Ui->TPS->isChecked()) { save_format = 3; }
-	mqMorphoDigCore::instance()->Setmui_CURVERFormat(save_format);
-
-	if (this->Ui->All->isChecked()) { save_other_lmks = 1; }
-	mqMorphoDigCore::instance()->Setmui_CURVERIncludeNormalLandmarks(save_other_lmks);
-
+	if (this->Ui->STV->isChecked()) { save_format = 0; }
+	else if (this->Ui->VTP->isChecked()) { save_format = 1; }
+	
+	
 	int decimation = this->Ui->defaultDecimation->value();
-	int milestonesOnce = this->Ui->milestonesOnce->isChecked();
-	mqMorphoDigCore::instance()->Setmui_CURVERExportMilestonesOnce(milestonesOnce);
 
-	mqMorphoDigCore::instance()->SaveCURasVERFile(fileName, decimation, save_format, save_other_lmks, milestonesOnce);
+	mqMorphoDigCore::instance()->CutSurfaceAlongCUR(fileName, decimation, save_format);
 
 }
 

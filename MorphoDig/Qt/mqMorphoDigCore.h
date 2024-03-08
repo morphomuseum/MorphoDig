@@ -653,6 +653,7 @@ public:
 	void OpenMAP(QString fileName, int mode=0);
 	int SaveCURFile(QString fileName, int save_only_selected);
 	int SaveCURasVERFile(QString fileName, int default_decimation, int save_format, int save_other_lmks, int milestones_once);
+	int CutSurfaceAlongCUR(QString fileName, int default_decimation, int save_format);
 	int GetNumberOfCurveSegments();
 	int GetNumberOfMileStoneNodesToRemove(int default_decimation);
 	void SetOcclusionRatioAndNumPeels(double ratio, int numpeels);

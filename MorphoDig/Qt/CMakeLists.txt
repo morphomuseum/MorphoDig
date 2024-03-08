@@ -85,6 +85,10 @@ mqCubeDialog.cxx
 mqCubeDialog.h
 mqCubeDialogReaction.cxx
 mqCubeDialogReaction.h
+mqCutSurfaceAlongCURDialog.h
+mqCutSurfaceAlongCURDialog.cxx
+mqCutSurfaceAlongCURDialogReaction.h
+mqCutSurfaceAlongCURDialogReaction.cxx
 mqCylinderDialog.cxx
 mqCylinderDialog.h
 mqCylinderDialogReaction.cxx
@@ -425,6 +429,7 @@ mqColorDialog.ui
 mqColorOpacityEditorWidget.ui
 mqCreateLMKDialog.ui
 mqCubeDialog.ui
+mqCutSurfaceAlongCURDialog.ui
 mqCylinderDialog.ui
 mqDecimateDialog.ui
 mqDecomposeDialog.ui

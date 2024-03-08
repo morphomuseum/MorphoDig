@@ -4,24 +4,24 @@
    
 
 =========================================================================*/
-#ifndef _mqSaveCURasVERDialog_h
-#define _mqSaveCURasVERDialog_h
+#ifndef _mqCutSurfaceAlongCURDialog_h
+#define _mqCutSurfaceAlongCURDialog_h
 
 #include <QDialog>
 
 namespace Ui
 {
-class mqSaveCURasVERDialog;
+class mqCutSurfaceAlongCURDialog;
 }
 
-class SignalBlocker3 {
+class SignalBlocker2 {
 public:
-	SignalBlocker3(QObject *o) : object(o), alreadyBlocked(object->signalsBlocked()) {
+	SignalBlocker2(QObject *o) : object(o), alreadyBlocked(object->signalsBlocked()) {
 		if (!alreadyBlocked) {
 			object->blockSignals(true);
 		}
 	}
-	~SignalBlocker3() {
+	~SignalBlocker2() {
 		if (!alreadyBlocked) {
 			object->blockSignals(false);
 		}
@@ -34,19 +34,19 @@ private:
 
 
 /**
-* mqSaveCURasVERDialog is the dialog used by MorphoDig to save CUR files.
+* mqCutSurfaceAlongCURDialog is the dialog used by MorphoDig to save CUR files.
 */
-class  mqSaveCURasVERDialog : public QDialog
+class  mqCutSurfaceAlongCURDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  mqSaveCURasVERDialog(QWidget* Parent);
+  mqCutSurfaceAlongCURDialog(QWidget* Parent);
   
-  ~mqSaveCURasVERDialog();
+  ~mqCutSurfaceAlongCURDialog();
 
   public slots:
-  virtual void slotSaveCURasVERFile();
+	  virtual void slotCutSurface();
 
 	
 	virtual void slotDecimationChanged(int newdecimation);
@@ -57,8 +57,8 @@ protected:
 private:
 	
 
-  Q_DISABLE_COPY(mqSaveCURasVERDialog)
-  Ui::mqSaveCURasVERDialog* const Ui;
+  Q_DISABLE_COPY(mqCutSurfaceAlongCURDialog)
+  Ui::mqCutSurfaceAlongCURDialog* const Ui;
   
   void RefreshDecimationTable(int toDefault=0);
   void updateDecimation(int row, int newdecimation);
