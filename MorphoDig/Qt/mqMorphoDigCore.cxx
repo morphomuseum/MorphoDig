@@ -6068,24 +6068,25 @@ void mqMorphoDigCore::OpenFCSV(QString fileName, int mode)
 					QString line1 = in.readLine(); // second line is not interesting
 					QString line2 = in.readLine(); // third line is not interesting
 					//Neverthe less, try to get landmark number!
-					int equal = line0.indexOf("=");
 					int numLM = 1000000;
-					if (equal != -1)
-					{
-						int num = line0.size() - equal - 1;
-						cout << "TPS: length landmark to read:" << num << endl;
-						QString snumLM = line0.right(num);
-						cout << "Result:" << snumLM.toStdString() << endl;
-						numLM = snumLM.toInt();
-						cout << "numLM:" << numLM << endl;
-					}
+					
 					int cpt = 0;
 					while (!in.atEnd() && cpt < numLM)
 					{
 
 						QString line = in.readLine();
-						QTextStream myteststream(&line);
-						myteststream >> x >> y >> z;
+						QStringList line_pieces = line.split(",");
+						QString qX = line_pieces.value(1);
+						QString qY = line_pieces.value(2);
+						QString qZ = line_pieces.value(3);
+						QTextStream Xstream(&qX);
+						QTextStream Ystream(&qY);
+						QTextStream Zstream(&qZ);
+						Xstream >> x ;
+						Ystream >> y;
+						Zstream >> z;
+
+
 						double coord[3] = { x,y,z };
 						double ori[3];
 
@@ -11496,8 +11497,11 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		}
 		else if (save_format == 4)
 		{
-			stream << "LM=" << tot_lm_number << Qt::endl;
+			stream << "# Markups fiducial file version = 5.5" << Qt::endl;
+			stream << "# CoordinateSystem = LPS" << Qt::endl;
+			stream << "# columns = id, x, y, z, ow, ox, oy, oz, vis, sel, lock, label, desc, associatedNodeID" << Qt::endl;
 		}
+		int cpt = 0;
 		if (save_other_lmks == 1)
 		{
 			vtkLMActor  * normal, *target;
@@ -11506,7 +11510,6 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 			if (num_normal > 0)
 			{
 				normal = this->getNormalLandmarkCollection()->GetLandmarkAfter(0);
-
 
 				while (normal != NULL)
 				{
@@ -11535,7 +11538,8 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 					}
 					else if (save_format == 4)
 					{
-						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
+						cpt++;
+						stream << cpt << "," << lmpos[0] << "," << lmpos[1] << "," << lmpos[2] << ",0,0,0,1,1,1,1,N-" << cpt << ",," << Qt::endl;
 					}
 					ci++;
 					if (ci < 10) { csi = "00"; }
@@ -11577,7 +11581,9 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 					}
 					else if (save_format == 4)
 					{
-						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
+						cpt++;
+						stream << cpt << "," << lmpos[0] << "," << lmpos[1] << "," << lmpos[2] << ",0,0,0,1,1,1,1,T-" << cpt << ",," << Qt::endl;
+
 					}
 					ci++;
 					if (ci < 10) { csi = "00"; }
@@ -11832,6 +11838,11 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 									else if (save_format == 3)
 									{
 										stream << slm[0] << " " << slm[1] << " " << slm[2] << Qt::endl;
+									}
+									else if (save_format == 4)
+									{
+										cpt++;
+										stream << cpt << "," << slm[0] << "," << slm[1] << "," << slm[2] << ",0,0,0,1,1,1,1,S-" << cpt << ",," << Qt::endl;
 									}
 								}
 								else // just in case we had are at the milestone!
@@ -12540,16 +12551,21 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 		}
 		if (file_type == 4)
 		{
-			stream << "LM=" << num_lmk << Qt::endl;
+		
+			stream << "# Markups fiducial file version = 5.5" << Qt::endl;
+			stream << "# CoordinateSystem = LPS" << Qt::endl;
+			stream << "# columns = id, x, y, z, ow, ox, oy, oz, vis, sel, lock, label, desc, associatedNodeID" << Qt::endl;
+		
 		}
 		myColl->InitTraversal();
 		std::string csi;
+		int cpt = 0;
 		for (vtkIdType i = 0; i < myColl->GetNumberOfItems(); i++)
 		{
 			vtkLMActor *myActor = vtkLMActor::SafeDownCast(myColl->GetNextActor());
 			if (myActor->GetSelected() == 1 || save_only_selected==0)
 			{
-				
+				cpt++;
 				double lmpos[3];
 				myActor->GetLMOrigin(lmpos);
 				double ori[3];
@@ -12577,7 +12593,8 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 				}
 				else if (file_type == 4)
 				{
-					stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
+					//1, 88.5456, 93.4598, 190.764, 0, 0, 0, 1, 1, 1, 1, F - 1, ,
+					stream <<cpt<< ","<< lmpos[0]<<"," << lmpos[1] << "," << lmpos[2]<<",0,0,0,1,1,1,1,F-"<<cpt<<",," << Qt::endl;
 				}
 			}
 
