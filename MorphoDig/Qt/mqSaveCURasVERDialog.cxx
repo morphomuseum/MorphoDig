@@ -315,6 +315,15 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 		);
 		
 	}
+	else if (this->Ui->FCSV->isChecked())
+	{
+		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+			tr("Export as FCSV file"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
+			tr("FCSV file (*.fcsv)"), NULL
+			//, QFileDialog::DontConfirmOverwrite
+		);
+
+	}
 	if (fileName.isEmpty()) return;
 	QFileInfo fileInfo(fileName);
 	mqMorphoDigCore::instance()->Setmui_LastUsedDir(fileInfo.path());
@@ -328,6 +337,7 @@ void mqSaveCURasVERDialog::slotSaveCURasVERFile()
 	else if (this->Ui->LMK->isChecked()) { save_format = 1; }
 	else if (this->Ui->PTS->isChecked()) { save_format = 2; }
 	else if (this->Ui->TPS->isChecked()) { save_format = 3; }
+	else if (this->Ui->FCSV->isChecked()) { save_format = 4; }
 	mqMorphoDigCore::instance()->Setmui_CURVERFormat(save_format);
 
 	if (this->Ui->All->isChecked()) { save_other_lmks = 1; }

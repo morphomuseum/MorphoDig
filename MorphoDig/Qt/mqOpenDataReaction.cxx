@@ -137,7 +137,7 @@ void mqOpenDataReaction::OpenLandmark(int mode)
 
 	QString fileName = QFileDialog::getOpenFileName(this->MainWindow,
 		tr("Load landmarks"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("landmark files(*.ver *.lmk *.pts *.tps)"));
+		tr("landmark files(*.ver *.lmk *.pts *.tps *.fcsv)"));
 
 	cout << fileName.toStdString();
 	if (fileName.isEmpty()) return;
@@ -152,6 +152,8 @@ void mqOpenDataReaction::OpenLandmark(int mode)
 	std::string PTSext2(".PTS");
 	std::string TPSext(".tps");
 	std::string TPSext2(".TPS");
+	std::string FCSVext(".fcsv");
+	std::string FCSVext2(".FCSV");
 
 	int type = 0; //0 =  ver, 1 lmk
 	std::size_t found = fileName.toStdString().find(VERext);
@@ -178,6 +180,13 @@ void mqOpenDataReaction::OpenLandmark(int mode)
 	{
 		type = 3; //TPS
 	}
+	found = fileName.toStdString().find(FCSVext);
+	found2 = fileName.toStdString().find(FCSVext2);
+
+	if (found != std::string::npos || found2 != std::string::npos)
+	{
+		type = 4; //FCSV
+	}
 	if (type == 0)
 	{
 		
@@ -194,6 +203,10 @@ void mqOpenDataReaction::OpenLandmark(int mode)
 	else if (type == 3)
 	{
 		mqMorphoDigCore::instance()->OpenTPS(fileName, mode);
+	}
+	else if (type == 4)
+	{
+		mqMorphoDigCore::instance()->OpenFCSV(fileName, mode);
 	}
 }
 void mqOpenDataReaction::OpenSTV()
@@ -1095,7 +1108,7 @@ void mqOpenDataReaction::OpenData()
 	
 	QStringList filenames = QFileDialog::getOpenFileNames(this->MainWindow,
 		tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.png *.bmp *.tif *.tiff *.dcm *.ima )")); 
+		tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.pts *.tps *fcsv *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.png *.bmp *.tif *.tiff *.dcm *.ima )")); 
 	int cpt_tiff = 0;
 	int tiff_3D = 1;
 	int cpt_bmp = 0;
@@ -1215,6 +1228,9 @@ void mqOpenDataReaction::OpenData()
 			std::string LMKext2(".LMK");
 			std::string TPSext(".tps");
 			std::string TPSext2(".TPS");
+			std::string FCSVext(".fcsv");
+			std::string FCSVext2(".FCSV");
+
 			std::string PTSext(".pts");
 			std::string PTSext2(".PTS");
 			std::string TAGext(".tag");
@@ -1382,7 +1398,13 @@ void mqOpenDataReaction::OpenData()
 				cout << "TPS" << endl;
 				type = 15; //TPS
 			}
-
+			found = fileName.toStdString().find(FCSVext);
+			found2 = fileName.toStdString().find(FCSVext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+				cout << "FCSV" << endl;
+				type = 19; //TPS
+			}
 			found = fileName.toStdString().find(RAWext);
 			found2 = fileName.toStdString().find(RAWext2);
 			if (found != std::string::npos || found2 != std::string::npos)
@@ -1498,6 +1520,10 @@ void mqOpenDataReaction::OpenData()
 				
 					//do nothing!
 				
+			}
+			else if (type == 19)
+			{
+				mqMorphoDigCore::instance()->OpenFCSV(fileName, 0);
 			}
 			
 		}

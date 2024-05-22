@@ -6014,6 +6014,103 @@ void mqMorphoDigCore::OpenTPS(QString fileName, int mode)
 
 }
 
+void mqMorphoDigCore::OpenFCSV(QString fileName, int mode)
+{// mode : 0 for normal landmarks
+ // mode : 1 for target landmarks
+ // mode : 2 for curve node landmarks
+ // mode : 3 for curve handle landmarks
+	double  x, y, z;
+	QString LMKName;
+	//Open a landmark file!
+
+	cout << "Open a fcsv file" << endl;
+	size_t  length;
+
+
+	length = fileName.toStdString().length();
+
+	int done = 0;
+	if (length > 0)
+	{
+		int file_exists = 1;
+		std::ifstream file(fileName.toLocal8Bit());
+		if (file)
+		{
+			//std::cout<<"file:"<<filename.c_str()<<" exists."<<std::endl;
+			file.close();
+		}
+		else
+		{
+
+			//std::cout << "file:" << fileName.toLocal8Bit() << " does not exists." << std::endl;
+			file_exists = 0;
+		}
+
+		if (file_exists == 1)
+		{
+
+			std::string FCSVext(".fcsv");
+			std::string FCSVext2(".FCSV");
+
+			std::size_t found = fileName.toStdString().find(FCSVext);
+			std::size_t found2 = fileName.toStdString().find(FCSVext2);
+			if (found != std::string::npos || found2 != std::string::npos)
+			{
+
+				//filein = fopen(fileName.toLocal8Bit(), "rt");
+				QFile inputFile(fileName);
+				int ok = 0;
+
+				if (inputFile.open(QIODevice::ReadOnly))
+				{
+					QTextStream in(&inputFile);
+					QString line0 = in.readLine(); // first line is not interesting
+					QString line1 = in.readLine(); // second line is not interesting
+					QString line2 = in.readLine(); // third line is not interesting
+					//Neverthe less, try to get landmark number!
+					int equal = line0.indexOf("=");
+					int numLM = 1000000;
+					if (equal != -1)
+					{
+						int num = line0.size() - equal - 1;
+						cout << "TPS: length landmark to read:" << num << endl;
+						QString snumLM = line0.right(num);
+						cout << "Result:" << snumLM.toStdString() << endl;
+						numLM = snumLM.toInt();
+						cout << "numLM:" << numLM << endl;
+					}
+					int cpt = 0;
+					while (!in.atEnd() && cpt < numLM)
+					{
+
+						QString line = in.readLine();
+						QTextStream myteststream(&line);
+						myteststream >> x >> y >> z;
+						double coord[3] = { x,y,z };
+						double ori[3];
+
+						ori[0] = 0;
+						ori[1] = 0;
+						ori[2] = 1;
+
+						this->CreateLandmark(coord, ori, mode);
+						cpt++;
+					}
+					this->CreateLandmarkUndoSet(mode, cpt);
+					/**/
+
+					inputFile.close();
+
+
+				}
+
+			}//fin if																		
+
+		}//file exists...
+	}	//length
+	this->Render();
+
+}
 void mqMorphoDigCore::OpenVER(QString fileName, int mode)
 {// mode : 0 for normal landmarks
  // mode : 1 for target landmarks
@@ -11295,6 +11392,9 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 	std::string LMKext2 = ".LMK";
 	std::string TPSext = ".tps";
 	std::string TPSext2 = ".TPS";
+	std::string FCSVext = ".fcsv";
+	std::string FCSVext2 = ".FCSV";
+
 	std::string PTSext = ".pts";
 
 	std::string PTSext2 = ".PTS";
@@ -11329,13 +11429,22 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 			fileName.append(".pts");
 		}
 	}
-	else
+	else if (save_format ==3)
 	{
 		std::size_t found = fileName.toStdString().find(TPSext);
 		std::size_t found2 = fileName.toStdString().find(TPSext2);
 		if (found == std::string::npos && found2 == std::string::npos)
 		{
 			fileName.append(".tps");
+		}
+	}
+	else if (save_format == 4)
+	{
+		std::size_t found = fileName.toStdString().find(FCSVext);
+		std::size_t found2 = fileName.toStdString().find(FCSVext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".fcsv");
 		}
 	}
 	QString onlyFileName(info.fileName().left(info.fileName().length() - 4));
@@ -11385,7 +11494,10 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		{
 			stream << "LM=" << tot_lm_number << Qt::endl;
 		}
-
+		else if (save_format == 4)
+		{
+			stream << "LM=" << tot_lm_number << Qt::endl;
+		}
 		if (save_other_lmks == 1)
 		{
 			vtkLMActor  * normal, *target;
@@ -11418,6 +11530,10 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 3)
+					{
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
+					}
+					else if (save_format == 4)
 					{
 						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
@@ -11456,6 +11572,10 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 						stream << "S" << csi.c_str() << ci << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
 					else if (save_format == 3)
+					{
+						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
+					}
+					else if (save_format == 4)
 					{
 						stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 					}
@@ -12384,6 +12504,17 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 			fileName.append(".tps");
 		}
 	}
+	if (file_type == 4)
+	{
+		std::string FCSVext = ".fcsv";
+		std::string FCSVext2 = ".FCSV";
+		std::size_t found = fileName.toStdString().find(FCSVext);
+		std::size_t found2 = fileName.toStdString().find(FCSVext2);
+		if (found == std::string::npos && found2 == std::string::npos)
+		{
+			fileName.append(".fcsv");
+		}
+	}
 	QString onlyFileName(info.fileName().left(info.fileName().length() - 4));
 
 
@@ -12404,6 +12535,10 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 			stream << num_lmk << Qt::endl;
 		}
 		if (file_type == 3)
+		{
+			stream << "LM=" << num_lmk << Qt::endl;
+		}
+		if (file_type == 4)
 		{
 			stream << "LM=" << num_lmk << Qt::endl;
 		}
@@ -12437,6 +12572,10 @@ int mqMorphoDigCore::SaveLandmarkFile(QString fileName, int lm_type, int file_ty
 					stream << "S" << csi.c_str() << i  << " " << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 				}
 				else if (file_type == 3)
+				{
+					stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
+				}
+				else if (file_type == 4)
 				{
 					stream << lmpos[0] << " " << lmpos[1] << " " << lmpos[2] << Qt::endl;
 				}

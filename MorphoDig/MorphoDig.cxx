@@ -1455,6 +1455,8 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		std::string VTIext2(".VTI");
 		std::string TPSext(".tps");
 		std::string TPSext2(".TPS");
+		std::string FCSVext(".fcsv");
+		std::string FCSVext2(".FCSV");
 		std::string PTSext(".pts");
 		std::string PTSext2(".PTS");
 		std::string RAWext(".raw");
@@ -1604,7 +1606,12 @@ void MorphoDig::dropEvent(QDropEvent *e)
 		{
 			type = 15; //TPS
 		}
-		
+		found = fileName.toStdString().find(FCSVext);
+		found2 = fileName.toStdString().find(FCSVext2);
+		if (found != std::string::npos || found2 != std::string::npos)
+		{
+			type = 19; //FCSV
+		}
 
 		found = fileName.toStdString().find(RAWext);
 		found2 = fileName.toStdString().find(RAWext2);
@@ -1722,6 +1729,10 @@ void MorphoDig::dropEvent(QDropEvent *e)
 			
 				//do nothing!
 			
+		}
+		else if (type == 19)
+		{
+			mqMorphoDigCore::instance()->OpenFCSV(fileName, 0);
 		}
 
 	}

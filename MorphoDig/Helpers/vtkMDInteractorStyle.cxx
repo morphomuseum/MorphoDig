@@ -610,7 +610,7 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 			
 			QStringList filenames = QFileDialog::getOpenFileNames(mqCoreUtilities::mainWidget(),
 				QObject::tr("Load data"), mqMorphoDigCore::instance()->Getmui_LastUsedDir(),
-				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff *.bmp *.png *.dcm *.ima )"));
+				QObject::tr("MorphoDig data or project (*.ntw *.ver *.cur *.stv *.tag *.tgp *.pos *.ori *.flg *.lmk *.tps *.fcsv *.pts *.ply *.stl *.vtk *.obj *.vtp *.mha *.mhd *.vti *.raw *.tif *.tiff *.bmp *.png *.dcm *.ima )"));
 			int cpt_tiff = 0;
 			int tiff_3D = 1;
 			int cpt_bmp = 0;
@@ -725,6 +725,8 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 					std::string VERext2(".VER");
 					std::string TPSext(".tps");
 					std::string TPSext2(".TPS");
+					std::string FCSVext(".fcsv");
+					std::string FCSVext2(".FCSV");
 					std::string PTSext(".pts");
 					std::string PTSext2(".PTS");
 					std::string CURext(".cur");
@@ -897,6 +899,13 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 					{
 						type = 15; //TPS
 					}
+					found = fileName.toStdString().find(FCSVext);
+					found2 = fileName.toStdString().find(FCSVext2);
+					if (found != std::string::npos || found2 != std::string::npos)
+					{
+						type = 19; //FCSV
+					}
+
 					found = fileName.toStdString().find(RAWext);
 					found2 = fileName.toStdString().find(RAWext2);
 					if (found != std::string::npos || found2 != std::string::npos)
@@ -1012,6 +1021,10 @@ void vtkMDInteractorStyle::EndLandmarkMovements()
 
 						//do nothing!
 
+					}
+					else if (type == 19)
+					{
+						mqMorphoDigCore::instance()->OpenFCSV(fileName, 0);
 					}
 
 

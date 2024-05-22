@@ -691,6 +691,8 @@ public:
 	void ExportAvizoLandmarks(QString fileName);
 	void OpenLMK(QString fileName, int mode);
 	void OpenTPS(QString fileName, int mode);
+	void OpenFCSV(QString fileName, int mode);
+
 	void OpenPTS(QString fileName, int mode);
 	int OpenMesh(QString fileName);
 	void OpenVolume(QString fileName, vtkMDVolume *myVolume = NULL, int isMSK = 0);

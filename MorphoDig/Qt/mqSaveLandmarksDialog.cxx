@@ -145,6 +145,14 @@ void mqSaveLandmarksDialog::slotSaveLandmarkFile()
 			//, QFileDialog::DontConfirmOverwrite
 		);
 	}
+	if (this->Ui->FCSV->isChecked())
+	{
+		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
+			tr("Save Landmark files"), mqMorphoDigCore::instance()->Getmui_LastUsedDir() + proposedName,
+			tr("Landmark file (*.fcsv)"), NULL
+			//, QFileDialog::DontConfirmOverwrite
+		);
+	}
 	if (this->Ui->PTS->isChecked())
 	{
 		fileName = QFileDialog::getSaveFileName(mqMorphoDigCore::instance()->GetMainWindow(),
@@ -165,7 +173,8 @@ void mqSaveLandmarksDialog::slotSaveLandmarkFile()
 	else if (this->Ui->LMK->isChecked()) { file_type = 1; }
 	else if (this->Ui->PTS->isChecked()) { file_type = 2; }
 	else if (this->Ui->TPS->isChecked()) { file_type = 3; }
-	
+	else if (this->Ui->FCSV->isChecked()) { file_type = 4; }
+
 
 	if (this->Ui->SaveOnlySelected->isChecked()) { save_only_selected = 1; }
 	else if (this->Ui->SaveAll->isChecked()) { save_only_selected = 0; }

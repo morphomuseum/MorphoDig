@@ -926,7 +926,7 @@
       <x>20</x>
       <y>20</y>
       <width>301</width>
-      <height>131</height>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
@@ -938,7 +938,7 @@
        <x>20</x>
        <y>20</y>
        <width>270</width>
-       <height>88</height>
+       <height>115</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout1">
@@ -967,6 +967,13 @@
        <widget class="QRadioButton" name="TPS">
         <property name="text">
          <string>.TPS File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="FCSV">
+        <property name="text">
+         <string>.FCSV File</string>
         </property>
        </widget>
       </item>
