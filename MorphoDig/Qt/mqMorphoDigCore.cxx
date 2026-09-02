@@ -11656,7 +11656,7 @@ int mqMorphoDigCore::SaveCURasVERFile(QString fileName, int default_decimation, 
 		}
 
 		//if (decimation > 1 && decimation < nint)
-		if (decimation < nint)
+		if (decimation <= nint)
 		{
 
 			int cpt = 0;
@@ -20232,7 +20232,8 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 				vtkSmartPointer<vtkPolyData> observedMoved = vtkSmartPointer<vtkPolyData>::New();
 				observedMoved->DeepCopy(vtkPolyData::SafeDownCast(mObservedPD));
 				
-
+				cout << "Try to compute observedMoved"<< endl;
+				
 				for (vtkIdType i = 0; i < observedMoved->GetNumberOfPoints(); i++) {
 					// for every triangle 
 					observedMoved->GetPoint(i, ve_obs_init_pos);
@@ -20241,17 +20242,20 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					observedMoved->GetPoints()->SetPoint((vtkIdType)i, ve_obs_final_pos);
 				}
 
-
+				cout << "Try to make KDTree" << endl;
 				kDTree->SetDataSet(observedMoved);
 				
 				kDTree->BuildLocator();
-
+				cout << "Sart loop on vertices" << endl;
 				for (ve = 0; ve < numvert; ve++)
 				{
 					min_dist = max_thickness;
-					if ((ve % (int)(numvert / 100)) == 0)
+					if (numvert > 100)
 					{
-						emit thicknessProgression((int)(100 * ve / numvert));
+						if ((ve % (int)(numvert / 100)) == 0)
+						{
+							emit thicknessProgression((int)(100 * ve / numvert));
+						}
 					}
 					//progress.setValue(ve);
 					/*if (progress.wasCanceled())
@@ -20271,7 +20275,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 					if (ve < 10)
 					{
-						//cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+						cout << "ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
 					}
 					vtkSmartPointer<vtkIdList> connectedVertices = vtkSmartPointer<vtkIdList>::New();
 					//ptn will be the average norm of all connected vertices.
@@ -20283,21 +20287,21 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					{
 						if (ve < 10)
 						{
-							//cout << "no ptn avg!" << endl;
+							cout << "no ptn avg!" << endl;
 						}
 
 
 					}
 					mqMorphoDigCore::RotateNorm(impMat, ven_imp_init_pos, ptn);
 					if (ve < 10) {
-					//	cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << endl;
-					//	cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << endl;
+						cout << "ven_imp_init_pos=" << ven_imp_init_pos[0] << "|" << ven_imp_init_pos[1] << "|" << ven_imp_init_pos[2] << "|" << endl;
+						cout << "ptn=" << ptn[0] << "|" << ptn[1] << "|" << ptn[2] << "|" << endl;
 
 					}
 
 					if (ve < 10)
 					{
-						//cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
+						cout << "avg ptn" << ptn[0] << "," << ptn[1] << "," << ptn[2] << endl;
 					}
 
 						////self thickness : look for norms in other directions!
@@ -20318,24 +20322,28 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 
 
-					//if (ve<10){std::cout << "Connected vertices: ";}
+					if (ve<10){std::cout << "Connected vertices: ";}
 					double newscalar = 0;
-					/*if (ve < 10)
+					if (ve < 10)
 					{
-					cout << "found" << neighbours->GetNumberOfIds() << " neighbours" << endl;
-					}*/
+					cout << "found" << observedNeighbours->GetNumberOfIds() << " neighbours" << endl;
+					}
 
 					std::vector<double> thicknesses;
 					int cpt = 0;
 
 
-
+					if (ve < 10) {
+						std::cout << "vertex " << ve << endl;	
+						std::cout << "Start to loop on j" << endl;
+					
+					}
 
 
 					for (vtkIdType j = 0; j < observedNeighbours->GetNumberOfIds(); j++)
 					{
 
-						//if (ve<10){std::cout << connectedVertices->GetId(j) << " ";}
+						//if (ve<10){std::cout <<"vertex"<<ve << ", neighbour" << connectedVertices->GetId(j) << " "<<endl; }
 						vtkIdType observedConnectedVertex = observedNeighbours->GetId(j);
 						if (ve != observedConnectedVertex || impactedActor != observedActor)// to cases: 1) self observation= we don't want to compare 1 vertex with itself; 2) comparison, then impacted and observed lists do not have links
 						{
@@ -20424,7 +20432,7 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 
 					}
 
-					// if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
+					 if (ve<10){std::cout<<"New Scalar value at "<<ve<<"="<<newscalar<<std::endl;}	
 					if (avg <= 1 || cpt == 0 )
 					{
 
@@ -20432,10 +20440,10 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 					}
 					else
 					{
-						/*if (ve < 10)
+						if (ve < 10)
 						{
 						cout << "try to sort thicknesses"  << endl;
-						}*/
+						}
 						std::sort(thicknesses.begin(), thicknesses.end());
 						double thick_avg = 0;
 						double mavg = avg;// in some cases there are less thickness candidates thant avg => the avg thickness will be done using less than "avg" nr of candidates.
@@ -20448,14 +20456,14 @@ void mqMorphoDigCore::scalarsThicknessBetween(double max_thickness, int smooth_n
 						newScalars->InsertTuple1(ve, thick_avg);
 						if (ve < 10)
 						{
-							//cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << endl;
+							cout << "Avg thickness=" << thick_avg << ", max min thickness=" << min_dist << endl;
 						}
 
 					}
 
 
 				}
-				//std::cout<<"New Scalar computation done "<<std::endl;
+				std::cout<<"New Scalar computation done "<<std::endl;
 
 				newScalars->SetName(mScalarName.c_str());
 				// test if exists...
